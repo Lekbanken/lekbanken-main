@@ -1,0 +1,2721 @@
+﻿{
+    "id":  "domains/admin",
+    "updatedAt":  "2026-01-27T21:07:26Z",
+    "generatedBy":  "generate-inventory-v3.ps1",
+    "nodes":  [
+                  {
+                      "id":  "route:app/admin/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/page.tsx",
+                      "path":  "app/admin/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/(system)/audit-logs/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/(system)/audit-logs/page.tsx",
+                      "path":  "app/admin/(system)/audit-logs/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/(system)/audit-logs/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/(system)/legal/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/(system)/legal/page.tsx",
+                      "path":  "app/admin/(system)/legal/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/(system)/legal/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/(system)/legal/[docType]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/(system)/legal/[docType]/page.tsx",
+                      "path":  "app/admin/(system)/legal/[docType]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/(system)/legal/[docType]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/(system)/system-health/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/(system)/system-health/page.tsx",
+                      "path":  "app/admin/(system)/system-health/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/(system)/system-health/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/achievements/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/achievements/page.tsx",
+                      "path":  "app/admin/achievements/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/achievements/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/achievements-advanced/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/achievements-advanced/page.tsx",
+                      "path":  "app/admin/achievements-advanced/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/achievements-advanced/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/analytics/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/analytics/page.tsx",
+                      "path":  "app/admin/analytics/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/analytics/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/analytics/errors/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/analytics/errors/page.tsx",
+                      "path":  "app/admin/analytics/errors/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/analytics/errors/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/api-keys/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/api-keys/page.tsx",
+                      "path":  "app/admin/api-keys/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/api-keys/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/billing/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/billing/page.tsx",
+                      "path":  "app/admin/billing/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/billing/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/billing/analytics/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/billing/analytics/page.tsx",
+                      "path":  "app/admin/billing/analytics/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/billing/analytics/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/billing/dunning/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/billing/dunning/page.tsx",
+                      "path":  "app/admin/billing/dunning/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/billing/dunning/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/billing/invoices/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/billing/invoices/page.tsx",
+                      "path":  "app/admin/billing/invoices/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/billing/invoices/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/billing/promo-codes/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/billing/promo-codes/page.tsx",
+                      "path":  "app/admin/billing/promo-codes/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/billing/promo-codes/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/billing/subscriptions/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/billing/subscriptions/page.tsx",
+                      "path":  "app/admin/billing/subscriptions/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/billing/subscriptions/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/billing/usage/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/billing/usage/page.tsx",
+                      "path":  "app/admin/billing/usage/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/billing/usage/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/content/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/content/page.tsx",
+                      "path":  "app/admin/content/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/content/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/cookies/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/cookies/page.tsx",
+                      "path":  "app/admin/cookies/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/cookies/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/demo/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/demo/page.tsx",
+                      "path":  "app/admin/demo/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/demo/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "role_gate",
+                                     "flag_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/design/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/design/page.tsx",
+                      "path":  "app/admin/design/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/design/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/feature-flags/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/feature-flags/page.tsx",
+                      "path":  "app/admin/feature-flags/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/feature-flags/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/games/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/games/page.tsx",
+                      "path":  "app/admin/games/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/games/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/games/new/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/games/new/page.tsx",
+                      "path":  "app/admin/games/new/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/games/new/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/games/[gameId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/games/[gameId]/page.tsx",
+                      "path":  "app/admin/games/[gameId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/games/[gameId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/games/[gameId]/edit/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/games/[gameId]/edit/page.tsx",
+                      "path":  "app/admin/games/[gameId]/edit/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/games/[gameId]/edit/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/page.tsx",
+                      "path":  "app/admin/gamification/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/achievements/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/achievements/page.tsx",
+                      "path":  "app/admin/gamification/achievements/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/achievements/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/analytics/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/analytics/page.tsx",
+                      "path":  "app/admin/gamification/analytics/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/analytics/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/automation/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/automation/page.tsx",
+                      "path":  "app/admin/gamification/automation/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/automation/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/awards/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/awards/page.tsx",
+                      "path":  "app/admin/gamification/awards/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/awards/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/campaigns/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/campaigns/page.tsx",
+                      "path":  "app/admin/gamification/campaigns/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/campaigns/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/campaigns/[campaignId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/campaigns/[campaignId]/page.tsx",
+                      "path":  "app/admin/gamification/campaigns/[campaignId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/campaigns/[campaignId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/dashboard/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/dashboard/page.tsx",
+                      "path":  "app/admin/gamification/dashboard/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/dashboard/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/dicecoin-xp/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/dicecoin-xp/page.tsx",
+                      "path":  "app/admin/gamification/dicecoin-xp/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/dicecoin-xp/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/levels/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/levels/page.tsx",
+                      "path":  "app/admin/gamification/levels/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/levels/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/library-exports/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/library-exports/page.tsx",
+                      "path":  "app/admin/gamification/library-exports/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/library-exports/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/gamification/shop-rewards/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/gamification/shop-rewards/page.tsx",
+                      "path":  "app/admin/gamification/shop-rewards/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/gamification/shop-rewards/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/incidents/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/incidents/page.tsx",
+                      "path":  "app/admin/incidents/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/incidents/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/leaderboard/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/leaderboard/page.tsx",
+                      "path":  "app/admin/leaderboard/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/leaderboard/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/learning/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/learning/page.tsx",
+                      "path":  "app/admin/learning/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/learning/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/learning/courses/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/learning/courses/page.tsx",
+                      "path":  "app/admin/learning/courses/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/learning/courses/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/learning/paths/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/learning/paths/page.tsx",
+                      "path":  "app/admin/learning/paths/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/learning/paths/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/learning/reports/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/learning/reports/page.tsx",
+                      "path":  "app/admin/learning/reports/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/learning/reports/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/learning/requirements/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/learning/requirements/page.tsx",
+                      "path":  "app/admin/learning/requirements/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/learning/requirements/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/library/badges/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/library/badges/page.tsx",
+                      "path":  "app/admin/library/badges/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/library/badges/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/library/coach-diagrams/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/library/coach-diagrams/page.tsx",
+                      "path":  "app/admin/library/coach-diagrams/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/library/coach-diagrams/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/library/coach-diagrams/[diagramId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/library/coach-diagrams/[diagramId]/page.tsx",
+                      "path":  "app/admin/library/coach-diagrams/[diagramId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/library/coach-diagrams/[diagramId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/licenses/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/licenses/page.tsx",
+                      "path":  "app/admin/licenses/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/licenses/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/marketing/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/marketing/page.tsx",
+                      "path":  "app/admin/marketing/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/marketing/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/marketing/features/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/marketing/features/page.tsx",
+                      "path":  "app/admin/marketing/features/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/marketing/features/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/marketing/updates/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/marketing/updates/page.tsx",
+                      "path":  "app/admin/marketing/updates/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/marketing/updates/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/marketplace/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/marketplace/page.tsx",
+                      "path":  "app/admin/marketplace/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/marketplace/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/media/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/media/page.tsx",
+                      "path":  "app/admin/media/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/media/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/moderation/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/moderation/page.tsx",
+                      "path":  "app/admin/moderation/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/moderation/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/notifications/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/notifications/page.tsx",
+                      "path":  "app/admin/notifications/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/notifications/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/organisations/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/organisations/page.tsx",
+                      "path":  "app/admin/organisations/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/organisations/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/organisations/[tenantId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/organisations/[tenantId]/page.tsx",
+                      "path":  "app/admin/organisations/[tenantId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/organisations/[tenantId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/participants/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/participants/page.tsx",
+                      "path":  "app/admin/participants/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/participants/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/participants/[participantId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/participants/[participantId]/page.tsx",
+                      "path":  "app/admin/participants/[participantId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/participants/[participantId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/personalization/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/personalization/page.tsx",
+                      "path":  "app/admin/personalization/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/personalization/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/planner/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/planner/page.tsx",
+                      "path":  "app/admin/planner/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/planner/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/planner/[planId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/planner/[planId]/page.tsx",
+                      "path":  "app/admin/planner/[planId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/planner/[planId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/planner/[planId]/versions/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/planner/[planId]/versions/page.tsx",
+                      "path":  "app/admin/planner/[planId]/versions/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/planner/[planId]/versions/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/play/sessions/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/play/sessions/page.tsx",
+                      "path":  "app/admin/play/sessions/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/play/sessions/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/products/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/products/page.tsx",
+                      "path":  "app/admin/products/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/products/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/products/images/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/products/images/page.tsx",
+                      "path":  "app/admin/products/images/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/products/images/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/products/[productId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/products/[productId]/page.tsx",
+                      "path":  "app/admin/products/[productId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/products/[productId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/purposes/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/purposes/page.tsx",
+                      "path":  "app/admin/purposes/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/purposes/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/release-notes/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/release-notes/page.tsx",
+                      "path":  "app/admin/release-notes/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/release-notes/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/sessions/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/sessions/page.tsx",
+                      "path":  "app/admin/sessions/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/sessions/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/sessions/[sessionId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/sessions/[sessionId]/page.tsx",
+                      "path":  "app/admin/sessions/[sessionId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/sessions/[sessionId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/settings/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/settings/page.tsx",
+                      "path":  "app/admin/settings/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/settings/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/support/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/support/page.tsx",
+                      "path":  "app/admin/support/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/support/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/support/automation/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/support/automation/page.tsx",
+                      "path":  "app/admin/support/automation/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/support/automation/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/support/bugs/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/support/bugs/page.tsx",
+                      "path":  "app/admin/support/bugs/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/support/bugs/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/support/feedback/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/support/feedback/page.tsx",
+                      "path":  "app/admin/support/feedback/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/support/feedback/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/support/kb/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/support/kb/page.tsx",
+                      "path":  "app/admin/support/kb/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/support/kb/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/support/notifications/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/support/notifications/page.tsx",
+                      "path":  "app/admin/support/notifications/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/support/notifications/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/analytics/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/analytics/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/analytics/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/analytics/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/billing/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/billing/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/billing/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/billing/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/content/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/content/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/content/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/content/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/games/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/games/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/games/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/games/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/gamification/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/gamification/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/gamification/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/gamification/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/gamification/achievements/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/gamification/achievements/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/gamification/achievements/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/gamification/achievements/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/legal/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/legal/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/legal/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/legal/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/legal/[docType]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/legal/[docType]/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/legal/[docType]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/legal/[docType]/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/licenses/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/licenses/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/licenses/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/licenses/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/members/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/members/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/members/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/members/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/participants/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/participants/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/participants/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/participants/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/participants/[participantId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/participants/[participantId]/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/participants/[participantId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/participants/[participantId]/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/security/mfa/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/security/mfa/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/security/mfa/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/security/mfa/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/security/mfa/users/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/security/mfa/users/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/security/mfa/users/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/security/mfa/users/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/sessions/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/sessions/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/sessions/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/sessions/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/settings/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/settings/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/settings/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/settings/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tenant/[tenantId]/subscription/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tenant/[tenantId]/subscription/page.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/subscription/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.45,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tenant/[tenantId]/subscription/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "security-critical; requires audit"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tickets/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tickets/page.tsx",
+                      "path":  "app/admin/tickets/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tickets/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/toolbelt/conversation-cards/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/toolbelt/conversation-cards/page.tsx",
+                      "path":  "app/admin/toolbelt/conversation-cards/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/toolbelt/conversation-cards/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/toolbelt/conversation-cards/new/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/toolbelt/conversation-cards/new/page.tsx",
+                      "path":  "app/admin/toolbelt/conversation-cards/new/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/toolbelt/conversation-cards/new/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/toolbelt/conversation-cards/[collectionId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/toolbelt/conversation-cards/[collectionId]/page.tsx",
+                      "path":  "app/admin/toolbelt/conversation-cards/[collectionId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/toolbelt/conversation-cards/[collectionId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/toolbelt/conversation-cards/[collectionId]/import/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/toolbelt/conversation-cards/[collectionId]/import/page.tsx",
+                      "path":  "app/admin/toolbelt/conversation-cards/[collectionId]/import/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/toolbelt/conversation-cards/[collectionId]/import/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/tools/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/tools/page.tsx",
+                      "path":  "app/admin/tools/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/tools/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/translations/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/translations/page.tsx",
+                      "path":  "app/admin/translations/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/translations/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/translations/audit/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/translations/audit/page.tsx",
+                      "path":  "app/admin/translations/audit/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/translations/audit/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/translations/content/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/translations/content/page.tsx",
+                      "path":  "app/admin/translations/content/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/translations/content/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/translations/content/[domain]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/translations/content/[domain]/page.tsx",
+                      "path":  "app/admin/translations/content/[domain]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/translations/content/[domain]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/translations/content/[domain]/[itemId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/translations/content/[domain]/[itemId]/page.tsx",
+                      "path":  "app/admin/translations/content/[domain]/[itemId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/translations/content/[domain]/[itemId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/translations/missing/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/translations/missing/page.tsx",
+                      "path":  "app/admin/translations/missing/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/translations/missing/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/translations/[namespace]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/translations/[namespace]/page.tsx",
+                      "path":  "app/admin/translations/[namespace]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/translations/[namespace]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/users/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/users/page.tsx",
+                      "path":  "app/admin/users/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/users/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "route:app/admin/webhooks/page.tsx",
+                      "type":  "route",
+                      "name":  "app/admin/webhooks/page.tsx",
+                      "path":  "app/admin/webhooks/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/admin/webhooks/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "layout:app/admin/layout.tsx",
+                      "type":  "layout",
+                      "name":  "app/admin/layout.tsx",
+                      "path":  "app/admin/layout.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "layout.tsx under app router: app/admin/layout.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js layout",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "layout:app/admin/(system)/layout.tsx",
+                      "type":  "layout",
+                      "name":  "app/admin/(system)/layout.tsx",
+                      "path":  "app/admin/(system)/layout.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "layout.tsx under app router: app/admin/(system)/layout.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js layout",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "layout:app/admin/tenant/[tenantId]/layout.tsx",
+                      "type":  "layout",
+                      "name":  "app/admin/tenant/[tenantId]/layout.tsx",
+                      "path":  "app/admin/tenant/[tenantId]/layout.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "layout.tsx under app router: app/admin/tenant/[tenantId]/layout.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  [
+                                     "tenant_gate",
+                                     "role_gate"
+                                 ],
+                      "risk":  "medium",
+                      "notes":  "Next.js layout",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "server_action:app/admin/support/automation/page.tsx",
+                      "type":  "server_action",
+                      "name":  "app/admin/support/automation/page.tsx",
+                      "path":  "app/admin/support/automation/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "import_path",
+                                                          "detail":  "Inline \u0027use server\u0027 directive in app/admin/support/automation/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "high",
+                      "notes":  "Server action file",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  },
+                  {
+                      "id":  "server_action:app/admin/translations/content/[domain]/[itemId]/page.tsx",
+                      "type":  "server_action",
+                      "name":  "app/admin/translations/content/[domain]/[itemId]/page.tsx",
+                      "path":  "app/admin/translations/content/[domain]/[itemId]/page.tsx",
+                      "ownerDomain":  "admin",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "import_path",
+                                                          "detail":  "Inline \u0027use server\u0027 directive in app/admin/translations/content/[domain]/[itemId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "role_gate",
+                      "risk":  "high",
+                      "notes":  "Server action file",
+                      "runtime_scope":  "prod",
+                      "exposure":  "admin_only"
+                  }
+              ],
+    "nodeCount":  117
+}

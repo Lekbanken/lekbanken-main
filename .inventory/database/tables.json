@@ -1,0 +1,3324 @@
+﻿{
+    "id":  "database/tables",
+    "updatedAt":  "2026-01-27T21:08:14Z",
+    "generatedBy":  "generate-inventory-v3.ps1",
+    "nodes":  [
+                  {
+                      "id":  "db_table:achievement_leaderboards",
+                      "type":  "db_table",
+                      "name":  "achievement_leaderboards",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027achievement_leaderboards\u0027) in app/admin/leaderboard/_legacy-page.tsx:145"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:achievements",
+                      "type":  "db_table",
+                      "name":  "achievements",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027achievements\u0027) in app/actions/achievements-admin.ts:116"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:analytics_timeseries",
+                      "type":  "db_table",
+                      "name":  "analytics_timeseries",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:billing_accounts",
+                      "type":  "db_table",
+                      "name":  "billing_accounts",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027billing_accounts\u0027) in app/api/billing/create-subscription/route.ts:81"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:billing_events",
+                      "type":  "db_table",
+                      "name":  "billing_events",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027billing_events\u0027) in app/api/billing/webhooks/stripe/route.ts:268"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:billing_history",
+                      "type":  "db_table",
+                      "name":  "billing_history",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027billing_history\u0027) in lib/services/billingService.ts:271"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:billing_plans",
+                      "type":  "db_table",
+                      "name":  "billing_plans",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027billing_plans\u0027) in lib/services/billingService.ts:30"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:billing_product_features",
+                      "type":  "db_table",
+                      "name":  "billing_product_features",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:billing_products",
+                      "type":  "db_table",
+                      "name":  "billing_products",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027billing_products\u0027) in app/api/billing/create-subscription/route.ts:154"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:browse_search_logs",
+                      "type":  "db_table",
+                      "name":  "browse_search_logs",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027browse_search_logs\u0027) in app/api/games/search/route.ts:206"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:bug_reports",
+                      "type":  "db_table",
+                      "name":  "bug_reports",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027bug_reports\u0027) in app/actions/bug-reports-admin.ts:104"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:challenge_participation",
+                      "type":  "db_table",
+                      "name":  "challenge_participation",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027challenge_participation\u0027) in lib/services/achievementsAdvancedService.ts:145"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:coin_transactions",
+                      "type":  "db_table",
+                      "name":  "coin_transactions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027coin_transactions\u0027) in app/api/gamification/route.ts:222"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:collection_items",
+                      "type":  "db_table",
+                      "name":  "collection_items",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027collection_items\u0027) in lib/services/contentService.ts:411"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:community_challenges",
+                      "type":  "db_table",
+                      "name":  "community_challenges",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027community_challenges\u0027) in lib/services/achievementsAdvancedService.ts:89"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:content_analytics",
+                      "type":  "db_table",
+                      "name":  "content_analytics",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027content_analytics\u0027) in lib/services/contentService.ts:481"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:content_collections",
+                      "type":  "db_table",
+                      "name":  "content_collections",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027content_collections\u0027) in lib/services/contentService.ts:334"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:content_filter_rules",
+                      "type":  "db_table",
+                      "name":  "content_filter_rules",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027content_filter_rules\u0027) in lib/services/moderationService.ts:174"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:content_items",
+                      "type":  "db_table",
+                      "name":  "content_items",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027content_items\u0027) in lib/services/contentService.ts:66"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:content_preferences",
+                      "type":  "db_table",
+                      "name":  "content_preferences",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027content_preferences\u0027) in lib/services/personalizationService.ts:452"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:content_reports",
+                      "type":  "db_table",
+                      "name":  "content_reports",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027content_reports\u0027) in lib/services/moderationService.ts:93"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:content_schedules",
+                      "type":  "db_table",
+                      "name":  "content_schedules",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027content_schedules\u0027) in lib/services/contentService.ts:184"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:error_tracking",
+                      "type":  "db_table",
+                      "name":  "error_tracking",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027error_tracking\u0027) in app/admin/analytics/errors/page.tsx:88"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:event_rewards",
+                      "type":  "db_table",
+                      "name":  "event_rewards",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027event_rewards\u0027) in lib/services/achievementsAdvancedService.ts:258"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:feature_usage",
+                      "type":  "db_table",
+                      "name":  "feature_usage",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027feature_usage\u0027) in lib/services/analyticsService.ts:331"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:feedback",
+                      "type":  "db_table",
+                      "name":  "feedback",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027feedback\u0027) in app/actions/feedback-admin.ts:102"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:friend_requests",
+                      "type":  "db_table",
+                      "name":  "friend_requests",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027friend_requests\u0027) in lib/services/socialService.ts:55"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:friends",
+                      "type":  "db_table",
+                      "name":  "friends",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027friends\u0027) in lib/services/socialService.ts:90"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:funnel_analytics",
+                      "type":  "db_table",
+                      "name":  "funnel_analytics",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027funnel_analytics\u0027) in lib/services/analyticsService.ts:586"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:game_media",
+                      "type":  "db_table",
+                      "name":  "game_media",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027game_media\u0027) in app/api/games/builder/route.ts:28"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:game_scores",
+                      "type":  "db_table",
+                      "name":  "game_scores",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027game_scores\u0027) in lib/services/sessionService.ts:129"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:game_secondary_purposes",
+                      "type":  "db_table",
+                      "name":  "game_secondary_purposes",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027game_secondary_purposes\u0027) in app/api/admin/games/bulk/route.ts:253"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:game_sessions",
+                      "type":  "db_table",
+                      "name":  "game_sessions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027game_sessions\u0027) in app/admin/settings/page.tsx:74"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "auth",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:game_translations",
+                      "type":  "db_table",
+                      "name":  "game_translations",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027game_translations\u0027) in scripts/seed-games.ts:794"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:games",
+                      "type":  "db_table",
+                      "name":  "games",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027games\u0027) in app/admin/settings/page.tsx:68"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:interest_profiles",
+                      "type":  "db_table",
+                      "name":  "interest_profiles",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027interest_profiles\u0027) in lib/services/personalizationService.ts:387"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:invoices",
+                      "type":  "db_table",
+                      "name":  "invoices",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027invoices\u0027) in app/api/billing/webhooks/stripe/route.ts:286"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:leaderboards",
+                      "type":  "db_table",
+                      "name":  "leaderboards",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027leaderboards\u0027) in lib/services/leaderboardService.ts:46"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:limited_time_events",
+                      "type":  "db_table",
+                      "name":  "limited_time_events",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027limited_time_events\u0027) in lib/services/achievementsAdvancedService.ts:202"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:marketplace_analytics",
+                      "type":  "db_table",
+                      "name":  "marketplace_analytics",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027marketplace_analytics\u0027) in lib/services/marketplaceService.ts:489"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:media",
+                      "type":  "db_table",
+                      "name":  "media",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027media\u0027) in app/api/admin/coach-diagrams/route.ts:240"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:moderation_actions",
+                      "type":  "db_table",
+                      "name":  "moderation_actions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027moderation_actions\u0027) in lib/services/moderationService.ts:228"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:moderation_analytics",
+                      "type":  "db_table",
+                      "name":  "moderation_analytics",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027moderation_analytics\u0027) in lib/services/moderationService.ts:452"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:moderation_queue",
+                      "type":  "db_table",
+                      "name":  "moderation_queue",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027moderation_queue\u0027) in lib/services/moderationService.ts:351"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:multiplayer_participants",
+                      "type":  "db_table",
+                      "name":  "multiplayer_participants",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027multiplayer_participants\u0027) in lib/services/socialService.ts:355"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:multiplayer_sessions",
+                      "type":  "db_table",
+                      "name":  "multiplayer_sessions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027multiplayer_sessions\u0027) in lib/services/socialService.ts:338"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "auth",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:notification_log",
+                      "type":  "db_table",
+                      "name":  "notification_log",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027notification_log\u0027) in lib/services/notificationsService.ts:369"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:notification_preferences",
+                      "type":  "db_table",
+                      "name":  "notification_preferences",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027notification_preferences\u0027) in app/actions/notifications-user.ts:508"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:notification_read_status",
+                      "type":  "db_table",
+                      "name":  "notification_read_status",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027notification_read_status\u0027) in app/actions/notifications-user.ts:84"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:notifications",
+                      "type":  "db_table",
+                      "name":  "notifications",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027notifications\u0027) in app/actions/notifications-admin.ts:227"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:page_views",
+                      "type":  "db_table",
+                      "name":  "page_views",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027page_views\u0027) in app/api/system/metrics/route.ts:65"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:payment_methods",
+                      "type":  "db_table",
+                      "name":  "payment_methods",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027payment_methods\u0027) in lib/services/billingService.ts:419"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:payments",
+                      "type":  "db_table",
+                      "name":  "payments",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027payments\u0027) in app/api/billing/webhooks/stripe/route.ts:315"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:personalization_events",
+                      "type":  "db_table",
+                      "name":  "personalization_events",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027personalization_events\u0027) in lib/services/personalizationService.ts:265"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:plan_blocks",
+                      "type":  "db_table",
+                      "name":  "plan_blocks",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027plan_blocks\u0027) in app/api/plans/schedules/route.ts:77"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:plan_games",
+                      "type":  "db_table",
+                      "name":  "plan_games",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:plan_notes_private",
+                      "type":  "db_table",
+                      "name":  "plan_notes_private",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:plan_notes_tenant",
+                      "type":  "db_table",
+                      "name":  "plan_notes_tenant",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:plan_play_progress",
+                      "type":  "db_table",
+                      "name":  "plan_play_progress",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027plan_play_progress\u0027) in app/api/journey/feed/route.ts:64"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:plans",
+                      "type":  "db_table",
+                      "name":  "plans",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027plans\u0027) in app/api/journey/feed/route.ts:99"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:player_cosmetics",
+                      "type":  "db_table",
+                      "name":  "player_cosmetics",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027player_cosmetics\u0027) in app/api/cosmetics/loadout/route.ts:62"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:private_subscriptions",
+                      "type":  "db_table",
+                      "name":  "private_subscriptions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027private_subscriptions\u0027) in lib/db/billing.ts:41"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:product_purposes",
+                      "type":  "db_table",
+                      "name":  "product_purposes",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027product_purposes\u0027) in app/api/browse/filters/route.ts:81"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:products",
+                      "type":  "db_table",
+                      "name":  "products",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027products\u0027) in app/api/admin/products/bulk/route.ts:51"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:promo_codes",
+                      "type":  "db_table",
+                      "name":  "promo_codes",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027promo_codes\u0027) in lib/services/marketplaceService.ts:415"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:purposes",
+                      "type":  "db_table",
+                      "name":  "purposes",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027purposes\u0027) in app/api/admin/toolbelt/conversation-cards/import/route.ts:48"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:recommendation_history",
+                      "type":  "db_table",
+                      "name":  "recommendation_history",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027recommendation_history\u0027) in lib/services/personalizationService.ts:330"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:role_permissions",
+                      "type":  "db_table",
+                      "name":  "role_permissions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:saved_items",
+                      "type":  "db_table",
+                      "name":  "saved_items",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027saved_items\u0027) in lib/services/personalizationService.ts:168"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:seasonal_achievements",
+                      "type":  "db_table",
+                      "name":  "seasonal_achievements",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027seasonal_achievements\u0027) in lib/services/achievementsAdvancedService.ts:310"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:seasonal_events",
+                      "type":  "db_table",
+                      "name":  "seasonal_events",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027seasonal_events\u0027) in lib/services/contentService.ts:258"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:session_analytics",
+                      "type":  "db_table",
+                      "name":  "session_analytics",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027session_analytics\u0027) in lib/services/analyticsService.ts:202"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "auth",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:shop_items",
+                      "type":  "db_table",
+                      "name":  "shop_items",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027shop_items\u0027) in app/actions/shop-rewards-admin.ts:137"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:social_leaderboards",
+                      "type":  "db_table",
+                      "name":  "social_leaderboards",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027social_leaderboards\u0027) in lib/services/socialService.ts:224"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:subscription_items",
+                      "type":  "db_table",
+                      "name":  "subscription_items",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:subscriptions",
+                      "type":  "db_table",
+                      "name":  "subscriptions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027subscriptions\u0027) in lib/services/billingService.ts:88"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:support_reports",
+                      "type":  "db_table",
+                      "name":  "support_reports",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:support_tickets",
+                      "type":  "db_table",
+                      "name":  "support_tickets",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027support_tickets\u0027) in app/actions/support-automation.ts:807"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:tenant_audit_logs",
+                      "type":  "db_table",
+                      "name":  "tenant_audit_logs",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027tenant_audit_logs\u0027) in app/admin/(system)/audit-logs/page.tsx:75"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:tenant_branding",
+                      "type":  "db_table",
+                      "name":  "tenant_branding",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027tenant_branding\u0027) in features/admin/organisations/components/card/OrganisationBrandingSection.tsx:178"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:tenant_features",
+                      "type":  "db_table",
+                      "name":  "tenant_features",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027tenant_features\u0027) in features/admin/organisations/components/card/OrganisationFeaturesSection.tsx:54"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:tenant_invitations",
+                      "type":  "db_table",
+                      "name":  "tenant_invitations",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027tenant_invitations\u0027) in features/admin/organisations/organisationDetail.server.ts:84"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:tenant_seat_assignments",
+                      "type":  "db_table",
+                      "name":  "tenant_seat_assignments",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027tenant_seat_assignments\u0027) in lib/db/billing.ts:195"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:tenant_settings",
+                      "type":  "db_table",
+                      "name":  "tenant_settings",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:tenant_subscriptions",
+                      "type":  "db_table",
+                      "name":  "tenant_subscriptions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027tenant_subscriptions\u0027) in app/api/billing/create-subscription/route.ts:161"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "billing",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:tenants",
+                      "type":  "db_table",
+                      "name":  "tenants",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027tenants\u0027) in app/actions/achievements-admin.ts:527"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:ticket_messages",
+                      "type":  "db_table",
+                      "name":  "ticket_messages",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027ticket_messages\u0027) in app/actions/tickets-admin.ts:432"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:trial_usage",
+                      "type":  "db_table",
+                      "name":  "trial_usage",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_achievements",
+                      "type":  "db_table",
+                      "name":  "user_achievements",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_achievements\u0027) in app/api/gamification/achievements/unlock/route.ts:184"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "content",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_audit_logs",
+                      "type":  "db_table",
+                      "name":  "user_audit_logs",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_audit_logs\u0027) in lib/gdpr/user-rights.ts:190"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "telemetry",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_coins",
+                      "type":  "db_table",
+                      "name":  "user_coins",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_coins\u0027) in app/api/gamification/route.ts:215"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_currency_balances",
+                      "type":  "db_table",
+                      "name":  "user_currency_balances",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_currency_balances\u0027) in lib/services/marketplaceService.ts:111"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_devices",
+                      "type":  "db_table",
+                      "name":  "user_devices",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_devices\u0027) in app/api/accounts/devices/remove/route.ts:17"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "auth",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_mfa",
+                      "type":  "db_table",
+                      "name":  "user_mfa",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_mfa\u0027) in app/api/accounts/auth/mfa/recovery-codes/verify/route.ts:61"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "auth",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_preferences",
+                      "type":  "db_table",
+                      "name":  "user_preferences",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_preferences\u0027) in app/actions/locale.ts:66"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_profiles",
+                      "type":  "db_table",
+                      "name":  "user_profiles",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_profiles\u0027) in app/admin/(system)/audit-logs/page.tsx:110"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_progress",
+                      "type":  "db_table",
+                      "name":  "user_progress",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_progress\u0027) in app/api/cosmetics/loadout/route.ts:68"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_purchases",
+                      "type":  "db_table",
+                      "name":  "user_purchases",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_purchases\u0027) in app/actions/shop-rewards-admin.ts:520"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_restrictions",
+                      "type":  "db_table",
+                      "name":  "user_restrictions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_restrictions\u0027) in lib/services/moderationService.ts:277"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_sessions",
+                      "type":  "db_table",
+                      "name":  "user_sessions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_sessions\u0027) in app/api/accounts/devices/register-login.ts:57"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "auth",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_streaks",
+                      "type":  "db_table",
+                      "name":  "user_streaks",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_streaks\u0027) in app/api/gamification/route.ts:228"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:user_tenant_memberships",
+                      "type":  "db_table",
+                      "name":  "user_tenant_memberships",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027user_tenant_memberships\u0027) in app/actions/achievements-admin.ts:575"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_table:users",
+                      "type":  "db_table",
+                      "name":  "users",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027users\u0027) in app/actions/achievements-admin.ts:567"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "pii",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_table:virtual_currencies",
+                      "type":  "db_table",
+                      "name":  "virtual_currencies",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Table listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .from(\u0027virtual_currencies\u0027) in app/actions/shop-rewards-admin.ts:269"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "DB table",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "true",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_view:tenant_memberships",
+                      "type":  "db_view",
+                      "name":  "tenant_memberships",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "View listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB view",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  "tenant_id"
+                  }
+              ],
+    "nodeCount":  105
+}

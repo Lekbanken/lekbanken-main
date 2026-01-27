@@ -1,0 +1,86 @@
+﻿{
+    "id":  "domains/demo",
+    "updatedAt":  "2026-01-27T21:07:26Z",
+    "generatedBy":  "generate-inventory-v3.ps1",
+    "nodes":  [
+                  {
+                      "id":  "route:app/demo/page.tsx",
+                      "type":  "route",
+                      "name":  "app/demo/page.tsx",
+                      "path":  "app/demo/page.tsx",
+                      "ownerDomain":  "demo",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/demo/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/demo/upgrade/page.tsx",
+                      "type":  "route",
+                      "name":  "app/demo/upgrade/page.tsx",
+                      "path":  "app/demo/upgrade/page.tsx",
+                      "ownerDomain":  "demo",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/demo/upgrade/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/demo-expired/page.tsx",
+                      "type":  "route",
+                      "name":  "app/demo-expired/page.tsx",
+                      "path":  "app/demo-expired/page.tsx",
+                      "ownerDomain":  "demo",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/demo-expired/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  }
+              ],
+    "nodeCount":  3
+}

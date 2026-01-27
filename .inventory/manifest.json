@@ -1,0 +1,67 @@
+﻿{
+    "root":  ".",
+    "partitions":  {
+                       "database/functions":  {
+                                                  "updatedAt":  "2026-01-27T21:08:14Z",
+                                                  "nodeCount":  6
+                                              },
+                       "edges/routes":  {
+                                            "updatedAt":  "2026-01-27T21:07:26Z",
+                                            "edgeCount":  272,
+                                            "nodeCount":  null
+                                        },
+                       "database/tables":  {
+                                               "updatedAt":  "2026-01-27T21:08:14Z",
+                                               "nodeCount":  105
+                                           },
+                       "database/triggers":  {
+                                                 "updatedAt":  "2026-01-27T21:08:14Z",
+                                                 "nodeCount":  79
+                                             },
+                       "domains/shared":  {
+                                              "updatedAt":  "2026-01-27T21:07:26Z",
+                                              "edgeCount":  null,
+                                              "nodeCount":  362
+                                          },
+                       "edges/db-usage":  {
+                                              "updatedAt":  "2026-01-27T21:08:14Z",
+                                              "edgeCount":  1544
+                                          },
+                       "domains/marketing":  {
+                                                 "updatedAt":  "2026-01-27T21:07:26Z",
+                                                 "edgeCount":  null,
+                                                 "nodeCount":  18
+                                             },
+                       "domains/app":  {
+                                           "updatedAt":  "2026-01-27T21:07:26Z",
+                                           "edgeCount":  null,
+                                           "nodeCount":  51
+                                       },
+                       "domains/admin":  {
+                                             "updatedAt":  "2026-01-27T21:07:26Z",
+                                             "edgeCount":  null,
+                                             "nodeCount":  117
+                                         },
+                       "database/policies":  {
+                                                 "updatedAt":  "2026-01-27T21:08:14Z",
+                                                 "nodeCount":  957
+                                             },
+                       "domains/sandbox":  {
+                                               "updatedAt":  "2026-01-27T21:07:26Z",
+                                               "edgeCount":  null,
+                                               "nodeCount":  78
+                                           },
+                       "domains/demo":  {
+                                            "updatedAt":  "2026-01-27T21:07:26Z",
+                                            "edgeCount":  null,
+                                            "nodeCount":  3
+                                        }
+                   },
+    "generatedAt":  "2026-01-27T21:08:14Z",
+    "version":  "2.0.0",
+    "totals":  {
+                   "nodeCount":  1776,
+                   "findingCount":  2,
+                   "edgeCount":  1816
+               }
+}

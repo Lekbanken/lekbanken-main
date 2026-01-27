@@ -1,0 +1,2036 @@
+﻿{
+    "id":  "domains/sandbox",
+    "updatedAt":  "2026-01-27T21:07:26Z",
+    "generatedBy":  "generate-inventory-v3.ps1",
+    "nodes":  [
+                  {
+                      "id":  "route:app/sandbox/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/page.tsx",
+                      "path":  "app/sandbox/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/achievements/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/achievements/page.tsx",
+                      "path":  "app/sandbox/achievements/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/achievements/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/page.tsx",
+                      "path":  "app/sandbox/admin/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/achievements/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/achievements/page.tsx",
+                      "path":  "app/sandbox/admin/achievements/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/achievements/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/achievements-builder/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/achievements-builder/page.tsx",
+                      "path":  "app/sandbox/admin/achievements-builder/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/achievements-builder/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/analytics/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/analytics/page.tsx",
+                      "path":  "app/sandbox/admin/analytics/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/analytics/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/badge-wizard/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/badge-wizard/page.tsx",
+                      "path":  "app/sandbox/admin/badge-wizard/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/badge-wizard/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/billing/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/billing/page.tsx",
+                      "path":  "app/sandbox/admin/billing/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/billing/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/coach-diagrams/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/coach-diagrams/page.tsx",
+                      "path":  "app/sandbox/admin/coach-diagrams/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/coach-diagrams/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/components/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/components/page.tsx",
+                      "path":  "app/sandbox/admin/components/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/components/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/content/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/content/page.tsx",
+                      "path":  "app/sandbox/admin/content/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/content/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/dashboard/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/dashboard/page.tsx",
+                      "path":  "app/sandbox/admin/dashboard/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/dashboard/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/leaderboard/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/leaderboard/page.tsx",
+                      "path":  "app/sandbox/admin/leaderboard/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/leaderboard/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/licenses/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/licenses/page.tsx",
+                      "path":  "app/sandbox/admin/licenses/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/licenses/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/moderation/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/moderation/page.tsx",
+                      "path":  "app/sandbox/admin/moderation/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/moderation/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/notifications/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/notifications/page.tsx",
+                      "path":  "app/sandbox/admin/notifications/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/notifications/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/organisations/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/organisations/page.tsx",
+                      "path":  "app/sandbox/admin/organisations/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/organisations/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/personalization/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/personalization/page.tsx",
+                      "path":  "app/sandbox/admin/personalization/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/personalization/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/settings/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/settings/page.tsx",
+                      "path":  "app/sandbox/admin/settings/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/settings/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/support/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/support/page.tsx",
+                      "path":  "app/sandbox/admin/support/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/support/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/admin/users/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/admin/users/page.tsx",
+                      "path":  "app/sandbox/admin/users/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/admin/users/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/page.tsx",
+                      "path":  "app/sandbox/app/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/dashboard/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/dashboard/page.tsx",
+                      "path":  "app/sandbox/app/dashboard/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/dashboard/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/events/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/events/page.tsx",
+                      "path":  "app/sandbox/app/events/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/events/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/game-card/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/game-card/page.tsx",
+                      "path":  "app/sandbox/app/game-card/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/game-card/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/game-detail/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/game-detail/page.tsx",
+                      "path":  "app/sandbox/app/game-detail/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/game-detail/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/games/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/games/page.tsx",
+                      "path":  "app/sandbox/app/games/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/games/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/leaderboard/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/leaderboard/page.tsx",
+                      "path":  "app/sandbox/app/leaderboard/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/leaderboard/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/planner/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/planner/page.tsx",
+                      "path":  "app/sandbox/app/planner/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/planner/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/profile/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/profile/page.tsx",
+                      "path":  "app/sandbox/app/profile/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/profile/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/shell/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/shell/page.tsx",
+                      "path":  "app/sandbox/app/shell/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/shell/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/shell/mobile-preview/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/shell/mobile-preview/page.tsx",
+                      "path":  "app/sandbox/app/shell/mobile-preview/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/shell/mobile-preview/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/app/shop/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/app/shop/page.tsx",
+                      "path":  "app/sandbox/app/shop/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/app/shop/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/artifacts/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/artifacts/page.tsx",
+                      "path":  "app/sandbox/artifacts/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/artifacts/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/atlas/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/atlas/page.tsx",
+                      "path":  "app/sandbox/atlas/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/atlas/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/auth-demo/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/auth-demo/page.tsx",
+                      "path":  "app/sandbox/auth-demo/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/auth-demo/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/avatar-builder/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/avatar-builder/page.tsx",
+                      "path":  "app/sandbox/avatar-builder/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/avatar-builder/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/buttons/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/buttons/page.tsx",
+                      "path":  "app/sandbox/buttons/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/buttons/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/cards/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/cards/page.tsx",
+                      "path":  "app/sandbox/cards/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/cards/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/colors/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/colors/page.tsx",
+                      "path":  "app/sandbox/colors/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/colors/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/design-system/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/design-system/page.tsx",
+                      "path":  "app/sandbox/design-system/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/design-system/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/design-system/icons/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/design-system/icons/page.tsx",
+                      "path":  "app/sandbox/design-system/icons/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/design-system/icons/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/design-system/tokens/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/design-system/tokens/page.tsx",
+                      "path":  "app/sandbox/design-system/tokens/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/design-system/tokens/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/docs/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/docs/page.tsx",
+                      "path":  "app/sandbox/docs/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/docs/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/docs/conversation-cards/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/docs/conversation-cards/page.tsx",
+                      "path":  "app/sandbox/docs/conversation-cards/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/docs/conversation-cards/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/docs/repo/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/docs/repo/page.tsx",
+                      "path":  "app/sandbox/docs/repo/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/docs/repo/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/docs/repo/[...slug]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/docs/repo/[...slug]/page.tsx",
+                      "path":  "app/sandbox/docs/repo/[...slug]/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/docs/repo/[...slug]/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/docs/wiki/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/docs/wiki/page.tsx",
+                      "path":  "app/sandbox/docs/wiki/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/docs/wiki/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/docs/wiki/[slug]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/docs/wiki/[slug]/page.tsx",
+                      "path":  "app/sandbox/docs/wiki/[slug]/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/docs/wiki/[slug]/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/feedback/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/feedback/page.tsx",
+                      "path":  "app/sandbox/feedback/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/feedback/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/forms/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/forms/page.tsx",
+                      "path":  "app/sandbox/forms/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/forms/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/gamification/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/gamification/page.tsx",
+                      "path":  "app/sandbox/gamification/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/gamification/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/gamification/achievements/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/gamification/achievements/page.tsx",
+                      "path":  "app/sandbox/gamification/achievements/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/gamification/achievements/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/gamification/badges/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/gamification/badges/page.tsx",
+                      "path":  "app/sandbox/gamification/badges/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/gamification/badges/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/gamification/dicecoin/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/gamification/dicecoin/page.tsx",
+                      "path":  "app/sandbox/gamification/dicecoin/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/gamification/dicecoin/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/gamification/library-exports/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/gamification/library-exports/page.tsx",
+                      "path":  "app/sandbox/gamification/library-exports/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/gamification/library-exports/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/gamification/rewards/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/gamification/rewards/page.tsx",
+                      "path":  "app/sandbox/gamification/rewards/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/gamification/rewards/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/hero/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/hero/page.tsx",
+                      "path":  "app/sandbox/hero/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/hero/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/interactive/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/interactive/page.tsx",
+                      "path":  "app/sandbox/interactive/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/interactive/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/journey/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/journey/page.tsx",
+                      "path":  "app/sandbox/journey/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/journey/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/learning/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/learning/page.tsx",
+                      "path":  "app/sandbox/learning/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/learning/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/learning/admin/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/learning/admin/page.tsx",
+                      "path":  "app/sandbox/learning/admin/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/learning/admin/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/learning/learner/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/learning/learner/page.tsx",
+                      "path":  "app/sandbox/learning/learner/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/learning/learner/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/marketing/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/marketing/page.tsx",
+                      "path":  "app/sandbox/marketing/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/marketing/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/navigation/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/navigation/page.tsx",
+                      "path":  "app/sandbox/navigation/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/navigation/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/play/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/play/page.tsx",
+                      "path":  "app/sandbox/play/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/play/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/play/components/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/play/components/page.tsx",
+                      "path":  "app/sandbox/play/components/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/play/components/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/play/modes/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/play/modes/page.tsx",
+                      "path":  "app/sandbox/play/modes/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/play/modes/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/play/participant/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/play/participant/page.tsx",
+                      "path":  "app/sandbox/play/participant/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/play/participant/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/pricing/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/pricing/page.tsx",
+                      "path":  "app/sandbox/pricing/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/pricing/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/primitives/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/primitives/page.tsx",
+                      "path":  "app/sandbox/primitives/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/primitives/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/scenes/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/scenes/page.tsx",
+                      "path":  "app/sandbox/scenes/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/scenes/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/spacing/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/spacing/page.tsx",
+                      "path":  "app/sandbox/spacing/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/spacing/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/stripe-test/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/stripe-test/page.tsx",
+                      "path":  "app/sandbox/stripe-test/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/stripe-test/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/testimonials/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/testimonials/page.tsx",
+                      "path":  "app/sandbox/testimonials/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/testimonials/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "route:app/sandbox/typography/page.tsx",
+                      "type":  "route",
+                      "name":  "app/sandbox/typography/page.tsx",
+                      "path":  "app/sandbox/typography/page.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/sandbox/typography/page.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo/playground route"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "layout:app/sandbox/layout.tsx",
+                      "type":  "layout",
+                      "name":  "app/sandbox/layout.tsx",
+                      "path":  "app/sandbox/layout.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "layout.tsx under app router: app/sandbox/layout.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo layout"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js layout",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  },
+                  {
+                      "id":  "layout:app/sandbox/auth-demo/layout.tsx",
+                      "type":  "layout",
+                      "name":  "app/sandbox/auth-demo/layout.tsx",
+                      "path":  "app/sandbox/auth-demo/layout.tsx",
+                      "ownerDomain":  "sandbox",
+                      "status":  {
+                                     "usage":  "dormant_flagged",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "layout.tsx under app router: app/sandbox/auth-demo/layout.tsx"
+                                                      },
+                                                      {
+                                                          "kind":  "flag_gate",
+                                                          "detail":  "Sandbox/demo layout"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  "flag_gate",
+                      "risk":  "medium",
+                      "notes":  "Next.js layout",
+                      "runtime_scope":  "dev_only",
+                      "exposure":  "internal"
+                  }
+              ],
+    "nodeCount":  78
+}

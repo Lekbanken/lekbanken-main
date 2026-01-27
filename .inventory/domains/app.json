@@ -1,0 +1,1232 @@
+﻿{
+    "id":  "domains/app",
+    "updatedAt":  "2026-01-27T21:07:26Z",
+    "generatedBy":  "generate-inventory-v3.ps1",
+    "nodes":  [
+                  {
+                      "id":  "route:app/app/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/page.tsx",
+                      "path":  "app/app/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/browse/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/browse/page.tsx",
+                      "path":  "app/app/browse/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/browse/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/challenges/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/challenges/page.tsx",
+                      "path":  "app/app/challenges/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/challenges/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/events/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/events/page.tsx",
+                      "path":  "app/app/events/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/events/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/games/[gameId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/games/[gameId]/page.tsx",
+                      "path":  "app/app/games/[gameId]/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/games/[gameId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/gamification/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/gamification/page.tsx",
+                      "path":  "app/app/gamification/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/gamification/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/gamification/achievements/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/gamification/achievements/page.tsx",
+                      "path":  "app/app/gamification/achievements/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/gamification/achievements/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/gamification/coins/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/gamification/coins/page.tsx",
+                      "path":  "app/app/gamification/coins/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/gamification/coins/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/gamification/events/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/gamification/events/page.tsx",
+                      "path":  "app/app/gamification/events/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/gamification/events/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/invoices/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/invoices/page.tsx",
+                      "path":  "app/app/invoices/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/invoices/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/journey/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/journey/page.tsx",
+                      "path":  "app/app/journey/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/journey/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/leaderboard/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/leaderboard/page.tsx",
+                      "path":  "app/app/leaderboard/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/leaderboard/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/learning/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/learning/page.tsx",
+                      "path":  "app/app/learning/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/learning/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/learning/course/[slug]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/learning/course/[slug]/page.tsx",
+                      "path":  "app/app/learning/course/[slug]/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/learning/course/[slug]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/no-access/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/no-access/page.tsx",
+                      "path":  "app/app/no-access/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/no-access/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/notifications/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/notifications/page.tsx",
+                      "path":  "app/app/notifications/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/notifications/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/planner/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/planner/page.tsx",
+                      "path":  "app/app/planner/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/planner/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/planner/calendar/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/planner/calendar/page.tsx",
+                      "path":  "app/app/planner/calendar/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/planner/calendar/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/planner/plan/[planId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/planner/plan/[planId]/page.tsx",
+                      "path":  "app/app/planner/plan/[planId]/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/planner/plan/[planId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/planner/plans/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/planner/plans/page.tsx",
+                      "path":  "app/app/planner/plans/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/planner/plans/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/planner/[planId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/planner/[planId]/page.tsx",
+                      "path":  "app/app/planner/[planId]/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/planner/[planId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/play/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/play/page.tsx",
+                      "path":  "app/app/play/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/play/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/play/plan/[planId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/play/plan/[planId]/page.tsx",
+                      "path":  "app/app/play/plan/[planId]/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/play/plan/[planId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/play/sessions/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/play/sessions/page.tsx",
+                      "path":  "app/app/play/sessions/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/play/sessions/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/play/sessions/[id]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/play/sessions/[id]/page.tsx",
+                      "path":  "app/app/play/sessions/[id]/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/play/sessions/[id]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/play/[gameId]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/play/[gameId]/page.tsx",
+                      "path":  "app/app/play/[gameId]/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/play/[gameId]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/preferences/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/preferences/page.tsx",
+                      "path":  "app/app/preferences/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/preferences/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/preferences/cookies/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/preferences/cookies/page.tsx",
+                      "path":  "app/app/preferences/cookies/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/preferences/cookies/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/preferences/legal/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/preferences/legal/page.tsx",
+                      "path":  "app/app/preferences/legal/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/preferences/legal/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/preferences/privacy/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/preferences/privacy/page.tsx",
+                      "path":  "app/app/preferences/privacy/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/preferences/privacy/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/page.tsx",
+                      "path":  "app/app/profile/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/account/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/account/page.tsx",
+                      "path":  "app/app/profile/account/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/account/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/achievements/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/achievements/page.tsx",
+                      "path":  "app/app/profile/achievements/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/achievements/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/activity/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/activity/page.tsx",
+                      "path":  "app/app/profile/activity/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/activity/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/edit/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/edit/page.tsx",
+                      "path":  "app/app/profile/edit/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/edit/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/friends/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/friends/page.tsx",
+                      "path":  "app/app/profile/friends/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/friends/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/general/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/general/page.tsx",
+                      "path":  "app/app/profile/general/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/general/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/notifications/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/notifications/page.tsx",
+                      "path":  "app/app/profile/notifications/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/notifications/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/organizations/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/organizations/page.tsx",
+                      "path":  "app/app/profile/organizations/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/organizations/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/preferences/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/preferences/page.tsx",
+                      "path":  "app/app/profile/preferences/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/preferences/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/privacy/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/privacy/page.tsx",
+                      "path":  "app/app/profile/privacy/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/privacy/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/profile/security/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/profile/security/page.tsx",
+                      "path":  "app/app/profile/security/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/profile/security/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/select-tenant/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/select-tenant/page.tsx",
+                      "path":  "app/app/select-tenant/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/select-tenant/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/shop/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/shop/page.tsx",
+                      "path":  "app/app/shop/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/shop/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/subscription/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/subscription/page.tsx",
+                      "path":  "app/app/subscription/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/subscription/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/support/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/support/page.tsx",
+                      "path":  "app/app/support/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/support/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/support/contact/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/support/contact/page.tsx",
+                      "path":  "app/app/support/contact/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/support/contact/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "route:app/app/support/tickets/[id]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/app/support/tickets/[id]/page.tsx",
+                      "path":  "app/app/support/tickets/[id]/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/app/support/tickets/[id]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "layout:app/app/layout.tsx",
+                      "type":  "layout",
+                      "name":  "app/app/layout.tsx",
+                      "path":  "app/app/layout.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "layout.tsx under app router: app/app/layout.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js layout",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "layout:app/app/profile/layout.tsx",
+                      "type":  "layout",
+                      "name":  "app/app/profile/layout.tsx",
+                      "path":  "app/app/profile/layout.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "layout.tsx under app router: app/app/profile/layout.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js layout",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  },
+                  {
+                      "id":  "server_action:app/app/select-tenant/page.tsx",
+                      "type":  "server_action",
+                      "name":  "app/app/select-tenant/page.tsx",
+                      "path":  "app/app/select-tenant/page.tsx",
+                      "ownerDomain":  "app",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "import_path",
+                                                          "detail":  "Inline \u0027use server\u0027 directive in app/app/select-tenant/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "Server action file",
+                      "runtime_scope":  "prod",
+                      "exposure":  "authenticated"
+                  }
+              ],
+    "nodeCount":  51
+}

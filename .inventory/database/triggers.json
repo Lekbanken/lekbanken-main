@@ -1,0 +1,2220 @@
+﻿{
+    "id":  "database/triggers",
+    "updatedAt":  "2026-01-27T21:08:14Z",
+    "generatedBy":  "generate-inventory-v3.ps1",
+    "nodes":  [
+                  {
+                      "id":  "db_trigger:trigger_update_participant_count",
+                      "type":  "db_trigger",
+                      "name":  "trigger_update_participant_count",
+                      "path":  "supabase/migrations/20241210_create_participants_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on participants in supabase/migrations/20241210_create_participants_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trigger_participant_sessions_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "trigger_participant_sessions_updated_at",
+                      "path":  "supabase/migrations/20241210_create_participants_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on participant_sessions in supabase/migrations/20241210_create_participants_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trigger_participants_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "trigger_participants_updated_at",
+                      "path":  "supabase/migrations/20241210_create_participants_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on participants in supabase/migrations/20241210_create_participants_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trigger_token_quotas_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "trigger_token_quotas_updated_at",
+                      "path":  "supabase/migrations/20241210_create_participants_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on participant_token_quotas in supabase/migrations/20241210_create_participants_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:on_auth_user_created",
+                      "type":  "db_trigger",
+                      "name":  "on_auth_user_created",
+                      "path":  "supabase/migrations/20251129000000_initial_schema.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on users in supabase/migrations/20251129000000_initial_schema.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:on_auth_user_created",
+                      "type":  "db_trigger",
+                      "name":  "on_auth_user_created",
+                      "path":  "supabase/migrations/20251209120000_accounts_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on users in supabase/migrations/20251209120000_accounts_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:for",
+                      "type":  "db_trigger",
+                      "name":  "for",
+                      "path":  "supabase/migrations/20251215000000_fix_profile_sync_on_update.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on users in supabase/migrations/20251215000000_fix_profile_sync_on_update.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:for",
+                      "type":  "db_trigger",
+                      "name":  "for",
+                      "path":  "supabase/migrations/20251215000000_fix_profile_sync_on_update.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on users in supabase/migrations/20251215000000_fix_profile_sync_on_update.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_game_steps_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_game_steps_updated",
+                      "path":  "supabase/migrations/20251216010000_game_builder_p0.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on game_steps in supabase/migrations/20251216010000_game_builder_p0.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_game_materials_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_game_materials_updated",
+                      "path":  "supabase/migrations/20251216010000_game_builder_p0.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on game_materials in supabase/migrations/20251216010000_game_builder_p0.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_game_phases_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_game_phases_updated",
+                      "path":  "supabase/migrations/20251216020000_game_phases.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on game_phases in supabase/migrations/20251216020000_game_phases.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_game_roles_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_game_roles_updated",
+                      "path":  "supabase/migrations/20251216030000_game_roles.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on game_roles in supabase/migrations/20251216030000_game_roles.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_game_board_config_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_game_board_config_updated",
+                      "path":  "supabase/migrations/20251216040000_game_board_config.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on game_board_config in supabase/migrations/20251216040000_game_board_config.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:plan_blocks_recalc_plan_total_time_minutes_ins",
+                      "type":  "db_trigger",
+                      "name":  "plan_blocks_recalc_plan_total_time_minutes_ins",
+                      "path":  "supabase/migrations/20251217120000_planner_total_time_trigger.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on plan_blocks in supabase/migrations/20251217120000_planner_total_time_trigger.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:plan_blocks_recalc_plan_total_time_minutes_del",
+                      "type":  "db_trigger",
+                      "name":  "plan_blocks_recalc_plan_total_time_minutes_del",
+                      "path":  "supabase/migrations/20251217120000_planner_total_time_trigger.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on plan_blocks in supabase/migrations/20251217120000_planner_total_time_trigger.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:plan_blocks_recalc_plan_total_time_minutes_upd",
+                      "type":  "db_trigger",
+                      "name":  "plan_blocks_recalc_plan_total_time_minutes_upd",
+                      "path":  "supabase/migrations/20251217120000_planner_total_time_trigger.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on plan_blocks in supabase/migrations/20251217120000_planner_total_time_trigger.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_game_artifacts_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_game_artifacts_updated",
+                      "path":  "supabase/migrations/20251219113000_legendary_play_primitives_v1.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on game_artifacts in supabase/migrations/20251219113000_legendary_play_primitives_v1.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_game_artifact_variants_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_game_artifact_variants_updated",
+                      "path":  "supabase/migrations/20251219113000_legendary_play_primitives_v1.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on game_artifact_variants in supabase/migrations/20251219113000_legendary_play_primitives_v1.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_session_decisions_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_session_decisions_updated",
+                      "path":  "supabase/migrations/20251219113000_legendary_play_primitives_v1.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on session_decisions in supabase/migrations/20251219113000_legendary_play_primitives_v1.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_session_outcomes_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_session_outcomes_updated",
+                      "path":  "supabase/migrations/20251219113000_legendary_play_primitives_v1.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on session_outcomes in supabase/migrations/20251219113000_legendary_play_primitives_v1.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_game_triggers_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_game_triggers_updated",
+                      "path":  "supabase/migrations/20251226120000_game_triggers.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on game_triggers in supabase/migrations/20251226120000_game_triggers.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_session_triggers_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_session_triggers_updated",
+                      "path":  "supabase/migrations/20251226120000_game_triggers.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on session_triggers in supabase/migrations/20251226120000_game_triggers.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_session_time_bank_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_session_time_bank_updated",
+                      "path":  "supabase/migrations/20251227120000_signal_time_bank.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on session_time_bank in supabase/migrations/20251227120000_signal_time_bank.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:plan_blocks_update_status_ins",
+                      "type":  "db_trigger",
+                      "name":  "plan_blocks_update_status_ins",
+                      "path":  "supabase/migrations/20251230100000_planner_versioning.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on plan_blocks in supabase/migrations/20251230100000_planner_versioning.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:plan_blocks_update_status_upd",
+                      "type":  "db_trigger",
+                      "name":  "plan_blocks_update_status_upd",
+                      "path":  "supabase/migrations/20251230100000_planner_versioning.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on plan_blocks in supabase/migrations/20251230100000_planner_versioning.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:plan_blocks_update_status_del",
+                      "type":  "db_trigger",
+                      "name":  "plan_blocks_update_status_del",
+                      "path":  "supabase/migrations/20251230100000_planner_versioning.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on plan_blocks in supabase/migrations/20251230100000_planner_versioning.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:plans_update_status",
+                      "type":  "db_trigger",
+                      "name":  "plans_update_status",
+                      "path":  "supabase/migrations/20251230100000_planner_versioning.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on plans in supabase/migrations/20251230100000_planner_versioning.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_game_tools_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_game_tools_updated",
+                      "path":  "supabase/migrations/20260102120000_game_tools_v1.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on game_tools in supabase/migrations/20260102120000_game_tools_v1.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_conversation_card_collections_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_conversation_card_collections_updated",
+                      "path":  "supabase/migrations/20260103120000_conversation_cards_v1.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on conversation_card_collections in supabase/migrations/20260103120000_conversation_cards_v1.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_conversation_cards_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_conversation_cards_updated",
+                      "path":  "supabase/migrations/20260103120000_conversation_cards_v1.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on conversation_cards in supabase/migrations/20260103120000_conversation_cards_v1.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:on_auth_user_created",
+                      "type":  "db_trigger",
+                      "name":  "on_auth_user_created",
+                      "path":  "supabase/migrations/20260103160000_fix_orphaned_user_profiles.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on users in supabase/migrations/20260103160000_fix_orphaned_user_profiles.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:on_auth_user_updated",
+                      "type":  "db_trigger",
+                      "name":  "on_auth_user_updated",
+                      "path":  "supabase/migrations/20260103160000_fix_orphaned_user_profiles.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on users in supabase/migrations/20260103160000_fix_orphaned_user_profiles.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:tenant_domains_updated_at_trigger",
+                      "type":  "db_trigger",
+                      "name":  "tenant_domains_updated_at_trigger",
+                      "path":  "supabase/migrations/20260103180000_add_tenant_domains.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on tenant_domains in supabase/migrations/20260103180000_add_tenant_domains.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:learning_courses_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "learning_courses_updated_at",
+                      "path":  "supabase/migrations/20260104000000_learning_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on learning_courses in supabase/migrations/20260104000000_learning_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:learning_paths_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "learning_paths_updated_at",
+                      "path":  "supabase/migrations/20260104000000_learning_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on learning_paths in supabase/migrations/20260104000000_learning_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:learning_user_progress_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "learning_user_progress_updated_at",
+                      "path":  "supabase/migrations/20260104000000_learning_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on learning_user_progress in supabase/migrations/20260104000000_learning_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:learning_requirements_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "learning_requirements_updated_at",
+                      "path":  "supabase/migrations/20260104000000_learning_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on learning_requirements in supabase/migrations/20260104000000_learning_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:set_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "set_updated_at",
+                      "path":  "supabase/migrations/20260104140000_system_design_config.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on system_design_config in supabase/migrations/20260104140000_system_design_config.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:set_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "set_updated_at",
+                      "path":  "supabase/migrations/20260104140000_system_design_config.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on tenant_design_config in supabase/migrations/20260104140000_system_design_config.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:product_prices_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "product_prices_updated_at",
+                      "path":  "supabase/migrations/20260108100000_product_stripe_sync.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on product_prices in supabase/migrations/20260108100000_product_stripe_sync.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:badge_presets_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "badge_presets_updated_at",
+                      "path":  "supabase/migrations/20260109000000_badge_presets_v1.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on badge_presets in supabase/migrations/20260109000000_badge_presets_v1.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:achievements_updated_at_trigger",
+                      "type":  "db_trigger",
+                      "name":  "achievements_updated_at_trigger",
+                      "path":  "supabase/migrations/20260110000001_achievements_phase1_schema.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on achievements in supabase/migrations/20260110000001_achievements_phase1_schema.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trigger_update_support_faq_entries_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "trigger_update_support_faq_entries_updated_at",
+                      "path":  "supabase/migrations/20260111000001_support_faq_entries.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on support_faq_entries in supabase/migrations/20260111000001_support_faq_entries.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:update_learning_course_translations_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "update_learning_course_translations_updated_at",
+                      "path":  "supabase/migrations/20260111400000_content_translations_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on learning_course_translations in supabase/migrations/20260111400000_content_translations_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:update_learning_path_translations_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "update_learning_path_translations_updated_at",
+                      "path":  "supabase/migrations/20260111400000_content_translations_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on learning_path_translations in supabase/migrations/20260111400000_content_translations_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:update_achievement_translations_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "update_achievement_translations_updated_at",
+                      "path":  "supabase/migrations/20260111400000_content_translations_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on achievement_translations in supabase/migrations/20260111400000_content_translations_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:update_shop_item_translations_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "update_shop_item_translations_updated_at",
+                      "path":  "supabase/migrations/20260111400000_content_translations_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on shop_item_translations in supabase/migrations/20260111400000_content_translations_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:update_notification_template_translations_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "update_notification_template_translations_updated_at",
+                      "path":  "supabase/migrations/20260111400000_content_translations_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on notification_template_translations in supabase/migrations/20260111400000_content_translations_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:update_tenant_translation_overrides_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "update_tenant_translation_overrides_updated_at",
+                      "path":  "supabase/migrations/20260111500000_translation_enterprise_features.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on tenant_translation_overrides in supabase/migrations/20260111500000_translation_enterprise_features.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:audit_learning_course_translations",
+                      "type":  "db_trigger",
+                      "name":  "audit_learning_course_translations",
+                      "path":  "supabase/migrations/20260111500000_translation_enterprise_features.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on learning_course_translations in supabase/migrations/20260111500000_translation_enterprise_features.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:audit_learning_path_translations",
+                      "type":  "db_trigger",
+                      "name":  "audit_learning_path_translations",
+                      "path":  "supabase/migrations/20260111500000_translation_enterprise_features.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on learning_path_translations in supabase/migrations/20260111500000_translation_enterprise_features.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:audit_achievement_translations",
+                      "type":  "db_trigger",
+                      "name":  "audit_achievement_translations",
+                      "path":  "supabase/migrations/20260111500000_translation_enterprise_features.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on achievement_translations in supabase/migrations/20260111500000_translation_enterprise_features.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:audit_shop_item_translations",
+                      "type":  "db_trigger",
+                      "name":  "audit_shop_item_translations",
+                      "path":  "supabase/migrations/20260111500000_translation_enterprise_features.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on shop_item_translations in supabase/migrations/20260111500000_translation_enterprise_features.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:audit_notification_template_translations",
+                      "type":  "db_trigger",
+                      "name":  "audit_notification_template_translations",
+                      "path":  "supabase/migrations/20260111500000_translation_enterprise_features.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on notification_template_translations in supabase/migrations/20260111500000_translation_enterprise_features.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:tenant_mfa_policies_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "tenant_mfa_policies_updated_at",
+                      "path":  "supabase/migrations/20260113200000_mfa_enterprise_foundation.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on tenant_mfa_policies in supabase/migrations/20260113200000_mfa_enterprise_foundation.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:for",
+                      "type":  "db_trigger",
+                      "name":  "for",
+                      "path":  "supabase/migrations/20260114100000_demo_foundation.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on demo_sessions in supabase/migrations/20260114100000_demo_foundation.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:demo_sessions_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "demo_sessions_updated_at",
+                      "path":  "supabase/migrations/20260114100000_demo_foundation.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on demo_sessions in supabase/migrations/20260114100000_demo_foundation.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:user_consents_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "user_consents_updated_at",
+                      "path":  "supabase/migrations/20260114200000_gdpr_compliance_tables.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on user_consents in supabase/migrations/20260114200000_gdpr_compliance_tables.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:gdpr_requests_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "gdpr_requests_updated_at",
+                      "path":  "supabase/migrations/20260114200000_gdpr_compliance_tables.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on gdpr_requests in supabase/migrations/20260114200000_gdpr_compliance_tables.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:data_retention_policies_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "data_retention_policies_updated_at",
+                      "path":  "supabase/migrations/20260114200000_gdpr_compliance_tables.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on data_retention_policies in supabase/migrations/20260114200000_gdpr_compliance_tables.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:data_breach_notifications_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "data_breach_notifications_updated_at",
+                      "path":  "supabase/migrations/20260114200000_gdpr_compliance_tables.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on data_breach_notifications in supabase/migrations/20260114200000_gdpr_compliance_tables.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:purchase_intents_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "purchase_intents_updated_at",
+                      "path":  "supabase/migrations/20260120120000_licensing_purchase_intents_and_entitlements.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on purchase_intents in supabase/migrations/20260120120000_licensing_purchase_intents_and_entitlements.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:tenant_product_entitlements_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "tenant_product_entitlements_updated_at",
+                      "path":  "supabase/migrations/20260120120000_licensing_purchase_intents_and_entitlements.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on tenant_product_entitlements in supabase/migrations/20260120120000_licensing_purchase_intents_and_entitlements.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:tenant_entitlement_seat_assignments_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "tenant_entitlement_seat_assignments_updated_at",
+                      "path":  "supabase/migrations/20260121150000_entitlement_seat_assignments.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on tenant_entitlement_seat_assignments in supabase/migrations/20260121150000_entitlement_seat_assignments.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:tenant_entitlement_seat_assignments_capacity",
+                      "type":  "db_trigger",
+                      "name":  "tenant_entitlement_seat_assignments_capacity",
+                      "path":  "supabase/migrations/20260121150000_entitlement_seat_assignments.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on tenant_entitlement_seat_assignments in supabase/migrations/20260121150000_entitlement_seat_assignments.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_session_artifact_state_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_session_artifact_state_updated",
+                      "path":  "supabase/migrations/20260125000001_artifacts_v2_state_tables.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on session_artifact_state in supabase/migrations/20260125000001_artifacts_v2_state_tables.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_session_trigger_state_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_session_trigger_state_updated",
+                      "path":  "supabase/migrations/20260125000004_triggers_v2_state_tables.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on session_trigger_state in supabase/migrations/20260125000004_triggers_v2_state_tables.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_session_artifact_state_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_session_artifact_state_updated",
+                      "path":  "supabase/migrations/20260125154500_fix_artifact_state_view_conflict.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on session_artifact_state in supabase/migrations/20260125154500_fix_artifact_state_view_conflict.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:trg_session_trigger_state_updated",
+                      "type":  "db_trigger",
+                      "name":  "trg_session_trigger_state_updated",
+                      "path":  "supabase/migrations/20260125154500_fix_artifact_state_view_conflict.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on session_trigger_state in supabase/migrations/20260125154500_fix_artifact_state_view_conflict.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:marketing_features_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "marketing_features_updated_at",
+                      "path":  "supabase/migrations/20260126100000_marketing_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on marketing_features in supabase/migrations/20260126100000_marketing_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:marketing_updates_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "marketing_updates_updated_at",
+                      "path":  "supabase/migrations/20260126100000_marketing_domain.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on marketing_updates in supabase/migrations/20260126100000_marketing_domain.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:bundle_items_updated_at",
+                      "type":  "db_trigger",
+                      "name":  "bundle_items_updated_at",
+                      "path":  "supabase/migrations/20260127100000_bundle_items_table.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on bundle_items in supabase/migrations/20260127100000_bundle_items_table.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:payment_failures_updated",
+                      "type":  "db_trigger",
+                      "name":  "payment_failures_updated",
+                      "path":  "supabase/migrations/20260127200000_dunning_management.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on payment_failures in supabase/migrations/20260127200000_dunning_management.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:dunning_config_updated",
+                      "type":  "db_trigger",
+                      "name":  "dunning_config_updated",
+                      "path":  "supabase/migrations/20260127200000_dunning_management.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on dunning_config in supabase/migrations/20260127200000_dunning_management.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:gift_purchases_updated",
+                      "type":  "db_trigger",
+                      "name":  "gift_purchases_updated",
+                      "path":  "supabase/migrations/20260127300000_gift_subscriptions.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on gift_purchases in supabase/migrations/20260127300000_gift_subscriptions.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:quotes_updated",
+                      "type":  "db_trigger",
+                      "name":  "quotes_updated",
+                      "path":  "supabase/migrations/20260127400000_enterprise_quotes.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on quotes in supabase/migrations/20260127400000_enterprise_quotes.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:quote_line_items_calculate_total",
+                      "type":  "db_trigger",
+                      "name":  "quote_line_items_calculate_total",
+                      "path":  "supabase/migrations/20260127400000_enterprise_quotes.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on quote_line_items in supabase/migrations/20260127400000_enterprise_quotes.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:usage_meters_updated",
+                      "type":  "db_trigger",
+                      "name":  "usage_meters_updated",
+                      "path":  "supabase/migrations/20260127500000_usage_based_billing.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on usage_meters in supabase/migrations/20260127500000_usage_based_billing.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  },
+                  {
+                      "id":  "db_trigger:usage_summaries_updated",
+                      "type":  "db_trigger",
+                      "name":  "usage_summaries_updated",
+                      "path":  "supabase/migrations/20260127500000_usage_based_billing.sql",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.5,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "manual_note",
+                                                          "detail":  "Trigger on usage_summaries in supabase/migrations/20260127500000_usage_based_billing.sql"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "DB trigger",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "misc",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  null
+                  }
+              ],
+    "nodeCount":  79
+}

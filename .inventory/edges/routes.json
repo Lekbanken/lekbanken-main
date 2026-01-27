@@ -1,0 +1,1640 @@
+﻿{
+    "id":  "edges/routes",
+    "updatedAt":  "2026-01-27T21:07:26Z",
+    "generatedBy":  "generate-inventory-v3.ps1",
+    "edges":  [
+                  {
+                      "from":  "route:app/(marketing)/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/auth/login/page.tsx",
+                      "to":  "layout:app/(marketing)/auth/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/auth/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/auth/reset-password/page.tsx",
+                      "to":  "layout:app/(marketing)/auth/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/auth/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/auth/signup/page.tsx",
+                      "to":  "layout:app/(marketing)/auth/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/auth/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/checkout/canceled/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/checkout/return/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/checkout/start/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/checkout/success/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/enterprise/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/features/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/gift/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/gift/redeem/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/play/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/play/session/[code]/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/(marketing)/pricing/page.tsx",
+                      "to":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/(marketing)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/browse/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/challenges/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/events/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/games/[gameId]/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/gamification/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/gamification/achievements/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/gamification/coins/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/gamification/events/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/invoices/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/journey/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/leaderboard/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/learning/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/learning/course/[slug]/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/no-access/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/notifications/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/planner/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/planner/calendar/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/planner/plan/[planId]/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/planner/plans/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/planner/[planId]/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/play/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/play/plan/[planId]/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/play/sessions/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/play/sessions/[id]/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/play/[gameId]/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/preferences/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/preferences/cookies/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/preferences/legal/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/preferences/privacy/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/account/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/achievements/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/activity/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/edit/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/friends/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/general/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/notifications/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/organizations/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/preferences/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/privacy/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/profile/security/page.tsx",
+                      "to":  "layout:app/app/profile/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/profile/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/select-tenant/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/shop/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/subscription/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/support/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/support/contact/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/app/support/tickets/[id]/page.tsx",
+                      "to":  "layout:app/app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/(system)/audit-logs/page.tsx",
+                      "to":  "layout:app/admin/(system)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/(system)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/(system)/legal/page.tsx",
+                      "to":  "layout:app/admin/(system)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/(system)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/(system)/legal/[docType]/page.tsx",
+                      "to":  "layout:app/admin/(system)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/(system)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/(system)/system-health/page.tsx",
+                      "to":  "layout:app/admin/(system)/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/(system)/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/achievements/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/achievements-advanced/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/analytics/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/analytics/errors/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/api-keys/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/billing/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/billing/analytics/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/billing/dunning/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/billing/invoices/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/billing/promo-codes/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/billing/subscriptions/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/billing/usage/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/content/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/cookies/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/demo/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/design/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/feature-flags/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/games/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/games/new/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/games/[gameId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/games/[gameId]/edit/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/achievements/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/analytics/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/automation/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/awards/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/campaigns/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/campaigns/[campaignId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/dashboard/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/dicecoin-xp/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/levels/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/library-exports/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/gamification/shop-rewards/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/incidents/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/leaderboard/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/learning/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/learning/courses/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/learning/paths/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/learning/reports/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/learning/requirements/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/library/badges/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/library/coach-diagrams/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/library/coach-diagrams/[diagramId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/licenses/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/marketing/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/marketing/features/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/marketing/updates/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/marketplace/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/media/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/moderation/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/notifications/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/organisations/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/organisations/[tenantId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/participants/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/participants/[participantId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/personalization/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/planner/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/planner/[planId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/planner/[planId]/versions/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/play/sessions/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/products/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/products/images/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/products/[productId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/purposes/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/release-notes/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/sessions/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/sessions/[sessionId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/settings/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/support/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/support/automation/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/support/bugs/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/support/feedback/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/support/kb/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/support/notifications/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/analytics/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/billing/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/content/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/games/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/gamification/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/gamification/achievements/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/legal/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/legal/[docType]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/licenses/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/members/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/participants/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/participants/[participantId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/security/mfa/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/security/mfa/users/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/sessions/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/settings/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tenant/[tenantId]/subscription/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tickets/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/toolbelt/conversation-cards/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/toolbelt/conversation-cards/new/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/toolbelt/conversation-cards/[collectionId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/toolbelt/conversation-cards/[collectionId]/import/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/tools/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/translations/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/translations/audit/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/translations/content/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/translations/content/[domain]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/translations/content/[domain]/[itemId]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/translations/missing/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/translations/[namespace]/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/users/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/admin/webhooks/page.tsx",
+                      "to":  "layout:app/admin/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/admin/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/achievements/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/achievements/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/achievements-builder/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/analytics/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/badge-wizard/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/billing/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/coach-diagrams/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/components/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/content/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/dashboard/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/leaderboard/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/licenses/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/moderation/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/notifications/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/organisations/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/personalization/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/settings/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/support/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/admin/users/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/dashboard/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/events/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/game-card/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/game-detail/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/games/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/leaderboard/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/planner/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/profile/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/shell/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/shell/mobile-preview/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/app/shop/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/artifacts/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/atlas/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/auth-demo/page.tsx",
+                      "to":  "layout:app/sandbox/auth-demo/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/auth-demo/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/avatar-builder/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/buttons/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/cards/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/colors/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/design-system/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/design-system/icons/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/design-system/tokens/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/docs/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/docs/conversation-cards/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/docs/repo/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/docs/repo/[...slug]/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/docs/wiki/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/docs/wiki/[slug]/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/feedback/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/forms/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/gamification/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/gamification/achievements/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/gamification/badges/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/gamification/dicecoin/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/gamification/library-exports/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/gamification/rewards/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/hero/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/interactive/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/journey/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/learning/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/learning/admin/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/learning/learner/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/marketing/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/navigation/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/play/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/play/components/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/play/modes/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/play/participant/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/pricing/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/primitives/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/scenes/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/spacing/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/stripe-test/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/testimonials/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/sandbox/typography/page.tsx",
+                      "to":  "layout:app/sandbox/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/sandbox/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/demo/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/demo/upgrade/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/demo-expired/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/auth/mfa-challenge/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/auth/recovery/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/board/[code]/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/gift/redeem/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/legal/accept/page.tsx",
+                      "to":  "layout:app/legal/accept/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/legal/accept/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/legal/cookie-policy/page.tsx",
+                      "to":  "layout:app/legal/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/legal/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/legal/privacy/page.tsx",
+                      "to":  "layout:app/legal/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/legal/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/legal/subprocessors/page.tsx",
+                      "to":  "layout:app/legal/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/legal/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/legal/terms/page.tsx",
+                      "to":  "layout:app/legal/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/legal/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/participants/analytics/[sessionId]/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/participants/create/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/participants/history/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/participants/host/[sessionId]/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/participants/join/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/participants/view/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/playground/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/privacy/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  },
+                  {
+                      "from":  "route:app/terms/page.tsx",
+                      "to":  "layout:app/layout.tsx",
+                      "type":  "route_renders",
+                      "details":  "Nearest layout: app/layout.tsx"
+                  }
+              ],
+    "edgeCount":  272
+}

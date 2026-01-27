@@ -1,0 +1,440 @@
+﻿{
+    "id":  "domains/marketing",
+    "updatedAt":  "2026-01-27T21:07:26Z",
+    "generatedBy":  "generate-inventory-v3.ps1",
+    "nodes":  [
+                  {
+                      "id":  "route:app/(marketing)/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/page.tsx",
+                      "path":  "app/(marketing)/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/auth/login/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/auth/login/page.tsx",
+                      "path":  "app/(marketing)/auth/login/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/auth/login/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/auth/reset-password/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/auth/reset-password/page.tsx",
+                      "path":  "app/(marketing)/auth/reset-password/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/auth/reset-password/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/auth/signup/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/auth/signup/page.tsx",
+                      "path":  "app/(marketing)/auth/signup/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/auth/signup/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/checkout/canceled/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/checkout/canceled/page.tsx",
+                      "path":  "app/(marketing)/checkout/canceled/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/checkout/canceled/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/checkout/return/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/checkout/return/page.tsx",
+                      "path":  "app/(marketing)/checkout/return/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/checkout/return/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/checkout/start/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/checkout/start/page.tsx",
+                      "path":  "app/(marketing)/checkout/start/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/checkout/start/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/checkout/success/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/checkout/success/page.tsx",
+                      "path":  "app/(marketing)/checkout/success/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/checkout/success/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/enterprise/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/enterprise/page.tsx",
+                      "path":  "app/(marketing)/enterprise/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/enterprise/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/features/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/features/page.tsx",
+                      "path":  "app/(marketing)/features/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/features/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/gift/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/gift/page.tsx",
+                      "path":  "app/(marketing)/gift/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/gift/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/gift/redeem/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/gift/redeem/page.tsx",
+                      "path":  "app/(marketing)/gift/redeem/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/gift/redeem/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/play/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/play/page.tsx",
+                      "path":  "app/(marketing)/play/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/play/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/play/session/[code]/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/play/session/[code]/page.tsx",
+                      "path":  "app/(marketing)/play/session/[code]/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/play/session/[code]/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "route:app/(marketing)/pricing/page.tsx",
+                      "type":  "route",
+                      "name":  "app/(marketing)/pricing/page.tsx",
+                      "path":  "app/(marketing)/pricing/page.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "page.tsx under app router: app/(marketing)/pricing/page.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js page route",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "layout:app/(marketing)/layout.tsx",
+                      "type":  "layout",
+                      "name":  "app/(marketing)/layout.tsx",
+                      "path":  "app/(marketing)/layout.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "layout.tsx under app router: app/(marketing)/layout.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js layout",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "layout:app/(marketing)/auth/layout.tsx",
+                      "type":  "layout",
+                      "name":  "app/(marketing)/auth/layout.tsx",
+                      "path":  "app/(marketing)/auth/layout.tsx",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.7,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "route_reachability",
+                                                          "detail":  "layout.tsx under app router: app/(marketing)/auth/layout.tsx"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "medium",
+                      "notes":  "Next.js layout",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  },
+                  {
+                      "id":  "server_action:components/marketing/actions.ts",
+                      "type":  "server_action",
+                      "name":  "components/marketing/actions.ts",
+                      "path":  "components/marketing/actions.ts",
+                      "ownerDomain":  "marketing",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "import_path",
+                                                          "detail":  "Inline \u0027use server\u0027 directive in components/marketing/actions.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "Server action file",
+                      "runtime_scope":  "prod",
+                      "exposure":  "public"
+                  }
+              ],
+    "nodeCount":  18
+}

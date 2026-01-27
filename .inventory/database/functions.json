@@ -1,0 +1,184 @@
+﻿{
+    "id":  "database/functions",
+    "updatedAt":  "2026-01-27T21:08:14Z",
+    "generatedBy":  "generate-inventory-v3.ps1",
+    "nodes":  [
+                  {
+                      "id":  "db_function:add_initial_tenant_owner",
+                      "type":  "db_function",
+                      "name":  "add_initial_tenant_owner",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Function listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .rpc(\u0027add_initial_tenant_owner\u0027) in features/admin/organisations/OrganisationAdminPage.tsx:178"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "RPC function",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_function:get_user_tenant_ids",
+                      "type":  "db_function",
+                      "name":  "get_user_tenant_ids",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Function listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "RPC function",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_function:is_global_admin",
+                      "type":  "db_function",
+                      "name":  "is_global_admin",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Function listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "RPC function",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_function:is_system_admin",
+                      "type":  "db_function",
+                      "name":  "is_system_admin",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "used_referenced",
+                                     "confidence":  0.6,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Function listed in database.types.ts"
+                                                      },
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Referenced via .rpc(\u0027is_system_admin\u0027) in app/actions/learning-requirements.ts:135"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "RPC function",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_function:is_tenant_member",
+                      "type":  "db_function",
+                      "name":  "is_tenant_member",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Function listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "RPC function",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  "tenant_id"
+                  },
+                  {
+                      "id":  "db_function:SetofOptions",
+                      "type":  "db_function",
+                      "name":  "SetofOptions",
+                      "path":  "lib/supabase/database.types.ts",
+                      "ownerDomain":  "db",
+                      "status":  {
+                                     "usage":  "unknown",
+                                     "confidence":  0.4,
+                                     "evidence":  [
+                                                      {
+                                                          "kind":  "db_usage",
+                                                          "detail":  "Function listed in database.types.ts"
+                                                      }
+                                                  ]
+                                 },
+                      "guards":  {
+
+                                 },
+                      "risk":  "high",
+                      "notes":  "RPC function",
+                      "runtime_scope":  "prod",
+                      "exposure":  "internal",
+                      "data_class":  "tenant_core",
+                      "rls_required":  true,
+                      "rls_covered":  "unknown",
+                      "tenant_key":  "tenant_id"
+                  }
+              ],
+    "nodeCount":  6
+}

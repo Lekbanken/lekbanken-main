@@ -22,7 +22,14 @@
     "db:check-any": "pwsh -File scripts/find-any-casts.ps1",
     "upload:utmarkelser": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/upload-utmarkelser.ts",
     "sync:utmarkelser:local": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/sync-utmarkelser-local.ts",
-    "smoke:licensing": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/smoke-licensing.ts"
+    "smoke:licensing": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/smoke-licensing.ts",
+    "inventory": "pwsh -File scripts/generate-inventory-v3.ps1",
+    "inventory:db": "pwsh -File scripts/generate-inventory-v3.ps1 -DbOnly",
+    "inventory:app": "pwsh -File scripts/generate-inventory-v3.ps1 -Domain app",
+    "inventory:admin": "pwsh -File scripts/generate-inventory-v3.ps1 -Domain admin",
+    "inventory:marketing": "pwsh -File scripts/generate-inventory-v3.ps1 -Domain marketing",
+    "inventory:sandbox": "pwsh -File scripts/generate-inventory-v3.ps1 -Domain sandbox",
+    "inventory:shared": "pwsh -File scripts/generate-inventory-v3.ps1 -Domain shared"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

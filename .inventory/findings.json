@@ -1,0 +1,27 @@
+﻿{
+    "id":  "findings",
+    "updatedAt":  "2026-01-27T21:08:14Z",
+    "findings":  [
+                     {
+                         "category":  "orphan",
+                         "summary":  "proxy.ts has no detected imports or middleware wiring",
+                         "affected":  [
+                                          "middleware:proxy.ts"
+                                      ],
+                         "recommendation":  "Confirm runtime use or remove file if unused.",
+                         "prechecks":  "Search for usage in deployment/proxy config.",
+                         "rollback":  "Restore from git if needed."
+                     },
+                     {
+                         "category":  "unreachable",
+                         "summary":  "cleanup-demo-data edge function invocation not verified",
+                         "affected":  [
+                                          "edge_function:supabase/functions/cleanup-demo-data/index.ts"
+                                      ],
+                         "recommendation":  "Check Supabase schedules/invocations and add documentation.",
+                         "prechecks":  "Review Supabase dashboard logs.",
+                         "rollback":  "Disable function rather than delete."
+                     }
+                 ],
+    "findingCount":  2
+}

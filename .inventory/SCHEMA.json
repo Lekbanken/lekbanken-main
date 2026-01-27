@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Lekbanken Partitioned Inventory v2.0",
+  "description": "Schema for the modular, partitioned inventory system",
+
+  "definitions": {
+    "evidence": {
+      "type": "object",
+      "required": ["kind", "detail"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "import_path",
+            "route_reachability",
+            "link_ref",
+            "flag_gate",
+            "role_gate",
+            "tenant_gate",
+            "runtime_signal",
+            "db_usage",
+            "manual_note"
+          ]
+        },
+        "detail": { "type": "string" }
+      }
+    },
+
+    "nodeStatus": {
+      "type": "object",
+      "required": ["usage", "confidence", "evidence"],
+      "properties": {
+        "usage": {
+          "type": "string",
+          "enum": [
+            "used_runtime",
+            "used_referenced",
+            "reachable_but_off",
+            "dormant_flagged",
+            "legacy_deprecated",
+            "dead_orphan",
+            "unknown"
+          ]
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/evidence" }
+        }
+      }
+    },
+
+    "node": {
+      "type": "object",
+      "required": ["id", "type", "name", "ownerDomain", "status", "risk", "runtime_scope", "exposure"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "route", "route_handler", "layout", "component", "hook",
+            "service", "api", "server_action", "middleware / proxy",
+            "edge_function", "job", "asset", "db_table", "db_view",
+            "db_function", "db_trigger", "rls_policy", "storage_bucket", "feature_flag"
+          ]
+        },
+        "name": { "type": "string" },
+        "path": { "type": ["string", "null"] },
+        "ownerDomain": {
+          "type": "string",
+          "enum": ["marketing", "app", "admin", "sandbox", "demo", "shared", "db"]
+        },
+        "status": { "$ref": "#/definitions/nodeStatus" },
+        "guards": { "type": "array", "items": { "type": "string" } },
+        "risk": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+        "notes": { "type": "string" },
+        "runtime_scope": { "type": "string", "enum": ["prod", "dev_only", "test_only", "build_only"] },
+        "exposure": { "type": "string", "enum": ["public", "authenticated", "tenant_scoped", "admin_only", "internal"] },
+        "data_class": { "type": ["string", "null"], "enum": ["pii", "auth", "billing", "tenant_core", "content", "telemetry", "misc", null] },
+        "rls_required": { "type": ["boolean", "null"] },
+        "rls_covered": { "type": ["string", "null"], "enum": ["true", "false", "unknown", null] },
+        "tenant_key": { "type": ["string", "null"] }
+      }
+    },
+
+    "edge": {
+      "type": "object",
+      "required": ["from", "to", "type"],
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "route_renders", "renders_component", "uses_hook", "calls_service",
+            "db_reads", "db_writes", "db_rpc", "storage_access",
+            "handles_request", "external_call", "protected_by", "triggers",
+            "used_by", "gates", "guards"
+          ]
+        },
+        "details": { "type": "string" }
+      }
+    },
+
+    "finding": {
+      "type": "object",
+      "required": ["category", "summary", "affected", "recommendation"],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["orphan", "unreachable", "duplicate", "dead_code", "db_shadow", "policy_mismatch", "security_gap"]
+        },
+        "summary": { "type": "string" },
+        "affected": { "type": "array", "items": { "type": "string" } },
+        "recommendation": { "type": "string" },
+        "prechecks": { "type": "string" },
+        "rollback": { "type": "string" }
+      }
+    },
+
+    "partition": {
+      "type": "object",
+      "required": ["id", "updatedAt", "nodes"],
+      "properties": {
+        "id": { "type": "string", "description": "Partition identifier, e.g., 'domains/marketing'" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "generatedBy": { "type": "string", "description": "Script or command that generated this partition" },
+        "nodes": { "type": "array", "items": { "$ref": "#/definitions/node" } },
+        "nodeCount": { "type": "integer" }
+      }
+    },
+
+    "edgePartition": {
+      "type": "object",
+      "required": ["id", "updatedAt", "edges"],
+      "properties": {
+        "id": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "edges": { "type": "array", "items": { "$ref": "#/definitions/edge" } },
+        "edgeCount": { "type": "integer" }
+      }
+    },
+
+    "manifest": {
+      "type": "object",
+      "required": ["version", "generatedAt", "partitions", "totals"],
+      "properties": {
+        "version": { "type": "string" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "root": { "type": "string" },
+        "partitions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "updatedAt": { "type": "string", "format": "date-time" },
+              "nodeCount": { "type": "integer" },
+              "edgeCount": { "type": "integer" }
+            }
+          }
+        },
+        "totals": {
+          "type": "object",
+          "properties": {
+            "nodeCount": { "type": "integer" },
+            "edgeCount": { "type": "integer" },
+            "findingCount": { "type": "integer" }
+          }
+        }
+      }
+    }
+  },
+
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/definitions/manifest" },
+    { "$ref": "#/definitions/partition" },
+    { "$ref": "#/definitions/edgePartition" }
+  ]
+}

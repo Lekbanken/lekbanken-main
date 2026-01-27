@@ -231,7 +231,7 @@ async function provisionFromPurchaseIntent(params: {
         p_tenant_id: tenantId,
         p_bundle_product_id: intent.product_id,
         p_base_quantity: intent.quantity_seats ?? 1,
-        p_expires_at: null, // TODO: Calculate from subscription billing period if needed
+        p_expires_at: undefined, // TODO: Calculate from subscription billing period if needed
       })
 
     if (expandError) {

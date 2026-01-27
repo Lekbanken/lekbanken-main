@@ -9942,6 +9942,7 @@
       "badge": "Priser",
       "title": "Enkla och transparenta priser",
       "description": "Välj den plan som passar dig bäst. Ingen bindningstid.",
+      "viewDetails": "Visa detaljer",
       "frequencyLabel": "Välj betalningsfrekvens",
       "save15": "Spara 15%",
       "frequencies": {
@@ -10020,7 +10021,73 @@
           "description": "Anpassade lösningar för organisationer."
         }
       },
-      "mostPopular": "Mest populär"
+      "mostPopular": "Mest populär",
+      "detail": {
+        "notFound": "Produkten hittades inte",
+        "notFoundDescription": "Den begärda produkten finns inte eller är inte tillgänglig.",
+        "backToPricing": "Tillbaka till priser",
+        "breadcrumb": {
+          "pricing": "Priser"
+        },
+        "license": "Licens",
+        "productInfo": "Produktinformation",
+        "reviews": "omdömen",
+        "defaultDescription": "Få tillgång till alla aktiviteter och lekar för {name}.",
+        "instantAccess": "Direkt tillgång efter köp",
+        "buyNow": "Köp nu",
+        "previewActivities": "Förhandsgranska aktiviteter",
+        "guarantee": "30 dagars nöjdhetsgaranti",
+        "contactUs": "Kontakta oss",
+        "activityPreview": "Förhandsvisning av aktiviteter",
+        "viewAllProducts": "Visa alla produkter",
+        "benefits": {
+          "title": "Fördelar",
+          "activities": {
+            "title": "Hundratals aktiviteter",
+            "description": "Noggrant utvalda och testade aktiviteter för alla åldrar och nivåer."
+          },
+          "ages": {
+            "title": "Alla åldrar",
+            "description": "Aktiviteter anpassade för barn, ungdomar och vuxna."
+          },
+          "instant": {
+            "title": "Direkt tillgång",
+            "description": "Börja använda aktiviteterna direkt efter köp."
+          },
+          "tested": {
+            "title": "Kvalitetssäkrat",
+            "description": "Alla aktiviteter är testade och godkända av erfarna ledare."
+          }
+        },
+        "tabs": {
+          "reviews": "Omdömen",
+          "faq": "Vanliga frågor"
+        },
+        "reviews": {
+          "title": "Kundrecensioner",
+          "outOf5": "av 5 stjärnor",
+          "basedOn": "Baserat på {count} omdömen"
+        },
+        "faq": {
+          "title": "Vanliga frågor",
+          "howMany": {
+            "question": "Hur många aktiviteter ingår?",
+            "answer": "Varje licens ger tillgång till hundratals aktiviteter som ständigt uppdateras och utökas."
+          },
+          "cancel": {
+            "question": "Kan jag avbryta mitt abonnemang?",
+            "answer": "Ja, du kan avbryta när som helst. Din tillgång fortsätter till slutet av den betalda perioden."
+          },
+          "updates": {
+            "question": "Får jag tillgång till nya aktiviteter?",
+            "answer": "Absolut! Alla nya aktiviteter inom din kategori ingår automatiskt i din licens."
+          },
+          "support": {
+            "question": "Hur får jag hjälp om jag har frågor?",
+            "answer": "Vi erbjuder support via e-post och chatt. Svarstid inom 24 timmar på vardagar."
+          }
+        }
+      }
     },
     "cta": {
       "title": "Redo att komma igång?",

@@ -17,7 +17,7 @@ import { CartItemRow } from '@/components/billing/CartItemRow'
 import { useState } from 'react'
 
 export function CartDrawer() {
-  const t = useTranslations('billing.cart')
+  const t = useTranslations('admin.billing.cart')
   const { state, itemCount, subtotal, clearCart, hasSubscription, hasOneTime } = useCart()
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)

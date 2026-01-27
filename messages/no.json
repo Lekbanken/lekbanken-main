@@ -9234,9 +9234,76 @@
       "badge": "Priser",
       "title": "Enkel, transparent prising",
       "description": "Velg planen som passer ditt team. Oppgrader eller nedgrader når som helst.",
+      "viewDetails": "Vis detaljer",
       "frequencyLabel": "Betalingsfrekvens",
       "save15": "Spar 15%",
       "mostPopular": "Mest populær",
+      "detail": {
+        "notFound": "Produktet ble ikke funnet",
+        "notFoundDescription": "Det forespurte produktet finnes ikke eller er ikke tilgjengelig.",
+        "backToPricing": "Tilbake til priser",
+        "breadcrumb": {
+          "pricing": "Priser"
+        },
+        "license": "Lisens",
+        "productInfo": "Produktinformasjon",
+        "reviews": "anmeldelser",
+        "defaultDescription": "Få tilgang til alle aktiviteter og leker for {name}.",
+        "instantAccess": "Umiddelbar tilgang etter kjøp",
+        "buyNow": "Kjøp nå",
+        "previewActivities": "Forhåndsvis aktiviteter",
+        "guarantee": "30 dagers fornøydhetsgaranti",
+        "contactUs": "Kontakt oss",
+        "activityPreview": "Forhåndsvisning av aktiviteter",
+        "viewAllProducts": "Vis alle produkter",
+        "benefits": {
+          "title": "Fordeler",
+          "activities": {
+            "title": "Hundrevis av aktiviteter",
+            "description": "Nøye utvalgte og testede aktiviteter for alle aldre og nivåer."
+          },
+          "ages": {
+            "title": "Alle aldre",
+            "description": "Aktiviteter tilpasset barn, ungdom og voksne."
+          },
+          "instant": {
+            "title": "Umiddelbar tilgang",
+            "description": "Begynn å bruke aktivitetene umiddelbart etter kjøp."
+          },
+          "tested": {
+            "title": "Kvalitetssikret",
+            "description": "Alle aktiviteter er testet og godkjent av erfarne ledere."
+          }
+        },
+        "tabs": {
+          "reviews": "Anmeldelser",
+          "faq": "Vanlige spørsmål"
+        },
+        "reviews": {
+          "title": "Kundeanmeldelser",
+          "outOf5": "av 5 stjerner",
+          "basedOn": "Basert på {count} anmeldelser"
+        },
+        "faq": {
+          "title": "Vanlige spørsmål",
+          "howMany": {
+            "question": "Hvor mange aktiviteter er inkludert?",
+            "answer": "Hver lisens gir tilgang til hundrevis av aktiviteter som stadig oppdateres og utvides."
+          },
+          "cancel": {
+            "question": "Kan jeg avbryte abonnementet mitt?",
+            "answer": "Ja, du kan avbryte når som helst. Tilgangen din fortsetter til slutten av den betalte perioden."
+          },
+          "updates": {
+            "question": "Får jeg tilgang til nye aktiviteter?",
+            "answer": "Absolutt! Alle nye aktiviteter i din kategori inkluderes automatisk i lisensen din."
+          },
+          "support": {
+            "question": "Hvordan får jeg hjelp hvis jeg har spørsmål?",
+            "answer": "Vi tilbyr støtte via e-post og chat. Svartid innen 24 timer på hverdager."
+          }
+        }
+      },
       "frequencies": {
         "monthly": {
           "label": "Månedlig",

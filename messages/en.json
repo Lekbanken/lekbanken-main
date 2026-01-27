@@ -9006,9 +9006,76 @@
       "badge": "Pricing",
       "title": "Simple, transparent pricing",
       "description": "Choose the plan that fits your team. Upgrade or downgrade anytime.",
+      "viewDetails": "View details",
       "frequencyLabel": "Payment frequency",
       "save15": "Save 15%",
       "mostPopular": "Most popular",
+      "detail": {
+        "notFound": "Product not found",
+        "notFoundDescription": "The requested product does not exist or is not available.",
+        "backToPricing": "Back to pricing",
+        "breadcrumb": {
+          "pricing": "Pricing"
+        },
+        "license": "License",
+        "productInfo": "Product information",
+        "reviews": "reviews",
+        "defaultDescription": "Get access to all activities and games for {name}.",
+        "instantAccess": "Instant access after purchase",
+        "buyNow": "Buy now",
+        "previewActivities": "Preview activities",
+        "guarantee": "30-day satisfaction guarantee",
+        "contactUs": "Contact us",
+        "activityPreview": "Activity preview",
+        "viewAllProducts": "View all products",
+        "benefits": {
+          "title": "Benefits",
+          "activities": {
+            "title": "Hundreds of activities",
+            "description": "Carefully selected and tested activities for all ages and skill levels."
+          },
+          "ages": {
+            "title": "All ages",
+            "description": "Activities adapted for children, teenagers, and adults."
+          },
+          "instant": {
+            "title": "Instant access",
+            "description": "Start using the activities immediately after purchase."
+          },
+          "tested": {
+            "title": "Quality assured",
+            "description": "All activities are tested and approved by experienced leaders."
+          }
+        },
+        "tabs": {
+          "reviews": "Reviews",
+          "faq": "FAQ"
+        },
+        "reviews": {
+          "title": "Customer reviews",
+          "outOf5": "out of 5 stars",
+          "basedOn": "Based on {count} reviews"
+        },
+        "faq": {
+          "title": "Frequently Asked Questions",
+          "howMany": {
+            "question": "How many activities are included?",
+            "answer": "Each license provides access to hundreds of activities that are constantly updated and expanded."
+          },
+          "cancel": {
+            "question": "Can I cancel my subscription?",
+            "answer": "Yes, you can cancel at any time. Your access continues until the end of the paid period."
+          },
+          "updates": {
+            "question": "Do I get access to new activities?",
+            "answer": "Absolutely! All new activities in your category are automatically included in your license."
+          },
+          "support": {
+            "question": "How do I get help if I have questions?",
+            "answer": "We offer support via email and chat. Response time within 24 hours on weekdays."
+          }
+        }
+      },
       "frequencies": {
         "monthly": {
           "label": "Monthly",

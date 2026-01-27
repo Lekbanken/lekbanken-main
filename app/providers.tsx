@@ -7,6 +7,7 @@ import type { UserProfile } from '@/types/auth'
 import type { TenantMembership } from '@/types/tenant'
 import { PreferencesProvider } from '@/lib/context/PreferencesContext'
 import { AuthProvider } from '@/lib/supabase/auth'
+import { CartProvider } from '@/lib/cart/CartContext'
 
 // Dynamically import CookieConsentBanner to avoid SSR issues
 // This ensures it only renders on the client where NextIntlClientProvider context is available
@@ -35,8 +36,10 @@ export function Providers({
       initialMemberships={initialMemberships}
     >
       <PreferencesProvider>
-        {children}
-        <CookieConsentBanner />
+        <CartProvider>
+          {children}
+          <CookieConsentBanner />
+        </CartProvider>
       </PreferencesProvider>
     </AuthProvider>
   )

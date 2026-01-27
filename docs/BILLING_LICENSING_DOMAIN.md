@@ -145,3 +145,52 @@ Seat assignment enforces capacity:
 - Unify legacy `billing_plans/subscriptions` paths with the newer `billing_products/tenant_subscriptions` model.
 - Decide the canonical source for "licenses": `tenant_subscriptions` + `tenant_seat_assignments` is the most complete today; `tenants.subscription_*` looks like a placeholder.
 - Cross-domain integration: connect domain `products` table to `billing_products` (or replace billing_products) to avoid drift.
+
+---
+
+## Private Tenant Lifecycle (B2C)
+
+**Added:** 2026-01-27
+
+Private tenants (type: 'private') are created for individual consumers purchasing personal subscriptions. They have different lifecycle rules than organization tenants.
+
+### Tenant Types
+
+| Type | Description | Created When |
+|------|-------------|--------------|
+| `organisation` | Multi-user tenant with seat management | B2B checkout with org name |
+| `private` | Single-user tenant for individual | B2C checkout (kind: 'user_subscription') |
+
+### Lifecycle Events
+
+| Event | Action | Notes |
+|-------|--------|-------|
+| **User purchases personal subscription** | Create private tenant, assign as owner | Name derived from email if not provided |
+| **Subscription canceled** | Entitlement → `status: 'inactive'` | Tenant remains active for data access |
+| **Subscription paused** | Entitlement → `status: 'paused'` | Tenant remains active |
+| **User account deleted** | Private tenant → `status: 'archived'` | Soft-delete only, data preserved |
+| **Chargeback/dispute lost** | Entitlement → `status: 'revoked'` | Tenant remains for audit trail |
+| **All entitlements inactive 90+ days** | Candidate for cleanup review | **Manual** review only |
+
+### Critical Rules
+
+1. **Private tenants are NEVER hard-deleted automatically**
+   - Contains purchase history and audit trails
+   - User can resubscribe and recover access
+   
+2. **Subscription cancellation ≠ tenant deletion**
+   - User loses access to gated content
+   - Can still log in and view account
+   - Can export their data (GDPR compliance)
+   
+3. **Seats are always 1 for private tenants**
+   - Enforced at checkout and webhook processing
+   - Cannot be upgraded to multi-user (must migrate to org)
+
+### Stripe Portal Access
+
+Private tenant owners access Stripe Customer Portal via:
+- `POST /api/billing/portal` with their tenantId
+- Portal allows: cancel subscription, update payment method, view invoices
+
+See: [PURCHASE_FLOW_STATUS_REPORT.md](./PURCHASE_FLOW_STATUS_REPORT.md) for architecture details.

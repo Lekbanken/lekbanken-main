@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTenant } from "@/lib/context/TenantContext";
+import { CartProvider } from "@/lib/cart";
 import { AppShell as Shell } from "@/components/app/AppShell";
 import { AppTopbar } from "./components/app-topbar";
 import { ToastProvider } from "@/components/ui/toast";
@@ -28,18 +29,20 @@ export default function AppShellContent({ children }: { children: ReactNode }) {
   }, [currentTenant, userTenants, isLoadingTenants, isSystemAdmin, isExemptRoute, router]);
 
   return (
-    <ToastProvider>
-      <div className="flex flex-col min-h-screen">
-        {/* Demo Banner (only shown if in demo mode) - sticky at top */}
-        <div className="sticky top-0 z-50">
-          <DemoBanner />
-        </div>
+    <CartProvider>
+      <ToastProvider>
+        <div className="flex flex-col min-h-screen">
+          {/* Demo Banner (only shown if in demo mode) - sticky at top */}
+          <div className="sticky top-0 z-50">
+            <DemoBanner />
+          </div>
 
-        {/* Main App Shell - flex-1 to fill remaining space */}
-        <div className="flex-1">
-          <Shell header={<AppTopbar />}>{children}</Shell>
+          {/* Main App Shell - flex-1 to fill remaining space */}
+          <div className="flex-1">
+            <Shell header={<AppTopbar />}>{children}</Shell>
+          </div>
         </div>
-      </div>
-    </ToastProvider>
+      </ToastProvider>
+    </CartProvider>
   );
 }

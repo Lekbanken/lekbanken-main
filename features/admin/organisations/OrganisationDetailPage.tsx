@@ -8,10 +8,6 @@ import {
   ClipboardDocumentIcon,
   ArrowLeftIcon,
   ArrowPathIcon,
-  EllipsisVerticalIcon,
-  PencilIcon,
-  ArrowTopRightOnSquareIcon,
-  TrashIcon,
 } from "@heroicons/react/24/outline";
 import {
   AdminPageLayout,
@@ -19,13 +15,6 @@ import {
   AdminErrorState,
 } from "@/components/admin/shared";
 import { Button, Tabs, TabPanel } from "@/components/ui";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/toast";
 import { supabase } from "@/lib/supabase/client";
 import { getOrganisationDetail } from "./organisationDetail.server";
@@ -110,7 +99,6 @@ function StatusBadge({ status }: { status: TenantStatus }) {
 }
 
 export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps) {
-  const t = useTranslations('admin.organizations.detail');
   const router = useRouter();
   const { success, error: toastError } = useToast();
   // Dynamic import to avoid circular dependency issues
@@ -314,68 +302,16 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
             </div>
           </div>
 
-          {/* Quick stats */}
-          <div className="hidden lg:flex items-center gap-6 text-sm">
-            <div className="text-center">
-              <div className="text-lg font-semibold">{organisation.memberSummary.total}</div>
-              <div className="text-muted-foreground text-xs">{t('detail.stats.members')}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-semibold">{organisation.features.filter(f => f.enabled).length}</div>
-              <div className="text-muted-foreground text-xs">{t('detail.stats.features')}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-semibold">{organisation.domains.length}</div>
-              <div className="text-muted-foreground text-xs">{t('detail.stats.domains')}</div>
-            </div>
-          </div>
-
-          {/* Quick actions */}
+          {/* Refresh button */}
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={loadOrganisation}
-              title={t('detail.actions.refresh')}
+              title="Uppdatera"
             >
               <ArrowPathIcon className="h-4 w-4" />
             </Button>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <EllipsisVerticalIcon className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => setActiveTab('overview')}>
-                  <PencilIcon className="h-4 w-4 mr-2" />
-                  {t('detail.actions.edit')}
-                </DropdownMenuItem>
-                {organisation.slug && (
-                  <DropdownMenuItem
-                    onClick={() => window.open(`https://${organisation.slug}.lekbanken.no/app`, '_blank')}
-                  >
-                    <ArrowTopRightOnSquareIcon className="h-4 w-4 mr-2" />
-                    {t('detail.actions.openApp')}
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => handleStatusChange(organisation.status === 'suspended' ? 'active' : 'suspended')}
-                  className={organisation.status === 'suspended' ? 'text-emerald-600' : 'text-amber-600'}
-                >
-                  {organisation.status === 'suspended' ? t('detail.actions.reactivate') : t('detail.actions.suspend')}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleDelete}
-                  className="text-destructive focus:text-destructive"
-                >
-                  <TrashIcon className="h-4 w-4 mr-2" />
-                  {t('detail.actions.delete')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </div>

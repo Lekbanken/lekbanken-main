@@ -16,7 +16,7 @@ export function OrganisationContactSection({
   organisation,
   onUpdate,
 }: OrganisationContactSectionProps) {
-  const t = useTranslations('admin.organisations.contact');
+  const t = useTranslations('admin.organisations.contactSection');
   const [isEditing, setIsEditing] = useState(false);
   const [contactName, setContactName] = useState(organisation.contactName ?? '');
   const [contactEmail, setContactEmail] = useState(organisation.contactEmail ?? '');

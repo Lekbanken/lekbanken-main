@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Alert } from '@/components/ui/alert'
+import { DemoConversionModal } from '@/components/demo/DemoConversionModal'
+import { UserIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline'
 
 type PricingApiResponse = {
   currency: string
@@ -34,12 +36,21 @@ export default function CheckoutStartPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  // Purchase type: personal (B2C) or organization (B2B)
+  const [purchaseType, setPurchaseType] = useState<'personal' | 'organization'>('personal')
   const [tenantName, setTenantName] = useState('')
   const [quantitySeats, setQuantitySeats] = useState(1)
   const [pricing, setPricing] = useState<PricingApiResponse | null>(null)
   const [selectedPriceId, setSelectedPriceId] = useState<string>('')
   const [error, setError] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
+  
+  // Demo conversion modal
+  const [showDemoModal, setShowDemoModal] = useState(false)
+  const [currentProductName, setCurrentProductName] = useState<string>('')
+  
+  // Already owned state
+  const [alreadyOwned, setAlreadyOwned] = useState(false)
 
   const canceled = searchParams.get('canceled') === '1'
 
@@ -71,13 +82,14 @@ export default function CheckoutStartPage() {
   }, [])
 
   const priceOptions = useMemo(() => {
-    const options: Array<{ id: string; label: string }> = []
+    const options: Array<{ id: string; label: string; productName: string }> = []
     for (const p of pricing?.products ?? []) {
       for (const pr of p.prices ?? []) {
         const interval = pr.interval_count && pr.interval_count > 1 ? `${pr.interval_count} ${pr.interval}` : pr.interval
         options.push({
           id: pr.id,
           label: `${p.name} – ${pr.amount} ${pr.currency} / ${interval}`,
+          productName: p.name,
         })
       }
     }
@@ -86,14 +98,22 @@ export default function CheckoutStartPage() {
 
   async function handleStart() {
     setError('')
+    setAlreadyOwned(false)
+    
     if (!selectedPriceId) {
       setError(t('start.errors.pickProduct'))
       return
     }
-    if (!tenantName.trim()) {
+    
+    // Only require org name for organization purchases
+    if (purchaseType === 'organization' && !tenantName.trim()) {
       setError(t('start.errors.enterOrgName'))
       return
     }
+    
+    // Get product name for modal
+    const selectedOption = priceOptions.find(opt => opt.id === selectedPriceId)
+    setCurrentProductName(selectedOption?.productName || '')
 
     setIsLoading(true)
     try {
@@ -102,8 +122,9 @@ export default function CheckoutStartPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productPriceId: selectedPriceId,
-          tenantName: tenantName.trim(),
-          quantitySeats,
+          kind: purchaseType === 'personal' ? 'user_subscription' : 'organisation_subscription',
+          tenantName: purchaseType === 'organization' ? tenantName.trim() : undefined,
+          quantitySeats: purchaseType === 'organization' ? quantitySeats : undefined,
         }),
       })
 
@@ -113,7 +134,25 @@ export default function CheckoutStartPage() {
         return
       }
 
-      const json = (await res.json()) as { checkout_url?: string; purchase_intent_id?: string; error?: string }
+      const json = (await res.json()) as { 
+        checkout_url?: string
+        purchase_intent_id?: string
+        error?: string
+        code?: string
+      }
+      
+      // Handle demo user blocked
+      if (json.code === 'DEMO_USER_BLOCKED') {
+        setShowDemoModal(true)
+        return
+      }
+      
+      // Handle already owned
+      if (json.code === 'ALREADY_OWNED') {
+        setAlreadyOwned(true)
+        return
+      }
+      
       if (!res.ok) {
         throw new Error(json.error || t('start.errors.startCheckoutFailed'))
       }
@@ -152,30 +191,89 @@ export default function CheckoutStartPage() {
       )}
 
       {error && <Alert variant="error">{error}</Alert>}
+      
+      {alreadyOwned && (
+        <Alert variant="info">
+          <div className="space-y-2">
+            <p className="font-medium">{t('start.alreadyOwned.title')}</p>
+            <p className="text-sm">{t('start.alreadyOwned.description')}</p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => router.push('/app/settings')}
+            >
+              {t('start.alreadyOwned.manageSubscription')}
+            </Button>
+          </div>
+        </Alert>
+      )}
+
+      {/* Demo Conversion Modal */}
+      <DemoConversionModal
+        open={showDemoModal}
+        onClose={() => setShowDemoModal(false)}
+        productName={currentProductName}
+      />
 
       <Card>
         <CardHeader>
           <CardTitle>{t('start.cardTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Purchase Type Toggle */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t('start.fields.orgName.label')}</label>
-            <Input
-              value={tenantName}
-              onChange={(e) => setTenantName(e.target.value)}
-              placeholder={t('start.fields.orgName.placeholder')}
-            />
+            <label className="text-sm font-medium">{t('start.fields.purchaseType.label')}</label>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant={purchaseType === 'personal' ? 'default' : 'outline'}
+                className="flex items-center justify-center gap-2"
+                onClick={() => setPurchaseType('personal')}
+              >
+                <UserIcon className="h-4 w-4" />
+                {t('start.fields.purchaseType.personal')}
+              </Button>
+              <Button
+                type="button"
+                variant={purchaseType === 'organization' ? 'default' : 'outline'}
+                className="flex items-center justify-center gap-2"
+                onClick={() => setPurchaseType('organization')}
+              >
+                <BuildingOffice2Icon className="h-4 w-4" />
+                {t('start.fields.purchaseType.organization')}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {purchaseType === 'personal' 
+                ? t('start.fields.purchaseType.personalHint')
+                : t('start.fields.purchaseType.organizationHint')
+              }
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t('start.fields.seats.label')}</label>
-            <Input
-              type="number"
-              min={1}
-              value={quantitySeats}
-              onChange={(e) => setQuantitySeats(Math.max(1, Number(e.target.value) || 1))}
-            />
-          </div>
+          {/* Organization fields - only show for org purchases */}
+          {purchaseType === 'organization' && (
+            <>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('start.fields.orgName.label')}</label>
+                <Input
+                  value={tenantName}
+                  onChange={(e) => setTenantName(e.target.value)}
+                  placeholder={t('start.fields.orgName.placeholder')}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('start.fields.seats.label')}</label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={quantitySeats}
+                  onChange={(e) => setQuantitySeats(Math.max(1, Number(e.target.value) || 1))}
+                />
+              </div>
+            </>
+          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium">{t('start.fields.plan.label')}</label>

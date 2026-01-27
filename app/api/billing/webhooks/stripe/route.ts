@@ -31,7 +31,7 @@ async function provisionFromPurchaseIntent(params: {
   const { data: intent, error: intentError } = await supabaseAdmin
     .from('purchase_intents')
     .select(
-      'id,status,user_id,email,tenant_id,tenant_name,product_id,product_price_id,quantity_seats,stripe_checkout_session_id,stripe_customer_id,stripe_subscription_id'
+      'id,kind,status,user_id,email,tenant_id,tenant_name,product_id,product_price_id,quantity_seats,stripe_checkout_session_id,stripe_customer_id,stripe_subscription_id'
     )
     .eq('id', intentId)
     .maybeSingle()
@@ -85,7 +85,21 @@ async function provisionFromPurchaseIntent(params: {
   let tenantId = intent.tenant_id
 
   if (!tenantId) {
-    const tenantName = (intent.tenant_name || '').trim() || 'Organisation'
+    // Task 1.3: Determine tenant type based on purchase intent kind
+    const isPrivatePurchase = intent.kind === 'user_subscription'
+    const tenantType = isPrivatePurchase ? 'private' : 'organisation'
+    
+    // For private tenants, generate name from email if not provided
+    let tenantName = (intent.tenant_name || '').trim()
+    if (!tenantName) {
+      if (isPrivatePurchase && intent.email) {
+        const emailPrefix = intent.email.split('@')[0]
+        tenantName = `${emailPrefix}'s Account`
+      } else {
+        tenantName = isPrivatePurchase ? 'Personal Account' : 'Organisation'
+      }
+    }
+    
     const slug = slugifyTenant(tenantName) || null
 
     const { data: tenant, error: tenantError } = await supabaseAdmin
@@ -93,7 +107,7 @@ async function provisionFromPurchaseIntent(params: {
       .insert({
         name: tenantName,
         slug,
-        type: 'organisation',
+        type: tenantType,
         status: 'active',
         created_by: intent.user_id,
         updated_by: intent.user_id,
@@ -192,6 +206,39 @@ async function provisionFromPurchaseIntent(params: {
     if (seatAssignError && seatAssignError.code !== '23505') {
       console.error('[stripe-webhook] seat assignment insert error', seatAssignError)
       // Non-fatal: tenant admins can assign seats later.
+    }
+  }
+
+  // Task 2.2: Expand bundle products into child entitlements
+  // Check if the purchased product is a bundle
+  const { data: bundleProduct, error: bundleCheckError } = await supabaseAdmin
+    .from('products')
+    .select('is_bundle')
+    .eq('id', intent.product_id)
+    .single()
+
+  if (bundleCheckError) {
+    console.warn('[stripe-webhook] bundle check error (non-fatal)', bundleCheckError)
+  }
+
+  if (bundleProduct?.is_bundle) {
+    console.log('[stripe-webhook] expanding bundle product', intent.product_id)
+    
+    // Call the expand_bundle_entitlements function
+    const { data: expandedItems, error: expandError } = await supabaseAdmin
+      .rpc('expand_bundle_entitlements', {
+        p_purchase_intent_id: intent.id,
+        p_tenant_id: tenantId,
+        p_bundle_product_id: intent.product_id,
+        p_base_quantity: intent.quantity_seats ?? 1,
+        p_expires_at: null, // TODO: Calculate from subscription billing period if needed
+      })
+
+    if (expandError) {
+      console.error('[stripe-webhook] bundle expansion error', expandError)
+      // Non-fatal: the main bundle entitlement is still granted
+    } else {
+      console.log('[stripe-webhook] expanded bundle to child entitlements', expandedItems)
     }
   }
 
@@ -415,6 +462,7 @@ export async function POST(request: Request) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         
+        // Update legacy tenant_subscriptions
         const { data: existing } = await supabaseAdmin
           .from('tenant_subscriptions')
           .select('id')
@@ -429,6 +477,24 @@ export async function POST(request: Request) {
               cancelled_at: new Date().toISOString(),
             })
             .eq('id', existing.id)
+        }
+
+        // Task 1.7: Also deactivate entitlements (new model)
+        // Find entitlements linked to this subscription
+        const { data: entitlements } = await supabaseAdmin
+          .from('tenant_product_entitlements')
+          .select('id')
+          .eq('metadata->>stripe_subscription_id', subscription.id)
+          .eq('status', 'active')
+
+        if (entitlements?.length) {
+          for (const ent of entitlements) {
+            await supabaseAdmin
+              .from('tenant_product_entitlements')
+              .update({ status: 'inactive' })
+              .eq('id', ent.id)
+          }
+          console.log(`[stripe-webhook] Deactivated ${entitlements.length} entitlements for subscription ${subscription.id}`)
         }
         break
       }
@@ -465,6 +531,112 @@ export async function POST(request: Request) {
             reference: (invoiceObj.payment_intent as string | null) ?? null,
             status: 'failed',
           })
+        }
+
+        // Task 3.3: Dunning Management - Record payment failure
+        const subscriptionId = invoiceObj.subscription as string | null
+        const customerId = invoiceObj.customer as string | null
+        const failureCode = (invoiceObj.last_finalization_error as { code?: string } | null)?.code
+        const failureMessage = (invoiceObj.last_finalization_error as { message?: string } | null)?.message
+
+        // Find the tenant by customer ID from purchase_intents or tenant metadata
+        let tenantId: string | null = null
+        if (customerId) {
+          // Check purchase_intents
+          const { data: intentData } = await supabaseAdmin
+            .from('purchase_intents')
+            .select('tenant_id')
+            .eq('stripe_customer_id', customerId)
+            .not('tenant_id', 'is', null)
+            .limit(1)
+            .maybeSingle()
+          
+          tenantId = intentData?.tenant_id ?? null
+        }
+
+        if (tenantId) {
+          // Get dunning config (use global if no tenant-specific config)
+          const { data: dunningConfig } = await supabaseAdmin
+            .from('dunning_config')
+            .select('*')
+            .or(`tenant_id.eq.${tenantId},tenant_id.is.null`)
+            .order('tenant_id', { nullsFirst: false })
+            .limit(1)
+            .maybeSingle()
+
+          const maxRetries = dunningConfig?.max_retry_attempts ?? 3
+          const retryIntervalHours = dunningConfig?.retry_interval_hours ?? 24
+          const gracePeriodDays = dunningConfig?.grace_period_days ?? 7
+
+          // Calculate next retry and grace period
+          const nextRetryAt = new Date(Date.now() + retryIntervalHours * 60 * 60 * 1000).toISOString()
+          const gracePeriodEndsAt = new Date(Date.now() + gracePeriodDays * 24 * 60 * 60 * 1000).toISOString()
+
+          // Check if we already have a failure record for this invoice
+          const { data: existingFailure } = await supabaseAdmin
+            .from('payment_failures')
+            .select('id, retry_count')
+            .eq('invoice_id', invoiceObj.id)
+            .maybeSingle()
+
+          if (existingFailure) {
+            // Update retry count
+            const newRetryCount = (existingFailure.retry_count || 0) + 1
+            const newStatus = newRetryCount >= maxRetries ? 'failed' : 'retrying'
+            
+            await supabaseAdmin
+              .from('payment_failures')
+              .update({
+                retry_count: newRetryCount,
+                last_retry_at: new Date().toISOString(),
+                next_retry_at: newStatus === 'failed' ? null : nextRetryAt,
+                status: newStatus,
+                failure_code: failureCode,
+                failure_message: failureMessage,
+              })
+              .eq('id', existingFailure.id)
+
+            // Log the retry action
+            await supabaseAdmin.rpc('log_dunning_action', {
+              p_payment_failure_id: existingFailure.id,
+              p_action_type: 'retry_attempted',
+              p_action_result: 'failed',
+              p_action_details: { retry_count: newRetryCount, failure_code: failureCode },
+            })
+          } else {
+            // Create new failure record
+            const { data: newFailure, error: insertError } = await supabaseAdmin
+              .from('payment_failures')
+              .insert({
+                tenant_id: tenantId,
+                subscription_id: subscriptionId,
+                invoice_id: invoiceObj.id,
+                stripe_customer_id: customerId,
+                failure_code: failureCode,
+                failure_message: failureMessage,
+                amount: invoiceObj.amount_due,
+                currency: invoiceObj.currency,
+                retry_count: 0,
+                max_retries: maxRetries,
+                next_retry_at: nextRetryAt,
+                status: 'pending',
+                grace_period_ends_at: gracePeriodEndsAt,
+              })
+              .select('id')
+              .single()
+
+            if (!insertError && newFailure) {
+              // Log initial failure
+              await supabaseAdmin.rpc('log_dunning_action', {
+                p_payment_failure_id: newFailure.id,
+                p_action_type: 'retry_scheduled',
+                p_action_result: 'success',
+                p_action_details: { next_retry_at: nextRetryAt, grace_period_ends_at: gracePeriodEndsAt },
+              })
+            }
+          }
+
+          console.log(`[stripe-webhook] Dunning: payment failure recorded for tenant ${tenantId}`)
         }
         break
       }

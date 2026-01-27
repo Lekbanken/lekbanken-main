@@ -10,8 +10,10 @@ export const dynamic = 'force-dynamic'
 
 const startCheckoutSchema = z.object({
   productPriceId: z.string().uuid(),
-  tenantName: z.string().min(2).max(120),
+  tenantId: z.string().uuid().optional(), // For existing org purchases
+  tenantName: z.string().min(2).max(120).optional(), // Required for new orgs, optional for private
   quantitySeats: z.number().int().min(1).max(100000).optional(),
+  kind: z.enum(['organisation_subscription', 'user_subscription']).default('organisation_subscription'),
 })
 
 function getOrigin(request: Request): string {
@@ -29,6 +31,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
+  // Task 1.1: Block demo users from checkout
+  const { data: userProfile } = await supabaseAdmin
+    .from('users')
+    .select('is_demo_user, is_ephemeral')
+    .eq('id', user.id)
+    .single()
+
+  if (userProfile?.is_demo_user || userProfile?.is_ephemeral) {
+    return NextResponse.json(
+      {
+        error: 'Demo accounts cannot make purchases',
+        code: 'DEMO_USER_BLOCKED',
+        action: 'convert_account',
+      },
+      { status: 403 }
+    )
+  }
+
   let body: unknown
   try {
     body = await request.json()
@@ -41,8 +61,39 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 })
   }
 
-  const { productPriceId, tenantName } = parsed.data
-  const quantitySeats = parsed.data.quantitySeats ?? 1
+  const { productPriceId, tenantId, kind } = parsed.data
+  const tenantName = parsed.data.tenantName?.trim() || ''
+  // Private purchases always have 1 seat
+  const quantitySeats = kind === 'user_subscription' ? 1 : (parsed.data.quantitySeats ?? 1)
+
+  // Task 1.3: Validate tenantName for new org purchases
+  if (kind === 'organisation_subscription' && !tenantId && !tenantName) {
+    return NextResponse.json(
+      { error: 'Organization name is required for new organizations' },
+      { status: 400 }
+    )
+  }
+
+  // Task 1.2: Ownership check for existing tenant purchases
+  if (tenantId && kind === 'organisation_subscription') {
+    const { data: membership } = await supabaseAdmin
+      .from('user_tenant_memberships')
+      .select('role')
+      .eq('tenant_id', tenantId)
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .single()
+
+    if (!membership || !['owner', 'admin'].includes(membership.role)) {
+      return NextResponse.json(
+        {
+          error: 'Only organization owners and admins can make purchases',
+          code: 'INSUFFICIENT_ROLE',
+        },
+        { status: 403 }
+      )
+    }
+  }
 
   const { data: price, error: priceError } = await supabaseAdmin
     .from('product_prices')
@@ -78,14 +129,69 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Price not linked to Stripe' }, { status: 400 })
   }
 
+  // Task 1.5: Check existing entitlements before allowing purchase
+  if (tenantId) {
+    // Check if this tenant already owns the product
+    const { data: existingEntitlement } = await supabaseAdmin
+      .from('tenant_product_entitlements')
+      .select('id, status')
+      .eq('tenant_id', tenantId)
+      .eq('product_id', price.product_id)
+      .eq('status', 'active')
+      .maybeSingle()
+
+    if (existingEntitlement) {
+      return NextResponse.json(
+        {
+          error: 'Your organization already owns this product',
+          code: 'ALREADY_OWNED',
+          entitlement_id: existingEntitlement.id,
+        },
+        { status: 409 }
+      )
+    }
+  }
+
+  // For personal purchases, check all user's tenants for existing entitlement
+  if (kind === 'user_subscription') {
+    const { data: userTenants } = await supabaseAdmin
+      .from('user_tenant_memberships')
+      .select('tenant_id')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+
+    if (userTenants?.length) {
+      const tenantIds = userTenants.map((t) => t.tenant_id)
+      const { data: existingEntitlement } = await supabaseAdmin
+        .from('tenant_product_entitlements')
+        .select('id, tenant_id')
+        .in('tenant_id', tenantIds)
+        .eq('product_id', price.product_id)
+        .eq('status', 'active')
+        .maybeSingle()
+
+      if (existingEntitlement) {
+        return NextResponse.json(
+          {
+            error: 'You already own this product',
+            code: 'ALREADY_OWNED',
+            tenant_id: existingEntitlement.tenant_id,
+          },
+          { status: 409 }
+        )
+      }
+    }
+  }
+
   const { data: intent, error: intentError } = await supabaseAdmin
     .from('purchase_intents')
     .insert({
-      kind: 'organisation_subscription',
+      kind, // Task 1.3: Use dynamic kind instead of hardcoded
       status: 'awaiting_payment',
       email: user.email ?? null,
       user_id: user.id,
-      tenant_name: tenantName,
+      tenant_id: tenantId || null, // Store existing tenant if provided
+      tenant_name: tenantName || null,
       product_id: price.product_id,
       product_price_id: price.id,
       quantity_seats: quantitySeats,
@@ -98,8 +204,39 @@ export async function POST(request: Request) {
     .select('id')
     .single()
 
-  if (intentError || !intent) {
+  // Task 1.4: Handle duplicate pending purchase intent gracefully
+  if (intentError) {
+    // Check for unique constraint violation (code 23505)
+    if (intentError.code === '23505' && intentError.message?.includes('purchase_intents_pending_unique')) {
+      // Find existing pending intent and return its checkout session
+      const { data: existingIntent } = await supabaseAdmin
+        .from('purchase_intents')
+        .select('id, stripe_checkout_session_id')
+        .eq('user_id', user.id)
+        .eq('product_id', price.product_id)
+        .in('status', ['draft', 'awaiting_payment'])
+        .single()
+
+      if (existingIntent?.stripe_checkout_session_id) {
+        try {
+          const existingSession = await stripe.checkout.sessions.retrieve(existingIntent.stripe_checkout_session_id)
+          if (existingSession.url && existingSession.status === 'open') {
+            return NextResponse.json({
+              purchase_intent_id: existingIntent.id,
+              checkout_url: existingSession.url,
+              reused_session: true,
+            })
+          }
+        } catch {
+          // Session expired or invalid, continue to create new one
+        }
+      }
+    }
     console.error('[checkout/start] intent insert error', intentError)
+    return NextResponse.json({ error: 'Failed to create purchase intent' }, { status: 500 })
+  }
+
+  if (!intent) {
     return NextResponse.json({ error: 'Failed to create purchase intent' }, { status: 500 })
   }
 
@@ -130,7 +267,9 @@ export async function POST(request: Request) {
         product_price_id: price.id,
         product_id: price.product_id,
         quantity_seats: String(quantitySeats),
-        tenant_name: tenantName,
+        tenant_name: tenantName || '',
+        tenant_id: tenantId || '', // Existing tenant for B2B
+        kind, // Task 1.3: Include kind for webhook processing
       },
     })
   } catch (err) {

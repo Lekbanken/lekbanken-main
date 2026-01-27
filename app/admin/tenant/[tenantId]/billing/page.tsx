@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { CreditCardIcon, DocumentTextIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState, AdminStatCard, AdminStatGrid } from '@/components/admin/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useTenant } from '@/lib/context/TenantContext';
 import { getBillingStats, getSubscription, getInvoices, type Subscription, type Invoice } from '@/lib/services/billingService';
 
@@ -23,6 +24,30 @@ export default function TenantBillingPage() {
     outstandingInvoices: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPortalLoading, setIsPortalLoading] = useState(false);
+
+  // Handle opening Stripe Portal
+  const handleManageSubscription = async () => {
+    if (!tenantId) return;
+    setIsPortalLoading(true);
+    try {
+      const res = await fetch('/api/billing/portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenantId }),
+      });
+      const json = await res.json();
+      if (json.url) {
+        window.location.href = json.url;
+      } else {
+        console.error('No portal URL returned');
+      }
+    } catch (error) {
+      console.error('Failed to open billing portal:', error);
+    } finally {
+      setIsPortalLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!tenantId) return;
@@ -72,12 +97,23 @@ export default function TenantBillingPage() {
         description={t('description')}
         icon={<CreditCardIcon className="h-8 w-8 text-primary" />}
         actions={
-          isLoading ? (
-            <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-              <ArrowPathIcon className="h-4 w-4 animate-spin" />
-              {t('loading')}
-            </span>
-          ) : null
+          <div className="flex items-center gap-2">
+            {subscription && (
+              <Button
+                onClick={handleManageSubscription}
+                disabled={isPortalLoading}
+                variant="outline"
+              >
+                {isPortalLoading ? t('openingPortal') : t('manageSubscription')}
+              </Button>
+            )}
+            {isLoading && (
+              <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+                <ArrowPathIcon className="h-4 w-4 animate-spin" />
+                {t('loading')}
+              </span>
+            )}
+          </div>
         }
       />
 

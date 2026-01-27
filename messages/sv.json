@@ -602,6 +602,17 @@
     }
   },
   "admin": {
+    "table": {
+      "pagination": {
+        "ariaLabel": "Tabellpaginering",
+        "showing": "Visar",
+        "of": "av",
+        "previousPage": "Gå till föregående sida",
+        "previous": "Föregående",
+        "nextPage": "Gå till nästa sida",
+        "next": "Nästa"
+      }
+    },
     "confirm": {
       "defaultConfirm": "Bekräfta",
       "defaultCancel": "Avbryt",
@@ -1467,6 +1478,113 @@
       }
     },
     "organisations": {
+      "openOrg": "Öppna {name}",
+      "copyUuid": "Kopiera UUID för {name}",
+      "copy": "Kopiera",
+      "created": "Skapad",
+      "quickActions": "Snabbåtgärder",
+      "manageBilling": "Hantera fakturering",
+      "openStripe": "Öppna Stripe",
+      "reactivate": "Återaktivera",
+      "suspend": "Stäng av",
+      "deleteOrg": "Ta bort organisation",
+      "domain": "Domän",
+      "domainActive": "aktiv",
+      "domainPending": "väntande",
+      "noDomain": "Ingen domän",
+      "contact": "Kontakt",
+      "connected": "Kopplad",
+      "noBilling": "Ingen fakturering",
+      "deleteOrgTitle": "Ta bort organisation?",
+      "deleteOrgWarning": "Detta går inte att ångra. Organisationen och all tillhörande data kommer att tas bort permanent.",
+      "cancel": "Avbryt",
+      "delete": "Ta bort",
+      "contactSection": {
+        "title": "Kontaktinformation",
+        "primaryContact": "Primär kontakt",
+        "namePlaceholder": "Namn",
+        "notSpecified": "Ej angiven",
+        "notSpecifiedNeutral": "Ej angivet",
+        "contactEmail": "E-post",
+        "phone": "Telefon",
+        "internalNote": "Intern anteckning",
+        "systemAdminOnly": "(endast systemadmin)",
+        "internalNotePlaceholder": "Interna anteckningar om organisationen...",
+        "noNotes": "Inga anteckningar"
+      },
+      "branding": {
+        "title": "Profil & Varumärke",
+        "logo": "Logotyp",
+        "uploadLogo": "Ladda upp logotyp",
+        "removeLogo": "Ta bort logotyp",
+        "brandName": "Varumärkesnamn",
+        "brandNamePlaceholder": "Anpassat namn (valfritt)",
+        "brandNameOverride": "Eget varumärkesnamn",
+        "primaryColor": "Primärfärg",
+        "secondaryColor": "Sekundärfärg",
+        "accentColor": "Accentfärg",
+        "theme": "Tema",
+        "themeAuto": "Automatiskt",
+        "themeLight": "Ljust",
+        "themeDark": "Mörkt",
+        "save": "Spara",
+        "saving": "Sparar...",
+        "reset": "Återställ",
+        "enableBranding": "Aktivera varumärkesprofil",
+        "brandingEnabled": "Varumärkesprofil aktiverad",
+        "brandingDisabled": "Varumärkesprofil inaktiverad",
+        "tenantBranding": "Varumärkesprofil",
+        "paidFeature": "Betalfunktion",
+        "tenantBrandingDescription": "Aktivera för att visa organisationens egna färger och logotyp.",
+        "logoHint": "PNG eller SVG, max 2 MB",
+        "brandNameOverrideHint": "Lämna tomt för att använda organisationens namn",
+        "selectTheme": "Välj tema",
+        "colorPreview": "Förhandsvisning"
+      },
+      "audit": {
+        "title": "Aktivitetslogg",
+        "fullLog": "Visa fullständig logg",
+        "noActivity": "Ingen aktivitet ännu"
+      },
+      "dangerZone": {
+        "title": "Farozon",
+        "suspendOrg": "Stäng av organisation",
+        "suspendDescription": "Stänger av tillgång för alla medlemmar.",
+        "reactivateOrg": "Återaktivera organisation",
+        "reactivateDescription": "Återger tillgång för alla medlemmar.",
+        "suspend": "Stäng av",
+        "reactivate": "Återaktivera",
+        "archiveOrg": "Arkivera organisation",
+        "archiveDescription": "Arkiverar organisationen och döljer den från listor.",
+        "archive": "Arkivera",
+        "deleteOrgPermanently": "Ta bort organisation permanent",
+        "deleteWarning": "Detta går inte att ångra. All data kommer att raderas.",
+        "delete": "Ta bort",
+        "archiveDialog": {
+          "title": "Arkivera organisation?",
+          "description": "kommer att arkiveras och döljas från listor.",
+          "cancel": "Avbryt",
+          "confirm": "Arkivera"
+        },
+        "deleteDialog": {
+          "title": "Ta bort organisation permanent?",
+          "description": "{name} kommer att tas bort permanent.",
+          "placeholder": "Skriv slug här",
+          "cancel": "Avbryt",
+          "confirm": "Ta bort permanent",
+          "willRemove": "Detta kommer att ta bort:",
+          "removeMemberships": "Alla medlemskap och roller",
+          "removeConfig": "Alla inställningar och konfigurationer",
+          "removeDomains": "Alla kopplade domäner",
+          "removeAudit": "All aktivitetshistorik",
+          "cannotBeUndone": "Detta kan inte ångras.",
+          "confirmPrompt": "Skriv {slug} för att bekräfta"
+        },
+        "cancel": "Avbryt",
+        "archiving": "Arkiverar...",
+        "deleting": "Tar bort...",
+        "deletePermanently": "Ta bort permanent"
+      },
       "licensing": {
         "errorTitle": "Kunde inte ladda",
         "errorDescription": "Kunde inte ladda licenser/entitlements.",
@@ -1505,9 +1623,18 @@
       },
       "billing": {
         "paymentOverdue": "Betalning förfallen",
-        "overdueDescription": "Det finns en förfallen betalning. Kontrollera faktureringsinformationen i Stripe för att undvika avbrott i tjänsten."
+        "overdueDescription": "Det finns en förfallen betalning. Kontrollera faktureringsinformationen i Stripe för att undvika avbrott i tjänsten.",
+        "noSubscription": "Ingen aktiv prenumeration",
+        "contactSupport": "Kontakta support för att konfigurera fakturering.",
+        "stripeDashboard": "Stripe Dashboard",
+        "trialActive": "Provperiod aktiv",
+        "trialDaysRemaining": "{count} dagar kvar (slutar {date})"
       },
       "domains": {
+        "title": "Domäner",
+        "add": "Lägg till",
+        "platformDomain": "Plattformsdomän (automatisk)",
+        "noCustomDomain": "Inga egna domäner konfigurerade ännu.",
         "howToTitle": "Så här kopplar du en egen domän",
         "step1": "Lägg en DNS CNAME-post: ",
         "step2": "Lägg till domänen i listan ovan",
@@ -1685,7 +1812,9 @@
         "invoicesTitle": "Fakturor",
         "noInvoicesTitle": "Inga fakturor ännu",
         "noInvoicesDescription": "När fakturor finns för denna organisation visas de här.",
-        "invoiceFallbackName": "Faktura"
+        "invoiceFallbackName": "Faktura",
+        "manageSubscription": "Hantera prenumeration",
+        "openingPortal": "Öppnar..."
       },
       "analytics": {
         "pageTitle": "Statistik",
@@ -2862,6 +2991,181 @@
         "form": {
           "amountPlaceholder": "499.00",
           "referencePlaceholder": "Transaktions-ID"
+        }
+      },
+      "upsell": {
+        "unlock": "Lås upp",
+        "unlockFor": "Lås upp för {price}",
+        "unlockNow": "Lås upp nu",
+        "loading": "Laddar...",
+        "maybeLater": "Kanske senare",
+        "oneTime": "engångsköp",
+        "modalTitle": "Uppgradera för att fortsätta",
+        "modalDescription": "Lås upp fler funktioner med en uppgradering.",
+        "modalDescriptionWithFeature": "Lås upp \"{feature}\" med en uppgradering.",
+        "errorGeneric": "Något gick fel. Försök igen.",
+        "errorNoCheckoutUrl": "Kunde inte starta betalning."
+      },
+      "lockedContent": {
+        "defaultTitle": "Premiuminnehåll",
+        "defaultMessage": "Uppgradera för att låsa upp detta innehåll.",
+        "unlock": "Lås upp"
+      },
+      "promoCodes": {
+        "title": "Rabattkoder",
+        "description": "Hantera rabattkoder och kampanjer i Stripe.",
+        "createNew": "Skapa rabattkod",
+        "createTitle": "Skapa ny rabattkod",
+        "loading": "Laddar rabattkoder...",
+        "emptyTitle": "Inga rabattkoder",
+        "emptyDescription": "Skapa din första rabattkod för att komma igång.",
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "off": "rabatt",
+        "redeemed": "inlösta",
+        "expiresAt": "Går ut",
+        "confirmDeactivate": "Är du säker på att du vill inaktivera denna rabattkod?",
+        "creating": "Skapar...",
+        "create": "Skapa",
+        "cancel": "Avbryt",
+        "form": {
+          "code": "Kod",
+          "percentOff": "Procent rabatt",
+          "amountOff": "Belopp rabatt (SEK)",
+          "maxRedemptions": "Max antal inlösningar",
+          "expiresAt": "Går ut (valfritt)",
+          "firstTimeOnly": "Endast för nya kunder"
+        }
+      },
+      "cart": {
+        "title": "Varukorg",
+        "openCart": "Öppna varukorg",
+        "empty": "Din varukorg är tom",
+        "subtotal": "Delsumma",
+        "clearCart": "Töm",
+        "checkout": "Gå till kassan",
+        "processing": "Bearbetar...",
+        "addToCart": "Lägg i varukorg",
+        "added": "Tillagd!",
+        "perMonth": "/månad",
+        "perYear": "/år",
+        "oneTime": "engångsköp",
+        "mixedTypesWarning": "Du kan inte blanda prenumerationer och engångsköp i samma beställning."
+      },
+      "analytics": {
+        "title": "Intäktsanalys",
+        "description": "Överblick av prenumerationer, intäkter och tillväxt.",
+        "period": {
+          "7d": "Senaste 7 dagarna",
+          "30d": "Senaste 30 dagarna",
+          "90d": "Senaste 90 dagarna",
+          "12m": "Senaste 12 månaderna"
+        },
+        "metrics": {
+          "mrr": "MRR",
+          "arr": "ARR",
+          "activeSubscriptions": "Aktiva prenumerationer",
+          "newThisPeriod": "nya denna period",
+          "churnRate": "Churn-rate",
+          "churned": "avslutade",
+          "arpu": "ARPU",
+          "perMonth": "per månad"
+        },
+        "revenueByProduct": {
+          "title": "Intäkt per produkt",
+          "description": "Fördelning av intäkter mellan produkter.",
+          "product": "Produkt",
+          "revenue": "Intäkt",
+          "subscriptions": "Prenumerationer",
+          "empty": "Inga produktintäkter att visa."
+        },
+        "monthlyTrend": {
+          "title": "Månatlig trend",
+          "description": "Intäktsutveckling över tid.",
+          "month": "Månad",
+          "revenue": "Intäkt",
+          "empty": "Ingen trenddata att visa."
+        },
+        "growth": {
+          "title": "Tillväxt",
+          "newSubscriptions": "Nya prenumerationer",
+          "upgrades": "Uppgraderingar"
+        },
+        "churn": {
+          "title": "Churn",
+          "canceled": "Avslutade",
+          "downgrades": "Nedgraderingar"
+        }
+      },
+      "dunning": {
+        "title": "Betalningsuppföljning",
+        "description": "Hantera misslyckade betalningar och återhämtning.",
+        "refresh": "Uppdatera",
+        "noFailures": "Inga misslyckade betalningar. Utmärkt!",
+        "confirmCancel": "Är du säker på att du vill avbryta denna betalningsuppföljning?",
+        "viewDetails": "Detaljer",
+        "retryNow": "Försök igen",
+        "cancel": "Avbryt",
+        "stats": {
+          "pending": "Väntande",
+          "failed": "Misslyckade",
+          "recovered": "Återhämtade"
+        },
+        "status": {
+          "pending": "Väntande",
+          "retrying": "Försöker igen",
+          "recovered": "Återhämtad",
+          "failed": "Misslyckad",
+          "canceled": "Avbruten"
+        },
+        "failuresTable": {
+          "title": "Misslyckade betalningar",
+          "description": "Betalningar som kräver åtgärd.",
+          "tenant": "Organisation",
+          "amount": "Belopp",
+          "status": "Status",
+          "retries": "Försök",
+          "gracePeriod": "Respit till",
+          "actions": "Åtgärder"
+        },
+        "detailsModal": {
+          "title": "Betalningsdetaljer",
+          "noMessage": "Inget felmeddelande tillgängligt.",
+          "created": "Skapad",
+          "nextRetry": "Nästa försök",
+          "actionsLog": "Åtgärdslogg",
+          "noActions": "Inga åtgärder loggade."
+        }
+      },
+      "usage": {
+        "title": "Förbrukningsbaserad fakturering",
+        "description": "Hantera och visa användningsdata för förbrukningsbaserad prissättning.",
+        "refresh": "Uppdatera",
+        "loading": "Laddar...",
+        "noData": "Ingen användningsdata för denna period.",
+        "noMeters": "Inga användningsmätare konfigurerade.",
+        "filterMeter": "Mätare",
+        "filterPeriod": "Period",
+        "allMeters": "Alla mätare",
+        "periodCurrent": "Nuvarande månad",
+        "periodPrevious": "Föregående månad",
+        "period30Days": "Senaste 30 dagarna",
+        "periodRange": "{start} - {end}",
+        "tenantsCount": "{count} organisationer",
+        "metersTitle": "Användningsmätare",
+        "table": {
+          "tenant": "Organisation",
+          "meter": "Mätare",
+          "quantity": "Mängd",
+          "billable": "Fakturerat",
+          "period": "Period"
+        },
+        "metersTable": {
+          "name": "Namn",
+          "slug": "Slug",
+          "unit": "Enhet",
+          "aggregation": "Aggregering",
+          "status": "Status"
         }
       }
     },
@@ -5734,7 +6038,32 @@
       }
     },
     "organizations": {
+      "breadcrumb": "Organisationer",
       "title": "Organisationer",
+      "description": "Hantera organisationer och deras inställningar",
+      "createButton": "Skapa organisation",
+      "accessDenied": "Åtkomst nekad",
+      "noPermissionOrgs": "Du har inte behörighet att visa organisationer.",
+      "goToDashboard": "Gå till dashboard",
+      "retryOrRefresh": "Försök igen eller ladda om sidan.",
+      "reload": "Ladda om",
+      "detail": {
+        "copied": "Kopierad!",
+        "copiedWithLabel": "{label} kopierad!",
+        "stats": {
+          "members": "Medlemmar",
+          "features": "Funktioner",
+          "domains": "Domäner"
+        },
+        "actions": {
+          "refresh": "Uppdatera",
+          "edit": "Redigera",
+          "openApp": "Öppna appen",
+          "suspend": "Stäng av",
+          "reactivate": "Återaktivera",
+          "delete": "Ta bort"
+        }
+      },
       "createOrganization": "Skapa organisation",
       "editOrganization": "Redigera organisation",
       "deleteOrganization": "Ta bort organisation",
@@ -7646,6 +7975,26 @@
     }
   },
   "app": {
+    "invoices": {
+      "title": "Mina fakturor",
+      "description": "Visa och ladda ner dina fakturor.",
+      "loading": "Laddar fakturor...",
+      "fetchError": "Kunde inte hämta fakturor.",
+      "emptyTitle": "Inga fakturor",
+      "emptyDescription": "Du har inga fakturor ännu.",
+      "invoiceNumberMissing": "Faktura",
+      "paidOn": "Betald",
+      "dueOn": "Förfaller",
+      "pay": "Betala",
+      "status": {
+        "paid": "Betald",
+        "open": "Öppen",
+        "draft": "Utkast",
+        "void": "Annullerad",
+        "uncollectible": "Ej indrivbar",
+        "unknown": "Okänd"
+      }
+    },
     "nav": {
       "home": "Hem",
       "dashboard": "Dashboard",
@@ -8699,23 +9048,44 @@
     },
     "subscription": {
       "title": "Prenumeration",
-      "subtitle": "Hantera din prenumeration och fakturor",
+      "subtitle": "Hantera prenumerationen för {tenantName}",
+      "subtitleNoTenant": "Du har inget aktivt konto",
       "tabs": {
         "overview": "Översikt",
         "plans": "Planer",
-        "invoices": "Fakturor"
+        "invoices": "Fakturor",
+        "entitlements": "Produkter"
+      },
+      "error": {
+        "title": "Något gick fel",
+        "retry": "Försök igen"
       },
       "status": {
-        "active": "Aktiv"
+        "active": "Aktiv",
+        "canceled": "Avslutad",
+        "past_due": "Förfallen",
+        "canceling": "Avslutas snart",
+        "trialing": "Provperiod",
+        "incomplete": "Ofullständig"
       },
       "currentPlan": {
+        "subscription": "Aktiv prenumeration",
         "proPlan": "Pro-plan",
         "unlimited": "Obegränsad tillgång till alla funktioner",
         "perMonth": "per månad",
-        "renews": "Förnyas: {date}",
+        "perInterval": "per {interval}",
+        "renews": "Förnyas {date}",
+        "endsOn": "Avslutas {date}",
         "paymentMethod": "{brand} •••• {last4}",
+        "role": "Din roll: {role}",
         "changePlan": "Byt plan",
-        "cancel": "Avbryt prenumeration"
+        "cancel": "Avbryt prenumeration",
+        "manage": "Hantera prenumeration"
+      },
+      "noSubscription": {
+        "title": "Ingen aktiv prenumeration",
+        "description": "Välj en plan för att komma igång",
+        "choosePlan": "Välj plan"
       },
       "features": {
         "title": "Dina funktioner"
@@ -8723,7 +9093,26 @@
       "stats": {
         "activities": "Aktiviteter",
         "usedToday": "Använda idag",
-        "monthsMember": "Månader medlem"
+        "monthsMember": "Månader medlem",
+        "activeProducts": "Aktiva produkter",
+        "invoices": "Fakturor",
+        "accountType": "Kontotyp",
+        "personal": "Privat",
+        "organization": "Organisation"
+      },
+      "entitlements": {
+        "unknownProduct": "Okänd produkt",
+        "seats": "{count} platser",
+        "status": {
+          "active": "Aktiv",
+          "inactive": "Inaktiv",
+          "paused": "Pausad"
+        },
+        "empty": {
+          "title": "Inga produkter",
+          "description": "Du har inga aktiva produkter",
+          "browse": "Utforska produkter"
+        }
       },
       "plans": {
         "free": "Gratis",
@@ -8759,6 +9148,15 @@
         "pending": "Väntande",
         "failed": "Misslyckad",
         "download": "Ladda ner",
+        "view": "Visa",
+        "empty": "Inga fakturor ännu",
+        "status": {
+          "paid": "Betald",
+          "open": "Öppen",
+          "draft": "Utkast",
+          "void": "Annullerad",
+          "uncollectible": "Obetald"
+        },
         "emptyTitle": "Inga fakturor",
         "emptyDescription": "Det finns inga fakturor att visa.",
         "noResultsFor": "Inga resultat för \"{query}\"",
@@ -9255,10 +9653,17 @@
     "checkout": {
       "start": {
         "title": "Köp licens",
-        "subtitle": "Skapa din organisation och gå vidare till betalning. Organisationen skapas först när Stripe bekräftar köpet.",
+        "subtitle": "Välj om du köper för dig själv eller din organisation. Organisationen skapas först när Stripe bekräftar köpet.",
         "canceled": "Betalningen avbröts. Du kan prova igen när du vill.",
         "cardTitle": "Uppgifter",
         "fields": {
+          "purchaseType": {
+            "label": "Vem köper du för?",
+            "personal": "För mig",
+            "organization": "För organisation",
+            "personalHint": "Du får ett personligt konto med tillgång till allt innehåll.",
+            "organizationHint": "Skapa en organisation och bjud in teammedlemmar."
+          },
           "orgName": {
             "label": "Organisationsnamn",
             "placeholder": "t.ex. Lekbanken AB"
@@ -9270,6 +9675,11 @@
             "label": "Plan",
             "loading": "Laddar planer…"
           }
+        },
+        "alreadyOwned": {
+          "title": "Du äger redan denna produkt",
+          "description": "Du har redan en aktiv prenumeration för denna produkt.",
+          "manageSubscription": "Hantera prenumeration"
         },
         "noAccount": "Har du inget konto?",
         "actions": {
@@ -9304,6 +9714,85 @@
           "readStatusFailed": "Kunde inte läsa status.",
           "generic": "Något gick fel. Försök igen."
         }
+      },
+      "success": {
+        "title": "Välkommen till Lekbanken!",
+        "subtitle": "Ditt köp är klart och ditt konto är aktiverat.",
+        "defaultProduct": "Din nya prenumeration",
+        "newOrganization": "Ny organisation skapad",
+        "addedTo": "Tillagd i",
+        "goToDashboard": "Gå till appen",
+        "viewReceipt": "Visa kvitto",
+        "manageSubscription": "Hantera prenumeration",
+        "helpText": "Har du frågor?",
+        "contactSupport": "Kontakta support"
+      },
+      "canceled": {
+        "title": "Betalningen avbröts",
+        "subtitle": "Inget har debiterats. Du kan försöka igen när du vill.",
+        "reasons": {
+          "title": "Vanliga anledningar:",
+          "changedMind": "Du ändrade dig",
+          "wrongProduct": "Du ville välja en annan produkt",
+          "paymentIssue": "Problem med betalningen",
+          "moreInfo": "Du ville läsa mer först"
+        },
+        "tryAgain": "Försök igen",
+        "viewPricing": "Se priser",
+        "needHelp": "Behöver du hjälp?",
+        "backToHome": "Tillbaka till startsidan"
+      }
+    },
+    "gift": {
+      "title": "Ge bort en gåva",
+      "subtitle": "Ge någon du bryr dig om tillgång till Lekbanken.",
+      "loginRequired": "Logga in för att köpa present",
+      "loginDescription": "Du måste vara inloggad för att köpa en presentprenumeration.",
+      "loginButton": "Logga in",
+      "loading": "Laddar produkter...",
+      "noProducts": "Inga presentprodukter tillgängliga just nu.",
+      "step1Title": "Välj produkt",
+      "step2Title": "Mottagarens uppgifter",
+      "step3Title": "Bekräfta och betala",
+      "changeProduct": "Byt produkt",
+      "giftBadge": "Present",
+      "recipientName": "Mottagarens namn (valfritt)",
+      "recipientNamePlaceholder": "t.ex. Anna",
+      "recipientEmail": "Mottagarens e-post (valfritt)",
+      "recipientEmailPlaceholder": "anna@example.com",
+      "recipientEmailHint": "Om du anger e-post skickas presentkoden automatiskt.",
+      "giftMessage": "Personligt meddelande (valfritt)",
+      "giftMessagePlaceholder": "Skriv ett meddelande till mottagaren...",
+      "back": "Tillbaka",
+      "continue": "Fortsätt",
+      "confirmProduct": "Produkt",
+      "confirmRecipient": "Mottagare",
+      "confirmEmail": "E-post",
+      "confirmMessage": "Meddelande",
+      "total": "Totalt",
+      "processing": "Bearbetar...",
+      "purchaseGift": "Köp present",
+      "errorGeneric": "Något gick fel. Försök igen.",
+      "redeem": {
+        "title": "Lös in presentkod",
+        "subtitle": "Ange din presentkod för att aktivera ditt konto.",
+        "loginRequired": "Logga in för att lösa in",
+        "loginDescription": "Du måste vara inloggad för att lösa in din presentkod.",
+        "loginButton": "Logga in",
+        "codeLabel": "Presentkod",
+        "codePlaceholder": "XXXX1234",
+        "codeHint": "Koden finns på ditt presentkort eller i e-postmeddelandet.",
+        "redeeming": "Löser in...",
+        "redeemButton": "Lös in kod",
+        "successTitle": "Grattis!",
+        "successDescription": "Du har nu tillgång till {product}.",
+        "defaultProduct": "din nya prenumeration",
+        "goToDashboard": "Gå till appen",
+        "noCode": "Har du ingen presentkod?",
+        "purchaseGift": "Köp en present",
+        "errorGeneric": "Kunde inte lösa in koden. Kontrollera att den är korrekt.",
+        "errorExpired": "Denna presentkod har gått ut.",
+        "errorAlreadyUsed": "Denna presentkod har redan använts."
       }
     },
     "footer": {
@@ -9319,6 +9808,63 @@
         "privacy": "Integritetspolicy"
       },
       "copyright": "Lekbanken AS. Alla rättigheter förbehållna."
+    },
+    "enterprise": {
+      "title": "Företagslösningar",
+      "subtitle": "Skräddarsydda lösningar för stora team och organisationer med avancerade behov.",
+      "features": {
+        "title": "Vad du får med Enterprise",
+        "items": {
+          "ssoLogin": {
+            "title": "SSO-inloggning",
+            "description": "Single Sign-On med SAML eller OAuth för enkel åtkomsthantering."
+          },
+          "advancedSecurity": {
+            "title": "Avancerad säkerhet",
+            "description": "Anpassade säkerhetspolicyer, audit-loggar och compliance-verktyg."
+          },
+          "customIntegrations": {
+            "title": "Anpassade integrationer",
+            "description": "API-åtkomst och integrationer med era befintliga system."
+          },
+          "dedicatedSupport": {
+            "title": "Dedikerad support",
+            "description": "Prioriterad support med personlig kontaktperson."
+          }
+        }
+      },
+      "testimonial": {
+        "quote": "Lekbanken har revolutionerat hur vi planerar aktiviteter för våra 500+ anställda.",
+        "author": "Maria Andersson",
+        "role": "HR-chef, Stort Företag AB"
+      },
+      "form": {
+        "title": "Begär offert",
+        "description": "Fyll i formuläret så kontaktar vi dig inom 24 timmar.",
+        "companyName": "Företagsnamn",
+        "companyNamePlaceholder": "t.ex. Lekbanken AB",
+        "contactName": "Kontaktperson",
+        "contactNamePlaceholder": "Ditt namn",
+        "email": "E-post",
+        "emailPlaceholder": "din@epost.se",
+        "phone": "Telefon (valfritt)",
+        "phonePlaceholder": "+46 70 123 45 67",
+        "teamSize": "Antal användare",
+        "message": "Meddelande (valfritt)",
+        "messagePlaceholder": "Beskriv era behov...",
+        "submitting": "Skickar...",
+        "submit": "Begär offert",
+        "privacy": "Vi behandlar dina uppgifter enligt vår integritetspolicy."
+      },
+      "success": {
+        "title": "Tack för din förfrågan!",
+        "description": "Vi har mottagit din offertförfrågan och återkommer inom 24 timmar.",
+        "nextSteps": "Kolla din e-post för bekräftelse."
+      },
+      "errors": {
+        "requiredFields": "Fyll i alla obligatoriska fält.",
+        "generic": "Något gick fel. Försök igen."
+      }
     },
     "hero": {
       "badge": "✨ Nyhet: AI-drivna spelplaner",
@@ -9423,6 +9969,7 @@
     },
     "pricing": {
       "tagline": "Priser",
+      "badge": "Priser",
       "title": "Enkla och transparenta priser",
       "description": "Välj den plan som passar dig bäst. Ingen bindningstid.",
       "frequencyLabel": "Välj betalningsfrekvens",
@@ -9483,6 +10030,24 @@
             "Dedikerad support",
             "SLA-garanti"
           ]
+        },
+        "marketing": {
+          "name": "Marknadsföring",
+          "highlight": "Grundläggande",
+          "price": "Gratis",
+          "description": "Utforska våra aktiviteter och lekar utan kostnad."
+        },
+        "app": {
+          "name": "App",
+          "highlight": "Populär",
+          "price": "99 kr/mån",
+          "description": "Full tillgång till alla funktioner i appen."
+        },
+        "admin": {
+          "name": "Admin",
+          "highlight": "Avancerad",
+          "price": "Kontakta oss",
+          "description": "Anpassade lösningar för organisationer."
         }
       },
       "mostPopular": "Mest populär"
@@ -9683,6 +10248,15 @@
           "description": "Ett oväntat fel inträffade. Försök igen eller starta om demon."
         }
       }
+    },
+    "conversionModal": {
+      "title": "Du använder ett demokonto",
+      "description": "För att göra köp behöver du ett riktigt konto.",
+      "descriptionWithProduct": "För att köpa <strong>{product}</strong> behöver du ett riktigt konto.",
+      "warning": "Din demo-progress sparas inte när du skapar ett nytt konto.",
+      "createAccount": "Skapa riktigt konto",
+      "login": "Logga in på befintligt konto",
+      "continueDemo": "Fortsätt demo"
     }
   },
   "legal": {
@@ -13503,5 +14077,53 @@
     "consent_id": "Samtyckes-ID: {id}",
     "change_preferences": "Ändra dina cookiepreferenser",
     "withdraw_consent": "Återkalla samtycke"
+  },
+  "gift": {
+    "redeem": {
+      "title": "Lös in gåvokod",
+      "description": "Ange din gåvokod för att låsa upp din produkt.",
+      "codeLabel": "Gåvokod",
+      "codeHint": "8-siffrig kod (t.ex. ABCD1234)",
+      "validate": "Validera kod",
+      "validating": "Validerar...",
+      "redeemButton": "Lös in gåva",
+      "redeeming": "Löser in...",
+      "valid": {
+        "title": "Giltig gåvokod!",
+        "product": "Du kommer att få: {name}"
+      },
+      "invalid": {
+        "notFound": "Ogiltig gåvokod. Kontrollera koden och försök igen.",
+        "alreadyRedeemed": "Denna gåvokod har redan använts.",
+        "expired": "Denna gåvokod har gått ut.",
+        "generic": "Gåvokoden är inte giltig."
+      },
+      "success": {
+        "title": "Gåva inlöst!",
+        "unlocked": "Du har nu tillgång till {product}.",
+        "redirecting": "Omdirigerar dig..."
+      },
+      "error": {
+        "validate": "Kunde inte validera koden.",
+        "redeem": "Kunde inte lösa in gåvan."
+      }
+    },
+    "purchase": {
+      "title": "Köp gåva",
+      "description": "Ge bort en prenumeration till någon.",
+      "recipientEmail": "Mottagarens e-post (valfritt)",
+      "recipientName": "Mottagarens namn (valfritt)",
+      "giftMessage": "Personligt meddelande (valfritt)",
+      "purchaseButton": "Köp gåva",
+      "processing": "Bearbetar..."
+    },
+    "success": {
+      "title": "Gåva köpt!",
+      "codeLabel": "Gåvokod",
+      "copyCode": "Kopiera kod",
+      "copied": "Kopierad!",
+      "sendToRecipient": "Skicka koden till mottagaren",
+      "expiresAt": "Gäller till: {date}"
+    }
   }
 }

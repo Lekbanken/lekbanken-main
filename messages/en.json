@@ -114,29 +114,29 @@
       "noData": "No data available",
       "emptyState": "Nothing here yet",
       "confirmDelete": "Are you sure you want to delete this?",
-        "member": "Member",
-        "licensing": {
-          "title": "Licenses",
-          "selectPlaceholder": "Select license…",
-          "emptyAssignments": "No active seat assignments.",
-          "labels": {
-            "assignedAt": "Assigned {date}"
-          },
-          "actions": {
-            "assign": "Assign",
-            "release": "Release"
-          },
-          "errors": {
-            "unknownUserId": "Unknown user id."
-          },
-          "toasts": {
-            "selectLicense": "Select a license.",
-            "seatAssigned": "Seat assigned.",
-            "assignFailed": "Could not assign seat (no seats left or already assigned).",
-            "seatReleased": "Seat released.",
-            "releaseFailed": "Could not release seat."
-          }
+      "member": "Member",
+      "licensing": {
+        "title": "Licenses",
+        "selectPlaceholder": "Select license…",
+        "emptyAssignments": "No active seat assignments.",
+        "labels": {
+          "assignedAt": "Assigned {date}"
         },
+        "actions": {
+          "assign": "Assign",
+          "release": "Release"
+        },
+        "errors": {
+          "unknownUserId": "Unknown user id."
+        },
+        "toasts": {
+          "selectLicense": "Select a license.",
+          "seatAssigned": "Seat assigned.",
+          "assignFailed": "Could not assign seat (no seats left or already assigned).",
+          "seatReleased": "Seat released.",
+          "releaseFailed": "Could not release seat."
+        }
+      },
       "unsavedChanges": "You have unsaved changes. Do you want to leave this page?",
       "loadingError": "Could not load data",
       "saveError": "Could not save",
@@ -621,6 +621,17 @@
     }
   },
   "admin": {
+    "table": {
+      "pagination": {
+        "ariaLabel": "Table pagination",
+        "showing": "Showing",
+        "of": "of",
+        "previousPage": "Go to previous page",
+        "previous": "Previous",
+        "nextPage": "Go to next page",
+        "next": "Next"
+      }
+    },
     "confirm": {
       "defaultConfirm": "Confirm",
       "defaultCancel": "Cancel",
@@ -1219,12 +1230,12 @@
       }
     },
     "licenses": {
-        "confirmReset": {
-          "title": "Reset trigger?",
-          "description": "This will reset the trigger “{name}” so it can be fired again.",
-          "cancel": "Cancel",
-          "confirm": "Reset"
-        },
+      "confirmReset": {
+        "title": "Reset trigger?",
+        "description": "This will reset the trigger “{name}” so it can be fired again.",
+        "cancel": "Cancel",
+        "confirm": "Reset"
+      },
       "legacy": {
         "pageTitle": "Licenses",
         "pageDescription": "Overview of customer licenses, status and usage.",
@@ -1430,7 +1441,288 @@
         "publishToCreateVersion": "Publish the plan to create a version"
       }
     },
+    "organizations": {
+      "breadcrumb": "Organizations",
+      "title": "Organizations",
+      "description": "Manage organizations and their settings",
+      "createButton": "Create organization",
+      "accessDenied": "Access denied",
+      "noPermissionOrgs": "You don't have permission to view organizations.",
+      "goToDashboard": "Go to dashboard",
+      "retryOrRefresh": "Try again or refresh the page if the problem persists.",
+      "reload": "Reload",
+      "detail": {
+        "copied": "Copied to clipboard",
+        "copiedWithLabel": "{label} copied"
+      },
+      "createOrganization": "Create organization",
+      "editOrganization": "Edit organization",
+      "deleteOrganization": "Delete organization",
+      "organizationDetails": "Organization details",
+      "searchOrganizations": "Search organizations...",
+      "noOrganizations": "No organizations found",
+      "members": {
+        "title": "Members",
+        "addMember": "Add member",
+        "addMemberDescription": "Search for an existing user by email and add them directly to the organization.",
+        "searchByEmail": "Search user by email",
+        "searchPlaceholder": "name@example.com",
+        "searching": "Searching...",
+        "search": "Search",
+        "noUserFound": "No user found with that email address",
+        "searchFailed": "Could not search for users",
+        "searchResults": "Search results",
+        "alreadyMember": "Already a member",
+        "role": "Role",
+        "roleOwner": "Owner",
+        "roleAdmin": "Admin",
+        "roleMember": "Member",
+        "cancel": "Cancel",
+        "adding": "Adding...",
+        "addMemberButton": "Add member",
+        "memberAdded": "{name} added as {role}",
+        "alreadyMemberError": "The user is already a member of the organization",
+        "addFailed": "Could not add member",
+        "loadFailed": "Could not load members",
+        "unknown": "Unknown",
+        "statsTotal": "Total",
+        "statsOwners": "Owners",
+        "statsAdmins": "Admins",
+        "statsPending": "Pending",
+        "membersCount": "Members ({count})",
+        "searchNameOrEmail": "Search by name or email...",
+        "allRoles": "All roles",
+        "loading": "Loading members...",
+        "noMembersMatch": "No members match the filters",
+        "noMembersYet": "No members in the organization",
+        "tableUser": "User",
+        "tableRole": "Role",
+        "tableMemberSince": "Member since",
+        "tableActions": "Actions",
+        "primary": "Primary",
+        "makeOwner": "Make owner",
+        "makeAdmin": "Make admin",
+        "makeMember": "Make member",
+        "removeFromOrg": "Remove from organization",
+        "confirmRemove": "Are you sure you want to remove {name} from the organization?",
+        "cannotRemoveOnlyOwner": "Cannot remove the only owner",
+        "memberRemoved": "Member removed",
+        "removeFailed": "Could not remove member",
+        "roleChanged": "Role changed to {role}",
+        "roleChangeFailed": "Could not change role"
+      },
+      "memberCount": "{count} members",
+      "plan": "Plan",
+      "subscription": "Subscription",
+      "settings": "Settings",
+      "billing": "Billing",
+      "mainLanguage": "Main language",
+      "confirmDelete": "Are you sure you want to delete this organization?",
+      "noMatchingOrgs": "No matching organizations",
+      "noOrgsYet": "No organizations yet",
+      "adjustSearchOrClear": "Adjust search or clear filters to see more.",
+      "createFirstOrg": "Create your first organization to start managing tenants.",
+      "allLanguages": "All languages",
+      "unknown": "Unknown",
+      "domains": "Domains",
+      "openApp": "Open app",
+      "reactivate": "Reactivate",
+      "suspend": "Suspend",
+      "overview": "Overview",
+      "statusChanged": "Status changed to {status}",
+      "couldNotChangeStatus": "Could not change status",
+      "toolbar": {
+        "searchPlaceholder": "Search organizations...",
+        "searchAriaLabel": "Search organizations",
+        "billing": {
+          "all": "All billing modes",
+          "connected": "Billing connected",
+          "notConnected": "No billing"
+        },
+        "domain": {
+          "all": "All domains",
+          "yes": "Has custom domain",
+          "no": "No domain"
+        },
+        "sort": {
+          "recent": "Newest first",
+          "name": "Name A–Z",
+          "members": "Most members",
+          "updated": "Recently updated"
+        },
+        "statusLabel": "Status",
+        "billingLabel": "Billing",
+        "languageLabel": "Language",
+        "domainLabel": "Domain",
+        "sortLabel": "Sort",
+        "clear": "Clear",
+        "clearWithCount": "Clear ({count})"
+      },
+      "create": {
+        "title": "Create organization",
+        "description": "Add a new organization and enter contact details.",
+        "nameLabel": "Organization name",
+        "namePlaceholder": "Organization Inc",
+        "slugLabel": "Slug",
+        "slugOptional": "(optional)",
+        "slugPlaceholder": "organization-inc",
+        "slugHint": "Leave empty for auto-slug.",
+        "contactPerson": "Contact person",
+        "contactPersonPlaceholder": "Name",
+        "contactEmail": "Contact email",
+        "contactEmailPlaceholder": "email@example.com",
+        "phone": "Phone",
+        "phoneOptional": "(optional)",
+        "phonePlaceholder": "+1 ...",
+        "status": "Status",
+        "statusPlaceholder": "Select status",
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "submit": "Create organization",
+        "required": "*"
+      },
+      "audit": {
+        "title": "Activity log",
+        "titleWithCount": "Activity log ({count})",
+        "loadFailed": "Could not load activity log",
+        "loading": "Loading events...",
+        "noEventsOfType": "No events of this type",
+        "noActivity": "No activity recorded",
+        "showingRange": "Showing {from}–{to} of {total}",
+        "allEvents": "All events",
+        "event": "Event",
+        "justNow": "Just now",
+        "minAgo": "{min} min ago",
+        "hoursAgo": "{hours}h ago",
+        "daysAgo": "{days}d ago",
+        "enabled": "enabled",
+        "disabled": "disabled",
+        "events": {
+          "statusChanged": "Status changed",
+          "memberAdded": "Member added",
+          "memberRemoved": "Member removed",
+          "memberRoleChanged": "Role changed",
+          "settingsUpdated": "Settings updated",
+          "domainAdded": "Domain added",
+          "domainRemoved": "Domain removed",
+          "domainStatusChanged": "Domain status changed",
+          "brandingUpdated": "Branding updated",
+          "brandingLogoUpdated": "Logo updated",
+          "localeUpdated": "Language updated",
+          "featureToggled": "Feature changed",
+          "organisationSuspended": "Organization suspended",
+          "organisationArchived": "Organization archived"
+        }
+      }
+    },
     "organisations": {
+      "openOrg": "Open {name}",
+      "copyUuid": "Copy UUID for {name}",
+      "copy": "Copy",
+      "created": "Created",
+      "quickActions": "Quick actions",
+      "manageBilling": "Manage billing",
+      "openStripe": "Open Stripe",
+      "reactivate": "Reactivate",
+      "suspend": "Suspend",
+      "deleteOrg": "Delete organization",
+      "domain": "Domain",
+      "domainActive": "active",
+      "domainPending": "pending",
+      "noDomain": "No domain",
+      "contact": "Contact",
+      "connected": "Connected",
+      "noBilling": "No billing",
+      "deleteOrgTitle": "Delete organization?",
+      "deleteOrgWarning": "This cannot be undone. The organization and all associated data will be permanently deleted.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "contactSection": {
+        "title": "Contact Information",
+        "primaryContact": "Primary Contact",
+        "namePlaceholder": "Name",
+        "notSpecified": "Not specified",
+        "notSpecifiedNeutral": "Not specified",
+        "contactEmail": "Email",
+        "phone": "Phone",
+        "internalNote": "Internal Note",
+        "systemAdminOnly": "(system admin only)",
+        "internalNotePlaceholder": "Internal notes about the organization...",
+        "noNotes": "No notes"
+      },
+      "branding": {
+        "title": "Profile & Branding",
+        "logo": "Logo",
+        "uploadLogo": "Upload logo",
+        "removeLogo": "Remove logo",
+        "brandName": "Brand name",
+        "brandNamePlaceholder": "Custom name (optional)",
+        "brandNameOverride": "Brand name override",
+        "primaryColor": "Primary color",
+        "secondaryColor": "Secondary color",
+        "accentColor": "Accent color",
+        "theme": "Theme",
+        "themeAuto": "Auto",
+        "themeLight": "Light",
+        "themeDark": "Dark",
+        "save": "Save",
+        "saving": "Saving...",
+        "reset": "Reset",
+        "enableBranding": "Enable branding",
+        "brandingEnabled": "Branding enabled",
+        "brandingDisabled": "Branding disabled",
+        "tenantBranding": "Tenant branding",
+        "paidFeature": "Paid feature",
+        "tenantBrandingDescription": "Enable to show organization's custom colors and logo.",
+        "logoHint": "PNG or SVG, max 2 MB",
+        "brandNameOverrideHint": "Leave empty to use organization name",
+        "selectTheme": "Select theme",
+        "colorPreview": "Preview"
+      },
+      "audit": {
+        "title": "Activity Log",
+        "fullLog": "View full log",
+        "noActivity": "No activity yet"
+      },
+      "dangerZone": {
+        "title": "Danger Zone",
+        "suspendOrg": "Suspend organization",
+        "suspendDescription": "Suspends access for all members.",
+        "reactivateOrg": "Reactivate organization",
+        "reactivateDescription": "Restores access for all members.",
+        "suspend": "Suspend",
+        "reactivate": "Reactivate",
+        "archiveOrg": "Archive organization",
+        "archiveDescription": "Archives the organization and hides it from lists.",
+        "archive": "Archive",
+        "deleteOrgPermanently": "Delete organization permanently",
+        "deleteWarning": "This cannot be undone. All data will be deleted.",
+        "delete": "Delete",
+        "archiveDialog": {
+          "title": "Archive organization?",
+          "description": "will be archived and hidden from lists.",
+          "cancel": "Cancel",
+          "confirm": "Archive"
+        },
+        "deleteDialog": {
+          "title": "Delete organization permanently?",
+          "description": "{name} will be permanently deleted.",
+          "placeholder": "Type slug here",
+          "cancel": "Cancel",
+          "confirm": "Delete permanently",
+          "willRemove": "This will remove:",
+          "removeMemberships": "All memberships and roles",
+          "removeConfig": "All settings and configurations",
+          "removeDomains": "All connected domains",
+          "removeAudit": "All activity history",
+          "cannotBeUndone": "This cannot be undone.",
+          "confirmPrompt": "Type {slug} to confirm"
+        },
+        "cancel": "Cancel",
+        "archiving": "Archiving...",
+        "deleting": "Deleting...",
+        "deletePermanently": "Delete permanently"
+      },
       "licensing": {
         "errorTitle": "Could not load",
         "errorDescription": "Could not load licenses/entitlements.",
@@ -1469,9 +1761,18 @@
       },
       "billing": {
         "paymentOverdue": "Payment overdue",
-        "overdueDescription": "There is an overdue payment. Check the billing information in Stripe to avoid service interruption."
+        "overdueDescription": "There is an overdue payment. Check the billing information in Stripe to avoid service interruption.",
+        "noSubscription": "No active subscription",
+        "contactSupport": "Contact support to configure billing.",
+        "stripeDashboard": "Stripe Dashboard",
+        "trialActive": "Trial active",
+        "trialDaysRemaining": "{count} days remaining (ends {date})"
       },
       "domains": {
+        "title": "Domains",
+        "add": "Add",
+        "platformDomain": "Platform domain (automatic)",
+        "noCustomDomain": "No custom domains configured yet.",
         "howToTitle": "How to connect a custom domain",
         "step1": "Add a DNS CNAME record: ",
         "step2": "Add the domain in the list above",
@@ -1612,7 +1913,9 @@
         "invoicesTitle": "Invoices",
         "noInvoicesTitle": "No invoices yet",
         "noInvoicesDescription": "When invoices exist for this organization, they will be displayed here.",
-        "invoiceFallbackName": "Invoice"
+        "invoiceFallbackName": "Invoice",
+        "manageSubscription": "Manage subscription",
+        "openingPortal": "Opening..."
       },
       "analytics": {
         "pageTitle": "Statistics",
@@ -2177,14 +2480,13 @@
         "noSessions": "No demo sessions found.",
         "user": "User",
         "created": "Created",
-        "status": "Status",
-        "sessionId": "Session ID",
-        "anonymousUser": "Anonymous demo user",
         "status": {
           "active": "Active",
           "expired": "Expired",
           "old": "Old"
-        }
+        },
+        "sessionId": "Session ID",
+        "anonymousUser": "Anonymous demo user"
       },
       "quickActions": {
         "title": "Quick Actions",
@@ -2578,8 +2880,8 @@
         "connectionPool": "Connection pool"
       }
     },
-        "minutesShort": "{count} min",
-        "scriptLabel": "Script",
+    "minutesShort": "{count} min",
+    "scriptLabel": "Script",
     "auditLog": {
       "pageTitle": "Audit Logs",
       "pageDescription": "Review all system activities and changes",
@@ -2926,6 +3228,181 @@
         "form": {
           "amountPlaceholder": "499.00",
           "referencePlaceholder": "Txn ID"
+        }
+      },
+      "upsell": {
+        "unlock": "Unlock",
+        "unlockFor": "Unlock for {price}",
+        "unlockNow": "Unlock now",
+        "loading": "Loading...",
+        "maybeLater": "Maybe later",
+        "oneTime": "one-time purchase",
+        "modalTitle": "Upgrade to continue",
+        "modalDescription": "Unlock more features with an upgrade.",
+        "modalDescriptionWithFeature": "Unlock \"{feature}\" with an upgrade.",
+        "errorGeneric": "Something went wrong. Please try again.",
+        "errorNoCheckoutUrl": "Could not start checkout."
+      },
+      "lockedContent": {
+        "defaultTitle": "Premium Content",
+        "defaultMessage": "Upgrade to unlock this content.",
+        "unlock": "Unlock"
+      },
+      "promoCodes": {
+        "title": "Promo Codes",
+        "description": "Manage discount codes and promotions in Stripe.",
+        "createNew": "Create promo code",
+        "createTitle": "Create new promo code",
+        "loading": "Loading promo codes...",
+        "emptyTitle": "No promo codes",
+        "emptyDescription": "Create your first promo code to get started.",
+        "active": "Active",
+        "inactive": "Inactive",
+        "off": "off",
+        "redeemed": "redeemed",
+        "expiresAt": "Expires",
+        "confirmDeactivate": "Are you sure you want to deactivate this promo code?",
+        "creating": "Creating...",
+        "create": "Create",
+        "cancel": "Cancel",
+        "form": {
+          "code": "Code",
+          "percentOff": "Percent off",
+          "amountOff": "Amount off (SEK)",
+          "maxRedemptions": "Max redemptions",
+          "expiresAt": "Expires at (optional)",
+          "firstTimeOnly": "First-time customers only"
+        }
+      },
+      "cart": {
+        "title": "Cart",
+        "openCart": "Open cart",
+        "empty": "Your cart is empty",
+        "subtotal": "Subtotal",
+        "clearCart": "Clear",
+        "checkout": "Proceed to checkout",
+        "processing": "Processing...",
+        "addToCart": "Add to cart",
+        "added": "Added!",
+        "perMonth": "/month",
+        "perYear": "/year",
+        "oneTime": "one-time",
+        "mixedTypesWarning": "You cannot mix subscriptions and one-time purchases in the same order."
+      },
+      "analytics": {
+        "title": "Revenue Analytics",
+        "description": "Overview of subscriptions, revenue, and growth.",
+        "period": {
+          "7d": "Last 7 days",
+          "30d": "Last 30 days",
+          "90d": "Last 90 days",
+          "12m": "Last 12 months"
+        },
+        "metrics": {
+          "mrr": "MRR",
+          "arr": "ARR",
+          "activeSubscriptions": "Active subscriptions",
+          "newThisPeriod": "new this period",
+          "churnRate": "Churn rate",
+          "churned": "churned",
+          "arpu": "ARPU",
+          "perMonth": "per month"
+        },
+        "revenueByProduct": {
+          "title": "Revenue by Product",
+          "description": "Distribution of revenue across products.",
+          "product": "Product",
+          "revenue": "Revenue",
+          "subscriptions": "Subscriptions",
+          "empty": "No product revenue to display."
+        },
+        "monthlyTrend": {
+          "title": "Monthly Trend",
+          "description": "Revenue development over time.",
+          "month": "Month",
+          "revenue": "Revenue",
+          "empty": "No trend data to display."
+        },
+        "growth": {
+          "title": "Growth",
+          "newSubscriptions": "New subscriptions",
+          "upgrades": "Upgrades"
+        },
+        "churn": {
+          "title": "Churn",
+          "canceled": "Canceled",
+          "downgrades": "Downgrades"
+        }
+      },
+      "dunning": {
+        "title": "Dunning Management",
+        "description": "Manage failed payments and recovery.",
+        "refresh": "Refresh",
+        "noFailures": "No failed payments. Excellent!",
+        "confirmCancel": "Are you sure you want to cancel this payment recovery?",
+        "viewDetails": "Details",
+        "retryNow": "Retry now",
+        "cancel": "Cancel",
+        "stats": {
+          "pending": "Pending",
+          "failed": "Failed",
+          "recovered": "Recovered"
+        },
+        "status": {
+          "pending": "Pending",
+          "retrying": "Retrying",
+          "recovered": "Recovered",
+          "failed": "Failed",
+          "canceled": "Canceled"
+        },
+        "failuresTable": {
+          "title": "Failed Payments",
+          "description": "Payments requiring action.",
+          "tenant": "Organization",
+          "amount": "Amount",
+          "status": "Status",
+          "retries": "Retries",
+          "gracePeriod": "Grace period ends",
+          "actions": "Actions"
+        },
+        "detailsModal": {
+          "title": "Payment Details",
+          "noMessage": "No error message available.",
+          "created": "Created",
+          "nextRetry": "Next retry",
+          "actionsLog": "Actions Log",
+          "noActions": "No actions logged."
+        }
+      },
+      "usage": {
+        "title": "Usage-Based Billing",
+        "description": "Manage and view usage data for consumption-based pricing.",
+        "refresh": "Refresh",
+        "loading": "Loading...",
+        "noData": "No usage data for this period.",
+        "noMeters": "No usage meters configured.",
+        "filterMeter": "Meter",
+        "filterPeriod": "Period",
+        "allMeters": "All meters",
+        "periodCurrent": "Current month",
+        "periodPrevious": "Previous month",
+        "period30Days": "Last 30 days",
+        "periodRange": "{start} - {end}",
+        "tenantsCount": "{count} tenants",
+        "metersTitle": "Usage Meters",
+        "table": {
+          "tenant": "Tenant",
+          "meter": "Meter",
+          "quantity": "Quantity",
+          "billable": "Billable",
+          "period": "Period"
+        },
+        "metersTable": {
+          "name": "Name",
+          "slug": "Slug",
+          "unit": "Unit",
+          "aggregation": "Aggregation",
+          "status": "Status"
         }
       }
     },
@@ -3958,7 +4435,12 @@
         "low": "Low",
         "medium": "Medium",
         "high": "High",
-        "energy": "Energy",
+        "energy": {
+          "label": "Energy level",
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        },
         "allPlayModes": "All play modes",
         "basicPlay": "Simple play",
         "facilitatedActivity": "Facilitated activity",
@@ -3967,7 +4449,11 @@
         "allOwners": "All owners",
         "global": "Global",
         "owner": "Owner",
-        "status": "Status",
+        "status": {
+          "label": "Status",
+          "published": "Published",
+          "draft": "Draft"
+        },
         "removeFilter": "Remove filter {label}",
         "purposes": "Purposes",
         "tenants": "Tenants",
@@ -3992,17 +4478,6 @@
           "label": "Players",
           "min": "Min players",
           "max": "Max players"
-        },
-        "status": {
-          "label": "Status",
-          "published": "Published",
-          "draft": "Draft"
-        },
-        "energy": {
-          "label": "Energy level",
-          "low": "Low",
-          "medium": "Medium",
-          "high": "High"
         },
         "location": {
           "label": "Location",
@@ -4924,9 +5399,9 @@
           "title": "Phases & Rounds",
           "subtitle": "Divide the game into clear phases with their own time limits.",
           "addPhase": "Add phase",
-        "playError": "Could not play the audio",
-        "playLabel": "Play",
-        "pauseLabel": "Pause",
+          "playError": "Could not play the audio",
+          "playLabel": "Play",
+          "pauseLabel": "Pause",
           "noPhasesYet": "No phases yet",
           "noPhases": "No phases yet. Add your first phase.",
           "namePlaceholder": "E.g. The investigation begins",
@@ -5333,172 +5808,6 @@
           "templates": {
             "keypadBasic": {
               "name": "Keypad (4 digits)",
-              "description": "A simple 4-digit PIN to unlock something",
-              "title": "Secret code",
-              "correctCode": "1234",
-              "successMessage": "✅ Correct! You unlocked the clue.",
-              "failMessage": "❌ Wrong code. Try again!"
-            },
-            "keypadAdvanced": {
-              "name": "Keypad (with attempt limit)",
-              "description": "PIN with max 3 attempts before lock",
-              "title": "Security code",
-              "successMessage": "🎉 Correct! The way is open.",
-              "failMessage": "⚠️ Wrong code!",
-              "lockedMessage": "🚫 Keypad locked. Contact the host."
-            },
-            "riddle": {
-              "name": "Riddle / Question",
-              "description": "A riddle with text input for answers",
-              "title": "The riddle",
-              "prompt": "What has four legs but cannot walk?",
-              "correctAnswers": "table\na table\ndesk"
-            },
-            "cipherCaesar": {
-              "name": "Caesar cipher",
-              "description": "Encrypted message with letter shift",
-              "title": "Encrypted message",
-              "cipherKey": "3",
-              "plaintext": "the secret is under the stairs"
-            },
-            "hotspotImage": {
-              "name": "Clickable image",
-              "description": "Image with hidden zones to find",
-              "title": "Search the image"
-            },
-            "tilePuzzle": {
-              "name": "Tile puzzle (3x3)",
-              "description": "Sliding tile puzzle to reveal an image",
-              "title": "The puzzle"
-            },
-            "logicGrid": {
-              "name": "Logic grid",
-              "description": "Logic puzzle where things must be matched",
-              "title": "Who did what?",
-              "rows": "Alice\nBob\nCharlie",
-              "columns": "Red\nGreen\nBlue",
-              "solution": "'{\"Alice\":\"Red\",\"Bob\":\"Green\",\"Charlie\":\"Blue\"}'"
-            },
-            "counterClues": {
-              "name": "Clue counter",
-              "description": "Count found clues or progress",
-              "title": "Clues found",
-              "label": "Clues"
-            },
-            "hintContainer": {
-              "name": "Hint container",
-              "description": "Progressive hints that can be revealed",
-              "title": "Hints",
-              "hints": "Look under the mat\nThere is a hidden key\nThe key fits the cabinet on the right"
-            },
-            "qrGate": {
-              "name": "QR code checkpoint",
-              "description": "Scan a QR code to continue",
-              "title": "Scan the code",
-              "expectedValue": "SECRET123",
-              "successMessage": "✅ Correct code! Continue to the next clue."
-            },
-            "locationCheckpoint": {
-              "name": "Location checkpoint",
-              "description": "GPS verification for city games",
-              "title": "Find the location",
-              "locationName": "Main square"
-            },
-            "clueCard": {
-              "name": "Clue/Hint",
-              "description": "A card with a clue that can be revealed",
-              "title": "Clue",
-              "descriptionText": "Hidden clue that the host can show",
-              "variantTitle": "Clue",
-              "variantBody": "Write your clue here..."
-            },
-            "secretDocument": {
-              "name": "Secret document",
-              "description": "A document revealed at the right time",
-              "title": "Secret document",
-              "descriptionText": "Revealed when participants find it"
-            },
-            "revealCard": {
-              "name": "Reveal card",
-              "description": "A card for dramatic reveals",
-              "title": "The reveal"
-            },
-            "roleSecret": {
-              "name": "Role secret",
-              "description": "Secret information visible only to a role",
-              "title": "Your secret",
-              "variantTitle": "Secret information",
-              "variantBody": "Only you can see this..."
-            },
-            "audioClue": {
-              "name": "Audio clue",
-              "description": "Audio clip played for participants",
-              "title": "Listen closely"
-            },
-            "soundTrigger": {
-              "name": "Sound trigger",
-              "description": "Triggered when participants make noise",
-              "title": "Shout loudly!",
-              "instruction": "Shout loudly to open the door!"
-            },
-            "propCheck": {
-              "name": "Prop check",
-              "description": "The host confirms participants have the right item",
-              "title": "Show the item",
-              "propName": "The golden key",
-              "instruction": "Show the golden key to the host to continue."
-            },
-            "quizAnswer": {
-              "name": "Quiz answer",
-              "description": "Keypad for quiz questions with numeric answers",
-              "title": "Question",
-              "descriptionText": "Enter the answer using digits",
-              "successMessage": "✅ Correct answer!",
-              "failMessage": "❌ Wrong answer. Try again!"
-            },
-            "textQuestion": {
-              "name": "Text question",
-              "description": "Open question with text answer",
-              "title": "Answer the question",
-              "prompt": "What is the capital of Sweden?",
-              "correctAnswers": "stockholm\nStockholm"
-            },
-            "checklist": {
-              "name": "Checklist",
-              "description": "Several items to check off",
-              "title": "Checklist",
-              "items": "Task 1\nTask 2\nTask 3"
-            },
-            "learningCard": {
-              "name": "Learning card",
-              "description": "Card with information or facts",
-              "title": "Learning card"
-            },
-            "imageReveal": {
-              "name": "Image to reveal",
-              "description": "An image shown at the right time",
-              "title": "Image"
-            },
-            "replayMarker": {
-              "name": "Replay marker",
-              "description": "Let participants mark important moments",
-              "title": "Mark moment"
-            },
-            "blank": {
-              "name": "Blank artifact",
-              "description": "Start from scratch",
-              "title": "New artifact"
-            }
-          },
-          "categories": {
-            "escape_room": "Escape Room",
-            "party": "Party game",
-            "educational": "Educational",
-            "general": "General"
-          },
-          "templates": {
-            "keypadBasic": {
-              "name": "Keypad (4 digits)",
               "description": "A simple 4-digit PIN code to unlock something"
             },
             "keypadAdvanced": {
@@ -5557,6 +5866,12 @@
               "name": "Role secret",
               "description": "Secret information visible only to one role"
             }
+          },
+          "categories": {
+            "escape_room": "Escape Room",
+            "party": "Party game",
+            "educational": "Educational",
+            "general": "General"
           }
         }
       }
@@ -5629,177 +5944,6 @@
         "visualBadgeConstruction": "Visual badge construction and metadata",
         "selectOrCreate": "Select or create an achievement",
         "selectOrCreateDescription": "Choose a badge from the library above or create a new one to start building its layers, colors, and metadata."
-      }
-    },
-    "organizations": {
-      "title": "Organizations",
-      "createOrganization": "Create organization",
-      "editOrganization": "Edit organization",
-      "deleteOrganization": "Delete organization",
-      "organizationDetails": "Organization details",
-      "searchOrganizations": "Search organizations...",
-      "noOrganizations": "No organizations found",
-      "members": {
-        "title": "Members",
-        "addMember": "Add member",
-        "addMemberDescription": "Search for an existing user by email and add them directly to the organization.",
-        "searchByEmail": "Search user by email",
-        "searchPlaceholder": "name@example.com",
-        "searching": "Searching...",
-        "search": "Search",
-        "noUserFound": "No user found with that email address",
-        "searchFailed": "Could not search for users",
-        "searchResults": "Search results",
-        "alreadyMember": "Already a member",
-        "role": "Role",
-        "roleOwner": "Owner",
-        "roleAdmin": "Admin",
-        "roleMember": "Member",
-        "cancel": "Cancel",
-        "adding": "Adding...",
-        "addMemberButton": "Add member",
-        "memberAdded": "{name} added as {role}",
-        "alreadyMemberError": "The user is already a member of the organization",
-        "addFailed": "Could not add member",
-        "loadFailed": "Could not load members",
-        "unknown": "Unknown",
-        "statsTotal": "Total",
-        "statsOwners": "Owners",
-        "statsAdmins": "Admins",
-        "statsPending": "Pending",
-        "membersCount": "Members ({count})",
-        "searchNameOrEmail": "Search by name or email...",
-        "allRoles": "All roles",
-        "loading": "Loading members...",
-        "noMembersMatch": "No members match the filters",
-        "noMembersYet": "No members in the organization",
-        "tableUser": "User",
-        "tableRole": "Role",
-        "tableMemberSince": "Member since",
-        "tableActions": "Actions",
-        "primary": "Primary",
-        "makeOwner": "Make owner",
-        "makeAdmin": "Make admin",
-        "makeMember": "Make member",
-        "removeFromOrg": "Remove from organization",
-        "confirmRemove": "Are you sure you want to remove {name} from the organization?",
-        "cannotRemoveOnlyOwner": "Cannot remove the only owner",
-        "memberRemoved": "Member removed",
-        "removeFailed": "Could not remove member",
-        "roleChanged": "Role changed to {role}",
-        "roleChangeFailed": "Could not change role"
-      },
-      "memberCount": "{count} members",
-      "plan": "Plan",
-      "subscription": "Subscription",
-      "settings": "Settings",
-      "billing": "Billing",
-      "mainLanguage": "Main language",
-      "confirmDelete": "Are you sure you want to delete this organization?",
-      "accessDenied": "Access denied",
-      "noPermissionOrgs": "You don't have permission to view organizations.",
-      "goToDashboard": "Go to dashboard",
-      "retryOrRefresh": "Try again or refresh the page if the problem persists.",
-      "reload": "Reload",
-      "noMatchingOrgs": "No matching organizations",
-      "noOrgsYet": "No organizations yet",
-      "adjustSearchOrClear": "Adjust search or clear filters to see more.",
-      "createFirstOrg": "Create your first organization to start managing tenants.",
-      "allLanguages": "All languages",
-      "unknown": "Unknown",
-      "domains": "Domains",
-      "openApp": "Open app",
-      "reactivate": "Reactivate",
-      "suspend": "Suspend",
-      "overview": "Overview",
-      "statusChanged": "Status changed to {status}",
-      "couldNotChangeStatus": "Could not change status",
-      "toolbar": {
-        "searchPlaceholder": "Search organizations...",
-        "searchAriaLabel": "Search organizations",
-        "billing": {
-          "all": "All billing modes",
-          "connected": "Billing connected",
-          "notConnected": "No billing"
-        },
-        "domain": {
-          "all": "All domains",
-          "yes": "Has custom domain",
-          "no": "No domain"
-        },
-        "sort": {
-          "recent": "Newest first",
-          "name": "Name A–Z",
-          "members": "Most members",
-          "updated": "Recently updated"
-        },
-        "statusLabel": "Status",
-        "billingLabel": "Billing",
-        "languageLabel": "Language",
-        "domainLabel": "Domain",
-        "sortLabel": "Sort",
-        "clear": "Clear",
-        "clearWithCount": "Clear ({count})"
-      },
-      "detail": {
-        "copied": "Copied to clipboard",
-        "copiedWithLabel": "{label} copied"
-      },
-      "create": {
-        "title": "Create organization",
-        "description": "Add a new organization and enter contact details.",
-        "nameLabel": "Organization name",
-        "namePlaceholder": "Organization Inc",
-        "slugLabel": "Slug",
-        "slugOptional": "(optional)",
-        "slugPlaceholder": "organization-inc",
-        "slugHint": "Leave empty for auto-slug.",
-        "contactPerson": "Contact person",
-        "contactPersonPlaceholder": "Name",
-        "contactEmail": "Contact email",
-        "contactEmailPlaceholder": "email@example.com",
-        "phone": "Phone",
-        "phoneOptional": "(optional)",
-        "phonePlaceholder": "+1 ...",
-        "status": "Status",
-        "statusPlaceholder": "Select status",
-        "cancel": "Cancel",
-        "creating": "Creating...",
-        "submit": "Create organization",
-        "required": "*"
-      },
-      "audit": {
-        "title": "Activity log",
-        "titleWithCount": "Activity log ({count})",
-        "loadFailed": "Could not load activity log",
-        "loading": "Loading events...",
-        "noEventsOfType": "No events of this type",
-        "noActivity": "No activity recorded",
-        "showingRange": "Showing {from}–{to} of {total}",
-        "allEvents": "All events",
-        "event": "Event",
-        "justNow": "Just now",
-        "minAgo": "{min} min ago",
-        "hoursAgo": "{hours}h ago",
-        "daysAgo": "{days}d ago",
-        "enabled": "enabled",
-        "disabled": "disabled",
-        "events": {
-          "statusChanged": "Status changed",
-          "memberAdded": "Member added",
-          "memberRemoved": "Member removed",
-          "memberRoleChanged": "Role changed",
-          "settingsUpdated": "Settings updated",
-          "domainAdded": "Domain added",
-          "domainRemoved": "Domain removed",
-          "domainStatusChanged": "Domain status changed",
-          "brandingUpdated": "Branding updated",
-          "brandingLogoUpdated": "Logo updated",
-          "localeUpdated": "Language updated",
-          "featureToggled": "Feature changed",
-          "organisationSuspended": "Organization suspended",
-          "organisationArchived": "Organization archived"
-        }
       }
     },
     "products": {
@@ -6201,17 +6345,17 @@
             "requires": "Requires",
             "excludes": "Excludes"
           },
-            "footer": {
-              "tagline": "Activities, sessions, and sharing for coaches, teachers, and leaders.",
-              "actions": {
-                "getStarted": "Get started"
-              },
-              "legal": {
-                "terms": "Terms of use",
-                "privacy": "Privacy policy"
-              },
-              "copyright": "© {year} Lekbanken AS. All rights reserved."
+          "footer": {
+            "tagline": "Activities, sessions, and sharing for coaches, teachers, and leaders.",
+            "actions": {
+              "getStarted": "Get started"
             },
+            "legal": {
+              "terms": "Terms of use",
+              "privacy": "Privacy policy"
+            },
+            "copyright": "© {year} Lekbanken AS. All rights reserved."
+          },
           "availability": {
             "scope": "Availability Scope",
             "scopeLabel": "Scope",
@@ -6769,7 +6913,10 @@
       "notifications": {
         "title": "Notifications",
         "markAllAsRead": "Mark all as read",
-        "empty": "No notifications",
+        "empty": {
+          "title": "No notifications found",
+          "description": "Only notifications from the last 7 days are shown."
+        },
         "pageTitle": "Notification History",
         "pageDescription": "View and manage sent notifications",
         "noAccess": "You do not have access to notification history",
@@ -6799,10 +6946,6 @@
           "gamification": "Gamification"
         },
         "loading": "Loading...",
-        "empty": {
-          "title": "No notifications found",
-          "description": "Only notifications from the last 7 days are shown."
-        },
         "status": {
           "unread": "Unread"
         },
@@ -7552,6 +7695,26 @@
     }
   },
   "app": {
+    "invoices": {
+      "title": "My Invoices",
+      "description": "View and download your invoices.",
+      "loading": "Loading invoices...",
+      "fetchError": "Could not fetch invoices.",
+      "emptyTitle": "No invoices",
+      "emptyDescription": "You don't have any invoices yet.",
+      "invoiceNumberMissing": "Invoice",
+      "paidOn": "Paid on",
+      "dueOn": "Due on",
+      "pay": "Pay",
+      "status": {
+        "paid": "Paid",
+        "open": "Open",
+        "draft": "Draft",
+        "void": "Void",
+        "uncollectible": "Uncollectible",
+        "unknown": "Unknown"
+      }
+    },
     "nav": {
       "home": "Home",
       "dashboard": "Dashboard",
@@ -8544,10 +8707,17 @@
     "checkout": {
       "start": {
         "title": "Buy a license",
-        "subtitle": "Create your organization and proceed to payment. The organization is created only after Stripe confirms the purchase.",
+        "subtitle": "Choose whether you're buying for yourself or your organization. The organization is created only after Stripe confirms the purchase.",
         "canceled": "Payment was canceled. You can try again anytime.",
         "cardTitle": "Details",
         "fields": {
+          "purchaseType": {
+            "label": "Who are you buying for?",
+            "personal": "For me",
+            "organization": "For organization",
+            "personalHint": "You'll get a personal account with access to all content.",
+            "organizationHint": "Create an organization and invite team members."
+          },
           "orgName": {
             "label": "Organization name",
             "placeholder": "e.g. Lekbanken AB"
@@ -8573,6 +8743,11 @@
           "startCheckoutFailed": "Could not start checkout.",
           "missingCheckoutUrl": "Missing checkout URL.",
           "generic": "Something went wrong. Please try again."
+        },
+        "alreadyOwned": {
+          "title": "You already own this product",
+          "description": "You already have an active subscription for this product.",
+          "manageSubscription": "Manage subscription"
         }
       },
       "return": {
@@ -8593,6 +8768,85 @@
           "readStatusFailed": "Could not read status.",
           "generic": "Something went wrong. Please try again."
         }
+      },
+      "success": {
+        "title": "Welcome to Lekbanken!",
+        "subtitle": "Your purchase is complete and your account is activated.",
+        "defaultProduct": "Your new subscription",
+        "newOrganization": "New organization created",
+        "addedTo": "Added to",
+        "goToDashboard": "Go to app",
+        "viewReceipt": "View receipt",
+        "manageSubscription": "Manage subscription",
+        "helpText": "Have questions?",
+        "contactSupport": "Contact support"
+      },
+      "canceled": {
+        "title": "Payment canceled",
+        "subtitle": "Nothing was charged. You can try again whenever you want.",
+        "reasons": {
+          "title": "Common reasons:",
+          "changedMind": "You changed your mind",
+          "wrongProduct": "You wanted a different product",
+          "paymentIssue": "Payment issue",
+          "moreInfo": "You wanted to read more first"
+        },
+        "tryAgain": "Try again",
+        "viewPricing": "View pricing",
+        "needHelp": "Need help?",
+        "backToHome": "Back to home"
+      }
+    },
+    "gift": {
+      "title": "Give a gift",
+      "subtitle": "Give someone you care about access to Lekbanken.",
+      "loginRequired": "Log in to purchase gift",
+      "loginDescription": "You must be logged in to purchase a gift subscription.",
+      "loginButton": "Log in",
+      "loading": "Loading products...",
+      "noProducts": "No gift products available right now.",
+      "step1Title": "Choose product",
+      "step2Title": "Recipient details",
+      "step3Title": "Confirm and pay",
+      "changeProduct": "Change product",
+      "giftBadge": "Gift",
+      "recipientName": "Recipient's name (optional)",
+      "recipientNamePlaceholder": "e.g. Anna",
+      "recipientEmail": "Recipient's email (optional)",
+      "recipientEmailPlaceholder": "anna@example.com",
+      "recipientEmailHint": "If you enter an email, the gift code will be sent automatically.",
+      "giftMessage": "Personal message (optional)",
+      "giftMessagePlaceholder": "Write a message for the recipient...",
+      "back": "Back",
+      "continue": "Continue",
+      "confirmProduct": "Product",
+      "confirmRecipient": "Recipient",
+      "confirmEmail": "Email",
+      "confirmMessage": "Message",
+      "total": "Total",
+      "processing": "Processing...",
+      "purchaseGift": "Purchase gift",
+      "errorGeneric": "Something went wrong. Please try again.",
+      "redeem": {
+        "title": "Redeem gift code",
+        "subtitle": "Enter your gift code to activate your account.",
+        "loginRequired": "Log in to redeem",
+        "loginDescription": "You must be logged in to redeem your gift code.",
+        "loginButton": "Log in",
+        "codeLabel": "Gift code",
+        "codePlaceholder": "XXXX1234",
+        "codeHint": "The code is on your gift card or in the email you received.",
+        "redeeming": "Redeeming...",
+        "redeemButton": "Redeem code",
+        "successTitle": "Congratulations!",
+        "successDescription": "You now have access to {product}.",
+        "defaultProduct": "your new subscription",
+        "goToDashboard": "Go to app",
+        "noCode": "Don't have a gift code?",
+        "purchaseGift": "Purchase a gift",
+        "errorGeneric": "Could not redeem the code. Please check that it's correct.",
+        "errorExpired": "This gift code has expired.",
+        "errorAlreadyUsed": "This gift code has already been used."
       }
     },
     "footer": {
@@ -8600,6 +8854,63 @@
       "login": "Log in",
       "getStartedFree": "Get started free",
       "copyright": "Lekbanken AS. All rights reserved."
+    },
+    "enterprise": {
+      "title": "Enterprise Solutions",
+      "subtitle": "Tailored solutions for large teams and organizations with advanced needs.",
+      "features": {
+        "title": "What you get with Enterprise",
+        "items": {
+          "ssoLogin": {
+            "title": "SSO Login",
+            "description": "Single Sign-On with SAML or OAuth for easy access management."
+          },
+          "advancedSecurity": {
+            "title": "Advanced Security",
+            "description": "Custom security policies, audit logs and compliance tools."
+          },
+          "customIntegrations": {
+            "title": "Custom Integrations",
+            "description": "API access and integrations with your existing systems."
+          },
+          "dedicatedSupport": {
+            "title": "Dedicated Support",
+            "description": "Priority support with a personal contact person."
+          }
+        }
+      },
+      "testimonial": {
+        "quote": "Lekbanken has revolutionized how we plan activities for our 500+ employees.",
+        "author": "Maria Andersson",
+        "role": "HR Manager, Big Company Inc"
+      },
+      "form": {
+        "title": "Request a quote",
+        "description": "Fill in the form and we'll contact you within 24 hours.",
+        "companyName": "Company name",
+        "companyNamePlaceholder": "e.g. Lekbanken Inc",
+        "contactName": "Contact person",
+        "contactNamePlaceholder": "Your name",
+        "email": "Email",
+        "emailPlaceholder": "your@email.com",
+        "phone": "Phone (optional)",
+        "phonePlaceholder": "+1 555 123 4567",
+        "teamSize": "Number of users",
+        "message": "Message (optional)",
+        "messagePlaceholder": "Describe your needs...",
+        "submitting": "Submitting...",
+        "submit": "Request quote",
+        "privacy": "We handle your data according to our privacy policy."
+      },
+      "success": {
+        "title": "Thank you for your request!",
+        "description": "We have received your quote request and will get back to you within 24 hours.",
+        "nextSteps": "Check your email for confirmation."
+      },
+      "errors": {
+        "requiredFields": "Please fill in all required fields.",
+        "generic": "Something went wrong. Please try again."
+      }
     },
     "hero": {
       "badge": "✨ New: AI-powered activity plans",
@@ -8674,39 +8985,27 @@
     },
     "howItWorks": {
       "tagline": "How it works",
-      "title": "Get started in minutes",
-      "description": "Three simple steps to start planning better activities.",
-      "steps": {
-        "step1": {
-          "title": "Create account",
-          "description": "Sign up for free and get started right away."
-        },
-        "step2": {
-          "title": "Build your session",
-          "description": "Choose activities and drag them to your plan."
-        },
-        "step3": {
-          "title": "Share with your team",
-          "description": "Export to PDF or share digitally with colleagues."
-        }
-      }
+      "title": "From idea to execution in minutes",
+      "description": "Four simple steps to plan and run activities that engage."
     },
     "spotlight": {
-      "tagline": "Spotlight",
-      "title": "Designed for real needs",
-      "description": "Lekbanken is built by and for activity leaders. We understand your challenges.",
-      "imagePlaceholder": "Product image"
+      "tagline": "Powerful features",
+      "title": "Everything you need for activity management",
+      "description": "Build, share and run activities with tools made for leaders, coaches and teachers.",
+      "imagePlaceholder": "Product image coming soon"
     },
     "testimonials": {
-      "tagline": "What our users say",
-      "title": "Loved by thousands of leaders"
+      "tagline": "What others say",
+      "title": "Loved by activity leaders"
     },
     "pricing": {
       "tagline": "Pricing",
-      "title": "Simple and transparent pricing",
-      "description": "Choose the plan that suits you best. No commitment.",
-      "frequencyLabel": "Choose payment frequency",
+      "badge": "Pricing",
+      "title": "Simple, transparent pricing",
+      "description": "Choose the plan that fits your team. Upgrade or downgrade anytime.",
+      "frequencyLabel": "Payment frequency",
       "save15": "Save 15%",
+      "mostPopular": "Most popular",
       "frequencies": {
         "monthly": {
           "label": "Monthly",
@@ -8720,22 +9019,22 @@
       "tiers": {
         "free": {
           "name": "Free",
-          "description": "Perfect for testing and getting started.",
+          "description": "Perfect for getting started and exploring the platform.",
           "price": {
             "monthly": "$0",
             "annually": "$0"
           },
-          "cta": "Get started free",
+          "cta": "Get started",
           "features": [
-            "Up to 10 activities",
+            "5 activities",
             "1 session per week",
             "Basic filters",
-            "Email support"
+            "PDF export"
           ]
         },
         "pro": {
           "name": "Pro",
-          "description": "For those who want more power and flexibility.",
+          "description": "For active leaders who want more.",
           "price": {
             "monthly": "$9",
             "annually": "$99"
@@ -8745,37 +9044,52 @@
             "Unlimited activities",
             "Unlimited sessions",
             "Advanced filters",
-            "PDF export",
-            "Shared folders",
+            "Team sharing",
             "Priority support"
           ]
         },
         "team": {
           "name": "Team",
-          "description": "For organizations with multiple users.",
+          "description": "For organizations with multiple leaders.",
           "price": "Contact us",
           "cta": "Contact sales",
           "features": [
             "Everything in Pro",
-            "Team management",
             "SSO login",
-            "Custom onboarding",
-            "Dedicated support",
-            "SLA guarantee"
+            "Admin dashboard",
+            "Dedicated success manager",
+            "Custom onboarding"
           ]
+        },
+        "marketing": {
+          "name": "Marketing",
+          "highlight": "Basic",
+          "price": "Free",
+          "description": "Explore our activities and games at no cost."
+        },
+        "app": {
+          "name": "App",
+          "highlight": "Popular",
+          "price": "$9/month",
+          "description": "Full access to all app features."
+        },
+        "admin": {
+          "name": "Admin",
+          "highlight": "Advanced",
+          "price": "Contact us",
+          "description": "Custom solutions for organizations."
         }
-      },
-      "mostPopular": "Most popular"
+      }
     },
     "cta": {
       "title": "Ready to get started?",
-      "description": "Start planning better activities today. Free to try.",
-      "startFree": "Get started free",
+      "description": "Join thousands of activity leaders already using Lekbanken to plan and run activities.",
+      "startFree": "Start free",
       "login": "Log in",
-      "seePlans": "See pricing",
+      "seePlans": "See plans",
       "badges": {
-        "swedishOnboarding": "Swedish support",
-        "supportResponse": "Response within 24h"
+        "swedishOnboarding": "Local onboarding",
+        "supportResponse": "Response within 24 hours"
       }
     },
     "featuresPage": {
@@ -8824,67 +9138,6 @@
         "tryFree": "Try for free",
         "viewPricing": "View pricing"
       }
-    },
-    "howItWorks": {
-      "tagline": "How it works",
-      "title": "From idea to execution in minutes",
-      "description": "Four simple steps to plan and run activities that engage."
-    },
-    "spotlight": {
-      "tagline": "Powerful features",
-      "title": "Everything you need for activity management",
-      "description": "Build, share and run activities with tools made for leaders, coaches and teachers.",
-      "imagePlaceholder": "Product image coming soon"
-    },
-    "testimonials": {
-      "tagline": "What others say",
-      "title": "Loved by activity leaders"
-    },
-    "pricing": {
-      "tagline": "Pricing",
-      "title": "Simple, transparent pricing",
-      "description": "Choose the plan that fits your team. Upgrade or downgrade anytime.",
-      "frequencyLabel": "Payment frequency",
-      "save15": "Save 15%",
-      "mostPopular": "Most popular",
-      "frequencies": {
-        "monthly": { "label": "Monthly", "suffix": "/month" },
-        "annually": { "label": "Annually", "suffix": "/year" }
-      },
-      "tiers": {
-        "free": {
-          "name": "Free",
-          "description": "Perfect for getting started and exploring the platform.",
-          "price": { "monthly": "$0", "annually": "$0" },
-          "cta": "Get started",
-          "features": ["5 activities", "1 session per week", "Basic filters", "PDF export"]
-        },
-        "pro": {
-          "name": "Pro",
-          "description": "For active leaders who want more.",
-          "price": { "monthly": "$9", "annually": "$99" },
-          "cta": "Try Pro free",
-          "features": ["Unlimited activities", "Unlimited sessions", "Advanced filters", "Team sharing", "Priority support"]
-        },
-        "team": {
-          "name": "Team",
-          "description": "For organizations with multiple leaders.",
-          "price": "Contact us",
-          "cta": "Contact sales",
-          "features": ["Everything in Pro", "SSO login", "Admin dashboard", "Dedicated success manager", "Custom onboarding"]
-        }
-      }
-    },
-    "cta": {
-      "title": "Ready to get started?",
-      "description": "Join thousands of activity leaders already using Lekbanken to plan and run activities.",
-      "startFree": "Start free",
-      "login": "Log in",
-      "seePlans": "See plans",
-      "badges": {
-        "swedishOnboarding": "Local onboarding",
-        "supportResponse": "Response within 24 hours"
-      }
     }
   },
   "demo": {
@@ -8908,61 +9161,61 @@
         "description": "Full access with personal guide",
         "button": "Contact sales"
       }
-      },
-      "features": {
-        "badge": "Features",
-        "title": "Architecture at a glance",
-        "description": "The UI worlds stay separate but share a component library. The app/ structure follows Next.js App Router with route groups for marketing, app, and admin.",
-        "groups": {
-          "sharedProviders": {
-            "title": "Shared providers",
-            "points": {
-              "theme": "Theme, Supabase, and i18n are loaded in the root layout.",
-              "layouts": "Layouts stay thin and focus on navigation and chrome."
-            }
-          },
-          "uiWorlds": {
-            "title": "UI worlds",
-            "points": {
-              "marketing": "Marketing uses header and footer without coupling to app flows.",
-              "app": "App has bottom navigation and mobile-first components.",
-              "admin": "Admin has a left sidebar and topbar with search/notifications."
-            }
-          },
-          "responsiveStrategy": {
-            "title": "Responsive strategy",
-            "points": {
-              "marketing": "Marketing: classic responsive layout.",
-              "app": "App: mobile-first with airy desktop layout.",
-              "admin": "Admin: desktop-first with fallback for smaller screens."
-            }
+    },
+    "features": {
+      "badge": "Features",
+      "title": "Architecture at a glance",
+      "description": "The UI worlds stay separate but share a component library. The app/ structure follows Next.js App Router with route groups for marketing, app, and admin.",
+      "groups": {
+        "sharedProviders": {
+          "title": "Shared providers",
+          "points": {
+            "theme": "Theme, Supabase, and i18n are loaded in the root layout.",
+            "layouts": "Layouts stay thin and focus on navigation and chrome."
+          }
+        },
+        "uiWorlds": {
+          "title": "UI worlds",
+          "points": {
+            "marketing": "Marketing uses header and footer without coupling to app flows.",
+            "app": "App has bottom navigation and mobile-first components.",
+            "admin": "Admin has a left sidebar and topbar with search/notifications."
+          }
+        },
+        "responsiveStrategy": {
+          "title": "Responsive strategy",
+          "points": {
+            "marketing": "Marketing: classic responsive layout.",
+            "app": "App: mobile-first with airy desktop layout.",
+            "admin": "Admin: desktop-first with fallback for smaller screens."
           }
         }
-      },
-      "pricing": {
-        "badge": "Pricing",
-        "title": "Three product experiences",
-        "description": "The architecture separates public marketing, mobile App, and desktop Admin so each team can move at its own pace.",
-        "tiers": {
-          "marketing": {
-            "name": "Marketing",
-            "price": "0 SEK",
-            "description": "Landing pages and marketing without login.",
-            "highlight": "Public"
-          },
-          "app": {
-            "name": "App",
-            "price": "Pro per facilitator",
-            "description": "Mobile-first flows with bottom navigation and shared components.",
-            "highlight": "Mobile first"
-          },
-          "admin": {
-            "name": "Admin",
-            "price": "Quote",
-            "description": "Admin portal with desktop priority, sidebar, and modular navigation.",
-            "highlight": "Desktop first"
-          }
+      }
+    },
+    "pricing": {
+      "badge": "Pricing",
+      "title": "Three product experiences",
+      "description": "The architecture separates public marketing, mobile App, and desktop Admin so each team can move at its own pace.",
+      "tiers": {
+        "marketing": {
+          "name": "Marketing",
+          "price": "0 SEK",
+          "description": "Landing pages and marketing without login.",
+          "highlight": "Public"
+        },
+        "app": {
+          "name": "App",
+          "price": "Pro per facilitator",
+          "description": "Mobile-first flows with bottom navigation and shared components.",
+          "highlight": "Mobile first"
+        },
+        "admin": {
+          "name": "Admin",
+          "price": "Quote",
+          "description": "Admin portal with desktop priority, sidebar, and modular navigation.",
+          "highlight": "Desktop first"
         }
+      }
     },
     "privacy": {
       "title": "Your privacy matters",
@@ -9054,6 +9307,15 @@
           "description": "An unexpected error occurred. Try again or restart the demo."
         }
       }
+    },
+    "conversionModal": {
+      "title": "You're using a demo account",
+      "description": "To make purchases, you need a real account.",
+      "descriptionWithProduct": "To purchase <strong>{product}</strong>, you need a real account.",
+      "warning": "Your demo progress won't be saved when you create a new account.",
+      "createAccount": "Create real account",
+      "login": "Log in to existing account",
+      "continueDemo": "Continue demo"
     }
   },
   "legal": {
@@ -9423,10 +9685,10 @@
       "banner": {
         "waiting": "Waiting to start. Participants can join with the code.",
         "paused": "Paused. We'll be back shortly.",
-      "meta": {
-        "manual": "Manual trigger",
-        "automatic": "Automatic trigger"
-      },
+        "meta": {
+          "manual": "Manual trigger",
+          "automatic": "Automatic trigger"
+        },
         "locked": "Session is locked.",
         "ended": "Session has ended.",
         "degraded": "Connection is unstable. Showing latest known state.",
@@ -9435,12 +9697,12 @@
       "lobby": {
         "sessionCodeLabel": "Session code",
         "joinHint": "Scan the QR code or enter the code to join.",
-      "confirmFire": {
-        "title": "Fire trigger now?",
-        "description": "This will fire the trigger “{name}” immediately and may affect everyone in the session.",
-        "cancel": "Cancel",
-        "confirm": "Fire"
-      },
+        "confirmFire": {
+          "title": "Fire trigger now?",
+          "description": "This will fire the trigger “{name}” immediately and may affect everyone in the session.",
+          "cancel": "Cancel",
+          "confirm": "Fire"
+        },
         "qrAlt": "QR code",
         "qrLoading": "Loading QR code..."
       },
@@ -11757,11 +12019,8 @@
       "increase": "Increase"
     },
     "hotspotImage": {
-      "found": "{found} / {total} found",
-      "imageAlt": "Search for hidden objects",
-      "zoomOut": "Zoom out",
-      "zoomIn": "Zoom in",
-      "allFound": "All objects found!"
+      "notConfigured": "Hotspot image not configured",
+      "complete": "✓ All found!"
     },
     "joinPage": {
       "title": "Join session",
@@ -11784,19 +12043,15 @@
         "invalidName": "Enter a display name (at least 2 characters)"
       }
     },
-      "checklist": {
-        "title": "Checklist",
-        "complete": "✓ All done!"
-      },
+    "checklist": {
+      "title": "Checklist",
+      "complete": "✓ All done!"
+    },
     "participantList": {
       "title": "Participants ({count})",
       "noParticipants": "No participants yet",
       "showLess": "Show less",
       "showMore": "+{count} more"
-    },
-    "hotspotImage": {
-      "notConfigured": "Hotspot image not configured",
-      "complete": "✓ All found!"
     },
     "participantStatusBadge": {
       "active": "Connected",
@@ -11805,8 +12060,11 @@
       "blocked": "Blocked"
     },
     "tilePuzzle": {
-      "title": "Tile puzzle",
-      "missingConfig": "Tile puzzle not configured"
+      "moves": "Moves",
+      "hideSolution": "Hide solution",
+      "showSolution": "Show solution",
+      "solutionImageAlt": "Solution image",
+      "puzzleComplete": "Puzzle complete! ({moves} moves)"
     },
     "sessionCard": {
       "time": {
@@ -11842,13 +12100,6 @@
     "storyOverlay": {
       "skip": "Skip",
       "continue": "Continue"
-    },
-    "tilePuzzle": {
-      "moves": "Moves",
-      "hideSolution": "Hide solution",
-      "showSolution": "Show solution",
-      "solutionImageAlt": "Solution image",
-      "puzzleComplete": "Puzzle complete! ({moves} moves)"
     },
     "typewriterText": {
       "pause": "Pause",
@@ -12833,5 +13084,53 @@
     "consent_id": "Consent ID: {id}",
     "change_preferences": "Change your cookie preferences",
     "withdraw_consent": "Withdraw consent"
+  },
+  "gift": {
+    "redeem": {
+      "title": "Redeem Gift Code",
+      "description": "Enter your gift code to unlock your product.",
+      "codeLabel": "Gift Code",
+      "codeHint": "8-character code (e.g. ABCD1234)",
+      "validate": "Validate code",
+      "validating": "Validating...",
+      "redeemButton": "Redeem Gift",
+      "redeeming": "Redeeming...",
+      "valid": {
+        "title": "Valid gift code!",
+        "product": "You will receive: {name}"
+      },
+      "invalid": {
+        "notFound": "Invalid gift code. Check the code and try again.",
+        "alreadyRedeemed": "This gift code has already been used.",
+        "expired": "This gift code has expired.",
+        "generic": "The gift code is not valid."
+      },
+      "success": {
+        "title": "Gift Redeemed!",
+        "unlocked": "You now have access to {product}.",
+        "redirecting": "Redirecting you..."
+      },
+      "error": {
+        "validate": "Could not validate the code.",
+        "redeem": "Could not redeem the gift."
+      }
+    },
+    "purchase": {
+      "title": "Purchase Gift",
+      "description": "Give a subscription to someone.",
+      "recipientEmail": "Recipient's email (optional)",
+      "recipientName": "Recipient's name (optional)",
+      "giftMessage": "Personal message (optional)",
+      "purchaseButton": "Purchase Gift",
+      "processing": "Processing..."
+    },
+    "success": {
+      "title": "Gift Purchased!",
+      "codeLabel": "Gift Code",
+      "copyCode": "Copy code",
+      "copied": "Copied!",
+      "sendToRecipient": "Send the code to the recipient",
+      "expiresAt": "Valid until: {date}"
+    }
   }
 }

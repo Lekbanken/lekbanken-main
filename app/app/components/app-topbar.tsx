@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/navigation/LanguageSwitcher";
 import { ProfileMenu } from "@/components/navigation/ProfileMenu";
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
+import { CartDrawer } from "@/components/billing/CartDrawer";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/supabase/auth";
 
@@ -82,6 +83,7 @@ export function AppTopbar() {
             Admin
           </Badge>
         )}
+        <CartDrawer />
         <LanguageSwitcher />
         <ThemeToggle />
         <ProfileMenu context="app" />

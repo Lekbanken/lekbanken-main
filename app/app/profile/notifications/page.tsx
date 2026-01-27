@@ -55,7 +55,11 @@ export default function NotificationSettingsPage() {
       // Wait for auth to finish loading before deciding there's no user
       if (authLoading) return;
       
-      if (!user?.id || !supabase) {
+      // Wait for supabase client to be initialized
+      if (!supabase) return;
+      
+      // If no user after auth is done, stop loading
+      if (!user?.id) {
         setIsLoading(false);
         return;
       }

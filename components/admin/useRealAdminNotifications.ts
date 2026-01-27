@@ -6,6 +6,7 @@ import {
   markNotificationAsRead,
   markAllNotificationsAsRead,
   getUnreadNotificationCount,
+  deleteNotification,
 } from '@/app/actions/notifications-user'
 import type { AdminNotification } from './AdminNotificationsCenter'
 
@@ -106,8 +107,19 @@ export function useRealAdminNotifications() {
   }, [fetchNotifications])
 
   const dismiss = useCallback((notificationId: string) => {
-    // Just remove from local state - we don't actually delete from DB
-    setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
+    startTransition(async () => {
+      // Optimistic update - remove from local state immediately
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
+      
+      // Try to delete from database (works for personal notifications)
+      // For broadcast notifications, this will fail silently (RLS won't allow delete)
+      // but the notification is already removed from local state
+      const result = await deleteNotification(notificationId)
+      if (!result.success) {
+        // For broadcast notifications, mark as read instead
+        await markNotificationAsRead(notificationId)
+      }
+    })
   }, [])
 
   return {

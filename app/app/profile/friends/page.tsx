@@ -41,6 +41,7 @@ export default function FriendsPage() {
     // Wait for auth to finish loading before deciding there's no user
     if (authLoading) return;
     
+    // If no user after auth is done, stop loading
     if (!userId) {
       setIsLoading(false);
       return;

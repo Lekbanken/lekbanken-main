@@ -1056,6 +1056,9 @@
       "settings": "Inställningar"
     },
     "notifications": {
+      "title": "Notifikationer",
+      "markAllAsRead": "Markera alla som lästa",
+      "noNotifications": "Inga notifikationer",
       "pageTitle": "Notifikationer",
       "pageDescription": "Skicka meddelanden till organisationens användare.",
       "noTenantTitle": "Ingen organisation vald",

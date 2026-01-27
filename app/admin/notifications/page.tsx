@@ -167,7 +167,9 @@ export default function NotificationsAdminPage() {
       actionLabel: actionLabel || undefined,
     };
 
+    console.log('[Notifications] Sending with params:', params);
     const result = await sendAdminNotification(params);
+    console.log('[Notifications] Result:', result);
 
     if (result.success) {
       setSuccessMessage(t('success.sent', { count: result.sentCount ?? 1 }));

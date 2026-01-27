@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { BellIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { BellAlertIcon } from '@heroicons/react/24/solid';
 
@@ -166,7 +167,7 @@ export function AdminNotificationsCenter({
                 <div className="px-4 py-12 text-center">
                   <BellIcon className="mx-auto h-10 w-10 text-muted-foreground/40" />
                   <p className="mt-3 text-sm text-muted-foreground">
-                    {t('empty')}
+                    {t('noNotifications')}
                   </p>
                 </div>
               ) : (
@@ -232,15 +233,13 @@ export function AdminNotificationsCenter({
             {/* Footer */}
             {notifications.length > 0 && (
               <div className="border-t border-border px-4 py-2">
-                <button
-                  onClick={() => {
-                    // Could navigate to full notifications page
-                    setIsOpen(false);
-                  }}
-                  className="w-full text-center text-xs text-primary hover:underline"
+                <Link
+                  href="/app/notifications"
+                  onClick={() => setIsOpen(false)}
+                  className="block w-full text-center text-xs text-primary hover:underline"
                 >
                   Visa alla notifikationer
-                </button>
+                </Link>
               </div>
             )}
           </div>

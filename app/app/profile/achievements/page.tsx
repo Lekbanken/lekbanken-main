@@ -32,14 +32,15 @@ export default function AchievementsPage() {
     // Wait for auth to finish loading before deciding there's no user
     if (authLoading) return;
     
+    // If no user after auth is done, stop loading
     if (!userId) {
       setIsLoading(false);
       return;
     }
 
     const loadAchievements = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
         const progress = await getUserAchievementProgress(userId);
         setAchievements(progress);
       } catch (err) {

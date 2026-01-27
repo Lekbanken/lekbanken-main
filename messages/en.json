@@ -618,6 +618,9 @@
         "checkLink": "Check that you have the correct link or create a new plan.",
         "goToPlans": "Go to my plans"
       }
+    },
+    "sharedPlan": {
+      "viewOnlyBanner": "You are viewing a shared plan. You have read-only access."
     }
   },
   "admin": {
@@ -9898,7 +9901,10 @@
         "totalParticipants": "Total participants",
         "totalScore": "Total score",
         "achievements": "Achievements",
-        "averageTime": "Average time"
+        "averageTime": "Average time",
+        "totalDecisions": "Decisions",
+        "decisionsCompleted": "Completed",
+        "totalVotes": "Votes"
       },
       "duration": {
         "hoursMinutes": "{hours}h {minutes}m",
@@ -9939,6 +9945,12 @@
       },
       "recentActivity": {
         "title": "Recent activity"
+      },
+      "sessionInfo": {
+        "title": "Session Info",
+        "started": "Started",
+        "ended": "Ended",
+        "totalEvents": "Total events"
       }
     },
     "participantSessionCreate": {

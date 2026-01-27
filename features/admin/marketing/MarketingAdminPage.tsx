@@ -348,6 +348,7 @@ export function MarketingAdminPage({ defaultTab = 'features' }: MarketingAdminPa
                 />
                 {(isCreatingFeature || editingFeature) && (
                   <FeatureEditor
+                    key={editingFeature?.id ?? 'new'}
                     feature={editingFeature}
                     onSave={handleSaveFeature}
                     onCancel={() => {
@@ -373,6 +374,7 @@ export function MarketingAdminPage({ defaultTab = 'features' }: MarketingAdminPa
                 />
                 {(isCreatingUpdate || editingUpdate) && (
                   <UpdateEditor
+                    key={editingUpdate?.id ?? 'new'}
                     update={editingUpdate}
                     onSave={handleSaveUpdate}
                     onCancel={() => {

@@ -77,7 +77,7 @@ export async function getUserNotifications(params?: {
       .filter((n) => n.user_id === null)
       .map((n) => n.id)
     
-    let readStatusMap = new Map<string, boolean>()
+    const readStatusMap = new Map<string, boolean>()
     
     if (broadcastNotificationIds.length > 0) {
       const { data: readStatuses } = await supabase

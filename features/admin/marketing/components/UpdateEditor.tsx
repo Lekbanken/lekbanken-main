@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   XMarkIcon,
@@ -43,12 +43,6 @@ export function UpdateEditor({ update, onSave, onCancel, isPending }: UpdateEdit
   
   const [formData, setFormData] = useState<UpdateFormData>(initialFormData);
   const [tagInput, setTagInput] = useState('');
-
-  // Sync form data when update prop changes (e.g., when switching between updates)
-  useEffect(() => {
-    setFormData(initialFormData);
-    setTagInput('');
-  }, [initialFormData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

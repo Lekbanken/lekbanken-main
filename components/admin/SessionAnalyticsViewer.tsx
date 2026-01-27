@@ -99,7 +99,7 @@ type SessionAnalyticsViewerProps = {
 };
 
 export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProps) {
-  const t = useTranslations('admin.sessionAnalytics');
+  const t = useTranslations('play.sessionAnalytics');
   const [data, setData] = useState<SessionAnalyticsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -286,15 +286,15 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Totalt</span>
+                <span className="text-muted-foreground">{t('stats.totalDecisions')}</span>
                 <span className="font-mono">{analytics.total_decisions}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Avslutade</span>
+                <span className="text-muted-foreground">{t('stats.decisionsCompleted')}</span>
                 <span className="font-mono">{analytics.decisions_completed}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Röster</span>
+                <span className="text-muted-foreground">{t('stats.totalVotes')}</span>
                 <span className="font-mono">{analytics.total_votes}</span>
               </div>
             </div>
@@ -307,19 +307,19 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Startad</span>
+                <span className="text-muted-foreground">{t('sessionInfo.started')}</span>
                 <span className="font-mono">
                   {analytics.started_at ? formatTime(analytics.started_at) : '-'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Avslutad</span>
+                <span className="text-muted-foreground">{t('sessionInfo.ended')}</span>
                 <span className="font-mono">
                   {analytics.ended_at ? formatTime(analytics.ended_at) : '-'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Totala händelser</span>
+                <span className="text-muted-foreground">{t('sessionInfo.totalEvents')}</span>
                 <span className="font-mono">{analytics.total_events}</span>
               </div>
             </div>

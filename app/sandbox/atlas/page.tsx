@@ -12,7 +12,7 @@ import { RiskDashboard } from '@/app/sandbox/atlas/components/RiskDashboard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
+import { Progress as _Progress } from '@/components/ui/progress';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,7 +45,7 @@ import {
   type InventoryUsageStatus,
   type InventoryRiskLevel,
 } from '@/app/sandbox/atlas/lib/inventory-types';
-import type { AtlasEdge, AtlasSelection } from './types';
+import type { AtlasEdge, AtlasSelection, AtlasEntity } from './types';
 
 // Domain options for filter
 const DOMAIN_OPTIONS: { id: InventoryDomain; label: string }[] = [
@@ -391,10 +391,10 @@ export default function AtlasV2Page() {
     expandedGroupIds,
     selectedNodeId,
     selectedNode,
-    selectedNodeEdges,
-    impactTrace,
-    recentNodes,
-    relatedNodes,
+    selectedNodeEdges: _selectedNodeEdges,
+    impactTrace: _impactTrace,
+    recentNodes: _recentNodes,
+    relatedNodes: _relatedNodes,
     filteredNodes,
     riskSummary,
     filters,
@@ -403,8 +403,8 @@ export default function AtlasV2Page() {
     loadInventory,
     toggleGroupExpanded,
     selectNode,
-    computeImpact,
-    clearImpactTrace,
+    computeImpact: _computeImpact,
+    clearImpactTrace: _clearImpactTrace,
   } = useInventoryStore();
 
   // Annotations for review state management (Sprint 2/3)
@@ -427,20 +427,21 @@ export default function AtlasV2Page() {
 
   // Convert mappedEdges to AtlasEdge format for inspector
   // Note: mappedEdges uses source/target, we need fromType/fromId/toType/toId
+  const edges = inventoryData?.edges;
   const atlasEdges = useMemo<AtlasEdge[]>(() => {
-    if (!inventoryData?.edges) return [];
-    return inventoryData.edges.map(edge => ({
+    if (!edges) return [];
+    return edges.map(edge => ({
       fromType: (edge.from.split(':')[0] || 'component') as 'frame' | 'component' | 'table' | 'endpoint',
       fromId: edge.from,
       toType: (edge.to.split(':')[0] || 'component') as 'frame' | 'component' | 'table' | 'endpoint',
       toId: edge.to,
       relation: (edge.type || 'uses') as 'navigates' | 'reads' | 'writes' | 'uses' | 'calls' | 'emits',
     }));
-  }, [inventoryData?.edges]);
+  }, [edges]);
 
   // Build node lookup for inspector
   const nodeLookup = useMemo(() => {
-    const lookup: Record<string, any> = {};
+    const lookup: Record<string, AtlasEntity & { risk?: string; usage?: string }> = {};
     filteredNodes.forEach(node => {
       const key = `${node.type}:${node.id}`;
       lookup[key] = {
@@ -449,7 +450,7 @@ export default function AtlasV2Page() {
         name: node.name,
         route: node.path,
         fileRef: node.path,
-      };
+      } as AtlasEntity & { risk?: string; usage?: string };
     });
     return lookup;
   }, [filteredNodes]);

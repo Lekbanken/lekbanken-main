@@ -87,7 +87,8 @@ export default function NotificationsAdminPage() {
     void init();
   }, [t]);
 
-  // Load users when tenant changes
+  // Load users when tenant changes - combined with user reset logic
+  // to avoid multiple effects triggering cascading renders
   const loadUsers = useCallback(async (tenantId: string) => {
     if (!tenantId) {
       setUsers([]);
@@ -104,16 +105,20 @@ export default function NotificationsAdminPage() {
     setUsersLoading(false);
   }, []);
 
-  useEffect(() => {
-    if (selectedTenantId && (scope === 'tenant' || scope === 'users')) {
-      void loadUsers(selectedTenantId);
-    }
-  }, [selectedTenantId, scope, loadUsers]);
-
-  // Reset user selection when scope or tenant changes
-  useEffect(() => {
+  // Handle scope change - reset users selection
+  const handleScopeChange = useCallback((newScope: NotificationScope) => {
+    setScope(newScope);
     setSelectedUserIds([]);
-  }, [scope, selectedTenantId]);
+  }, []);
+
+  // Handle tenant change - reset users selection and load users
+  const handleTenantChange = useCallback((tenantId: string) => {
+    setSelectedTenantId(tenantId);
+    setSelectedUserIds([]);
+    if (tenantId && (scope === 'tenant' || scope === 'users')) {
+      void loadUsers(tenantId);
+    }
+  }, [scope, loadUsers]);
 
   // Validation
   const canSend = useMemo(() => {
@@ -253,7 +258,7 @@ export default function NotificationsAdminPage() {
                 {isSystemAdmin && (
                   <button
                     type="button"
-                    onClick={() => setScope('global')}
+                    onClick={() => handleScopeChange('global')}
                     className={`flex items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
                       scope === 'global'
                         ? 'border-primary bg-primary/5 ring-2 ring-primary'
@@ -269,7 +274,7 @@ export default function NotificationsAdminPage() {
                 )}
                 <button
                   type="button"
-                  onClick={() => setScope('tenant')}
+                  onClick={() => handleScopeChange('tenant')}
                   className={`flex items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
                     scope === 'tenant'
                       ? 'border-primary bg-primary/5 ring-2 ring-primary'
@@ -284,7 +289,7 @@ export default function NotificationsAdminPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setScope('users')}
+                  onClick={() => handleScopeChange('users')}
                   className={`flex items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
                     scope === 'users'
                       ? 'border-primary bg-primary/5 ring-2 ring-primary'
@@ -307,7 +312,7 @@ export default function NotificationsAdminPage() {
                 <select
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={selectedTenantId}
-                  onChange={(e) => setSelectedTenantId(e.target.value)}
+                  onChange={(e) => handleTenantChange(e.target.value)}
                 >
                   <option value="">{t('options.selectOrg')}</option>
                   {tenants.map((tenant) => (

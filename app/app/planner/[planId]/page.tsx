@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { getTranslations } from 'next-intl/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { PlanOverview } from '@/features/planner/components/PlanOverview'
 import type { PlannerPlan } from '@/types/planner'
@@ -82,12 +83,14 @@ export default async function PlannerShareLinkPage({
     redirect(`/app/planner/plan/${planId}`)
   }
 
+  const t = await getTranslations('planner')
+
   // Non-editors see the read-only overview
   return (
     <div className="mx-auto max-w-3xl space-y-6 py-6 px-4">
       <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-4 mb-6">
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          Du visar en delad plan. Du har endast läsbehörighet.
+          {t('sharedPlan.viewOnlyBanner')}
         </p>
       </div>
       <PlanOverview plan={plan} />

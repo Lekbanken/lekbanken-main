@@ -76,7 +76,7 @@ export function TenantAwardModal({
     };
     
     loadMembers();
-  }, [open, tenantId]);
+  }, [open, tenantId, t]);
 
   // Filtered members based on search
   const filteredMembers = memberSearch.trim()

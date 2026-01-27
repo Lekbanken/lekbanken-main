@@ -642,6 +642,9 @@
       "visibilityLabel": "Synlighet:",
       "tenantVisibilityDescription": "Synlig for alle i organisasjonen din",
       "publicVisibilityDescription": "Synlig for alle brukere"
+    },
+    "sharedPlan": {
+      "viewOnlyBanner": "Du ser en delt plan. Du har kun lesetilgang."
     }
   },
   "admin": {
@@ -10128,7 +10131,10 @@
         "totalParticipants": "Totalt deltakere",
         "totalScore": "Total poeng",
         "achievements": "Utmerkelser",
-        "averageTime": "Gjennomsnittstid"
+        "averageTime": "Gjennomsnittstid",
+        "totalDecisions": "Beslutninger",
+        "decisionsCompleted": "Fullført",
+        "totalVotes": "Stemmer"
       },
       "duration": {
         "hoursMinutes": "{hours}h {minutes}m",
@@ -10169,6 +10175,12 @@
       },
       "recentActivity": {
         "title": "Siste aktivitet"
+      },
+      "sessionInfo": {
+        "title": "Sesjonsinfo",
+        "started": "Startet",
+        "ended": "Avsluttet",
+        "totalEvents": "Totale hendelser"
       }
     },
     "participantSessionCreate": {

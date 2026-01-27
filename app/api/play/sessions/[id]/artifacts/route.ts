@@ -196,7 +196,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   artifactsQuery = locale ? artifactsQuery.eq('locale', locale) : artifactsQuery.is('locale', null);
 
-  let { data: gameArtifacts, error: aErr } = await artifactsQuery.order('artifact_order', { ascending: true });
+  const artifactsResult = await artifactsQuery.order('artifact_order', { ascending: true });
+  let gameArtifacts = artifactsResult.data;
+  const aErr = artifactsResult.error;
 
   if (aErr) return jsonError('Failed to load artifacts', 500);
 

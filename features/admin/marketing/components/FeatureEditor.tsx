@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   XMarkIcon,
@@ -51,12 +51,6 @@ export function FeatureEditor({ feature, onSave, onCancel, isPending }: FeatureE
   
   const [formData, setFormData] = useState<FeatureFormData>(initialFormData);
   const [tagInput, setTagInput] = useState('');
-
-  // Sync form data when feature prop changes (e.g., when switching between features)
-  useEffect(() => {
-    setFormData(initialFormData);
-    setTagInput('');
-  }, [initialFormData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

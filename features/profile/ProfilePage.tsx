@@ -437,8 +437,8 @@ export function ProfilePage() {
               )}
               {recoveryCodes && (
                 <div className="mt-3 space-y-2 rounded-lg border border-border/60 p-3">
-                  <p className="text-sm font-semibold text-foreground">Recovery-koder</p>
-                  <p className="text-xs text-muted-foreground">Spara dessa på en säker plats. De visas bara nu.</p>
+                  <p className="text-sm font-semibold text-foreground">{t('security.recoveryCodes')}</p>
+                  <p className="text-xs text-muted-foreground">{t('security.recoveryCodesDescription')}</p>
                   <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                     {recoveryCodes.map((code) => (
                       <div key={code} className="rounded bg-muted px-2 py-1">

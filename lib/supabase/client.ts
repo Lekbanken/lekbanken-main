@@ -10,25 +10,30 @@ import { createBrowserClient as createSupabaseBrowserClient, type CookieOptions 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 import { env } from '@/lib/config/env'
+import { enhanceCookieOptions, getBrowserHostname } from '@/lib/supabase/cookie-domain'
 
 const supabaseUrl = env.supabase.url
 const supabaseAnonKey = env.supabase.anonKey
 
 function serializeCookie(name: string, value: string, options: CookieOptions = {}) {
+  // Enhance cookie options with cross-subdomain domain for platform domains
+  const hostname = getBrowserHostname()
+  const enhancedOptions = enhanceCookieOptions(options, hostname)
+  
   // Minimal cookie serializer for browser usage; mirrors Next.js defaults.
   const parts = [
     `${name}=${encodeURIComponent(value)}`,
-    `Path=${options.path ?? '/'}`,
-    options.maxAge ? `Max-Age=${options.maxAge}` : null,
-    options.expires ? `Expires=${options.expires.toUTCString()}` : null,
-    options.domain ? `Domain=${options.domain}` : null,
-    `SameSite=${options.sameSite ?? 'Lax'}`,
-    options.secure ? 'Secure' : null,
+    `Path=${enhancedOptions.path ?? '/'}`,
+    enhancedOptions.maxAge ? `Max-Age=${enhancedOptions.maxAge}` : null,
+    enhancedOptions.expires ? `Expires=${enhancedOptions.expires.toUTCString()}` : null,
+    enhancedOptions.domain ? `Domain=${enhancedOptions.domain}` : null,
+    `SameSite=${enhancedOptions.sameSite ?? 'Lax'}`,
+    enhancedOptions.secure ? 'Secure' : null,
   ].filter(Boolean)
 
   // fall back to Secure when running on https even if not explicitly set
   const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:'
-  if (!options.secure && isHttps) parts.push('Secure')
+  if (!enhancedOptions.secure && isHttps) parts.push('Secure')
 
   document.cookie = parts.join('; ')
 }

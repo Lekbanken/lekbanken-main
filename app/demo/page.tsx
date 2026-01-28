@@ -91,14 +91,15 @@ export default function DemoPage() {
         cache: 'no-store',
       });
 
-      if (response.redirected) {
-        // Successful redirect to demo app - force full page reload to clear cache
-        window.location.href = response.url;
+      const data = await response.json();
+
+      if (response.ok && data.success && data.redirectUrl) {
+        // Navigate to the redirect URL (may be cross-origin like demo.lekbanken.no)
+        window.location.href = data.redirectUrl;
         return;
       }
 
       if (!response.ok) {
-        const data = await response.json();
         setError(data.error || 'Kunde inte starta demo. Försök igen.');
       }
     } catch (err) {

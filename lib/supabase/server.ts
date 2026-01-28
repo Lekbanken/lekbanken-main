@@ -5,6 +5,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import type { Database } from '@/types/supabase'
 import { env } from '@/lib/config/env'
+import { enhanceCookieOptions } from '@/lib/supabase/cookie-domain'
 
 const supabaseUrl = env.supabase.url
 const supabaseAnonKey = env.supabase.anonKey
@@ -24,6 +25,8 @@ const supabaseServiceRoleKey = env.supabase.serviceRoleKey
  */
 export async function createServerRlsClient() {
   const cookieStore = await cookies()
+  const headerStore = await headers()
+  const hostname = headerStore.get('host')?.split(':')[0] || null
 
   return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
@@ -32,7 +35,9 @@ export async function createServerRlsClient() {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value, options }) => {
-          cookieStore.set(name, value, options)
+          // Enhance cookie options with cross-subdomain domain for platform domains
+          const enhancedOptions = enhanceCookieOptions(options, hostname)
+          cookieStore.set(name, value, enhancedOptions)
         })
       },
     },

@@ -6,6 +6,7 @@ import { deriveEffectiveGlobalRoleFromClaims, resolveTenantForMiddlewareRequest 
 import { setTenantCookie, clearTenantCookie } from '@/lib/utils/tenantCookie'
 import { defaultLocale, LOCALE_COOKIE, isValidLocale, type Locale } from '@/lib/i18n/config'
 import { checkMFAStatus, MFA_TRUST_COOKIE, buildMFAChallengeUrl, buildMFAEnrollUrl, extractDeviceFingerprint } from '@/lib/auth/mfa-aal'
+import { enhanceCookieOptions } from '@/lib/supabase/cookie-domain'
 
 const guestOnlyPaths = new Set(['/auth/login', '/auth/signup'])
 
@@ -185,6 +186,11 @@ export default async function proxy(request: NextRequest) {
   response.headers.set('x-request-id', requestId)
 
   // ============================================
+  // HOSTNAME EXTRACTION (needed early for cookie domain)
+  // ============================================
+  const hostname = extractHostname(request)
+
+  // ============================================
   // LOCALE RESOLUTION
   // Resolve and set locale cookie for i18n
   // ============================================
@@ -208,7 +214,9 @@ export default async function proxy(request: NextRequest) {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options)
+          // Enhance cookie options with cross-subdomain domain for platform domains
+          const enhancedOptions = enhanceCookieOptions(options, hostname)
+          response.cookies.set(name, value, enhancedOptions)
         })
       },
     },
@@ -221,7 +229,6 @@ export default async function proxy(request: NextRequest) {
   // Only perform hostname resolution for protected paths (/app, /admin)
   // ============================================
   
-  const hostname = extractHostname(request)
   let hostTenantId: string | null = null
   let isHostTrusted = false
   let isDemoMode = false

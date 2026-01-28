@@ -167,25 +167,29 @@ export async function POST(request: Request) {
       console.log(`[POST /auth/demo] Demo session created: ${typedDemoSession.id}, tenant: ${DEMO_TENANT_ID}`);
     }
 
-    // Step 5: Redirect to demo subdomain
+    // Step 5: Build redirect URL for demo subdomain
     // IMPORTANT: Always redirect demo users to demo.lekbanken.no for proper tenant isolation
     const isProduction = process.env.NODE_ENV === 'production';
     
     // Build redirect URL
-    let redirectUrl: URL;
+    let redirectUrl: string;
     if (isProduction) {
       // In production, always redirect to demo.lekbanken.no
       const path = redirectParam?.startsWith('/') ? redirectParam : '/app?demo=true&onboarding=true';
-      redirectUrl = new URL(path, 'https://demo.lekbanken.no');
+      redirectUrl = `https://demo.lekbanken.no${path}`;
     } else {
       // In development, use same-origin redirect
-      const path = redirectParam || '/app?demo=true&onboarding=true';
-      redirectUrl = new URL(path, request.url);
+      redirectUrl = redirectParam || '/app?demo=true&onboarding=true';
     }
 
-    console.log(`[POST /auth/demo] Redirecting to: ${redirectUrl.toString()}`);
+    console.log(`[POST /auth/demo] Returning redirect URL: ${redirectUrl}`);
 
-    return NextResponse.redirect(redirectUrl);
+    // Return JSON with redirect URL instead of HTTP redirect
+    // This avoids CORS issues when redirecting cross-origin from fetch()
+    return NextResponse.json({
+      success: true,
+      redirectUrl,
+    });
   } catch (error) {
     console.error('[POST /auth/demo] Unexpected error:', error);
 

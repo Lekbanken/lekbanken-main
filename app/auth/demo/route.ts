@@ -170,29 +170,22 @@ export async function POST(request: Request) {
     // Step 5: Redirect to demo subdomain
     // IMPORTANT: Always redirect demo users to demo.lekbanken.no for proper tenant isolation
     const isProduction = process.env.NODE_ENV === 'production';
-    const demoHost = isProduction ? 'https://demo.lekbanken.no' : '';
-    const defaultRedirect = `${demoHost}/app?demo=true&onboarding=true`;
     
-    // If custom redirect provided, ensure it goes to demo subdomain in production
-    let redirectUrl = redirectParam || defaultRedirect;
-    if (isProduction && redirectParam && !redirectParam.startsWith('https://demo.lekbanken.no')) {
-      // Prepend demo subdomain to relative paths
-      if (redirectParam.startsWith('/')) {
-        redirectUrl = `https://demo.lekbanken.no${redirectParam}`;
-      } else {
-        // For absolute URLs not on demo subdomain, use default
-        redirectUrl = defaultRedirect;
-      }
-    }
-
-    console.log(`[POST /auth/demo] Redirecting to: ${redirectUrl}`);
-
-    // In production, redirect to full URL; in dev, use relative path
+    // Build redirect URL
+    let redirectUrl: URL;
     if (isProduction) {
-      return NextResponse.redirect(redirectUrl);
+      // In production, always redirect to demo.lekbanken.no
+      const path = redirectParam?.startsWith('/') ? redirectParam : '/app?demo=true&onboarding=true';
+      redirectUrl = new URL(path, 'https://demo.lekbanken.no');
     } else {
-      return NextResponse.redirect(new URL(redirectUrl || '/app?demo=true&onboarding=true', request.url));
+      // In development, use same-origin redirect
+      const path = redirectParam || '/app?demo=true&onboarding=true';
+      redirectUrl = new URL(path, request.url);
     }
+
+    console.log(`[POST /auth/demo] Redirecting to: ${redirectUrl.toString()}`);
+
+    return NextResponse.redirect(redirectUrl);
   } catch (error) {
     console.error('[POST /auth/demo] Unexpected error:', error);
 

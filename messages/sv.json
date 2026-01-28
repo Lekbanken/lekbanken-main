@@ -605,6 +605,9 @@
     }
   },
   "admin": {
+    "pageHeader": {
+      "breadcrumbsLabel": "Brödsmulor"
+    },
     "table": {
       "pagination": {
         "ariaLabel": "Tabellpaginering",
@@ -678,6 +681,7 @@
         "apiKeys": "API-nycklar",
         "webhooks": "Webhooks",
         "incidents": "Incidenter",
+        "scheduledJobs": "Schemalagda jobb",
         "releaseNotes": "Release Notes",
         "settings": "Inställningar",
         "members": "Medlemmar",
@@ -750,6 +754,7 @@
       "webhooks": "Webhooks",
       "cookies": "Kakor",
       "incidents": "Incidenter",
+      "scheduledJobs": "Schemalagda jobb",
       "releaseNotes": "Release Notes",
       "settings": "Inställningar",
       "translations": "Översättningar",
@@ -3177,6 +3182,45 @@
       "emptyTitle": "Ingen incidentdata ännu",
       "emptyDescription": "Här kommer driftstatus och incidentlogg att visas när backendkoppling finns."
     },
+    "scheduledJobs": {
+      "title": "Schemalagda jobb",
+      "description": "Översikt över automatiska databas-jobb (pg_cron).",
+      "activeJobs": "Aktiva jobb",
+      "lastRun": "Senaste körning",
+      "nextRun": "Nästa körning",
+      "status": "Status",
+      "result": "Resultat",
+      "duration": "Varaktighet",
+      "runHistory": "Körhistorik",
+      "runNow": "Kör nu",
+      "refresh": "Uppdatera",
+      "noHistory": "Ingen körhistorik ännu",
+      "errorTitle": "Kunde inte hämta jobbstatus",
+      "cronNotEnabled": "pg_cron är inte aktiverat",
+      "time": "Tid",
+      "job": "Jobb",
+      "schedule": "Schema",
+      "running": "Körs",
+      "runningManual": "Kör manuellt...",
+      "success": "Lyckades",
+      "failed": "Misslyckades",
+      "never": "Aldrig kört",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "ms": "ms",
+      "seconds": "sekunder",
+      "cronExpressions": {
+        "daily3am": "Dagligen kl 03:00 UTC"
+      },
+      "dailyAt": "Dagligen {time} (svensk tid)",
+      "jobs": {
+        "cleanupDemoUsers": {
+          "name": "Städa demo-användare",
+          "description": "Raderar demo-användare äldre än 24 timmar som inte konverterat till betalande."
+        }
+      },
+      "resultFormat": "{users} användare, {sessions} sessioner raderade"
+    },
     "gamification": {
       "hub": {
         "breadcrumbs": {
@@ -4853,6 +4897,8 @@
             "statusPublished": "Publicerad",
             "statusHelpDraft": "Utkast är bara synliga för dig.",
             "statusHelpPublished": "Publicerade spel är synliga för alla med åtkomst.",
+            "demoContentLabel": "Demo-innehåll",
+            "demoContentHelp": "Aktivera för att visa detta spel för demo-användare på demo.lekbanken.no",
             "dangerTitle": "Farozon",
             "dangerDescription": "Permanent radering av spelet. Denna åtgärd kan inte ångras.",
             "deleteButton": "Ta bort spel",
@@ -9943,6 +9989,67 @@
       "title": "Enkla och transparenta priser",
       "description": "Välj den plan som passar dig bäst. Ingen bindningstid.",
       "viewDetails": "Visa detaljer",
+      "viewAll": "Visa alla",
+      "allCategories": "Alla",
+      "noProducts": "Inga produkter hittades",
+      "noProductsDescription": "Det finns inga produkter tillgängliga just nu.",
+      "products": {
+        "autismnpf": { "name": "Autism & NPF", "description": "Aktiviteter anpassade för autism och NPF" },
+        "rarelsehinder": { "name": "Rörelsehinder", "description": "Anpassat för personer med rörelsehinder" },
+        "synharselvariation": { "name": "Syn & hörselvariation", "description": "Aktiviteter för syn- och hörselvariation" },
+        "kickoff": { "name": "Kickoff", "description": "Lekar för kickoff-event" },
+        "kontorsaktiviteter": { "name": "Kontorsaktiviteter", "description": "Aktiviteter för arbetsplatsen" },
+        "teambuilding": { "name": "Teambuilding", "description": "Stärk teamet med roliga övningar" },
+        "digitalaisbrytare": { "name": "Digitala isbrytare", "description": "Isbrytare för digitala möten" },
+        "sittandegruppovningar": { "name": "Sittande gruppövningar", "description": "Gruppövningar som kan göras sittandes" },
+        "videomoteslekarteamsmeet": { "name": "Videomöteslekar", "description": "Lekar för Teams/Meet" },
+        "lagerkolloledare": { "name": "Läger/Kolloledare", "description": "Perfekt för läger och kollo" },
+        "scoutledare": { "name": "Scoutledare", "description": "Aktiviteter för scouter" },
+        "ungaledare": { "name": "Unga ledare", "description": "För unga ledare i verksamheten" },
+        "fodolsedagarkalas": { "name": "Födelsedagar & kalas", "description": "Lekar för barnkalas" },
+        "smabarnbarn18ar": { "name": "Småbarn & Barn (1–8 år)", "description": "Anpassat för de yngsta" },
+        "tweenstonaringar917ar": { "name": "Tweens & Tonåringar (9–17 år)", "description": "För äldre barn och tonåringar" },
+        "jul": { "name": "Jul", "description": "Jullekar och aktiviteter" },
+        "midsommar": { "name": "Midsommar", "description": "Midsommarlekar" },
+        "pask": { "name": "Påsk", "description": "Påsklekar och aktiviteter" },
+        "skolavslutning": { "name": "Skolavslutning", "description": "Lekar för skolavslutningen" },
+        "brallop": { "name": "Bröllop", "description": "Lekar för bröllopsfesten" },
+        "hemmafest": { "name": "Hemmafest", "description": "Festlekar hemma" },
+        "nyarsfest": { "name": "Nyårsfest", "description": "Nyårslekar" },
+        "studentexamen": { "name": "Student / Examen", "description": "Lekar för studenten" },
+        "dagisforskola": { "name": "Dagis & Förskola", "description": "Anpassat för förskolan" },
+        "grundskola_lag": { "name": "Grundskola (Lågstadiet)", "description": "För lågstadiet" },
+        "grundskola_mellan": { "name": "Grundskola (Mellanstadiet)", "description": "För mellanstadiet" },
+        "grundskola_hog": { "name": "Grundskola (Högstadiet)", "description": "För högstadiet" },
+        "gymnasium": { "name": "Gymnasium", "description": "För gymnasiet" },
+        "fritidspedagog": { "name": "Fritidspedagog", "description": "Aktiviteter för fritids" },
+        "fotboll": { "name": "Fotboll", "description": "Fotbollsträning och lekar" },
+        "innebandy": { "name": "Innebandy", "description": "Innebandyträning" },
+        "handboll": { "name": "Handboll", "description": "Handbollsträning" },
+        "basket": { "name": "Basket", "description": "Basketträning" },
+        "trainer": { "name": "Tränare", "description": "För tränare och coacher" },
+        "pedagog": { "name": "Pedagog", "description": "För pedagoger och lärare" },
+        "parent": { "name": "Förälder", "description": "För föräldrar och hemmet" }
+      },
+      "categories": {
+        "Specialpedagog": "Specialpedagog",
+        "Arbetsplatsen": "Arbetsplatsen",
+        "Digitala aktiviteter": "Digitala aktiviteter",
+        "Ungdomsverksamhet": "Ungdomsverksamhet",
+        "Föräldrar": "Föräldrar",
+        "Event & högtider": "Event & högtider",
+        "Festligheter": "Festligheter",
+        "Pedagoger": "Pedagoger",
+        "Tränare": "Tränare",
+        "Familie": "Familj",
+        "sports": "Sport",
+        "Sports": "Sport",
+        "education": "Utbildning",
+        "Education": "Utbildning",
+        "family": "Familj",
+        "Family": "Familj",
+        "other": "Övrigt"
+      },
       "frequencyLabel": "Välj betalningsfrekvens",
       "save15": "Spara 15%",
       "frequencies": {
@@ -10063,7 +10170,7 @@
           "reviews": "Omdömen",
           "faq": "Vanliga frågor"
         },
-        "reviews": {
+        "reviewsSection": {
           "title": "Kundrecensioner",
           "outOf5": "av 5 stjärnor",
           "basedOn": "Baserat på {count} omdömen"

@@ -421,7 +421,7 @@ export default function ProductDetailPage() {
               <div className="grid gap-8 lg:grid-cols-12">
                 {/* Rating summary */}
                 <div className="lg:col-span-4">
-                  <h3 className="text-lg font-semibold text-slate-900">{t('reviews.title')}</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">{t('reviewsSection.title')}</h3>
                   <div className="mt-3 flex items-center">
                     <div className="flex items-center">
                       {[0, 1, 2, 3, 4].map((rating) => (
@@ -435,11 +435,11 @@ export default function ProductDetailPage() {
                       ))}
                     </div>
                     <p className="ml-3 text-sm text-slate-700">
-                      {reviews.average} {t('reviews.outOf5')}
+                      {reviews.average} {t('reviewsSection.outOf5')}
                     </p>
                   </div>
                   <p className="mt-1 text-sm text-slate-500">
-                    {t('reviews.basedOn', { count: reviews.totalCount })}
+                    {t('reviewsSection.basedOn', { count: reviews.totalCount })}
                   </p>
                 </div>
 

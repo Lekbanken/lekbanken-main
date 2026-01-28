@@ -271,6 +271,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           accessibility_notes: g.accessibility_notes || '',
           space_requirements: g.space_requirements || '',
           leader_tips: g.leader_tips || '',
+          is_demo_content: g.is_demo_content ?? false,
         });
 
         const loadedSteps = ((data.steps as Partial<StepData>[] | undefined) ?? []).map(
@@ -528,6 +529,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           name: core.name.trim(),
           short_description: core.short_description.trim(),
           description: core.description || null,
+          is_demo_content: core.is_demo_content ?? false,
         },
         steps: steps.map((s, idx) => ({
           id: isUuid(s.id) ? s.id : undefined,
@@ -1368,6 +1370,31 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                   <p className="text-xs text-muted-foreground">
                     {core.status === 'draft' ? t('settings.statusHelpDraft') : t('settings.statusHelpPublished')}
                   </p>
+                </div>
+
+                {/* Demo Content Toggle */}
+                <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/30">
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-foreground">{t('settings.demoContentLabel')}</label>
+                    <p className="text-xs text-muted-foreground">
+                      {t('settings.demoContentHelp')}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={core.is_demo_content}
+                    onClick={() => setCore({ is_demo_content: !core.is_demo_content })}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                      core.is_demo_content ? 'bg-primary' : 'bg-muted-foreground/30'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        core.is_demo_content ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
                 </div>
               </Card>
 

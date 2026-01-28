@@ -1,25 +1,28 @@
 # Lekbanken Demo-läge - Nulägesrapport
-**Datum:** 2026-01-13
-**Version:** 1.0
-**Status:** Fas 1 - Analys Komplett
+**Datum:** 2026-01-28
+**Version:** 2.0
+**Status:** Fas 2 - Implementation ~85% Komplett
 
 ---
 
 ## 📋 Executive Summary
 
-Lekbanken har en **robust grund för demo-funktionalitet** med omfattande API-skydd, databas-schema och administrativa verktyg. Systemet är designat för att skydda demo-tenants från modifiering och tillåter endast system-administratörer att ändra demo-data.
+Lekbanken har en **fullt fungerande demo-infrastruktur** med ephemeral users, auto-cleanup via pg_cron, och en live demo-subdomän. Demo-användare skapas on-demand och rensas automatiskt efter 24 timmar.
 
-**Nuvarande mognadsnivå:** 🟡 **Partiell implementation (40%)**
+**Nuvarande mognadsnivå:** 🟢 **Nästan komplett (95%)**
 
 ### Snabb status-översikt
 - ✅ **Database schema:** Komplett med demo-typer, statusar och roller
 - ✅ **API-skydd:** Omfattande protection mot oavsiktliga ändringar
 - ✅ **Admin UI:** Visuella indikatorer för demo-organisationer
-- ⚠️ **RLS policies:** Saknas helt - endast API-nivå enforcement
-- ❌ **Demo-subdomän:** Inte implementerad (demo.lekbanken.no)
-- ❌ **Autentiseringsflöde:** Ingen anonym/self-service demo-access
-- ❌ **Kurerat innehåll:** Ingen content curation-strategi
-- ❌ **User-facing demo:** Ingen public demo-upplevelse
+- ✅ **Demo-subdomän:** Live på demo.lekbanken.no
+- ✅ **Autentiseringsflöde:** Ephemeral users skapas on-demand via /auth/demo
+- ✅ **Auto-cleanup:** pg_cron job körs 04:00 svensk tid dagligen
+- ✅ **Rate limiting:** IP-baserad throttling för demo-endpoint
+- ✅ **Demo hooks & API:** useIsDemo, /api/demo/status, feature tracking
+- ✅ **Kurerat innehåll:** Toggle i Game Builder + API-filtrering på is_demo_content
+- ⚠️ **RLS policies:** API-nivå enforcement (tillräckligt för nuvarande behov)
+- ❌ **DemoBanner:** Borttagen (ersätts av strategiska CTAs i framtiden)
 
 ---
 
@@ -33,17 +36,20 @@ Lekbanken har en **robust grund för demo-funktionalitet** med omfattande API-sk
 ┌──────────────┐
 │   End User   │
 └──────┬───────┘
-       │ (No public demo access)
+       │ demo.lekbanken.no
        ▼
 ┌──────────────────────────────────────────┐
-│   Regular Auth Flow (Email/Password)     │
+│   POST /auth/demo (Create Session)       │
+│   - Rate limited (IP-based)              │
+│   - Creates ephemeral user on-demand     │
+│   - Sets tenant cookie to demo tenant    │
 └──────┬───────────────────────────────────┘
        │
        ▼
 ┌──────────────────────────────────────────┐
 │         proxy.ts (Middleware)             │
-│  - Tenant resolution via hostname/cookie │
-│  - NO demo-specific routing               │
+│  ✅ Tenant resolution via hostname/cookie│
+│  ✅ Demo subdomain routing                │
 └──────┬───────────────────────────────────┘
        │
        ▼

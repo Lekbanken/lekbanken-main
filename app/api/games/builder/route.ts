@@ -119,6 +119,7 @@ type CorePayload = {
   accessibility_notes?: string | null;
   space_requirements?: string | null;
   leader_tips?: string | null;
+  is_demo_content?: boolean | null;
 };
 
 type StepPayload = {
@@ -221,6 +222,7 @@ export async function POST(request: Request) {
     accessibility_notes: core.accessibility_notes ?? null,
     space_requirements: core.space_requirements ?? null,
     leader_tips: core.leader_tips ?? null,
+    is_demo_content: core.is_demo_content ?? false,
   };
 
   const { data: game, error } = await supabase.from('games').insert(insertGame).select().single();

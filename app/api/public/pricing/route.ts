@@ -11,6 +11,7 @@ type ProductRow = {
   product_type: string | null
   category: string | null
   status: string
+  image_url: string | null
 }
 
 type PricingProduct = {
@@ -20,6 +21,7 @@ type PricingProduct = {
   product_key?: string | null
   product_type?: string | null
   category?: string | null
+  image_url?: string | null
   prices: Array<{
     id: string
     amount: number
@@ -38,7 +40,7 @@ export async function GET(request: Request) {
 
   const { data: products, error: productsError } = await supabase
     .from('products')
-    .select('id,name,description,product_key,product_type,category,status')
+    .select('id,name,description,product_key,product_type,category,status,image_url')
     .eq('status', 'active')
     .order('name', { ascending: true })
 
@@ -88,6 +90,7 @@ export async function GET(request: Request) {
     product_key: p.product_key ?? null,
     product_type: p.product_type ?? null,
     category: p.category ?? null,
+    image_url: p.image_url ?? null,
     prices: pricesByProductId.get(p.id) ?? [],
   }))
 

@@ -624,6 +624,9 @@
     }
   },
   "admin": {
+    "pageHeader": {
+      "breadcrumbsLabel": "Breadcrumbs"
+    },
     "table": {
       "pagination": {
         "ariaLabel": "Table pagination",
@@ -697,6 +700,7 @@
         "apiKeys": "API Keys",
         "webhooks": "Webhooks",
         "incidents": "Incidents",
+        "scheduledJobs": "Scheduled Jobs",
         "releaseNotes": "Release Notes",
         "settings": "Settings",
         "members": "Members",
@@ -769,6 +773,7 @@
       "webhooks": "Webhooks",
       "cookies": "Cookie Management",
       "incidents": "Incidents",
+      "scheduledJobs": "Scheduled Jobs",
       "releaseNotes": "Release Notes",
       "settings": "Settings",
       "translations": "Translations",
@@ -3415,6 +3420,45 @@
       "emptyTitle": "No incident data yet",
       "emptyDescription": "Operational status and incident logs will appear here when the backend is connected."
     },
+    "scheduledJobs": {
+      "title": "Scheduled Jobs",
+      "description": "Overview of automatic database jobs (pg_cron).",
+      "activeJobs": "Active jobs",
+      "lastRun": "Last run",
+      "nextRun": "Next run",
+      "status": "Status",
+      "result": "Result",
+      "duration": "Duration",
+      "runHistory": "Run history",
+      "runNow": "Run now",
+      "refresh": "Refresh",
+      "noHistory": "No run history yet",
+      "errorTitle": "Could not fetch job status",
+      "cronNotEnabled": "pg_cron is not enabled",
+      "time": "Time",
+      "job": "Job",
+      "schedule": "Schedule",
+      "running": "Running",
+      "runningManual": "Running manually...",
+      "success": "Success",
+      "failed": "Failed",
+      "never": "Never run",
+      "active": "Active",
+      "inactive": "Inactive",
+      "ms": "ms",
+      "seconds": "seconds",
+      "cronExpressions": {
+        "daily3am": "Daily at 03:00 UTC"
+      },
+      "dailyAt": "Daily at {time} (Swedish time)",
+      "jobs": {
+        "cleanupDemoUsers": {
+          "name": "Cleanup demo users",
+          "description": "Deletes demo users older than 24 hours who have not converted to paying customers."
+        }
+      },
+      "resultFormat": "{users} users, {sessions} sessions deleted"
+    },
     "gamification": {
       "hub": {
         "breadcrumbs": {
@@ -4885,6 +4929,8 @@
             "statusPublished": "Published",
             "statusHelpDraft": "Drafts are only visible to you.",
             "statusHelpPublished": "Published games are visible to everyone with access.",
+            "demoContentLabel": "Demo content",
+            "demoContentHelp": "Enable to show this game for demo users on demo.lekbanken.no",
             "dangerTitle": "Danger zone",
             "dangerDescription": "Permanent deletion of the game. This action cannot be undone.",
             "deleteButton": "Delete game",
@@ -9007,6 +9053,67 @@
       "title": "Simple, transparent pricing",
       "description": "Choose the plan that fits your team. Upgrade or downgrade anytime.",
       "viewDetails": "View details",
+      "viewAll": "View all",
+      "allCategories": "All",
+      "noProducts": "No products found",
+      "noProductsDescription": "There are no products available at the moment.",
+      "products": {
+        "autismnpf": { "name": "Autism & NPF", "description": "Activities adapted for autism and NPF" },
+        "rarelsehinder": { "name": "Mobility Impairment", "description": "Adapted for people with mobility impairments" },
+        "synharselvariation": { "name": "Vision & Hearing Variation", "description": "Activities for visual and hearing variations" },
+        "kickoff": { "name": "Kickoff", "description": "Games for kickoff events" },
+        "kontorsaktiviteter": { "name": "Office Activities", "description": "Activities for the workplace" },
+        "teambuilding": { "name": "Team Building", "description": "Strengthen the team with fun exercises" },
+        "digitalaisbrytare": { "name": "Digital Icebreakers", "description": "Icebreakers for digital meetings" },
+        "sittandegruppovningar": { "name": "Seated Group Exercises", "description": "Group exercises that can be done sitting" },
+        "videomoteslekarteamsmeet": { "name": "Video Meeting Games", "description": "Games for Teams/Meet" },
+        "lagerkolloledare": { "name": "Camp Leader", "description": "Perfect for camps and summer camps" },
+        "scoutledare": { "name": "Scout Leader", "description": "Activities for scouts" },
+        "ungaledare": { "name": "Young Leaders", "description": "For young leaders in activities" },
+        "fodolsedagarkalas": { "name": "Birthdays & Parties", "description": "Games for children's parties" },
+        "smabarnbarn18ar": { "name": "Toddlers & Children (1–8 years)", "description": "Adapted for the youngest" },
+        "tweenstonaringar917ar": { "name": "Tweens & Teenagers (9–17 years)", "description": "For older children and teenagers" },
+        "jul": { "name": "Christmas", "description": "Christmas games and activities" },
+        "midsommar": { "name": "Midsummer", "description": "Midsummer games" },
+        "pask": { "name": "Easter", "description": "Easter games and activities" },
+        "skolavslutning": { "name": "End of School Year", "description": "Games for the end of school" },
+        "brallop": { "name": "Wedding", "description": "Games for wedding parties" },
+        "hemmafest": { "name": "House Party", "description": "Party games at home" },
+        "nyarsfest": { "name": "New Year's Party", "description": "New Year's games" },
+        "studentexamen": { "name": "Graduation", "description": "Games for graduation parties" },
+        "dagisforskola": { "name": "Kindergarten & Preschool", "description": "Adapted for preschool" },
+        "grundskola_lag": { "name": "Primary School (Early Years)", "description": "For early primary school" },
+        "grundskola_mellan": { "name": "Primary School (Middle Years)", "description": "For middle primary school" },
+        "grundskola_hog": { "name": "Middle School", "description": "For middle school" },
+        "gymnasium": { "name": "High School", "description": "For high school" },
+        "fritidspedagog": { "name": "After-School Teacher", "description": "Activities for after-school programs" },
+        "fotboll": { "name": "Football", "description": "Football training and games" },
+        "innebandy": { "name": "Floorball", "description": "Floorball training" },
+        "handboll": { "name": "Handball", "description": "Handball training" },
+        "basket": { "name": "Basketball", "description": "Basketball training" },
+        "trainer": { "name": "Coach", "description": "For coaches and trainers" },
+        "pedagog": { "name": "Educator", "description": "For educators and teachers" },
+        "parent": { "name": "Parent", "description": "For parents and home activities" }
+      },
+      "categories": {
+        "Specialpedagog": "Special Education",
+        "Arbetsplatsen": "Workplace",
+        "Digitala aktiviteter": "Digital Activities",
+        "Ungdomsverksamhet": "Youth Activities",
+        "Föräldrar": "Parents",
+        "Event & högtider": "Events & Holidays",
+        "Festligheter": "Celebrations",
+        "Pedagoger": "Educators",
+        "Tränare": "Coaches",
+        "Familie": "Family",
+        "sports": "Sports",
+        "Sports": "Sports",
+        "education": "Education",
+        "Education": "Education",
+        "family": "Family",
+        "Family": "Family",
+        "other": "Other"
+      },
       "frequencyLabel": "Payment frequency",
       "save15": "Save 15%",
       "mostPopular": "Most popular",
@@ -9051,7 +9158,7 @@
           "reviews": "Reviews",
           "faq": "FAQ"
         },
-        "reviews": {
+        "reviewsSection": {
           "title": "Customer reviews",
           "outOf5": "out of 5 stars",
           "basedOn": "Based on {count} reviews"

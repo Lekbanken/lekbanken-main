@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +28,10 @@ export function LanguageSwitcher({ className, align = "end" }: LanguageSwitcherP
   const { language, setLanguage } = usePreferences();
   const { switchLocale, isPending } = useLocaleSwitcher();
   const active = LANG_OPTIONS.find((option) => option.code === language);
+  
+  // Prevent hydration mismatch from Radix UI generating different IDs on server vs client
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const handleLanguageChange = (option: typeof LANG_OPTIONS[number]) => {
     // Update both PreferencesContext (for legacy support) and next-intl locale
@@ -48,6 +53,15 @@ export function LanguageSwitcher({ className, align = "end" }: LanguageSwitcherP
     isPending && "opacity-50",
     className,
   );
+
+  // Render a static placeholder during SSR to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <button type="button" aria-label="Change language" disabled className={buttonClassName}>
+        {buttonContent}
+      </button>
+    );
+  }
 
   return (
     <DropdownMenu>

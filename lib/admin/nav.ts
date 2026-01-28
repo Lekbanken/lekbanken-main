@@ -154,6 +154,7 @@ const systemAdminCategories: AdminNavCategory[] = [
       { id: 'sessions', labelKey: 'sessions', href: '/admin/sessions', icon: 'sessions', permission: 'admin.sessions.list' },
       { id: 'moderation', labelKey: 'moderation', href: '/admin/moderation', icon: 'moderation', permission: 'admin.moderation.view' },
       { id: 'incidents', labelKey: 'incidents', href: '/admin/incidents', icon: 'incident', permission: 'admin.system.view' },
+      { id: 'scheduled-jobs', labelKey: 'scheduledJobs', href: '/admin/scheduled-jobs', icon: 'clock', permission: 'admin.system.view', systemAdminOnly: true },
     ],
   },
   {

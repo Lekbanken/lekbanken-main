@@ -36,6 +36,7 @@ export interface CoreForm {
   accessibility_notes: string;
   space_requirements: string;
   leader_tips: string;
+  is_demo_content: boolean;
 }
 
 export interface MaterialsForm {
@@ -248,6 +249,7 @@ export const defaultCore: CoreForm = {
   accessibility_notes: '',
   space_requirements: '',
   leader_tips: '',
+  is_demo_content: false,
 };
 
 export const defaultMaterials: MaterialsForm = {

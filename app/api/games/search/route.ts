@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { getAllowedProductIds } from '@/app/api/games/utils'
 import { buildGroupSizeOr, computeHasMore, normalizeEnvironment, searchSchema } from './helpers'
+import { DEMO_TENANT_ID } from '@/lib/auth/ephemeral-users'
 
 async function getSubPurposeGameIds(
   supabase: Awaited<ReturnType<typeof createServerRlsClient>>,
@@ -60,6 +61,92 @@ export async function POST(request: Request) {
 
   const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
   const isElevated = role === 'system_admin' || role === 'superadmin' || role === 'admin' || role === 'owner'
+  
+  // Detect demo mode: either demo tenant or demo user metadata
+  const isDemoMode = tenantId === DEMO_TENANT_ID || user?.user_metadata?.is_demo_user === true
+
+  // For demo users: skip product access checks, show only is_demo_content games
+  if (isDemoMode) {
+    const offset = (page - 1) * pageSize
+    
+    let demoQuery = supabase
+      .from('games')
+      .select(
+        `
+          *,
+          owner:tenants(id,name),
+          media:game_media(*, media:media(*)),
+          product:products(*),
+          main_purpose:purposes!main_purpose_id(*),
+          secondary_purposes:game_secondary_purposes(purpose:purposes(*))
+        `,
+        { count: 'exact' }
+      )
+      .eq('status', 'published')
+      .eq('is_demo_content', true)
+    
+    // Apply search filter
+    if (search) {
+      demoQuery = demoQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`)
+    }
+    
+    // Apply other filters that make sense for demo
+    if (energyLevelsFilter.length > 0) {
+      demoQuery = demoQuery.in('energy_level', energyLevelsFilter)
+    }
+    
+    const normalizedEnv = normalizeEnvironment(environment)
+    if (normalizedEnv !== undefined) {
+      demoQuery = normalizedEnv === null 
+        ? demoQuery.is('location_type', null) 
+        : demoQuery.eq('location_type', normalizedEnv)
+    }
+    
+    if (minPlayers !== undefined) demoQuery = demoQuery.gte('min_players', minPlayers)
+    if (maxPlayers !== undefined) demoQuery = demoQuery.lte('max_players', maxPlayers)
+    if (minTime !== undefined) demoQuery = demoQuery.gte('time_estimate_min', minTime)
+    if (maxTime !== undefined) demoQuery = demoQuery.lte('time_estimate_min', maxTime)
+    
+    const groupSizeOr = buildGroupSizeOr(parsed.data.groupSizes ?? [])
+    if (groupSizeOr) {
+      demoQuery = demoQuery.or(groupSizeOr)
+    }
+    
+    // Sort demo games
+    switch (sort) {
+      case 'name':
+        demoQuery = demoQuery.order('name', { ascending: true })
+        break
+      case 'duration':
+        demoQuery = demoQuery.order('time_estimate_min', { ascending: true, nullsFirst: true })
+        break
+      default:
+        demoQuery = demoQuery.order('created_at', { ascending: false })
+        break
+    }
+    
+    demoQuery = demoQuery.range(offset, offset + pageSize - 1)
+    
+    const { data: demoGames, error: demoError, count: demoCount } = await demoQuery
+    
+    if (demoError) {
+      console.error('[api/games/search] demo query error', demoError)
+      return NextResponse.json({ error: 'Failed to load demo games' }, { status: 500 })
+    }
+    
+    const games = demoGames ?? []
+    const total = demoCount ?? games.length
+    const hasMore = computeHasMore(total, page, pageSize)
+    
+    return NextResponse.json({
+      games,
+      total,
+      page,
+      pageSize,
+      hasMore,
+      metadata: { allowedProducts: [], isDemoMode: true },
+    })
+  }
 
   const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId, user?.id ?? null)
   if (tenantId && allowedProductIds.length === 0 && !isElevated) {

@@ -101,22 +101,24 @@ const { data } = await supabase
 
 ---
 
-### 4. Komponentbibliotek: Catalyst
+### 4. Komponentbibliotek: Standard UI Components
 
 **✅ RÄTT:**
 ```typescript
-import { Button } from '@/catalyst-ui-kit/button';
-import { Badge } from '@/catalyst-ui-kit/badge';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 ```
 
 **❌ FEL:**
 ```typescript
-import { Button } from '@/components/ui/button';  // Shadcn-path
+import { Button } from '@/catalyst-ui-kit/typescript/button';  // Catalyst är borttaget
 ```
 
-**Regel:** Vi använder **Catalyst UI Kit**, inte Shadcn. Komponenter ligger i `@/catalyst-ui-kit/`.
+**Regel:** Vi använder våra egna UI-komponenter i `@/components/ui/`.
 
-**Varför:** Vi har migrerat från Shadcn till Catalyst för konsistens med Tailwind UI.
+**Varför:** Vi har migrerat bort från Catalyst UI Kit för att undvika externa beroenden och säkerhetsproblem.
 
 ---
 

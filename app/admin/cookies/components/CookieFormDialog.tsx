@@ -7,12 +7,11 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { Dialog, DialogTitle, DialogBody, DialogActions } from '@/catalyst-ui-kit/typescript/dialog'
-import { Field, Label, Description } from '@/catalyst-ui-kit/typescript/fieldset'
-import { Input } from '@/catalyst-ui-kit/typescript/input'
-import { Select } from '@/catalyst-ui-kit/typescript/select'
-import { Textarea } from '@/catalyst-ui-kit/typescript/textarea'
-import { Switch, SwitchField } from '@/catalyst-ui-kit/typescript/switch'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase/client'
 import type { CookieCatalogItem } from './CookieCatalogTab'
@@ -132,99 +131,112 @@ export function CookieFormDialog({ open, onClose, onSave, cookie }: CookieFormDi
   }
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <form onSubmit={handleSubmit}>
-        <DialogTitle>
-          {isEditing ? t('editCookie') : t('addCookie')}
-        </DialogTitle>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="max-w-lg">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>
+              {isEditing ? t('editCookie') : t('addCookie')}
+            </DialogTitle>
+          </DialogHeader>
         
-        <DialogBody className="space-y-4">
-          {error && (
-            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-400">
-              {error}
-            </div>
-          )}
+          <div className="space-y-4 py-4">
+            {error && (
+              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-400">
+                {error}
+              </div>
+            )}
 
-          <Field>
-            <Label>{t('fields.name')}</Label>
-            <Description>{t('descriptions.cookieName')}</Description>
-            <Input
-              value={formData.key}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('key', e.target.value)}
-              placeholder="cookie_name"
-              required
-              disabled={isEditing} // Can't change the key (primary key)
-            />
-          </Field>
-
-          <Field>
-            <Label>{t('fields.provider')}</Label>
-            <Input
-              value={formData.provider}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('provider', e.target.value)}
-              placeholder={t('descriptions.providerPlaceholder')}
-            />
-          </Field>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Field>
-              <Label>{t('fields.category')}</Label>
-              <Select
-                value={formData.category}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChange('category', e.target.value)}
-              >
-                <option value="necessary">{t('categories.necessary')}</option>
-                <option value="functional">{t('categories.functional')}</option>
-                <option value="analytics">{t('categories.analytics')}</option>
-                <option value="marketing">{t('categories.marketing')}</option>
-              </Select>
-            </Field>
-
-            <Field>
-              <Label>{t('fields.duration')}</Label>
-              <Description>{t('descriptions.duration')}</Description>
+            <div className="space-y-2">
+              <Label htmlFor="cookie-key">{t('fields.name')}</Label>
+              <p className="text-sm text-muted-foreground">{t('descriptions.cookieName')}</p>
               <Input
-                type="number"
-                value={formData.ttl_days ?? ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
-                  handleChange('ttl_days', e.target.value ? parseInt(e.target.value, 10) : null)
-                }
-                placeholder="365"
-                min={0}
+                id="cookie-key"
+                value={formData.key}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('key', e.target.value)}
+                placeholder="cookie_name"
+                required
+                disabled={isEditing}
               />
-            </Field>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cookie-provider">{t('fields.provider')}</Label>
+              <Input
+                id="cookie-provider"
+                value={formData.provider}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('provider', e.target.value)}
+                placeholder={t('descriptions.providerPlaceholder')}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="cookie-category">{t('fields.category')}</Label>
+                <select
+                  id="cookie-category"
+                  value={formData.category}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChange('category', e.target.value)}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="necessary">{t('categories.necessary')}</option>
+                  <option value="functional">{t('categories.functional')}</option>
+                  <option value="analytics">{t('categories.analytics')}</option>
+                  <option value="marketing">{t('categories.marketing')}</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cookie-duration">{t('fields.duration')}</Label>
+                <p className="text-sm text-muted-foreground">{t('descriptions.duration')}</p>
+                <Input
+                  id="cookie-duration"
+                  type="number"
+                  value={formData.ttl_days ?? ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                    handleChange('ttl_days', e.target.value ? parseInt(e.target.value, 10) : null)
+                  }
+                  placeholder="365"
+                  min={0}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cookie-purpose">{t('fields.purpose')}</Label>
+              <Textarea
+                id="cookie-purpose"
+                value={formData.purpose}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleChange('purpose', e.target.value)}
+                placeholder={t('fields.purpose')}
+                rows={3}
+                required
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="cookie-default-on">{t('fields.isActive')}</Label>
+                <p className="text-sm text-muted-foreground">{t('descriptions.defaultOn')}</p>
+              </div>
+              <Switch
+                id="cookie-default-on"
+                checked={formData.default_on}
+                onCheckedChange={(checked: boolean) => handleChange('default_on', checked)}
+              />
+            </div>
           </div>
 
-          <Field>
-            <Label>{t('fields.purpose')}</Label>
-            <Textarea
-              value={formData.purpose}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleChange('purpose', e.target.value)}
-              placeholder={t('fields.purpose')}
-              rows={3}
-              required
-            />
-          </Field>
-
-          <SwitchField>
-            <Label>{t('fields.isActive')}</Label>
-            <Description>{t('descriptions.defaultOn')}</Description>
-            <Switch
-              checked={formData.default_on}
-              onChange={(checked: boolean) => handleChange('default_on', checked)}
-            />
-          </SwitchField>
-        </DialogBody>
-
-        <DialogActions>
-          <Button type="button" variant="outline" onClick={onClose}>
-            {tc('cancel')}
-          </Button>
-          <Button type="submit" disabled={isSaving}>
-            {isSaving ? tc('saving') : tc('save')}
-          </Button>
-        </DialogActions>
-      </form>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              {tc('cancel')}
+            </Button>
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? tc('saving') : tc('save')}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   )
 }

@@ -2,21 +2,16 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { Heading, Subheading } from '@/catalyst-ui-kit/typescript/heading'
-import { Text } from '@/catalyst-ui-kit/typescript/text'
-import { Button } from '@/catalyst-ui-kit/typescript/button'
 import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
+  TableHead,
   TableRow,
-} from '@/catalyst-ui-kit/typescript/table'
-import {
-  Select,
-} from '@/catalyst-ui-kit/typescript/select'
-import { Badge } from '@/catalyst-ui-kit/typescript/badge'
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { ArrowPathIcon, ChartBarIcon } from '@heroicons/react/24/outline'
 
 interface UsageMeter {
@@ -112,10 +107,10 @@ export default function UsageAdminPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <Heading>{t('title')}</Heading>
-          <Text className="text-zinc-600 dark:text-zinc-400">
+          <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+          <p className="text-zinc-600 dark:text-zinc-400">
             {t('description')}
-          </Text>
+          </p>
         </div>
         <Button onClick={fetchData} disabled={loading}>
           <ArrowPathIcon className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
@@ -129,9 +124,10 @@ export default function UsageAdminPage() {
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
             {t('filterMeter')}
           </label>
-          <Select
+          <select
             value={selectedMeter}
             onChange={(e) => setSelectedMeter(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="all">{t('allMeters')}</option>
             {data?.meters.map((meter) => (
@@ -139,20 +135,21 @@ export default function UsageAdminPage() {
                 {meter.name}
               </option>
             ))}
-          </Select>
+          </select>
         </div>
         <div className="w-48">
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
             {t('filterPeriod')}
           </label>
-          <Select
+          <select
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="current">{t('periodCurrent')}</option>
             <option value="previous">{t('periodPrevious')}</option>
             <option value="30days">{t('period30Days')}</option>
-          </Select>
+          </select>
         </div>
       </div>
 
@@ -166,7 +163,7 @@ export default function UsageAdminPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <ChartBarIcon className="h-5 w-5 text-blue-500" />
-                <Subheading>{total.meter.name}</Subheading>
+                <h3 className="text-lg font-semibold text-foreground">{total.meter.name}</h3>
               </div>
               <div className="text-3xl font-bold text-zinc-900 dark:text-white">
                 {formatNumber(total.total)}
@@ -174,9 +171,9 @@ export default function UsageAdminPage() {
                   {total.meter.unit_name}
                 </span>
               </div>
-              <Text className="text-sm text-zinc-500">
+              <p className="text-sm text-zinc-500">
                 {t('tenantsCount', { count: total.tenantCount })}
-              </Text>
+              </p>
             </div>
           ))}
         </div>
@@ -195,30 +192,30 @@ export default function UsageAdminPage() {
       {/* Usage Table */}
       <div className="rounded-lg border border-zinc-200 dark:border-zinc-700">
         <Table>
-          <TableHead>
+          <TableHeader>
             <TableRow>
-              <TableHeader>{t('table.tenant')}</TableHeader>
-              <TableHeader>{t('table.meter')}</TableHeader>
-              <TableHeader className="text-right">{t('table.quantity')}</TableHeader>
-              <TableHeader className="text-right">{t('table.billable')}</TableHeader>
-              <TableHeader>{t('table.period')}</TableHeader>
+              <TableHead>{t('table.tenant')}</TableHead>
+              <TableHead>{t('table.meter')}</TableHead>
+              <TableHead className="text-right">{t('table.quantity')}</TableHead>
+              <TableHead className="text-right">{t('table.billable')}</TableHead>
+              <TableHead>{t('table.period')}</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8">
-                  <Text>{t('loading')}</Text>
+                  <p className="text-muted-foreground">{t('loading')}</p>
                 </TableCell>
               </TableRow>
             ) : data?.summaries && data.summaries.length > 0 ? (
               data.summaries.map((summary) => (
                 <TableRow key={summary.id}>
                   <TableCell>
-                    <Text className="font-medium">{summary.tenant?.name || summary.tenant_id}</Text>
+                    <span className="font-medium">{summary.tenant?.name || summary.tenant_id}</span>
                   </TableCell>
                   <TableCell>
-                    <Badge color="blue">{summary.meter?.name || summary.meter_id}</Badge>
+                    <Badge variant="primary">{summary.meter?.name || summary.meter_id}</Badge>
                   </TableCell>
                   <TableCell className="text-right font-mono">
                     {formatNumber(summary.total_quantity)} {summary.meter?.unit_name}
@@ -229,16 +226,16 @@ export default function UsageAdminPage() {
                       : '-'}
                   </TableCell>
                   <TableCell>
-                    <Text className="text-sm text-zinc-500">
+                    <span className="text-sm text-zinc-500">
                       {formatDate(summary.period_start)} - {formatDate(summary.period_end)}
-                    </Text>
+                    </span>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8">
-                  <Text>{t('noData')}</Text>
+                  <p className="text-muted-foreground">{t('noData')}</p>
                 </TableCell>
               </TableRow>
             )}
@@ -248,26 +245,26 @@ export default function UsageAdminPage() {
 
       {/* Meters List */}
       <div className="mt-8">
-        <Subheading>{t('metersTitle')}</Subheading>
+        <h2 className="text-lg font-semibold text-foreground">{t('metersTitle')}</h2>
         <div className="mt-4 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <Table>
-            <TableHead>
+            <TableHeader>
               <TableRow>
-                <TableHeader>{t('metersTable.name')}</TableHeader>
-                <TableHeader>{t('metersTable.slug')}</TableHeader>
-                <TableHeader>{t('metersTable.unit')}</TableHeader>
-                <TableHeader>{t('metersTable.aggregation')}</TableHeader>
-                <TableHeader>{t('metersTable.status')}</TableHeader>
+                <TableHead>{t('metersTable.name')}</TableHead>
+                <TableHead>{t('metersTable.slug')}</TableHead>
+                <TableHead>{t('metersTable.unit')}</TableHead>
+                <TableHead>{t('metersTable.aggregation')}</TableHead>
+                <TableHead>{t('metersTable.status')}</TableHead>
               </TableRow>
-            </TableHead>
+            </TableHeader>
             <TableBody>
               {data?.meters && data.meters.length > 0 ? (
                 data.meters.map((meter) => (
                   <TableRow key={meter.id}>
                     <TableCell>
-                      <Text className="font-medium">{meter.name}</Text>
+                      <span className="font-medium">{meter.name}</span>
                       {meter.description && (
-                        <Text className="text-sm text-zinc-500">{meter.description}</Text>
+                        <p className="text-sm text-zinc-500">{meter.description}</p>
                       )}
                     </TableCell>
                     <TableCell>
@@ -277,10 +274,10 @@ export default function UsageAdminPage() {
                     </TableCell>
                     <TableCell>{meter.unit_name}</TableCell>
                     <TableCell>
-                      <Badge color="zinc">{meter.aggregation_type}</Badge>
+                      <Badge variant="default">{meter.aggregation_type}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge color={meter.status === 'active' ? 'green' : 'zinc'}>
+                      <Badge variant={meter.status === 'active' ? 'success' : 'default'}>
                         {meter.status}
                       </Badge>
                     </TableCell>
@@ -289,7 +286,7 @@ export default function UsageAdminPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-4">
-                    <Text>{t('noMeters')}</Text>
+                    <p className="text-muted-foreground">{t('noMeters')}</p>
                   </TableCell>
                 </TableRow>
               )}

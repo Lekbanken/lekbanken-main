@@ -6,19 +6,19 @@
 'use client'
 
 import { useTranslations, useLocale } from 'next-intl'
-import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@/catalyst-ui-kit/typescript/table'
-import { Badge } from '@/catalyst-ui-kit/typescript/badge'
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table'
+import { Badge, type BadgeVariant } from '@/components/ui/badge'
 import type { CookieCatalogEntry, CookieCategory } from '@/lib/consent/types'
 
 interface CookieDeclarationTableProps {
   cookies: CookieCatalogEntry[]
 }
 
-const CATEGORY_COLORS: Record<CookieCategory, 'green' | 'blue' | 'purple' | 'orange'> = {
-  necessary: 'green',
-  functional: 'blue',
-  analytics: 'purple',
-  marketing: 'orange',
+const CATEGORY_COLORS: Record<CookieCategory, BadgeVariant> = {
+  necessary: 'success',
+  functional: 'primary',
+  analytics: 'accent',
+  marketing: 'warning',
 }
 
 export function CookieDeclarationTable({ cookies }: CookieDeclarationTableProps) {
@@ -63,20 +63,20 @@ export function CookieDeclarationTable({ cookies }: CookieDeclarationTableProps)
         return (
           <div key={category}>
             <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-zinc-950 dark:text-white">
-              <Badge color={CATEGORY_COLORS[category]}>
+              <Badge variant={CATEGORY_COLORS[category]}>
                 {t(`categories.${category}.title`)}
               </Badge>
             </h3>
             
             <Table className="w-full">
-              <TableHead>
+              <TableHeader>
                 <TableRow>
-                  <TableHeader>{t('declaration.table.name')}</TableHeader>
-                  <TableHeader>{t('declaration.table.purpose')}</TableHeader>
-                  <TableHeader>{t('declaration.table.provider')}</TableHeader>
-                  <TableHeader>{t('declaration.table.duration')}</TableHeader>
+                  <TableHead>{t('declaration.table.name')}</TableHead>
+                  <TableHead>{t('declaration.table.purpose')}</TableHead>
+                  <TableHead>{t('declaration.table.provider')}</TableHead>
+                  <TableHead>{t('declaration.table.duration')}</TableHead>
                 </TableRow>
-              </TableHead>
+              </TableHeader>
               <TableBody>
                 {categoryCookies.map((cookie) => (
                   <TableRow key={cookie.key}>

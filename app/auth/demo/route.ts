@@ -167,22 +167,32 @@ export async function POST(request: Request) {
       console.log(`[POST /auth/demo] Demo session created: ${typedDemoSession.id}, tenant: ${DEMO_TENANT_ID}`);
     }
 
-    // Step 5: Redirect to demo app
-    const defaultRedirect = '/app?demo=true&onboarding=true';
-    const redirectUrl = redirectParam || defaultRedirect;
-
-    // Security: Validate redirect URL is same-origin
-    const redirectUrlObj = new URL(redirectUrl, request.url);
-    const requestUrlObj = new URL(request.url);
-
-    if (redirectUrlObj.origin !== requestUrlObj.origin) {
-      console.warn('[POST /auth/demo] Invalid redirect URL, using default');
-      return NextResponse.redirect(new URL(defaultRedirect, request.url));
+    // Step 5: Redirect to demo subdomain
+    // IMPORTANT: Always redirect demo users to demo.lekbanken.no for proper tenant isolation
+    const isProduction = process.env.NODE_ENV === 'production';
+    const demoHost = isProduction ? 'https://demo.lekbanken.no' : '';
+    const defaultRedirect = `${demoHost}/app?demo=true&onboarding=true`;
+    
+    // If custom redirect provided, ensure it goes to demo subdomain in production
+    let redirectUrl = redirectParam || defaultRedirect;
+    if (isProduction && redirectParam && !redirectParam.startsWith('https://demo.lekbanken.no')) {
+      // Prepend demo subdomain to relative paths
+      if (redirectParam.startsWith('/')) {
+        redirectUrl = `https://demo.lekbanken.no${redirectParam}`;
+      } else {
+        // For absolute URLs not on demo subdomain, use default
+        redirectUrl = defaultRedirect;
+      }
     }
 
     console.log(`[POST /auth/demo] Redirecting to: ${redirectUrl}`);
 
-    return NextResponse.redirect(new URL(redirectUrl, request.url));
+    // In production, redirect to full URL; in dev, use relative path
+    if (isProduction) {
+      return NextResponse.redirect(redirectUrl);
+    } else {
+      return NextResponse.redirect(new URL(redirectUrl || '/app?demo=true&onboarding=true', request.url));
+    }
   } catch (error) {
     console.error('[POST /auth/demo] Unexpected error:', error);
 

@@ -479,7 +479,14 @@ export function LegalAcceptWizard({ documents, redirectTo, onAccept }: LegalAcce
       }
       
       await onAccept(formData);
-      router.push(redirectTo);
+      
+      // Use window.location for cross-origin redirects (e.g., demo.lekbanken.no)
+      // and router.push for same-origin relative paths
+      if (redirectTo.startsWith('http://') || redirectTo.startsWith('https://')) {
+        window.location.href = redirectTo;
+      } else {
+        router.push(redirectTo);
+      }
     } catch (error) {
       console.error('Error accepting legal documents:', error);
       setIsSubmitting(false);

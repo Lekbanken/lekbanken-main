@@ -488,6 +488,11 @@ export function LegalAcceptWizard({ documents, redirectTo, onAccept }: LegalAcce
         router.push(redirectTo);
       }
     } catch (error) {
+      // NEXT_REDIRECT is thrown by Next.js redirect() in Server Actions
+      // This is expected behavior - the redirect still happens
+      if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+        return; // Redirect is being handled by Next.js
+      }
       console.error('Error accepting legal documents:', error);
       setIsSubmitting(false);
     }

@@ -26,7 +26,7 @@ interface LegalDocument {
 interface LegalAcceptWizardProps {
   documents: LegalDocument[];
   redirectTo: string;
-  onAccept: (formData: FormData) => Promise<void>;
+  onAccept: (formData: FormData) => Promise<{ success: boolean; error?: string; redirectTo?: string }>;
 }
 
 // =============================================================================
@@ -478,21 +478,25 @@ export function LegalAcceptWizard({ documents, redirectTo, onAccept }: LegalAcce
         formData.append('documentId', doc.id);
       }
       
-      await onAccept(formData);
+      const result = await onAccept(formData);
+      
+      if (!result.success) {
+        console.error('Error accepting legal documents:', result.error);
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Use the redirect URL from the result, or fall back to prop
+      const targetUrl = result.redirectTo || redirectTo;
       
       // Use window.location for cross-origin redirects (e.g., demo.lekbanken.no)
       // and router.push for same-origin relative paths
-      if (redirectTo.startsWith('http://') || redirectTo.startsWith('https://')) {
-        window.location.href = redirectTo;
+      if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
+        window.location.href = targetUrl;
       } else {
-        router.push(redirectTo);
+        router.push(targetUrl);
       }
     } catch (error) {
-      // NEXT_REDIRECT is thrown by Next.js redirect() in Server Actions
-      // This is expected behavior - the redirect still happens
-      if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
-        return; // Redirect is being handled by Next.js
-      }
       console.error('Error accepting legal documents:', error);
       setIsSubmitting(false);
     }

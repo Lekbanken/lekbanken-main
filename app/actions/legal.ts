@@ -1,7 +1,6 @@
 'use server'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { redirect } from 'next/navigation'
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { getServerAuthContext } from '@/lib/auth/server-context'
 import {
@@ -22,28 +21,29 @@ import type {
 type AcceptResult = {
   success: boolean
   error?: string
+  redirectTo?: string
 }
 
-export async function acceptLegalDocuments(formData: FormData): Promise<void> {
+export async function acceptLegalDocuments(formData: FormData): Promise<AcceptResult> {
   const authContext = await getServerAuthContext()
   const user = authContext.user
 
   if (!user) {
-    redirect('/auth/login?redirect=/legal/accept')
+    return { success: false, error: 'Not authenticated', redirectTo: '/auth/login?redirect=/legal/accept' }
   }
 
   const redirectParam = String(formData.get('redirectTo') || '')
-  const redirectTo = redirectParam.startsWith('/') ? redirectParam : '/app'
+  const redirectTo = redirectParam.startsWith('/') || redirectParam.startsWith('http') ? redirectParam : '/app'
   const documentIds = formData.getAll('documentId').map(String).filter(Boolean)
 
   if (!documentIds.length) {
-    redirect(redirectTo)
+    return { success: true, redirectTo }
   }
 
   for (const docId of documentIds) {
     const accepted = formData.get(`accept_${docId}`)
     if (!accepted) {
-      redirect('/legal/accept?error=missing')
+      return { success: false, error: 'Missing acceptance', redirectTo: '/legal/accept?error=missing' }
     }
   }
 
@@ -55,12 +55,12 @@ export async function acceptLegalDocuments(formData: FormData): Promise<void> {
     .in('id', documentIds)
 
   if (docsError) {
-    throw new Error(docsError.message)
+    return { success: false, error: docsError.message }
   }
 
   const activeDocs = (docs ?? []).filter((doc) => doc.is_active && doc.requires_acceptance)
   if (activeDocs.length !== documentIds.length) {
-    redirect('/legal/accept?error=invalid')
+    return { success: false, error: 'Invalid documents', redirectTo: '/legal/accept?error=invalid' }
   }
 
   const acceptedAt = new Date().toISOString()
@@ -77,10 +77,10 @@ export async function acceptLegalDocuments(formData: FormData): Promise<void> {
     .upsert(rows, { onConflict: 'user_id,document_id' })
 
   if (error) {
-    throw new Error(error.message)
+    return { success: false, error: error.message }
   }
 
-  redirect(redirectTo)
+  return { success: true, redirectTo }
 }
 
 export async function saveCookieConsent(

@@ -82,15 +82,23 @@ export async function PATCH(request: Request) {
     authMetadata.show_theme_toggle_in_header = body.show_theme_toggle_in_header
 
   if (Object.keys(userUpdate).length > 0) {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('users')
       .update(userUpdate)
       .eq('id', user.id)
       .select()
       .maybeSingle()
     if (error) {
-      console.error('[accounts/profile] users update error', error)
-      return NextResponse.json({ error: 'Failed to update user' }, { status: 500 })
+      console.error('[accounts/profile] users update error', { 
+        error, 
+        userId: user.id, 
+        updates: userUpdate,
+        email: user.email 
+      })
+      return NextResponse.json({ error: 'Failed to update user', details: error.message }, { status: 500 })
+    }
+    if (!data) {
+      console.warn('[accounts/profile] users update returned no data - row may not exist', { userId: user.id })
     }
   }
 

@@ -163,23 +163,29 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     }
   }, [userProfile, userChangedLanguage, userChangedTheme])
 
-  // Helper to persist to users table
+  // Check if user is a demo user (preferences should only be stored locally)
+  const isDemoUser = user?.user_metadata?.is_demo_user === true
+
+  // Helper to persist to users table (skipped for demo users)
   const persistUserProfile = useCallback(
     async (updates: Partial<Database['public']['Tables']['users']['Update']>) => {
       if (!user) return
+      // Demo users don't persist to database - their preferences are localStorage only
+      if (isDemoUser) return
       try {
         await updateProfile(updates)
       } catch (err) {
         console.warn('[preferences] Failed to persist profile updates', err)
       }
     },
-    [updateProfile, user]
+    [updateProfile, user, isDemoUser]
   )
 
   // Helper to sync user_preferences (tenant-scoped) for analytics/use elsewhere
+  // Skipped for demo users - their preferences are localStorage only
   const syncUserPreferences = useCallback(
     async (updates: Partial<{ theme: ThemePreference; language: LanguageCode }>) => {
-      if (!user || !tenantId) return
+      if (!user || !tenantId || isDemoUser) return
       try {
         await supabase
           .from('user_preferences')
@@ -195,7 +201,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         console.warn('[preferences] Failed to sync user_preferences', err)
       }
     },
-    [tenantId, user]
+    [tenantId, user, isDemoUser]
   )
 
   const setTheme = useCallback(

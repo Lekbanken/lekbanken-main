@@ -3,6 +3,17 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import type { InventoryData } from '@/app/sandbox/atlas/lib/inventory-types';
 
+/**
+ * Remove BOM (Byte Order Mark) from file content if present.
+ * Common in Windows UTF-8 files.
+ */
+function removeBOM(content: string): string {
+  if (content.charCodeAt(0) === 0xFEFF) {
+    return content.slice(1);
+  }
+  return content;
+}
+
 interface PartitionManifest {
   version: string;
   generatedAt: string;
@@ -61,7 +72,7 @@ export async function GET(request: Request) {
 async function loadPartitionedInventory(inventoryDir: string, domainFilter: string | null): Promise<NextResponse> {
   const manifestPath = path.join(inventoryDir, 'manifest.json');
   const manifestContent = await fs.readFile(manifestPath, 'utf-8');
-  const manifest: PartitionManifest = JSON.parse(manifestContent);
+  const manifest: PartitionManifest = JSON.parse(removeBOM(manifestContent));
 
   console.log(`[Atlas API] Manifest loaded: v${manifest.version}, ${Object.keys(manifest.partitions).length} partitions`);
 
@@ -83,7 +94,7 @@ async function loadPartitionedInventory(inventoryDir: string, domainFilter: stri
     
     const partitionPath = path.join(domainsDir, file);
     const content = await fs.readFile(partitionPath, 'utf-8');
-    const partition: Partition = JSON.parse(content);
+    const partition: Partition = JSON.parse(removeBOM(content));
     
     if (partition.nodes) {
       allNodes.push(...partition.nodes);
@@ -99,7 +110,7 @@ async function loadPartitionedInventory(inventoryDir: string, domainFilter: stri
     
     const partitionPath = path.join(databaseDir, file);
     const content = await fs.readFile(partitionPath, 'utf-8');
-    const partition: Partition = JSON.parse(content);
+    const partition: Partition = JSON.parse(removeBOM(content));
     
     if (partition.nodes) {
       allNodes.push(...partition.nodes);
@@ -115,7 +126,7 @@ async function loadPartitionedInventory(inventoryDir: string, domainFilter: stri
     
     const partitionPath = path.join(edgesDir, file);
     const content = await fs.readFile(partitionPath, 'utf-8');
-    const partition: Partition = JSON.parse(content);
+    const partition: Partition = JSON.parse(removeBOM(content));
     
     if (partition.edges) {
       allEdges.push(...partition.edges);
@@ -126,7 +137,7 @@ async function loadPartitionedInventory(inventoryDir: string, domainFilter: stri
   const findingsPath = path.join(inventoryDir, 'findings.json');
   try {
     const findingsContent = await fs.readFile(findingsPath, 'utf-8');
-    const findingsPartition = JSON.parse(findingsContent);
+    const findingsPartition = JSON.parse(removeBOM(findingsContent));
     allFindings = findingsPartition.findings || [];
   } catch {
     // Findings file may not exist

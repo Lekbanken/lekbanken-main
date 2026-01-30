@@ -61,6 +61,7 @@ function QuickLink({ href, icon: Icon, title, description, badge, badgeVariant }
 
 export default function ProfileOverviewPage() {
   const t = useTranslations('app.profile');
+  const tCommon = useTranslations('common');
   const { user, userProfile } = useAuth();
   const { currentTenant, userTenants } = useTenant();
   const [mfaEnabled, setMfaEnabled] = useState(false);
@@ -120,7 +121,7 @@ export default function ProfileOverviewPage() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base">
               <BuildingOfficeIcon className="h-5 w-5 text-primary" />
-              {t('common:tenant.selectTenant')}
+              {tCommon('tenant.selectTenant')}
             </CardTitle>
           </CardHeader>
           <CardContent>

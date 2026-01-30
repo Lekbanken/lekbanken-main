@@ -140,8 +140,8 @@ export interface GameDetailGalleryProps extends GameDetailSectionProps {
   galleryItems?: Array<{
     id: string;
     media?: {
-      url?: string;
-      alt_text?: string;
+      url?: string | null;
+      alt_text?: string | null;
     } | null;
   }>;
   /** Section labels */

@@ -18,6 +18,7 @@ export const searchSchema = z.object({
   maxTime: z.number().int().positive().optional(),
   minAge: z.number().int().positive().optional(),
   maxAge: z.number().int().positive().optional(),
+  showLiked: z.boolean().optional(),
   sort: z.enum(['relevance', 'newest', 'popular', 'name', 'duration', 'rating']).optional(),
   page: z.number().int().min(1).default(1),
   pageSize: z.number().int().min(1).max(50).default(24),

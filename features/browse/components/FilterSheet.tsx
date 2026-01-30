@@ -41,7 +41,7 @@ export function FilterSheet({ open, onOpenChange, filters, options, onApply, onC
   const t = useTranslations("browse");
 
   const activeCount = useMemo(() => {
-    const { products, mainPurposes, subPurposes, groupSizes, energyLevels, environment, minPlayers, maxPlayers, minAge, maxAge, minTime, maxTime } = localFilters;
+    const { products, mainPurposes, subPurposes, groupSizes, energyLevels, environment, minPlayers, maxPlayers, minAge, maxAge, minTime, maxTime, showLiked } = localFilters;
     return (
       products.length +
       mainPurposes.length +
@@ -54,7 +54,8 @@ export function FilterSheet({ open, onOpenChange, filters, options, onApply, onC
       (minAge ? 1 : 0) +
       (maxAge ? 1 : 0) +
       (minTime ? 1 : 0) +
-      (maxTime ? 1 : 0)
+      (maxTime ? 1 : 0) +
+      (showLiked ? 1 : 0)
     );
   }, [localFilters]);
 
@@ -99,6 +100,34 @@ export function FilterSheet({ open, onOpenChange, filters, options, onApply, onC
         </SheetHeader>
 
         <div className="mt-6 space-y-1">
+          {/* Show Liked toggle - personal filter */}
+          <div className="mb-4 flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">❤️</span>
+              <div>
+                <span className="font-medium">{t("filter.showLiked")}</span>
+                <p className="text-xs text-muted-foreground">{t("filter.showLikedDescription")}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={localFilters.showLiked ?? false}
+              onClick={() => setField("showLiked", !localFilters.showLiked)}
+              className={cn(
+                "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                localFilters.showLiked ? "bg-primary" : "bg-input"
+              )}
+            >
+              <span
+                className={cn(
+                  "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform",
+                  localFilters.showLiked ? "translate-x-5" : "translate-x-0"
+                )}
+              />
+            </button>
+          </div>
+
           <FilterSection
             title="Produkt"
             icon="📦"

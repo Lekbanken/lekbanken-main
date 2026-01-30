@@ -14,9 +14,11 @@ import type { BrowseFilters, FilterOptions, SortOption } from "./types";
 import type { GameSummary } from "@/lib/game-display";
 import { mapDbGameToSummary } from "@/lib/game-display";
 import type { Tables } from "@/types/supabase";
+import type { GameReactionMap } from "@/types/game-reaction";
 import { cn } from "@/lib/utils";
 import { PageTitleHeader } from "@/components/app/PageTitleHeader";
 import { appNavItems } from "@/components/app/nav-items";
+import { createBrowserClient } from "@/lib/supabase/client";
 
 type GameMediaWithAsset = Tables<"game_media"> & { media?: Tables<"media"> | null };
 
@@ -77,6 +79,7 @@ const pageSize = 12;
 export function BrowsePage() {
   const [games, setGames] = useState<GameSummary[]>([]);
   const [featuredGames, setFeaturedGames] = useState<GameSummary[]>([]);
+  const [reactions, setReactions] = useState<GameReactionMap>({});
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [searchInput, setSearchInput] = useState("");
@@ -162,6 +165,7 @@ export function BrowsePage() {
           maxAge: payload.filters.maxAge || undefined,
           minTime: payload.filters.minTime || undefined,
           maxTime: payload.filters.maxTime || undefined,
+          showLiked: payload.filters.showLiked || undefined,
           sort: payload.sort,
           page: payload.page,
           pageSize,
@@ -214,9 +218,38 @@ export function BrowsePage() {
         });
 
         const mapped = dbGames.map(mapBrowseGameToSummary);
+        
+        // Set games first, then fetch reactions in background
         setGames((prev) => (append ? [...prev, ...mapped] : mapped));
         setTotal(dbTotal);
         setHasMore(more);
+        
+        // Fetch reactions for these games (non-blocking)
+        const gameIds = mapped.map((g) => g.id);
+        if (gameIds.length > 0) {
+          const supabase = createBrowserClient();
+          Promise.resolve(
+            supabase.rpc('get_game_reactions_batch', {
+              p_game_ids: gameIds,
+            })
+          ).then(({ data: reactionsData, error: reactionsError }) => {
+            if (reactionsError) {
+              console.warn('Failed to fetch reactions:', reactionsError);
+              return;
+            }
+            if (reactionsData && Array.isArray(reactionsData)) {
+              const newReactions: GameReactionMap = {};
+              for (const r of reactionsData) {
+                if (r.game_id && r.reaction) {
+                  newReactions[r.game_id] = r.reaction as 'like' | 'dislike';
+                }
+              }
+              setReactions((prev) => (append ? { ...prev, ...newReactions } : newReactions));
+            }
+          }).catch((err) => {
+            console.warn('Failed to fetch reactions:', err);
+          });
+        }
       } catch (err) {
         console.error("Failed to load games:", err);
         setError("Kunde inte ladda aktiviteter");
@@ -313,7 +346,11 @@ export function BrowsePage() {
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {featuredGames.map((game) => (
-              <GameCard key={game.id} game={game} variant="list" />
+              <GameCard 
+                key={game.id} 
+                game={{ ...game, isFavorite: reactions[game.id] === 'like' }} 
+                variant="list" 
+              />
             ))}
           </div>
         </section>
@@ -394,7 +431,11 @@ export function BrowsePage() {
             )}
           >
             {games.map((game) => (
-              <GameCard key={game.id} game={game} variant={view} />
+              <GameCard 
+                key={game.id} 
+                game={{ ...game, isFavorite: reactions[game.id] === 'like' }} 
+                variant={view} 
+              />
             ))}
           </div>
 

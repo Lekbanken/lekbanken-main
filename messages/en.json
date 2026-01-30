@@ -315,7 +315,9 @@
       "title": "Filter",
       "description": "Select filters to find the right activity",
       "clearAll": "Clear all",
-      "apply": "Apply"
+      "apply": "Apply",
+      "showLiked": "Show liked",
+      "showLikedDescription": "Only show games you have liked"
     },
     "environment": "Environment",
     "players": "Players",
@@ -7857,7 +7859,11 @@
       "actions": {
         "share": "Share",
         "favorite": "Save as favorite",
-        "shareTitle": "Share this game"
+        "shareTitle": "Share this game",
+        "like": "Like",
+        "unlike": "Unlike",
+        "dislike": "Dislike",
+        "addToPlan": "Add to plan"
       }
     },
     "gamification": {

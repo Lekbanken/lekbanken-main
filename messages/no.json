@@ -480,7 +480,9 @@
       "title": "Filter",
       "description": "Velg filtre for å finne riktig aktivitet",
       "clearAll": "Tøm alle",
-      "apply": "Bruk"
+      "apply": "Bruk",
+      "showLiked": "Vis likte",
+      "showLikedDescription": "Vis bare leker du har likt"
     },
     "environment": "Miljø",
     "players": "Spillere",

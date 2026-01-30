@@ -304,7 +304,9 @@
       "title": "Filtrera",
       "description": "Välj filter för att hitta rätt aktivitet",
       "clearAll": "Rensa alla",
-      "apply": "Tillämpa"
+      "apply": "Tillämpa",
+      "showLiked": "Visa gillade",
+      "showLikedDescription": "Visa bara lekar du har gillat"
     },
     "environment": "Miljö",
     "players": "Spelare",
@@ -8243,7 +8245,11 @@
       "actions": {
         "share": "Dela",
         "favorite": "Spara som favorit",
-        "shareTitle": "Dela denna lek"
+        "shareTitle": "Dela denna lek",
+        "like": "Gilla",
+        "unlike": "Sluta gilla",
+        "dislike": "Gilla inte",
+        "addToPlan": "Lägg till i plan"
       }
     },
     "play": {

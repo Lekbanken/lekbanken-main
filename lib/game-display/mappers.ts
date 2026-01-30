@@ -21,6 +21,7 @@ import type {
   GameMaterial,
   GameMaterialGroup,
   GameArtifactVariant,
+  GameBoardWidget,
 } from './types';
 
 // =============================================================================

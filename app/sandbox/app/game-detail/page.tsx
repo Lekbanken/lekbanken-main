@@ -25,6 +25,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 // GameDetails komponenter (samma som production)
+import { GameStartActions } from '@/components/game/GameStartActions';
 import {
   GameDetailHeader,
   GameDetailBadges,
@@ -39,7 +40,6 @@ import {
   GameDetailArtifacts,
   GameDetailTriggers,
   GameDetailQuickFacts,
-  GameDetailActions,
   // P1 komponenter
   GameDetailAccessibility,
   GameDetailRequirements,
@@ -231,7 +231,7 @@ export default function GameDetailSandbox() {
               {/* Right Column: Sidebar */}
               <aside className="space-y-4">
                 {config.sidebar && (
-                  <GameDetailActions game={game} gameId={game.id} gameName={game.title} />
+                  <GameStartActions gameId={game.id} gameName={game.title} showShare={true} />
                 )}
                 {config.quickFacts && <GameDetailQuickFacts game={game} />}
                 {config.sidebar && <MetadataSection game={game} />}

@@ -22,6 +22,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { HeartIcon } from '@/components/icons/HeartIcon';
+import { LikeButton } from '@/components/game/LikeButton';
 import {
   formatDuration,
   formatPlayers,
@@ -33,27 +35,6 @@ import {
 } from '@/lib/game-display';
 import type { GameCardProps, GameCardFlags } from './types';
 import { DEFAULT_FLAGS } from './types';
-
-// =============================================================================
-// ICONS (inline SVG för att undvika extra dependencies)
-// =============================================================================
-
-const HeartIcon = ({ filled, className }: { filled?: boolean; className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill={filled ? 'currentColor' : 'none'}
-    stroke="currentColor"
-    strokeWidth={2}
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-    />
-  </svg>
-);
 
 const StarIcon = ({ className }: { className?: string }) => (
   <svg
@@ -177,32 +158,63 @@ function GameImage({ src, alt, aspectRatio = 'video', className }: GameImageProp
 }
 
 interface FavoriteButtonProps {
+  gameId?: string;
   isFavorite?: boolean;
   onFavorite?: (isFavorite: boolean) => void;
   className?: string;
 }
 
-function FavoriteButton({ isFavorite = false, onFavorite, className }: FavoriteButtonProps) {
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onFavorite?.(!isFavorite);
-      }}
-      className={cn(
-        'rounded-full bg-background/80 p-1.5 backdrop-blur transition-colors hover:bg-background',
-        className
-      )}
-      aria-label={isFavorite ? 'Ta bort favorit' : 'Lägg till favorit'}
-    >
-      <HeartIcon
-        filled={isFavorite}
-        className={cn('h-4 w-4', isFavorite ? 'text-destructive' : 'text-muted-foreground')}
+/**
+ * FavoriteButton - Wrapper that uses LikeButton for backend or legacy for custom handlers
+ *
+ * PRIORITY RULES (checked in order):
+ * 1. If onFavorite callback is provided → use legacy callback behavior (for custom handlers)
+ * 2. If gameId is provided (and no onFavorite) → use LikeButton with backend integration
+ * 3. If neither → render disabled button (fallback, shouldn't happen in practice)
+ *
+ * This ensures backward compatibility while enabling new backend-powered behavior.
+ */
+function FavoriteButton({ gameId, isFavorite = false, onFavorite, className }: FavoriteButtonProps) {
+  // PRIORITY 1: If onFavorite callback is provided, use legacy behavior
+  // This takes precedence to maintain backward compatibility
+  if (onFavorite) {
+    return (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onFavorite(!isFavorite);
+        }}
+        className={cn(
+          'rounded-full bg-background/80 p-1.5 backdrop-blur transition-colors hover:bg-background',
+          className
+        )}
+        aria-label={isFavorite ? 'Ta bort favorit' : 'Lägg till favorit'}
+      >
+        <HeartIcon
+          filled={isFavorite}
+          className={cn('h-4 w-4', isFavorite ? 'text-destructive' : 'text-muted-foreground')}
+        />
+      </button>
+    );
+  }
+
+  // PRIORITY 2: If gameId is provided, use new LikeButton with backend integration
+  if (gameId) {
+    return (
+      <LikeButton
+        gameId={gameId}
+        initialLiked={isFavorite}
+        size="sm"
+        context="card"
+        className={className}
       />
-    </button>
-  );
+    );
+  }
+
+  // PRIORITY 3: No gameId and no onFavorite - render nothing (shouldn't happen)
+  return null;
 }
 
 interface RatingDisplayProps {
@@ -252,6 +264,7 @@ function GameCardGrid({
           {/* Favorite button - top right */}
           {flags.showFavorite && (
             <FavoriteButton
+              gameId={game.id}
               isFavorite={game.isFavorite}
               onFavorite={actions?.onFavorite}
               className="absolute right-3 top-3 z-10"
@@ -412,7 +425,7 @@ function GameCardList({
 
       {/* Favorite button - right side */}
       {flags.showFavorite && (
-        <FavoriteButton isFavorite={game.isFavorite} onFavorite={actions?.onFavorite} className="shrink-0" />
+        <FavoriteButton gameId={game.id} isFavorite={game.isFavorite} onFavorite={actions?.onFavorite} className="shrink-0" />
       )}
     </div>
   );
@@ -718,6 +731,7 @@ function GameCardFeatured({
       {/* Favorite button */}
       {flags.showFavorite && (
         <FavoriteButton
+          gameId={game.id}
           isFavorite={game.isFavorite}
           onFavorite={actions?.onFavorite}
           className="absolute right-4 top-4 z-10"

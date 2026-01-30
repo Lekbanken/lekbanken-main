@@ -30,6 +30,8 @@ export type BrowseFilters = {
   maxAge: number | null;
   minTime: number | null;
   maxTime: number | null;
+  /** Filter to only show liked games */
+  showLiked?: boolean;
 };
 
 export type SortOption = "relevance" | "newest" | "name" | "duration" | "popular" | "rating";

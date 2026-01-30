@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { getGameByIdPreview, getRelatedGames } from '@/lib/services/games.server'
 import { mapDbGameToDetailPreview, mapDbGameToSummary } from '@/lib/game-display'
 import type { DbGame } from '@/lib/game-display'
-import { StartSessionCta } from './start-session-cta'
+import { GameStartActions } from '@/components/game/GameStartActions'
 import { GameCard } from '@/components/game/GameCard'
 import {
   GameDetailHeader,
@@ -19,7 +19,6 @@ import {
   GameDetailArtifacts,
   GameDetailTriggers,
   GameDetailQuickFacts,
-  GameDetailActions,
   GameDetailSidebar,
   // P1 components
   GameDetailAccessibility,
@@ -280,18 +279,13 @@ export default async function GameDetailPage({ params }: Props) {
             }}
             className="lg:col-span-1"
           >
-            {/* Start Session CTA */}
-            <StartSessionCta gameId={game.id} gameName={game.title} />
-
-            {/* Share/Favorite Actions */}
-            <GameDetailActions
-              game={game}
+            {/* Unified Game Actions: Start Session + Like + Share */}
+            <GameStartActions
               gameId={game.id}
               gameName={game.title}
+              showShare={true}
               labels={{
                 share: t('actions.share'),
-                favorite: t('actions.favorite'),
-                shareTitle: t('actions.shareTitle'),
               }}
             />
           </GameDetailSidebar>

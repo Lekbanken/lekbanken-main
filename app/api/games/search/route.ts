@@ -53,6 +53,7 @@ export async function POST(request: Request) {
     maxTime,
     minAge,
     maxAge,
+    showLiked,
     sort = 'relevance',
     page,
     pageSize,
@@ -160,6 +161,38 @@ export async function POST(request: Request) {
     return NextResponse.json({ games: [], total: 0, page, pageSize, hasMore: false, metadata: { allowedProducts: allowedProductIds } })
   }
 
+  // Get liked game IDs if showLiked filter is enabled
+  let likedGameIds: string[] = []
+  if (showLiked && user?.id) {
+    const { data: likedData, error: likedError } = await supabase.rpc('get_liked_game_ids')
+    if (likedError) {
+      console.error('[api/games/search] liked games lookup error', likedError)
+    } else {
+      likedGameIds = (likedData ?? []) as string[]
+    }
+    // If no liked games, return empty result
+    if (likedGameIds.length === 0) {
+      return NextResponse.json({ 
+        games: [], 
+        total: 0, 
+        page, 
+        pageSize, 
+        hasMore: false, 
+        metadata: { allowedProducts: allowedProductIds } 
+      })
+    }
+  } else if (showLiked && !user?.id) {
+    // Not logged in but trying to filter by liked - return empty
+    return NextResponse.json({ 
+      games: [], 
+      total: 0, 
+      page, 
+      pageSize, 
+      hasMore: false, 
+      metadata: { allowedProducts: allowedProductIds } 
+    })
+  }
+
   const offset = (page - 1) * pageSize
 
   let query = supabase
@@ -200,6 +233,14 @@ export async function POST(request: Request) {
 
   if (subPurposeGameIds.length > 0) {
     query = query.in('id', subPurposeGameIds)
+  }
+
+  // Filter by liked game IDs
+  // TODO: Performance - large IN-lists can be slow. Consider using a JOIN or
+  // RPC that returns games directly, or an EXISTS subquery for better performance
+  // at scale. Current approach is fine for MVP with small datasets.
+  if (likedGameIds.length > 0) {
+    query = query.in('id', likedGameIds)
   }
 
   if (mainPurposes.length > 0) {

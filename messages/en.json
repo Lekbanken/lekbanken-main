@@ -7805,8 +7805,36 @@
       "sections": {
         "about": "About the game",
         "instructions": "How to play",
+        "materials": "Materials",
+        "safety": "Safety",
+        "preparation": "Preparation",
+        "phases": "Phases",
         "images": "Images",
-        "details": "Details"
+        "details": "Details",
+        "roles": "Roles",
+        "artifacts": "Artifacts",
+        "triggers": "Events",
+        "quickInfo": "Quick info",
+        "accessibility": "Accessibility",
+        "requirements": "Requirements",
+        "board": "Public board",
+        "tools": "Facilitator tools"
+      },
+      "loading": "Loading...",
+      "loadError": "Could not load data",
+      "phases": {
+        "goal": "Goal",
+        "duration": "Duration"
+      },
+      "roles": {
+        "count": "Count"
+      },
+      "artifacts": {
+        "variants": "Variants"
+      },
+      "triggers": {
+        "condition": "Condition",
+        "effect": "Effect"
       },
       "details": {
         "participants": "Participants",
@@ -7819,6 +7847,17 @@
         "low": "Low energy",
         "medium": "Medium energy",
         "high": "High energy"
+      },
+      "sidebar": {
+        "status": "Status",
+        "published": "Published",
+        "draft": "Draft",
+        "addedAt": "Added"
+      },
+      "actions": {
+        "share": "Share",
+        "favorite": "Save as favorite",
+        "shareTitle": "Share this game"
       }
     },
     "gamification": {

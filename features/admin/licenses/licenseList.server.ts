@@ -39,7 +39,7 @@ export async function fetchLicenses(
       product:products!inner(
         id,
         name,
-        slug
+        product_key
       )
     `, { count: 'exact' });
 
@@ -87,7 +87,7 @@ export async function fetchLicenses(
     valid_from: string;
     created_at: string;
     tenant: { id: string; name: string; type: string };
-    product: { id: string; name: string; slug: string };
+    product: { id: string; name: string; product_key: string };
   }
   
   const typedEntitlements = entitlements as unknown as EntitlementWithTenant[] | null;
@@ -156,7 +156,7 @@ export async function fetchLicenses(
       tenantType: tenant.type as LicenseListItem['tenantType'],
       productId: e.product_id,
       productName: product.name,
-      productSlug: product.slug,
+      productSlug: product.product_key,
       status: e.status as LicenseListItem['status'],
       quantitySeats: e.quantity_seats,
       assignedSeats: seatCountMap[e.id] || 0,

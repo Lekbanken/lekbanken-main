@@ -97,6 +97,61 @@ const eslintConfig = defineConfig([
     rules: {
       "no-restricted-imports": "off"
     }
+  },
+  // =============================================================================
+  // LAYER-BASED IMPORT GUARDRAILS (GameDetails Phase 0)
+  // =============================================================================
+  // Prevent UI components from importing server-only service layer directly.
+  // Service layer should only be used in:
+  // - app/api/** (API routes)
+  // - lib/services/** (internal service composition)
+  // - Server components in app/ that explicitly need DB access
+  {
+    files: [
+      "components/**/*.tsx",
+      "components/**/*.ts",
+      "features/**/*.tsx",
+      "features/**/*.ts",
+    ],
+    ignores: [
+      // These are allowed to use service layer
+      "**/*.server.ts",
+      "**/*.server.tsx",
+    ],
+    rules: {
+      "no-restricted-imports": ["error", {
+        "patterns": [
+          {
+            "group": ["@/lib/services/*", "@/lib/services"],
+            "message": "UI components should not import from service layer directly. Use API routes or server components instead."
+          }
+        ]
+      }]
+    }
+  },
+  // app/app/ pages should use service layer via server components, not client components
+  // This is a softer warning since some pages legitimately use server actions
+  {
+    files: [
+      "app/app/**/*.tsx",
+    ],
+    ignores: [
+      "app/app/**/page.tsx",
+      "app/app/**/layout.tsx",
+      "app/app/**/loading.tsx",
+      "app/app/**/error.tsx",
+      "**/*.server.tsx",
+    ],
+    rules: {
+      "no-restricted-imports": ["warn", {
+        "patterns": [
+          {
+            "group": ["@/lib/services/*", "@/lib/services"],
+            "message": "Client components should not import from service layer. Use props from server components or API routes."
+          }
+        ]
+      }]
+    }
   }
 ]);
 

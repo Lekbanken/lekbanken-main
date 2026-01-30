@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin';
-import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import type { GrantPersonalLicensePayload, GrantPersonalLicenseResponse } from '@/features/admin/licenses';
 
 /**
@@ -33,7 +33,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createServerRlsClient();
+    // Use service role client to bypass RLS for admin operations
+    const supabase = createServiceRoleClient();
 
     // 1. Find user by email in users table
     const { data: existingUser } = await supabase
@@ -74,10 +75,9 @@ export async function POST(request: NextRequest) {
         .from('tenants')
         .insert({
           name: `Privat (${userEmail})`,
-          slug: `private-${userId.slice(0, 8)}`,
+          tenant_key: `private-${userId.slice(0, 8)}`,
           type: 'private',
-          settings: {},
-          metadata: { created_via: 'admin_grant', notes },
+          status: 'active',
         })
         .select('id')
         .single();
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
           .update({ 
             status: 'active', 
             quantity_seats: quantitySeats,
-            valid_until: validUntil,
+            valid_to: validUntil,
             metadata: { reactivated_via: 'admin_grant', notes },
           })
           .eq('id', existingEntitlement.id);
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
           status: 'active',
           quantity_seats: quantitySeats,
           valid_from: new Date().toISOString(),
-          valid_until: validUntil,
+          valid_to: validUntil,
           source: 'admin_grant',
           metadata: { created_via: 'admin_grant', notes },
         })

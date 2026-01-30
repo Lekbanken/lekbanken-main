@@ -110,57 +110,87 @@ export interface GameSummary {
  * GameStep - Ett steg i spelinstruktionerna
  */
 export interface GameStep {
+  id?: string;
   title: string;
   body?: string;
   duration?: string;
   durationMinutes?: number;
+  durationSeconds?: number;
   leaderScript?: string;
   participantPrompt?: string;
   boardText?: string;
   displayMode?: 'instant' | 'typewriter' | 'dramatic';
   optional?: boolean;
+  phaseId?: string;
+  mediaRef?: string;
 }
 
 /**
  * GamePhase - En fas i ett faciliterat spel
  */
 export interface GamePhase {
+  id?: string;
   title: string;
+  name?: string;
+  phaseType?: 'intro' | 'round' | 'finale' | 'break';
   duration: string;
+  durationSeconds?: number;
   goal: string;
+  description?: string;
   facilitator?: string;
   outputs?: string[];
   board?: string;
+  boardMessage?: string;
+  timerVisible?: boolean;
+  timerStyle?: 'countdown' | 'elapsed' | 'trafficlight';
+  autoAdvance?: boolean;
 }
 
 /**
  * GameRole - En roll i ett deltagarspel
  */
 export interface GameRole {
+  id?: string;
   name: string;
+  icon?: string;
+  color?: string;
   count?: string;
+  minCount?: number;
+  maxCount?: number;
   publicNote?: string;
   privateNote?: string;
   secrets?: string[];
+  assignmentStrategy?: 'random' | 'leader_picks' | 'player_picks';
 }
 
 /**
  * GameArtifact - En artefakt/rekvisita
  */
 export interface GameArtifact {
+  id?: string;
   title: string;
+  description?: string;
   type?: string;
   use?: string;
   access?: string;
+  tags?: string[];
+  variants?: GameArtifactVariant[];
 }
 
 /**
  * GameTrigger - En trigger/händelse
  */
 export interface GameTrigger {
+  id?: string;
+  name?: string;
   title: string;
-  condition: string;
+  description?: string;
+  condition: string | object;
   effect: string;
+  actions?: object[];
+  enabled?: boolean;
+  executeOnce?: boolean;
+  delaySeconds?: number;
 }
 
 /**
@@ -180,6 +210,31 @@ export interface GameMaterial {
   label: string;
   detail?: string;
   quantity?: string;
+  /** Icon name for the material type */
+  icon?: string;
+}
+
+/**
+ * GameMaterialGroup - Grupperat material med metadata
+ * Används för att visa materials + safety/preparation derivat
+ */
+export interface GameMaterialGroup {
+  items: GameMaterial[];
+  /** Safety notes extracted from materials */
+  safetyNotes?: string[];
+  /** Preparation notes extracted from materials */
+  preparationNotes?: string[];
+}
+
+/**
+ * GameArtifactVariant - En variant av en artefakt
+ */
+export interface GameArtifactVariant {
+  title?: string;
+  body?: string;
+  visibility?: 'public' | 'leader_only' | 'role_private';
+  visibleToRoleId?: string;
+  mediaRef?: string;
 }
 
 /**

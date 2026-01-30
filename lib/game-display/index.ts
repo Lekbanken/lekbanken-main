@@ -41,9 +41,11 @@ export type {
   GamePhase,
   GameRole,
   GameArtifact,
+  GameArtifactVariant,
   GameTrigger,
   GameDecision,
   GameMaterial,
+  GameMaterialGroup,
   GameBoardWidget,
   GameMetadata,
 } from './types';
@@ -103,9 +105,19 @@ export {
   // Main mappers
   mapDbGameToSummary,
   mapDbGameToDetail,
+  mapDbGameToDetailPreview,
+  mapDbGameToDetailFull,
   mapSearchResultToSummary,
   mapPlannerBlockToSummary,
   createMinimalSummary,
+  // Helper mappers
+  mapSteps,
+  mapPhases,
+  mapMaterials,
+  mapRoles,
+  mapArtifacts,
+  mapTriggers,
+  mapBoardConfigToWidgets,
   // Validation
   validateGameSummary,
 } from './mappers';

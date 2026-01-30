@@ -1,25 +1,34 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
-import { ArrowLeftIcon, BoltIcon, ClockIcon, UsersIcon, UserIcon } from '@heroicons/react/24/outline'
-import { getGameById, getRelatedGames, type GameWithRelations } from '@/lib/services/games.server'
+import { getGameByIdPreview, getRelatedGames } from '@/lib/services/games.server'
+import { mapDbGameToDetailPreview, mapDbGameToSummary } from '@/lib/game-display'
+import type { DbGame } from '@/lib/game-display'
 import { StartSessionCta } from './start-session-cta'
 import { GameCard } from '@/components/game/GameCard'
-import { formatEnergyLevel, mapDbGameToSummary } from '@/lib/game-display'
-import type { EnergyLevel, GameSummary } from '@/lib/game-display'
-
-type Instruction = { title?: string; description?: string; duration_minutes?: number | null }
-
-const localePriority = ['sv', 'no', 'en']
-
-function pickTranslation(game: GameWithRelations) {
-  const translations = game.translations || []
-  for (const locale of localePriority) {
-    const hit = translations.find((t) => t.locale === locale)
-    if (hit) return hit
-  }
-  return translations[0] || null
-}
+import {
+  GameDetailHeader,
+  GameDetailBadges,
+  GameDetailAbout,
+  GameDetailSteps,
+  GameDetailMaterials,
+  GameDetailSafety,
+  GameDetailPreparation,
+  GameDetailPhases,
+  GameDetailGallery,
+  GameDetailRoles,
+  GameDetailArtifacts,
+  GameDetailTriggers,
+  GameDetailQuickFacts,
+  GameDetailActions,
+  GameDetailSidebar,
+  // P1 components
+  GameDetailAccessibility,
+  GameDetailRequirements,
+  GameDetailBoard,
+  GameDetailTools,
+  getSectionConfig,
+} from '@/components/game/GameDetails'
+import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 
 type Props = {
   params: Promise<{ gameId: string }>;
@@ -28,17 +37,11 @@ type Props = {
 export default async function GameDetailPage({ params }: Props) {
   const t = await getTranslations('app.gameDetail')
   const { gameId } = await params;
-  const game = await getGameById(gameId)
-  const relatedGames = game ? await getRelatedGames(game, 4) : []
-
-  // Use centralized energy formatter
-  const getEnergyFormatted = (level?: string | null) => {
-    const energy = formatEnergyLevel(level as EnergyLevel | null);
-    if (!energy) return { label: t('energy.medium'), labelShort: t('energy.medium'), color: 'text-amber-600 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-950/50' };
-    return energy;
-  };
-
-  if (!game) {
+  
+  // Use new preview query
+  const dbGame = await getGameByIdPreview(gameId)
+  
+  if (!dbGame) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-center">
@@ -55,260 +58,244 @@ export default async function GameDetailPage({ params }: Props) {
     )
   }
 
-  const translation = pickTranslation(game)
-  const displayTitle = translation?.title || game.name
-  const displayDescription = translation?.short_description || game.description || t('descriptionFallback')
+  // Map to GameDetailData using new mapper
+  const game = mapDbGameToDetailPreview(dbGame as unknown as DbGame)
+  
+  // Get section visibility config based on mode and playMode
+  const config = getSectionConfig('preview', game.playMode)
+  
+  // Get related games
+  const relatedGames = await getRelatedGames(dbGame, 4)
 
-  const structuredSteps =
-    Array.isArray(game.steps) && game.steps.length
-      ? [...game.steps].sort((a, b) => (a.step_order ?? 0) - (b.step_order ?? 0))
-      : null
-
-  const displayInstructions: Instruction[] | null = structuredSteps
-    ? structuredSteps.map((s) => ({
-        title: s.title || undefined,
-        description: s.body || undefined,
-        duration_minutes: s.duration_seconds ? Math.round(Number(s.duration_seconds) / 60) : null,
-      }))
-    : Array.isArray(translation?.instructions)
-      ? (translation?.instructions as Instruction[])
-      : null
-
-  const energy = getEnergyFormatted(game.energy_level)
-  const media = game.media ?? []
+  // Media for gallery (non-cover images)
+  const media = dbGame.media ?? []
   const cover = media.find((m) => m.kind === 'cover') ?? media[0]
   const gallery = media.filter((m) => m !== cover)
 
-  // Capture nullable fields into locals so TS can narrow safely in JSX
-  const ageMin = game.age_min
-  const ageMax = game.age_max
-  const minPlayers = game.min_players
-  const maxPlayers = game.max_players
-  const timeEstimateMin = game.time_estimate_min
-
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-4">
-        <Link
-          href="/app/browse"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
-        >
-          <ArrowLeftIcon className="h-4 w-4" />
-          {t('backToBrowse')}
-        </Link>
+      {/* Header with title, cover, back link */}
+      <GameDetailHeader
+        game={game}
+        backLink={{ href: '/app/browse', label: t('backToBrowse') }}
+        label={t('label')}
+      />
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary mb-1">{t('label')}</p>
-            <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{displayTitle}</h1>
-          </div>
-        </div>
-
-        {/* Cover image */}
-        {cover?.media?.url && (
-          <div className="overflow-hidden rounded-2xl border border-border/60 bg-muted">
-            <div className="relative aspect-[16/9]">
-              <Image
-                src={cover.media.url}
-                alt={cover.media.alt_text || displayTitle}
-                fill
-                className="object-cover"
-                sizes="100vw"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Badges */}
-        <div className="flex flex-wrap gap-2">
-          {game.energy_level && (
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium ${energy.bgColor} ${energy.color}`}>
-              <BoltIcon className="h-4 w-4" />
-              {energy.labelShort}
-            </span>
-          )}
-          {game.main_purpose && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary/10 text-primary">
-              {game.main_purpose.name || t('purposeFallback')}
-            </span>
-          )}
-          {game.product && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200">
-              {game.product.name || t('productFallback')}
-            </span>
-          )}
-          {ageMin != null && ageMax != null && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400">
-              <UserIcon className="h-4 w-4" />
-              {t('ageRange', { min: ageMin, max: ageMax })}
-            </span>
-          )}
-          {minPlayers != null && maxPlayers != null && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-orange-50 dark:bg-orange-950/50 text-orange-600 dark:text-orange-400">
-              <UsersIcon className="h-4 w-4" />
-              {t('playersRange', { min: minPlayers, max: maxPlayers })}
-            </span>
-          )}
-          {timeEstimateMin != null && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary/10 text-primary">
-              <ClockIcon className="h-4 w-4" />
-              {t('approxMinutes', { minutes: timeEstimateMin })}
-            </span>
-          )}
-        </div>
-      </div>
+      {/* Badges */}
+      {config.badges && <GameDetailBadges game={game} />}
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Game Details */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Description */}
-          <section className="rounded-2xl border border-border/60 bg-card p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-3">{t('sections.about')}</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {displayDescription}
-            </p>
-          </section>
+          {/* About */}
+          {config.about && (
+            <GameDetailAbout
+              game={game}
+              labels={{
+                title: t('sections.about'),
+              }}
+            />
+          )}
 
-          {/* Instructions */}
-          {displayInstructions && displayInstructions.length > 0 ? (
-            <section className="rounded-2xl border border-border/60 bg-card p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-3">{t('sections.instructions')}</h2>
-              <ol className="space-y-3 text-muted-foreground leading-relaxed">
-                {displayInstructions.map((step, idx) => (
-                  <li key={idx} className="rounded-lg border border-border/60 bg-muted/30 p-3">
-                    {step.title && <p className="font-semibold text-foreground">{step.title}</p>}
-                    {step.description && <p className="mt-1 whitespace-pre-wrap">{step.description}</p>}
-                    {step.duration_minutes != null ? (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {t('approxMinutes', { minutes: step.duration_minutes })}
-                      </p>
-                    ) : null}
-                  </li>
-                ))}
-              </ol>
-            </section>
-          ) : (
-            game.instructions && (
-              <section className="rounded-2xl border border-border/60 bg-card p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-3">{t('sections.instructions')}</h2>
-                <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {game.instructions}
-                </div>
-              </section>
-            )
+          {/* Steps */}
+          {config.steps && (
+            <GameDetailSteps
+              game={game}
+              labels={{
+                title: t('sections.instructions'),
+                approxMinutes: '~{minutes} min',
+              }}
+            />
+          )}
+
+          {/* Materials */}
+          {config.materials && (
+            <GameDetailMaterials
+              game={game}
+              labels={{
+                title: t('sections.materials'),
+              }}
+            />
+          )}
+
+          {/* Safety */}
+          {config.safety && (
+            <GameDetailSafety
+              game={game}
+              labels={{
+                title: t('sections.safety'),
+              }}
+            />
+          )}
+
+          {/* Preparation */}
+          {config.preparation && (
+            <GameDetailPreparation
+              game={game}
+              labels={{
+                title: t('sections.preparation'),
+              }}
+            />
+          )}
+
+          {/* P1: Accessibility */}
+          {config.accessibility && (
+            <GameDetailAccessibility
+              game={game}
+              labels={{
+                title: t('sections.accessibility'),
+              }}
+            />
+          )}
+
+          {/* P1: Requirements */}
+          {config.requirements && (
+            <GameDetailRequirements
+              game={game}
+              labels={{
+                title: t('sections.requirements'),
+              }}
+            />
+          )}
+
+          {/* Phases (facilitated mode) */}
+          {config.phases && (
+            <GameDetailPhases
+              game={game}
+              labels={{
+                title: t('sections.phases'),
+                goal: t('phases.goal'),
+                duration: t('phases.duration'),
+              }}
+            />
+          )}
+
+          {/* P1: Board config (facilitated/participants mode) */}
+          {config.board && (
+            <GameDetailBoard
+              game={game}
+              labels={{
+                title: t('sections.board'),
+              }}
+            />
           )}
 
           {/* Gallery */}
-          {gallery.length > 0 && (
-            <section className="rounded-2xl border border-border/60 bg-card p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-3">{t('sections.images')}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {gallery.map((item) =>
-                  item.media?.url ? (
-                    <div key={item.id} className="overflow-hidden rounded-xl border border-border/60 bg-muted">
-                      <div className="relative aspect-[4/3]">
-                        <Image
-                          src={item.media.url}
-                          alt={item.media.alt_text || displayTitle}
-                          fill
-                          className="object-cover"
-                          sizes="50vw"
-                        />
-                      </div>
-                    </div>
-                  ) : null
-                )}
-              </div>
-            </section>
+          {config.gallery && (
+            <GameDetailGallery
+              game={game}
+              galleryItems={gallery}
+              labels={{
+                title: t('sections.images'),
+              }}
+            />
           )}
 
-          {/* Game Details Grid */}
-          <section className="rounded-2xl border border-border/60 bg-card p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">{t('sections.details')}</h2>
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                  {t('details.participants')}
-                </h3>
-                <p className="text-xl font-bold text-foreground">
-                  {minPlayers != null && maxPlayers != null
-                    ? t('playersRange', { min: minPlayers, max: maxPlayers })
-                    : '—'}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                  {t('details.time')}
-                </h3>
-                <p className="text-xl font-bold text-foreground">
-                  {timeEstimateMin != null
-                    ? t('approxMinutes', { minutes: timeEstimateMin })
-                    : '—'}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                  {t('details.age')}
-                </h3>
-                <p className="text-xl font-bold text-foreground">
-                  {ageMin != null && ageMax != null
-                    ? t('ageRange', { min: ageMin, max: ageMax })
-                    : '—'}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                  {t('details.energy')}
-                </h3>
-                <p className={`text-xl font-bold ${energy.color}`}>
-                  {energy.labelShort}
-                </p>
-              </div>
-            </div>
-          </section>
+          {/* Roles (lazy-loaded, participant mode only) */}
+          {config.roles && (
+            <GameDetailRoles
+              game={game}
+              labels={{
+                title: t('sections.roles'),
+                loading: t('loading'),
+                error: t('loadError'),
+                count: t('roles.count'),
+              }}
+            />
+          )}
+
+          {/* Artifacts (lazy-loaded) */}
+          {config.artifacts && (
+            <GameDetailArtifacts
+              game={game}
+              labels={{
+                title: t('sections.artifacts'),
+                loading: t('loading'),
+                error: t('loadError'),
+                variants: t('artifacts.variants'),
+              }}
+            />
+          )}
+
+          {/* Triggers (lazy-loaded) */}
+          {config.triggers && (
+            <GameDetailTriggers
+              game={game}
+              labels={{
+                title: t('sections.triggers'),
+                loading: t('loading'),
+                error: t('loadError'),
+                condition: t('triggers.condition'),
+                effect: t('triggers.effect'),
+              }}
+            />
+          )}
+
+          {/* P1: Facilitator Tools */}
+          {config.tools && (
+            <GameDetailTools
+              game={game}
+              labels={{
+                title: t('sections.tools'),
+              }}
+            />
+          )}
+
+          {/* Quick Facts Grid */}
+          {config.quickFacts && (
+            <GameDetailQuickFacts
+              game={game}
+              labels={{
+                title: t('sections.details'),
+                participants: t('details.participants'),
+                time: t('details.time'),
+                age: t('details.age'),
+                energy: t('details.energy'),
+                playersRange: t('playersRange', { min: '{min}', max: '{max}' }),
+                ageRange: t('ageRange', { min: '{min}', max: '{max}' }),
+                approxMinutes: t('approxMinutes', { minutes: '{min}' }),
+              }}
+              energyLabels={{
+                low: t('energy.low'),
+                medium: t('energy.medium'),
+                high: t('energy.high'),
+              }}
+            />
+          )}
         </div>
 
         {/* Sidebar */}
-        <div className="lg:col-span-1 space-y-4">
-          {/* Play Button */}
-          <StartSessionCta gameId={game.id} gameName={game.name} />
+        {config.sidebar && (
+          <GameDetailSidebar
+            game={game}
+            gameId={game.id}
+            gameName={game.title}
+            labels={{
+              quickInfoTitle: t('sections.quickInfo'),
+              status: t('sidebar.status'),
+              published: t('sidebar.published'),
+              draft: t('sidebar.draft'),
+              addedAt: t('sidebar.addedAt'),
+            }}
+            className="lg:col-span-1"
+          >
+            {/* Start Session CTA */}
+            <StartSessionCta gameId={game.id} gameName={game.title} />
 
-          {/* Quick Info Card */}
-          <div className="rounded-2xl border border-border/60 bg-card p-5">
-            <h3 className="text-base font-semibold text-foreground mb-3">Snabbinfo</h3>
-            <div className="space-y-3 text-sm">
-              <div>
-                <p className="text-muted-foreground text-xs uppercase tracking-wide">Status</p>
-                <p className="text-foreground font-medium">
-                  {game.status === 'published' ? 'Publicerad' : 'Utkast'}
-                </p>
-              </div>
-              {game.created_at && (
-                <div>
-                  <p className="text-muted-foreground text-xs uppercase tracking-wide">Tillagd</p>
-                  <p className="text-foreground font-medium">
-                    {new Date(game.created_at).toLocaleDateString('sv-SE')}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Actions Card */}
-          <div className="rounded-2xl border border-border/60 bg-card p-5">
-            <h3 className="text-base font-semibold text-foreground mb-3">Dela leken</h3>
-            <div className="space-y-2">
-              <button className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 px-4 rounded-lg transition">
-                Dela
-              </button>
-              <button className="w-full bg-muted/50 hover:bg-muted text-foreground font-medium py-2.5 px-4 rounded-lg transition">
-                Spara som favorit
-              </button>
-            </div>
-          </div>
-        </div>
+            {/* Share/Favorite Actions */}
+            <GameDetailActions
+              game={game}
+              gameId={game.id}
+              gameName={game.title}
+              labels={{
+                share: t('actions.share'),
+                favorite: t('actions.favorite'),
+                shareTitle: t('actions.shareTitle'),
+              }}
+            />
+          </GameDetailSidebar>
+        )}
       </div>
 
       {/* Related Games */}
@@ -317,13 +304,7 @@ export default async function GameDetailPage({ params }: Props) {
           <h2 className="text-xl font-semibold text-foreground mb-4">Liknande lekar</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {relatedGames.map((relatedGame) => {
-              // Map to GameSummary for Unified GameCard
-              const summary: GameSummary = {
-                id: relatedGame.id,
-                title: relatedGame.name,
-                shortDescription: relatedGame.description ?? undefined,
-                energyLevel: relatedGame.energy_level as EnergyLevel ?? undefined,
-              };
+              const summary = mapDbGameToSummary(relatedGame as unknown as DbGame);
               return (
                 <GameCard
                   key={relatedGame.id}

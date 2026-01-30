@@ -8191,8 +8191,36 @@
       "sections": {
         "about": "Om leken",
         "instructions": "Så spelar du",
+        "materials": "Material",
+        "safety": "Säkerhet",
+        "preparation": "Förberedelser",
+        "phases": "Faser",
         "images": "Bilder",
-        "details": "Detaljer"
+        "details": "Detaljer",
+        "roles": "Roller",
+        "artifacts": "Artefakter",
+        "triggers": "Händelser",
+        "quickInfo": "Snabbinfo",
+        "accessibility": "Tillgänglighet",
+        "requirements": "Krav för spelet",
+        "board": "Publik tavla",
+        "tools": "Facilitatorverktyg"
+      },
+      "loading": "Laddar...",
+      "loadError": "Kunde inte ladda data",
+      "phases": {
+        "goal": "Mål",
+        "duration": "Tid"
+      },
+      "roles": {
+        "count": "Antal"
+      },
+      "artifacts": {
+        "variants": "Varianter"
+      },
+      "triggers": {
+        "condition": "Villkor",
+        "effect": "Effekt"
       },
       "details": {
         "participants": "Antal deltagare",
@@ -8205,6 +8233,17 @@
         "low": "Låg energi",
         "medium": "Medel energi",
         "high": "Hög energi"
+      },
+      "sidebar": {
+        "status": "Status",
+        "published": "Publicerad",
+        "draft": "Utkast",
+        "addedAt": "Tillagd"
+      },
+      "actions": {
+        "share": "Dela",
+        "favorite": "Spara som favorit",
+        "shareTitle": "Dela denna lek"
       }
     },
     "play": {

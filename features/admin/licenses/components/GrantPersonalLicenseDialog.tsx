@@ -16,7 +16,7 @@ import { UserIcon, KeyIcon } from '@heroicons/react/24/outline';
 interface Product {
   id: string;
   name: string;
-  slug: string;
+  product_key: string;
 }
 
 interface GrantPersonalLicenseDialogProps {
@@ -48,7 +48,11 @@ export function GrantPersonalLicenseDialog({
   useEffect(() => {
     if (open && products.length === 0) {
       setIsLoadingProducts(true);
-      fetch('/api/admin/products/search?status=active&limit=100')
+      fetch('/api/admin/products/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ statuses: ['active'], pageSize: 100 }),
+      })
         .then((res) => res.json())
         .then((data) => {
           setProducts(data.products || []);

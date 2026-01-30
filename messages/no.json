@@ -8008,8 +8008,36 @@
       "sections": {
         "about": "Om spillet",
         "instructions": "Slik spiller du",
+        "materials": "Materialer",
+        "safety": "Sikkerhet",
+        "preparation": "Forberedelser",
+        "phases": "Faser",
         "images": "Bilder",
-        "details": "Detaljer"
+        "details": "Detaljer",
+        "roles": "Roller",
+        "artifacts": "Artefakter",
+        "triggers": "Hendelser",
+        "quickInfo": "Hurtiginformasjon",
+        "accessibility": "Tilgjengelighet",
+        "requirements": "Krav for spillet",
+        "board": "Offentlig tavle",
+        "tools": "Fasilitatorverktøy"
+      },
+      "loading": "Laster...",
+      "loadError": "Kunne ikke laste data",
+      "phases": {
+        "goal": "Mål",
+        "duration": "Varighet"
+      },
+      "roles": {
+        "count": "Antall"
+      },
+      "artifacts": {
+        "variants": "Varianter"
+      },
+      "triggers": {
+        "condition": "Vilkår",
+        "effect": "Effekt"
       },
       "details": {
         "participants": "Antall deltakere",

@@ -39,12 +39,12 @@ COMMENT ON COLUMN public.games.imported_at IS
 -- Allows same external_ref across different sources, but unique within a source.
 -- NULL import_source is treated as separate namespace (for manually created games).
 
-CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS idx_games_external_ref_source
+CREATE UNIQUE INDEX IF NOT EXISTS idx_games_external_ref_source
 ON public.games (import_source, external_ref)
 WHERE external_ref IS NOT NULL AND import_source IS NOT NULL;
 
 -- Also index for lookup by external_ref alone (common query pattern)
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_games_external_ref
+CREATE INDEX IF NOT EXISTS idx_games_external_ref
 ON public.games (external_ref)
 WHERE external_ref IS NOT NULL;
 

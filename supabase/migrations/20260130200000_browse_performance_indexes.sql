@@ -16,7 +16,7 @@
 -- Critical for stable pagination when dataset grows
 -- Partial index on status='published' since Browse always filters on this
 
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_games_browse_sort
+CREATE INDEX IF NOT EXISTS idx_games_browse_sort
 ON public.games (popularity_score DESC, created_at DESC, id DESC)
 WHERE status = 'published';
 
@@ -29,7 +29,7 @@ COMMENT ON INDEX public.idx_games_browse_sort IS
 -- These cover the most common Browse filter patterns
 
 -- Product filter (most common)
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_games_status_product
+CREATE INDEX IF NOT EXISTS idx_games_status_product
 ON public.games (status, product_id)
 WHERE product_id IS NOT NULL;
 
@@ -37,7 +37,7 @@ COMMENT ON INDEX public.idx_games_status_product IS
   'Browse filter: games by product';
 
 -- Main purpose filter
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_games_status_purpose
+CREATE INDEX IF NOT EXISTS idx_games_status_purpose
 ON public.games (status, main_purpose_id)
 WHERE main_purpose_id IS NOT NULL;
 
@@ -45,7 +45,7 @@ COMMENT ON INDEX public.idx_games_status_purpose IS
   'Browse filter: games by main purpose';
 
 -- Play mode filter (basic/facilitated/participants)
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_games_status_playmode
+CREATE INDEX IF NOT EXISTS idx_games_status_playmode
 ON public.games (status, play_mode)
 WHERE play_mode IS NOT NULL;
 
@@ -53,7 +53,7 @@ COMMENT ON INDEX public.idx_games_status_playmode IS
   'Browse filter: games by play mode';
 
 -- Player count range queries
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_games_player_range
+CREATE INDEX IF NOT EXISTS idx_games_player_range
 ON public.games (min_players, max_players)
 WHERE status = 'published';
 

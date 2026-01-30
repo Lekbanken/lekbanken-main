@@ -195,12 +195,20 @@ export function NotificationBell({ className }: NotificationBellProps) {
               <ul className="divide-y divide-border">
                 {notifications.map((notification) => (
                   <li key={notification.id}>
-                    <button
-                      type="button"
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={() => handleNotificationClick(notification)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          handleNotificationClick(notification)
+                        }
+                      }}
                       className={cn(
-                        'flex w-full gap-3 px-4 py-3 text-left transition-colors',
+                        'group flex w-full gap-3 px-4 py-3 text-left transition-colors',
                         'hover:bg-muted/50',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                         !notification.readAt && 'bg-primary/5'
                       )}
                     >
@@ -255,7 +263,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
                       >
                         <XMarkIcon className="h-4 w-4" />
                       </button>
-                    </button>
+                    </div>
                   </li>
                 ))}
               </ul>

@@ -21,6 +21,8 @@ export interface SendNotificationParams {
   category?: string
   actionUrl?: string
   actionLabel?: string
+  /** Schedule for later (ISO string). If omitted, sends immediately. */
+  scheduleAt?: string
 }
 
 export interface SendNotificationResult {
@@ -187,7 +189,15 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
   try {
     const supabase = await createServiceRoleClient()
     
-    // Build notification base
+    // Determine if this is scheduled or immediate send
+    const isScheduled = !!params.scheduleAt
+    const scheduleAt = params.scheduleAt ? new Date(params.scheduleAt) : null
+    
+    // Map scope to database scope ('all' for global, 'tenant' for tenant/users)
+    const dbScope = params.scope === 'global' ? 'all' : 'tenant'
+    
+    // Build notification base with new scheduling fields
+    // Note: Using type assertion due to generated types not having new columns yet
     const notificationBase = {
       title: params.title.trim(),
       message: params.message.trim(),
@@ -195,80 +205,157 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
       category: params.category || 'system',
       action_url: params.actionUrl || null,
       action_label: params.actionLabel || null,
-    }
+      scope: dbScope,
+      status: isScheduled ? 'scheduled' : 'sent',
+      schedule_at: scheduleAt?.toISOString() ?? null,
+      sent_at: isScheduled ? null : new Date().toISOString(),
+      created_by: user.id,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as Record<string, unknown>
     
     let sentCount = 0
     
+    // For 'users' scope, we need to create individual deliveries
+    // For 'tenant' and 'global', we create notification(s) and then generate deliveries
+    
     switch (params.scope) {
       case 'global': {
-        // Global broadcast: Create one notification per tenant with user_id = NULL
-        // This way all members of each tenant can see it via RLS
-        const { data: tenants, error: tenantError } = await supabase
-          .from('tenants')
+        // Global broadcast: Create one notification with scope='all', tenant_id=NULL
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: notification, error: insertError } = await (supabase
+          .from('notifications') as any)
+          .insert({
+            ...notificationBase,
+            tenant_id: null,
+          })
           .select('id')
+          .single() as { data: { id: string } | null; error: Error | null }
         
-        if (tenantError) {
-          console.error('sendAdminNotification global tenant fetch error:', tenantError)
-          return { success: false, error: 'Kunde inte hämta organisationer' }
-        }
-        
-        if (!tenants || tenants.length === 0) {
-          return { success: false, error: 'Inga organisationer hittades' }
-        }
-        
-        // Insert one broadcast notification per tenant
-        const notifications = tenants.map((t) => ({
-          ...notificationBase,
-          tenant_id: t.id,
-          user_id: null, // NULL = broadcast to all in tenant
-        }))
-        
-        const { error: insertError } = await supabase
-          .from('notifications')
-          .insert(notifications)
-        
-        if (insertError) {
+        if (insertError || !notification) {
           console.error('sendAdminNotification global insert error:', insertError)
-          return { success: false, error: 'Kunde inte skicka notifikationer' }
+          return { success: false, error: 'Kunde inte skicka notifikation' }
         }
         
-        sentCount = tenants.length
+        if (!isScheduled) {
+          // Generate deliveries immediately for all users
+          const { data: allUsers, error: usersError } = await supabase
+            .from('users')
+            .select('id')
+          
+          if (usersError) {
+            console.error('sendAdminNotification fetch users error:', usersError)
+            return { success: false, error: 'Kunde inte hämta användare' }
+          }
+          
+          if (allUsers && allUsers.length > 0) {
+            const deliveries = allUsers.map((u) => ({
+              notification_id: notification.id,
+              user_id: u.id,
+              delivered_at: new Date().toISOString(),
+            }))
+            
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: deliveryError } = await (supabase as any)
+              .from('notification_deliveries')
+              .insert(deliveries)
+            
+            if (deliveryError) {
+              console.error('sendAdminNotification delivery insert error:', deliveryError)
+              // Don't fail completely, notification is created
+            }
+            
+            sentCount = allUsers.length
+          }
+        } else {
+          sentCount = 1 // Scheduled
+        }
         break
       }
       
       case 'tenant': {
-        // Tenant broadcast: One notification with user_id = NULL
-        const { error: insertError } = await supabase
-          .from('notifications')
+        // Tenant broadcast: One notification for the tenant
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: notification, error: insertError } = await (supabase
+          .from('notifications') as any)
           .insert({
             ...notificationBase,
             tenant_id: params.tenantId!,
-            user_id: null, // NULL = broadcast to all in tenant
           })
+          .select('id')
+          .single() as { data: { id: string } | null; error: Error | null }
         
-        if (insertError) {
+        if (insertError || !notification) {
           console.error('sendAdminNotification tenant insert error:', insertError)
           return { success: false, error: 'Kunde inte skicka notifikation' }
         }
         
-        sentCount = 1
+        if (!isScheduled) {
+          // Generate deliveries for all users in tenant
+          const { data: members, error: membersError } = await supabase
+            .from('user_tenant_memberships')
+            .select('user_id')
+            .eq('tenant_id', params.tenantId!)
+          
+          if (membersError) {
+            console.error('sendAdminNotification fetch members error:', membersError)
+            return { success: false, error: 'Kunde inte hämta medlemmar' }
+          }
+          
+          if (members && members.length > 0) {
+            const deliveries = members.map((m) => ({
+              notification_id: notification.id,
+              user_id: m.user_id,
+              delivered_at: new Date().toISOString(),
+            }))
+            
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: deliveryError } = await (supabase as any)
+              .from('notification_deliveries')
+              .insert(deliveries)
+            
+            if (deliveryError) {
+              console.error('sendAdminNotification delivery insert error:', deliveryError)
+            }
+            
+            sentCount = members.length
+          }
+        } else {
+          sentCount = 1 // Scheduled
+        }
         break
       }
       
       case 'users': {
-        // Specific users: One notification per user
-        const notifications = params.userIds!.map((userId) => ({
-          ...notificationBase,
-          tenant_id: params.tenantId!,
+        // Specific users: Create notification and deliveries only for selected users
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: notification, error: insertError } = await (supabase
+          .from('notifications') as any)
+          .insert({
+            ...notificationBase,
+            tenant_id: params.tenantId!,
+          })
+          .select('id')
+          .single() as { data: { id: string } | null; error: Error | null }
+        
+        if (insertError || !notification) {
+          console.error('sendAdminNotification users insert error:', insertError)
+          return { success: false, error: 'Kunde inte skicka notifikation' }
+        }
+        
+        // Always create deliveries for specific users (even if scheduled)
+        const deliveries = params.userIds!.map((userId) => ({
+          notification_id: notification.id,
           user_id: userId,
+          delivered_at: isScheduled ? null : new Date().toISOString(),
         }))
         
-        const { error: insertError } = await supabase
-          .from('notifications')
-          .insert(notifications)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: deliveryError } = await (supabase as any)
+          .from('notification_deliveries')
+          .insert(deliveries)
         
-        if (insertError) {
-          console.error('sendAdminNotification users insert error:', insertError)
+        if (deliveryError) {
+          console.error('sendAdminNotification user delivery insert error:', deliveryError)
           return { success: false, error: 'Kunde inte skicka notifikationer' }
         }
         

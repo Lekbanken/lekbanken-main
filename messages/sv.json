@@ -129,7 +129,9 @@
     },
     "states": {
       "errorState": {
-        "defaultTitle": "Något gick fel"
+        "defaultTitle": "Något gick fel",
+        "defaultDescription": "Försök igen.",
+        "retryButton": "Försök igen"
       },
       "networkErrorState": {
         "title": "Ingen anslutning",
@@ -8137,6 +8139,14 @@
       "viewProfile": "Visa profil",
       "marketing": "Marknadsföring",
       "visitWebsite": "Besök hemsidan"
+    },
+    "notifications": {
+      "title": "Notifikationer",
+      "bell": "Visa notifikationer",
+      "markAllRead": "Markera alla som lästa",
+      "empty": "Inga notifikationer",
+      "dismiss": "Stäng",
+      "viewAll": "Visa alla"
     },
     "dashboard": {
       "title": "Dashboard",

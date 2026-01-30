@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { getServerAuthContext } from '@/lib/auth/server-context'
 
 export const dynamic = 'force-dynamic'
@@ -21,16 +21,25 @@ export async function GET() {
       )
     }
 
-    const supabase = createServiceRoleClient()
-    
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.rpc as any)('get_scheduled_jobs_status')
+    // Use request-scoped client so the RPC can evaluate auth context (auth.uid())
+    // for `public.is_system_admin()` checks inside the function.
+    const supabase = await createServerRlsClient()
+
+    const { data, error } = await supabase.rpc('get_scheduled_jobs_status')
 
     if (error) {
       console.error('[scheduled-jobs] RPC error:', error)
       return NextResponse.json(
         { error: 'Failed to fetch scheduled jobs', details: error.message },
         { status: 500 }
+      )
+    }
+
+    // The RPC returns JSON. If the DB-side role check fails it returns `{ error: 'Unauthorized' }`.
+    if (data && typeof data === 'object' && 'error' in data) {
+      return NextResponse.json(
+        { error: (data as { error?: string }).error ?? 'Unauthorized' },
+        { status: 403 }
       )
     }
 
@@ -71,18 +80,20 @@ export async function POST(request: Request) {
       )
     }
 
-    // Endast cleanup_demo_users stöds för manuell körning
-    if (jobName !== 'cleanup_demo_users') {
+    // Stödda jobb för manuell körning
+    const supportedJobs = ['cleanup_demo_users', 'process_scheduled_notifications']
+    if (!supportedJobs.includes(jobName)) {
       return NextResponse.json(
         { error: 'Unknown job' },
         { status: 400 }
       )
     }
 
+    // Manual job execution should run with service role privileges.
     const supabase = createServiceRoleClient()
     
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.rpc as any)('cleanup_demo_users')
+    const { data, error } = await (supabase.rpc as any)(jobName)
 
     if (error) {
       console.error('[scheduled-jobs] Manual run error:', error)

@@ -148,7 +148,9 @@
     },
     "states": {
       "errorState": {
-        "defaultTitle": "Something went wrong"
+        "defaultTitle": "Something went wrong",
+        "defaultDescription": "Please try again.",
+        "retryButton": "Try again"
       },
       "networkErrorState": {
         "title": "No connection",
@@ -7784,6 +7786,14 @@
       "play": "Play",
       "tip": "Tip",
       "tipText": "Add your most used filters as quick selections for faster planning."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "bell": "Show notifications",
+      "markAllRead": "Mark all as read",
+      "empty": "No notifications",
+      "dismiss": "Dismiss",
+      "viewAll": "View all"
     },
     "dashboard": {
       "title": "Dashboard",

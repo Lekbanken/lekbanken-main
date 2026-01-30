@@ -49,6 +49,10 @@ interface ScheduledJobsData {
   fetched_at: string
 }
 
+function asArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : []
+}
+
 function formatSwedishTime(isoDate: string): string {
   const date = new Date(isoDate)
   return date.toLocaleString('sv-SE', {
@@ -92,6 +96,34 @@ function parseCronSchedule(schedule: string, t: ReturnType<typeof useTranslation
   }
   
   return `${hour}:${minute.padStart(2, '0')} UTC`
+}
+
+// Map cron job names to internal function names for manual runs
+const JOB_NAME_TO_FUNCTION: Record<string, string> = {
+  'cleanup-demo-users': 'cleanup_demo_users',
+  'process-scheduled-notifications': 'process_scheduled_notifications',
+}
+
+// Format job result based on job type
+function formatJobResult(
+  result: JobRun['result'], 
+  jobName: string,
+  t: ReturnType<typeof useTranslations<'admin.scheduledJobs'>>
+): string {
+  if (!result) return '-'
+  
+  // Notification processing job
+  if (jobName === 'process_scheduled_notifications' || jobName === 'process-scheduled-notifications') {
+    const processed = (result as { processed_notifications?: number }).processed_notifications ?? 0
+    const deliveries = (result as { total_deliveries?: number }).total_deliveries ?? 0
+    return `${processed} notif → ${deliveries} deliv`
+  }
+  
+  // Demo cleanup job (default)
+  return t('resultFormat', { 
+    users: result.deleted_users ?? 0, 
+    sessions: result.deleted_sessions ?? 0 
+  })
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -182,10 +214,7 @@ function JobCard({ job, latestRun, onRunManually, isRunning }: {
             <div className="mt-2 flex items-center justify-between text-sm">
               <span className="text-muted-foreground">{t('result')}:</span>
               <span className="font-mono text-foreground">
-                {t('resultFormat', { 
-                  users: latestRun.result.deleted_users ?? 0, 
-                  sessions: latestRun.result.deleted_sessions ?? 0 
-                })}
+                {formatJobResult(latestRun.result, latestRun.job_name, t)}
               </span>
             </div>
           )}
@@ -238,7 +267,7 @@ function RunHistoryTable({ runs }: { runs: JobRun[] }) {
               <td className="py-2 text-muted-foreground">
                 {run.status === 'success' && run.result ? (
                   <span className="font-mono">
-                    {run.result.deleted_users ?? 0}u / {run.result.deleted_sessions ?? 0}s
+                    {formatJobResult(run.result, run.job_name, t)}
                   </span>
                 ) : run.error_message ? (
                   <span className="text-red-500">{run.error_message}</span>
@@ -273,6 +302,9 @@ function ScheduledJobsContent() {
         throw new Error('Failed to fetch scheduled jobs')
       }
       const result = await response.json()
+      if (result && typeof result === 'object' && 'error' in result) {
+        throw new Error((result as { error?: string }).error ?? 'Failed to fetch scheduled jobs')
+      }
       setData(result)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
@@ -329,16 +361,19 @@ function ScheduledJobsContent() {
     return null
   }
 
+  const jobs = asArray<ScheduledJob>((data as unknown as { jobs?: unknown }).jobs ?? data.jobs)
+  const recentRuns = asArray<JobRun>((data as unknown as { recent_runs?: unknown }).recent_runs ?? data.recent_runs)
+
   // Mappa jobnamn till senaste körning
   const latestRunByJob: Record<string, JobRun> = {}
-  for (const run of data.recent_runs) {
+  for (const run of recentRuns) {
     if (!latestRunByJob[run.job_name]) {
       latestRunByJob[run.job_name] = run
     }
   }
 
   // Om inga cron-jobb finns, visa info om att pg_cron inte är aktiverat
-  const hasJobs = data.jobs.length > 0
+  const hasJobs = jobs.length > 0
 
   return (
     <div className="space-y-6">
@@ -347,15 +382,18 @@ function ScheduledJobsContent() {
         <h2 className="mb-4 text-lg font-semibold text-foreground">{t('activeJobs')}</h2>
         {hasJobs ? (
           <div className="grid gap-4 md:grid-cols-2">
-            {data.jobs.map((job) => (
-              <JobCard
-                key={job.jobid}
-                job={job}
-                latestRun={latestRunByJob[job.jobname] ?? null}
-                onRunManually={() => handleRunManually('cleanup_demo_users')}
-                isRunning={runningJob === 'cleanup_demo_users'}
-              />
-            ))}
+            {jobs.map((job) => {
+              const functionName = JOB_NAME_TO_FUNCTION[job.jobname] ?? job.jobname
+              return (
+                <JobCard
+                  key={job.jobid}
+                  job={job}
+                  latestRun={latestRunByJob[job.jobname] ?? null}
+                  onRunManually={() => handleRunManually(functionName)}
+                  isRunning={runningJob === functionName}
+                />
+              )
+            })}
           </div>
         ) : (
           <AdminCard className="p-6">
@@ -368,17 +406,17 @@ function ScheduledJobsContent() {
                 </p>
               </div>
             </div>
-            {data.recent_runs.length > 0 && (
+            {recentRuns.length > 0 && (
               <div className="mt-4 rounded-lg bg-muted/50 p-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">{t('lastRun')}:</span>
                   <span className="font-mono">
-                    {formatSwedishTime(data.recent_runs[0].started_at)}
+                    {formatSwedishTime(recentRuns[0].started_at)}
                   </span>
                 </div>
                 <div className="mt-2 flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">{t('status')}:</span>
-                  <StatusBadge status={data.recent_runs[0].status} />
+                  <StatusBadge status={recentRuns[0].status} />
                 </div>
               </div>
             )}
@@ -411,7 +449,7 @@ function ScheduledJobsContent() {
           </Button>
         </div>
         <AdminCard className="p-4">
-          <RunHistoryTable runs={data.recent_runs} />
+          <RunHistoryTable runs={recentRuns} />
         </AdminCard>
       </section>
     </div>

@@ -35,7 +35,7 @@ export function AdminErrorState({
   icon,
   className = '',
 }: AdminErrorStateProps) {
-  const t = useTranslations('admin.states.error');
+  const t = useTranslations('admin.states.errorState');
   const displayTitle = title || t('defaultTitle');
   const displayDescription = description || t('defaultDescription');
   return (

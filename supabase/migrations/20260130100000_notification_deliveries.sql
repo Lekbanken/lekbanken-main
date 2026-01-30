@@ -281,6 +281,47 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.dismiss_notification TO authenticated;
 
+-- Get user notifications with details (for app bell)
+CREATE OR REPLACE FUNCTION public.get_user_notifications(p_limit INTEGER DEFAULT 20)
+RETURNS TABLE (
+  id UUID,
+  notification_id UUID,
+  delivered_at TIMESTAMP,
+  read_at TIMESTAMP,
+  dismissed_at TIMESTAMP,
+  title TEXT,
+  message TEXT,
+  type TEXT,
+  category TEXT,
+  action_url TEXT,
+  action_label TEXT
+)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT 
+    nd.id,
+    nd.notification_id,
+    nd.delivered_at,
+    nd.read_at,
+    nd.dismissed_at,
+    n.title,
+    n.message,
+    n.type,
+    n.category,
+    n.action_url,
+    n.action_label
+  FROM notification_deliveries nd
+  JOIN notifications n ON n.id = nd.notification_id
+  WHERE nd.user_id = auth.uid()
+    AND nd.dismissed_at IS NULL
+  ORDER BY nd.delivered_at DESC
+  LIMIT p_limit;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_user_notifications TO authenticated;
+
 -- =============================================================================
 -- 6. BATCH DELIVERY FUNCTION (for worker/cron)
 -- =============================================================================

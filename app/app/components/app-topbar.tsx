@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/components/app/NotificationBell";
 
 /**
  * AppTopbar - Minimal, stable topbar for the app
@@ -84,9 +85,9 @@ export function AppTopbar({ canGoBack = false, onBack, backLabel }: AppTopbarPro
         </button>
       </div>
 
-      {/* Right: Empty (MVP) - placeholder for future notifications */}
+      {/* Right: Notification bell */}
       <div className="flex w-20 items-center justify-end">
-        {/* Future: <NotificationBell /> */}
+        <NotificationBell />
       </div>
     </header>
   );

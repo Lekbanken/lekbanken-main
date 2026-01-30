@@ -313,7 +313,9 @@
     },
     "states": {
       "errorState": {
-        "defaultTitle": "Noe gikk galt"
+        "defaultTitle": "Noe gikk galt",
+        "defaultDescription": "Prøv igjen.",
+        "retryButton": "Prøv igjen"
       },
       "networkErrorState": {
         "title": "Ingen tilkobling",
@@ -7954,6 +7956,14 @@
       "viewProfile": "Vis profil",
       "marketing": "Markedsføring",
       "visitWebsite": "Besøk nettsiden"
+    },
+    "notifications": {
+      "title": "Varsler",
+      "bell": "Vis varsler",
+      "markAllRead": "Merk alle som lest",
+      "empty": "Ingen varsler",
+      "dismiss": "Lukk",
+      "viewAll": "Vis alle"
     },
     "dashboard": {
       "title": "Dashboard",

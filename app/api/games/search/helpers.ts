@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const energyLevels = ['low', 'medium', 'high'] as const
 export const locationTypes = ['indoor', 'outdoor', 'both'] as const
+export const playModes = ['basic', 'facilitated', 'participants'] as const
 
 export const searchSchema = z.object({
   search: z.string().trim().max(200).optional(),
@@ -19,9 +20,13 @@ export const searchSchema = z.object({
   minAge: z.number().int().positive().optional(),
   maxAge: z.number().int().positive().optional(),
   showLiked: z.boolean().optional(),
+  // Super filters (PR2)
+  playMode: z.enum(playModes).optional(),
+  categories: z.array(z.string()).optional(),
   sort: z.enum(['relevance', 'newest', 'popular', 'name', 'duration', 'rating']).optional(),
   page: z.number().int().min(1).default(1),
-  pageSize: z.number().int().min(1).max(50).default(24),
+  // GUARDRAIL: Max 48 per page to prevent "fetch all" scenarios
+  pageSize: z.number().int().min(1).max(48).default(24),
   status: z.enum(['published', 'draft', 'all']).optional(),
 })
 

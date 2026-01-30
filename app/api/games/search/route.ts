@@ -54,6 +54,9 @@ export async function POST(request: Request) {
     minAge,
     maxAge,
     showLiked,
+    // Super filters (PR2)
+    playMode,
+    categories = [],
     sort = 'relevance',
     page,
     pageSize,
@@ -277,6 +280,14 @@ export async function POST(request: Request) {
   }
   if (maxAge !== undefined) {
     query = query.lte('age_max', maxAge)
+  }
+
+  // Super filters (PR2)
+  if (playMode) {
+    query = query.eq('play_mode', playMode)
+  }
+  if (categories.length > 0) {
+    query = query.in('category', categories)
   }
 
   const groupSizeOr = buildGroupSizeOr(parsed.data.groupSizes ?? [])

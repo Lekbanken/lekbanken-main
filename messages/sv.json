@@ -308,13 +308,72 @@
       "clearAll": "Rensa alla",
       "apply": "Tillämpa",
       "showLiked": "Visa gillade",
-      "showLikedDescription": "Visa bara lekar du har gillat"
+      "showLikedDescription": "Visa bara lekar du har gillat",
+
+      "purpose": "Syfte",
+      "energy": {
+        "label": "Energi",
+        "low": "Låg",
+        "medium": "Medel",
+        "high": "Hög"
+      },
+      "environment": {
+        "label": "Miljö",
+        "indoor": "Inne",
+        "outdoor": "Ute",
+        "both": "Båda"
+      },
+      "groupSize": {
+        "label": "Gruppstorlek",
+        "small": "2-6 pers",
+        "medium": "6-14 pers",
+        "large": "15+ pers"
+      },
+      "time": "Tid",
+      "product": "Produkt",
+      "subPurpose": "Del-syfte",
+      "age": "Ålder",
+      "players": "Spelare",
+
+      "playMode": {
+        "label": "Spelläge",
+        "basic": "Grundläggande",
+        "facilitated": "Faciliterat",
+        "participants": "Deltagarläge"
+      },
+      "hasPhases": "Har faser",
+      "hasRoles": "Har roller",
+      "hasArtifacts": "Har artefakter",
+      "hasMaterials": "Har material",
+      "category": "Kategori",
+      "difficulty": {
+        "label": "Svårighet",
+        "easy": "Lätt",
+        "medium": "Medel",
+        "hard": "Svår"
+      },
+
+      "group": {
+        "basic": "Filter",
+        "facilitator": "Facilitator",
+        "participants": "Deltagare",
+        "material": "Material",
+        "advanced": "Avancerat"
+      },
+
+      "super": {
+        "title": "Avancerade filter"
+      },
+
+      "showAdvanced": "Visa fler filter",
+      "hideAdvanced": "Dölj avancerade filter"
     },
     "environment": "Miljö",
     "players": "Spelare",
     "count": "Antal",
     "age": "Ålder",
     "years": "År",
+    "minutes": "Minuter",
     "noAccess": "Du har inte tillgång till några produkter ännu.",
     "errorTitle": "Kunde inte ladda",
     "emptyTitle": "Inga aktiviteter hittades",
@@ -461,7 +520,11 @@
       "searching": "Söker...",
       "search": "Sök",
       "emptyState": "Sök efter lekar att lägga till",
-      "noResults": "Inga resultat för \"{query}\""
+      "noResults": "Inga resultat för \"{query}\"",
+      "openFilters": "Öppna filter",
+      "activeFilters": "{count, plural, one {# aktivt filter} other {# aktiva filter}}",
+      "clearFilters": "Rensa filter",
+      "loadMore": "Ladda fler"
     },
     "versions": {
       "noPublishedVersionsYet": "Inga publicerade versioner ännu",
@@ -624,6 +687,13 @@
   "admin": {
     "pageHeader": {
       "breadcrumbsLabel": "Brödsmulor"
+    },
+    "states": {
+      "errorState": {
+        "defaultTitle": "Något gick fel",
+        "defaultDescription": "Ett fel uppstod. Försök igen.",
+        "retryButton": "Försök igen"
+      }
     },
     "table": {
       "pagination": {
@@ -1114,7 +1184,9 @@
         "selectOrg": "Välj organisation",
         "scope": "Mottagare",
         "actionUrl": "Action URL",
-        "actionLabel": "Action label"
+        "actionLabel": "Action label",
+        "excludeDemoUsers": "Exkludera demoanvändare",
+        "excludeDemoUsersDesc": "Skicka inte till användare som är i demoläge"
       },
       "scope": {
         "global": "Alla organisationer",
@@ -8138,7 +8210,8 @@
       "loggedInAs": "Du är inloggad som",
       "viewProfile": "Visa profil",
       "marketing": "Marknadsföring",
-      "visitWebsite": "Besök hemsidan"
+      "visitWebsite": "Besök hemsidan",
+      "manageApp": "Hantera plattformen"
     },
     "notifications": {
       "title": "Notifikationer",
@@ -9628,6 +9701,7 @@
       },
       "actions": {
         "view": "Visa",
+        "viewAll": "Visa alla",
         "markAsRead": "Markera som läst",
         "delete": "Ta bort"
       },

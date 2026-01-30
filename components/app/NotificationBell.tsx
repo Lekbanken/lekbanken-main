@@ -133,7 +133,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
           isOpen && 'bg-muted text-foreground',
           className
         )}
-        aria-label={t('bell')}
+        aria-label={t('title')}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
@@ -175,7 +175,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
                 onClick={() => markAllAsRead()}
                 className="text-xs text-primary hover:underline"
               >
-                {t('markAllRead')}
+                {t('markAllAsRead')}
               </button>
             )}
           </div>
@@ -189,7 +189,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
             ) : !hasNotifications ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <BellIcon className="mb-2 h-10 w-10 text-muted-foreground/40" />
-                <p className="text-sm text-muted-foreground">{t('empty')}</p>
+                <p className="text-sm text-muted-foreground">{t('empty.message')}</p>
               </div>
             ) : (
               <ul className="divide-y divide-border">
@@ -251,7 +251,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
                           'opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted hover:text-foreground',
                           'focus:opacity-100'
                         )}
-                        aria-label={t('dismiss')}
+                        aria-label={t('actions.delete')}
                       >
                         <XMarkIcon className="h-4 w-4" />
                       </button>
@@ -276,7 +276,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
                   'text-primary hover:bg-primary/10 transition-colors'
                 )}
               >
-                {t('viewAll')}
+                {t('actions.viewAll')}
               </button>
             </div>
           )}

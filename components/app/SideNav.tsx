@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,14 +8,17 @@ import { useTranslations } from "next-intl";
 import { Avatar } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/supabase/auth";
 import { appNavItems } from "./nav-items";
+import { ProfileModal } from "./ProfileModal";
 
 export function SideNav() {
   const pathname = usePathname();
   const t = useTranslations();
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, effectiveGlobalRole } = useAuth();
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const displayName = userProfile?.full_name || user?.user_metadata?.full_name || user?.email || "Profil";
   const avatarUrl = userProfile?.avatar_url;
+  const isAdmin = effectiveGlobalRole === "system_admin";
 
   return (
     <aside className="fixed top-0 bottom-0 left-0 z-30 hidden w-64 border-r border-border/50 bg-card/98 px-4 py-6 backdrop-blur-xl lg:flex lg:flex-col" style={{ marginTop: 'var(--demo-banner-height, 0px)' }}>
@@ -44,6 +48,33 @@ export function SideNav() {
           ) : (
             item.icon
           );
+          
+          // Profile tab opens modal instead of navigating
+          if (isProfileTab) {
+            return (
+              <button
+                key={item.href}
+                type="button"
+                onClick={() => setProfileOpen(true)}
+                className={`group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all duration-150 hover:scale-[1.01] ${
+                  active
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                {active && (
+                  <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-full bg-primary shadow-sm shadow-primary/50" />
+                )}
+                <span className={`flex h-9 w-9 items-center justify-center rounded-xl transition-colors ${
+                  active ? "bg-primary/15 text-primary" : "bg-muted/60 text-inherit group-hover:bg-muted"
+                }`}>
+                  {iconNode}
+                </span>
+                <span>{t(item.labelKey)}</span>
+              </button>
+            );
+          }
+          
           return (
             <Link
               key={item.href}
@@ -79,6 +110,14 @@ export function SideNav() {
           {t('app.nav.tipText')}
         </p>
       </div>
+
+      <ProfileModal
+        open={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        displayName={displayName}
+        avatarUrl={avatarUrl}
+        isAdmin={isAdmin}
+      />
     </aside>
   );
 }

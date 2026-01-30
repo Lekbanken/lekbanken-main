@@ -319,13 +319,72 @@
       "clearAll": "Clear all",
       "apply": "Apply",
       "showLiked": "Show liked",
-      "showLikedDescription": "Only show games you have liked"
+      "showLikedDescription": "Only show games you have liked",
+
+      "purpose": "Purpose",
+      "energy": {
+        "label": "Energy",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "environment": {
+        "label": "Environment",
+        "indoor": "Indoor",
+        "outdoor": "Outdoor",
+        "both": "Both"
+      },
+      "groupSize": {
+        "label": "Group size",
+        "small": "2-6 ppl",
+        "medium": "6-14 ppl",
+        "large": "15+ ppl"
+      },
+      "time": "Time",
+      "product": "Product",
+      "subPurpose": "Sub-purpose",
+      "age": "Age",
+      "players": "Players",
+
+      "playMode": {
+        "label": "Play mode",
+        "basic": "Basic",
+        "facilitated": "Facilitated",
+        "participants": "Participant mode"
+      },
+      "hasPhases": "Has phases",
+      "hasRoles": "Has roles",
+      "hasArtifacts": "Has artifacts",
+      "hasMaterials": "Has materials",
+      "category": "Category",
+      "difficulty": {
+        "label": "Difficulty",
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      },
+
+      "group": {
+        "basic": "Filter",
+        "facilitator": "Facilitator",
+        "participants": "Participants",
+        "material": "Materials",
+        "advanced": "Advanced"
+      },
+
+      "super": {
+        "title": "Advanced filters"
+      },
+
+      "showAdvanced": "Show more filters",
+      "hideAdvanced": "Hide advanced filters"
     },
     "environment": "Environment",
     "players": "Players",
     "count": "Count",
     "age": "Age",
     "years": "Years",
+    "minutes": "Minutes",
     "noAccess": "You don't have access to any products yet.",
     "errorTitle": "Could not load",
     "emptyTitle": "No activities found",
@@ -467,7 +526,11 @@
       "searching": "Searching...",
       "search": "Search",
       "emptyState": "Search for games to add",
-      "noResults": "No results for \"{query}\""
+      "noResults": "No results for \"{query}\"",
+      "openFilters": "Open filters",
+      "activeFilters": "{count, plural, one {# active filter} other {# active filters}}",
+      "clearFilters": "Clear filters",
+      "loadMore": "Load more"
     },
     "versions": {
       "noPublishedVersionsYet": "No published versions yet",
@@ -630,6 +693,13 @@
   "admin": {
     "pageHeader": {
       "breadcrumbsLabel": "Breadcrumbs"
+    },
+    "states": {
+      "errorState": {
+        "defaultTitle": "Something went wrong",
+        "defaultDescription": "An error occurred. Please try again.",
+        "retryButton": "Try again"
+      }
     },
     "table": {
       "pagination": {
@@ -1071,7 +1141,9 @@
         "selectOrg": "Select organization",
         "scope": "Recipients",
         "actionUrl": "Action URL",
-        "actionLabel": "Action label"
+        "actionLabel": "Action label",
+        "excludeDemoUsers": "Exclude demo users",
+        "excludeDemoUsersDesc": "Don't send to users in demo mode"
       },
       "scope": {
         "global": "All organizations",
@@ -7785,7 +7857,12 @@
       "browse": "Discover",
       "play": "Play",
       "tip": "Tip",
-      "tipText": "Add your most used filters as quick selections for faster planning."
+      "tipText": "Add your most used filters as quick selections for faster planning.",
+      "loggedInAs": "You are logged in as",
+      "viewProfile": "View profile",
+      "marketing": "Marketing",
+      "visitWebsite": "Visit website",
+      "manageApp": "Manage platform"
     },
     "notifications": {
       "title": "Notifications",
@@ -7803,7 +7880,40 @@
       "quickActions": "Quick actions",
       "startSession": "Start session",
       "createPlan": "Create plan",
-      "browseGames": "Browse games"
+      "browseGames": "Browse games",
+      "loading": "Loading...",
+      "heroTitle": "Ready for new experiences?",
+      "heroSubtitle": "Explore our collection or continue where you left off.",
+      "stats": {
+        "streakDays": "Streak days",
+        "coins": "Coins",
+        "achievements": "Achievements"
+      },
+      "pinnedAchievements": {
+        "title": "Shown on your dashboard",
+        "manage": "Manage",
+        "emptyHint": "Choose up to 3 achievements to show here.",
+        "goToAchievements": "Go to achievements"
+      },
+      "cosmetics": {
+        "title": "Cosmetics",
+        "toShop": "To shop",
+        "locked": "Loadout locked",
+        "unlockHint": "Unlock by reaching the next level.",
+        "lockedLevel": "Locked: level {level}",
+        "loading": "Loading cosmetics…",
+        "empty": "You don't have any cosmetics yet."
+      },
+      "recentActivity": {
+        "title": "Recent activity",
+        "loading": "Loading activity…",
+        "empty": "No activity yet."
+      },
+      "continue": {
+        "title": "Keep exploring",
+        "findGames": "Find new games",
+        "exploreDescription": "Explore 100+ activities for all ages and group sizes"
+      }
     },
     "gameDetail": {
       "notFoundTitle": "Game not found",
@@ -8560,6 +8670,7 @@
       },
       "actions": {
         "view": "View",
+        "viewAll": "View all",
         "markAsRead": "Mark as read",
         "delete": "Delete"
       },

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRbac } from '@/features/admin/shared/hooks/useRbac'
@@ -473,6 +473,7 @@ export function AdminSidebarV2({
     return (
       <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose?.()}>
         <SheetContent side="left" className="w-72 border-slate-800 bg-slate-900 p-0">
+          <SheetTitle className="sr-only">Admin Navigation</SheetTitle>
           <SidebarContent onNavigate={onClose} systemDesign={systemDesign} />
         </SheetContent>
       </Sheet>

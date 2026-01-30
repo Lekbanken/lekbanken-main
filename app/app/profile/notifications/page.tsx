@@ -3,11 +3,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
-import { createBrowserClient } from '@/lib/supabase/client';
 import { ProfileService, type NotificationSettings } from '@/lib/profile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { Alert } from '@/components/ui/alert';
+import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
 import {
   BellIcon,
   EnvelopeIcon,
@@ -35,14 +36,7 @@ const defaultSettings: Partial<NotificationSettings> = {
 export default function NotificationSettingsPage() {
   const t = useTranslations('app.profile');
   const { user, isLoading: authLoading } = useAuth();
-  const [supabase, setSupabase] = useState<ReturnType<typeof createBrowserClient> | null>(null);
-
-  // Initialize supabase client only in browser
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setSupabase(createBrowserClient());
-    }
-  }, []);
+  const { supabase, error: supabaseError, isInitializing } = useBrowserSupabase();
 
   const [settings, setSettings] = useState<Partial<NotificationSettings>>(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +48,11 @@ export default function NotificationSettingsPage() {
     const loadSettings = async () => {
       // Wait for auth to finish loading before deciding there's no user
       if (authLoading) return;
+
+      if (supabaseError) {
+        setIsLoading(false);
+        return;
+      }
       
       // Wait for supabase client to be initialized
       if (!supabase) return;
@@ -69,7 +68,7 @@ export default function NotificationSettingsPage() {
         const profileService = new ProfileService(supabase);
         const loadedSettings = await profileService.getNotificationSettings(user.id);
         if (loadedSettings) {
-          setSettings(loadedSettings);
+          setSettings({ ...defaultSettings, ...loadedSettings });
         }
       } catch (error) {
         console.error('Failed to load notification settings:', error);
@@ -79,7 +78,7 @@ export default function NotificationSettingsPage() {
     };
 
     loadSettings();
-  }, [user?.id, supabase, authLoading]);
+  }, [user?.id, supabase, authLoading, supabaseError]);
 
   const handleSettingChange = useCallback((key: keyof NotificationSettings, value: boolean | string) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -104,7 +103,37 @@ export default function NotificationSettingsPage() {
     }
   }, [user?.id, supabase, settings]);
 
+  if (!authLoading && supabaseError) {
+    return (
+      <div className="p-6 lg:p-8 space-y-4">
+        <Alert variant="error" title="Kunde inte ladda notifikationsinställningar">
+          <p>Det gick inte att initiera anslutningen till databasen.</p>
+          {process.env.NODE_ENV !== 'production' && (
+            <pre className="mt-2 whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs text-foreground">
+              {supabaseError.message}
+            </pre>
+          )}
+        </Alert>
+        <Button onClick={() => window.location.reload()} variant="outline">
+          Ladda om
+        </Button>
+      </div>
+    );
+  }
+
   if (isLoading) {
+    return (
+      <div className="p-6 lg:p-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 w-48 bg-muted rounded" />
+          <div className="h-4 w-72 bg-muted rounded" />
+          <div className="h-64 bg-muted rounded-lg" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isInitializing) {
     return (
       <div className="p-6 lg:p-8">
         <div className="animate-pulse space-y-4">

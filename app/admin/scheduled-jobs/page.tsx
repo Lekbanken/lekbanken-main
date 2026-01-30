@@ -372,8 +372,29 @@ function ScheduledJobsContent() {
     }
   }
 
+  // Definiera alla jobb som ska visas (även om de inte finns i pg_cron)
+  const allKnownJobs: ScheduledJob[] = [
+    ...jobs,
+    // Lägg till cleanup-demo-users om det saknas
+    ...(!jobs.some(j => j.jobname === 'cleanup-demo-users') ? [{
+      jobid: -1,
+      jobname: 'cleanup-demo-users',
+      schedule: '0 3 * * *',
+      command: 'SELECT public.cleanup_demo_users()',
+      active: false,
+    }] : []),
+    // Lägg till process-scheduled-notifications om det saknas
+    ...(!jobs.some(j => j.jobname === 'process-scheduled-notifications') ? [{
+      jobid: -2,
+      jobname: 'process-scheduled-notifications',
+      schedule: '0 2 * * *',
+      command: 'SELECT public.process_scheduled_notifications()',
+      active: false,
+    }] : []),
+  ]
+
   // Om inga cron-jobb finns, visa info om att pg_cron inte är aktiverat
-  const hasJobs = jobs.length > 0
+  const hasJobs = allKnownJobs.length > 0
 
   return (
     <div className="space-y-6">
@@ -382,13 +403,13 @@ function ScheduledJobsContent() {
         <h2 className="mb-4 text-lg font-semibold text-foreground">{t('activeJobs')}</h2>
         {hasJobs ? (
           <div className="grid gap-4 md:grid-cols-2">
-            {jobs.map((job) => {
+            {allKnownJobs.map((job) => {
               const functionName = JOB_NAME_TO_FUNCTION[job.jobname] ?? job.jobname
               return (
                 <JobCard
                   key={job.jobid}
                   job={job}
-                  latestRun={latestRunByJob[job.jobname] ?? null}
+                  latestRun={latestRunByJob[job.jobname] ?? latestRunByJob[functionName] ?? null}
                   onRunManually={() => handleRunManually(functionName)}
                   isRunning={runningJob === functionName}
                 />

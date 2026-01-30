@@ -8792,6 +8792,7 @@
       },
       "actions": {
         "view": "Vis",
+        "viewAll": "Vis alle",
         "markAsRead": "Merk som lest",
         "delete": "Slett"
       },

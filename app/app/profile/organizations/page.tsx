@@ -3,13 +3,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
-import { createBrowserClient } from '@/lib/supabase/client';
 import { ProfileService, type OrganizationMembership } from '@/lib/profile';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Alert } from '@/components/ui/alert';
+import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
 import {
   BuildingOffice2Icon,
   UserGroupIcon,
@@ -38,15 +39,8 @@ const orgTypeIcons: Record<string, React.ElementType> = {
 export default function OrganizationsPage() {
   const t = useTranslations('app.profile');
   const { user, isLoading: authLoading } = useAuth();
-  const [supabase, setSupabase] = useState<ReturnType<typeof createBrowserClient> | null>(null);
+  const { supabase, error: supabaseError, isInitializing } = useBrowserSupabase();
   const roleLabels = useMemo(() => getRoleLabels(t), [t]);
-
-  // Initialize supabase client only in browser
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setSupabase(createBrowserClient());
-    }
-  }, []);
 
   const [memberships, setMemberships] = useState<OrganizationMembership[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,7 +49,12 @@ export default function OrganizationsPage() {
     const loadMemberships = async () => {
       // Wait for auth to finish loading before deciding there's no user
       if (authLoading) return;
-      
+
+      if (supabaseError) {
+        setIsLoading(false);
+        return;
+      }
+       
       // Wait for supabase client to be initialized
       if (!supabase) return;
       
@@ -81,11 +80,29 @@ export default function OrganizationsPage() {
     };
 
     loadMemberships();
-  }, [user?.id, supabase, authLoading]);
+  }, [user?.id, supabase, authLoading, supabaseError]);
 
   const ownedOrgs = memberships.filter((m) => m.role === 'owner');
   const adminOrgs = memberships.filter((m) => m.role === 'admin');
   const memberOrgs = memberships.filter((m) => m.role === 'member' || m.role === 'editor');
+
+  if (!authLoading && supabaseError) {
+    return (
+      <div className="p-6 lg:p-8 space-y-4">
+        <Alert variant="error" title="Kunde inte ladda organisationer">
+          <p>Det gick inte att initiera anslutningen till databasen.</p>
+          {process.env.NODE_ENV !== 'production' && (
+            <pre className="mt-2 whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs text-foreground">
+              {supabaseError.message}
+            </pre>
+          )}
+        </Alert>
+        <Button onClick={() => window.location.reload()} variant="outline">
+          Ladda om
+        </Button>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -97,6 +114,18 @@ export default function OrganizationsPage() {
             <div className="h-32 bg-muted rounded-lg" />
             <div className="h-32 bg-muted rounded-lg" />
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isInitializing) {
+    return (
+      <div className="p-6 lg:p-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 w-48 bg-muted rounded" />
+          <div className="h-4 w-72 bg-muted rounded" />
+          <div className="h-64 bg-muted rounded-lg" />
         </div>
       </div>
     );

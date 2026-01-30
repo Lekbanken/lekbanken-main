@@ -23,6 +23,8 @@ export interface SendNotificationParams {
   actionLabel?: string
   /** Schedule for later (ISO string). If omitted, sends immediately. */
   scheduleAt?: string
+  /** Exclude demo users from notification. Defaults to true. */
+  excludeDemoUsers?: boolean
 }
 
 export interface SendNotificationResult {
@@ -238,17 +240,24 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
         
         if (!isScheduled) {
           // Generate deliveries immediately for all users
-          const { data: allUsers, error: usersError } = await supabase
-            .from('users')
-            .select('id')
+          // Optionally exclude demo users (default: true)
+          const excludeDemo = params.excludeDemoUsers !== false
+          
+          let usersQuery = supabase.from('users').select('id, is_demo_user')
+          const { data: allUsers, error: usersError } = await usersQuery
           
           if (usersError) {
             console.error('sendAdminNotification fetch users error:', usersError)
             return { success: false, error: 'Kunde inte hämta användare' }
           }
           
-          if (allUsers && allUsers.length > 0) {
-            const deliveries = allUsers.map((u) => ({
+          // Filter out demo users if excludeDemo is true
+          const filteredUsers = excludeDemo
+            ? (allUsers || []).filter((u) => !u.is_demo_user)
+            : allUsers || []
+          
+          if (filteredUsers.length > 0) {
+            const deliveries = filteredUsers.map((u) => ({
               notification_id: notification.id,
               user_id: u.id,
               delivered_at: new Date().toISOString(),
@@ -264,7 +273,7 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
               // Don't fail completely, notification is created
             }
             
-            sentCount = allUsers.length
+            sentCount = filteredUsers.length
           }
         } else {
           sentCount = 1 // Scheduled
@@ -291,9 +300,12 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
         
         if (!isScheduled) {
           // Generate deliveries for all users in tenant
+          // Optionally exclude demo users (default: true)
+          const excludeDemo = params.excludeDemoUsers !== false
+          
           const { data: members, error: membersError } = await supabase
             .from('user_tenant_memberships')
-            .select('user_id')
+            .select('user_id, users:user_id (is_demo_user)')
             .eq('tenant_id', params.tenantId!)
           
           if (membersError) {
@@ -301,8 +313,16 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
             return { success: false, error: 'Kunde inte hämta medlemmar' }
           }
           
-          if (members && members.length > 0) {
-            const deliveries = members.map((m) => ({
+          // Filter out demo users if excludeDemo is true
+          const filteredMembers = excludeDemo
+            ? (members || []).filter((m) => {
+                const userInfo = m.users as { is_demo_user: boolean | null } | null
+                return !userInfo?.is_demo_user
+              })
+            : members || []
+          
+          if (filteredMembers.length > 0) {
+            const deliveries = filteredMembers.map((m) => ({
               notification_id: notification.id,
               user_id: m.user_id,
               delivered_at: new Date().toISOString(),
@@ -317,7 +337,7 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
               console.error('sendAdminNotification delivery insert error:', deliveryError)
             }
             
-            sentCount = members.length
+            sentCount = filteredMembers.length
           }
         } else {
           sentCount = 1 // Scheduled

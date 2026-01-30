@@ -93,10 +93,13 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const supabase = createBrowserClient();
+  // Client components can still render on the server in Next.js; avoid
+  // calling `createBrowserClient()` when `window` is not available.
+  const supabase = typeof window !== 'undefined' ? createBrowserClient() : null;
 
   // Fetch notifications via RPC
   const fetchNotifications = useCallback(async () => {
+    if (!supabase) return;
     try {
       setError(null);
 
@@ -146,6 +149,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // Mark as read
   const markAsRead = useCallback(
     async (deliveryId: string) => {
+      if (!supabase) return;
       startTransition(async () => {
         const { error: rpcError } = await (supabase.rpc as AnyRpc)(
           'mark_notification_read',
@@ -171,6 +175,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
 
   // Mark all as read
   const markAllAsRead = useCallback(async () => {
+    if (!supabase) return;
     startTransition(async () => {
       const { error: rpcError } = await (supabase.rpc as AnyRpc)(
         'mark_all_notifications_read'
@@ -192,6 +197,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // Dismiss
   const dismiss = useCallback(
     async (deliveryId: string) => {
+      if (!supabase) return;
       startTransition(async () => {
         const { error: rpcError } = await (supabase.rpc as AnyRpc)(
           'dismiss_notification',

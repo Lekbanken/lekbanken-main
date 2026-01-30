@@ -1,16 +1,19 @@
 ﻿"use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Toggle } from "@/components/ui/toggle";
 import { useTenant } from "@/lib/context/TenantContext";
+import { useAuth } from "@/lib/supabase/auth";
+import { getUserPlayModesFromContext } from "@/lib/auth/playModeCapabilities";
 import { FilterBar } from "./components/FilterBar";
-import { FilterSheet } from "./components/FilterSheet";
+import { FilterSheetV2 } from "./components/FilterSheetV2";
+import { useBrowseFilters } from "./hooks/useBrowseFilters";
 import { GameCard, GameCardSkeleton } from "@/components/game/GameCard";
 import { SearchBar } from "./components/SearchBar";
-import type { BrowseFilters, FilterOptions, SortOption } from "./types";
+import type { BrowseFilters, SortOption } from "./types";
 import type { GameSummary } from "@/lib/game-display";
 import { mapDbGameToSummary } from "@/lib/game-display";
 import type { Tables } from "@/types/supabase";
@@ -18,7 +21,6 @@ import type { GameReactionMap } from "@/types/game-reaction";
 import { cn } from "@/lib/utils";
 import { PageTitleHeader } from "@/components/app/PageTitleHeader";
 import { appNavItems } from "@/components/app/nav-items";
-import { createBrowserClient } from "@/lib/supabase/client";
 
 type GameMediaWithAsset = Tables<"game_media"> & { media?: Tables<"media"> | null };
 
@@ -88,15 +90,31 @@ export function BrowsePage() {
   const [sort, setSort] = useState<SortOption>("relevance");
   const [page, setPage] = useState(1);
   const [view, setView] = useState<"grid" | "list">("grid");
-  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [noAccess, setNoAccess] = useState(false);
-  const { currentTenant } = useTenant();
-
+  
+  // Auth and tenant context
+  const { currentTenant, tenantRole } = useTenant();
+  const { effectiveGlobalRole, userProfile } = useAuth();
   const tenantId = currentTenant?.id ?? null;
+  
+  // Derive user play modes from their role/context
+  const userPlayModes = useMemo(() => {
+    const isDemoUser = userProfile?.is_demo_user ?? false;
+    return getUserPlayModesFromContext(effectiveGlobalRole, tenantRole, isDemoUser);
+  }, [effectiveGlobalRole, tenantRole, userProfile?.is_demo_user]);
+  
+  // Use the new browse filters hook (replaces manual fetchFilters)
+  const {
+    options: filterOptions,
+    visibleGroups,
+    hasSuperFilters,
+    isLoading: isLoadingFilters,
+    error: filterError,
+  } = useBrowseFilters(tenantId, userPlayModes);
 
   // Reset filters when tenant changes to avoid stale, disallowed selections
   useEffect(() => {
@@ -113,31 +131,14 @@ export function BrowsePage() {
     return () => clearTimeout(handle);
   }, [searchInput]);
 
-  const fetchFilters = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/browse/filters${tenantId ? `?tenantId=${tenantId}` : ""}`);
-      if (!res.ok) throw new Error("Failed to load filters");
-      const json = (await res.json()) as {
-        products: { id: string; name: string | null }[];
-        purposes: { id: string; name: string | null }[];
-        subPurposes: { id: string; name: string | null; parent_id?: string | null }[];
-        metadata?: { allowedProducts?: string[] };
-      };
-      setFilterOptions({
-        products: json.products ?? [],
-        mainPurposes: json.purposes ?? [],
-        subPurposes: json.subPurposes ?? [],
-      });
-      if (tenantId && (json.metadata?.allowedProducts?.length ?? 0) === 0) {
-        setNoAccess(true);
-      } else {
-        setNoAccess(false);
-      }
-    } catch (err) {
-      console.error("[BrowsePage] filter fetch failed", err);
-      setFilterOptions({ products: [], mainPurposes: [], subPurposes: [] });
+  // Handle noAccess based on filterOptions (no products available)
+  useEffect(() => {
+    if (tenantId && filterOptions && filterOptions.products.length === 0) {
+      setNoAccess(true);
+    } else {
+      setNoAccess(false);
     }
-  }, [tenantId]);
+  }, [tenantId, filterOptions]);
 
   const fetchGames = useCallback(
     async (payload: {
@@ -227,28 +228,23 @@ export function BrowsePage() {
         // Fetch reactions for these games (non-blocking)
         const gameIds = mapped.map((g) => g.id);
         if (gameIds.length > 0) {
-          const supabase = createBrowserClient();
-          Promise.resolve(
-            supabase.rpc('get_game_reactions_batch', {
-              p_game_ids: gameIds,
-            })
-          ).then(({ data: reactionsData, error: reactionsError }) => {
-            if (reactionsError) {
-              console.warn('Failed to fetch reactions:', reactionsError);
-              return;
-            }
-            if (reactionsData && Array.isArray(reactionsData)) {
-              const newReactions: GameReactionMap = {};
-              for (const r of reactionsData) {
-                if (r.game_id && r.reaction) {
-                  newReactions[r.game_id] = r.reaction as 'like' | 'dislike';
-                }
+          fetch('/api/game-reactions/batch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gameIds }),
+          })
+            .then((res) => res.json())
+            .then((json: { success?: boolean; reactions?: GameReactionMap; error?: string }) => {
+              if (!json?.success || !json.reactions) {
+                console.warn('Failed to fetch reactions:', json?.error ?? 'Unknown error')
+                return
               }
-              setReactions((prev) => (append ? { ...prev, ...newReactions } : newReactions));
-            }
-          }).catch((err) => {
-            console.warn('Failed to fetch reactions:', err);
-          });
+              const reactionMap = json.reactions
+              setReactions((prev) => (append ? { ...prev, ...reactionMap } : reactionMap))
+            })
+            .catch((err) => {
+              console.warn('Failed to fetch reactions:', err)
+            })
         }
       } catch (err) {
         console.error("Failed to load games:", err);
@@ -263,11 +259,6 @@ export function BrowsePage() {
     },
     [fetchGames, debouncedSearch, filters, tenantId, sort]
   );
-
-  // Fetch filter options on mount/tenant change
-  useEffect(() => {
-    void fetchFilters();
-  }, [fetchFilters]);
 
   // Reset paging when inputs change
   useEffect(() => {
@@ -381,11 +372,13 @@ export function BrowsePage() {
         }}
         onViewChange={setView}
       />
-      <FilterSheet
+      <FilterSheetV2
         open={isSheetOpen}
         onOpenChange={setSheetOpen}
         filters={filters}
         options={filterOptions}
+        visibleGroups={visibleGroups}
+        hasSuperFilters={hasSuperFilters}
         onApply={handleApplyFilters}
         onClearAll={handleClearAll}
       />

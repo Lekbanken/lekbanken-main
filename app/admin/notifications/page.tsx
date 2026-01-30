@@ -49,6 +49,7 @@ export default function NotificationsAdminPage() {
   const [notificationCategory, setNotificationCategory] = useState('system');
   const [actionUrl, setActionUrl] = useState('');
   const [actionLabel, setActionLabel] = useState('');
+  const [excludeDemoUsers, setExcludeDemoUsers] = useState(true);
 
   // UI state
   const [isSending, setIsSending] = useState(false);
@@ -170,6 +171,7 @@ export default function NotificationsAdminPage() {
       category: notificationCategory,
       actionUrl: actionUrl || undefined,
       actionLabel: actionLabel || undefined,
+      excludeDemoUsers,
     };
 
     console.log('[Notifications] Sending with params:', params);
@@ -455,6 +457,23 @@ export default function NotificationsAdminPage() {
                   onChange={(e) => setActionLabel(e.target.value)}
                   placeholder={t('placeholders.actionLabel')}
                 />
+              </div>
+            )}
+
+            {/* Exclude demo users toggle */}
+            {scope !== 'users' && (
+              <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/30 p-4">
+                <input
+                  type="checkbox"
+                  id="excludeDemoUsers"
+                  checked={excludeDemoUsers}
+                  onChange={(e) => setExcludeDemoUsers(e.target.checked)}
+                  className="h-4 w-4 rounded border-border"
+                />
+                <label htmlFor="excludeDemoUsers" className="flex-1 cursor-pointer">
+                  <div className="text-sm font-medium text-foreground">{t('form.excludeDemoUsers')}</div>
+                  <div className="text-xs text-muted-foreground">{t('form.excludeDemoUsersDesc')}</div>
+                </label>
               </div>
             )}
 

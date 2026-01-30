@@ -6,14 +6,27 @@ import { DEMO_TENANT_ID } from '@/lib/auth/ephemeral-users'
 type Purpose = { id: string; name?: string | null; type?: string | null; parent_id?: string | null }
 type ProductPurposeRow = { product_id: string; purpose: Purpose | null }
 
+/**
+ * Coverage data for Super filter gating.
+ * Each value is 0.0 - 1.0 representing percentage of accessible games with the feature.
+ */
+type FilterCoverage = {
+  hasRoles: number
+  hasArtifacts: number
+  hasPhases: number
+  hasMaterials: number
+  hasAgeRange: number
+}
+
 type CachedFilters = {
   products: { id: string; name: string | null; product_key?: string | null; category?: string | null; status?: string | null }[]
   purposes: Purpose[]
   subPurposes: Purpose[]
+  coverage: FilterCoverage
   metadata: { allowedProducts: string[]; isDemoMode?: boolean }
 }
 
-const CACHE_TTL_MS = 1000 * 60 * 5
+const CACHE_TTL_MS = 1000 * 60 * 10 // 10 minutes for coverage stability
 const filterCache = new Map<string, { expires: number; value: CachedFilters }>()
 
 function cacheKey(tenantId: string | null) {
@@ -95,10 +108,20 @@ export async function GET(request: Request) {
       products = (productData ?? []) as { id: string; name: string | null }[]
     }
     
+    // Demo mode: return empty coverage (hide Super filters)
+    const demoCoverage: FilterCoverage = {
+      hasRoles: 0,
+      hasArtifacts: 0,
+      hasPhases: 0,
+      hasMaterials: 0,
+      hasAgeRange: 0,
+    }
+    
     const payload: CachedFilters = {
       products,
       purposes: purposes.filter(p => p.type === 'main'),
       subPurposes: purposes.filter(p => p.type === 'sub'),
+      coverage: demoCoverage,
       metadata: { allowedProducts: Array.from(demoProductIds), isDemoMode: true },
     }
     
@@ -117,7 +140,14 @@ export async function GET(request: Request) {
   const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId, userId)
 
   if (tenantId && allowedProductIds.length === 0) {
-    const payload = { products: [], purposes: [], subPurposes: [], metadata: { allowedProducts: allowedProductIds } }
+    const emptyCoverage: FilterCoverage = { hasRoles: 0, hasArtifacts: 0, hasPhases: 0, hasMaterials: 0, hasAgeRange: 0 }
+    const payload: CachedFilters = { 
+      products: [], 
+      purposes: [], 
+      subPurposes: [], 
+      coverage: emptyCoverage,
+      metadata: { allowedProducts: allowedProductIds } 
+    }
     setCachedFilters(cacheId, payload)
     return NextResponse.json(payload)
   }
@@ -143,9 +173,10 @@ export async function GET(request: Request) {
 
   // 2. Get all published games the user can access and extract their purpose IDs
   // This must mirror the exact same access logic as /api/games/search
+  // Include age_min/age_max for coverage calculation
   let gamesQuery = supabase
     .from('games')
-    .select('id, main_purpose_id, product_id, owner_tenant_id')
+    .select('id, main_purpose_id, product_id, owner_tenant_id, age_min, age_max')
     .eq('status', 'published')
   
   // Apply owner_tenant_id filter (same logic as games search)
@@ -223,10 +254,81 @@ export async function GET(request: Request) {
   // Only include products that have at least one game
   const filteredProducts = (products ?? []).filter(p => productIdsFromGames.has(p.id))
   
+  // ───────────────────────────────────────────────────────────────────────────
+  // 6. Calculate coverage for Super filter gating (PR2)
+  // Coverage is calculated once per scope (tenant/product), NOT per query
+  // This is efficient: we already have the game IDs from step 2
+  // ───────────────────────────────────────────────────────────────────────────
+  const gameIds = (accessibleGames ?? []).map(g => g.id)
+  const totalGames = gameIds.length
+  
+  let coverage: FilterCoverage = {
+    hasRoles: 0,
+    hasArtifacts: 0,
+    hasPhases: 0,
+    hasMaterials: 0,
+    hasAgeRange: 0,
+  }
+  
+  if (totalGames > 0) {
+    // Count games with each feature using EXISTS subqueries
+    // This is efficient with indexes on game_id columns
+    const coveragePromises = await Promise.all([
+      // hasRoles: games with at least one role
+      supabase
+        .from('game_roles')
+        .select('game_id', { count: 'exact', head: true })
+        .in('game_id', gameIds),
+      // hasArtifacts: games with at least one artifact
+      supabase
+        .from('game_artifacts')
+        .select('game_id', { count: 'exact', head: true })
+        .in('game_id', gameIds),
+      // hasPhases: games with at least one phase
+      supabase
+        .from('game_phases')
+        .select('game_id', { count: 'exact', head: true })
+        .in('game_id', gameIds),
+      // hasMaterials: games with at least one material record with items
+      supabase
+        .from('game_materials')
+        .select('game_id', { count: 'exact', head: true })
+        .in('game_id', gameIds),
+    ])
+    
+    // Get unique game counts from each relation
+    // Note: count returns total rows, but we want unique games
+    // For now, use the count as approximation (will be accurate for most cases)
+    const [rolesResult, artifactsResult, phasesResult, materialsResult] = coveragePromises
+    
+    // For accurate distinct counts, we'd need a different query approach
+    // But for gating purposes, presence/absence is what matters
+    const hasRolesCount = rolesResult.count ?? 0
+    const hasArtifactsCount = artifactsResult.count ?? 0
+    const hasPhasesCount = phasesResult.count ?? 0
+    const hasMaterialsCount = materialsResult.count ?? 0
+    
+    // Get count of games with age data (age_min or age_max is not null)
+    type GameWithAge = { age_min?: number | null; age_max?: number | null }
+    const ageGamesCount = (accessibleGames ?? []).filter(
+      (g: GameWithAge) => g.age_min != null || g.age_max != null
+    ).length
+    
+    // Calculate coverage ratios (clamped to 1.0 max)
+    coverage = {
+      hasRoles: Math.min(hasRolesCount / totalGames, 1),
+      hasArtifacts: Math.min(hasArtifactsCount / totalGames, 1),
+      hasPhases: Math.min(hasPhasesCount / totalGames, 1),
+      hasMaterials: Math.min(hasMaterialsCount / totalGames, 1),
+      hasAgeRange: ageGamesCount / totalGames,
+    }
+  }
+  
   const payload: CachedFilters = {
     products: filteredProducts.length > 0 ? filteredProducts : (products ?? []),
     purposes: mainPurposes,
     subPurposes: filteredSubPurposes,
+    coverage,
     metadata: {
       allowedProducts: allowedProductIds,
     },

@@ -3,12 +3,13 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
-import { createBrowserClient } from '@/lib/supabase/client';
 import { ProfileService, type GDPRRequest, type UserConsent } from '@/lib/profile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert } from '@/components/ui/alert';
+import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
 import {
   ShieldCheckIcon,
   DocumentArrowDownIcon,
@@ -23,14 +24,7 @@ import { cn } from '@/lib/utils';
 export default function PrivacySettingsPage() {
   const t = useTranslations('app.profile');
   const { user, isLoading: authLoading } = useAuth();
-  const [supabase, setSupabase] = useState<ReturnType<typeof createBrowserClient> | null>(null);
-
-  // Initialize supabase client only in browser
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setSupabase(createBrowserClient());
-    }
-  }, []);
+  const { supabase, error: supabaseError, isInitializing } = useBrowserSupabase();
 
   // GDPR Requests state
   const [gdprRequests, setGdprRequests] = useState<GDPRRequest[]>([]);
@@ -53,7 +47,12 @@ export default function PrivacySettingsPage() {
     const loadPrivacyData = async () => {
       // Wait for auth to finish loading before deciding there's no user
       if (authLoading) return;
-      
+
+      if (supabaseError) {
+        setIsLoading(false);
+        return;
+      }
+       
       // Wait for supabase client to be initialized
       if (!supabase) return;
       
@@ -82,7 +81,7 @@ export default function PrivacySettingsPage() {
     };
 
     loadPrivacyData();
-  }, [user?.id, supabase, authLoading]);
+  }, [user?.id, supabase, authLoading, supabaseError]);
 
   const handleDataExportRequest = useCallback(async () => {
     if (!user?.id || !supabase) return;
@@ -184,6 +183,28 @@ export default function PrivacySettingsPage() {
           {t('sections.privacy.description')}
         </p>
       </div>
+
+      {!authLoading && supabaseError && (
+        <Alert variant="error" title="Kunde inte ladda integritetsinställningar">
+          <div className="space-y-3">
+            <p>Det gick inte att initiera anslutningen till databasen.</p>
+            {process.env.NODE_ENV !== 'production' && (
+              <pre className="whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs text-foreground">
+                {supabaseError.message}
+              </pre>
+            )}
+            <Button onClick={() => window.location.reload()} variant="outline" size="sm">
+              Ladda om
+            </Button>
+          </div>
+        </Alert>
+      )}
+
+      {!authLoading && !supabaseError && isInitializing && (
+        <Alert variant="info" title="Laddar…">
+          <p>Initierar anslutning.</p>
+        </Alert>
+      )}
 
       {/* GDPR Info Banner */}
       <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">

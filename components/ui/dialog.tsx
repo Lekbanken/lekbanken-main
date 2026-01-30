@@ -12,6 +12,32 @@ export const DialogClose = DialogPrimitive.Close
 
 const DialogPortal = DialogPrimitive.Portal
 
+function hasDialogDescription(node: React.ReactNode): boolean {
+  let found = false
+
+  const visit = (child: React.ReactNode) => {
+    if (found || child == null || typeof child === 'boolean') return
+
+    if (Array.isArray(child)) {
+      for (const c of child) visit(c)
+      return
+    }
+
+    if (!React.isValidElement(child)) return
+
+    if (child.type === DialogDescription || child.type === DialogPrimitive.Description) {
+      found = true
+      return
+    }
+
+    const props = child.props as { children?: React.ReactNode } | undefined
+    if (props?.children) visit(props.children)
+  }
+
+  visit(node)
+  return found
+}
+
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
@@ -32,6 +58,9 @@ export const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
   const tActions = useTranslations('common.actions')
+  const hasDescription = hasDialogDescription(children)
+  const shouldUnsetDescribedBy =
+    !hasDescription && !Object.prototype.hasOwnProperty.call(props, 'aria-describedby')
 
   return (
     <DialogPortal>
@@ -42,6 +71,7 @@ export const DialogContent = React.forwardRef<
           'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-2xl border border-border bg-card p-6 shadow-xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95',
           className,
         )}
+        {...(shouldUnsetDescribedBy ? { 'aria-describedby': undefined } : {})}
         {...props}
       >
         {children}

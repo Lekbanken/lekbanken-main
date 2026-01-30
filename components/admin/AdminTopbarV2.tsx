@@ -4,8 +4,6 @@ import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { ProfileMenu } from '@/components/navigation/ProfileMenu'
 import { ThemeToggle } from '@/components/navigation/ThemeToggle'
-import { AdminNotificationsCenter } from './AdminNotificationsCenter'
-import { useRealAdminNotifications } from './useRealAdminNotifications'
 import { useAdminMode } from './useAdminMode'
 import { useRbac } from '@/features/admin/shared/hooks/useRbac'
 import { useTenant } from '@/lib/context/TenantContext'
@@ -132,8 +130,6 @@ function ModeIndicator() {
 
 export function AdminTopbarV2({ onToggleSidebar }: AdminTopbarV2Props) {
   const t = useTranslations('admin.nav')
-  // Use real notifications from database instead of demo data
-  const { notifications, markAsRead, markAllAsRead, dismiss } = useRealAdminNotifications()
 
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/95 px-4 backdrop-blur-sm lg:px-6">
@@ -156,13 +152,8 @@ export function AdminTopbarV2({ onToggleSidebar }: AdminTopbarV2Props) {
         <ModeIndicator />
 
         <div className="flex items-center gap-1.5">
-          <AdminNotificationsCenter
-            notifications={notifications}
-            onMarkAsRead={markAsRead}
-            onMarkAllAsRead={markAllAsRead}
-            onDismiss={dismiss}
-          />
-
+          {/* Notifications removed from admin - admin only creates, app consumes */}
+          
           <ThemeToggle />
           
           <div className="ml-1">

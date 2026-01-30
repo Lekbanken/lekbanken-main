@@ -10,6 +10,32 @@ export const SheetClose = SheetPrimitive.Close
 
 const SheetPortal = SheetPrimitive.Portal
 
+function hasSheetDescription(node: React.ReactNode): boolean {
+  let found = false
+
+  const visit = (child: React.ReactNode) => {
+    if (found || child == null || typeof child === 'boolean') return
+
+    if (Array.isArray(child)) {
+      for (const c of child) visit(c)
+      return
+    }
+
+    if (!React.isValidElement(child)) return
+
+    if (child.type === SheetDescription || child.type === SheetPrimitive.Description) {
+      found = true
+      return
+    }
+
+    const props = child.props as { children?: React.ReactNode } | undefined
+    if (props?.children) visit(props.children)
+  }
+
+  visit(node)
+  return found
+}
+
 const SheetOverlay = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
@@ -43,22 +69,29 @@ function sideClasses(side: SheetSide) {
 export const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & { side?: SheetSide }
->(({ className, children, side = 'right', ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content
-      ref={ref}
-      className={cn(
-        'fixed z-50 gap-4 bg-card p-6 shadow-xl outline-none transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out',
-        sideClasses(side),
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </SheetPrimitive.Content>
-  </SheetPortal>
-))
+>(({ className, children, side = 'right', ...props }, ref) => {
+  const hasDescription = hasSheetDescription(children)
+  const shouldUnsetDescribedBy =
+    !hasDescription && !Object.prototype.hasOwnProperty.call(props, 'aria-describedby')
+
+  return (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        ref={ref}
+        className={cn(
+          'fixed z-50 gap-4 bg-card p-6 shadow-xl outline-none transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out',
+          sideClasses(side),
+          className,
+        )}
+        {...(shouldUnsetDescribedBy ? { 'aria-describedby': undefined } : {})}
+        {...props}
+      >
+        {children}
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  )
+})
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 export const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

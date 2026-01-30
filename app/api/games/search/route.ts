@@ -1,7 +1,18 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { getAllowedProductIds } from '@/app/api/games/utils'
-import { buildGroupSizeOr, computeHasMore, normalizeEnvironment, searchSchema } from './helpers'
+import { 
+  applyTranslation,
+  applySortOrder,
+  buildGroupSizeOr, 
+  computeHasMore, 
+  defaultLocale,
+  GAME_SUMMARY_SELECT,
+  normalizeEnvironment, 
+  searchSchema,
+  type SortMode,
+  type SupportedLocale,
+} from './helpers'
 import { DEMO_TENANT_ID } from '@/lib/auth/ephemeral-users'
 
 async function getSubPurposeGameIds(
@@ -61,7 +72,11 @@ export async function POST(request: Request) {
     page,
     pageSize,
     status = 'published',
+    locale = defaultLocale,
   } = parsed.data
+
+  // Effective locale for translation lookup
+  const effectiveLocale: SupportedLocale = locale ?? defaultLocale
 
   const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
   const isElevated = role === 'system_admin' || role === 'superadmin' || role === 'admin' || role === 'owner'
@@ -75,17 +90,7 @@ export async function POST(request: Request) {
     
     let demoQuery = supabase
       .from('games')
-      .select(
-        `
-          *,
-          owner:tenants(id,name),
-          media:game_media(*, media:media(*)),
-          product:products(*),
-          main_purpose:purposes!main_purpose_id(*),
-          secondary_purposes:game_secondary_purposes(purpose:purposes(*))
-        `,
-        { count: 'exact' }
-      )
+      .select(GAME_SUMMARY_SELECT, { count: 'exact' })
       .eq('status', 'published')
       .eq('is_demo_content', true)
     
@@ -116,18 +121,8 @@ export async function POST(request: Request) {
       demoQuery = demoQuery.or(groupSizeOr)
     }
     
-    // Sort demo games
-    switch (sort) {
-      case 'name':
-        demoQuery = demoQuery.order('name', { ascending: true })
-        break
-      case 'duration':
-        demoQuery = demoQuery.order('time_estimate_min', { ascending: true, nullsFirst: true })
-        break
-      default:
-        demoQuery = demoQuery.order('created_at', { ascending: false })
-        break
-    }
+    // Apply stable sort order (uses index)
+    demoQuery = applySortOrder(demoQuery, sort as SortMode)
     
     demoQuery = demoQuery.range(offset, offset + pageSize - 1)
     
@@ -138,16 +133,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to load demo games' }, { status: 500 })
     }
     
-    const games = demoGames ?? []
-    const total = demoCount ?? games.length
+    // Apply translations to each game
+    const gamesWithTranslations = (demoGames ?? []).map(game => 
+      applyTranslation(game, effectiveLocale)
+    )
+    
+    const total = demoCount ?? gamesWithTranslations.length
     const hasMore = computeHasMore(total, page, pageSize)
     
     return NextResponse.json({
-      games,
+      games: gamesWithTranslations,
       total,
       page,
       pageSize,
       hasMore,
+      locale: effectiveLocale,
       metadata: { allowedProducts: [], isDemoMode: true },
     })
   }
@@ -200,17 +200,7 @@ export async function POST(request: Request) {
 
   let query = supabase
     .from('games')
-    .select(
-      `
-        *,
-        owner:tenants(id,name),
-        media:game_media(*, media:media(*)),
-        product:products(*),
-        main_purpose:purposes!main_purpose_id(*),
-        secondary_purposes:game_secondary_purposes(purpose:purposes(*))
-      `,
-      { count: 'exact' }
-    )
+    .select(GAME_SUMMARY_SELECT, { count: 'exact' })
 
   if (!isElevated) {
     query = query.eq('status', 'published')
@@ -295,34 +285,8 @@ export async function POST(request: Request) {
     query = query.or(groupSizeOr)
   }
 
-  // Sorting (server-side best effort)
-  switch (sort) {
-    case 'name':
-      query = query.order('name', { ascending: true })
-      break
-    case 'duration':
-      query = query.order('time_estimate_min', { ascending: true, nullsFirst: true })
-      break
-    case 'popular':
-      query = query
-        .order('popularity_score', { ascending: false })
-        .order('rating_count', { ascending: false })
-      break
-    case 'rating':
-      query = query
-        .order('rating_average', { ascending: false })
-        .order('rating_count', { ascending: false })
-      break
-    case 'relevance':
-      query = query
-        .order('popularity_score', { ascending: false })
-        .order('created_at', { ascending: false })
-      break
-    case 'newest':
-    default:
-      query = query.order('created_at', { ascending: false })
-      break
-  }
+  // Apply stable sort order (uses index for performance)
+  query = applySortOrder(query, sort as SortMode)
 
   query = query.range(offset, offset + pageSize - 1)
 
@@ -333,8 +297,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to load games' }, { status: 500 })
   }
 
-  const games = data ?? []
-  const total = count ?? games.length
+  // Apply translations to each game
+  const gamesWithTranslations = (data ?? []).map(game => 
+    applyTranslation(game, effectiveLocale)
+  )
+  
+  const total = count ?? gamesWithTranslations.length
   const hasMore = computeHasMore(total, page, pageSize)
 
   // Log search (best effort)
@@ -359,9 +327,10 @@ export async function POST(request: Request) {
           sort,
           page,
           pageSize,
+          locale: effectiveLocale,
         },
-        results_count: games.length,
-        result_ids: (games as Array<{ id: string }>).slice(0, pageSize).map((g) => g.id),
+        results_count: gamesWithTranslations.length,
+        result_ids: (gamesWithTranslations as Array<{ id: string }>).slice(0, pageSize).map((g) => g.id),
         user_id: userId,
         tenant_id: tenantId,
       })
@@ -371,11 +340,12 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({
-    games,
+    games: gamesWithTranslations,
     total,
     page,
     pageSize,
     hasMore,
+    locale: effectiveLocale,
     metadata: {
       allowedProducts: allowedProductIds,
     },

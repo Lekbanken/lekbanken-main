@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   PuzzlePieceIcon,
   PlusIcon,
@@ -78,6 +78,7 @@ export function GameAdminPage() {
   const { success, warning, info } = useToast();
   const router = useRouter();
   const t = useTranslations('admin.games');
+  const locale = useLocale();
 
   const [games, setGames] = useState<GameWithRelations[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -121,7 +122,7 @@ export function GameAdminPage() {
         fetch('/api/games/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tenantId, page: 1, pageSize: 50, status: statusFilter }),
+          body: JSON.stringify({ tenantId, page: 1, pageSize: 50, status: statusFilter, locale }),
         }),
         fetch('/api/tenants'),
         fetch('/api/purposes'),
@@ -155,7 +156,7 @@ export function GameAdminPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [canView, filters.status, filters.tenant, t]);
+  }, [canView, filters.status, filters.tenant, t, locale]);
 
   useEffect(() => {
     let active = true;

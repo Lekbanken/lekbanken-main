@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BlockList } from '../../components/BlockList';
@@ -26,6 +26,7 @@ interface StepByggPlanProps {
 export function StepByggPlan({ plan, capabilities, onPlanUpdate, wizard }: StepByggPlanProps) {
   const t = useTranslations('planner.wizard.steps.bygg');
   const tc = useTranslations('common.actions');
+  const locale = useLocale();
   const { withFeedback, withSilentFeedback, isPending } = useActionFeedback();
 
   const [editingBlock, setEditingBlock] = useState<PlannerBlock | null>(null);
@@ -225,6 +226,7 @@ export function StepByggPlan({ plan, capabilities, onPlanUpdate, wizard }: StepB
       />
 
       <GamePicker
+        key={locale}
         open={showGamePicker}
         onOpenChange={setShowGamePicker}
         onSelect={(game) => void handleGameSelected(game)}

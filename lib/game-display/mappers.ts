@@ -31,12 +31,16 @@ import type {
 /**
  * Typ för games-tabell från Supabase (med relationer)
  * Denna matchar strukturen från lib/services/games.server.ts
+ * 
+ * Note: Database column is `game_key`, mapped to `slug` in GameSummary
  */
 export interface DbGame {
   id: string;
   name: string;
-  slug?: string | null;
+  game_key?: string | null;  // Database column name
+  slug?: string | null;       // Legacy/alias (some services may use this)
   description?: string | null;
+  short_description?: string | null;  // Base short description
   instructions?: string | null;
   status?: string | null;
   play_mode?: string | null;
@@ -56,6 +60,9 @@ export interface DbGame {
   accessibility_notes?: string | null;
   space_requirements?: string | null;
   leader_tips?: string | null;
+  // Pre-computed translated fields (from API applyTranslation)
+  _translatedTitle?: string;
+  _translatedShortDescription?: string;
   // Relationer
   media?: Array<{
     id?: string;
@@ -306,14 +313,23 @@ export function mapDbGameToSummary(
   dbGame: DbGame,
   options?: { localeOrder?: string[] }
 ): GameSummary {
+  // Use pre-computed translations from API if available (Browse/Planner)
+  // Fall back to pickTranslation for direct DB queries (GameDetails)
   const translation = pickTranslation(dbGame.translations, options?.localeOrder);
+  
+  // Priority: pre-computed → translation → base field
+  const title = dbGame._translatedTitle ?? translation?.title ?? dbGame.name;
+  const shortDescription = dbGame._translatedShortDescription 
+    ?? translation?.short_description 
+    ?? dbGame.short_description 
+    ?? dbGame.description 
+    ?? undefined;
 
   return {
     id: dbGame.id,
-    slug: dbGame.slug ?? undefined,
-    title: translation?.title ?? dbGame.name,
-    shortDescription:
-      translation?.short_description ?? dbGame.description ?? undefined,
+    slug: dbGame.game_key ?? dbGame.slug ?? undefined,  // Prefer game_key, fallback to slug
+    title,
+    shortDescription,
     coverUrl: findCoverUrl(dbGame.media),
     durationMin: dbGame.time_estimate_min,
     durationMax: dbGame.time_estimate_max,

@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Toggle } from "@/components/ui/toggle";
@@ -79,6 +79,7 @@ const initialFilters: BrowseFilters = {
 const pageSize = 12;
 
 export function BrowsePage() {
+  const locale = useLocale();
   const [games, setGames] = useState<GameSummary[]>([]);
   const [featuredGames, setFeaturedGames] = useState<GameSummary[]>([]);
   const [reactions, setReactions] = useState<GameReactionMap>({});
@@ -170,6 +171,7 @@ export function BrowsePage() {
           sort: payload.sort,
           page: payload.page,
           pageSize,
+          locale,
         }),
       });
 
@@ -196,7 +198,7 @@ export function BrowsePage() {
         hasMore: json.hasMore ?? payload.page * pageSize < (json.total ?? json.games.length),
       };
     },
-    [tenantId]
+    [tenantId, locale]
   );
 
   // Fetch games from database
@@ -264,7 +266,7 @@ export function BrowsePage() {
   useEffect(() => {
     setPage(1);
     setHasMore(true);
-  }, [debouncedSearch, filters, sort, tenantId]);
+  }, [debouncedSearch, filters, sort, tenantId, locale]);
 
   // Load games on mount and when search/filter/sort changes
   useEffect(() => {
@@ -408,7 +410,7 @@ export function BrowsePage() {
           action={{ label: t("empty.clearFilters"), onClick: handleClearAll }}
         />
       ) : (
-        <div className="space-y-4">
+        <div key={locale} className="space-y-4">
           {games.length > 0 && debouncedSearch === "" && Object.values(filters).every((val) => Array.isArray(val) ? val.length === 0 : val === null) && (
             <div className="flex items-center gap-2 rounded-xl border border-border/50 bg-muted/40 px-3 py-2.5 text-xs text-muted-foreground">
               <svg className="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

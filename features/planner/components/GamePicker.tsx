@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,6 +76,7 @@ export function GamePicker({
   userPlayModes = ['basic'],
 }: GamePickerProps) {
   const t = useTranslations('planner');
+  const locale = useLocale();
   const [query, setQuery] = React.useState(initialQuery ?? "");
   const [results, setResults] = React.useState<GameSearchResult[]>(seedResults ?? []);
   const [isSearching, setIsSearching] = React.useState(false);
@@ -152,6 +153,7 @@ export function GamePicker({
           playMode: filters.playMode || undefined,
           categories: filters.categories?.length ? filters.categories : undefined,
           difficulty: filters.difficulty || undefined,
+          locale,
         }),
       });
       
@@ -170,7 +172,7 @@ export function GamePicker({
     } finally {
       setIsSearching(false);
     }
-  }, [query, filters, tenantId, results, activeFilterCount]);
+  }, [query, filters, tenantId, results, activeFilterCount, locale]);
 
   const loadMore = React.useCallback(() => {
     if (!isSearching && hasMore) {

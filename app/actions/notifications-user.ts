@@ -25,6 +25,10 @@ export interface UserNotification {
   updated_at: string
 }
 
+type NotificationReadStatusRow = {
+  notification_id: string
+}
+
 // ============================================================================
 // USER: GET NOTIFICATIONS
 // ============================================================================
@@ -80,14 +84,16 @@ export async function getUserNotifications(params?: {
     const readStatusMap = new Map<string, boolean>()
     
     if (broadcastNotificationIds.length > 0) {
-      const { data: readStatuses } = await supabase
+      // Work around Supabase typed client occasionally triggering
+      // "Type instantiation is excessively deep" during Next build.
+      const { data: readStatuses } = await (supabase as unknown as { from: (t: string) => any })
         .from('notification_read_status')
         .select('notification_id')
         .eq('user_id', user.id)
         .in('notification_id', broadcastNotificationIds)
       
-      readStatuses?.forEach((rs) => {
-        readStatusMap.set(rs.notification_id, true)
+      ;(readStatuses as NotificationReadStatusRow[] | null)?.forEach((rs) => {
+        if (rs?.notification_id) readStatusMap.set(rs.notification_id, true)
       })
     }
     
@@ -167,13 +173,13 @@ export async function getUnreadNotificationCount(): Promise<{ success: boolean; 
       
       if (broadcastIds.length > 0) {
         // Get which ones user has already read
-        const { data: readStatuses } = await supabase
+        const { data: readStatuses } = await (supabase as unknown as { from: (t: string) => any })
           .from('notification_read_status')
           .select('notification_id')
           .eq('user_id', user.id)
           .in('notification_id', broadcastIds)
         
-        const readIds = new Set((readStatuses ?? []).map((rs) => rs.notification_id))
+        const readIds = new Set(((readStatuses as NotificationReadStatusRow[] | null) ?? []).map((rs) => rs.notification_id))
         broadcastUnreadCount = broadcastIds.filter((id) => !readIds.has(id)).length
       }
     }
@@ -227,7 +233,7 @@ export async function markNotificationAsRead(notificationId: string): Promise<{ 
       }
     } else {
       // Broadcast notification (user_id is NULL) - insert into read_status table
-      const { error: insertError } = await supabase
+      const { error: insertError } = await (supabase as unknown as { from: (t: string) => any })
         .from('notification_read_status')
         .upsert({
           notification_id: notificationId,
@@ -296,13 +302,13 @@ export async function markAllNotificationsAsRead(): Promise<{ success: boolean; 
       
       if (broadcastNotifications && broadcastNotifications.length > 0) {
         // 4. Get already read broadcast notification IDs
-        const { data: alreadyRead } = await supabase
+        const { data: alreadyRead } = await (supabase as unknown as { from: (t: string) => any })
           .from('notification_read_status')
           .select('notification_id')
           .eq('user_id', user.id)
           .in('notification_id', broadcastNotifications.map((n) => n.id))
         
-        const alreadyReadIds = new Set((alreadyRead ?? []).map((r) => r.notification_id))
+        const alreadyReadIds = new Set((((alreadyRead as NotificationReadStatusRow[] | null) ?? [])).map((r) => r.notification_id))
         
         // 5. Insert read status for unread broadcast notifications
         const toInsert = broadcastNotifications
@@ -314,7 +320,7 @@ export async function markAllNotificationsAsRead(): Promise<{ success: boolean; 
           }))
         
         if (toInsert.length > 0) {
-          const { error: insertError } = await supabase
+          const { error: insertError } = await (supabase as unknown as { from: (t: string) => any })
             .from('notification_read_status')
             .insert(toInsert)
           

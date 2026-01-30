@@ -30,10 +30,7 @@ import type { ReactionType, SetReactionResult } from '@/types/game-reaction';
  * @returns Result with new reaction state
  */
 export async function toggleLike(gameId: string): Promise<SetReactionResult> {
-  console.log('[toggleLike] Called with gameId:', gameId);
-  
   if (!gameId) {
-    console.log('[toggleLike] Missing gameId');
     return {
       success: false,
       reaction: null,
@@ -48,10 +45,7 @@ export async function toggleLike(gameId: string): Promise<SetReactionResult> {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log('[toggleLike] User:', user?.id ?? 'null');
-
   if (!user) {
-    console.log('[toggleLike] Not authenticated');
     return {
       success: false,
       reaction: null,
@@ -60,13 +54,10 @@ export async function toggleLike(gameId: string): Promise<SetReactionResult> {
   }
 
   // Use RPC for atomic toggle
-  console.log('[toggleLike] Calling RPC upsert_game_reaction');
   const { data, error } = await supabase.rpc('upsert_game_reaction', {
     p_game_id: gameId,
     p_reaction: 'like',
   });
-
-  console.log('[toggleLike] RPC result:', { data, error: error?.message });
 
   if (error) {
     console.error('[toggleLike] Error:', error.message);
@@ -81,7 +72,6 @@ export async function toggleLike(gameId: string): Promise<SetReactionResult> {
   const result = Array.isArray(data) ? data[0] : data;
   const newReaction = (result?.reaction as ReactionType) ?? null;
   const created = result?.created ?? false;
-  console.log('[toggleLike] Parsed result:', { newReaction, created });
 
   // Revalidate relevant paths
   revalidatePath('/app/browse');

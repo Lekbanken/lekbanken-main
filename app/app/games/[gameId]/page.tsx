@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { getGameByIdPreview, getRelatedGames } from '@/lib/services/games.server'
+import { getUserReactionForGame } from '@/lib/services/game-reactions.server'
 import { mapDbGameToDetailPreview, mapDbGameToSummary } from '@/lib/game-display'
 import type { DbGame } from '@/lib/game-display'
 import { GameStartActions } from '@/components/game/GameStartActions'
@@ -60,6 +61,9 @@ export default async function GameDetailPage({ params }: Props) {
   // Map to GameDetailData using new mapper
   const game = mapDbGameToDetailPreview(dbGame as unknown as DbGame)
   
+  // User-specific reaction (like/dislike) for this game (null when unauthenticated)
+  const initialReaction = await getUserReactionForGame(game.id)
+
   // Get section visibility config based on mode and playMode
   const config = getSectionConfig('preview', game.playMode)
   
@@ -283,6 +287,7 @@ export default async function GameDetailPage({ params }: Props) {
             <GameStartActions
               gameId={game.id}
               gameName={game.title}
+              initialReaction={initialReaction}
               showShare={true}
               labels={{
                 share: t('actions.share'),

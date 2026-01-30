@@ -7933,6 +7933,7 @@
       }
     },
     "nav": {
+      "back": "Tilbake",
       "home": "Hjem",
       "dashboard": "Dashboard",
       "games": "Spill",

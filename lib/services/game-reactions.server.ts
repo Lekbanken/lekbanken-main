@@ -28,18 +28,19 @@ export async function getUserReactionForGame(
 ): Promise<ReactionType | null> {
   const supabase = await createServerRlsClient();
 
-  const { data, error } = await supabase
-    .from('game_reactions')
-    .select('reaction')
-    .eq('game_id', gameId)
-    .maybeSingle();
+  // Use RPC (granted to anon) so unauthenticated requests return empty instead
+  // of surfacing permission errors when selecting directly from the table.
+  const { data, error } = await supabase.rpc('get_game_reactions_batch', {
+    p_game_ids: [gameId],
+  });
 
   if (error) {
     console.error('[getUserReactionForGame] Error:', error.message);
     return null;
   }
 
-  return (data?.reaction as ReactionType) ?? null;
+  const first = Array.isArray(data) ? data[0] : null;
+  return (first?.reaction as ReactionType) ?? null;
 }
 
 /**

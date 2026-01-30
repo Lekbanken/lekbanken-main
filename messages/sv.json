@@ -8116,6 +8116,7 @@
       }
     },
     "nav": {
+      "back": "Tillbaka",
       "home": "Hem",
       "dashboard": "Dashboard",
       "games": "Spel",

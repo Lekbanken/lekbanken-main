@@ -1,95 +1,120 @@
 "use client"
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { LanguageSwitcher } from "@/components/navigation/LanguageSwitcher";
-import { ProfileMenu } from "@/components/navigation/ProfileMenu";
-import { ThemeToggle } from "@/components/navigation/ThemeToggle";
-import { TenantSelector } from "@/components/tenant/TenantSelector";
-import { CartDrawer } from "@/components/billing/CartDrawer";
-import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/lib/supabase/auth";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { cn } from "@/lib/utils";
 
-export function AppTopbar() {
+/**
+ * AppTopbar - Minimal, stable topbar for the app
+ * 
+ * Layout:
+ * - Left: Back button (only when canGoBack is true)
+ * - Center: Dice icon (always → home)
+ * - Right: Empty (MVP) - notifications placeholder for future
+ * 
+ * Same behavior on mobile and desktop.
+ */
+
+interface AppTopbarProps {
+  /** Whether back navigation is available */
+  canGoBack?: boolean;
+  /** Custom back handler (default: router.back) */
+  onBack?: () => void;
+  /** Custom back label for accessibility */
+  backLabel?: string;
+}
+
+export function AppTopbar({ canGoBack = false, onBack, backLabel }: AppTopbarProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const t = useTranslations("app.nav");
-  const { effectiveGlobalRole } = useAuth();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      router.back();
+    }
+  };
 
-  const isAdmin = effectiveGlobalRole === "system_admin";
-  const isDashboard = pathname === "/app" || pathname === "/app/";
-
-  if (!mounted) {
-    return (
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          <div className="h-8 w-8 rounded-xl bg-muted sm:h-9 sm:w-9" />
-          <div className="hidden space-y-1 sm:block">
-            <div className="h-2 w-16 rounded bg-muted" />
-            <div className="h-3 w-24 rounded bg-muted" />
-          </div>
-          <div className="h-3 w-20 rounded bg-muted sm:hidden" />
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-9 w-20 rounded-full bg-muted" />
-          <div className="h-9 w-9 rounded-full bg-muted" />
-        </div>
-      </header>
-    );
-  }
+  const handleHome = () => {
+    router.push("/app/browse");
+  };
 
   return (
-    <header className="relative flex items-center justify-between">
-      {/* Logo section - centered dice on mobile for ALL pages, left-aligned on desktop */}
-      <div className="flex flex-1 items-center justify-center gap-2.5 sm:gap-3 lg:flex-none lg:justify-start">
+    <header className="relative flex h-12 items-center justify-between">
+      {/* Left: Back button (only when canGoBack) */}
+      <div className="flex w-20 items-center">
+        {canGoBack && (
+          <button
+            type="button"
+            onClick={handleBack}
+            className={cn(
+              "flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium",
+              "text-muted-foreground transition-colors hover:text-foreground",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            )}
+            aria-label={backLabel || t("back")}
+          >
+            <ChevronLeftIcon className="h-5 w-5" />
+            <span className="hidden sm:inline">{backLabel || t("back")}</span>
+          </button>
+        )}
+      </div>
+
+      {/* Center: Dice icon (always → home) */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <button
           type="button"
-          onClick={() => router.push("/app")}
-          className="flex items-center gap-2.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          onClick={handleHome}
+          className={cn(
+            "rounded-xl transition-transform hover:scale-105",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          )}
           aria-label={t("goToDashboard")}
         >
-          {/* Dice icon - always visible, centered on mobile */}
           <Image
             src="/lekbanken-icon.png"
             alt={t("logoAlt")}
-            width={36}
-            height={36}
-            className={`rounded-xl ${isDashboard ? "h-10 w-10" : "h-9 w-9"} lg:h-9 lg:w-9`}
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-xl"
           />
-          {/* Desktop only: show App + Lekbanken text */}
-          <div className="hidden lg:block">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">App</p>
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">Lekbanken</h1>
-          </div>
         </button>
       </div>
 
-      {/* Right side controls - hidden on mobile (profile in BottomNav) */}
-      <div className="hidden lg:flex items-center gap-3">
-        <TenantSelector />
-        {isAdmin && (
-          <Badge
-            variant="accent"
-            size="sm"
-            className="cursor-pointer transition-opacity hover:opacity-80"
-            onClick={() => router.push("/admin")}
-          >
-            Admin
-          </Badge>
-        )}
-        <CartDrawer />
-        <LanguageSwitcher />
-        <ThemeToggle />
-        <ProfileMenu context="app" />
+      {/* Right: Empty (MVP) - placeholder for future notifications */}
+      <div className="flex w-20 items-center justify-end">
+        {/* Future: <NotificationBell /> */}
       </div>
     </header>
   );
+}
+
+/**
+ * Hook for pages to determine if they should show back navigation
+ * 
+ * Usage:
+ * ```tsx
+ * const { canGoBack, backLabel } = useAppNavigation();
+ * return <AppTopbar canGoBack={canGoBack} backLabel={backLabel} />;
+ * ```
+ */
+export function useAppNavigation() {
+  // Root routes where back should NOT be shown
+  const rootRoutes = [
+    '/app',
+    '/app/browse',
+    '/app/play',
+    '/app/planner',
+    '/app/profile',
+  ];
+  
+  // This would need to be enhanced with actual pathname logic
+  // For now, return false (root level)
+  return {
+    canGoBack: false,
+    backLabel: undefined as string | undefined,
+  };
 }

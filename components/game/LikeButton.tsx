@@ -73,17 +73,11 @@ export function LikeButton({
   // Determine initial reaction from props
   const computedInitialReaction = initialReaction ?? (initialLiked ? 'like' : null);
 
-  console.log('[LikeButton] Rendered:', { gameId, initialLiked, computedInitialReaction });
-
-  const { isLiked, isLoading, toggleLike, error } = useGameReaction({
+  const { isLiked, isLoading, toggleLike } = useGameReaction({
     gameId,
     initialReaction: computedInitialReaction,
     onReactionChange: (reaction) => {
-      console.log('[LikeButton] Reaction changed:', reaction);
       onLikeChange?.(reaction === 'like');
-    },
-    onError: (err) => {
-      console.error('[LikeButton] Error:', err);
     },
   });
 
@@ -99,7 +93,6 @@ export function LikeButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('[LikeButton] Clicked, calling toggleLike');
     toggleLike();
   };
 

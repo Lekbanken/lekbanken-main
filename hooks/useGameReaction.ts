@@ -15,7 +15,7 @@
  * ```
  */
 
-import { useState, useCallback, useTransition } from 'react';
+import { useState, useCallback, useEffect, useRef, useTransition } from 'react';
 import { toggleLike as toggleLikeAction, setReaction as setReactionAction } from '@/app/actions/game-reactions';
 import type { ReactionType } from '@/types/game-reaction';
 
@@ -65,6 +65,21 @@ export function useGameReaction({
   const [reaction, setReactionState] = useState<ReactionType | null>(initialReaction);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const userInteractedRef = useRef(false);
+
+  // Sync state when changing games
+  useEffect(() => {
+    userInteractedRef.current = false;
+    setReactionState(initialReaction);
+    setError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameId]);
+
+  // Sync initial reaction when it arrives/changes (e.g. async fetch), unless user already interacted
+  useEffect(() => {
+    if (userInteractedRef.current) return;
+    setReactionState(initialReaction);
+  }, [initialReaction]);
 
   // Derived state
   const isLiked = reaction === 'like';
@@ -74,6 +89,7 @@ export function useGameReaction({
    * Toggle like with optimistic update
    */
   const toggleLike = useCallback(() => {
+    userInteractedRef.current = true;
     // Store previous state for rollback
     const previousReaction = reaction;
 
@@ -105,6 +121,7 @@ export function useGameReaction({
    */
   const setReaction = useCallback(
     (newReaction: ReactionType | null) => {
+      userInteractedRef.current = true;
       // Store previous state for rollback
       const previousReaction = reaction;
 

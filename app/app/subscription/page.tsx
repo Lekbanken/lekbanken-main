@@ -12,6 +12,7 @@ import {
   CalendarDaysIcon,
   ArrowDownTrayIcon,
   ExclamationTriangleIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline'
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
 import { useSubscription } from '@/hooks/useSubscription'
@@ -32,6 +33,9 @@ export default function SubscriptionPage() {
   
   const [selectedTab, setSelectedTab] = useState<'overview' | 'invoices' | 'entitlements'>('overview')
   const [isPortalLoading, setIsPortalLoading] = useState(false)
+
+  // Determine if this is a personal (private) tenant
+  const isPrivateTenant = tenant?.type === 'private'
 
   const handleManageSubscription = async () => {
     setIsPortalLoading(true)
@@ -85,11 +89,52 @@ export default function SubscriptionPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+        <h1 className="text-2xl font-bold text-foreground">
+          {isPrivateTenant ? t('titlePersonal') : t('title')}
+        </h1>
         <p className="text-muted-foreground mt-1">
-          {tenant ? t('subtitle', { tenantName: tenant.name }) : t('subtitleNoTenant')}
+          {isPrivateTenant 
+            ? t('subtitlePersonal')
+            : tenant 
+              ? t('subtitle', { tenantName: tenant.name }) 
+              : t('subtitleNoTenant')
+          }
         </p>
       </div>
+
+      {/* Cancel Scheduled Banner */}
+      {subscription?.cancel_at_period_end && (
+        <Card className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <ExclamationTriangleIcon className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-medium text-amber-900 dark:text-amber-100">
+                  {t('cancelScheduled.title')}
+                </h3>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                  {isPrivateTenant
+                    ? t('cancelScheduled.descriptionPersonal', { 
+                        date: formatDate(subscription.current_period_end) 
+                      })
+                    : t('cancelScheduled.description', { 
+                        date: formatDate(subscription.current_period_end) 
+                      })
+                  }
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleManageSubscription}
+                disabled={isPortalLoading}
+              >
+                {t('cancelScheduled.reactivate')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-border pb-2">
@@ -134,7 +179,8 @@ export default function SubscriptionPage() {
                     <h2 className="text-2xl font-bold text-foreground">
                       {subscription.plan.nickname || t('currentPlan.subscription')}
                     </h2>
-                    {membership && (
+                    {/* Only show role for organization tenants */}
+                    {!isPrivateTenant && membership && (
                       <p className="text-muted-foreground mt-1">
                         {t('currentPlan.role', { role: membership.role })}
                       </p>
@@ -200,9 +246,17 @@ export default function SubscriptionPage() {
           ) : (
             <Card>
               <CardContent className="p-6 text-center">
-                <SparklesIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h2 className="text-lg font-semibold">{t('noSubscription.title')}</h2>
-                <p className="text-muted-foreground mt-1">{t('noSubscription.description')}</p>
+                {isPrivateTenant ? (
+                  <UserIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                ) : (
+                  <SparklesIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                )}
+                <h2 className="text-lg font-semibold">
+                  {isPrivateTenant ? t('noSubscription.titlePersonal') : t('noSubscription.title')}
+                </h2>
+                <p className="text-muted-foreground mt-1">
+                  {isPrivateTenant ? t('noSubscription.descriptionPersonal') : t('noSubscription.description')}
+                </p>
                 <Button className="mt-4" onClick={() => router.push('/checkout/start')}>
                   {t('noSubscription.choosePlan')}
                 </Button>

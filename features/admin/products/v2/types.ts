@@ -61,7 +61,7 @@ export type StripeLinkage = {
   stripe_product_id: string | null;
   stripe_product_name: string | null;
   last_synced_at: string | null;
-  drift_details: StripeDriftItem[] | null;
+  drift_details: StripeDriftItem[] | string | null;
   active_prices_count: number;
 };
 
@@ -210,7 +210,7 @@ export type ProductAdminRow = {
   image_url: string | null;
   
   // Step 3: Strategic fields
-  target_audience: 'all' | 'schools' | 'kindergartens' | 'fritids' | 'enterprise';
+  target_audience: 'all' | 'b2b' | 'b2c' | 'schools' | 'kindergartens' | 'fritids' | 'enterprise';
   feature_tier: 'free' | 'standard' | 'premium' | 'enterprise';
   min_seats: number;
   max_seats: number;
@@ -327,6 +327,7 @@ export type ProductCardTab =
   | 'settings'
   | 'entitlements'
   | 'availability'
+  | 'games'
   | 'lifecycle'
   | 'audit';
 

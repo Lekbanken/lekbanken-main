@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/navigation/LanguageSwitcher";
 import { ProfileMenu } from "@/components/navigation/ProfileMenu";
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
+import { TenantSelector } from "@/components/tenant/TenantSelector";
 import { CartDrawer } from "@/components/billing/CartDrawer";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/supabase/auth";
@@ -73,6 +74,7 @@ export function AppTopbar() {
 
       {/* Right side controls - hidden on mobile (profile in BottomNav) */}
       <div className="hidden lg:flex items-center gap-3">
+        <TenantSelector />
         {isAdmin && (
           <Badge
             variant="accent"

@@ -3,92 +3,127 @@
 import { useState } from 'react'
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Button, Card, CardContent, Badge, Input, Select } from '@/components/ui'
-import { GameCard } from '@/components/app/GameCard'
+import { GameCard } from '@/components/game/GameCard'
+import type { GameSummary } from '@/lib/game-display'
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon,
   Squares2X2Icon,
   ListBulletIcon,
   SparklesIcon,
-  BoltIcon,
-  ClockIcon,
-  UserGroupIcon
 } from '@heroicons/react/24/outline'
 
 type ViewMode = 'grid' | 'list'
 
-const mockGames = [
+// Mock games using unified GameSummary format
+const mockGames: GameSummary[] = [
   { 
     id: '1', 
-    name: 'Kurragömma', 
-    description: 'Klassiskt gömlek där en person letar medan andra gömmer sig.',
-    energyLevel: 'high' as const,
+    slug: 'kurragomma',
+    title: 'Kurragömma', 
+    shortDescription: 'Klassiskt gömlek där en person letar medan andra gömmer sig.',
+    energyLevel: 'high',
     ageMin: 4,
     ageMax: 12,
     minPlayers: 3,
     maxPlayers: 20,
-    timeEstimate: 30,
-    playMode: 'basic' as const,
+    durationMin: 25,
+    durationMax: 35,
+    playMode: 'basic',
+    environment: 'both',
+    categories: ['Rörelselekar'],
+    tags: ['klassiker', 'utomhus'],
+    isFavorite: false,
   },
   { 
     id: '2', 
-    name: 'Samarbetspussel', 
-    description: 'Bygg pussel tillsammans i lag. Bra för samarbete.',
-    energyLevel: 'low' as const,
+    slug: 'samarbetspussel',
+    title: 'Samarbetspussel', 
+    shortDescription: 'Bygg pussel tillsammans i lag. Bra för samarbete.',
+    energyLevel: 'low',
     ageMin: 5,
     ageMax: 10,
     minPlayers: 2,
     maxPlayers: 6,
-    timeEstimate: 45,
-    playMode: 'facilitated' as const,
+    durationMin: 40,
+    durationMax: 50,
+    playMode: 'facilitated',
+    environment: 'indoor',
+    categories: ['Samarbetslekar'],
+    tags: ['samarbete', 'lugn'],
+    isFavorite: true,
   },
   { 
     id: '3', 
-    name: 'Stafett', 
-    description: 'Spännande stafettlopp med olika stationer.',
-    energyLevel: 'high' as const,
+    slug: 'stafett',
+    title: 'Stafett', 
+    shortDescription: 'Spännande stafettlopp med olika stationer.',
+    energyLevel: 'high',
     ageMin: 5,
     ageMax: 15,
     minPlayers: 6,
     maxPlayers: 30,
-    timeEstimate: 20,
-    playMode: 'participants' as const,
+    durationMin: 15,
+    durationMax: 25,
+    playMode: 'participants',
+    environment: 'outdoor',
+    categories: ['Laglekar'],
+    tags: ['tävling', 'lag'],
+    isFavorite: false,
   },
   { 
     id: '4', 
-    name: 'Ordlek', 
-    description: 'Gissa ord och fraser genom att rita eller förklara.',
-    energyLevel: 'low' as const,
+    slug: 'ordlek',
+    title: 'Ordlek', 
+    shortDescription: 'Gissa ord och fraser genom att rita eller förklara.',
+    energyLevel: 'low',
     ageMin: 7,
     ageMax: 99,
     minPlayers: 4,
     maxPlayers: 12,
-    timeEstimate: 30,
-    playMode: 'basic' as const,
+    durationMin: 25,
+    durationMax: 35,
+    playMode: 'basic',
+    environment: 'indoor',
+    categories: ['Ordlekar'],
+    tags: ['kreativitet', 'kommunikation'],
+    isFavorite: false,
   },
   { 
     id: '5', 
-    name: 'Freeze Dance', 
-    description: 'Dansa när musiken spelar, frys när den stannar!',
-    energyLevel: 'medium' as const,
+    slug: 'freeze-dance',
+    title: 'Freeze Dance', 
+    shortDescription: 'Dansa när musiken spelar, frys när den stannar!',
+    energyLevel: 'medium',
     ageMin: 3,
     ageMax: 10,
     minPlayers: 4,
     maxPlayers: 25,
-    timeEstimate: 15,
-    playMode: 'facilitated' as const,
+    durationMin: 10,
+    durationMax: 20,
+    playMode: 'facilitated',
+    environment: 'both',
+    categories: ['Danslekar'],
+    tags: ['musik', 'dans'],
+    isFavorite: false,
   },
   { 
     id: '6', 
-    name: 'Skattjakt', 
-    description: 'Följ ledtrådar och kartor för att hitta skatten.',
-    energyLevel: 'medium' as const,
+    slug: 'skattjakt',
+    title: 'Skattjakt', 
+    shortDescription: 'Följ ledtrådar och kartor för att hitta skatten.',
+    energyLevel: 'medium',
     ageMin: 5,
     ageMax: 12,
     minPlayers: 2,
     maxPlayers: 10,
-    timeEstimate: 60,
-    playMode: 'participants' as const,
+    durationMin: 50,
+    durationMax: 70,
+    playMode: 'participants',
+    environment: 'outdoor',
+    categories: ['Utomhuslekar'],
+    tags: ['utomhus', 'äventyr'],
+    isFavorite: false,
   },
 ]
 
@@ -99,56 +134,16 @@ const energyOptions = [
   { value: 'high', label: 'Hög energi' },
 ]
 
-const playModeConfig = {
-  basic: {
-    label: 'Enkel lek',
-    border: 'border-border',
-    badge: 'bg-muted text-muted-foreground ring-1 ring-border',
-  },
-  facilitated: {
-    label: 'Ledd aktivitet',
-    border: 'border-primary/50',
-    badge: 'bg-primary/10 text-primary ring-1 ring-primary/30',
-  },
-  participants: {
-    label: 'Deltagarlek',
-    border: 'border-yellow/60',
-    badge: 'bg-yellow/20 text-foreground ring-1 ring-yellow/40',
-  },
-}
-
 export default function GamesSandbox() {
   const [search, setSearch] = useState('')
   const [energyLevel, setEnergyLevel] = useState('')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
   const filteredGames = mockGames.filter(game => {
-    if (search && !game.name.toLowerCase().includes(search.toLowerCase())) return false
+    if (search && !game.title.toLowerCase().includes(search.toLowerCase())) return false
     if (energyLevel && game.energyLevel !== energyLevel) return false
     return true
   })
-
-  const getEnergyBadge = (level: string) => {
-    switch (level) {
-      case 'low':
-        return <Badge variant="success" size="sm">Låg energi</Badge>
-      case 'medium':
-        return <Badge variant="warning" size="sm">Medium</Badge>
-      case 'high':
-        return <Badge variant="error" size="sm">Hög energi</Badge>
-      default:
-        return null
-    }
-  }
-
-  const getPlayModeBadge = (mode: 'basic' | 'facilitated' | 'participants') => {
-    const meta = playModeConfig[mode]
-    return (
-      <Badge size="sm" className={meta.badge}>
-        {meta.label}
-      </Badge>
-    )
-  }
 
   return (
     <SandboxShell
@@ -175,18 +170,8 @@ export default function GamesSandbox() {
             {mockGames.slice(0, 3).map((game) => (
               <GameCard 
                 key={game.id}
-                id={game.id}
+                game={game}
                 variant="featured"
-                name={game.name}
-                description={game.description}
-                ageMin={game.ageMin}
-                ageMax={game.ageMax}
-                timeEstimate={game.timeEstimate}
-                minPlayers={game.minPlayers}
-                maxPlayers={game.maxPlayers}
-                energyLevel={game.energyLevel}
-                isFavorite={game.id === '1'}
-                playMode={game.playMode}
               />
             ))}
           </div>
@@ -270,54 +255,19 @@ export default function GamesSandbox() {
             {filteredGames.map((game) => (
               <GameCard 
                 key={game.id}
-                id={game.id}
-                name={game.name}
-                description={game.description}
-                ageMin={game.ageMin}
-                ageMax={game.ageMax}
-                timeEstimate={game.timeEstimate}
-                minPlayers={game.minPlayers}
-                maxPlayers={game.maxPlayers}
-                energyLevel={game.energyLevel}
-                isFavorite={game.id === '2'}
-                playMode={game.playMode}
+                game={game}
+                variant="grid"
               />
             ))}
           </div>
         ) : (
           <div className="space-y-3">
             {filteredGames.map((game) => (
-              <Card key={game.id} className={`hover:shadow-md transition-shadow ${playModeConfig[game.playMode].border}`}>
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-gray-900">{game.name}</h3>
-                        {getEnergyBadge(game.energyLevel)}
-                        {getPlayModeBadge(game.playMode)}
-                      </div>
-                      <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                        {game.description}
-                      </p>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <UserGroupIcon className="h-4 w-4" />
-                          {game.minPlayers}-{game.maxPlayers} spelare
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <ClockIcon className="h-4 w-4" />
-                          {game.timeEstimate} min
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <BoltIcon className="h-4 w-4" />
-                          {game.ageMin}+ år
-                        </span>
-                      </div>
-                    </div>
-                    <Button size="sm">Visa</Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <GameCard 
+                key={game.id}
+                game={game}
+                variant="list"
+              />
             ))}
           </div>
         )}

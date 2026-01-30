@@ -1,18 +1,25 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { GameCard, GameCardSkeleton } from "@/components/game/GameCard";
+import { mapSearchResultToSummary } from "@/lib/game-display";
+import type { GameSummary } from "@/lib/game-display";
 
 type GameSearchResult = {
   id: string;
   slug?: string | null;
+  name?: string | null;
+  description?: string | null;
   time_estimate_min?: number | null;
   time_estimate_max?: number | null;
+  energy_level?: string | null;
+  play_mode?: string | null;
   image_url?: string | null;
+  media?: Array<{ kind?: string | null; media?: { url?: string | null } | null }> | null;
   translations?: { title?: string | null; short_description?: string | null }[];
 };
 
@@ -25,11 +32,14 @@ type GamePickerProps = {
 };
 
 function getGameTitle(game: GameSearchResult): string {
-  return game.translations?.[0]?.title || game.slug || "Okänd lek";
+  return game.name || game.translations?.[0]?.title || game.slug || "Okänd lek";
 }
 
-function getGameDescription(game: GameSearchResult): string {
-  return game.translations?.[0]?.short_description || "";
+/**
+ * Converts GameSearchResult to GameSummary for picker variant
+ */
+function toSummary(game: GameSearchResult): GameSummary {
+  return mapSearchResultToSummary(game);
 }
 
 export function GamePicker({
@@ -140,91 +150,22 @@ export function GamePicker({
             )}
 
             {isSearching && (
-              <div className="flex items-center justify-center py-8">
-                <svg
-                  className="h-5 w-5 animate-spin text-primary"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
+              <div className="space-y-2">
+                {[...Array(3)].map((_, i) => (
+                  <GameCardSkeleton key={i} variant="picker" />
+                ))}
               </div>
             )}
 
             {results.map((game) => (
-              <button
+              <GameCard
                 key={game.id}
-                type="button"
-                onClick={() => handleSelect(game)}
-                className="flex w-full items-start gap-3 rounded-xl border border-border/60 bg-card p-3 text-left transition hover:border-primary/40 hover:bg-muted/50"
-              >
-                {game.image_url ? (
-                  <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
-                    <Image
-                      src={game.image_url}
-                      alt={getGameTitle(game)}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-muted">
-                    <svg
-                      className="h-6 w-6 text-muted-foreground"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-semibold text-foreground">
-                    {getGameTitle(game)}
-                  </p>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
-                    {getGameDescription(game)}
-                  </p>
-                </div>
-                <div className="flex-shrink-0">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
-                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    {game.time_estimate_min ?? 0} min
-                  </span>
-                </div>
-              </button>
+                game={toSummary(game)}
+                variant="picker"
+                actions={{
+                  onClick: () => handleSelect(game),
+                }}
+              />
             ))}
           </div>
         </div>

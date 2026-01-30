@@ -21,6 +21,14 @@ import {
 import { supabase } from '@/lib/supabase/client'
 import { resolveCurrentTenant, selectTenant as selectTenantAction } from '@/app/actions/tenant'
 import type { Tenant, TenantMembership, TenantRole, TenantWithMembership } from '@/types/tenant'
+import {
+  isPrivateTenant,
+  getPersonalTenantForUser,
+  getOrganizationTenants,
+  getTenantContextMode,
+  shouldShowTenantSelector,
+  type TenantContextMode,
+} from '@/lib/tenant/helpers'
 
 interface TenantContextType {
   currentTenant: TenantWithMembership | null
@@ -32,6 +40,12 @@ interface TenantContextType {
   selectTenant: (tenantId: string) => void
   createTenant: (name: string, type: string) => Promise<Tenant>
   reloadTenants: () => Promise<void>
+  // Personal license helpers
+  personalTenant: TenantWithMembership | null
+  organizationTenants: TenantWithMembership[]
+  isCurrentTenantPrivate: boolean
+  contextMode: TenantContextMode
+  showTenantSelector: boolean
 }
 
 type TenantProviderProps = {
@@ -186,6 +200,13 @@ export function TenantProvider({
     await loadTenants()
   }, [loadTenants])
 
+  // Derived values for personal license support
+  const personalTenant = getPersonalTenantForUser(userTenants)
+  const organizationTenants = getOrganizationTenants(userTenants)
+  const isCurrentTenantPrivate = isPrivateTenant(currentTenant)
+  const contextMode = getTenantContextMode(userTenants)
+  const showTenantSelector = shouldShowTenantSelector(userTenants)
+
   const value: TenantContextType = {
     currentTenant,
     userTenants,
@@ -196,6 +217,12 @@ export function TenantProvider({
     selectTenant,
     createTenant,
     reloadTenants,
+    // Personal license helpers
+    personalTenant,
+    organizationTenants,
+    isCurrentTenantPrivate,
+    contextMode,
+    showTenantSelector,
   }
 
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>

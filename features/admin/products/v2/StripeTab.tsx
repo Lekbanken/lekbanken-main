@@ -149,12 +149,14 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
   // DRIFT DETECTION
   // ==========================================================================
 
-  const driftItems: DiffItem[] = product.stripe_linkage?.drift_details?.map(d => ({
-    field: d.field,
-    label: d.field, // Could map to friendly names
-    localValue: d.local_value,
-    remoteValue: d.stripe_value,
-  })) || [];
+  const driftItems: DiffItem[] = (Array.isArray(product.stripe_linkage?.drift_details)
+    ? product.stripe_linkage.drift_details.map((d: { field: string; local_value: string | null; stripe_value: string | null }) => ({
+        field: d.field,
+        label: d.field, // Could map to friendly names
+        localValue: d.local_value,
+        remoteValue: d.stripe_value,
+      }))
+    : []);
 
   // ==========================================================================
   // RENDER

@@ -1,10 +1,18 @@
-import { redirect } from 'next/navigation';
 import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin';
+import { LicenseAdminPage, fetchLicenses } from '@/features/admin/licenses';
+
+export const metadata = {
+  title: 'Licenser | Admin',
+  description: 'Hantera licenser och prenumerationer',
+};
 
 /**
- * Legacy route: redirects to the new Products hub with Licenses tab active.
+ * Admin page for managing licenses (both personal and organization)
  */
-export default async function LicensesRedirect() {
+export default async function LicensesPage() {
   await requireSystemAdmin('/admin');
-  redirect('/admin/products?tab=licenses');
+
+  const initialData = await fetchLicenses({}, 1, 25);
+
+  return <LicenseAdminPage initialData={initialData} />;
 }

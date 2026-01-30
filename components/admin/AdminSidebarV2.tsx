@@ -14,6 +14,7 @@ import {
   ADMIN_NAV,
   resolveNavHref,
   getExpandedCategoriesFromRoute,
+  filterNavForTenantType,
 } from '@/lib/admin/nav'
 import { useAdminNav, type TranslatedAdminNavCategory } from '@/lib/admin/useAdminNav'
 import { navIcons } from '@/app/admin/components/admin-nav-config'
@@ -226,17 +227,33 @@ function SidebarContent({
 }) {
   const router = useRouter()
   const pathname = usePathname()
-  const { isSystemAdmin, currentTenantId, can } = useRbac()
+  const { isSystemAdmin, currentTenantId, can, isPrivateTenant } = useRbac()
   const { mode, setMode, canSwitchMode, isHydrated } = useAdminMode({ isSystemAdmin })
   
   // Get translated navigation
   const translatedNav = useAdminNav()
 
-  // Get categories based on current mode (translated)
-  const categories = mode === 'system' ? translatedNav.system : translatedNav.organisation
+  // Get categories based on current mode (translated) and filter for tenant type
+  const categories = useMemo(() => {
+    const rawCats = mode === 'system' ? translatedNav.system : translatedNav.organisation
+    // Filter out orgOnly items when viewing a private tenant
+    if (mode === 'tenant' && isPrivateTenant) {
+      return rawCats
+        .filter((category) => !category.orgOnly)
+        .map((category) => ({
+          ...category,
+          items: category.items.filter((item) => !item.orgOnly),
+        }))
+        .filter((category) => category.items.length > 0)
+    }
+    return rawCats
+  }, [mode, translatedNav, isPrivateTenant])
   
   // Get untranslated categories for route matching (stable reference)
-  const rawCategories = mode === 'system' ? ADMIN_NAV.system : ADMIN_NAV.organisation
+  const rawCategories = useMemo(() => {
+    const cats = mode === 'system' ? ADMIN_NAV.system : ADMIN_NAV.organisation
+    return filterNavForTenantType(cats, mode === 'tenant' && isPrivateTenant)
+  }, [mode, isPrivateTenant])
 
   // Expanded categories state with localStorage persistence
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(() => {

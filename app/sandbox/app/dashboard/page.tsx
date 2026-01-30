@@ -3,7 +3,8 @@
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { GameCard } from '@/components/app/GameCard'
+import { GameCard } from '@/components/game/GameCard'
+import type { GameSummary } from '@/lib/game-display'
 
 const stats = [
   { label: 'Sparade aktiviteter', value: '47', change: '+3 denna vecka' },
@@ -18,26 +19,42 @@ const recentActivities = [
   { id: '3', name: 'Mindfulness-runda', time: '3 dagar sedan', action: 'Delade' },
 ]
 
-const suggestedGames = [
+const suggestedGames: GameSummary[] = [
   {
     id: '1',
-    name: 'Bollkull',
-    description: 'Klassisk kullek med mjuk boll. Perfekt för uppvärmning.',
+    slug: 'bollkull',
+    title: 'Bollkull',
+    shortDescription: 'Klassisk kullek med mjuk boll. Perfekt för uppvärmning.',
     ageMin: 6,
     ageMax: 12,
-    energyLevel: 'high' as const,
-    timeEstimate: 10,
-    rating: 4.7,
+    energyLevel: 'high',
+    minPlayers: 4,
+    maxPlayers: 20,
+    durationMin: 8,
+    durationMax: 12,
+    playMode: 'basic',
+    environment: 'both',
+    categories: ['Rörelselekar'],
+    tags: ['uppvärmning', 'kull'],
+    isFavorite: false,
   },
   {
     id: '2',
-    name: 'Samarbetspussel',
-    description: 'Gruppen löser ett pussel tillsammans under tidspress.',
+    slug: 'samarbetspussel',
+    title: 'Samarbetspussel',
+    shortDescription: 'Gruppen löser ett pussel tillsammans under tidspress.',
     ageMin: 8,
     ageMax: 14,
-    energyLevel: 'low' as const,
-    timeEstimate: 15,
-    rating: 4.5,
+    energyLevel: 'low',
+    minPlayers: 3,
+    maxPlayers: 8,
+    durationMin: 12,
+    durationMax: 18,
+    playMode: 'facilitated',
+    environment: 'indoor',
+    categories: ['Samarbetslekar'],
+    tags: ['samarbete', 'problemlösning'],
+    isFavorite: false,
   },
 ]
 
@@ -117,7 +134,7 @@ export default function DashboardSandbox() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 {suggestedGames.map((game) => (
-                  <GameCard key={game.id} {...game} />
+                  <GameCard key={game.id} game={game} variant="grid" />
                 ))}
               </div>
             </section>

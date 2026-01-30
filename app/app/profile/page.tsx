@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { TenantSelector } from '@/components/tenant/TenantSelector';
 import { Avatar } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +23,7 @@ import {
   TrophyIcon,
 } from '@heroicons/react/24/outline';
 import { ProfileAchievementsShowcase } from '@/features/profile/components/ProfileAchievementsShowcase';
+import { isPrivateTenant } from '@/lib/tenant/helpers';
 
 interface QuickLinkProps {
   href: string;
@@ -110,6 +112,21 @@ export default function ProfileOverviewPage() {
         >
           {t('editProfile')}
         </Link>
+      </div>
+
+      {/* Mobile Tenant Selector - only visible on small screens */}
+      <div className="block lg:hidden">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BuildingOfficeIcon className="h-5 w-5 text-primary" />
+              {t('common:tenant.selectTenant')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TenantSelector variant="full" className="w-full" />
+          </CardContent>
+        </Card>
       </div>
 
       {/* Security Status */}

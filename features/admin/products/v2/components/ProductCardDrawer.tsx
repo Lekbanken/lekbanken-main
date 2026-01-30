@@ -320,7 +320,7 @@ function PricingTab({ product }: { product: ProductDetail }) {
       </Card>
 
       {/* Drift Detection */}
-      {linkage.status === 'drift' && linkage.drift_details && linkage.drift_details.length > 0 && (
+      {linkage.status === 'drift' && Array.isArray(linkage.drift_details) && linkage.drift_details.length > 0 && (
         <Card className="border-warning/40">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-warning">
@@ -339,7 +339,7 @@ function PricingTab({ product }: { product: ProductDetail }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {linkage.drift_details.map((item, i) => (
+                  {linkage.drift_details.map((item: { field: string; local_value: string | null; stripe_value: string | null }, i: number) => (
                     <tr key={i} className="border-b border-border last:border-0">
                       <td className="py-2 font-medium">{item.field}</td>
                       <td className="py-2 text-muted-foreground">{item.local_value || '—'}</td>

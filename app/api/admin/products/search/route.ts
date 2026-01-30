@@ -75,15 +75,14 @@ export async function POST(request: Request) {
   }
 
   // Transform to ProductAdminRow format
-  // Note: Many fields are computed/mocked since the current schema is minimal
   const products: ProductAdminRow[] = (data || []).map((row) => {
-    // Stripe linkage - mock as 'missing' until we have stripe_product_id column
+    // Stripe linkage - use actual database values
     const stripeLinkage: StripeLinkage = {
-      status: 'missing',
-      stripe_product_id: null,
-      stripe_product_name: null,
-      last_synced_at: null,
-      drift_details: null,
+      status: row.stripe_product_id ? 'connected' : 'missing',
+      stripe_product_id: row.stripe_product_id ?? null,
+      stripe_product_name: row.stripe_product_id ? row.name : null,
+      last_synced_at: row.stripe_last_synced_at ?? null,
+      drift_details: row.stripe_sync_error ?? null,
       active_prices_count: 0,
     };
 
@@ -98,37 +97,41 @@ export async function POST(request: Request) {
     if (!row.customer_description) {
       healthIssues.push('Kundbeskrivning saknas');
     }
+    if (row.stripe_sync_error) {
+      healthStatus = 'stripe_drift';
+      healthIssues.push('Stripe-synkfel');
+    }
 
     // Primary price - mock as null until pricing table is implemented
     const primaryPrice: ProductPrice | null = null;
 
-    // Infer product type from category
-    const productType: ProductType = row.category === 'subscription' ? 'subscription' : 'license';
+    // Infer product type from category or use database value
+    const productType: ProductType = (row.product_type as ProductType) || (row.category === 'subscription' ? 'subscription' : 'license');
 
-    // Infer status - default to 'active' for existing products
-    const status: ProductStatus = 'active';
+    // Use status from database, default to 'active'
+    const status: ProductStatus = (row.status as ProductStatus) || 'active';
 
     return {
       id: row.id,
       product_key: row.product_key,
       name: row.name,
-      internal_description: row.description,
-      customer_description: null,
+      internal_description: row.description ?? row.internal_description,
+      customer_description: row.customer_description ?? null,
       product_type: productType,
       category: row.category || 'general',
       tags: [],
       status: status,
       // Critical Stripe fields
-      unit_label: 'seat' as UnitLabel,
-      statement_descriptor: null,
-      stripe_product_id: null,
+      unit_label: (row.unit_label as UnitLabel) || 'seat',
+      statement_descriptor: row.statement_descriptor ?? null,
+      stripe_product_id: row.stripe_product_id ?? null,
       // Product image
-      image_url: null,
+      image_url: row.image_url ?? null,
       // Strategic fields
-      target_audience: 'all' as const,
-      feature_tier: 'standard' as const,
-      min_seats: 1,
-      max_seats: 100,
+      target_audience: (row.target_audience as 'all' | 'b2b' | 'b2c') || 'all',
+      feature_tier: (row.feature_tier as 'free' | 'standard' | 'premium' | 'enterprise') || 'standard',
+      min_seats: row.min_seats ?? 1,
+      max_seats: row.max_seats ?? 100,
       stripe_linkage: stripeLinkage,
       primary_price: primaryPrice,
       prices_count: 0,

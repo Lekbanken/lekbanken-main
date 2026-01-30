@@ -48,6 +48,18 @@ const eslintConfig = defineConfig([
           {
             "group": ["@/types/achievements-builder", "@/types/achievements-builder/*"],
             "message": "Legacy achievement types are deprecated. Use features/admin/achievements/types instead."
+          },
+          {
+            "group": ["@/components/app/GameCard", "@/components/app/GameCard/*"],
+            "message": "Legacy GameCard is removed. Use @/components/game/GameCard instead."
+          },
+          {
+            "group": ["@/features/browse/GameCard", "@/features/browse/GameCard/*"],
+            "message": "Legacy GameCard is removed. Use @/components/game/GameCard instead."
+          },
+          {
+            "group": ["@/features/browse/components/GameCard", "@/features/browse/components/GameCard/*"],
+            "message": "Legacy GameCard is removed. Use @/components/game/GameCard instead."
           }
         ]
       }]

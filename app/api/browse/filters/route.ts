@@ -122,6 +122,11 @@ export async function GET(request: Request) {
     return NextResponse.json(payload)
   }
 
+  // STRATEGY: Extract filter options from the games the user can actually access
+  // This ensures filters always correlate with available content
+  // IMPORTANT: Must mirror the same access logic as /api/games/search
+  
+  // 1. Get products user has access to
   let productQuery = supabase
     .from('products')
     .select('id,name,product_key,category,status')
@@ -132,46 +137,95 @@ export async function GET(request: Request) {
 
   const { data: products, error: prodErr } = await productQuery
   if (prodErr) {
-    console.error('[api/browse/filters] fetch error', prodErr)
+    console.error('[api/browse/filters] product fetch error', prodErr)
     return NextResponse.json({ error: 'Failed to load filters' }, { status: 500 })
   }
 
+  // 2. Get all published games the user can access and extract their purpose IDs
+  // This must mirror the exact same access logic as /api/games/search
+  let gamesQuery = supabase
+    .from('games')
+    .select('id, main_purpose_id, product_id, owner_tenant_id')
+    .eq('status', 'published')
+  
+  // Apply owner_tenant_id filter (same logic as games search)
+  if (tenantId) {
+    // Tenant users see: their tenant's games + global games (owner_tenant_id IS NULL)
+    gamesQuery = gamesQuery.or(`owner_tenant_id.eq.${tenantId},owner_tenant_id.is.null`)
+  } else {
+    // Public/anonymous users: only global games
+    gamesQuery = gamesQuery.is('owner_tenant_id', null)
+  }
+  
+  // Apply product filter if user has specific entitlements
+  if (allowedProductIds.length > 0) {
+    gamesQuery = gamesQuery.in('product_id', allowedProductIds)
+  }
+  
+  const { data: accessibleGames, error: gamesErr } = await gamesQuery
+  if (gamesErr) {
+    console.error('[api/browse/filters] games fetch error', gamesErr)
+  }
+  
+  // 3. Collect unique purpose IDs from accessible games
+  const purposeIdsFromGames = new Set<string>()
+  const productIdsFromGames = new Set<string>()
+  
+  for (const game of accessibleGames ?? []) {
+    if (game.main_purpose_id) purposeIdsFromGames.add(game.main_purpose_id)
+    if (game.product_id) productIdsFromGames.add(game.product_id)
+  }
+  
+  // 4. Fetch purpose details for purposes actually used by accessible games
+  let mainPurposes: Purpose[] = []
+  let subPurposes: Purpose[] = []
+  
+  if (purposeIdsFromGames.size > 0) {
+    const { data: purposeData, error: purposeErr } = await supabase
+      .from('purposes')
+      .select('id, name, type, parent_id')
+      .in('id', Array.from(purposeIdsFromGames))
+    
+    if (purposeErr) {
+      console.error('[api/browse/filters] purpose fetch error', purposeErr)
+    } else {
+      mainPurposes = (purposeData ?? []).filter(p => p.type === 'main') as Purpose[]
+      subPurposes = (purposeData ?? []).filter(p => p.type === 'sub') as Purpose[]
+    }
+  }
+  
+  // 5. Also try product_purposes as fallback for additional purposes
   const productIdsForPurposes = allowedProductIds.length > 0 ? allowedProductIds : (products ?? []).map((p) => p.id)
 
-  let productPurposeRows: ProductPurposeRow[] | null = []
   if (productIdsForPurposes.length > 0) {
-    const { data, error: ppErr } = await supabase
+    const { data: productPurposeRows, error: ppErr } = await supabase
       .from('product_purposes')
       .select('product_id, purpose:purposes(*)')
       .in('product_id', productIdsForPurposes)
 
-    if (ppErr) {
-      console.error('[api/browse/filters] fetch error', ppErr)
-      return NextResponse.json({ error: 'Failed to load filters' }, { status: 500 })
-    }
-
-    productPurposeRows = data as ProductPurposeRow[] | null
-  }
-
-  const mainPurposesMap = new Map<string, Purpose>()
-  const subPurposesMap = new Map<string, Purpose>()
-
-  for (const row of productPurposeRows ?? []) {
-    const purpose = row.purpose
-    if (!purpose?.id) continue
-    if (purpose.type === 'main') {
-      mainPurposesMap.set(purpose.id, purpose)
-    } else if (purpose.type === 'sub') {
-      subPurposesMap.set(purpose.id, purpose)
+    if (!ppErr && productPurposeRows) {
+      for (const row of productPurposeRows as ProductPurposeRow[]) {
+        const purpose = row.purpose
+        if (!purpose?.id) continue
+        if (purpose.type === 'main' && !mainPurposes.find(p => p.id === purpose.id)) {
+          mainPurposes.push(purpose)
+        } else if (purpose.type === 'sub' && !subPurposes.find(p => p.id === purpose.id)) {
+          subPurposes.push(purpose)
+        }
+      }
     }
   }
 
   // Filter sub-purposes to those whose parent is in main set when available
-  const mainIds = new Set(mainPurposesMap.keys())
-  const filteredSubPurposes = Array.from(subPurposesMap.values()).filter((p) => !p.parent_id || mainIds.has(p.parent_id))
+  const mainIds = new Set(mainPurposes.map(p => p.id))
+  const filteredSubPurposes = subPurposes.filter((p) => !p.parent_id || mainIds.has(p.parent_id))
+  
+  // Only include products that have at least one game
+  const filteredProducts = (products ?? []).filter(p => productIdsFromGames.has(p.id))
+  
   const payload: CachedFilters = {
-    products: products ?? [],
-    purposes: Array.from(mainPurposesMap.values()),
+    products: filteredProducts.length > 0 ? filteredProducts : (products ?? []),
+    purposes: mainPurposes,
     subPurposes: filteredSubPurposes,
     metadata: {
       allowedProducts: allowedProductIds,

@@ -324,9 +324,9 @@ export function GroupedNodeList({
               {isExpanded && (
                 <div className="border-t border-border bg-background/50">
                   <div className="max-h-[400px] overflow-y-auto">
-                    {group.nodes.map((node) => (
+                    {group.nodes.map((node, index) => (
                       <NodeRow
-                        key={node.id}
+                        key={`${node.id}-${index}`}
                         node={node}
                         isSelected={node.id === selectedNodeId}
                         onClick={() => onSelectNode(node.id)}

@@ -11,7 +11,7 @@ import { supabase } from '@/lib/supabase/client';
 type ProductRow = {
   id: string;
   name: string | null;
-  product_key: string;
+  product_key: string | null;
 };
 
 type EntitlementRow = {
@@ -49,21 +49,31 @@ export function OrganisationLicensingSection({ tenantId }: Props) {
     setError(null);
 
     try {
-      const [{ data: prodData, error: prodError }, { data: entData, error: entError }] = await Promise.all([
-        supabase.from('products').select('id, name, product_key').order('created_at', { ascending: false }),
-        supabase
-          .from('tenant_product_entitlements')
-          .select(
-            'id, status, source, quantity_seats, valid_from, valid_to, created_at, product:products(id, name, product_key)'
-          )
-          .eq('tenant_id', tenantId)
-          .order('created_at', { ascending: false }),
-      ]);
+      // Fetch products via API (uses server-side RLS client)
+      const productsRes = await fetch('/api/products');
+      if (!productsRes.ok) {
+        console.error('[OrganisationLicensingSection] Products fetch failed:', productsRes.status, productsRes.statusText);
+        throw new Error('Failed to load products');
+      }
+      const productsJson = (await productsRes.json()) as { products: Array<{ id: string; name: string | null; product_key: string | null }> };
+      console.log('[OrganisationLicensingSection] Products loaded:', productsJson.products?.length ?? 0);
 
-      if (prodError) throw prodError;
-      if (entError) throw entError;
+      // Fetch entitlements via Supabase client (RLS allows tenant members)
+      const { data: entData, error: entError } = await supabase
+        .from('tenant_product_entitlements')
+        .select(
+          'id, status, source, quantity_seats, valid_from, valid_to, created_at, product:products(id, name, product_key)'
+        )
+        .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: false });
 
-      const p = ((prodData as ProductRow[] | null) ?? []).filter((r) => typeof r?.id === 'string');
+      if (entError) {
+        console.error('[OrganisationLicensingSection] Entitlements fetch error:', entError);
+        throw entError;
+      }
+      console.log('[OrganisationLicensingSection] Entitlements loaded:', entData?.length ?? 0);
+
+      const p = (productsJson.products ?? []).filter((r) => typeof r?.id === 'string');
       setProducts(p);
       if (!productId && p.length > 0) setProductId(p[0].id);
 
@@ -83,8 +93,8 @@ export function OrganisationLicensingSection({ tenantId }: Props) {
 
   const productsSorted = useMemo(() => {
     return [...products].sort((a, b) => {
-      const an = (a.name ?? a.product_key).toLowerCase();
-      const bn = (b.name ?? b.product_key).toLowerCase();
+      const an = (a.name ?? a.product_key ?? '').toLowerCase();
+      const bn = (b.name ?? b.product_key ?? '').toLowerCase();
       return an.localeCompare(bn);
     });
   }, [products]);
@@ -164,13 +174,19 @@ export function OrganisationLicensingSection({ tenantId }: Props) {
               className="h-10 w-full rounded-md border bg-background px-3 text-sm"
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
-              disabled={isLoading}
+              disabled={isLoading || productsSorted.length === 0}
             >
-              {productsSorted.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name ?? p.product_key}
-                </option>
-              ))}
+              {isLoading ? (
+                <option value="">{t('loading')}</option>
+              ) : productsSorted.length === 0 ? (
+                <option value="">{t('noProducts')}</option>
+              ) : (
+                productsSorted.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name ?? p.product_key ?? p.id}
+                  </option>
+                ))
+              )}
             </select>
           </label>
 

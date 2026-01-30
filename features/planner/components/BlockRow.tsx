@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { formatEnergyLevel, formatEnvironment } from "@/lib/game-display";
 import type { PlannerBlock } from "@/types/planner";
 
 // Inline icons to avoid lucide-react dependency issues
@@ -74,24 +75,14 @@ interface BlockRowProps {
   onDurationChange: (duration: number) => void;
 }
 
-function formatEnergyLevel(value?: string | null) {
-  if (!value) return null;
-  const map: Record<string, string> = {
-    low: "Låg",
-    medium: "Medel",
-    high: "Hög",
-  };
-  return map[value] ?? value;
-}
-
-function formatLocationType(value?: string | null) {
-  if (!value) return null;
-  const map: Record<string, string> = {
-    indoor: "Inne",
-    outdoor: "Ute",
-    mixed: "Inne/ute",
-  };
-  return map[value] ?? value;
+/**
+ * Maps locationType string to Environment type for formatter
+ */
+function mapLocationType(value?: string | null) {
+  if (value === 'indoor') return 'indoor' as const;
+  if (value === 'outdoor') return 'outdoor' as const;
+  if (value === 'mixed' || value === 'both') return 'both' as const;
+  return null;
 }
 
 export function BlockRow({
@@ -141,8 +132,12 @@ export function BlockRow({
   const isGame = block.blockType === "game" && block.game;
   const title =
     block.blockType === "game" ? block.game?.title ?? "Lek" : block.title ?? meta.label;
-  const energyLabel = formatEnergyLevel(block.game?.energyLevel);
-  const locationLabel = formatLocationType(block.game?.locationType);
+  
+  // Use centralized formatters
+  const energyFormatted = formatEnergyLevel(
+    block.game?.energyLevel as 'low' | 'medium' | 'high' | null | undefined
+  );
+  const locationFormatted = formatEnvironment(mapLocationType(block.game?.locationType));
 
   return (
     <li
@@ -246,16 +241,16 @@ export function BlockRow({
         </div>
       </div>
 
-      {isGame && (energyLabel || locationLabel) ? (
+      {isGame && (energyFormatted || locationFormatted) ? (
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          {energyLabel && (
+          {energyFormatted && (
             <Badge variant="secondary" size="sm">
-              Energi: {energyLabel}
+              Energi: {energyFormatted.labelShort}
             </Badge>
           )}
-          {locationLabel && (
+          {locationFormatted && (
             <Badge variant="secondary" size="sm">
-              Plats: {locationLabel}
+              Plats: {locationFormatted.labelShort}
             </Badge>
           )}
         </div>

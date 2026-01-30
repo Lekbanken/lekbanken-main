@@ -4,14 +4,15 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Toggle } from "@/components/ui/toggle";
 import { useTenant } from "@/lib/context/TenantContext";
 import { FilterBar } from "./components/FilterBar";
 import { FilterSheet } from "./components/FilterSheet";
-import { GameCard } from "./components/GameCard";
+import { GameCard, GameCardSkeleton } from "@/components/game/GameCard";
 import { SearchBar } from "./components/SearchBar";
-import type { BrowseFilters, FilterOptions, Game, SortOption } from "./types";
+import type { BrowseFilters, FilterOptions, SortOption } from "./types";
+import type { GameSummary } from "@/lib/game-display";
+import { mapDbGameToSummary } from "@/lib/game-display";
 import type { Tables } from "@/types/supabase";
 import { cn } from "@/lib/utils";
 import { PageTitleHeader } from "@/components/app/PageTitleHeader";
@@ -25,52 +26,34 @@ type DbGame = Tables<"games"> & {
   main_purpose?: { name?: string | null } | null;
   main_purpose_id: string | null;
   secondary_purposes?: Array<{ purpose?: { id?: string | null; name?: string | null; type?: string | null } | null }>;
+  translations?: Array<{
+    locale?: string | null;
+    title?: string | null;
+    short_description?: string | null;
+    instructions?: unknown;
+  }> | null;
 };
 
-function mapDbGameToGame(dbGame: DbGame): Game {
-  const media = dbGame.media ?? [];
-  const cover = media.find((m) => m.kind === "cover") ?? media[0];
-  const coverUrl = cover?.media?.url ?? null;
-
-  const getGroupSize = (min: number | null, max: number | null): Game["groupSize"] => {
-    const avgPlayers = ((min ?? 2) + (max ?? 10)) / 2;
-    if (avgPlayers <= 6) return "small";
-    if (avgPlayers <= 14) return "medium";
-    return "large";
-  };
-
-  const getEnvironment = (locationType: string | null): Game["environment"] => {
-    if (locationType === "indoor") return "indoor";
-    if (locationType === "outdoor") return "outdoor";
-    return "both";
-  };
-
+/**
+ * Adapter: Converts Browse API response to GameSummary
+ * Uses the centralized mapper from lib/game-display
+ */
+function mapBrowseGameToSummary(dbGame: DbGame): GameSummary {
+  // Extract purpose from main_purpose or secondary_purposes
   const purposeName =
-    dbGame.main_purpose?.name ||
-    dbGame.secondary_purposes?.map((p) => p?.purpose?.name).filter(Boolean)[0] ||
-    dbGame.category ||
-    "aktivitet";
-  const playMode =
-    dbGame.play_mode === "participants" || dbGame.play_mode === "facilitated" || dbGame.play_mode === "basic"
-      ? dbGame.play_mode
-      : "basic";
+    dbGame.main_purpose?.name ??
+    dbGame.secondary_purposes?.map((p) => p?.purpose?.name).filter(Boolean)[0] ??
+    dbGame.category ??
+    undefined;
 
+  // Use centralized mapper with type casting for Browse's DbGame shape
+  const summary = mapDbGameToSummary(dbGame as Parameters<typeof mapDbGameToSummary>[0]);
+  
+  // Add purpose which isn't in standard mapper
   return {
-    id: dbGame.id,
-    title: dbGame.name,
-    description: dbGame.description ?? "",
-    durationMinutes: dbGame.time_estimate_min ?? 15,
-    groupSize: getGroupSize(dbGame.min_players, dbGame.max_players),
-    ageRange:
-      dbGame.age_min && dbGame.age_max
-        ? `${dbGame.age_min}-${dbGame.age_max}`
-        : "Alla åldrar",
-    energyLevel: (dbGame.energy_level as Game["energyLevel"]) ?? "medium",
-    environment: getEnvironment(dbGame.location_type),
-    purpose: purposeName,
-    playMode,
-    imageUrl: coverUrl,
-    productName: dbGame.product?.name ?? null,
+    ...summary,
+    purpose: purposeName ?? null,
+    product: dbGame.product?.name ?? null,
   };
 }
 
@@ -92,8 +75,8 @@ const initialFilters: BrowseFilters = {
 const pageSize = 12;
 
 export function BrowsePage() {
-  const [games, setGames] = useState<Game[]>([]);
-  const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
+  const [games, setGames] = useState<GameSummary[]>([]);
+  const [featuredGames, setFeaturedGames] = useState<GameSummary[]>([]);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [searchInput, setSearchInput] = useState("");
@@ -230,7 +213,7 @@ export function BrowsePage() {
           page: targetPage,
         });
 
-        const mapped = dbGames.map(mapDbGameToGame);
+        const mapped = dbGames.map(mapBrowseGameToSummary);
         setGames((prev) => (append ? [...prev, ...mapped] : mapped));
         setTotal(dbTotal);
         setHasMore(more);
@@ -270,7 +253,7 @@ export function BrowsePage() {
         const res = await fetch(`/api/games/featured?limit=4${tenantId ? `&tenantId=${tenantId}` : ""}`);
         if (!res.ok) return;
         const json = (await res.json()) as { games: DbGame[] };
-        setFeaturedGames((json.games ?? []).map(mapDbGameToGame));
+        setFeaturedGames((json.games ?? []).map(mapBrowseGameToSummary));
       } catch (err) {
         console.warn("[BrowsePage] featured fetch failed", err);
       }
@@ -330,7 +313,7 @@ export function BrowsePage() {
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {featuredGames.map((game) => (
-              <GameCard key={game.id} game={game} layout="list" />
+              <GameCard key={game.id} game={game} variant="list" />
             ))}
           </div>
         </section>
@@ -383,27 +366,9 @@ export function BrowsePage() {
           onRetry={() => window.location.reload()}
         />
       ) : isLoading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-2xl border border-border/60 bg-card p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-5 w-2/3" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-4/5" />
-                </div>
-                <Skeleton className="h-6 w-20 rounded-full" />
-              </div>
-              <div className="mt-4 flex gap-2">
-                <Skeleton className="h-7 w-16 rounded-lg" />
-                <Skeleton className="h-7 w-14 rounded-lg" />
-                <Skeleton className="h-7 w-14 rounded-lg" />
-              </div>
-              <div className="mt-3 flex gap-1.5">
-                <Skeleton className="h-5 w-16 rounded-full" />
-                <Skeleton className="h-5 w-14 rounded-full" />
-              </div>
-            </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <GameCardSkeleton key={i} variant="grid" />
           ))}
         </div>
       ) : games.length === 0 ? (
@@ -425,11 +390,11 @@ export function BrowsePage() {
           <div
             className={cn(
               "gap-4",
-              view === "grid" ? "grid grid-cols-1 sm:grid-cols-2" : "flex flex-col"
+              view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "flex flex-col"
             )}
           >
             {games.map((game) => (
-              <GameCard key={game.id} game={game} layout={view} />
+              <GameCard key={game.id} game={game} variant={view} />
             ))}
           </div>
 

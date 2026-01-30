@@ -4,6 +4,9 @@ import { getTranslations } from 'next-intl/server'
 import { ArrowLeftIcon, BoltIcon, ClockIcon, UsersIcon, UserIcon } from '@heroicons/react/24/outline'
 import { getGameById, getRelatedGames, type GameWithRelations } from '@/lib/services/games.server'
 import { StartSessionCta } from './start-session-cta'
+import { GameCard } from '@/components/game/GameCard'
+import { formatEnergyLevel, mapDbGameToSummary } from '@/lib/game-display'
+import type { EnergyLevel, GameSummary } from '@/lib/game-display'
 
 type Instruction = { title?: string; description?: string; duration_minutes?: number | null }
 
@@ -28,11 +31,12 @@ export default async function GameDetailPage({ params }: Props) {
   const game = await getGameById(gameId)
   const relatedGames = game ? await getRelatedGames(game, 4) : []
 
-  const energyConfig: Record<string, { label: string; color: string; bgColor: string }> = {
-    low: { label: t('energy.low'), color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-50 dark:bg-green-950/50' },
-    medium: { label: t('energy.medium'), color: 'text-amber-600 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-950/50' },
-    high: { label: t('energy.high'), color: 'text-red-600 dark:text-red-400', bgColor: 'bg-red-50 dark:bg-red-950/50' },
-  }
+  // Use centralized energy formatter
+  const getEnergyFormatted = (level?: string | null) => {
+    const energy = formatEnergyLevel(level as EnergyLevel | null);
+    if (!energy) return { label: t('energy.medium'), labelShort: t('energy.medium'), color: 'text-amber-600 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-950/50' };
+    return energy;
+  };
 
   if (!game) {
     return (
@@ -70,7 +74,7 @@ export default async function GameDetailPage({ params }: Props) {
       ? (translation?.instructions as Instruction[])
       : null
 
-  const energy = energyConfig[game.energy_level ?? 'medium'] ?? energyConfig.medium
+  const energy = getEnergyFormatted(game.energy_level)
   const media = game.media ?? []
   const cover = media.find((m) => m.kind === 'cover') ?? media[0]
   const gallery = media.filter((m) => m !== cover)
@@ -121,7 +125,7 @@ export default async function GameDetailPage({ params }: Props) {
           {game.energy_level && (
             <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium ${energy.bgColor} ${energy.color}`}>
               <BoltIcon className="h-4 w-4" />
-              {energy.label}
+              {energy.labelShort}
             </span>
           )}
           {game.main_purpose && (
@@ -259,7 +263,7 @@ export default async function GameDetailPage({ params }: Props) {
                   {t('details.energy')}
                 </h3>
                 <p className={`text-xl font-bold ${energy.color}`}>
-                  {energy.label}
+                  {energy.labelShort}
                 </p>
               </div>
             </div>
@@ -312,24 +316,23 @@ export default async function GameDetailPage({ params }: Props) {
         <section className="mt-12">
           <h2 className="text-xl font-semibold text-foreground mb-4">Liknande lekar</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {relatedGames.map((relatedGame) => (
-              <Link
-                key={relatedGame.id}
-                href={`/app/games/${relatedGame.id}`}
-                className="block rounded-2xl border border-border/60 bg-card p-4 hover:shadow-md hover:-translate-y-0.5 transition-all"
-              >
-                <h3 className="font-semibold text-foreground mb-1">{relatedGame.name}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2">{relatedGame.description}</p>
-                {relatedGame.energy_level && (
-                  <span
-                    className={`mt-2 inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg ${energyConfig[relatedGame.energy_level]?.bgColor} ${energyConfig[relatedGame.energy_level]?.color}`}
-                  >
-                    <BoltIcon className="h-3 w-3" />
-                    {energyConfig[relatedGame.energy_level]?.label}
-                  </span>
-                )}
-              </Link>
-            ))}
+            {relatedGames.map((relatedGame) => {
+              // Map to GameSummary for Unified GameCard
+              const summary: GameSummary = {
+                id: relatedGame.id,
+                title: relatedGame.name,
+                shortDescription: relatedGame.description ?? undefined,
+                energyLevel: relatedGame.energy_level as EnergyLevel ?? undefined,
+              };
+              return (
+                <GameCard
+                  key={relatedGame.id}
+                  game={summary}
+                  variant="mini"
+                  actions={{ href: `/app/games/${relatedGame.id}` }}
+                />
+              );
+            })}
           </div>
         </section>
       )}

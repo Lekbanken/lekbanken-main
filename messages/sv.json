@@ -162,6 +162,14 @@
         "browseAction": "Utforska aktiviteter"
       }
     },
+    "tenant": {
+      "personal": "Mitt konto",
+      "selectTenant": "Välj konto",
+      "sectionPersonal": "Personligt",
+      "sectionOrganizations": "Organisationer",
+      "noTenants": "Inga konton",
+      "switchTo": "Byt till {name}"
+    },
     "ui": {
       "audioEditor": {
         "autoplay": "Autoplay",
@@ -307,6 +315,11 @@
     "errorTitle": "Kunde inte ladda",
     "emptyTitle": "Inga aktiviteter hittades",
     "emptyDescription": "Försök med andra filter eller sökord.",
+    "empty": {
+      "title": "Inga aktiviteter hittades",
+      "description": "Försök med andra filter eller sökord.",
+      "clearFilters": "Rensa filter"
+    },
     "loadMore": "Ladda fler",
     "filterHint": "Tips: Använd filter för att hitta rätt aktivitet",
     "gameCard": {
@@ -1618,6 +1631,7 @@
           "revoke": "Återkalla"
         },
         "loading": "Laddar…",
+        "noProducts": "Inga produkter tillgängliga",
         "emptyTitle": "Inga entitlements",
         "emptyDescription": "Organisationen har inga licenser ännu.",
         "unknownProduct": "Okänd produkt",
@@ -4892,6 +4906,9 @@
             "taxonomyLabel": "Taxonomi / spelkategori",
             "taxonomyPlaceholder": "t.ex. Cirkellekar",
             "taxonomyNote": "Behåller tidigare värde vid import; sparas som spelkategori i databasen.",
+            "productLabel": "Produkt",
+            "productPlaceholder": "Välj produkt...",
+            "productHelp": "Kopplar leken till en licensprodukt.",
             "statusLabel": "Status",
             "statusDraft": "Utkast",
             "statusPublished": "Publicerad",
@@ -6592,6 +6609,7 @@
             "stripe": "Stripe",
             "settings": "Inställningar",
             "availability": "Tillgång",
+            "games": "Lekar",
             "entitlements": "Regler",
             "lifecycle": "Livscykel"
           },
@@ -6651,6 +6669,17 @@
             "noDependencies": "Inga beroenden konfigurerade",
             "requires": "Kräver",
             "excludes": "Utesluter"
+          },
+          "games": {
+            "title": "Kopplade lekar",
+            "loading": "Laddar lekar...",
+            "noGames": "Inga lekar kopplade",
+            "noGamesHelp": "Koppla lekar via lekbyggarens Inställningar-sektion.",
+            "global": "Global",
+            "unlink": "Ta bort",
+            "unlinkSuccess": "\"{name}\" bortkopplad från produkten",
+            "unlinkFailed": "Kunde inte ta bort koppling",
+            "helpText": "Lekar kopplas till produkter via lekbyggarens Inställningar-sektion."
           },
           "availability": {
             "scope": "Tillgänglighetsomfång",
@@ -6874,6 +6903,72 @@
           }
         }
       }
+    },
+    "licenses": {
+      "title": "Licenser",
+      "description": "Hantera alla licenser – personliga och organisationer",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "licenses": "Licenser"
+      },
+      "stats": {
+        "total": "Totalt",
+        "active": "Aktiva",
+        "private": "Personliga",
+        "organization": "Organisationer"
+      },
+      "filter": {
+        "searchPlaceholder": "Sök e-post, organisation...",
+        "typeAll": "Alla typer",
+        "typePrivate": "Personliga",
+        "typeOrganization": "Organisationer",
+        "statusAll": "Alla status",
+        "statusActive": "Aktiv",
+        "statusInactive": "Inaktiv",
+        "statusRevoked": "Återkallad",
+        "statusExpired": "Utgången"
+      },
+      "type": {
+        "private": "Personlig",
+        "organization": "Organisation"
+      },
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "revoked": "Återkallad",
+        "expired": "Utgången"
+      },
+      "seats": "platser",
+      "grantButton": "Skapa personlig licens",
+      "noLicenses": "Inga licenser hittades",
+      "noLicensesHint": "Justera filter eller skapa en ny licens",
+      "grantSuccess": "Personlig licens skapad",
+      "grantDialog": {
+        "title": "Skapa personlig licens",
+        "description": "Tilldela en licens till en privatperson. Användaren måste redan ha ett konto.",
+        "userEmail": "Användarens e-post",
+        "userEmailPlaceholder": "namn@exempel.se",
+        "userEmailHint": "Användaren måste redan ha ett konto i systemet",
+        "product": "Produkt",
+        "selectProduct": "Välj produkt",
+        "loadingProducts": "Laddar produkter...",
+        "noProducts": "Inga produkter tillgängliga",
+        "seats": "Antal platser",
+        "seatsHint": "Antal platser som ingår i licensen",
+        "validUntil": "Giltig till (valfritt)",
+        "notes": "Anteckningar (valfritt)",
+        "notesPlaceholder": "T.ex. support-ärende #123",
+        "cancel": "Avbryt",
+        "grant": "Skapa licens",
+        "granting": "Skapar...",
+        "submit": "Skapa licens",
+        "submitting": "Skapar...",
+        "validation": {
+          "required": "Fyll i alla obligatoriska fält",
+          "invalidEmail": "Ange en giltig e-postadress"
+        }
+      },
+      "loadError": "Kunde inte ladda licenser"
     },
     "participants": {
       "title": "Deltagare",
@@ -8711,6 +8806,90 @@
       "themeSystem": "System",
       "notifications": "Notifikationer"
     },
+    "subscription": {
+      "title": "Min prenumeration",
+      "titlePersonal": "Min prenumeration",
+      "titleOrg": "Organisationens prenumeration",
+      "subtitle": "Hantera din prenumeration för {tenantName}.",
+      "subtitlePersonal": "Hantera din personliga prenumeration.",
+      "subtitleNoTenant": "Välj en organisation för att se prenumerationsdetaljer.",
+      "tabs": {
+        "overview": "Översikt",
+        "entitlements": "Produkter",
+        "invoices": "Fakturor"
+      },
+      "status": {
+        "active": "Aktiv",
+        "past_due": "Förfallen",
+        "canceled": "Avslutad",
+        "incomplete": "Ofullständig",
+        "incomplete_expired": "Utgången",
+        "trialing": "Provperiod",
+        "unpaid": "Obetald",
+        "canceling": "Avslutas snart"
+      },
+      "currentPlan": {
+        "subscription": "Prenumeration",
+        "role": "Din roll: {role}",
+        "perInterval": "per {interval}",
+        "renews": "Förnyas {date}",
+        "endsOn": "Avslutas {date}",
+        "paymentMethod": "{brand} ···· {last4}",
+        "manage": "Hantera prenumeration"
+      },
+      "cancelScheduled": {
+        "title": "Prenumerationen avslutas",
+        "description": "Din prenumeration avslutas {date}. Du har tillgång till allt innehåll fram till dess.",
+        "descriptionPersonal": "Din personliga prenumeration avslutas {date}. Du har tillgång till allt innehåll fram till dess.",
+        "reactivate": "Återaktivera"
+      },
+      "noSubscription": {
+        "title": "Ingen aktiv prenumeration",
+        "titlePersonal": "Du har ingen personlig prenumeration",
+        "description": "Din organisation har ingen aktiv prenumeration.",
+        "descriptionPersonal": "Skaffa en personlig licens för att få tillgång till premium-innehåll.",
+        "choosePlan": "Välj plan"
+      },
+      "stats": {
+        "activeProducts": "Aktiva produkter",
+        "invoices": "Fakturor",
+        "accountType": "Kontotyp",
+        "personal": "Personligt",
+        "organization": "Organisation"
+      },
+      "entitlements": {
+        "title": "Dina produkter",
+        "empty": {
+          "title": "Inga aktiva produkter",
+          "description": "Du har inga aktiva produkter ännu.",
+          "browse": "Bläddra produkter"
+        },
+        "status": {
+          "active": "Aktiv",
+          "inactive": "Inaktiv",
+          "pending": "Väntar"
+        },
+        "unknownProduct": "Okänd produkt",
+        "seats": "{count} platser"
+      },
+      "invoices": {
+        "title": "Fakturor",
+        "empty": "Inga fakturor ännu.",
+        "status": {
+          "paid": "Betald",
+          "open": "Öppen",
+          "draft": "Utkast",
+          "void": "Annullerad",
+          "uncollectible": "Ej indrivbar"
+        },
+        "view": "Visa",
+        "download": "Ladda ner"
+      },
+      "error": {
+        "title": "Något gick fel",
+        "retry": "Försök igen"
+      }
+    },
     "gamification": {
       "events": {
         "signInRequired": "Du behöver vara inloggad för att se eventloggen.",
@@ -9714,7 +9893,9 @@
       },
       "return": {
         "title": "Tack!",
+        "titlePersonal": "Tack för ditt köp!",
         "subtitle": "Vi bekräftar din betalning och sätter upp din organisation. Det brukar gå snabbt.",
+        "subtitlePersonal": "Vi bekräftar din betalning och aktiverar ditt konto. Det brukar gå snabbt.",
         "labels": {
           "status": "Status:",
           "loading": "Laddar…",
@@ -9729,6 +9910,11 @@
           "missingIntentId": "Saknar purchase_intent_id.",
           "readStatusFailed": "Kunde inte läsa status.",
           "generic": "Något gick fel. Försök igen."
+        },
+        "personalSuccess": {
+          "title": "Du har nu tillgång!",
+          "subtitle": "Ditt konto är aktiverat och du har full tillgång till ditt innehåll.",
+          "redirecting": "Omdirigerar till appen..."
         }
       },
       "success": {

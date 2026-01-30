@@ -393,6 +393,159 @@ function PricingTab({ product, onRefresh }: { product: ProductDetail; onRefresh:
   );
 }
 
+// ============================================================================
+// GAMES TAB - Linked games from the games table
+// ============================================================================
+
+type LinkedGame = {
+  id: string;
+  game_key: string | null;
+  name: string;
+  status: string;
+  play_mode: string | null;
+  owner_tenant_id: string | null;
+  owner_tenant_name: string | null;
+  updated_at: string;
+};
+
+function GamesTab({ product, onRefresh }: { product: ProductDetail; onRefresh: () => void }) {
+  const t = useTranslations('admin.products.v2.detail');
+  const router = useRouter();
+  const { success, error: toastError } = useToast();
+  const [games, setGames] = useState<LinkedGame[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [unlinkingId, setUnlinkingId] = useState<string | null>(null);
+
+  const loadGames = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/admin/products/${product.id}/games`);
+      if (!res.ok) throw new Error('Failed to load games');
+      const data = await res.json();
+      setGames(data.games || []);
+    } catch (err) {
+      console.error('Failed to load linked games:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [product.id]);
+
+  useEffect(() => {
+    loadGames();
+  }, [loadGames]);
+
+  const handleUnlink = async (game: LinkedGame) => {
+    setUnlinkingId(game.id);
+    try {
+      const res = await fetch(`/api/admin/products/${product.id}/games/${game.id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to unlink game');
+      success(t('games.unlinkSuccess', { name: game.name }));
+      loadGames();
+    } catch (err) {
+      toastError(t('games.unlinkFailed'));
+    } finally {
+      setUnlinkingId(null);
+    }
+  };
+
+  const handleEditGame = (gameId: string) => {
+    router.push(`/admin/games/${gameId}/edit`);
+  };
+
+  const statusColors: Record<string, string> = {
+    published: 'bg-emerald-500',
+    draft: 'bg-amber-500',
+    archived: 'bg-gray-400',
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <CubeIcon className="h-4 w-4" />
+            {t('games.title')} ({games.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {isLoading ? (
+            <div className="py-8 text-center text-muted-foreground">
+              <ArrowPathIcon className="h-6 w-6 mx-auto mb-2 animate-spin" />
+              <p>{t('games.loading')}</p>
+            </div>
+          ) : games.length === 0 ? (
+            <div className="py-8 text-center text-muted-foreground">
+              <CubeIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="mb-1">{t('games.noGames')}</p>
+              <p className="text-xs">{t('games.noGamesHelp')}</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-border">
+              {games.map((game) => (
+                <div
+                  key={game.id}
+                  className="flex items-center justify-between py-3 px-1 group hover:bg-muted/30 rounded-lg -mx-1 px-3"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className={`h-2 w-2 rounded-full ${statusColors[game.status] || 'bg-gray-400'}`} />
+                    <div className="min-w-0 flex-1">
+                      <button
+                        onClick={() => handleEditGame(game.id)}
+                        className="text-sm font-medium text-foreground hover:text-primary hover:underline text-left truncate block w-full"
+                      >
+                        {game.name}
+                      </button>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {game.game_key && <code className="font-mono">{game.game_key}</code>}
+                        {game.owner_tenant_name && (
+                          <>
+                            <span>•</span>
+                            <span>{game.owner_tenant_name}</span>
+                          </>
+                        )}
+                        {!game.owner_tenant_id && (
+                          <>
+                            <span>•</span>
+                            <span className="text-primary">{t('games.global')}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="capitalize text-xs">
+                      {game.status}
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleUnlink(game)}
+                      disabled={unlinkingId === game.id}
+                      className="opacity-0 group-hover:opacity-100 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      {unlinkingId === game.id ? (
+                        <ArrowPathIcon className="h-4 w-4 animate-spin" />
+                      ) : (
+                        t('games.unlink')
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <p className="text-xs text-muted-foreground">
+        {t('games.helpText')}
+      </p>
+    </div>
+  );
+}
+
 function EntitlementsTab({ product }: { product: ProductDetail }) {
   const t = useTranslations('admin.products.v2.detail');
   return (
@@ -1078,6 +1231,7 @@ export function ProductDetailPage({ productId }: ProductDetailPageProps) {
     { id: 'stripe', label: t('tabs.stripe') },
     { id: 'settings', label: t('tabs.settings') },
     { id: 'availability', label: t('tabs.availability') },
+    { id: 'games', label: t('tabs.games') },
     { id: 'entitlements', label: t('tabs.entitlements') },
     { id: 'lifecycle', label: t('tabs.lifecycle') },
   ];
@@ -1243,6 +1397,10 @@ export function ProductDetailPage({ productId }: ProductDetailPageProps) {
 
       <TabPanel id="availability" activeTab={activeTab}>
         <AvailabilityTab product={product} />
+      </TabPanel>
+
+      <TabPanel id="games" activeTab={activeTab}>
+        <GamesTab product={product} onRefresh={loadProduct} />
       </TabPanel>
 
       <TabPanel id="entitlements" activeTab={activeTab}>

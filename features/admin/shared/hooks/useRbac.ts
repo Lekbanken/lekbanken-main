@@ -4,6 +4,7 @@ import { useCallback, useMemo } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import type { TenantRole } from '@/types/tenant';
+import { isPrivateTenant as checkIsPrivateTenant } from '@/lib/tenant/helpers';
 
 /**
  * Admin permission types.
@@ -59,7 +60,10 @@ export type AdminPermission =
   | 'admin.participants.view'
   | 'admin.participants.moderate'
   // Toolbelt libraries
-  | 'admin.conversation_cards.manage';
+  | 'admin.conversation_cards.manage'
+  // Licenses
+  | 'admin.licenses.list'
+  | 'admin.licenses.grant';
 
 /**
  * Admin role types
@@ -137,6 +141,10 @@ const permissionChecks: Record<AdminPermission, PermissionCheck> = {
 
   // Toolbelt libraries - system_admin or tenant admin
   'admin.conversation_cards.manage': (sys, tr) => sys || tr === 'owner' || tr === 'admin',
+
+  // Licenses - system_admin only
+  'admin.licenses.list': (sys) => sys,
+  'admin.licenses.grant': (sys) => sys,
 };
 
 /**
@@ -236,6 +244,9 @@ export function useRbac() {
     hasTenants,
     tenantRole,
     
+    // Tenant type checks
+    isPrivateTenant: checkIsPrivateTenant(currentTenant),
+    
     // Access checks
     canAccessSystemAdmin: isSystemAdmin,
     canAccessTenantAdmin: isTenantAdmin || isTenantEditor,
@@ -249,8 +260,7 @@ export function useRbac() {
     isSystemAdmin,
     isTenantAdmin,
     isTenantEditor,
-    currentTenant?.id,
-    currentTenant?.name,
+    currentTenant,
     hasTenants,
     tenantRole,
   ]);

@@ -126,12 +126,16 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   // Purposes are loaded separately (not part of builder state)
   const [purposes, setPurposes] = useState<Purpose[]>([]);
 
+  // Products for product picker
+  const [products, setProducts] = useState<Array<{ id: string; name: string }>>([]);
+
   // UI state (not part of builder state)
   const [activeSection, setActiveSection] = useState<BuilderSection>('grundinfo');
   const [loading, setLoading] = useState(isEditing);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
+
 
   // Keyboard shortcuts for undo/redo
   useEffect(() => {
@@ -210,6 +214,31 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       }
     })();
   }, [t]);
+
+  // Load products for product picker
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load products');
+        const prods = (data.products || [])
+          .filter((p: { id: string; name: string; status?: string }) => p.status !== 'archived')
+          .sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name));
+        setProducts(prods);
+      } catch (err) {
+        console.error('Failed to load products:', err);
+      }
+    })();
+  }, []);
+
+  const productOptions = useMemo(
+    () => [
+      { value: '', label: t('settings.productPlaceholder') },
+      ...products.map((p) => ({ value: p.id, label: p.name })),
+    ],
+    [products, t]
+  );
 
   const mainPurposeOptions = useMemo(
     () =>
@@ -1333,6 +1362,19 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               </div>
 
               <Card className="p-6 space-y-4">
+                {/* Product Picker - First for visibility */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">{t('settings.productLabel')}</label>
+                  <Select
+                    value={core.product_id || ''}
+                    onChange={(e) => setCore({ product_id: e.target.value || null })}
+                    options={productOptions}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('settings.productHelp')}
+                  </p>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">{t('settings.taxonomyLabel')}</label>
                   <Input

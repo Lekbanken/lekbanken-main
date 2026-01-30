@@ -29,6 +29,8 @@ export interface AdminNavItem {
   tenantOnly?: boolean
   /** Permission key for RBAC check */
   permission?: string
+  /** Only visible for organization tenants (hidden for private/personal tenants) */
+  orgOnly?: boolean
 }
 
 export interface AdminNavCategory {
@@ -41,6 +43,8 @@ export interface AdminNavCategory {
   systemAdminOnly?: boolean
   /** Default collapsed state */
   defaultCollapsed?: boolean
+  /** Only visible for organization tenants (hidden for private/personal tenants) */
+  orgOnly?: boolean
 }
 
 export interface AdminNavConfig {
@@ -205,6 +209,7 @@ const organisationAdminCategories: AdminNavCategory[] = [
     id: 'org-members',
     labelKey: 'members',
     icon: 'users',
+    orgOnly: true, // Hide for private/personal tenants
     items: [
       { id: 'members-list', labelKey: 'allMembers', href: '/admin/tenant/[tenantId]/members', icon: 'users' },
       { id: 'roles', labelKey: 'rolesPermissions', href: '/admin/tenant/[tenantId]/roles', icon: 'moderation' },
@@ -276,6 +281,27 @@ export const ADMIN_NAV: AdminNavConfig = {
 export function resolveNavHref(href: string, tenantId?: string | null): string {
   if (!tenantId) return href
   return href.replace('[tenantId]', tenantId)
+}
+
+/**
+ * Filter navigation categories and items based on tenant type.
+ * Removes items/categories marked as `orgOnly` when viewing a private tenant.
+ */
+export function filterNavForTenantType(
+  categories: AdminNavCategory[],
+  isPrivateTenant: boolean
+): AdminNavCategory[] {
+  if (!isPrivateTenant) {
+    return categories
+  }
+
+  return categories
+    .filter((category) => !category.orgOnly)
+    .map((category) => ({
+      ...category,
+      items: category.items.filter((item) => !item.orgOnly),
+    }))
+    .filter((category) => category.items.length > 0)
 }
 
 /**

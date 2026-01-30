@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { CheckCircleIcon, SparklesIcon } from '@heroicons/react/24/solid'
 
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 
 type PurchaseIntent = {
   id: string
+  kind: 'organisation_subscription' | 'user_subscription' | 'one_time'
   status: string
   tenant_id: string | null
   tenant_name: string | null
@@ -27,6 +29,9 @@ export default function CheckoutReturnPage() {
 
   const [intent, setIntent] = useState<PurchaseIntent | null>(null)
   const [error, setError] = useState<string>('')
+  const [isProvisioned, setIsProvisioned] = useState(false)
+
+  const isPersonalPurchase = intent?.kind === 'user_subscription'
 
   useEffect(() => {
     if (!purchaseIntentId) return
@@ -57,7 +62,18 @@ export default function CheckoutReturnPage() {
 
         const status = (json.intent?.status || '').toLowerCase()
         if (status === 'provisioned' && json.intent?.tenant_id) {
-          router.replace('/app/select-tenant')
+          setIsProvisioned(true)
+          // For personal purchases, go directly to app (skip tenant selection)
+          // For org purchases, go to tenant selection
+          const isPersonal = json.intent.kind === 'user_subscription'
+          if (isPersonal) {
+            // Short delay to show success state before redirect
+            setTimeout(() => {
+              router.replace('/app')
+            }, 1500)
+          } else {
+            router.replace('/app/select-tenant')
+          }
           return
         }
 
@@ -85,12 +101,36 @@ export default function CheckoutReturnPage() {
     )
   }
 
+  // Success state for personal purchases
+  if (isProvisioned && isPersonalPurchase) {
+    return (
+      <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center gap-6 px-4 py-12 text-center">
+        <div className="relative">
+          <div className="absolute inset-0 animate-ping rounded-full bg-green-500/20" />
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+            <CheckCircleIcon className="h-12 w-12 text-green-500" />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">{t('return.personalSuccess.title')}</h1>
+          <p className="text-lg text-muted-foreground">{t('return.personalSuccess.subtitle')}</p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <SparklesIcon className="h-4 w-4" />
+          <span>{t('return.personalSuccess.redirecting')}</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col gap-6 px-4 py-12">
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold">{t('return.title')}</h1>
+        <h1 className="text-3xl font-semibold">
+          {isPersonalPurchase ? t('return.titlePersonal') : t('return.title')}
+        </h1>
         <p className="text-sm text-muted-foreground">
-          {t('return.subtitle')}
+          {isPersonalPurchase ? t('return.subtitlePersonal') : t('return.subtitle')}
         </p>
       </div>
 
@@ -102,13 +142,13 @@ export default function CheckoutReturnPage() {
             <span className="text-muted-foreground">{t('return.labels.status')}</span>{' '}
             <span className="font-medium">{intent?.status ?? t('return.labels.loading')}</span>
           </div>
-          {intent?.tenant_name && (
+          {!isPersonalPurchase && intent?.tenant_name && (
             <div>
               <span className="text-muted-foreground">{t('return.labels.organization')}</span>{' '}
               <span className="font-medium">{intent.tenant_name}</span>
             </div>
           )}
-          {intent?.quantity_seats ? (
+          {!isPersonalPurchase && intent?.quantity_seats ? (
             <div>
               <span className="text-muted-foreground">{t('return.labels.seats')}</span>{' '}
               <span className="font-medium">{intent.quantity_seats}</span>
@@ -121,7 +161,9 @@ export default function CheckoutReturnPage() {
         <Button variant="outline" onClick={() => router.push('/checkout/start')}>
           {t('return.actions.back')}
         </Button>
-        <Button onClick={() => router.push('/app/select-tenant')}>{t('return.actions.continue')}</Button>
+        <Button onClick={() => router.push(isPersonalPurchase ? '/app' : '/app/select-tenant')}>
+          {t('return.actions.continue')}
+        </Button>
       </div>
     </div>
   )

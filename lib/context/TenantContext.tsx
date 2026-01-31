@@ -83,6 +83,11 @@ export function TenantProvider({
 }: TenantProviderProps) {
   const hasInitial = initialTenant !== undefined || initialMemberships !== undefined
 
+  const currentUserIdRef = useRef<string | null>(userId ?? null)
+  useEffect(() => {
+    currentUserIdRef.current = userId ?? null
+  }, [userId])
+
   const [currentTenant, setCurrentTenant] = useState<TenantWithMembership | null>(() => {
     if (initialTenant) {
       return initialTenant
@@ -99,6 +104,7 @@ export function TenantProvider({
   const [, startTransition] = useTransition()
 
   const prevUserIdRef = useRef<string | null>(null)
+  const loadTenantsInFlightRef = useRef<{ userId: string; promise: Promise<void> } | null>(null)
 
   const tenantRole = currentTenant?.membership?.role ?? initialRole ?? null
 
@@ -111,19 +117,40 @@ export function TenantProvider({
       return
     }
 
-    try {
-      setIsLoadingTenants(true)
-      const resolved = await resolveCurrentTenant()
-      const tenantsWithMembership = (resolved.tenants as TenantWithMembership[]) || []
-
-      setUserTenants(tenantsWithMembership)
-      setHasTenants(tenantsWithMembership.length > 0)
-      setCurrentTenant((resolved.tenant as TenantWithMembership) ?? null)
-    } catch (error) {
-      console.error('Error loading tenants:', error)
-    } finally {
-      setIsLoadingTenants(false)
+    const inFlight = loadTenantsInFlightRef.current
+    if (inFlight?.userId === userId) {
+      return inFlight.promise
     }
+
+    const requestedUserId = userId
+    const promise = (async () => {
+      try {
+        setIsLoadingTenants(true)
+        const resolved = await resolveCurrentTenant()
+        const tenantsWithMembership = (resolved.tenants as TenantWithMembership[]) || []
+
+        if (currentUserIdRef.current !== requestedUserId) return
+
+        setUserTenants(tenantsWithMembership)
+        setHasTenants(tenantsWithMembership.length > 0)
+        setCurrentTenant((resolved.tenant as TenantWithMembership) ?? null)
+      } catch (error) {
+        console.error('Error loading tenants:', error)
+      } finally {
+        if (currentUserIdRef.current === requestedUserId) {
+          setIsLoadingTenants(false)
+        }
+      }
+    })()
+
+    loadTenantsInFlightRef.current = { userId: requestedUserId, promise }
+    promise.finally(() => {
+      if (loadTenantsInFlightRef.current?.promise === promise) {
+        loadTenantsInFlightRef.current = null
+      }
+    })
+
+    return promise
   }, [userId])
 
   useEffect(() => {

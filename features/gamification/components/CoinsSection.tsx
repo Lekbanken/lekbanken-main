@@ -1,6 +1,4 @@
-import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { CoinsSummary } from "../types";
 
 type CoinsSectionProps = {
@@ -68,14 +66,6 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
             })
           )}
         </div>
-
-        <Link
-          href="/app/profile/coins"
-          className="flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline"
-        >
-          Se transaktionshistorik
-          <ChevronRightIcon className="h-4 w-4" />
-        </Link>
       </div>
     </section>
   );

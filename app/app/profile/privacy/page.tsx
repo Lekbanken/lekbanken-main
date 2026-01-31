@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { ProfileService, type GDPRRequest, type UserConsent } from '@/lib/profile';
@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert } from '@/components/ui/alert';
 import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
+import { useProfileQuery } from '@/hooks/useProfileQuery';
 import {
   ShieldCheckIcon,
   DocumentArrowDownIcon,
@@ -21,15 +22,76 @@ import {
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 
+interface PrivacyData {
+  gdprRequests: GDPRRequest[];
+  consents: UserConsent[];
+  partialFailure?: boolean;
+}
+
 export default function PrivacySettingsPage() {
   const t = useTranslations('app.profile');
   const { user, isLoading: authLoading } = useAuth();
   const { supabase, error: supabaseError, isInitializing } = useBrowserSupabase();
 
-  // GDPR Requests state
+  // Stabil queryKey
+  const queryKey = `privacy-${user?.id ?? 'anon'}`;
+  
+  // Använd useProfileQuery med Promise.allSettled för partial data
+  const {
+    data: privacyData,
+    isLoading,
+    status,
+    error: queryError,
+    retry,
+  } = useProfileQuery<PrivacyData>(
+    queryKey,
+    async () => {
+      if (!supabase || !user?.id) {
+        throw new Error('Missing supabase or user');
+      }
+      
+      const profileService = new ProfileService(supabase);
+      
+      // Promise.allSettled för att hantera partiella fel
+      const results = await Promise.allSettled([
+        profileService.getGDPRRequests(user.id),
+        profileService.getUserConsents(user.id),
+      ]);
+      
+      const gdprRequests = results[0].status === 'fulfilled' ? results[0].value : [];
+      const consents = results[1].status === 'fulfilled' ? results[1].value : [];
+      
+      // Kasta om båda failade
+      if (results[0].status === 'rejected' && results[1].status === 'rejected') {
+        throw results[0].reason;
+      }
+      
+      return {
+        gdprRequests,
+        consents,
+        partialFailure: results.some(r => r.status === 'rejected'),
+      };
+    },
+    { userId: user?.id, supabaseRef: supabase ? 1 : 0 },
+    {
+      timeout: 12000,
+      skip: authLoading || !supabase || !user?.id,
+    }
+  );
+
+  // Local state för mutations (inte fetching)
   const [gdprRequests, setGdprRequests] = useState<GDPRRequest[]>([]);
   const [consents, setConsents] = useState<UserConsent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  // Synka data från query till local state för mutations
+  if (privacyData && status === 'success') {
+    if (gdprRequests !== privacyData.gdprRequests) {
+      setGdprRequests(privacyData.gdprRequests);
+    }
+    if (consents !== privacyData.consents) {
+      setConsents(privacyData.consents);
+    }
+  }
 
   // Export request state
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -43,45 +105,7 @@ export default function PrivacySettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadPrivacyData = async () => {
-      // Wait for auth to finish loading before deciding there's no user
-      if (authLoading) return;
-
-      if (supabaseError) {
-        setIsLoading(false);
-        return;
-      }
-       
-      // Wait for supabase client to be initialized
-      if (!supabase) return;
-      
-      // If no user after auth is done, stop loading
-      if (!user?.id) {
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const profileService = new ProfileService(supabase);
-
-        const [requestsData, consentsData] = await Promise.all([
-          profileService.getGDPRRequests(user.id),
-          profileService.getUserConsents(user.id),
-        ]);
-
-        setGdprRequests(requestsData);
-        setConsents(consentsData);
-      } catch (error) {
-        console.error('Failed to load privacy data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadPrivacyData();
-  }, [user?.id, supabase, authLoading, supabaseError]);
+  // Manuell useEffect borttagen - använder useProfileQuery istället
 
   const handleDataExportRequest = useCallback(async () => {
     if (!user?.id || !supabase) return;
@@ -197,6 +221,25 @@ export default function PrivacySettingsPage() {
               Ladda om
             </Button>
           </div>
+        </Alert>
+      )}
+
+      {/* Query error/timeout */}
+      {(status === 'error' || status === 'timeout') && (
+        <Alert variant="error" title={status === 'timeout' ? 'Anslutningen tog för lång tid' : 'Kunde inte ladda data'}>
+          <div className="space-y-3">
+            <p>{queryError || 'Ett oväntat fel uppstod.'}</p>
+            <Button onClick={retry} variant="outline" size="sm">
+              Försök igen
+            </Button>
+          </div>
+        </Alert>
+      )}
+
+      {/* Partial failure warning */}
+      {privacyData?.partialFailure && (
+        <Alert variant="warning" title="Delvis fel">
+          <p>Vissa data kunde inte laddas. Informationen nedan kan vara ofullständig.</p>
         </Alert>
       )}
 

@@ -10,7 +10,6 @@ import {
   AtSymbolIcon,
   ShieldCheckIcon,
   LockClosedIcon,
-  BellIcon,
   Cog6ToothIcon,
   BuildingOfficeIcon,
   ClockIcon,
@@ -60,13 +59,6 @@ const navItems: ProfileNavItem[] = [
     href: '/app/profile/privacy',
     icon: LockClosedIcon,
     descriptionKey: 'nav.privacyDesc',
-  },
-  {
-    id: 'notifications',
-    labelKey: 'nav.notifications',
-    href: '/app/profile/notifications',
-    icon: BellIcon,
-    descriptionKey: 'nav.notificationsDesc',
   },
   {
     id: 'preferences',

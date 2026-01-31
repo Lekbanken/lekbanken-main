@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { ProfileService, type OrganizationMembership } from '@/lib/profile';
@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
 import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
+import { useProfileQuery } from '@/hooks/useProfileQuery';
 import {
   BuildingOffice2Icon,
   UserGroupIcon,
@@ -42,49 +43,42 @@ export default function OrganizationsPage() {
   const { supabase, error: supabaseError, isInitializing } = useBrowserSupabase();
   const roleLabels = useMemo(() => getRoleLabels(t), [t]);
 
-  const [memberships, setMemberships] = useState<OrganizationMembership[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Create stable profileService instance
+  const profileService = useMemo(
+    () => (supabase ? new ProfileService(supabase) : null),
+    [supabase]
+  );
 
-  useEffect(() => {
-    const loadMemberships = async () => {
-      // Wait for auth to finish loading before deciding there's no user
-      if (authLoading) return;
-
-      if (supabaseError) {
-        setIsLoading(false);
-        return;
+  // Use the new single-flight hook for fetching
+  const {
+    data: memberships,
+    status,
+    error: loadError,
+    isLoading,
+    isTimeout,
+    retry,
+  } = useProfileQuery<OrganizationMembership[]>(
+    `organizations-${user?.id}`,
+    async () => {
+      if (!profileService || !user?.id) {
+        throw new Error('Not ready');
       }
-       
-      // Wait for supabase client to be initialized
-      if (!supabase) return;
-      
-      // If no user after auth is done, stop loading
-      if (!user?.id) {
-        setIsLoading(false);
-        return;
-      }
+      return profileService.getOrganizationMemberships(user.id);
+    },
+    { userId: user?.id, profileService },
+    {
+      skip: authLoading || isInitializing || !supabase || !user?.id,
+      timeout: 10000,
+    }
+  );
 
-      setIsLoading(true);
-      try {
-        const profileService = new ProfileService(supabase);
-        const profile = await profileService.getCompleteProfile(user.id);
+  const stillLoading = isLoading || authLoading || isInitializing;
 
-        if (profile?.organizations) {
-          setMemberships(profile.organizations);
-        }
-      } catch (error) {
-        console.error('Failed to load organizations:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const membershipsList = memberships ?? [];
 
-    loadMemberships();
-  }, [user?.id, supabase, authLoading, supabaseError]);
-
-  const ownedOrgs = memberships.filter((m) => m.role === 'owner');
-  const adminOrgs = memberships.filter((m) => m.role === 'admin');
-  const memberOrgs = memberships.filter((m) => m.role === 'member' || m.role === 'editor');
+  const ownedOrgs = membershipsList.filter((m) => m.role === 'owner');
+  const adminOrgs = membershipsList.filter((m) => m.role === 'admin');
+  const memberOrgs = membershipsList.filter((m) => m.role === 'member' || m.role === 'editor');
 
   if (!authLoading && supabaseError) {
     return (
@@ -104,7 +98,7 @@ export default function OrganizationsPage() {
     );
   }
 
-  if (isLoading) {
+  if (stillLoading) {
     return (
       <div className="p-6 lg:p-8">
         <div className="animate-pulse space-y-4">
@@ -115,17 +109,38 @@ export default function OrganizationsPage() {
             <div className="h-32 bg-muted rounded-lg" />
           </div>
         </div>
+        {isTimeout && (
+          <div className="mt-6 space-y-3">
+            <p className="text-xs text-muted-foreground">
+              Det här tar ovanligt lång tid. Kolla Console/Network för vilken request som fastnat och prova att ladda om sidan.
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={retry} variant="outline" size="sm">
+                Försök igen
+              </Button>
+              <Button onClick={() => window.location.reload()} variant="ghost" size="sm">
+                Ladda om
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
-  if (isInitializing) {
+  if (status === 'error' || status === 'timeout') {
     return (
-      <div className="p-6 lg:p-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 w-48 bg-muted rounded" />
-          <div className="h-4 w-72 bg-muted rounded" />
-          <div className="h-64 bg-muted rounded-lg" />
+      <div className="p-6 lg:p-8 space-y-4">
+        <Alert variant="error" title="Kunde inte ladda organisationer">
+          <p>{loadError || 'Ett oväntat fel inträffade.'}</p>
+        </Alert>
+        <div className="flex gap-2">
+          <Button onClick={retry} variant="outline">
+            Försök igen
+          </Button>
+          <Button onClick={() => window.location.reload()} variant="ghost">
+            Ladda om
+          </Button>
         </div>
       </div>
     );
@@ -162,7 +177,7 @@ export default function OrganizationsPage() {
                 <BuildingOffice2Icon className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">{memberships.length}</p>
+                <p className="text-2xl font-bold text-foreground">{membershipsList.length}</p>
                 <p className="text-sm text-muted-foreground">{t('sections.organizations.stats.total')}</p>
               </div>
             </div>
@@ -191,7 +206,7 @@ export default function OrganizationsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">
-                  {memberships.filter((m) => m.status === 'active').length}
+                  {membershipsList.filter((m) => m.status === 'active').length}
                 </p>
                 <p className="text-sm text-muted-foreground">{t('sections.organizations.stats.activeMemberships')}</p>
               </div>
@@ -201,7 +216,7 @@ export default function OrganizationsPage() {
       </div>
 
       {/* No Organizations */}
-      {memberships.length === 0 && (
+      {membershipsList.length === 0 && (
         <Card>
           <CardContent className="py-12">
             <div className="text-center">

@@ -7,6 +7,7 @@ import {
   getUserAchievementProgress,
   type AchievementProgress,
 } from '@/lib/services/achievementService';
+import { withTimeout } from '@/lib/utils/withTimeout';
 import AchievementBadge from '@/components/AchievementBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { TrophyIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
@@ -31,6 +32,8 @@ export function ProfileAchievementsShowcase({
 }: ProfileAchievementsShowcaseProps) {
   const [achievements, setAchievements] = useState<AchievementProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadCounter, setReloadCounter] = useState(0);
   const t = useTranslations('profile');
 
   useEffect(() => {
@@ -42,17 +45,23 @@ export function ProfileAchievementsShowcase({
     const loadAchievements = async () => {
       try {
         setIsLoading(true);
-        const progress = await getUserAchievementProgress(userId);
+        setLoadError(null);
+        const progress = await withTimeout(
+          getUserAchievementProgress(userId),
+          12000,
+          'getUserAchievementProgress'
+        );
         setAchievements(progress);
       } catch (err) {
         console.error('Error loading achievements for showcase:', err);
+        setLoadError('Kunde inte ladda prestationer. Försök igen.');
       } finally {
         setIsLoading(false);
       }
     };
 
     void loadAchievements();
-  }, [userId]);
+  }, [userId, reloadCounter]);
 
   // Get the achievements to display:
   // - Prioritize recently unlocked
@@ -94,6 +103,29 @@ export function ProfileAchievementsShowcase({
           <div className="flex justify-center py-8">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
           </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrophyIcon className="h-5 w-5 text-amber-500" />
+            {t('achievements.title')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="py-6">
+          <p className="text-sm text-muted-foreground">{loadError}</p>
+          <button
+            type="button"
+            onClick={() => setReloadCounter((n) => n + 1)}
+            className="mt-3 inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium hover:bg-muted transition-colors"
+          >
+            Försök igen
+          </button>
         </CardContent>
       </Card>
     );

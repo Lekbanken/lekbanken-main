@@ -33,7 +33,9 @@ export default async function SecuritySettingsPage() {
   // const mfaStatus = null; - removed
   
   const hasTOTP = factors?.totp?.some(f => f.status === 'verified') ?? false;
+  const hasPhone = factors?.phone?.some(f => f.status === 'verified') ?? false;
   const totpFactor = factors?.totp?.find(f => f.status === 'verified');
+  const phoneFactor = factors?.phone?.find(f => f.status === 'verified');
   
   return (
     <div className="py-8">
@@ -50,8 +52,8 @@ export default async function SecuritySettingsPage() {
         
         {/* Client component for interactive MFA management */}
         <SecuritySettingsClient 
-          hasMFA={hasTOTP}
-          factorId={totpFactor?.id}
+          hasMFA={hasTOTP || hasPhone}
+          factorId={totpFactor?.id ?? phoneFactor?.id}
           userEmail={user.email}
         />
       </div>

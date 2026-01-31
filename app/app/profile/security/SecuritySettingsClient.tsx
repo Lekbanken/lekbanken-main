@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { 
@@ -20,6 +20,13 @@ import {
 } from '@heroicons/react/24/outline';
 import type { MFAStatus, MFATrustedDevice } from '@/types/mfa';
 import { MFAEnrollmentModal } from './MFAEnrollmentModal';
+import { useProfileQuery } from '@/hooks/useProfileQuery';
+
+type MfaStatusApiResponse = MFAStatus & {
+  // Raw Supabase factors returned from /api/accounts/auth/mfa/status
+  totp?: Array<{ id: string; status?: string } | null> | null
+  phone?: Array<{ id: string; status?: string } | null> | null
+}
 
 interface SecuritySettingsClientProps {
   hasMFA: boolean;
@@ -37,43 +44,103 @@ export function SecuritySettingsClient({
   const [factorId, setFactorId] = useState(initialFactorId);
   const [mfaStatus, setMfaStatus] = useState<MFAStatus | null>(null);
   const [trustedDevices, setTrustedDevices] = useState<MFATrustedDevice[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isDisabling, setIsDisabling] = useState(false);
   const [showEnrollment, setShowEnrollment] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Fetch MFA status and trusted devices
-  const fetchMFAData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const [statusRes, devicesRes] = await Promise.all([
-        fetch('/api/accounts/auth/mfa/status', { credentials: 'include' }),
-        fetch('/api/accounts/auth/mfa/devices', { credentials: 'include' }),
-      ]);
-      
-      if (statusRes.ok) {
-        const status = await statusRes.json();
-        setMfaStatus(status);
-        setHasMFA(status.is_enabled);
+  const statusFetchKey = useMemo(() => `mfa-security-status-${userEmail || 'unknown'}`, [userEmail])
+  const devicesFetchKey = useMemo(() => `mfa-security-devices-${userEmail || 'unknown'}`, [userEmail])
+
+  const {
+    data: mfaData,
+    error: mfaFetchError,
+    isLoading: isLoadingMfa,
+    retry: retryMfa,
+  } = useProfileQuery<{ status: MFAStatus; factorId?: string }>(
+    statusFetchKey,
+    async (signal) => {
+      const statusRes = await fetch('/api/accounts/auth/mfa/status', { credentials: 'include', signal })
+
+      if (!statusRes.ok) {
+        const body = await statusRes.text().catch(() => '')
+        throw new Error(body || `Failed to load MFA status (${statusRes.status})`)
       }
-      
-      if (devicesRes.ok) {
-        const devices = await devicesRes.json();
-        setTrustedDevices(devices.devices || []);
+
+      // Normalize the response to the UI shape (the endpoint returns more fields).
+      const statusJson = (await statusRes.json()) as Partial<MfaStatusApiResponse>
+      const status: MFAStatus = {
+        is_enabled: Boolean(statusJson.is_enabled),
+        is_required: Boolean(statusJson.is_required),
+        required_reason: statusJson.required_reason ?? null,
+        enrolled_at: statusJson.enrolled_at ?? null,
+        last_verified_at: statusJson.last_verified_at ?? null,
+        recovery_codes_remaining: Number(statusJson.recovery_codes_remaining ?? 0),
+        trusted_devices_count: Number(statusJson.trusted_devices_count ?? 0),
+        grace_period_end: statusJson.grace_period_end ?? null,
+        days_until_required: statusJson.days_until_required ?? null,
+        factors: {
+          totp: Array.isArray(statusJson.totp),
+          sms: Array.isArray(statusJson.phone),
+          webauthn: false,
+        },
       }
-    } catch (err) {
-      console.error('Failed to fetch MFA data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+
+      const verifiedTotp = Array.isArray(statusJson.totp)
+        ? statusJson.totp.find((f) => f && f.status === 'verified') ?? statusJson.totp.find(Boolean)
+        : null
+      const verifiedPhone = Array.isArray(statusJson.phone)
+        ? statusJson.phone.find((f) => f && f.status === 'verified') ?? statusJson.phone.find(Boolean)
+        : null
+
+      const factorIdFromApi =
+        (verifiedTotp && typeof verifiedTotp === 'object' ? verifiedTotp.id : undefined) ??
+        (verifiedPhone && typeof verifiedPhone === 'object' ? verifiedPhone.id : undefined)
+
+      return { status, factorId: factorIdFromApi }
+    },
+    { userEmail },
+    { timeout: 12000, skip: !userEmail }
+  )
+
+  const {
+    data: devicesData,
+    error: devicesError,
+    isLoading: isLoadingDevices,
+    retry: retryDevices,
+  } = useProfileQuery<{ devices: MFATrustedDevice[] }>(
+    devicesFetchKey,
+    async (signal) => {
+      const devicesRes = await fetch('/api/accounts/auth/mfa/devices', { credentials: 'include', signal })
+
+      if (!devicesRes.ok) {
+        const body = await devicesRes.text().catch(() => '')
+        throw new Error(body || `Failed to load trusted devices (${devicesRes.status})`)
+      }
+
+      const devicesJson = (await devicesRes.json()) as { devices?: MFATrustedDevice[] }
+      return { devices: devicesJson.devices || [] }
+    },
+    { userEmail },
+    { timeout: 12000, skip: !userEmail }
+  )
 
   useEffect(() => {
-    fetchMFAData();
-  }, [fetchMFAData]);
+    if (!mfaData) return
+    setMfaStatus(mfaData.status)
+    setHasMFA(Boolean(mfaData.status?.is_enabled))
+    if (mfaData.factorId) setFactorId(mfaData.factorId)
+  }, [mfaData])
+
+  useEffect(() => {
+    if (!devicesData) return
+    setTrustedDevices(devicesData.devices)
+  }, [devicesData])
+
+  useEffect(() => {
+    if (!mfaFetchError) return
+    setError(mfaFetchError)
+  }, [mfaFetchError])
 
   // Disable MFA
   const handleDisableMFA = useCallback(async () => {
@@ -146,10 +213,11 @@ export function SecuritySettingsClient({
   // Handle enrollment success
   const handleEnrollmentSuccess = useCallback(() => {
     setShowEnrollment(false);
-    fetchMFAData();
+    retryMfa();
+    retryDevices();
     setSuccess('Tvåfaktorsautentisering har aktiverats!');
     setTimeout(() => setSuccess(null), 5000);
-  }, [fetchMFAData]);
+  }, [retryMfa, retryDevices]);
 
   // Generate new recovery codes
   const handleGenerateRecoveryCodes = useCallback(async () => {
@@ -183,13 +251,14 @@ export function SecuritySettingsClient({
       URL.revokeObjectURL(url);
       
       setSuccess('Nya återställningskoder har genererats och laddats ner');
-      fetchMFAData();
+      retryMfa();
+      retryDevices();
       
       setTimeout(() => setSuccess(null), 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');
     }
-  }, [fetchMFAData]);
+  }, [retryMfa, retryDevices]);
 
   return (
     <div className="space-y-8">
@@ -314,9 +383,18 @@ export function SecuritySettingsClient({
             </div>
           </div>
           
-          {isLoading ? (
+          {isLoadingDevices ? (
             <div className="text-center py-8 text-muted-foreground">
               {t('loading')}
+            </div>
+          ) : devicesError ? (
+            <div className="py-6 space-y-3">
+              <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3">
+                {devicesError}
+              </div>
+              <Button variant="outline" onClick={retryDevices}>
+                Försök igen
+              </Button>
             </div>
           ) : trustedDevices.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">

@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
@@ -14,16 +13,15 @@ import {
   AtSymbolIcon,
   ShieldCheckIcon,
   LockClosedIcon,
-  BellIcon,
   Cog6ToothIcon,
   BuildingOfficeIcon,
   ChevronRightIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
-  TrophyIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
-import { ProfileAchievementsShowcase } from '@/features/profile/components/ProfileAchievementsShowcase';
 import { isPrivateTenant } from '@/lib/tenant/helpers';
+import { useProfileQuery } from '@/hooks/useProfileQuery';
 
 interface QuickLinkProps {
   href: string;
@@ -64,7 +62,6 @@ export default function ProfileOverviewPage() {
   const tCommon = useTranslations('common');
   const { user, userProfile } = useAuth();
   const { currentTenant, userTenants } = useTenant();
-  const [mfaEnabled, setMfaEnabled] = useState(false);
 
   const displayName = userProfile?.full_name || user?.email?.split('@')[0] || 'Användare';
   const email = user?.email || '';
@@ -76,21 +73,31 @@ export default function ProfileOverviewPage() {
     .slice(0, 2)
     .toUpperCase();
 
-  // Check MFA status
-  useEffect(() => {
-    const checkMfa = async () => {
-      try {
-        const res = await fetch('/api/accounts/auth/mfa/status');
-        if (res.ok) {
-          const data = await res.json();
-          setMfaEnabled(data.is_enabled);
-        }
-      } catch {
-        // Ignore errors
+  const mfaFetchKey = user?.id ? `profile-mfa-status-${user.id}` : 'profile-mfa-status-anon'
+  const {
+    data: mfaStatus,
+    status: mfaStatusStatus,
+    error: mfaStatusError,
+  } = useProfileQuery<{ is_enabled?: boolean }>(
+    mfaFetchKey,
+    async (signal) => {
+      const res = await fetch('/api/accounts/auth/mfa/status', {
+        credentials: 'include',
+        signal,
+      })
+
+      if (!res.ok) {
+        const body = await res.text().catch(() => '')
+        throw new Error(body || `Failed to load MFA status (${res.status})`)
       }
-    };
-    checkMfa();
-  }, []);
+
+      return (await res.json()) as { is_enabled?: boolean }
+    },
+    { userId: user?.id },
+    { timeout: 12000, skip: !user?.id }
+  )
+
+  const mfaEnabled = mfaStatusStatus === 'success' ? Boolean(mfaStatus?.is_enabled) : null
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
@@ -154,12 +161,12 @@ export default function ProfileOverviewPage() {
               )}
             </div>
             <div className="flex items-center gap-2">
-              {mfaEnabled ? (
+              {mfaEnabled === true ? (
                 <>
                   <CheckCircleIcon className="h-5 w-5 text-emerald-500" />
                   <span className="text-sm">{t('sections.security.mfaEnabled')}</span>
                 </>
-              ) : (
+              ) : mfaEnabled === false ? (
                 <>
                   <ExclamationTriangleIcon className="h-5 w-5 text-amber-500" />
                   <span className="text-sm text-amber-600">{t('sections.security.mfaDisabled')}</span>
@@ -168,6 +175,25 @@ export default function ProfileOverviewPage() {
                     className="text-sm text-primary hover:underline"
                   >
                     {t('sections.security.enableMfa')}
+                  </Link>
+                </>
+              ) : mfaStatusStatus === 'loading' || mfaStatusStatus === 'idle' ? (
+                <>
+                  <ArrowPathIcon className="h-5 w-5 text-muted-foreground animate-spin" />
+                  <span className="text-sm text-muted-foreground">{tCommon('actions.loading')}</span>
+                </>
+              ) : (
+                <>
+                  <ExclamationTriangleIcon className="h-5 w-5 text-amber-500" />
+                  <span className="text-sm text-amber-600">
+                    MFA-status: {tCommon('messages.loadingError')}
+                  </span>
+                  <Link
+                    href="/app/profile/security"
+                    className="text-sm text-primary hover:underline"
+                    title={mfaStatusError || undefined}
+                  >
+                    {t('nav.security')}
                   </Link>
                 </>
               )}
@@ -195,7 +221,7 @@ export default function ProfileOverviewPage() {
           icon={ShieldCheckIcon}
           title={t('nav.security')}
           description={t('nav.securityDesc')}
-          badge={mfaEnabled ? undefined : 'Rekommenderas'}
+          badge={mfaEnabled === false ? 'Rekommenderas' : undefined}
           badgeVariant="warning"
         />
         <QuickLink
@@ -203,12 +229,6 @@ export default function ProfileOverviewPage() {
           icon={LockClosedIcon}
           title={t('nav.privacy')}
           description={t('nav.privacyDesc')}
-        />
-        <QuickLink
-          href="/app/profile/notifications"
-          icon={BellIcon}
-          title={t('nav.notifications')}
-          description={t('nav.notificationsDesc')}
         />
         <QuickLink
           href="/app/profile/preferences"
@@ -225,24 +245,6 @@ export default function ProfileOverviewPage() {
         />
       </div>
 
-      {/* Achievements Showcase */}
-      {user?.id && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <TrophyIcon className="h-5 w-5 text-amber-500" />
-              {t('achievementsShowcase.title')}
-            </h2>
-            <Link
-              href="/app/profile/achievements"
-              className="text-sm text-primary hover:underline"
-            >
-              {t('achievementsShowcase.viewAll')}
-            </Link>
-          </div>
-          <ProfileAchievementsShowcase userId={user.id} maxDisplay={6} showLocked={false} />
-        </div>
-      )}
     </div>
   );
 }

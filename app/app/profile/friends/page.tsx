@@ -1,9 +1,12 @@
 'use client';
-/* eslint-disable react-hooks/set-state-in-effect */
 
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
+import { useProfileQuery } from '@/hooks/useProfileQuery';
+import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import type {
   FriendRequest 
 } from '@/lib/services/socialService';
@@ -15,72 +18,109 @@ import {
   rejectFriendRequest, 
   removeFriend 
 } from '@/lib/services/socialService';
-import { supabase } from '@/lib/supabase/client';
 
 interface FriendInfo {
   id: string;
   email: string;
 }
 
+interface FriendsData {
+  friends: FriendInfo[];
+  receivedRequests: FriendRequest[];
+  sentRequests: FriendRequest[];
+  partialFailure?: boolean;
+}
+
 export default function FriendsPage() {
   const t = useTranslations('app.profile');
   const { user, isLoading: authLoading } = useAuth();
+  const { supabase } = useBrowserSupabase();
 
   const userId = user?.id;
 
+  // Stabil queryKey
+  const queryKey = `friends-${userId ?? 'anon'}`;
+
+  // Använd useProfileQuery med Promise.allSettled
+  const {
+    data: friendsData,
+    isLoading,
+    status,
+    error: queryError,
+    retry,
+  } = useProfileQuery<FriendsData>(
+    queryKey,
+    async () => {
+      if (!userId || !supabase) {
+        throw new Error('Missing userId or supabase');
+      }
+
+      // Promise.allSettled för partial data
+      const results = await Promise.allSettled([
+        getFriends(userId),
+        getFriendRequests(userId, 'received'),
+        getFriendRequests(userId, 'sent'),
+      ]);
+
+      const friendships = results[0].status === 'fulfilled' ? results[0].value : [];
+      const receivedRequests = results[1].status === 'fulfilled' ? results[1].value : [];
+      const sentRequests = results[2].status === 'fulfilled' ? results[2].value : [];
+
+      // Hämta friend details om vi har friendships
+      let friends: FriendInfo[] = [];
+      if (friendships && friendships.length > 0) {
+        const friendIds = friendships.map((f) => (f.user_id_1 === userId ? f.user_id_2 : f.user_id_1));
+        const { data: friendDetails } = await supabase
+          .from('users')
+          .select('id, email')
+          .in('id', friendIds);
+        friends = (friendDetails as FriendInfo[] | null) || [];
+      }
+
+      // Kasta om alla tre failade
+      const allFailed = results.every(r => r.status === 'rejected');
+      if (allFailed && results[0].status === 'rejected') {
+        throw results[0].reason;
+      }
+
+      return {
+        friends,
+        receivedRequests: receivedRequests || [],
+        sentRequests: sentRequests || [],
+        partialFailure: !allFailed && results.some(r => r.status === 'rejected'),
+      };
+    },
+    { userId, supabaseRef: supabase ? 1 : 0 },
+    {
+      timeout: 12000,
+      skip: authLoading || !supabase || !userId,
+    }
+  );
+
+  // Local state för UI och mutations
   const [friendsList, setFriendsList] = useState<FriendInfo[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<FriendRequest[]>([]);
   const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'add'>('friends');
   const [addFriendEmail, setAddFriendEmail] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<FriendInfo[]>([]);
 
-  useEffect(() => {
-    // Wait for auth to finish loading before deciding there's no user
-    if (authLoading) return;
-    
-    // If no user after auth is done, stop loading
-    if (!userId) {
-      setIsLoading(false);
-      return;
+  // Synka data från query till local state
+  if (friendsData && status === 'success') {
+    if (friendsList !== friendsData.friends) {
+      setFriendsList(friendsData.friends);
     }
-
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const [friends, received, sent] = await Promise.all([
-          getFriends(userId),
-          getFriendRequests(userId, 'received'),
-          getFriendRequests(userId, 'sent'),
-        ]);
-
-        // Fetch friend details
-        if (friends && friends.length > 0) {
-          const friendIds = friends.map((f) => (f.user_id_1 === userId ? f.user_id_2 : f.user_id_1));
-
-          const { data: friendDetails } = await supabase
-            .from('users')
-            .select('id, email')
-            .in('id', friendIds);
-
-          setFriendsList((friendDetails as FriendInfo[] | null) || []);
-        }
-
-        setReceivedRequests(received || []);
-        setSentRequests(sent || []);
-      } catch (err) {
-        console.error('Error loading data:', err);
-      }
-      setIsLoading(false);
-    };
-
-    loadData();
-  }, [userId, authLoading]);
+    if (receivedRequests !== friendsData.receivedRequests) {
+      setReceivedRequests(friendsData.receivedRequests);
+    }
+    if (sentRequests !== friendsData.sentRequests) {
+      setSentRequests(friendsData.sentRequests);
+    }
+  }
 
   const handleSearchUsers = async (email: string) => {
-    if (!email.trim()) {
+    if (!email.trim() || !supabase) {
       setSearchResults([]);
       return;
     }
@@ -123,6 +163,8 @@ export default function FriendsPage() {
   };
 
   const handleAcceptRequest = async (requestId: string) => {
+    if (!supabase) return;
+    
     const success = await acceptFriendRequest(requestId);
     if (success) {
       setReceivedRequests(receivedRequests.filter((r) => r.id !== requestId));
@@ -175,6 +217,25 @@ export default function FriendsPage() {
         <h1 className="text-xl font-bold tracking-tight text-foreground">{t('sections.friends.title')}</h1>
         <p className="text-sm text-muted-foreground">{t('sections.friends.description')}</p>
       </header>
+
+      {/* Query error/timeout */}
+      {(status === 'error' || status === 'timeout') && (
+        <Alert variant="error" title={status === 'timeout' ? 'Anslutningen tog för lång tid' : 'Kunde inte ladda data'}>
+          <div className="space-y-3">
+            <p>{queryError || 'Ett oväntat fel uppstod.'}</p>
+            <Button onClick={retry} variant="outline" size="sm">
+              Försök igen
+            </Button>
+          </div>
+        </Alert>
+      )}
+
+      {/* Partial failure warning */}
+      {friendsData?.partialFailure && (
+        <Alert variant="warning" title="Delvis fel">
+          <p>Vissa data kunde inte laddas. Informationen nedan kan vara ofullständig.</p>
+        </Alert>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-2">

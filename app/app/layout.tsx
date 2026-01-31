@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { getLocale } from 'next-intl/server'
 import { TenantProvider } from '@/lib/context/TenantContext'
 import { getServerAuthContext } from '@/lib/auth/server-context'
-import { getPendingLegalDocuments } from '@/lib/legal/acceptance'
+import { getPendingLegalDocuments } from '@/lib/legal/cached-legal'
 import AppShellContent from './layout-client'
 
 type Props = {

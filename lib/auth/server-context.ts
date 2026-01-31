@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { cache } from 'react'
 import { cookies } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { resolveTenant } from '@/lib/tenant/resolver'
@@ -8,6 +9,11 @@ import type { AuthContext, UserProfile } from '@/types/auth'
 import type { TenantMembership, TenantRole, TenantWithMembership } from '@/types/tenant'
 
 export async function getServerAuthContext(pathname?: string): Promise<AuthContext> {
+  return getServerAuthContextCached(pathname)
+}
+
+// Cache within a single request to prevent duplicated `auth.getUser()` and related queries.
+const getServerAuthContextCached = cache(async (pathname?: string): Promise<AuthContext> => {
   const cookieStore = await cookies()
   const supabase = await createServerRlsClient()
   const {
@@ -65,4 +71,4 @@ export async function getServerAuthContext(pathname?: string): Promise<AuthConte
     activeTenant: tenant as TenantWithMembership | null,
     activeTenantRole: (tenantRole as TenantRole | null) ?? null,
   }
-}
+})

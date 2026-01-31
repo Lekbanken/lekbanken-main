@@ -14,6 +14,7 @@
 
 import { useState, useEffect, useCallback, useTransition } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { withTimeout } from '@/lib/utils/withTimeout';
 
 // =============================================================================
 // TYPES
@@ -86,6 +87,10 @@ interface NotificationRow {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyRpc = any;
 
+// Single-flight tracking to prevent duplicate concurrent requests (StrictMode safe)
+let inFlightFetch: Promise<AppNotification[]> | null = null;
+let fetchGeneration = 0;
+
 export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -97,51 +102,81 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // calling `createBrowserClient()` when `window` is not available.
   const supabase = typeof window !== 'undefined' ? createBrowserClient() : null;
 
-  // Fetch notifications via RPC
+  // Fetch notifications via RPC with single-flight deduplication
   const fetchNotifications = useCallback(async () => {
     if (!supabase) return;
+    
+    // If there's already an in-flight request, reuse it
+    if (inFlightFetch) {
+      try {
+        const result = await inFlightFetch;
+        setNotifications(result);
+        setUnreadCount(result.filter((n) => !n.readAt).length);
+        setIsLoading(false);
+      } catch {
+        // Error already handled by the original request
+      }
+      return;
+    }
+
+    const currentGeneration = ++fetchGeneration;
+    
     try {
       setError(null);
 
-      // Use RPC function for clean typed result
-      // Note: RPC cast needed until types are regenerated after migration
-      const { data, error: fetchError } = await (supabase.rpc as AnyRpc)(
-        'get_user_notifications',
-        { p_limit: limit }
-      ) as { data: NotificationRow[] | null; error: Error | null };
+      // Create promise and store for single-flight
+      const promise = (async () => {
+        const { data, error: fetchError } = await withTimeout(
+          (supabase.rpc as AnyRpc)(
+            'get_user_notifications',
+            { p_limit: limit }
+          ) as Promise<{ data: NotificationRow[] | null; error: Error | null }>,
+          12000,
+          'rpc:get_user_notifications'
+        );
 
-      if (fetchError) {
-        console.error('[useAppNotifications] Fetch error:', fetchError);
-        setError(fetchError.message);
-        return;
+        if (fetchError) {
+          throw new Error(fetchError.message);
+        }
+
+        // Map to AppNotification format
+        return (data || []).map((d: NotificationRow) => ({
+          id: d.id,
+          notificationId: d.notification_id,
+          title: d.title || 'Notification',
+          message: d.message || '',
+          type: (d.type as AppNotification['type']) || 'info',
+          category: d.category ?? undefined,
+          actionUrl: d.action_url ?? undefined,
+          actionLabel: d.action_label ?? undefined,
+          deliveredAt: new Date(d.delivered_at),
+          readAt: d.read_at ? new Date(d.read_at) : null,
+          dismissedAt: d.dismissed_at ? new Date(d.dismissed_at) : null,
+        }));
+      })();
+
+      inFlightFetch = promise;
+      const mapped = await promise;
+
+      // Only update state if this is still the current generation
+      if (fetchGeneration === currentGeneration) {
+        setNotifications(mapped);
+        setUnreadCount(mapped.filter((n) => !n.readAt).length);
       }
-
-      // Map to AppNotification format
-      const mapped: AppNotification[] = (data || []).map((d) => ({
-        id: d.id,
-        notificationId: d.notification_id,
-        title: d.title || 'Notification',
-        message: d.message || '',
-        type: (d.type as AppNotification['type']) || 'info',
-        category: d.category ?? undefined,
-        actionUrl: d.action_url ?? undefined,
-        actionLabel: d.action_label ?? undefined,
-        deliveredAt: new Date(d.delivered_at),
-        readAt: d.read_at ? new Date(d.read_at) : null,
-        dismissedAt: d.dismissed_at ? new Date(d.dismissed_at) : null,
-      }));
-
-      setNotifications(mapped);
-      setUnreadCount(mapped.filter((n) => !n.readAt).length);
     } catch (err) {
       console.error('[useAppNotifications] Error:', err);
-      setError('Failed to fetch notifications');
+      if (fetchGeneration === currentGeneration) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch notifications');
+      }
     } finally {
-      setIsLoading(false);
+      inFlightFetch = null;
+      if (fetchGeneration === currentGeneration) {
+        setIsLoading(false);
+      }
     }
   }, [supabase, limit]);
 
-  // Initial fetch
+  // Initial fetch (runs once, StrictMode-safe due to single-flight)
   useEffect(() => {
     fetchNotifications();
   }, [fetchNotifications]);
@@ -151,9 +186,13 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     async (deliveryId: string) => {
       if (!supabase) return;
       startTransition(async () => {
-        const { error: rpcError } = await (supabase.rpc as AnyRpc)(
-          'mark_notification_read',
-          { p_delivery_id: deliveryId }
+        const { error: rpcError } = await withTimeout(
+          (supabase.rpc as AnyRpc)(
+            'mark_notification_read',
+            { p_delivery_id: deliveryId }
+          ) as Promise<{ error: Error | null }>,
+          12000,
+          'rpc:mark_notification_read'
         );
 
         if (rpcError) {
@@ -177,8 +216,12 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   const markAllAsRead = useCallback(async () => {
     if (!supabase) return;
     startTransition(async () => {
-      const { error: rpcError } = await (supabase.rpc as AnyRpc)(
-        'mark_all_notifications_read'
+      const { error: rpcError } = await withTimeout(
+        (supabase.rpc as AnyRpc)(
+          'mark_all_notifications_read'
+        ) as Promise<{ error: Error | null }>,
+        12000,
+        'rpc:mark_all_notifications_read'
       );
 
       if (rpcError) {
@@ -199,9 +242,13 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     async (deliveryId: string) => {
       if (!supabase) return;
       startTransition(async () => {
-        const { error: rpcError } = await (supabase.rpc as AnyRpc)(
-          'dismiss_notification',
-          { p_delivery_id: deliveryId }
+        const { error: rpcError } = await withTimeout(
+          (supabase.rpc as AnyRpc)(
+            'dismiss_notification',
+            { p_delivery_id: deliveryId }
+          ) as Promise<{ error: Error | null }>,
+          12000,
+          'rpc:dismiss_notification'
         );
 
         if (rpcError) {

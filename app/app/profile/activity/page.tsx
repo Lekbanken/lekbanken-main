@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { ProfileService, type ActivityLogEntry, type UserSession } from '@/lib/profile';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
 import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
+import { useProfileQuery } from '@/hooks/useProfileQuery';
 import {
   ClockIcon,
   ComputerDesktopIcon,
@@ -76,62 +78,62 @@ const getActivityFilters = (t: (key: string) => string) => [
 
 export default function ActivityPage() {
   const t = useTranslations('app.profile');
+  const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
   const { supabase, error: supabaseError, isInitializing } = useBrowserSupabase();
   const activityFilters = useMemo(() => getActivityFilters(t), [t]);
 
-  const [activities, setActivities] = useState<ActivityLogEntry[]>([]);
-  const [sessions, setSessions] = useState<UserSession[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
   const [isRevokingSession, setIsRevokingSession] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<UserSession[]>([]);
 
+  // Create stable profileService instance
+  const profileService = useMemo(
+    () => (supabase ? new ProfileService(supabase) : null),
+    [supabase]
+  );
+
+  // Use the new single-flight hook for fetching
+  const {
+    data: activityData,
+    status,
+    error: loadError,
+    isLoading,
+    isTimeout,
+    retry,
+  } = useProfileQuery<{ activities: ActivityLogEntry[]; sessions: UserSession[] }>(
+    `activity-${user?.id}`,
+    async () => {
+      if (!profileService || !user?.id) {
+        throw new Error('Not ready');
+      }
+      const [activities, sessionsData] = await Promise.all([
+        profileService.getActivityLog(user.id, 50),
+        profileService.getActiveSessions(user.id),
+      ]);
+      return { activities, sessions: sessionsData };
+    },
+    { userId: user?.id, profileService },
+    {
+      skip: authLoading || isInitializing || !supabase || !user?.id,
+      timeout: 12000,
+    }
+  );
+
+  // Update sessions state when data is fetched
   useEffect(() => {
-    const loadActivityData = async () => {
-      // Wait for auth to finish loading before deciding there's no user
-      if (authLoading) return;
+    if (!activityData?.sessions) return
+    setSessions(activityData.sessions)
+  }, [activityData?.sessions]);
 
-      if (supabaseError) {
-        setIsLoading(false);
-        return;
-      }
-       
-      // Wait for supabase client to be initialized
-      if (!supabase) return;
-      
-      // If no user after auth is done, stop loading
-      if (!user?.id) {
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const profileService = new ProfileService(supabase);
-
-        const [activitiesData, sessionsData] = await Promise.all([
-          profileService.getActivityLog(user.id, 50),
-          profileService.getActiveSessions(user.id),
-        ]);
-
-        setActivities(activitiesData);
-        setSessions(sessionsData);
-      } catch (error) {
-        console.error('Failed to load activity data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadActivityData();
-  }, [user?.id, supabase, authLoading, supabaseError]);
+  const activities = activityData?.activities || [];
+  const stillLoading = isLoading || authLoading || isInitializing;
 
   const handleRevokeSession = useCallback(async (sessionId: string) => {
-    if (!user?.id || !supabase) return;
+    if (!user?.id || !profileService) return;
 
     setIsRevokingSession(sessionId);
     try {
-      const profileService = new ProfileService(supabase);
       await profileService.revokeSession(user.id, sessionId);
 
       // Refresh sessions
@@ -210,7 +212,7 @@ export default function ActivityPage() {
     );
   }
 
-  if (isLoading) {
+  if (stillLoading) {
     return (
       <div className="p-6 lg:p-8">
         <div className="animate-pulse space-y-4">
@@ -222,17 +224,38 @@ export default function ActivityPage() {
             ))}
           </div>
         </div>
+        {isTimeout && (
+          <div className="mt-6 space-y-3">
+            <p className="text-xs text-muted-foreground">
+              Det här tar ovanligt lång tid. Kolla Console/Network för vilken request som fastnat och prova att ladda om sidan.
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={retry} variant="outline" size="sm">
+                Försök igen
+              </Button>
+              <Button onClick={() => window.location.reload()} variant="ghost" size="sm">
+                Ladda om
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
-  if (isInitializing) {
+  if (status === 'error' || status === 'timeout') {
     return (
-      <div className="p-6 lg:p-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 w-48 bg-muted rounded" />
-          <div className="h-4 w-72 bg-muted rounded" />
-          <div className="h-64 bg-muted rounded-lg" />
+      <div className="p-6 lg:p-8 space-y-4">
+        <Alert variant="error" title="Kunde inte ladda aktivitet">
+          <p>{loadError || 'Ett oväntat fel inträffade.'}</p>
+        </Alert>
+        <div className="flex gap-2">
+          <Button onClick={retry} variant="outline">
+            Försök igen
+          </Button>
+          <Button onClick={() => window.location.reload()} variant="ghost">
+            Ladda om
+          </Button>
         </div>
       </div>
     );

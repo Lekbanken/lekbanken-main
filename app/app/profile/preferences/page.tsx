@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/supabase/auth';
@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { Alert } from '@/components/ui/alert';
 import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
+import { useProfileQuery } from '@/hooks/useProfileQuery';
 import {
   AdjustmentsHorizontalIcon,
   LanguageIcon,
@@ -75,49 +76,49 @@ export default function PreferencesPage() {
     ...defaultPreferences,
     language: locale,
   });
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
+  // Create stable profileService instance
+  const profileService = useMemo(
+    () => (supabase ? new ProfileService(supabase) : null),
+    [supabase]
+  );
+
+  // Use the new single-flight hook for fetching
+  const {
+    data: fetchedPreferences,
+    status,
+    error: loadError,
+    isLoading,
+    isTimeout,
+    retry,
+  } = useProfileQuery<UserPreferences | null>(
+    `preferences-${user?.id}`,
+    async () => {
+      if (!profileService || !user?.id) {
+        throw new Error('Not ready');
+      }
+      return profileService.getPreferences(user.id);
+    },
+    { userId: user?.id, profileService },
+    {
+      skip: authLoading || isInitializing || !supabase || !user?.id,
+      timeout: 10000,
+    }
+  );
+
+  // Update local preferences when data is fetched
   useEffect(() => {
-    const loadPreferences = async () => {
-      // Wait for auth to finish loading before deciding there's no user
-      if (authLoading) return;
+    if (!fetchedPreferences) return
+    setPreferences({
+      ...defaultPreferences,
+      ...fetchedPreferences,
+    })
+  }, [fetchedPreferences]);
 
-      if (supabaseError) {
-        setIsLoading(false);
-        return;
-      }
-       
-      // Wait for supabase client to be initialized
-      if (!supabase) return;
-      
-      // If no user after auth is done, stop loading
-      if (!user?.id) {
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const profileService = new ProfileService(supabase);
-        const profile = await profileService.getCompleteProfile(user.id);
-        if (profile?.preferences) {
-          setPreferences({
-            ...defaultPreferences,
-            ...profile.preferences,
-          });
-        }
-      } catch (error) {
-        console.error('Failed to load preferences:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadPreferences();
-  }, [user?.id, supabase, authLoading, supabaseError]);
+  const stillLoading = isLoading || authLoading || isInitializing;
 
   const handlePreferenceChange = useCallback((key: keyof UserPreferences, value: unknown) => {
     setPreferences((prev) => ({ ...prev, [key]: value }));
@@ -167,7 +168,7 @@ export default function PreferencesPage() {
     );
   }
 
-  if (isLoading) {
+  if (stillLoading) {
     return (
       <div className="p-6 lg:p-8">
         <div className="animate-pulse space-y-4">
@@ -175,17 +176,38 @@ export default function PreferencesPage() {
           <div className="h-4 w-72 bg-muted rounded" />
           <div className="h-64 bg-muted rounded-lg" />
         </div>
+        {isTimeout && (
+          <div className="mt-6 space-y-3">
+            <p className="text-xs text-muted-foreground">
+              Det här tar ovanligt lång tid. Kolla Console/Network för vilken request som fastnat och prova att ladda om sidan.
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={retry} variant="outline" size="sm">
+                Försök igen
+              </Button>
+              <Button onClick={() => window.location.reload()} variant="ghost" size="sm">
+                Ladda om
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
-  if (isInitializing) {
+  if (status === 'error' || status === 'timeout') {
     return (
-      <div className="p-6 lg:p-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 w-48 bg-muted rounded" />
-          <div className="h-4 w-72 bg-muted rounded" />
-          <div className="h-64 bg-muted rounded-lg" />
+      <div className="p-6 lg:p-8 space-y-4">
+        <Alert variant="error" title="Kunde inte ladda preferenser">
+          <p>{loadError || 'Ett oväntat fel inträffade.'}</p>
+        </Alert>
+        <div className="flex gap-2">
+          <Button onClick={retry} variant="outline">
+            Försök igen
+          </Button>
+          <Button onClick={() => window.location.reload()} variant="ghost">
+            Ladda om
+          </Button>
         </div>
       </div>
     );

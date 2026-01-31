@@ -152,6 +152,19 @@ const eslintConfig = defineConfig([
         ]
       }]
     }
+  },
+  // =============================================================================
+  // PROFILE LOADING RESILIENCE (Prevent regression to manual useEffect patterns)
+  // =============================================================================
+  // Profile routes should use useProfileQuery hook instead of manual useEffect
+  // to prevent infinite loading spinners and request storms.
+  {
+    files: [
+      "app/app/profile/**/*.tsx",
+    ],
+    rules: {
+      "lekbanken/no-manual-profile-fetch": "warn",
+    },
   }
 ]);
 

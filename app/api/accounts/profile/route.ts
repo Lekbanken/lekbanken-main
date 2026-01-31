@@ -73,13 +73,21 @@ export async function PATCH(request: Request) {
   if (body.metadata !== undefined) profileUpdate.metadata = body.metadata
   if (body.avatar_url !== undefined) profileUpdate.avatar_url = body.avatar_url
 
+  // ⚠️ IMPORTANT: Only store MINIMAL data in authMetadata (user_metadata)
+  // Everything in user_metadata is included in the JWT token!
+  // Large tokens get "chunked" into multiple cookies (.0, .1) which causes
+  // race conditions and "Invalid Refresh Token" errors.
+  // 
+  // STORE IN user_metadata: Only data needed for auth/RLS (global_role, is_demo_user)
+  // STORE IN user_profiles: Everything else (avatar_url, preferences, etc.)
+  // 
+  // See: https://supabase.com/docs/guides/auth/managing-user-data
   const authMetadata: Record<string, unknown> = {}
+  // Only sync essential fields that are needed for auth checks
+  // full_name is used in some RLS policies, so we keep it minimal
   if (body.full_name !== undefined) authMetadata.full_name = body.full_name
-  if (body.avatar_url !== undefined) authMetadata.avatar_url = body.avatar_url
-  if (body.language !== undefined) authMetadata.language = body.language
-  if (body.preferred_theme !== undefined) authMetadata.preferred_theme = body.preferred_theme
-  if (body.show_theme_toggle_in_header !== undefined)
-    authMetadata.show_theme_toggle_in_header = body.show_theme_toggle_in_header
+  // NOTE: avatar_url, language, theme preferences are now ONLY stored in user_profiles
+  // This reduces JWT token size and prevents cookie chunking
 
   if (Object.keys(userUpdate).length > 0) {
     const { data, error } = await supabase

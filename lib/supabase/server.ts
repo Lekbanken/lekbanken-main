@@ -1,11 +1,13 @@
 import 'server-only'
 
+import { cache } from 'react'
 import { createClient as createServiceRoleSupabaseClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import type { Database } from '@/types/supabase'
 import { env } from '@/lib/config/env'
 import { enhanceCookieOptions } from '@/lib/supabase/cookie-domain'
+import { createFetchWithTimeout } from '@/lib/supabase/fetch-with-timeout'
 
 const supabaseUrl = env.supabase.url
 const supabaseAnonKey = env.supabase.anonKey
@@ -24,6 +26,12 @@ const supabaseServiceRoleKey = env.supabase.serviceRoleKey
  * The warning is informational and does not indicate a security issue in our code.
  */
 export async function createServerRlsClient() {
+  return createServerRlsClientCached()
+}
+
+// Cache within a single RSC/server-action request to avoid repeated `/auth/v1/user` storms.
+// Next.js scopes React `cache()` to the active request context.
+const createServerRlsClientCached = cache(async () => {
   const cookieStore = await cookies()
   const headerStore = await headers()
   const hostname = headerStore.get('host')?.split(':')[0] || null
@@ -35,14 +43,16 @@ export async function createServerRlsClient() {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value, options }) => {
-          // Enhance cookie options with cross-subdomain domain for platform domains
           const enhancedOptions = enhanceCookieOptions(options, hostname)
           cookieStore.set(name, value, enhancedOptions)
         })
       },
     },
+    global: {
+      fetch: createFetchWithTimeout(fetch, { logPrefix: '[supabase fetch:server]' }),
+    },
   })
-}
+})
 
 /**
  * Get authenticated user from server context
@@ -50,16 +60,23 @@ export async function createServerRlsClient() {
  * This is the recommended way to get user on the server side.
  */
 export async function getAuthUser() {
+  return getAuthUserCached()
+}
+
+const getAuthUserCached = cache(async () => {
   const supabase = await createServerRlsClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
-  
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
+
   if (error) {
     console.warn('[getAuthUser] Error fetching user:', error.message)
     return null
   }
-  
+
   return user
-}
+})
 
 /**
  * Service role client for background/admin tasks.

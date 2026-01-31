@@ -30,6 +30,16 @@ export class ProfileService {
     this.supabase = supabase;
   }
 
+  private toError(err: unknown): Error {
+    if (err instanceof Error) return err
+    if (typeof err === 'string') return new Error(err)
+    try {
+      return new Error(JSON.stringify(err))
+    } catch {
+      return new Error('Unknown error')
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // GET PROFILE
   // ---------------------------------------------------------------------------
@@ -104,6 +114,51 @@ export class ProfileService {
     };
   }
 
+  /**
+   * Get user preferences (lightweight; avoids fetching full profile).
+   */
+  async getPreferences(userId: string): Promise<UserPreferences | null> {
+    const { data, error } = await this.supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (error) {
+      console.error('[ProfileService] Failed to get preferences:', error)
+      return null
+    }
+
+    return (data as UserPreferences) || null
+  }
+
+  /**
+   * Get organization memberships for the user (lightweight).
+   */
+  async getOrganizationMemberships(userId: string): Promise<OrganizationMembership[]> {
+    const { data, error } = await this.supabase
+      .from('user_tenant_memberships')
+      .select(`
+        id,
+        user_id,
+        tenant_id,
+        role,
+        is_primary,
+        status,
+        created_at,
+        tenant:tenants(id, name, slug, logo_url, type, status)
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'active')
+
+    if (error) {
+      console.error('[ProfileService] Failed to get organization memberships:', error)
+      return []
+    }
+
+    return (data || []) as unknown as OrganizationMembership[]
+  }
+
   // ---------------------------------------------------------------------------
   // UPDATE PROFILE
   // ---------------------------------------------------------------------------
@@ -169,47 +224,64 @@ export class ProfileService {
   /**
    * Get notification settings
    */
-  async getNotificationSettings(userId: string): Promise<NotificationSettings | null> {
+  async getNotificationSettings(
+    userId: string
+  ): Promise<{ settings: NotificationSettings | null; error: Error | null }> {
     const { data, error } = await this.supabase
       .from('notification_preferences')
       .select('*')
       .eq('user_id', userId)
+      // Profile notification settings are currently treated as a user-level preference (not tenant-scoped).
+      // Use tenant_id IS NULL to avoid ambiguity for multi-tenant users and to prevent multi-row errors.
+      .is('tenant_id', null)
+      .order('updated_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (error) {
       console.error('[ProfileService] Failed to get notification settings:', error);
-      return null;
+      return { settings: null, error: this.toError(error) }
     }
 
-    if (!data) return null;
+    if (!data) return { settings: null, error: null }
 
     // Map database columns to NotificationSettings type
+    const digest = (() => {
+      const raw = String(data.digest_frequency ?? 'realtime')
+      if (raw === 'realtime') return 'real-time'
+      return raw as NotificationSettings['email_digest']
+    })()
+
     return {
-      id: data.id,
-      user_id: data.user_id,
-      email_enabled: data.email_enabled ?? false,
-      email_activity: data.email_enabled ?? false,
-      email_mentions: data.email_enabled ?? false,
-      email_comments: data.email_enabled ?? false,
-      email_updates: data.email_enabled ?? false,
-      email_marketing: data.marketing_emails ?? false,
-      email_digest: (data.digest_frequency as NotificationSettings['email_digest']) || 'daily',
-      push_enabled: data.push_enabled ?? false,
-      push_activity: data.push_enabled ?? false,
-      push_mentions: data.push_enabled ?? false,
-      push_comments: data.push_enabled ?? false,
-      sms_enabled: data.sms_enabled ?? false,
-      sms_security_alerts: data.sms_enabled ?? false,
-      sms_important_updates: data.sms_enabled ?? false,
-      inapp_enabled: data.in_app_enabled ?? true,
-      inapp_sound: true,
-      dnd_enabled: data.quiet_hours_enabled ?? false,
-      dnd_start_time: data.quiet_hours_start ?? null,
-      dnd_end_time: data.quiet_hours_end ?? null,
-      dnd_days: [],
-      created_at: data.created_at || new Date().toISOString(),
-      updated_at: data.updated_at || new Date().toISOString(),
-    } as NotificationSettings;
+      error: null,
+      settings: {
+        id: data.id,
+        user_id: data.user_id,
+        email_enabled: data.email_enabled ?? true,
+        email_activity: data.email_enabled ?? true,
+        email_mentions: data.email_enabled ?? true,
+        email_comments: data.email_enabled ?? true,
+        email_updates: data.email_enabled ?? true,
+        // Not persisted yet (no dedicated column in `notification_preferences`).
+        email_marketing: false,
+        email_digest: digest,
+        push_enabled: data.push_enabled ?? true,
+        push_activity: data.push_enabled ?? true,
+        push_mentions: data.push_enabled ?? true,
+        push_comments: data.push_enabled ?? true,
+        sms_enabled: data.sms_enabled ?? false,
+        sms_security_alerts: data.sms_enabled ?? false,
+        sms_important_updates: data.sms_enabled ?? false,
+        inapp_enabled: data.in_app_enabled ?? true,
+        inapp_sound: true,
+        dnd_enabled: data.quiet_hours_enabled ?? false,
+        dnd_start_time: (data.quiet_hours_start as string | null) ?? null,
+        dnd_end_time: (data.quiet_hours_end as string | null) ?? null,
+        dnd_days: [],
+        created_at: data.created_at || new Date().toISOString(),
+        updated_at: data.updated_at || new Date().toISOString(),
+      } as NotificationSettings,
+    }
   }
 
   /**
@@ -229,15 +301,46 @@ export class ProfileService {
     if (settings.dnd_enabled !== undefined) dbUpdate.quiet_hours_enabled = settings.dnd_enabled;
     if (settings.dnd_start_time !== undefined) dbUpdate.quiet_hours_start = settings.dnd_start_time;
     if (settings.dnd_end_time !== undefined) dbUpdate.quiet_hours_end = settings.dnd_end_time;
-    if (settings.email_digest !== undefined) dbUpdate.digest_frequency = settings.email_digest;
-    if (settings.email_marketing !== undefined) dbUpdate.marketing_emails = settings.email_marketing;
+    if (settings.email_digest !== undefined) {
+      const raw = settings.email_digest
+      dbUpdate.digest_frequency =
+        raw === 'real-time' || raw === 'hourly'
+          ? 'realtime'
+          : raw
+    }
 
-    const upsertData = dbUpdate as Database['public']['Tables']['notification_preferences']['Insert'];
-    const { data, error } = await this.supabase
+    // `notification_preferences` has historically been modeled as tenant-scoped (UNIQUE(user_id, tenant_id)),
+    // but profile settings are currently user-scoped. To be robust across schemas and multi-tenant users,
+    // we resolve (or create) a single "global" row where tenant_id IS NULL.
+    const { data: existingRow, error: existingError } = await this.supabase
       .from('notification_preferences')
-      .upsert(upsertData, { onConflict: 'user_id' })
-      .select()
-      .single();
+      .select('id')
+      .eq('user_id', userId)
+      .is('tenant_id', null)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (existingError) {
+      console.error('[ProfileService] Failed to resolve existing notification settings row:', existingError)
+      return null
+    }
+
+    const { data, error } = existingRow?.id
+      ? await this.supabase
+          .from('notification_preferences')
+          .update(dbUpdate as Database['public']['Tables']['notification_preferences']['Update'])
+          .eq('id', existingRow.id)
+          .select()
+          .single()
+      : await this.supabase
+          .from('notification_preferences')
+          .insert({
+            ...(dbUpdate as Database['public']['Tables']['notification_preferences']['Insert']),
+            tenant_id: null,
+          })
+          .select()
+          .single()
 
     if (error) {
       console.error('[ProfileService] Failed to update notification settings:', error);

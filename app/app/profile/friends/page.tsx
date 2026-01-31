@@ -198,25 +198,22 @@ export default function FriendsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-3xl mx-auto pt-20">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-4">{t('sections.friends.title')}</h1>
-            <p className="text-muted-foreground">{t('sections.friends.loginRequired')}</p>
-          </div>
+      <div className="p-6 lg:p-8">
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-bold text-foreground mb-4">{t('sections.friends.title')}</h1>
+          <p className="text-muted-foreground">{t('sections.friends.loginRequired')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 pb-32">
+    <div className="p-6 lg:p-8 space-y-8">
       {/* Header */}
-      <header className="space-y-1">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">{t('title')}</p>
-        <h1 className="text-xl font-bold tracking-tight text-foreground">{t('sections.friends.title')}</h1>
-        <p className="text-sm text-muted-foreground">{t('sections.friends.description')}</p>
-      </header>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">{t('sections.friends.title')}</h1>
+        <p className="text-muted-foreground mt-1">{t('sections.friends.description')}</p>
+      </div>
 
       {/* Query error/timeout */}
       {(status === 'error' || status === 'timeout') && (

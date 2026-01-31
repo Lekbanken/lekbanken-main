@@ -38,8 +38,8 @@ export default async function SecuritySettingsPage() {
   const phoneFactor = factors?.phone?.find(f => f.status === 'verified');
   
   return (
-    <div className="py-8">
-      <div className="space-y-6">
+    <div className="p-6 lg:p-8">
+      <div className="space-y-8">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-foreground">

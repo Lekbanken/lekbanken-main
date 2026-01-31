@@ -8962,7 +8962,7 @@
         }
       },
       "settings": {
-        "title": "Tofaktorautentisering",
+        "title": "Sikkerhet",
         "description": "Administrer innstillinger for tofaktorautentisering",
         "enabled": "Aktivert",
         "enabledDescription": "Kontoen din er beskyttet med tofaktorautentisering.",

@@ -9869,7 +9869,7 @@
         }
       },
       "settings": {
-        "title": "Tvåfaktorsautentisering",
+        "title": "Säkerhet",
         "description": "Lägg till ett extra lager av säkerhet på ditt konto",
         "enabled": "MFA är aktiverat",
         "enabledDescription": "Ditt konto skyddas med tvåfaktorsautentisering.",

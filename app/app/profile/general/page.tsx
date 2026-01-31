@@ -1,44 +1,28 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import {
   UserIcon,
-  CameraIcon,
   TrashIcon,
   CheckIcon,
 } from '@heroicons/react/24/outline';
 import { avatarPresets } from '@/features/profile/avatarPresets';
 import { cn } from '@/lib/utils';
 
-const getVisibilityOptions = (t: (key: string) => string) => [
-  { value: 'public', label: t('sections.general.visibility.public') },
-  { value: 'private', label: t('sections.general.visibility.private') },
-  { value: 'organization', label: t('sections.general.visibility.organization') },
-];
-
 export default function GeneralSettingsPage() {
   const t = useTranslations('app.profile');
   const { user, userProfile, updateProfile, isLoading } = useAuth();
-  const visibilityOptions = useMemo(() => getVisibilityOptions(t), [t]);
 
   const [fullName, setFullName] = useState(userProfile?.full_name || '');
   const [avatarUrl, setAvatarUrl] = useState(userProfile?.avatar_url || null);
   const [displayName, setDisplayName] = useState('');
-  const [bio, setBio] = useState('');
   const [phone, setPhone] = useState('');
-  const [location, setLocation] = useState('');
-  const [pronouns, setPronouns] = useState('');
-  const [visibility, setVisibility] = useState('private');
-  const [showEmail, setShowEmail] = useState(false);
-  const [showPhone, setShowPhone] = useState(false);
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -133,13 +117,6 @@ export default function GeneralSettingsPage() {
           <div className="flex items-center gap-6">
             <div className="relative">
               <Avatar src={avatarUrl || undefined} name={fullName || initials} size="xl" />
-              <button
-                type="button"
-                className="absolute bottom-0 right-0 p-2 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
-                onClick={() => {/* TODO: Open file picker */}}
-              >
-                <CameraIcon className="h-4 w-4" />
-              </button>
             </div>
             <div className="space-y-2">
               <p className="text-sm font-medium text-foreground">
@@ -258,98 +235,6 @@ export default function GeneralSettingsPage() {
               onChange={(e) => setPhone(e.target.value)}
               placeholder={t('sections.general.personalInfo.phonePlaceholder')}
             />
-          </div>
-
-          {/* Bio */}
-          <div>
-            <label htmlFor="bio" className="block text-sm font-medium text-foreground mb-1.5">
-              {t('sections.general.personalInfo.bio')}
-            </label>
-            <textarea
-              id="bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder={t('sections.general.personalInfo.bioPlaceholder')}
-              rows={3}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-              maxLength={500}
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              {t('sections.general.personalInfo.bioCharCount', { count: bio.length })}
-            </p>
-          </div>
-
-          {/* Location & Pronouns */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label htmlFor="location" className="block text-sm font-medium text-foreground mb-1.5">
-                {t('sections.general.personalInfo.location')}
-              </label>
-              <Input
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder={t('sections.general.personalInfo.locationPlaceholder')}
-              />
-            </div>
-            <div>
-              <label htmlFor="pronouns" className="block text-sm font-medium text-foreground mb-1.5">
-                {t('sections.general.personalInfo.pronouns')}
-              </label>
-              <Input
-                id="pronouns"
-                value={pronouns}
-                onChange={(e) => setPronouns(e.target.value)}
-                placeholder={t('sections.general.personalInfo.pronounsPlaceholder')}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Privacy Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('sections.general.visibility.title')}</CardTitle>
-          <CardDescription>
-            {t('sections.general.visibility.description')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
-              {t('sections.general.visibility.label')}
-            </label>
-            <Select
-              value={visibility}
-              onChange={(e) => setVisibility(e.target.value)}
-              options={visibilityOptions}
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              {t('sections.general.visibility.hint')}
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-foreground">{t('sections.general.visibility.showEmail')}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('sections.general.visibility.showEmailDesc')}
-                </p>
-              </div>
-              <Switch checked={showEmail} onCheckedChange={setShowEmail} />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-foreground">{t('sections.general.visibility.showPhone')}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t('sections.general.visibility.showPhoneDesc')}
-                </p>
-              </div>
-              <Switch checked={showPhone} onCheckedChange={setShowPhone} />
-            </div>
           </div>
         </CardContent>
       </Card>

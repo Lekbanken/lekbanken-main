@@ -483,60 +483,6 @@ export default function ActivityPage() {
           )}
         </CardContent>
       </Card>
-
-      {/* Export Activity Log */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('sections.activity.exportLog')}</CardTitle>
-          <CardDescription>
-            {t('sections.activity.exportDesc')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => {
-                const data = JSON.stringify(activities, null, 2);
-                const blob = new Blob([data], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `activity-log-${new Date().toISOString().split('T')[0]}.json`;
-                a.click();
-              }}
-            >
-              {t('sections.activity.exportJson')}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                const headers = [
-                  t('sections.activity.csvHeaders.date'),
-                  t('sections.activity.csvHeaders.activity'),
-                  t('sections.activity.csvHeaders.details'),
-                  t('sections.activity.csvHeaders.ip')
-                ];
-                const rows = activities.map((a) => [
-                  new Date(a.created_at).toISOString(),
-                  getActivityLabel(t, a.action),
-                  typeof a.details === 'string' ? a.details : JSON.stringify(a.details),
-                  a.ip_address || '',
-                ]);
-                const csv = [headers.join(','), ...rows.map((r) => r.map((c) => `"${c}"`).join(','))].join('\n');
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `activity-log-${new Date().toISOString().split('T')[0]}.csv`;
-                a.click();
-              }}
-            >
-              {t('sections.activity.exportCsv')}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

@@ -115,12 +115,6 @@ export default function ProfileOverviewPage() {
             </div>
           )}
         </div>
-        <Link
-          href="/app/profile/general"
-          className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-        >
-          {t('editProfile')}
-        </Link>
       </div>
 
       {/* Mobile Tenant Selector - only visible on small screens */}

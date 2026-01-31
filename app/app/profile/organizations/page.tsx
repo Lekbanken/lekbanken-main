@@ -149,23 +149,14 @@ export default function OrganizationsPage() {
   return (
     <div className="p-6 lg:p-8 space-y-8">
       {/* Page Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <BuildingOffice2Icon className="h-6 w-6 text-primary" />
-            {t('sections.organizations.title')}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {t('sections.organizations.description')}
-          </p>
-        </div>
-
-        <Link href="/app/organizations/join">
-          <Button>
-            <PlusIcon className="h-4 w-4 mr-2" />
-            {t('sections.organizations.joinOrg')}
-          </Button>
-        </Link>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <BuildingOffice2Icon className="h-6 w-6 text-primary" />
+          {t('sections.organizations.title')}
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          {t('sections.organizations.description')}
+        </p>
       </div>
 
       {/* Summary Stats */}
@@ -224,22 +215,9 @@ export default function OrganizationsPage() {
               <h3 className="text-lg font-medium text-foreground mb-2">
                 {t('sections.organizations.noOrgs')}
               </h3>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground">
                 {t('sections.organizations.noOrgsDesc')}
               </p>
-              <div className="flex gap-3 justify-center">
-                <Link href="/app/organizations/join">
-                  <Button>
-                    <PlusIcon className="h-4 w-4 mr-2" />
-                    {t('sections.organizations.joinOrg')}
-                  </Button>
-                </Link>
-                <Link href="/app/organizations/create">
-                  <Button variant="outline">
-                    {t('sections.organizations.createOrg')}
-                  </Button>
-                </Link>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -369,29 +347,6 @@ export default function OrganizationsPage() {
           </CardContent>
         </Card>
       )}
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('sections.organizations.quickActions')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/app/organizations/create">
-              <Button variant="outline" className="w-full justify-start">
-                <PlusIcon className="h-4 w-4 mr-2" />
-                {t('sections.organizations.createOrg')}
-              </Button>
-            </Link>
-            <Link href="/app/organizations/join">
-              <Button variant="outline" className="w-full justify-start">
-                <UserGroupIcon className="h-4 w-4 mr-2" />
-                {t('sections.organizations.joinViaCode')}
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

@@ -21,6 +21,7 @@ import {
 import type { MFAStatus, MFATrustedDevice } from '@/types/mfa';
 import { MFAEnrollmentModal } from './MFAEnrollmentModal';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
+import { profileCacheKeys } from '@/lib/profile/cacheKeys';
 
 type MfaStatusApiResponse = MFAStatus & {
   // Raw Supabase factors returned from /api/accounts/auth/mfa/status
@@ -31,12 +32,14 @@ type MfaStatusApiResponse = MFAStatus & {
 interface SecuritySettingsClientProps {
   hasMFA: boolean;
   factorId?: string;
+  userId?: string;
   userEmail?: string;
 }
 
 export function SecuritySettingsClient({ 
   hasMFA: initialHasMFA, 
   factorId: initialFactorId,
+  userId,
   userEmail,
 }: SecuritySettingsClientProps) {
   const t = useTranslations('auth.mfa.settings');
@@ -49,8 +52,8 @@ export function SecuritySettingsClient({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const statusFetchKey = useMemo(() => `mfa-security-status-${userEmail || 'unknown'}`, [userEmail])
-  const devicesFetchKey = useMemo(() => `mfa-security-devices-${userEmail || 'unknown'}`, [userEmail])
+  const statusFetchKey = useMemo(() => userId ? profileCacheKeys.mfaStatus(userId) : 'mfa-status-anon', [userId])
+  const devicesFetchKey = useMemo(() => userId ? profileCacheKeys.mfaTrustedDevices(userId) : 'mfa-devices-anon', [userId])
 
   const {
     data: mfaData,
@@ -99,8 +102,8 @@ export function SecuritySettingsClient({
 
       return { status, factorId: factorIdFromApi }
     },
-    { userEmail },
-    { timeout: 12000, skip: !userEmail }
+    { userId },
+    { timeout: 12000, skip: !userId }
   )
 
   const {
@@ -121,8 +124,8 @@ export function SecuritySettingsClient({
       const devicesJson = (await devicesRes.json()) as { devices?: MFATrustedDevice[] }
       return { devices: devicesJson.devices || [] }
     },
-    { userEmail },
-    { timeout: 12000, skip: !userEmail }
+    { userId },
+    { timeout: 12000, skip: !userId }
   )
 
   useEffect(() => {

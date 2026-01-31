@@ -94,10 +94,15 @@ function getDepsKey(deps: Record<string, unknown>): string {
 }
 
 // Track in-flight requests by key to prevent duplicate concurrent fetches
+// Each entry includes a timestamp to detect stale entries
 const inFlightRequests = new Map<string, {
   promise: Promise<unknown>
   abortController: AbortController
+  timestamp: number
 }>()
+
+// Maximum age for an in-flight request entry (10 seconds)
+const MAX_INFLIGHT_AGE_MS = 10000
 
 // =============================================================================
 // HOOK
@@ -143,38 +148,48 @@ export function useProfileQuery<T>(
     // Check if there's already a global in-flight request for this key+deps
     const existing = inFlightRequests.get(requestKey)
     if (existing) {
-      // Reuse the existing promise (single-flight)
-      try {
-        setStatus('loading')
-        const result = await withTimeout(
-          existing.promise as Promise<T>,
-          timeout,
-          `useProfileQuery(${key})`
-        )
-        // Only update if this is still the current generation
-        if (requestGeneration.current === generation) {
-          setData(result as T)
-          setStatus('success')
-          setError(null)
-        }
-      } catch (err) {
-        if (requestGeneration.current === generation) {
-          if (err instanceof TimeoutError) {
-            existing.abortController.abort()
-            inFlightRequests.delete(requestKey)
-            setError(err.message)
-            setStatus('timeout')
-            return
+      const isStale = Date.now() - existing.timestamp > MAX_INFLIGHT_AGE_MS
+      // Check if the existing request's AbortController is already aborted or too old
+      // If so, we need to start a new request instead of waiting on a dead promise
+      if (existing.abortController.signal.aborted || isStale) {
+        // Clean up the stale entry
+        inFlightRequests.delete(requestKey)
+      } else {
+        // Reuse the existing promise (single-flight)
+        try {
+          setStatus('loading')
+          const result = await withTimeout(
+            existing.promise as Promise<T>,
+            timeout,
+            `useProfileQuery(${key})`
+          )
+          // Only update if this is still the current generation
+          if (requestGeneration.current === generation) {
+            setData(result as T)
+            setStatus('success')
+            setError(null)
           }
-          if (err instanceof Error && err.name === 'AbortError') {
-            // Silently ignore aborted requests
-            return
+        } catch (err) {
+          if (requestGeneration.current === generation) {
+            if (err instanceof TimeoutError) {
+              existing.abortController.abort()
+              inFlightRequests.delete(requestKey)
+              setError(err.message)
+              setStatus('timeout')
+              return
+            }
+            if (err instanceof Error && err.name === 'AbortError') {
+              // Clean up aborted request from cache
+              inFlightRequests.delete(requestKey)
+              // Silently ignore aborted requests
+              return
+            }
+            setError(err instanceof Error ? err.message : 'Unknown error')
+            setStatus('error')
           }
-          setError(err instanceof Error ? err.message : 'Unknown error')
-          setStatus('error')
         }
+        return
       }
-      return
     }
 
     // Create new AbortController
@@ -190,7 +205,11 @@ export function useProfileQuery<T>(
       throw err
     })
 
-    inFlightRequests.set(requestKey, { promise: promise as Promise<unknown>, abortController })
+    inFlightRequests.set(requestKey, { 
+      promise: promise as Promise<unknown>, 
+      abortController,
+      timestamp: Date.now()
+    })
 
     setStatus('loading')
     setError(null)
@@ -209,17 +228,17 @@ export function useProfileQuery<T>(
         if (err instanceof TimeoutError) {
           setError(err.message)
           setStatus('timeout')
-          return
+          // Don't return early - let finally run
+        } else if (err instanceof Error && err.name === 'AbortError') {
+          // Clean up aborted request - don't set error state
+          // Don't return early - let finally run
+        } else {
+          setError(err instanceof Error ? err.message : 'Unknown error')
+          setStatus('error')
         }
-        if (err instanceof Error && err.name === 'AbortError') {
-          // Silently ignore aborted requests (dependency change / unmount)
-          return
-        }
-        setError(err instanceof Error ? err.message : 'Unknown error')
-        setStatus('error')
       }
     } finally {
-      // Clean up in-flight tracking
+      // Clean up in-flight tracking - always runs
       if (inFlightRequests.get(requestKey)?.promise === promise) {
         inFlightRequests.delete(requestKey)
       }
@@ -237,7 +256,16 @@ export function useProfileQuery<T>(
     void executeQuery()
   }, [requestKey, executeQuery])
 
+  // Track cleanup timeout for StrictMode handling
+  const cleanupTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   useEffect(() => {
+    // Clear any pending cleanup timeout from previous effect
+    if (cleanupTimeoutRef.current) {
+      clearTimeout(cleanupTimeoutRef.current)
+      cleanupTimeoutRef.current = null
+    }
+
     // Skip if dependencies aren't ready
     if (skip) {
       setStatus('idle')
@@ -247,9 +275,21 @@ export function useProfileQuery<T>(
     void executeQuery()
 
     // Cleanup on unmount or deps change
+    // Use a short delay before aborting to handle React StrictMode double-mount.
+    // In StrictMode, the component unmounts and remounts within a few ms.
+    // By delaying the abort, the remounted component can reuse the in-flight request.
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
+      const controllerToAbort = abortControllerRef.current
+      if (controllerToAbort) {
+        // Clear the ref immediately so a new mount gets a fresh controller
+        abortControllerRef.current = null
+        
+        // Delay abort to allow StrictMode re-mount to potentially reuse the request
+        cleanupTimeoutRef.current = setTimeout(() => {
+          if (!controllerToAbort.signal.aborted) {
+            controllerToAbort.abort()
+          }
+        }, 100)
       }
     }
   }, [skip, executeQuery])

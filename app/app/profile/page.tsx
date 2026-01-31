@@ -22,6 +22,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { isPrivateTenant } from '@/lib/tenant/helpers';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
+import { profileCacheKeys } from '@/lib/profile/cacheKeys';
 
 interface QuickLinkProps {
   href: string;
@@ -73,7 +74,7 @@ export default function ProfileOverviewPage() {
     .slice(0, 2)
     .toUpperCase();
 
-  const mfaFetchKey = user?.id ? `profile-mfa-status-${user.id}` : 'profile-mfa-status-anon'
+  const mfaFetchKey = user?.id ? profileCacheKeys.mfaStatus(user.id) : 'mfa-status-anon'
   const {
     data: mfaStatus,
     status: mfaStatusStatus,

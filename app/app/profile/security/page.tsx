@@ -54,6 +54,7 @@ export default async function SecuritySettingsPage() {
         <SecuritySettingsClient 
           hasMFA={hasTOTP || hasPhone}
           factorId={totpFactor?.id ?? phoneFactor?.id}
+          userId={user.id}
           userEmail={user.email}
         />
       </div>

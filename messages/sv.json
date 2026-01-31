@@ -10724,6 +10724,12 @@
       "backToHome": "← Tillbaka till startsidan",
       "lastUpdated": "Senast uppdaterad: {date}"
     },
+    "cookiePolicy": {
+      "fallbackTitle": "Cookiepolicy",
+      "pendingContent": "Cookiepolicy publiceras snart.",
+      "noCookies": "Inga cookies registrerade ännu.",
+      "manageDescription": "Du kan när som helst ändra dina cookie-inställningar genom att klicka på knappen nedan."
+    },
     "accept": {
       "header": "VILLKOR",
       "title": "Granska och godkänn villkor",

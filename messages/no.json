@@ -9789,6 +9789,12 @@
       "backToHome": "← Tilbake til forsiden",
       "lastUpdated": "Sist oppdatert: {date}"
     },
+    "cookiePolicy": {
+      "fallbackTitle": "Informasjonskapselpolicy",
+      "pendingContent": "Informasjonskapselpolicy publiseres snart.",
+      "noCookies": "Ingen informasjonskapsler registrert ennå.",
+      "manageDescription": "Du kan når som helst endre innstillingene for informasjonskapsler ved å klikke på knappen nedenfor."
+    },
     "accept": {
       "header": "VILKÅR",
       "title": "Gjennomgå og godkjenn vilkår",

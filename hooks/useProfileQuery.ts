@@ -224,7 +224,6 @@ export function useProfileQuery<T>(
         inFlightRequests.delete(requestKey)
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, requestKey, timeout])
 
   const retry = useCallback(() => {

@@ -14,6 +14,7 @@ import {
   BuildingOfficeIcon,
   ClockIcon,
   ChevronLeftIcon,
+  UsersIcon,
 } from '@heroicons/react/24/outline';
 
 interface ProfileNavItem {
@@ -66,6 +67,13 @@ const navItems: ProfileNavItem[] = [
     href: '/app/profile/preferences',
     icon: Cog6ToothIcon,
     descriptionKey: 'nav.preferencesDesc',
+  },
+  {
+    id: 'friends',
+    labelKey: 'nav.friends',
+    href: '/app/profile/friends',
+    icon: UsersIcon,
+    descriptionKey: 'nav.friendsDesc',
   },
   {
     id: 'organizations',

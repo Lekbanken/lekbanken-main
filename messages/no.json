@@ -8163,6 +8163,8 @@
         "notificationsDesc": "E-post og push-innstillinger",
         "preferences": "Preferanser",
         "preferencesDesc": "Språk, tema og tilgjengelighet",
+        "friends": "Venner",
+        "friendsDesc": "Administrer venner og forespørsler",
         "organizations": "Organisasjoner",
         "organizationsDesc": "Dine organisasjoner og roller",
         "activity": "Aktivitet",

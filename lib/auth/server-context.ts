@@ -19,10 +19,12 @@ interface ServerUserData {
   memberships: TenantMembership[]
 }
 
-// Dev-only: Track bootstrap calls per "request" to detect cache misses
-// This uses a WeakMap keyed by the cookies() promise result (unique per request)
-let devBootstrapCallCount = 0
-let devLastBootstrapTime = 0
+/**
+ * Request-scoped counter for detecting cache() failures.
+ * Uses cache() itself to ensure counter is per-request, not global.
+ * Only active in development when SUPABASE_TRACE_BOOTSTRAP=1.
+ */
+const getBootstrapCallCounter = cache(() => ({ count: 0 }))
 
 /**
  * Cached fetcher for user data - NO pathname in cache key.
@@ -31,19 +33,15 @@ let devLastBootstrapTime = 0
  */
 const getServerUserDataCached = cache(async (): Promise<ServerUserData> => {
   // Dev-only: Detect if cache() is not working as expected
-  if (process.env.NODE_ENV !== 'production') {
-    const now = Date.now()
-    // Reset counter if more than 100ms since last call (new request)
-    if (now - devLastBootstrapTime > 100) {
-      devBootstrapCallCount = 0
-    }
-    devBootstrapCallCount++
-    devLastBootstrapTime = now
+  // Opt-in via SUPABASE_TRACE_BOOTSTRAP=1 to avoid console noise
+  if (process.env.NODE_ENV !== 'production' && process.env.SUPABASE_TRACE_BOOTSTRAP === '1') {
+    const counter = getBootstrapCallCounter()
+    counter.count++
     
-    if (devBootstrapCallCount > 1) {
+    if (counter.count > 1) {
       const stack = new Error().stack?.split('\n').slice(2, 8).join('\n') || ''
       console.warn(
-        `[getServerUserDataCached] WARNING: Bootstrap called ${devBootstrapCallCount}x in same request! ` +
+        `[getServerUserDataCached] WARNING: Bootstrap called ${counter.count}x in same request! ` +
         `This indicates cache() is not deduplicating correctly.\n${stack}`
       )
     }

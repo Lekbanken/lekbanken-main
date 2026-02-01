@@ -92,7 +92,9 @@ export function createFetchWithTimeout(
   const logPrefix = options.logPrefix ?? '[supabase fetch]'
 
   // Track request counts per URL (dev-only) to detect duplicates
+  // Only active when SUPABASE_TRACE_BOOTSTRAP=1 to avoid console noise
   const requestCounts = new Map<string, number>()
+  const traceBootstrap = process.env.SUPABASE_TRACE_BOOTSTRAP === '1'
 
   return async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = safeUrlString(input)
@@ -100,7 +102,8 @@ export function createFetchWithTimeout(
     const timeoutMs = pickTimeoutMs(url, timeouts)
 
     // Dev-only: Track and log duplicate requests with call stack
-    if (logEnabled && process.env.NODE_ENV !== 'production') {
+    // Opt-in via SUPABASE_TRACE_BOOTSTRAP=1 to avoid console noise
+    if (logEnabled && traceBootstrap && process.env.NODE_ENV !== 'production') {
       const urlKey = `${method}:${url}`
       const count = (requestCounts.get(urlKey) || 0) + 1
       requestCounts.set(urlKey, count)

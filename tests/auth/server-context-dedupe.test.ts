@@ -15,7 +15,7 @@
  * @vitest-environment node
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 
 // Note: This test cannot directly test the server-only module,
 // but it documents the expected behavior and can be used as a

@@ -8698,6 +8698,12 @@
         "preferences": {
           "title": "Preferenser",
           "description": "Anpassa din upplevelse i Lekbanken",
+          "loadError": "Kunde inte ladda preferenser",
+          "initError": "Det gick inte att initiera anslutningen till databasen.",
+          "unexpectedError": "Ett oväntat fel inträffade.",
+          "loadingTakingLong": "Det här tar ovanligt lång tid. Kolla Console/Network för vilken request som fastnat och prova att ladda om sidan.",
+          "retry": "Försök igen",
+          "reload": "Ladda om",
           "language": "Språk",
           "theme": "Tema",
           "showThemeToggle": "Visa tema-omkopplare i headern",
@@ -8761,6 +8767,12 @@
         "organizations": {
           "title": "Organisationer",
           "description": "Hantera dina organisationstillhörigheter och roller",
+          "loadError": "Kunde inte ladda organisationer",
+          "initError": "Det gick inte att initiera anslutningen till databasen.",
+          "unexpectedError": "Ett oväntat fel inträffade.",
+          "loadingTakingLong": "Det här tar ovanligt lång tid. Kolla Console/Network för vilken request som fastnat och prova att ladda om sidan.",
+          "retry": "Försök igen",
+          "reload": "Ladda om",
           "role": "Roll",
           "roles": {
             "owner": "Ägare",

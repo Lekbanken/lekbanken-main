@@ -12,6 +12,7 @@ import {
   LockClosedIcon,
   Cog6ToothIcon,
   BuildingOfficeIcon,
+  ChevronLeftIcon,
 } from '@heroicons/react/24/outline';
 
 interface ProfileNavItem {

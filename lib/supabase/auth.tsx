@@ -146,14 +146,13 @@ export function AuthProvider({
   }, [])
 
   const fetchProfile = useCallback(
-    async (currentUser: User) => {
-      const profile = await ensureProfile(currentUser)
-      setUserProfile(profile ?? null)
+    async (currentUser: User): Promise<UserProfile | null> => {
+      return await ensureProfile(currentUser)
     },
     [ensureProfile]
   )
 
-  const fetchMemberships = useCallback(async (currentUser: User) => {
+  const fetchMemberships = useCallback(async (currentUser: User): Promise<TenantMembership[]> => {
     const { data, error } = await supabase
       .from('user_tenant_memberships')
       .select('*, tenant:tenants(*)')
@@ -161,10 +160,10 @@ export function AuthProvider({
 
     if (error) {
       console.warn('[auth] fetchMemberships error:', error)
-      return
+      return []
     }
 
-    setMemberships((data as TenantMembership[]) ?? [])
+    return (data as TenantMembership[]) ?? []
   }, [])
 
   // Dedupe in-flight auth data fetches to prevent race conditions between
@@ -188,11 +187,18 @@ export function AuthProvider({
     }
 
     const promise = (async () => {
-      // Guard: only update state if still mounted
+      // Fetch data first (pure, no side effects)
+      const [profile, memberships] = await Promise.all([
+        fetchProfile(authUser),
+        fetchMemberships(authUser),
+      ])
+
+      // Guard: only update state if still mounted (prevents stale writes)
       if (!isMountedRef.current) return
 
       setUser(authUser)
-      await Promise.all([fetchProfile(authUser), fetchMemberships(authUser)])
+      setUserProfile(profile ?? null)
+      setMemberships(memberships)
     })().finally(() => {
       // Only clear if this is still the active request for this user
       if (inflightRef.current?.userId === authUser.id) {
@@ -242,6 +248,9 @@ export function AuthProvider({
       // Note: We clear sb-* cookies aggressively to prevent stale session state.
       // This is intentional after server-side dedupe fixes to ensure clean logout.
       if (event === 'SIGNED_OUT') {
+        // Cancel any in-flight refresh to prevent stale writes
+        inflightRef.current = null
+
         if (typeof document !== 'undefined') {
           document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
           document.cookie = 'demo_session_id=; Path=/; Max-Age=0; SameSite=Lax'
@@ -376,9 +385,14 @@ export function AuthProvider({
       await supabase.auth.signOut()
     }
 
-    setUser(null)
-    setUserProfile(null)
-    setMemberships([])
+    // Cancel any in-flight refresh
+    inflightRef.current = null
+
+    if (isMountedRef.current) {
+      setUser(null)
+      setUserProfile(null)
+      setMemberships([])
+    }
 
     if (typeof document !== 'undefined') {
       document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
@@ -427,7 +441,9 @@ export function AuthProvider({
     if (payload?.user) {
       setUserProfile(payload.user)
     } else {
-      await fetchProfile(user)
+      // fetchProfile now returns data, so we need to set state here
+      const profile = await fetchProfile(user)
+      setUserProfile(profile ?? null)
     }
 
     const { data: refreshedAuth } = await supabase.auth.getUser()

@@ -1,8 +1,14 @@
 /**
- * Server Context Deduplication Test
+ * Server Context Deduplication - DOCUMENTATION TEST
  * 
- * Verifies that getServerAuthContext() with different pathnames
- * does NOT cause duplicate auth/profile/membership fetches.
+ * ⚠️ IMPORTANT: This is a CONTRACT/DOCUMENTATION test, not a full integration test.
+ * Vitest cannot fully simulate React's request-scoped cache() behavior in Next.js RSC.
+ * 
+ * For real verification:
+ * 1. Set SUPABASE_TRACE_BOOTSTRAP=1 and run dev server
+ * 2. Navigate to /app/profile/organizations
+ * 3. Check logs for: "[bootstrap] requestId=XXXX call #1" (should only see #1, never #2)
+ * 4. Same requestId = same request. Different requestId = different request (OK).
  * 
  * Root cause this prevents: cache(async (pathname?) => ...) creates
  * different cache keys for different pathnames, causing 2x fetches.
@@ -17,9 +23,8 @@
 
 import { describe, it, expect } from 'vitest'
 
-// Note: This test cannot directly test the server-only module,
-// but it documents the expected behavior and can be used as a
-// reference for manual verification.
+// This test documents expected behavior and code structure.
+// It cannot directly test server-only modules or React cache() semantics.
 
 describe('Server Context Deduplication (documentation)', () => {
   it('documents the fix for duplicate bootstrap fetches', () => {

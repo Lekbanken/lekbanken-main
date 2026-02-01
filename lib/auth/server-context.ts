@@ -20,6 +20,13 @@ interface ServerUserData {
 }
 
 /**
+ * Request-scoped unique ID for tracing.
+ * Uses cache() to ensure same ID across all calls within a request.
+ * Useful for distinguishing "2x in same request" (bug) vs "2x across requests" (OK).
+ */
+const getRequestId = cache(() => crypto.randomUUID().slice(0, 8))
+
+/**
  * Request-scoped counter for detecting cache() failures.
  * Uses cache() itself to ensure counter is per-request, not global.
  * Only active in development when SUPABASE_TRACE_BOOTSTRAP=1.
@@ -35,13 +42,16 @@ const getServerUserDataCached = cache(async (): Promise<ServerUserData> => {
   // Dev-only: Detect if cache() is not working as expected
   // Opt-in via SUPABASE_TRACE_BOOTSTRAP=1 to avoid console noise
   if (process.env.NODE_ENV !== 'production' && process.env.SUPABASE_TRACE_BOOTSTRAP === '1') {
+    const requestId = getRequestId()
     const counter = getBootstrapCallCounter()
     counter.count++
+    
+    console.info(`[bootstrap] requestId=${requestId} call #${counter.count}`)
     
     if (counter.count > 1) {
       const stack = new Error().stack?.split('\n').slice(2, 8).join('\n') || ''
       console.warn(
-        `[getServerUserDataCached] WARNING: Bootstrap called ${counter.count}x in same request! ` +
+        `[getServerUserDataCached] WARNING: Bootstrap called ${counter.count}x in same request (${requestId})! ` +
         `This indicates cache() is not deduplicating correctly.\n${stack}`
       )
     }

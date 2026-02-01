@@ -165,6 +165,28 @@ const eslintConfig = defineConfig([
     rules: {
       "lekbanken/no-manual-profile-fetch": "warn",
     },
+  },
+  // =============================================================================
+  // SUPABASE AUTH SECURITY (Prevent reading session.user)
+  // =============================================================================
+  // Supabase v2 warns against reading session.user from onAuthStateChange events.
+  // Always use supabase.auth.getUser() instead which validates with auth server.
+  // See: https://supabase.com/docs/reference/javascript/auth-onauthstatechange
+  {
+    files: [
+      "lib/supabase/**/*.ts",
+      "lib/supabase/**/*.tsx",
+      "lib/auth/**/*.ts",
+      "lib/auth/**/*.tsx",
+    ],
+    rules: {
+      // Catches both session.user and session?.user
+      "no-restricted-properties": ["error", {
+        "object": "session",
+        "property": "user",
+        "message": "Do not read session.user directly - it triggers Supabase security warning. Use supabase.auth.getUser() instead."
+      }]
+    }
   }
 ]);
 

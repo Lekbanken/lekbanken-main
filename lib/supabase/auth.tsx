@@ -16,6 +16,7 @@ import {
   useState,
   useCallback,
   useMemo,
+  useRef,
 } from 'react'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
@@ -166,6 +167,43 @@ export function AuthProvider({
     setMemberships((data as TenantMembership[]) ?? [])
   }, [])
 
+  // Dedupe in-flight auth data fetches to prevent race conditions between
+  // initAuth() and onAuthStateChange events. Keyed on userId to handle user switches.
+  const inflightRef = useRef<{ userId: string; promise: Promise<void> } | null>(null)
+
+  // Track mounted state to prevent stale state writes during navigation/unmount
+  const isMountedRef = useRef(true)
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
+  const refreshAuthData = useCallback(async (authUser: User) => {
+    // If already fetching for THIS user, return the existing promise
+    // If userId changed (user switch), create new promise
+    if (inflightRef.current?.userId === authUser.id) {
+      return inflightRef.current.promise
+    }
+
+    const promise = (async () => {
+      // Guard: only update state if still mounted
+      if (!isMountedRef.current) return
+
+      setUser(authUser)
+      await Promise.all([fetchProfile(authUser), fetchMemberships(authUser)])
+    })().finally(() => {
+      // Only clear if this is still the active request for this user
+      if (inflightRef.current?.userId === authUser.id) {
+        inflightRef.current = null
+      }
+    })
+
+    inflightRef.current = { userId: authUser.id, promise }
+    return promise
+  }, [fetchProfile, fetchMemberships])
+
   useEffect(() => {
     // Skip client init if server provided initial data (including null)
     if (initialUser !== undefined) {
@@ -179,19 +217,20 @@ export function AuthProvider({
           data: { user: authUser },
         } = await supabase.auth.getUser()
 
-        if (authUser) {
-          setUser(authUser)
-          await Promise.all([fetchProfile(authUser), fetchMemberships(authUser)])
+        if (authUser && isMountedRef.current) {
+          await refreshAuthData(authUser)
         }
       } catch (error) {
         console.error('Error initializing auth:', error)
       } finally {
-        setIsLoading(false)
+        if (isMountedRef.current) {
+          setIsLoading(false)
+        }
       }
     }
 
     void initAuth()
-  }, [fetchMemberships, fetchProfile, initialUser])
+  }, [refreshAuthData, initialUser])
 
   useEffect(() => {
     const {
@@ -199,12 +238,13 @@ export function AuthProvider({
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'INITIAL_SESSION') return
 
+      // SIGNED_OUT: Clear state and redirect
+      // Note: We clear sb-* cookies aggressively to prevent stale session state.
+      // This is intentional after server-side dedupe fixes to ensure clean logout.
       if (event === 'SIGNED_OUT') {
-        // Clear all client-side cookies
         if (typeof document !== 'undefined') {
           document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
           document.cookie = 'demo_session_id=; Path=/; Max-Age=0; SameSite=Lax'
-          // Clear all supabase cookies
           document.cookie.split(';').forEach(cookie => {
             const name = cookie.split('=')[0].trim()
             if (name.includes('sb-') || name.includes('supabase')) {
@@ -212,10 +252,12 @@ export function AuthProvider({
             }
           })
         }
-        setUser(null)
-        setUserProfile(null)
-        setMemberships([])
-        // Force full page reload to clear any cached state
+        // Guard: check mounted before state updates
+        if (isMountedRef.current) {
+          setUser(null)
+          setUserProfile(null)
+          setMemberships([])
+        }
         if (typeof window !== 'undefined') {
           setTimeout(() => {
             window.location.href = '/auth/login?signedOut=true'
@@ -224,36 +266,48 @@ export function AuthProvider({
         return
       }
 
-      if (event === 'SIGNED_IN' && session?.user) {
-        // Use getUser() for authenticated data instead of session.user from cookies
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-        if (authUser) {
-          setUser(authUser)
-          await Promise.all([fetchProfile(authUser), fetchMemberships(authUser)])
-          router.refresh()
-        }
-        return
-      }
-
-      if (session?.user) {
-        // Use getUser() for authenticated data instead of session.user from cookies
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-        if (authUser) {
-          setUser(authUser)
-        } else {
+      // No session = clear state
+      if (!session) {
+        if (isMountedRef.current) {
           setUser(null)
           setUserProfile(null)
           setMemberships([])
         }
+        return
+      }
+
+      // IMPORTANT: Never read session.user directly - it triggers Supabase security warning
+      // Always use getUser() which validates with auth server
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+
+      if (!authUser) {
+        if (isMountedRef.current) {
+          setUser(null)
+          setUserProfile(null)
+          setMemberships([])
+        }
+        return
+      }
+
+      // Event matrix:
+      // - SIGNED_IN: Full refresh (user + profile + memberships) + router.refresh()
+      // - USER_UPDATED: Full refresh (metadata may affect profile/role)
+      // - TOKEN_REFRESHED: Just update user (reduce traffic, token refresh is frequent)
+      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        await refreshAuthData(authUser)
+        if (event === 'SIGNED_IN') {
+          router.refresh()
+        }
       } else {
-        setUser(null)
-        setUserProfile(null)
-        setMemberships([])
+        // TOKEN_REFRESHED and other events: just update user object
+        if (isMountedRef.current) {
+          setUser(authUser)
+        }
       }
     })
 
     return () => subscription?.unsubscribe()
-  }, [fetchMemberships, fetchProfile, router])
+  }, [refreshAuthData, router])
 
   const signUp = useCallback(async (email: string, password: string, fullName?: string) => {
     const { data, error } = await supabase.auth.signUp({
@@ -268,10 +322,9 @@ export function AuthProvider({
 
     if (error) throw error
     if (data.user) {
-      setUser(data.user)
-      await Promise.all([fetchProfile(data.user), fetchMemberships(data.user)])
+      await refreshAuthData(data.user)
     }
-  }, [fetchMemberships, fetchProfile])
+  }, [refreshAuthData])
 
   const signIn = useCallback(async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -281,8 +334,7 @@ export function AuthProvider({
 
     if (error) throw error
     if (data.user) {
-      setUser(data.user)
-      await Promise.all([fetchProfile(data.user), fetchMemberships(data.user)])
+      await refreshAuthData(data.user)
       void fetch('/api/accounts/devices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -294,7 +346,7 @@ export function AuthProvider({
       }).catch(() => {})
       void fetch('/api/accounts/sessions', { method: 'GET' }).catch(() => {})
     }
-  }, [fetchMemberships, fetchProfile])
+  }, [refreshAuthData])
 
   const signInWithGoogle = useCallback(async (redirectTo?: string) => {
     const urlParams = new URLSearchParams(window.location.search)

@@ -50,6 +50,7 @@ export default function OrganizationsPage() {
   );
 
   // Use the new single-flight hook for fetching
+  // NOTE: Only primitives in deps! profileService is accessed via closure.
   const {
     data: memberships,
     status,
@@ -65,7 +66,7 @@ export default function OrganizationsPage() {
       }
       return profileService.getOrganizationMemberships(user.id);
     },
-    { userId: user?.id, profileService },
+    { userId: user?.id },
     {
       skip: authLoading || isInitializing || !supabase || !user?.id,
       timeout: 10000,

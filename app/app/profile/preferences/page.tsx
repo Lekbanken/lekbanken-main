@@ -87,6 +87,7 @@ export default function PreferencesPage() {
   );
 
   // Use the new single-flight hook for fetching
+  // NOTE: Only primitives in deps! profileService is accessed via closure.
   const {
     data: fetchedPreferences,
     status,
@@ -102,7 +103,7 @@ export default function PreferencesPage() {
       }
       return profileService.getPreferences(user.id);
     },
-    { userId: user?.id, profileService },
+    { userId: user?.id },
     {
       skip: authLoading || isInitializing || !supabase || !user?.id,
       timeout: 10000,

@@ -10,17 +10,33 @@
  * - Timeout detection
  * - StrictMode-safe (ignores stale responses)
  * 
+ * IMPORTANT: Key stability rules
+ * - `key` should be a stable string that uniquely identifies the query
+ * - `deps` should ONLY contain serializable primitives (string, number, boolean, null)
+ * - Do NOT put object references (services, clients) in deps - they cause key churn
+ * - Services/clients should be accessed via closure in the fetcher function
+ * 
  * Usage:
  * ```tsx
- * const { data, status, error, retry } = useProfileQuery(
- *   `notifications-${userId}`,
- *   async (signal) => profileService.getNotificationSettings(userId),
- *   { userId, supabase }
+ * // ✅ CORRECT: Only primitives in deps, service in fetcher closure
+ * const { data } = useProfileQuery(
+ *   `organizations-${userId}`,
+ *   async (signal) => profileService.getMemberships(userId),
+ *   { userId },
+ *   { skip: !userId }
+ * );
+ * 
+ * // ❌ WRONG: Object in deps causes key churn
+ * const { data } = useProfileQuery(
+ *   `organizations-${userId}`,
+ *   async (signal) => profileService.getMemberships(userId),
+ *   { userId, profileService },  // DON'T DO THIS
+ *   { skip: !userId }
  * );
  * ```
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { TimeoutError, withTimeout } from '@/lib/utils/withTimeout'
 
 // =============================================================================
@@ -58,43 +74,79 @@ export interface UseProfileQueryResult<T> {
 }
 
 // =============================================================================
+// STABLE KEY DERIVATION (primitives only)
+// =============================================================================
+
+/**
+ * Track which dep keys have already warned to avoid console spam.
+ * Key format: "depName:typeName" (e.g., "profileService:object")
+ */
+const warnedDepKeys = new Set<string>()
+
+/**
+ * Check if a value is a serializable primitive.
+ * Only primitives are allowed in deps to ensure stable keys.
+ */
+function isSerializablePrimitive(value: unknown): boolean {
+  if (value === null || value === undefined) return true
+  const t = typeof value
+  return t === 'string' || t === 'number' || t === 'boolean'
+}
+
+/**
+ * Warn once per dep key about non-serializable values.
+ */
+function warnNonSerializable(depName: string, typeName: string): void {
+  if (process.env.NODE_ENV === 'production') return
+  
+  const warnKey = `${depName}:${typeName}`
+  if (warnedDepKeys.has(warnKey)) return
+  
+  warnedDepKeys.add(warnKey)
+  console.warn(
+    `[useProfileQuery] Non-serializable value in deps: "${depName}" is a ${typeName}. ` +
+    `This will be ignored in the cache key. Move services/clients to the fetcher closure instead.`
+  )
+}
+
+/**
+ * Convert a primitive value to a stable string key.
+ * Objects/functions are NOT supported and will trigger a one-time warning.
+ */
+function depToKey(key: string, value: unknown): string {
+  if (value === null) return `${key}:null`
+  if (value === undefined) return `${key}:undefined`
+  
+  const t = typeof value
+  if (t === 'string') return `${key}:s:${value}`
+  if (t === 'number') return `${key}:n:${value}`
+  if (t === 'boolean') return `${key}:b:${value}`
+  
+  // Warn once per dep key (not per render)
+  warnNonSerializable(key, t)
+  
+  // Return a constant so objects don't affect the key
+  // Include dep name for debugging but not as identity
+  return `${key}:__nonserializable(${t})__`
+}
+
+/**
+ * Generate a stable deps key from a deps object.
+ * Only serializable primitives contribute to the key.
+ */
+function getDepsKey(deps: Record<string, unknown>): string {
+  const entries = Object.entries(deps)
+    .filter(([, v]) => isSerializablePrimitive(v))
+    .sort(([a], [b]) => a.localeCompare(b))
+  
+  return entries.map(([k, v]) => depToKey(k, v)).join('|')
+}
+
+// =============================================================================
 // IN-FLIGHT TRACKING (Single-flight pattern)
 // =============================================================================
 
-const objectIds = new WeakMap<object, number>()
-let objectIdSeq = 1
-
-function depToKey(dep: unknown): string {
-  if (dep === null) return 'null'
-  const t = typeof dep
-  if (t === 'undefined') return 'undefined'
-  if (t === 'string') return `string:${dep}`
-  if (t === 'number') return `number:${dep}`
-  if (t === 'boolean') return `boolean:${dep}`
-  if (t === 'bigint') return `bigint:${String(dep)}`
-  if (t === 'symbol') return `symbol:${String(dep)}`
-
-  if (dep instanceof Date) return `date:${dep.toISOString()}`
-
-  if (t === 'function' || t === 'object') {
-    const obj = dep as object
-    const existing = objectIds.get(obj)
-    if (existing) return `ref:${existing}`
-    const id = objectIdSeq++
-    objectIds.set(obj, id)
-    return `ref:${id}`
-  }
-
-  return `unknown:${String(dep)}`
-}
-
-function getDepsKey(deps: Record<string, unknown>): string {
-  const entries = Object.entries(deps).sort(([a], [b]) => a.localeCompare(b))
-  return entries.map(([k, v]) => `${k}:${depToKey(v)}`).join('|')
-}
-
 // Track in-flight requests by key to prevent duplicate concurrent fetches
-// Each entry includes a timestamp to detect stale entries
 const inFlightRequests = new Map<string, {
   promise: Promise<unknown>
   abortController: AbortController
@@ -113,7 +165,7 @@ export function useProfileQuery<T>(
   key: string,
   /** Fetcher function that receives an AbortSignal */
   fetcher: (signal: AbortSignal) => Promise<T>,
-  /** Dependencies object - refetch when this changes */
+  /** Dependencies object - ONLY serializable primitives allowed */
   deps: Record<string, unknown>,
   /** Options */
   options: UseProfileQueryOptions = {}
@@ -129,12 +181,24 @@ export function useProfileQuery<T>(
   const abortControllerRef = useRef<AbortController | null>(null)
   const fetcherRef = useRef(fetcher)
 
+  // Keep fetcher ref updated without triggering re-renders
   useEffect(() => {
     fetcherRef.current = fetcher
   }, [fetcher])
 
-  const depsKey = getDepsKey(deps)
-  const requestKey = `${key}::${depsKey}`
+  // Memoize depsKey to prevent recalculation on every render
+  // This is the key fix: depsKey only changes when primitive values change
+  const depsKey = useMemo(() => getDepsKey(deps), [
+    // We manually list primitives to avoid object identity issues
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    ...Object.entries(deps)
+      .filter(([, v]) => isSerializablePrimitive(v))
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, v]) => v)
+  ])
+  
+  // Memoize requestKey based on stable key + depsKey
+  const requestKey = useMemo(() => `${key}::${depsKey}`, [key, depsKey])
 
   const executeQuery = useCallback(async () => {
     // Increment generation to invalidate previous requests
@@ -150,7 +214,6 @@ export function useProfileQuery<T>(
     if (existing) {
       const isStale = Date.now() - existing.timestamp > MAX_INFLIGHT_AGE_MS
       // Check if the existing request's AbortController is already aborted or too old
-      // If so, we need to start a new request instead of waiting on a dead promise
       if (existing.abortController.signal.aborted || isStale) {
         // Clean up the stale entry
         inFlightRequests.delete(requestKey)
@@ -179,9 +242,7 @@ export function useProfileQuery<T>(
               return
             }
             if (err instanceof Error && err.name === 'AbortError') {
-              // Clean up aborted request from cache
               inFlightRequests.delete(requestKey)
-              // Silently ignore aborted requests
               return
             }
             setError(err instanceof Error ? err.message : 'Unknown error')
@@ -196,7 +257,7 @@ export function useProfileQuery<T>(
     const abortController = new AbortController()
     abortControllerRef.current = abortController
 
-    // Create the promise and register it (wrapped with timeout so it always settles)
+    // Create the promise and register it
     const fetchPromise = fetcherRef.current(abortController.signal)
     const promise = withTimeout(fetchPromise, timeout, `useProfileQuery(${key})`).catch((err) => {
       if (err instanceof TimeoutError) {
@@ -217,7 +278,6 @@ export function useProfileQuery<T>(
     try {
       const result = await promise
 
-      // Only update if this is still the current generation
       if (requestGeneration.current === generation) {
         setData(result)
         setStatus('success')
@@ -228,17 +288,14 @@ export function useProfileQuery<T>(
         if (err instanceof TimeoutError) {
           setError(err.message)
           setStatus('timeout')
-          // Don't return early - let finally run
         } else if (err instanceof Error && err.name === 'AbortError') {
-          // Clean up aborted request - don't set error state
-          // Don't return early - let finally run
+          // Silently ignore aborted requests
         } else {
           setError(err instanceof Error ? err.message : 'Unknown error')
           setStatus('error')
         }
       }
     } finally {
-      // Clean up in-flight tracking - always runs
       if (inFlightRequests.get(requestKey)?.promise === promise) {
         inFlightRequests.delete(requestKey)
       }
@@ -246,13 +303,10 @@ export function useProfileQuery<T>(
   }, [key, requestKey, timeout])
 
   const retry = useCallback(() => {
-    // Abort any existing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
-    // Clear the in-flight tracking for this key+deps
     inFlightRequests.delete(requestKey)
-    // Re-execute
     void executeQuery()
   }, [requestKey, executeQuery])
 
@@ -260,13 +314,11 @@ export function useProfileQuery<T>(
   const cleanupTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    // Clear any pending cleanup timeout from previous effect
     if (cleanupTimeoutRef.current) {
       clearTimeout(cleanupTimeoutRef.current)
       cleanupTimeoutRef.current = null
     }
 
-    // Skip if dependencies aren't ready
     if (skip) {
       setStatus('idle')
       return
@@ -274,17 +326,10 @@ export function useProfileQuery<T>(
 
     void executeQuery()
 
-    // Cleanup on unmount or deps change
-    // Use a short delay before aborting to handle React StrictMode double-mount.
-    // In StrictMode, the component unmounts and remounts within a few ms.
-    // By delaying the abort, the remounted component can reuse the in-flight request.
     return () => {
       const controllerToAbort = abortControllerRef.current
       if (controllerToAbort) {
-        // Clear the ref immediately so a new mount gets a fresh controller
         abortControllerRef.current = null
-        
-        // Delay abort to allow StrictMode re-mount to potentially reuse the request
         cleanupTimeoutRef.current = setTimeout(() => {
           if (!controllerToAbort.signal.aborted) {
             controllerToAbort.abort()

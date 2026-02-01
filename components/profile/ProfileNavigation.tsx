@@ -12,9 +12,6 @@ import {
   LockClosedIcon,
   Cog6ToothIcon,
   BuildingOfficeIcon,
-  ClockIcon,
-  ChevronLeftIcon,
-  UsersIcon,
 } from '@heroicons/react/24/outline';
 
 interface ProfileNavItem {
@@ -69,25 +66,11 @@ const navItems: ProfileNavItem[] = [
     descriptionKey: 'nav.preferencesDesc',
   },
   {
-    id: 'friends',
-    labelKey: 'nav.friends',
-    href: '/app/profile/friends',
-    icon: UsersIcon,
-    descriptionKey: 'nav.friendsDesc',
-  },
-  {
     id: 'organizations',
     labelKey: 'nav.organizations',
     href: '/app/profile/organizations',
     icon: BuildingOfficeIcon,
     descriptionKey: 'nav.organizationsDesc',
-  },
-  {
-    id: 'activity',
-    labelKey: 'nav.activity',
-    href: '/app/profile/activity',
-    icon: ClockIcon,
-    descriptionKey: 'nav.activityDesc',
   },
 ];
 
@@ -108,15 +91,6 @@ export function ProfileNavigation({ className }: ProfileNavigationProps) {
 
   return (
     <nav className={cn('flex flex-col gap-1', className)}>
-      {/* Back to App */}
-      <Link
-        href="/app"
-        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors mb-4"
-      >
-        <ChevronLeftIcon className="h-4 w-4" />
-        {t('nav.backToApp')}
-      </Link>
-
       {/* Navigation Items */}
       {navItems.map((item) => {
         const Icon = item.icon;

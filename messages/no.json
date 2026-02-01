@@ -8182,6 +8182,24 @@
           "mfaEnabled": "MFA aktivert",
           "mfaDisabled": "MFA ikke aktivert",
           "enableMfa": "Aktiver nå"
+        },
+        "privacy": {
+          "title": "Personvern og GDPR",
+          "description": "Administrer dine data og samtykker i henhold til GDPR",
+          "gdprRights": {
+            "title": "Dine rettigheter i henhold til GDPR",
+            "description": "Du har rett til å få tilgang til, eksportere og slette dine personopplysninger. Vi behandler alle GDPR-forespørsler innen 30 dager i samsvar med personvernforordningen.",
+            "access": "Rett til innsyn i dine opplysninger",
+            "rectification": "Rett til retting av feilaktige opplysninger",
+            "erasure": "Rett til sletting (retten til å bli glemt)",
+            "portability": "Rett til dataportabilitet",
+            "restriction": "Rett til begrensning av behandling",
+            "objection": "Rett til å gjøre innsigelser"
+          },
+          "contact": {
+            "title": "Kontakt oss",
+            "description": "For GDPR-forespørsler eller spørsmål om dine personopplysninger, kontakt oss via e-post."
+          }
         }
       },
       "achievementsShowcase": {

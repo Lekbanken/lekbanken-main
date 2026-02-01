@@ -8577,7 +8577,17 @@
           "deleteWarning": "När du raderar ditt konto kommer alla dina personuppgifter, speldata och framsteg att tas bort permanent. Denna åtgärd kan inte ångras.",
           "gdprRights": {
             "title": "Dina rättigheter enligt GDPR",
-            "description": "Du har rätt att få tillgång till, exportera och radera dina personuppgifter. Vi behandlar alla GDPR-förfrågningar inom 30 dagar i enlighet med dataskyddsförordningen."
+            "description": "Du har rätt att få tillgång till, exportera och radera dina personuppgifter. Vi behandlar alla GDPR-förfrågningar inom 30 dagar i enlighet med dataskyddsförordningen.",
+            "access": "Rätt till tillgång till dina uppgifter",
+            "rectification": "Rätt till rättelse av felaktiga uppgifter",
+            "erasure": "Rätt till radering (rätten att bli bortglömd)",
+            "portability": "Rätt till dataportabilitet",
+            "restriction": "Rätt till begränsning av behandling",
+            "objection": "Rätt att göra invändningar"
+          },
+          "contact": {
+            "title": "Kontakta oss",
+            "description": "För GDPR-förfrågningar eller frågor om dina personuppgifter, kontakta oss via e-post."
           },
           "dataExportSection": {
             "title": "Exportera data",

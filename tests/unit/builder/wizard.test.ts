@@ -14,7 +14,12 @@
 
 import { describe, test, expect } from 'vitest';
 
-import type { BuilderAction, PhaseData, StepData } from '@/types/game-builder-state';
+import type { BuilderAction, PhaseData, StepData, GameBuilderState } from '@/types/game-builder-state';
+import type { ArtifactFormData, TriggerFormData } from '@/types/games';
+
+import {
+  resolveDraft,
+} from '@/lib/builder/resolver';
 
 import {
   switchToAdvancedMode,
@@ -47,6 +52,107 @@ import {
 } from '@/lib/builder/wizard/suggestions';
 
 import { TRIGGER_CONDITION_TYPES, TRIGGER_ACTION_TYPES } from '@/lib/domain/enums';
+
+// =============================================================================
+// Mini-reducer for testing (simulates real reducer)
+// =============================================================================
+
+function applyActionsToState(
+  initialState: GameBuilderState,
+  actions: BuilderAction[]
+): GameBuilderState {
+  let state = { ...initialState };
+
+  for (const action of actions) {
+    switch (action.type) {
+      case 'SET_CORE':
+        state = { ...state, core: { ...state.core, ...action.payload } };
+        break;
+      case 'ADD_STEP':
+        state = { ...state, steps: [...state.steps, action.payload] };
+        break;
+      case 'ADD_PHASE':
+        state = { ...state, phases: [...state.phases, action.payload] };
+        break;
+      case 'UPDATE_STEP':
+        state = {
+          ...state,
+          steps: state.steps.map((s) =>
+            s.id === action.payload.id ? { ...s, ...action.payload.data } : s
+          ),
+        };
+        break;
+      case 'ADD_ARTIFACT':
+        state = { ...state, artifacts: [...state.artifacts, action.payload as ArtifactFormData] };
+        break;
+      case 'ADD_TRIGGER':
+        state = { ...state, triggers: [...state.triggers, action.payload as TriggerFormData] };
+        break;
+      case 'ADD_ROLE':
+        state = { ...state, roles: [...state.roles, action.payload] };
+        break;
+    }
+  }
+
+  return state;
+}
+
+function createEmptyState(): GameBuilderState {
+  return {
+    core: {
+      name: '',
+      short_description: '',
+      description: '',
+      status: 'draft',
+      play_mode: 'basic',
+      main_purpose_id: '',
+      product_id: null,
+      taxonomy_category: '',
+      energy_level: null,
+      location_type: null,
+      time_estimate_min: null,
+      duration_max: null,
+      min_players: null,
+      max_players: null,
+      age_min: null,
+      age_max: null,
+      difficulty: null,
+      accessibility_notes: '',
+      space_requirements: '',
+      leader_tips: '',
+      is_demo_content: false,
+    },
+    steps: [],
+    phases: [],
+    roles: [],
+    artifacts: [],
+    triggers: [],
+    materials: {
+      items: [],
+      safety_notes: '',
+      preparation: '',
+    },
+    boardConfig: {
+      show_game_name: true,
+      show_current_phase: true,
+      show_timer: true,
+      show_participants: true,
+      show_public_roles: true,
+      show_leaderboard: false,
+      show_qr_code: true,
+      welcome_message: '',
+      theme: 'neutral',
+      background_color: '#ffffff',
+      layout_variant: 'standard',
+    },
+    gameTools: [],
+    subPurposeIds: [],
+    cover: {
+      mediaId: null,
+      url: null,
+    },
+  };
+}
 
 // Type guard for actions with payload (excludes UNDO, REDO, etc.)
 type ActionWithPayload = Extract<BuilderAction, { payload: unknown }>;
@@ -493,6 +599,85 @@ describe('Wizard Tripwires', () => {
         // Should not throw
         const actions = applyTemplate(template.id);
         expect(Array.isArray(actions)).toBe(true);
+      }
+    });
+  });
+
+  // ===========================================================================
+  // TEST 10: Template → Draft → ResolveResult (industrial-grade)
+  // ===========================================================================
+  describe('TEST 10: Template → Draft → ResolveResult (industrial-grade)', () => {
+    test('features.triggers matches actual draft.triggers array (not just action types)', () => {
+      for (const template of getAvailableTemplates()) {
+        const actions = applyTemplate(template.id);
+        const state = applyActionsToState(createEmptyState(), actions);
+        
+        const hasTriggers = state.triggers.length > 0;
+        expect(hasTriggers).toBe(template.features.triggers);
+      }
+    });
+
+    test('features.artifacts matches actual draft.artifacts array', () => {
+      for (const template of getAvailableTemplates()) {
+        const actions = applyTemplate(template.id);
+        const state = applyActionsToState(createEmptyState(), actions);
+        
+        const hasArtifacts = state.artifacts.length > 0;
+        expect(hasArtifacts).toBe(template.features.artifacts);
+      }
+    });
+
+    test('features.phases matches actual draft.phases array', () => {
+      for (const template of getAvailableTemplates()) {
+        const actions = applyTemplate(template.id);
+        const state = applyActionsToState(createEmptyState(), actions);
+        
+        const hasPhases = state.phases.length > 0;
+        expect(hasPhases).toBe(template.features.phases);
+      }
+    });
+
+    test('all non-blank templates pass draft gate after apply', () => {
+      for (const template of getAvailableTemplates()) {
+        if (template.id === 'blank') continue; // blank template is intentionally incomplete
+        
+        const actions = applyTemplate(template.id);
+        const state = applyActionsToState(createEmptyState(), actions);
+        const resolved = resolveDraft(state);
+        
+        // Template should produce valid draft structure
+        expect(resolved.isGatePassed('draft')).toBe(true);
+      }
+    });
+
+    test('templates do not produce dangling phase refs in steps', () => {
+      for (const template of getAvailableTemplates()) {
+        const actions = applyTemplate(template.id);
+        const state = applyActionsToState(createEmptyState(), actions);
+        
+        const phaseIds = new Set(state.phases.map(p => p.id));
+        
+        for (const step of state.steps) {
+          if (step.phase_id) {
+            expect(phaseIds.has(step.phase_id)).toBe(true);
+          }
+        }
+      }
+    });
+
+    test('templates do not produce dangling step refs in artifacts', () => {
+      for (const template of getAvailableTemplates()) {
+        const actions = applyTemplate(template.id);
+        const state = applyActionsToState(createEmptyState(), actions);
+        
+        const stepIds = new Set(state.steps.map(s => s.id));
+        
+        for (const artifact of state.artifacts) {
+          const stepId = artifact.metadata?.step_id;
+          if (typeof stepId === 'string') {
+            expect(stepIds.has(stepId)).toBe(true);
+          }
+        }
       }
     });
   });

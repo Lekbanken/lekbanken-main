@@ -603,7 +603,7 @@ export interface NotificationHistoryItem {
   id: string
   user_id: string | null
   user_email?: string | null
-  tenant_id: string
+  tenant_id: string | null
   tenant_name?: string | null
   title: string
   message: string

@@ -484,6 +484,11 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
 
   // Validation result using resolveDraft (single source of truth)
   // SPRINT 2: Migrated from validateGameRefs
+  // Filter triggers to only include those with id (TriggerFormData has id?: string)
+  const triggersWithId = useMemo(() => 
+    triggers.filter((t): t is typeof t & { id: string } => !!t.id),
+    [triggers]
+  );
   const resolverResult = useMemo(() => {
     return resolveDraft({
       core: {
@@ -499,10 +504,10 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       phases,
       roles,
       artifacts,
-      triggers,
+      triggers: triggersWithId,
       cover: { mediaId: cover.mediaId },
     });
-  }, [core, steps, phases, roles, artifacts, triggers, cover]);
+  }, [core, steps, phases, roles, artifacts, triggersWithId, cover]);
 
   // Quality state calculation
   const qualityState: QualityState = useMemo(() => ({

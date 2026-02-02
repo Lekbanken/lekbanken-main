@@ -137,6 +137,12 @@ export interface BuilderError {
    * Contains entity info for click-navigation.
    */
   meta?: BuilderErrorMeta;
+
+  /**
+   * Optional suggestion for how to fix the error.
+   * Shown in validation UI to help users resolve issues.
+   */
+  suggestion?: string;
 }
 
 // =============================================================================

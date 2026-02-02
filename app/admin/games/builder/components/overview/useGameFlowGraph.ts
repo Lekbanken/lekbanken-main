@@ -189,6 +189,8 @@ export function useGameFlowGraph(state: GameBuilderState): {
     const edges: FlowEdge[] = [];
 
     // Run validation using resolveDraft (single source of truth)
+    // Filter triggers to only include those with id (TriggerFormData has id?: string)
+    const triggersWithId = state.triggers.filter((t): t is typeof t & { id: string } => !!t.id);
     const resolverResult = resolveDraft({
       core: {
         name: '', // Not needed for graph validation
@@ -197,7 +199,7 @@ export function useGameFlowGraph(state: GameBuilderState): {
       steps: state.steps,
       phases: state.phases,
       artifacts: state.artifacts,
-      triggers: state.triggers,
+      triggers: triggersWithId,
       roles: state.roles,
     });
 

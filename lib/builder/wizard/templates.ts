@@ -46,10 +46,10 @@ export const TEMPLATE_METADATA: Record<TemplateId, TemplateMetadata> = {
   'escape-room-lite': {
     id: 'escape-room-lite',
     name: 'Escape Room Lite',
-    description: 'Faser + artifacts + triggers - för interaktiva lekar',
+    description: 'Faser + artifacts - för interaktiva lekar',
     mode: 'advanced',
     stepCount: 6,
-    features: { phases: true, roles: true, artifacts: true, triggers: true },
+    features: { phases: true, roles: true, artifacts: true, triggers: false },
   },
 };
 

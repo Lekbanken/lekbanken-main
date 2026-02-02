@@ -421,4 +421,79 @@ describe('Wizard Tripwires', () => {
       }
     });
   });
+
+  // ===========================================================================
+  // TEST 9: Template metadata matches actual output (tripwire)
+  // ===========================================================================
+  describe('TEST 9: Template metadata matches actual output', () => {
+    test('template features.phases = true iff template generates ADD_PHASE actions', () => {
+      for (const template of getAvailableTemplates()) {
+        const actions = applyTemplate(template.id);
+        const hasPhaseActions = actions.some((a) => a.type === 'ADD_PHASE');
+        
+        expect(hasPhaseActions).toBe(template.features.phases);
+      }
+    });
+
+    test('template features.artifacts = true iff template generates ADD_ARTIFACT actions', () => {
+      for (const template of getAvailableTemplates()) {
+        const actions = applyTemplate(template.id);
+        const hasArtifactActions = actions.some((a) => a.type === 'ADD_ARTIFACT');
+        
+        expect(hasArtifactActions).toBe(template.features.artifacts);
+      }
+    });
+
+    test('template features.triggers = true iff template generates ADD_TRIGGER actions', () => {
+      for (const template of getAvailableTemplates()) {
+        const actions = applyTemplate(template.id);
+        const hasTriggerActions = actions.some((a) => a.type === 'ADD_TRIGGER');
+        
+        expect(hasTriggerActions).toBe(template.features.triggers);
+      }
+    });
+
+    test('templates never create node-id refs in metadata (canonical keys only)', () => {
+      for (const template of getAvailableTemplates()) {
+        const actions = applyTemplate(template.id);
+        
+        // Check artifact metadata for invalid refs
+        const artifactActions = actions.filter((a) => a.type === 'ADD_ARTIFACT');
+        artifactActions.forEach((a) => {
+          if (hasPayload(a)) {
+            const metadata = a.payload.metadata as Record<string, unknown> | undefined;
+            if (metadata) {
+              // step_id should never be a node-id
+              if (typeof metadata.step_id === 'string') {
+                expect(metadata.step_id).not.toMatch(/^step-/);
+              }
+              // phase_id should never be a node-id
+              if (typeof metadata.phase_id === 'string') {
+                expect(metadata.phase_id).not.toMatch(/^phase-/);
+              }
+            }
+          }
+        });
+
+        // Check step phase_id for invalid refs
+        const stepActions = actions.filter((a) => a.type === 'ADD_STEP');
+        stepActions.forEach((a) => {
+          if (hasPayload(a)) {
+            const phaseId = (a.payload as StepData).phase_id;
+            if (typeof phaseId === 'string') {
+              expect(phaseId).not.toMatch(/^phase-/);
+            }
+          }
+        });
+      }
+    });
+
+    test('all templates in TEMPLATE_METADATA have matching applyTemplate implementation', () => {
+      for (const template of getAvailableTemplates()) {
+        // Should not throw
+        const actions = applyTemplate(template.id);
+        expect(Array.isArray(actions)).toBe(true);
+      }
+    });
+  });
 });

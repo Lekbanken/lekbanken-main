@@ -55,7 +55,7 @@ export type TemplateId =
   | 'blank'                    // Empty game
   | 'basic-activity'           // 3-5 steps, no phases
   | 'facilitated-phases'       // Intro → rounds → debrief
-  | 'escape-room-lite';        // Phases + artifacts + triggers
+  | 'escape-room-lite';        // Phases + artifacts (no triggers)
 
 /**
  * Template metadata.

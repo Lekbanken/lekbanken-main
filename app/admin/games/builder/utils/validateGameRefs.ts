@@ -1,8 +1,31 @@
 /**
  * Game Builder Validation Utilities
  * 
- * Validates artifact and trigger references to catch broken refs before publish.
- * Task 2.6 - Session Cockpit Architecture
+ * @deprecated This module is being replaced by lib/builder/resolver.ts
+ * 
+ * MIGRATION GUIDE:
+ * ================
+ * Instead of:
+ *   import { validateGameRefs } from './validateGameRefs';
+ *   const result = validateGameRefs(data);
+ *   if (!result.isValid) { ... }
+ * 
+ * Use:
+ *   import { resolveDraft, errorsForEntity } from '@/lib/builder';
+ *   const result = resolveDraft(draft);
+ *   if (!result.isGatePassed('draft')) { ... }
+ * 
+ * Benefits of new system:
+ * - Single source of truth for all validation
+ * - Typed error codes (B_ prefix)
+ * - Gate-based validation (draft/playable/publish)
+ * - Error routing helpers (errorsForEntity, errorsForPath)
+ * - Invariants tested (no mutation, deterministic, O(n))
+ * 
+ * This file will be removed in a future sprint.
+ * 
+ * @see docs/builder/BUILDER_WIRING_VALIDATION_PLAN.md
+ * @see lib/builder/resolver.ts
  */
 
 import type { ArtifactFormData } from '@/types/games';

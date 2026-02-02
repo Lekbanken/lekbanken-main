@@ -28,7 +28,7 @@ import {
   type QualityState,
 } from './components';
 import { ValidationPanel } from './components/ValidationPanel';
-import { validateGameRefs, type GameDataForValidation } from './utils/validateGameRefs';
+import { resolveDraft } from '@/lib/builder/resolver';
 import type { ArtifactFormData, ArtifactVariantFormData, TriggerFormData } from '@/types/games';
 import { TOOL_REGISTRY } from '@/features/tools/registry';
 import type { ToolScope } from '@/features/tools/types';
@@ -482,25 +482,27 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
     // All set* functions are stable and never change
   }, [gameId, t, setCore, setSteps, setPhases, setRoles, setArtifacts, setTriggers, setMaterials, setBoardConfig, setCover, setSubPurposeIds, setGameTools]);
 
-  // Validation result (Task 2.6)
-  const validationResult = useMemo(() => {
-    const dataForValidation: GameDataForValidation = {
+  // Validation result using resolveDraft (single source of truth)
+  // SPRINT 2: Migrated from validateGameRefs
+  const resolverResult = useMemo(() => {
+    return resolveDraft({
+      core: {
+        name: core.name,
+        main_purpose_id: core.main_purpose_id,
+        description: core.description,
+        age_min: core.age_min,
+        age_max: core.age_max,
+        min_players: core.min_players,
+        max_players: core.max_players,
+      },
+      steps,
+      phases,
+      roles,
       artifacts,
-      triggers: triggers
-        .filter((t): t is typeof t & { id: string } => Boolean(t.id))
-        .map((t) => ({
-          id: t.id,
-          name: t.name,
-          enabled: t.enabled,
-          condition: t.condition,
-          actions: t.actions,
-        })),
-      steps: steps.map((s) => ({ id: s.id, title: s.title })),
-      phases: phases.map((p) => ({ id: p.id, name: p.name })),
-      roles: roles.map((r) => ({ id: r.id, name: r.name })),
-    };
-    return validateGameRefs(dataForValidation);
-  }, [artifacts, triggers, steps, phases, roles]);
+      triggers,
+      cover: { mediaId: cover.mediaId },
+    });
+  }, [core, steps, phases, roles, artifacts, triggers, cover]);
 
   // Quality state calculation
   const qualityState: QualityState = useMemo(() => ({
@@ -519,9 +521,9 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       (steps.length > 0 || core.description.trim()) &&
       cover.mediaId
     ),
-    noValidationErrors: validationResult.isValid,
+    noValidationErrors: resolverResult.isGatePassed('draft'),
     reviewed: false,
-  }), [core, steps, subPurposeIds, cover, validationResult.isValid]);
+  }), [core, steps, subPurposeIds, cover, resolverResult]);
 
   // Completed sections
   const completedSections = useMemo(() => {
@@ -1462,11 +1464,11 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
             status={core.status}
           />
           
-          {/* Validation Panel (Task 2.6) */}
+          {/* Validation Panel (SPRINT 2: uses ResolverResult) */}
           {(artifacts.length > 0 || triggers.length > 0) && (
             <div className="p-4 border-t">
               <ValidationPanel
-                result={validationResult}
+                result={resolverResult}
                 onNavigateToItem={(section, _itemId) => {
                   // Navigate to the relevant section
                   if (section === 'triggers') {

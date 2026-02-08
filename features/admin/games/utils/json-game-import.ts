@@ -1,5 +1,18 @@
 import type { ParsedGame } from '../../../../types/csv-import';
 
+// =============================================================================
+// SSoT: Import trigger normalization from server module
+// The server module is the SINGLE SOURCE OF TRUTH for trigger normalization.
+// This ensures UI and server always use the same logic.
+// =============================================================================
+import { 
+  normalizeLegacyTrigger,
+  normalizeAndValidateGameTriggers,
+} from '@/lib/import/trigger-normalization';
+
+// Re-export for backward compatibility with existing imports
+export { normalizeLegacyTrigger };
+
 type JsonRecord = Record<string, unknown>;
 
 function isJsonRecord(value: unknown): value is JsonRecord {
@@ -15,8 +28,35 @@ function getNumber(value: unknown): number | null {
 }
 
 /**
+ * Normalize all triggers in a game, returning normalized triggers and any that failed.
+ * 
+ * This is a thin wrapper around the server-side normalizeAndValidateGameTriggers
+ * to maintain backward compatibility with existing callers.
+ */
+export function normalizeGameTriggers(rawTriggers: unknown[]): {
+  triggers: ParsedGame['triggers'];
+  failedIndexes: number[];
+} {
+  // Handle empty input
+  if (rawTriggers.length === 0) {
+    return { triggers: [], failedIndexes: [] };
+  }
+  
+  // Use SSoT from server module
+  const result = normalizeAndValidateGameTriggers(rawTriggers, 'ui-parser');
+  return {
+    triggers: result.triggers.length > 0 ? result.triggers : undefined,
+    failedIndexes: result.failedIndexes,
+  };
+}
+
+/**
  * Parse a JSON payload (exported games array) into ParsedGame[] without applying lossy defaults.
  * This is used by the JSON import API and by roundtrip tests.
+ * 
+ * IMPORTANT: This function now normalizes legacy trigger formats automatically.
+ * Legacy format: { condition_type, condition_config, actions[].artifactOrder }
+ * Canonical format: { condition: { type, ... }, actions[].artifact_order }
  */
 export function parseGamesFromJsonPayload(payload: string): ParsedGame[] {
   const data: unknown = JSON.parse(payload);
@@ -28,6 +68,21 @@ export function parseGamesFromJsonPayload(payload: string): ParsedGame[] {
     const subPurposeIds = Array.isArray(item.sub_purpose_ids)
       ? (item.sub_purpose_ids as unknown[]).filter((v): v is string => typeof v === 'string')
       : [];
+
+    // Normalize triggers from legacy format if needed
+    let normalizedTriggers: ParsedGame['triggers'] = undefined;
+    if (Array.isArray(item.triggers) && item.triggers.length > 0) {
+      const { triggers, failedIndexes } = normalizeGameTriggers(item.triggers);
+      if (failedIndexes.length > 0) {
+        // Log warning for triggers that couldn't be normalized
+        console.warn(
+          `[json-game-import] Game "${getString(item.game_key) ?? 'unknown'}": ` +
+          `${failedIndexes.length} trigger(s) could not be normalized (indexes: ${failedIndexes.join(', ')}). ` +
+          `These triggers are missing both 'condition.type' and 'condition_type'.`
+        );
+      }
+      normalizedTriggers = triggers && triggers.length > 0 ? triggers : undefined;
+    }
 
     return {
       game_key: getString(item.game_key) ?? '',
@@ -66,7 +121,7 @@ export function parseGamesFromJsonPayload(payload: string): ParsedGame[] {
       artifacts: (Array.isArray(item.artifacts) ? (item.artifacts as ParsedGame['artifacts']) : undefined) ?? undefined,
       decisions: (item.decisions as ParsedGame['decisions']) ?? undefined,
       outcomes: (item.outcomes as ParsedGame['outcomes']) ?? undefined,
-      triggers: (Array.isArray(item.triggers) ? (item.triggers as ParsedGame['triggers']) : undefined) ?? undefined,
+      triggers: normalizedTriggers,
     };
   });
 }

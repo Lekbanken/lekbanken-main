@@ -436,3 +436,161 @@ interface GameExport {
 | Roundtrip guaranteed | ❌ No | IDs and some fields differ |
 | Template library | ❌ Missing | Not implemented |
 | Import to builder | ❌ Missing | Not implemented |
+---
+
+## Trigger Format Specification
+
+**Datum:** 2026-02-08  
+**Status:** CANONICAL FORMAT DEFINED + LEGACY AUTO-NORMALIZED
+
+### Canonical Trigger Format
+
+This is the **only format** stored in the database. All imports are normalized to this format before writing.
+
+```json
+{
+  "name": "Reveal clue when keypad correct",
+  "description": "Optional description",
+  "enabled": true,
+  "condition": {
+    "type": "keypad_correct",
+    "artifactOrder": 2
+  },
+  "actions": [
+    {
+      "type": "reveal_artifact",
+      "artifactOrder": 3
+    }
+  ],
+  "execute_once": true,
+  "delay_seconds": 0,
+  "sort_order": 1
+}
+```
+
+#### Required Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `condition.type` | string | The condition type (e.g., `keypad_correct`, `manual`, `step_started`) |
+| `actions` | array | Array of action objects (can be empty) |
+
+#### Optional Fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `name` | string | `"Unnamed trigger"` | Display name |
+| `description` | string | - | Human-readable description |
+| `enabled` | boolean | `true` | Whether trigger is active |
+| `execute_once` | boolean | `false` | Fire only once per session |
+| `delay_seconds` | number | `0` | Delay before executing actions |
+| `sort_order` | number | `0` | Execution priority |
+
+#### Condition Reference Fields (camelCase)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `artifactOrder` | number | References artifact by artifact_order |
+| `stepOrder` | number | References step by step_order |
+| `phaseOrder` | number | References phase by phase_order |
+| `roleOrder` | number | References role by role_order |
+
+#### Action Reference Fields (camelCase)
+
+Same as condition fields. Example:
+
+```json
+{
+  "type": "reveal_artifact",
+  "artifactOrder": 3
+}
+```
+
+### Legacy Trigger Format (Auto-Normalized)
+
+The import system **accepts but normalizes** this legacy format:
+
+```json
+{
+  "name": "Legacy format trigger",
+  "condition_type": "keypad_correct",
+  "condition_config": {
+    "artifactOrder": 2
+  },
+  "actions": [
+    {
+      "type": "reveal_artifact",
+      "artifactOrder": 3
+    }
+  ]
+}
+```
+
+This is automatically normalized to:
+
+```json
+{
+  "name": "Legacy format trigger",
+  "condition": {
+    "type": "keypad_correct",
+    "artifactOrder": 2
+  },
+  "actions": [...],
+  "enabled": true,
+  "execute_once": false,
+  "delay_seconds": 0,
+  "sort_order": 0
+}
+```
+
+### Blocking Errors (Fail-Fast)
+
+Import will **fail entirely** for a game if any trigger has these errors:
+
+| Error Code | Description |
+|------------|-------------|
+| `TRIGGER_NORMALIZATION_FAILED` | Missing both `condition.type` and `condition_type` |
+| `TRIGGER_MISSING_CONDITION_TYPE` | Condition exists but has no `type` field |
+| `TRIGGER_ACTION_INVALID` | Action missing required `type` field |
+| `TRIGGER_INVALID_FORMAT` | Actions field is not an array |
+
+#### Example Error Response
+
+```json
+{
+  "success": false,
+  "stats": {
+    "created": 2,
+    "skipped": 1
+  },
+  "errors": [
+    {
+      "row": 2,
+      "column": "triggers[0].condition.type",
+      "message": "Trigger \"My Trigger\" is missing required field: condition.type",
+      "severity": "error",
+      "code": "TRIGGER_MISSING_CONDITION_TYPE"
+    }
+  ]
+}
+```
+
+### Validation Behavior
+
+1. **Dry-run shows same errors as actual import** - No surprises
+2. **Invalid trigger = entire game blocked** - No partial state
+3. **Valid games in batch still import** - Only invalid games skipped
+4. **Error codes are machine-readable** - For automation/analytics
+
+### Single Source of Truth
+
+All trigger normalization uses **one implementation**:
+
+```
+lib/import/trigger-normalization.ts
+  └── normalizeLegacyTrigger()      # Single trigger
+  └── normalizeAndValidateGameTriggers()  # Batch + validation
+  └── validateTrigger()             # Field validation
+```
+
+Both UI preview and server import use this module.

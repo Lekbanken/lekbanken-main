@@ -23,6 +23,7 @@ import { actionOrderAliasesToIds, conditionOrderAliasesToIds } from '@/lib/games
 import { normalizeAndValidate } from '@/lib/import/metadataSchemas';
 import { rewriteAllTriggerRefs, type TriggerIdMap, type TriggerPayload } from '@/lib/import/triggerRefRewrite';
 import { assignCoverFromTemplates, type AssignCoverResult } from '@/lib/import/assignCoverFromTemplates';
+import { runPreflightValidation, type PreflightResult } from '@/lib/import/preflight-validation';
 import type { ParsedGame, DryRunResult, DryRunGamePreview, ImportError } from '@/types/csv-import';
 import type { Json } from '@/types/supabase';
 
@@ -68,6 +69,7 @@ type ImportPayload = {
   dry_run?: boolean;
   upsert?: boolean;
   tenant_id?: string;
+  product_id?: string;
 };
 
 // =============================================================================
@@ -272,7 +274,7 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as ImportPayload;
-    const { data, format, dry_run = false, upsert = true, tenant_id } = body;
+    const { data, format, dry_run = false, upsert = true, tenant_id, product_id: overrideProductId } = body;
 
     // Authorization: system_admin for global, tenant_admin for tenant-scoped
     if (tenant_id) {
@@ -328,6 +330,12 @@ export async function POST(request: Request) {
         { error: 'Inga giltiga spel hittades i datan' },
         { status: 400 }
       );
+    }
+
+    // LOG: Parsed games summary for debugging
+    console.log(`[csv-import] parse.done run=${importRunId} format=${format} games=${parsedGames.length}`);
+    for (const g of parsedGames) {
+      console.log(`[csv-import] parse.game run=${importRunId} key=${g.game_key} steps=${g.steps?.length ?? 0} phases=${g.phases?.length ?? 0} roles=${g.roles?.length ?? 0} artifacts=${g.artifacts?.length ?? 0} triggers=${g.triggers?.length ?? 0}`);
     }
 
     // =========================================================================
@@ -390,6 +398,30 @@ export async function POST(request: Request) {
 
     // Dry run mode - return validation result without saving
     if (dry_run) {
+      // =====================================================================
+      // Run preflight validation on ALL games to catch trigger errors EARLY
+      // This ensures UI shows same errors that would block actual import
+      // =====================================================================
+      const preflightErrors: ImportError[] = [];
+      const gamesWithPreflightErrors = new Set<number>();  // Track which games failed
+      
+      for (let index = 0; index < parsedGames.length; index++) {
+        const game = parsedGames[index];
+        const preflight = runPreflightValidation(game, randomUUID);
+        if (!preflight.ok) {
+          gamesWithPreflightErrors.add(index);
+          for (const err of preflight.blockingErrors) {
+            preflightErrors.push({
+              row: index + 1,
+              column: err.column,
+              message: err.message,
+              severity: 'error',
+              code: err.code,  // Propagate machine-readable error code
+            });
+          }
+        }
+      }
+
       const dryRunGames: DryRunGamePreview[] = parsedGames.map((game, index) => {
         // Collect unique artifact types for quick inspection
         const artifactTypes = Array.from(
@@ -422,13 +454,15 @@ export async function POST(request: Request) {
         }))
       );
 
-      const allErrors = [...parseErrors, ...validationResult.allErrors];
+      // Combine all errors including preflight errors
+      const allErrors = [...parseErrors, ...validationResult.allErrors, ...preflightErrors];
       const allWarnings = [...parseWarnings, ...metadataWarnings, ...validationResult.allWarnings];
 
       const dryRunResult: DryRunResult = {
         valid: allErrors.length === 0,
         total_rows: parsedGames.length,
-        valid_count: validationResult.validGames.length,
+        // valid_count = games that pass validateGames minus games that fail preflight
+        valid_count: Math.max(0, validationResult.validGames.length - gamesWithPreflightErrors.size),
         warning_count: allWarnings.length,
         error_count: allErrors.length,
         errors: allErrors,
@@ -472,16 +506,46 @@ export async function POST(request: Request) {
     for (let index = 0; index < validationResult.validGames.length; index++) {
       const game = validationResult.validGames[index];
       const rowNumber = index + 1;
+      
+      // Apply product_id override from UI if provided
+      if (overrideProductId) {
+        game.product_id = overrideProductId;
+      }
 
       try {
+        // =====================================================================
+        // FAIL-FAST: Run preflight validation BEFORE any DB writes
+        // This ensures invalid triggers block import entirely (no partial state)
+        // =====================================================================
+        const preflight = runPreflightValidation(game, randomUUID);
+        
+        if (!preflight.ok) {
+          // Preflight failed - add errors and skip this game entirely
+          for (const err of preflight.blockingErrors) {
+            importErrors.push({
+              row: rowNumber,
+              column: err.column,
+              message: err.message,
+              severity: 'error',
+              code: err.code,  // Propagate machine-readable error code
+            });
+          }
+          failedCount++;
+          console.log(`[csv-import] preflight.blocked run=${importRunId} game=${game.game_key} errors=${preflight.blockingErrors.length}`);
+          continue; // Skip to next game - DO NOT create this game
+        }
+        
+        // Use normalized game data (with canonicalized triggers)
+        const normalizedGame = preflight.normalizedGame;
+
         // Check if game exists by game_key
         let existingGameId: string | null = null;
         
-        if (upsert && game.game_key) {
+        if (upsert && normalizedGame.game_key) {
           const { data: existing } = await db
             .from('games')
             .select('id')
-            .eq('game_key', game.game_key)
+            .eq('game_key', normalizedGame.game_key)
             .maybeSingle();
           
           if (existing && existing.id) {
@@ -491,28 +555,28 @@ export async function POST(request: Request) {
 
         // Prepare game data
         const gameData = {
-          game_key: game.game_key,
-          name: game.name,
-          short_description: game.short_description,
-          description: game.description,
-          play_mode: game.play_mode,
-          status: game.status,
-          energy_level: game.energy_level,
-          location_type: game.location_type,
-          time_estimate_min: game.time_estimate_min,
-          duration_max: game.duration_max,
-          min_players: game.min_players,
-          max_players: game.max_players,
-          players_recommended: game.players_recommended,
-          age_min: game.age_min,
-          age_max: game.age_max,
-          difficulty: game.difficulty,
-          accessibility_notes: game.accessibility_notes,
-          space_requirements: game.space_requirements,
-          leader_tips: game.leader_tips,
-          main_purpose_id: game.main_purpose_id,
-          product_id: game.product_id,
-          owner_tenant_id: game.owner_tenant_id,
+          game_key: normalizedGame.game_key,
+          name: normalizedGame.name,
+          short_description: normalizedGame.short_description,
+          description: normalizedGame.description,
+          play_mode: normalizedGame.play_mode,
+          status: normalizedGame.status,
+          energy_level: normalizedGame.energy_level,
+          location_type: normalizedGame.location_type,
+          time_estimate_min: normalizedGame.time_estimate_min,
+          duration_max: normalizedGame.duration_max,
+          min_players: normalizedGame.min_players,
+          max_players: normalizedGame.max_players,
+          players_recommended: normalizedGame.players_recommended,
+          age_min: normalizedGame.age_min,
+          age_max: normalizedGame.age_max,
+          difficulty: normalizedGame.difficulty,
+          accessibility_notes: normalizedGame.accessibility_notes,
+          space_requirements: normalizedGame.space_requirements,
+          leader_tips: normalizedGame.leader_tips,
+          main_purpose_id: normalizedGame.main_purpose_id,
+          product_id: normalizedGame.product_id,
+          owner_tenant_id: normalizedGame.owner_tenant_id,
         };
 
         let gameId: string;
@@ -545,7 +609,15 @@ export async function POST(request: Request) {
         }
 
         // Handle related data (steps, materials, phases, roles, boardConfig)
-        const coverResult = await importRelatedData(db, gameId, game, existingGameId !== null, importRunId);
+        // Pass pre-computed data from preflight to avoid duplicate validation
+        const coverResult = await importRelatedData(
+          db, 
+          gameId, 
+          normalizedGame, 
+          existingGameId !== null, 
+          importRunId,
+          preflight.precomputed
+        );
 
         // Track cover assignment results
         if (coverResult.assigned) {
@@ -634,6 +706,8 @@ export async function POST(request: Request) {
  * 
  * GUARANTEE: "No DB writes occur for a game if trigger rewrite fails."
  * 
+ * @param precomputed Optional pre-computed data from preflight validation.
+ *                    If provided, skips duplicate validation. If not, runs own validation.
  * @returns Cover assignment result for aggregation in parent
  */
 async function importRelatedData(
@@ -641,31 +715,58 @@ async function importRelatedData(
   gameId: string,
   game: ParsedGame,
   isUpdate: boolean,
-  importRunId: string
+  importRunId: string,
+  precomputed?: {
+    stepIdByOrder: Map<number, string>;
+    phaseIdByOrder: Map<number, string>;
+    artifactIdByOrder: Map<number, string>;
+    roleIdByOrder: Map<number, string>;
+    roleIdByName: Map<string, string>;
+    normalizedTriggers: import('@/types/csv-import').ParsedTrigger[];
+  }
 ): Promise<AssignCoverResult> {
   // ==========================================================================
+  // DEBUG: Log input data counts for troubleshooting
+  // ==========================================================================
+  console.log(`[csv-import] importRelatedData.start run=${importRunId} game=${game.game_key} steps=${game.steps?.length ?? 0} phases=${game.phases?.length ?? 0} roles=${game.roles?.length ?? 0} artifacts=${game.artifacts?.length ?? 0} triggers=${game.triggers?.length ?? 0} precomputed=${!!precomputed}`);
+
+  // ==========================================================================
   // PHASE 1: Pre-generate UUIDs for entities that triggers may reference
+  // Use pre-computed data if available (from fail-fast preflight)
   // ==========================================================================
   
   const preflightErrors: ImportError[] = [];
 
-  // Pre-generate step IDs (with collision check)
-  const stepIdByOrder = new Map<number, string>();
+  // =========================================================================
+  // Use pre-computed IDs if available (from fail-fast preflight validation)
+  // This avoids duplicate validation and ensures consistency
+  // =========================================================================
+  const stepIdByOrder = precomputed?.stepIdByOrder ?? new Map<number, string>();
+  const phaseIdByOrder = precomputed?.phaseIdByOrder ?? new Map<number, string>();
+  const artifactIdByOrder = precomputed?.artifactIdByOrder ?? new Map<number, string>();
+  const roleIdByOrder = precomputed?.roleIdByOrder ?? new Map<number, string>();
+  const roleIdByName = precomputed?.roleIdByName ?? new Map<string, string>();
+
+  // Pre-generate step IDs (with collision check) - SKIP if precomputed
   const stepRows = (game.steps ?? []).map((step, index) => {
     const stepOrder = step.step_order ?? index + 1;
     
-    // Collision check: detect duplicate step_order
-    if (stepIdByOrder.has(stepOrder)) {
-      preflightErrors.push({
-        row: index + 1,
-        column: `steps[${index}].step_order`,
-        message: `Duplicate step_order=${stepOrder} detected. Each step must have unique order.`,
-        severity: 'error',
-      });
+    // Use precomputed ID if available, otherwise generate and check
+    let id = stepIdByOrder.get(stepOrder);
+    if (!id) {
+      // Collision check: detect duplicate step_order
+      if (stepIdByOrder.has(stepOrder)) {
+        preflightErrors.push({
+          row: index + 1,
+          column: `steps[${index}].step_order`,
+          message: `Duplicate step_order=${stepOrder} detected. Each step must have unique order.`,
+          severity: 'error',
+        });
+      }
+      id = randomUUID();
+      stepIdByOrder.set(stepOrder, id);
     }
     
-    const id = randomUUID();
-    stepIdByOrder.set(stepOrder, id);
     return {
       id,
       game_id: gameId,
@@ -680,23 +781,26 @@ async function importRelatedData(
     };
   });
 
-  // Pre-generate phase IDs (with collision check)
-  const phaseIdByOrder = new Map<number, string>();
+  // Pre-generate phase IDs (with collision check) - SKIP if precomputed
   const phaseRows = (game.phases ?? []).map((phase, index) => {
     const phaseOrder = phase.phase_order ?? index + 1;
     
-    // Collision check: detect duplicate phase_order
-    if (phaseIdByOrder.has(phaseOrder)) {
-      preflightErrors.push({
-        row: index + 1,
-        column: `phases[${index}].phase_order`,
-        message: `Duplicate phase_order=${phaseOrder} detected. Each phase must have unique order.`,
-        severity: 'error',
-      });
+    // Use precomputed ID if available, otherwise generate and check
+    let id = phaseIdByOrder.get(phaseOrder);
+    if (!id) {
+      // Collision check: detect duplicate phase_order
+      if (phaseIdByOrder.has(phaseOrder)) {
+        preflightErrors.push({
+          row: index + 1,
+          column: `phases[${index}].phase_order`,
+          message: `Duplicate phase_order=${phaseOrder} detected. Each phase must have unique order.`,
+          severity: 'error',
+        });
+      }
+      id = randomUUID();
+      phaseIdByOrder.set(phaseOrder, id);
     }
     
-    const id = randomUUID();
-    phaseIdByOrder.set(phaseOrder, id);
     return {
       id,
       game_id: gameId,
@@ -712,8 +816,7 @@ async function importRelatedData(
     };
   });
 
-  // Pre-generate artifact IDs (with collision check)
-  const artifactIdByOrder = new Map<number, string>();
+  // Pre-generate artifact IDs (with collision check) - using precomputed if available
   type ArtifactRowData = {
     id: string;
     game_id: string;
@@ -728,18 +831,22 @@ async function importRelatedData(
   const artifactRows: ArtifactRowData[] = (game.artifacts ?? []).map((artifact, index) => {
     const artifactOrder = artifact.artifact_order ?? index + 1;
     
-    // Collision check: detect duplicate artifact_order
-    if (artifactIdByOrder.has(artifactOrder)) {
-      preflightErrors.push({
-        row: index + 1,
-        column: `artifacts[${index}].artifact_order`,
-        message: `Duplicate artifact_order=${artifactOrder} detected. Each artifact must have unique order.`,
-        severity: 'error',
-      });
+    // Use precomputed ID if available, otherwise generate and check
+    let id = artifactIdByOrder.get(artifactOrder);
+    if (!id) {
+      // Collision check: detect duplicate artifact_order
+      if (artifactIdByOrder.has(artifactOrder)) {
+        preflightErrors.push({
+          row: index + 1,
+          column: `artifacts[${index}].artifact_order`,
+          message: `Duplicate artifact_order=${artifactOrder} detected. Each artifact must have unique order.`,
+          severity: 'error',
+        });
+      }
+      id = randomUUID();
+      artifactIdByOrder.set(artifactOrder, id);
     }
     
-    const id = randomUUID();
-    artifactIdByOrder.set(artifactOrder, id);
     return {
       id,
       game_id: gameId,
@@ -754,8 +861,7 @@ async function importRelatedData(
   });
 
   // Pre-generate role IDs (REQUIRED for visible_to_role_id in variants)
-  const roleIdByOrder = new Map<number, string>();
-  const roleIdByName = new Map<string, string>();
+  // Use precomputed IDs if available
   type RoleRowData = {
     id: string;
     game_id: string;
@@ -776,21 +882,25 @@ async function importRelatedData(
   const roleRows: RoleRowData[] = (game.roles ?? []).map((role, index) => {
     const roleOrder = role.role_order ?? index + 1;
     
-    // Collision check: detect duplicate role_order
-    if (roleIdByOrder.has(roleOrder)) {
-      preflightErrors.push({
-        row: index + 1,
-        column: `roles[${index}].role_order`,
-        message: `Duplicate role_order=${roleOrder} detected. Each role must have unique order.`,
-        severity: 'error',
-      });
+    // Use precomputed ID if available, otherwise generate and check
+    let id = roleIdByOrder.get(roleOrder);
+    if (!id) {
+      // Collision check: detect duplicate role_order
+      if (roleIdByOrder.has(roleOrder)) {
+        preflightErrors.push({
+          row: index + 1,
+          column: `roles[${index}].role_order`,
+          message: `Duplicate role_order=${roleOrder} detected. Each role must have unique order.`,
+          severity: 'error',
+        });
+      }
+      id = randomUUID();
+      roleIdByOrder.set(roleOrder, id);
+      if (role.name) {
+        roleIdByName.set(role.name.toLowerCase(), id);
+      }
     }
     
-    const id = randomUUID();
-    roleIdByOrder.set(roleOrder, id);
-    if (role.name) {
-      roleIdByName.set(role.name.toLowerCase(), id);
-    }
     return {
       id,
       game_id: gameId,

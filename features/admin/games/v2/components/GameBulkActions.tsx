@@ -9,6 +9,7 @@ import {
   TrashIcon,
   ArchiveBoxIcon,
   EyeSlashIcon,
+  PhotoIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -87,6 +88,16 @@ const BULK_ACTIONS: BulkActionConfig[] = [
     confirmTitle: 'Arkivera spel?',
     confirmDescription: (count) => `${count} spel kommer att arkiveras.`,
     confirmLabel: 'Arkivera',
+  },
+  {
+    id: 'assign_cover',
+    label: 'Tilldela standardbild',
+    icon: PhotoIcon,
+    variant: 'outline',
+    requiresConfirmation: true,
+    confirmTitle: 'Tilldela standardbilder?',
+    confirmDescription: (count) => `Standardbilder tilldelas till ${count} spel som saknar omslagsbild baserat på deras huvudsyfte.`,
+    confirmLabel: 'Tilldela',
   },
   {
     id: 'delete',

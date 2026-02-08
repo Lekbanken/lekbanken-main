@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Button,
@@ -15,6 +15,7 @@ import {
   Badge,
 } from '@/components/ui';
 import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
 import {
   ArrowUpTrayIcon,
   DocumentTextIcon,
@@ -38,6 +39,11 @@ type GameImportDialogProps = {
 
 type ImportState = 'idle' | 'validating' | 'validated' | 'importing' | 'done';
 
+type Product = {
+  id: string;
+  name: string;
+};
+
 export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDialogProps) {
   // DEBUG: Log when dialog opens to verify correct component is being used
   console.log('[GameImportDialog] Dialog opened, using NEW import dialog with API route');
@@ -51,7 +57,32 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
   const [dryRunResult, setDryRunResult] = useState<DryRunResult | null>(null);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [upsertMode, setUpsertMode] = useState(true);
+  const [selectedProductId, setSelectedProductId] = useState<string>('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch products when dialog opens
+  useEffect(() => {
+    if (!open) return;
+    
+    const loadProducts = async () => {
+      setProductsLoading(true);
+      try {
+        const response = await fetch('/api/products');
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(data.products || []);
+        }
+      } catch (err) {
+        console.error('Failed to load products:', err);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+    
+    loadProducts();
+  }, [open]);
 
   const resetDialog = useCallback(() => {
     setRaw('');
@@ -60,6 +91,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
     setState('idle');
     setDryRunResult(null);
     setImportResult(null);
+    setSelectedProductId('');
   }, []);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,6 +134,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
           format,
           dry_run: true,
           upsert: upsertMode,
+          product_id: selectedProductId || undefined,
         }),
       });
 
@@ -135,6 +168,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
           format,
           dry_run: false,
           upsert: upsertMode,
+          product_id: selectedProductId || undefined,
         }),
       });
 
@@ -144,6 +178,44 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
         setError(result.error || t('importFailed'));
         setState('validated');
         return;
+      }
+
+      // CHECK FOR BLOCKING ERRORS (fail-fast: game was NOT created)
+      // These are preflight failures where import was blocked entirely
+      const blockingErrors = (result.errors || []).filter(
+        (e: { severity?: string }) => e.severity === 'error'
+      );
+      const warnings = (result.errors || []).filter(
+        (e: { severity?: string }) => e.severity === 'warning' || !e.severity
+      );
+      
+      // Count failed games (games that were NOT created due to preflight errors)
+      const failedCount = result.stats?.failed ?? 0;
+      const createdCount = result.stats?.created ?? 0;
+      const updatedCount = result.stats?.updated ?? 0;
+      
+      // Show blocking errors prominently
+      if (blockingErrors.length > 0 || failedCount > 0) {
+        const errorMessages = blockingErrors
+          .slice(0, 5)  // Show max 5 errors
+          .map((e: { message?: string; column?: string }) => 
+            e.column ? `[${e.column}] ${e.message}` : e.message
+          )
+          .join('\n');
+        
+        const summary = failedCount > 0
+          ? `❌ ${failedCount} spel blockerades pga fel. ${createdCount} skapades, ${updatedCount} uppdaterades.`
+          : 'Import hade blockerande fel.';
+        
+        setError(`${summary}\n\n${errorMessages || 'Se konsolen för detaljer.'}`);
+        setImportResult(result as ImportResult);
+        setState('validated');  // Stay in validated state to show errors
+        return;
+      }
+      
+      // Warnings don't block import but should be noted
+      if (warnings.length > 0) {
+        console.log(`[GameImportDialog] Import completed with ${warnings.length} warnings`);
       }
 
       // Store the import result for displaying coverStats
@@ -286,6 +358,28 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
               id="upsertMode"
               checked={upsertMode}
               onCheckedChange={setUpsertMode}
+            />
+          </div>
+
+          {/* Product selection */}
+          <div className="rounded-lg border border-border p-4 space-y-3">
+            <div>
+              <Label htmlFor="productSelect" className="font-medium">
+                {t('productSelect', { defaultValue: 'Koppla till produkt' })}
+              </Label>
+              <p className="text-xs text-muted-foreground max-w-md">
+                {t('productSelectDescription', { defaultValue: 'Spelen kopplas till vald produkt. Påverkar vilken standardbild som tilldelas.' })}
+              </p>
+            </div>
+            <Select
+              id="productSelect"
+              value={selectedProductId}
+              onChange={(e) => setSelectedProductId(e.target.value)}
+              disabled={productsLoading}
+              options={[
+                { value: '', label: t('productSelectNone', { defaultValue: 'Ingen produkt (global)' }) },
+                ...products.map((p) => ({ value: p.id, label: p.name })),
+              ]}
             />
           </div>
 

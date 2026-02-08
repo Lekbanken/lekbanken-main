@@ -242,7 +242,8 @@ export type BulkOperationType =
   | 'export'
   | 'revalidate'
   | 'archive'
-  | 'delete';
+  | 'delete'
+  | 'assign_cover';
 
 /**
  * Bulk operation parameters
@@ -261,6 +262,7 @@ export type BulkOperationParams = {
   revalidate: Record<string, never>;
   archive: Record<string, never>;
   delete: { force?: boolean };
+  assign_cover: Record<string, never>;
 };
 
 /**

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createServerRlsClient, supabaseAdmin } from '@/lib/supabase/server';
+import { createServerRlsClient, supabaseAdmin, createServiceRoleClient } from '@/lib/supabase/server';
+import { assignCoverFromTemplates } from '@/lib/import/assignCoverFromTemplates';
 import type { BulkOperationResult } from '@/features/admin/games/v2/types';
 
 // ============================================================================
@@ -22,6 +23,7 @@ const bulkOperationSchema = z.object({
     'revalidate',
     'archive',
     'delete',
+    'assign_cover',
   ]),
   gameIds: z.array(z.string().uuid()).min(1).max(500),
   params: z.record(z.unknown()).optional(),
@@ -228,6 +230,67 @@ async function handleExport(ctx: OperationContext): Promise<BulkOperationResult>
   };
 }
 
+async function handleAssignCover(ctx: OperationContext): Promise<BulkOperationResult & { coverStats?: { assigned: number; skipped: number; missing: number } }> {
+  // Uses service role client for proper permissions on game_media table
+  const db = await createServiceRoleClient();
+  const { gameIds } = ctx;
+  
+  // Fetch games with their game_key, name, main_purpose_id, product_id, and owner_tenant_id
+  const { data: games, error: fetchError } = await db
+    .from('games')
+    .select('id, game_key, name, main_purpose_id, product_id, owner_tenant_id')
+    .in('id', gameIds);
+    
+  if (fetchError || !games) {
+    return {
+      success: false,
+      affected: 0,
+      failed: gameIds.length,
+      errors: [{ gameId: 'all', error: fetchError?.message || 'Failed to fetch games' }],
+    };
+  }
+  
+  let assigned = 0;
+  let skippedExisting = 0;
+  let missingTemplates = 0;
+  const errors: Array<{ gameId: string; error: string }> = [];
+  const warnings: Array<{ gameId: string; warning: string }> = [];
+  
+  for (const game of games) {
+    try {
+      const result = await assignCoverFromTemplates(db, {
+        gameId: game.id,
+        gameKey: game.game_key || game.id,
+        gameName: game.name,
+        mainPurposeId: game.main_purpose_id,
+        productId: game.product_id,
+        tenantId: game.owner_tenant_id,
+      });
+      
+      if (result.assigned) {
+        assigned++;
+      } else if (result.skipReason === 'already_has_cover') {
+        skippedExisting++;
+        warnings.push({ gameId: game.id, warning: 'Already has cover image' });
+      } else if (result.skipReason === 'no_templates_found') {
+        missingTemplates++;
+        warnings.push({ gameId: game.id, warning: 'No matching template found' });
+      }
+    } catch (err) {
+      errors.push({ gameId: game.id, error: String(err) });
+    }
+  }
+  
+  return {
+    success: errors.length === 0,
+    affected: assigned,
+    failed: errors.length,
+    errors: errors.length > 0 ? errors : undefined,
+    warnings: warnings.length > 0 ? warnings : undefined,
+    coverStats: { assigned, skipped: skippedExisting, missing: missingTemplates },
+  };
+}
+
 async function handleAssignPurposes(ctx: OperationContext): Promise<BulkOperationResult> {
   const { supabase, gameIds, params } = ctx;
   const purposeIds = (params?.purposeIds as string[]) || [];
@@ -379,6 +442,9 @@ export async function POST(request: Request) {
         break;
       case 'remove_purposes':
         result = await handleRemovePurposes(ctx);
+        break;
+      case 'assign_cover':
+        result = await handleAssignCover(ctx);
         break;
       default:
         result = {

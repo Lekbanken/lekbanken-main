@@ -101,7 +101,32 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: 'A template with this template_key already exists' },
+        { error: 'TEMPLATE_KEY_EXISTS', message: 'A template with this template_key already exists' },
+        { status: 409 }
+      )
+    }
+
+    // G5: Enforce 5-slot limit per (product × purpose) combination
+    const MAX_TEMPLATES_PER_COMBO = 5
+    const slotQuery = supabase
+      .from('media_templates')
+      .select('id', { count: 'exact', head: true })
+      .eq('main_purpose_id', mainPurposeId)
+
+    if (productId) {
+      slotQuery.eq('product_id', productId)
+    } else {
+      slotQuery.is('product_id', null)
+    }
+
+    const { count: slotCount } = await slotQuery
+
+    if ((slotCount ?? 0) >= MAX_TEMPLATES_PER_COMBO) {
+      return NextResponse.json(
+        { 
+          error: 'TEMPLATE_SLOT_LIMIT', 
+          message: `Maximum ${MAX_TEMPLATES_PER_COMBO} templates allowed per product/purpose combination` 
+        },
         { status: 409 }
       )
     }

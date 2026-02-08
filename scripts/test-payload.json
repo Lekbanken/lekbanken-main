@@ -1,0 +1,165 @@
+[
+  {
+    "game_key": "test-lekbanken-mission",
+    "name": "Lekbanken Mission",
+    "short_description": "Ett testuppdrag som provar artifacts, triggers och full end-to-end-upplevelse i Lekbanken.",
+    "description": "Denna lek är byggd för att testa hela systemet: import, artifacts, triggers, publik information och ledarens manual fallback. Inga riktiga hemligheter, bara systemtest.",
+    "play_mode": "participants",
+    "status": "draft",
+    "locale": "sv-SE",
+    "time_estimate_min": 20,
+    "duration_max": 30,
+    "min_players": 3,
+    "max_players": 8,
+    "difficulty": "medium",
+    "energy_level": "medium",
+    "location_type": "indoor",
+    "accessibility_notes": "Kan köras sittande. Alla moment kan göras lugnt. Om någon inte vill läsa text: låt ledaren läsa högt.",
+    "space_requirements": "Bord eller samlingsyta.",
+    "leader_tips": "Testa både automation och manual override. Om gruppen fastnar: ge en mjuk hint och gå vidare.",
+    "main_purpose_id": "fddf7912-4616-446b-b68a-6aa1679dd7de",
+    "sub_purpose_ids": [
+      "61f29028-d8c1-42b8-afbf-20e9db246d90",
+      "8b55eb99-3c2c-4a20-ac3e-6b48bc1b3c8c",
+      "7ae2ae3d-1ca1-4380-90b7-f79a46d04318"
+    ],
+    "phases": [
+      {
+        "phase_order": 1,
+        "name": "Briefing",
+        "phase_type": "intro",
+        "timer_style": "countdown",
+        "duration_seconds": 180,
+        "timer_visible": true,
+        "auto_advance": false
+      },
+      {
+        "phase_order": 2,
+        "name": "Uppdrag",
+        "phase_type": "main",
+        "timer_style": "elapsed",
+        "duration_seconds": 900,
+        "timer_visible": true,
+        "auto_advance": false
+      },
+      {
+        "phase_order": 3,
+        "name": "Avslut",
+        "phase_type": "outro",
+        "timer_style": "countdown",
+        "duration_seconds": 180,
+        "timer_visible": true,
+        "auto_advance": false
+      }
+    ],
+    "roles": [
+      {
+        "role_order": 1,
+        "name": "Navigator",
+        "private_instructions": "Håll koll på nästa steg och läs upp korta instruktioner för gruppen.",
+        "min_count": 1
+      },
+      {
+        "role_order": 2,
+        "name": "Verifierare",
+        "private_instructions": "När ni tror ni är klara: dubbelkolla och be gruppen testa igen.",
+        "min_count": 1
+      }
+    ],
+    "steps": [
+      {
+        "step_order": 1,
+        "title": "Briefing",
+        "body": "Ledaren ger uppdraget och visar var artifacts dyker upp.",
+        "duration_seconds": 120
+      },
+      {
+        "step_order": 2,
+        "title": "Hitta koden",
+        "body": "Gruppen letar efter koden i texten och testar på kodlåset.",
+        "duration_seconds": 420
+      },
+      {
+        "step_order": 3,
+        "title": "Lås upp nästa del",
+        "body": "När koden är rätt ska nästa artifact visas. Testa gärna manual override om det behövs.",
+        "duration_seconds": 420
+      },
+      {
+        "step_order": 4,
+        "title": "Avslut",
+        "body": "Samla gruppen och avsluta uppdraget.",
+        "duration_seconds": 180
+      }
+    ],
+    "artifacts": [
+      {
+        "artifact_order": 1,
+        "artifact_type": "text",
+        "title": "Briefing-kort",
+        "description": "Ett kort som sätter upp uppdraget.",
+        "tags": [
+          "onboarding",
+          "test"
+        ],
+        "metadata": {},
+        "variants": [
+          {
+            "variant_type": "public",
+            "body": "Uppdrag: Hitta fyrsiffriga koden som döljer sig i texten. Koden är 0-0-4-2. Testa den i kodlåset."
+          }
+        ]
+      },
+      {
+        "artifact_order": 2,
+        "artifact_type": "keypad",
+        "title": "Kodlås",
+        "description": "Ett kodlås som verifierar en fyrsiffrig kod.",
+        "tags": [
+          "test"
+        ],
+        "metadata": {
+          "correctCode": "0042"
+        },
+        "variants": [
+          {
+            "variant_type": "public",
+            "body": "Ange en fyrsiffrig kod."
+          }
+        ]
+      },
+      {
+        "artifact_order": 3,
+        "artifact_type": "text",
+        "title": "Nästa del",
+        "description": "Detta kort ska visas när kodlåset är löst.",
+        "tags": [
+          "test"
+        ],
+        "metadata": {},
+        "variants": [
+          {
+            "variant_type": "public",
+            "body": "Bra! Nu har ni låst upp nästa del. Fortsätt till avslutet."
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "name": "Kodlås löst",
+        "condition_type": "keypad_correct",
+        "condition_config": {
+          "artifactOrder": 2
+        },
+        "actions": [
+          {
+            "type": "reveal_artifact",
+            "artifactOrder": 3
+          }
+        ],
+        "execute_once": true
+      }
+    ]
+  }
+]

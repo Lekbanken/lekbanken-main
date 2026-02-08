@@ -281,11 +281,34 @@ export type ParsedGame = {
 
 export type ImportErrorSeverity = 'error' | 'warning';
 
+/**
+ * Error codes for machine-readable categorization.
+ * Code = machine, Message = human.
+ */
+export type ImportErrorCode =
+  // Trigger errors
+  | 'TRIGGER_INVALID_FORMAT'
+  | 'TRIGGER_MISSING_CONDITION_TYPE'
+  | 'TRIGGER_ACTION_INVALID'
+  | 'TRIGGER_REF_INVALID'
+  | 'TRIGGER_NORMALIZATION_FAILED'
+  // Order collision errors
+  | 'DUPLICATE_STEP_ORDER'
+  | 'DUPLICATE_PHASE_ORDER'
+  | 'DUPLICATE_ARTIFACT_ORDER'
+  | 'DUPLICATE_ROLE_ORDER'
+  // General errors
+  | 'VALIDATION_ERROR'
+  | 'PARSE_ERROR'
+  | 'UNKNOWN_ERROR';
+
 export type ImportError = {
   row: number;
   column?: string;
   message: string;
   severity: ImportErrorSeverity;
+  /** Machine-readable error code for automation/analytics */
+  code?: ImportErrorCode;
 };
 
 // =============================================================================

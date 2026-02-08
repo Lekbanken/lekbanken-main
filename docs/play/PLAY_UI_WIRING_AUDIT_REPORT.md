@@ -1,9 +1,9 @@
 # Play UI Wiring Audit Report
 ## UI → API → DB Field Mapping (SSoT + Evidence)
 
-**Version:** 2.2  
+**Version:** 2.3  
 **Date:** 2026-02-08  
-**Status:** Reference Document (Verified + Tests Added)  
+**Status:** Reference Document (Verified + Full Contract Tests)  
 **Scope:** All Play domain UI components, API endpoints, and database tables
 
 ---
@@ -12,7 +12,8 @@
 
 | Version | Date | Changes |
 |---------|------|------|
-| v2.2 | 2026-02-08 | ✅ Added contract tests, ✅ Added Design Invariants section |
+| v2.3 | 2026-02-08 | ✅ Step index vs step_order audit + contract tests (13 tests) |
+| v2.2 | 2026-02-08 | ✅ Added phase contract tests, ✅ Added Design Invariants section |
 | v2.1 | 2026-02-08 | ✅ Fixed Board phase off-by-one bug, ✅ Exposed `step.phaseId` in `/game` endpoint |
 | v2.0 | 2026-02-08 | Full verification audit with evidence, identified bugs |
 | v1.0 | 2026-01-24 | Initial audit |
@@ -30,16 +31,29 @@ This means:
 - **Structural metadata**: `game_steps.phase_id` tells us which phase a step belongs to (design-time linkage)
 - **Do NOT derive phase from step**: Future devs must not "fix" navigation by deriving `current_phase_index` from `steps[current_step_index].phase_id` without explicit migration
 
+### Step Navigation Invariant
+
+> **INVARIANT:** Step navigation is controlled exclusively by `participant_sessions.current_step_index` (0-based). `game_steps.step_order` defines **ordering only**, not navigation or identity.
+
+This means:
+- Steps are fetched with `ORDER BY step_order ASC`
+- The result is an array where position 0 = lowest step_order, position 1 = second-lowest, etc.
+- `current_step_index` is a direct array index into this sorted array
+- The actual values of `step_order` (0, 1, 2 or 1, 2, 3 or 10, 20, 30) are irrelevant — only the relative ordering matters
+
 ### Index vs Order Fields
 
 | Field | Base | Source | Usage |
 |-------|------|--------|-------|
 | `current_step_index` | 0-based | Runtime | Array index into ordered steps |
 | `current_phase_index` | 0-based | Runtime | Array index into ordered phases |
-| `step_order` | 1-based | Design | Sort key for ordering |
+| `step_order` | 0 or 1-based | Design | Sort key for ordering (value irrelevant, only order matters) |
 | `phase_order` | 1-based | Design | Sort key for ordering |
 
-**Contract tests:** [tests/unit/play/board-phase-contract.test.ts](../../tests/unit/play/board-phase-contract.test.ts), [tests/unit/play/game-phaseId-contract.test.ts](../../tests/unit/play/game-phaseId-contract.test.ts)
+**Contract tests:**
+- [step-index-contract.test.ts](../../tests/unit/play/step-index-contract.test.ts) — 13 tests for step index→order mapping
+- [board-phase-contract.test.ts](../../tests/unit/play/board-phase-contract.test.ts) — 9 tests for phase index→order mapping
+- [game-phaseId-contract.test.ts](../../tests/unit/play/game-phaseId-contract.test.ts) — 6 tests for phaseId field presence
 
 ---
 

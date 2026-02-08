@@ -22,7 +22,6 @@ import {
 } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
 import {
-  TEMPLATE_METADATA,
   applyTemplate,
   getAvailableTemplates,
   type TemplateId,

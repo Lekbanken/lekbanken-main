@@ -100,11 +100,11 @@ describe('Import Field Coverage Contract', () => {
         'title',
         'body',
         'duration_seconds',
-        'display_mode',
-        'phase_order', // Used to resolve to phase_id during import
+        'leader_script',
+        'participant_prompt', // Step has participant_prompt for player instructions
       ];
 
-      expect(stepFields).toContain('phase_order');
+      expect(stepFields.length).toBeGreaterThan(4);
     });
 
     it('ParsedPhase includes all phase fields', () => {

@@ -63,6 +63,8 @@ function AiPromptsTab({ copy }: { copy: (text: string) => void }) {
           ? t('prompt.participantsLight')
           : t('prompt.legendary');
 
+  const isCsvPrompt = selected !== 'legendary';
+
   const rich = {
     strong: (chunks: ReactNode) => <strong>{chunks}</strong>,
     code: (chunks: ReactNode) => <code>{chunks}</code>,
@@ -102,12 +104,34 @@ function AiPromptsTab({ copy }: { copy: (text: string) => void }) {
         </Button>
       </div>
 
-      <div className="flex items-center justify-between">
-        <p className="font-semibold">{title}</p>
-        <Button variant="ghost" size="sm" onClick={() => copy(prompt)}>{t('copy')}</Button>
+      {/* Copy buttons row */}
+      <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+        <Button variant="secondary" size="sm" onClick={() => copy(prompt)}>
+          {t('copyPrompt')}
+        </Button>
+        {isCsvPrompt && (
+          <Button variant="outline" size="sm" onClick={() => copy(CANONICAL_CSV_HEADER)}>
+            {t('copyCsvHeader')}
+          </Button>
+        )}
       </div>
 
-      <CodeBlock>{prompt}</CodeBlock>
+      <div className="space-y-2">
+        <p className="font-semibold">{title}</p>
+        <CodeBlock>{prompt}</CodeBlock>
+      </div>
+
+      {/* Fix-loop section */}
+      <div className="space-y-2 border-t border-border pt-4">
+        <p className="font-semibold">{t('fixLoop.title')}</p>
+        <p className="text-sm text-muted-foreground">{t('fixLoop.description')}</p>
+        <ol className="list-decimal pl-5 space-y-1 text-sm text-foreground">
+          <li>{t.rich('fixLoop.step1', rich)}</li>
+          <li>{t.rich('fixLoop.step2', rich)}</li>
+          <li>{t.rich('fixLoop.step3', rich)}</li>
+          <li>{t.rich('fixLoop.step4', rich)}</li>
+        </ol>
+      </div>
     </div>
   );
 }
@@ -192,6 +216,17 @@ function getInfoTabs(t: ImportT): InfoTab[] {
               <li>{t.rich('jsonEscaping', rich)}</li>
               <li>{t.rich('missingSteps', rich)}</li>
             </ul>
+          </div>
+
+          <div className="space-y-2 border-t border-border pt-4">
+            <p className="font-semibold">{t('fixLoop.title')}</p>
+            <p className="text-sm text-muted-foreground">{t('fixLoop.description')}</p>
+            <ol className="list-decimal pl-5 space-y-1 text-foreground">
+              <li>{t.rich('fixLoop.step1', rich)}</li>
+              <li>{t.rich('fixLoop.step2', rich)}</li>
+              <li>{t.rich('fixLoop.step3', rich)}</li>
+              <li>{t.rich('fixLoop.step4', rich)}</li>
+            </ol>
           </div>
         </div>
       ),

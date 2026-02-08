@@ -10,8 +10,7 @@
  * Uses wizard/actions.ts for mode switching - NO shadow state.
  */
 
-import { useCallback, useState } from 'react';
-import { Button } from '@/components/ui';
+import { useCallback } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useTranslations } from 'next-intl';

@@ -22,6 +22,7 @@ import { validateGames } from '@/features/admin/games/utils/game-validator';
 import { actionOrderAliasesToIds, conditionOrderAliasesToIds } from '@/lib/games/trigger-order-alias';
 import { normalizeAndValidate } from '@/lib/import/metadataSchemas';
 import { rewriteAllTriggerRefs, type TriggerIdMap, type TriggerPayload } from '@/lib/import/triggerRefRewrite';
+import { assignCoverFromTemplates, type AssignCoverResult } from '@/lib/import/assignCoverFromTemplates';
 import type { ParsedGame, DryRunResult, DryRunGamePreview, ImportError } from '@/types/csv-import';
 import type { Json } from '@/types/supabase';
 
@@ -68,6 +69,52 @@ type ImportPayload = {
   upsert?: boolean;
   tenant_id?: string;
 };
+
+// =============================================================================
+// Cover Stats Helper
+// =============================================================================
+
+/**
+ * Groups missing template entries by purpose ID for UI display.
+ * Returns array of { purposeId, purposeName, count } for purposes without templates.
+ */
+async function groupByPurposeWithNames(
+  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
+  entries: { gameKey: string; purposeId: string | null }[]
+): Promise<{ purposeId: string | null; purposeName?: string; count: number }[]> {
+  // Count by purposeId
+  const counts = new Map<string | null, number>();
+  for (const entry of entries) {
+    counts.set(entry.purposeId, (counts.get(entry.purposeId) ?? 0) + 1);
+  }
+
+  // Get unique non-null purposeIds
+  const purposeIds = Array.from(counts.keys()).filter((id): id is string => id !== null);
+  
+  // Fetch purpose names if we have any IDs
+  const purposeNames = new Map<string, string>();
+  if (purposeIds.length > 0) {
+    const { data: purposes } = await supabase
+      .from('purposes')
+      .select('id, name')
+      .in('id', purposeIds);
+    
+    if (purposes) {
+      for (const p of purposes) {
+        purposeNames.set(p.id, p.name);
+      }
+    }
+  }
+
+  // Build result with names
+  return Array.from(counts.entries())
+    .map(([purposeId, count]) => ({
+      purposeId,
+      purposeName: purposeId ? purposeNames.get(purposeId) : undefined,
+      count,
+    }))
+    .sort((a, b) => b.count - a.count);
+}
 
 // =============================================================================
 // Metadata Validation Gate
@@ -343,14 +390,27 @@ export async function POST(request: Request) {
 
     // Dry run mode - return validation result without saving
     if (dry_run) {
-      const dryRunGames: DryRunGamePreview[] = parsedGames.map((game, index) => ({
-        row_number: index + 1,
-        game_key: game.game_key,
-        name: game.name,
-        play_mode: game.play_mode,
-        status: game.status,
-        steps: game.steps,
-      }));
+      const dryRunGames: DryRunGamePreview[] = parsedGames.map((game, index) => {
+        // Collect unique artifact types for quick inspection
+        const artifactTypes = Array.from(
+          new Set((game.artifacts ?? []).map(a => a.artifact_type).filter(Boolean))
+        ).sort();
+
+        return {
+          row_number: index + 1,
+          game_key: game.game_key,
+          name: game.name,
+          play_mode: game.play_mode,
+          status: game.status,
+          steps: game.steps,
+          // Advanced data counts for UI preview
+          phases_count: game.phases?.length ?? 0,
+          artifacts_count: game.artifacts?.length ?? 0,
+          triggers_count: game.triggers?.length ?? 0,
+          roles_count: game.roles?.length ?? 0,
+          artifact_types: artifactTypes,
+        };
+      });
 
       // Include metadata warnings in dry run response
       const metadataWarnings: ImportError[] = metadataValidation.warnings.flatMap(w => 
@@ -403,6 +463,11 @@ export async function POST(request: Request) {
     let updatedCount = 0;
     let failedCount = 0;
     const importErrors: ImportError[] = [];
+
+    // Cover assignment tracking
+    let coverAssignedCount = 0;
+    let coverSkippedExistingCount = 0;
+    const coverMissingTemplates: { gameKey: string; purposeId: string | null }[] = [];
 
     for (let index = 0; index < validationResult.validGames.length; index++) {
       const game = validationResult.validGames[index];
@@ -480,7 +545,19 @@ export async function POST(request: Request) {
         }
 
         // Handle related data (steps, materials, phases, roles, boardConfig)
-        await importRelatedData(db, gameId, game, existingGameId !== null, importRunId);
+        const coverResult = await importRelatedData(db, gameId, game, existingGameId !== null, importRunId);
+
+        // Track cover assignment results
+        if (coverResult.assigned) {
+          coverAssignedCount++;
+        } else if (coverResult.skipReason === 'already_has_cover') {
+          coverSkippedExistingCount++;
+        } else if (coverResult.skipReason === 'no_templates_found') {
+          coverMissingTemplates.push({
+            gameKey: game.game_key,
+            purposeId: game.main_purpose_id ?? null,
+          });
+        }
 
       } catch (err) {
         failedCount++;
@@ -507,7 +584,10 @@ export async function POST(request: Request) {
     }
 
     // LOG: Import request completed
-    console.log(`[csv-import] import.done run=${importRunId} total=${parsedGames.length} created=${createdCount} updated=${updatedCount} failed=${failedCount} errors=${importErrors.length} warnings=${parseWarnings.length + validationResult.allWarnings.length}`);
+    console.log(`[csv-import] import.done run=${importRunId} total=${parsedGames.length} created=${createdCount} updated=${updatedCount} failed=${failedCount} errors=${importErrors.length} warnings=${parseWarnings.length + validationResult.allWarnings.length} covers_assigned=${coverAssignedCount} covers_missing_templates=${coverMissingTemplates.length}`);
+
+    // Enrich missing templates with purpose names for better UI display
+    const missingTemplatesByPurpose = await groupByPurposeWithNames(db, coverMissingTemplates);
 
     return NextResponse.json({
       success: failedCount === 0,
@@ -517,6 +597,13 @@ export async function POST(request: Request) {
         created: createdCount,
         updated: updatedCount,
         skipped: failedCount,
+      },
+      // Cover assignment stats for UI feedback
+      coverStats: {
+        assigned: coverAssignedCount,
+        skippedExisting: coverSkippedExistingCount,
+        missingTemplates: coverMissingTemplates.length,
+        missingTemplatesByPurpose,
       },
       errors: importErrors,
       warnings: [...parseWarnings, ...validationResult.allWarnings],
@@ -546,6 +633,8 @@ export async function POST(request: Request) {
  * - Only proceed with DB writes if all validation passes
  * 
  * GUARANTEE: "No DB writes occur for a game if trigger rewrite fails."
+ * 
+ * @returns Cover assignment result for aggregation in parent
  */
 async function importRelatedData(
   db: Awaited<ReturnType<typeof createServiceRoleClient>>,
@@ -553,7 +642,7 @@ async function importRelatedData(
   game: ParsedGame,
   isUpdate: boolean,
   importRunId: string
-) {
+): Promise<AssignCoverResult> {
   // ==========================================================================
   // PHASE 1: Pre-generate UUIDs for entities that triggers may reference
   // ==========================================================================
@@ -988,5 +1077,26 @@ async function importRelatedData(
   // LOG: All DB writes completed successfully (atomic)
   const counts = rpcResult.counts ?? {};
   console.log(`[csv-import] db.write.done run=${importRunId} game=${game.game_key} counts=${JSON.stringify(counts)}`);
+
+  // ==========================================================================
+  // PHASE 4: Auto-assign cover image from templates (idempotent)
+  // ==========================================================================
+  const coverResult = await assignCoverFromTemplates(db, {
+    gameId,
+    gameKey: game.game_key,
+    gameName: game.name,
+    mainPurposeId: game.main_purpose_id ?? null,
+    productId: game.product_id ?? null,
+    tenantId: game.owner_tenant_id ?? null,
+  });
+
+  if (coverResult.assigned) {
+    console.log(`[csv-import] cover.assigned run=${importRunId} game=${game.game_key} template=${coverResult.templateKey ?? 'N/A'}`);
+  } else if (coverResult.skipReason === 'no_templates_found') {
+    console.warn(`[csv-import] cover.no_templates run=${importRunId} game=${game.game_key} purpose=${game.main_purpose_id}`);
+  }
+  // skipReason='already_has_cover' is silent (expected for upserts)
+
+  return coverResult;
 }
 

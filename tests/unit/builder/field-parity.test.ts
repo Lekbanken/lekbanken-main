@@ -23,11 +23,8 @@ import type {
   RoleData,
   BoardConfigData,
   MaterialsForm,
-  GameToolForm,
-  CoverMedia,
 } from '@/types/game-builder-state';
-import type { ArtifactFormData, TriggerFormData } from '@/types/games';
-import type { ParsedGame, ParsedStep, ParsedPhase, ParsedRole, ParsedBoardConfig, ParsedArtifact, ParsedTrigger } from '@/types/csv-import';
+import type { ParsedGame, ParsedStep, ParsedBoardConfig } from '@/types/csv-import';
 
 // =============================================================================
 // FIELD PARITY DOCUMENTATION
@@ -213,10 +210,9 @@ describe('Sprint 4.3 - Field Parity Audit', () => {
         'space_requirements', 'leader_tips',
       ];
 
-      // All these should exist in ParsedGame
-      for (const field of importedFields) {
-        expect(field in {} as ParsedGame || true).toBe(true);
-      }
+      // All these should exist in ParsedGame (compile-time check via type annotation)
+      // The type annotation on importedFields ensures we only list valid keys
+      expect(importedFields.length).toBeGreaterThan(15);
     });
 
     it('documents fields NOT in import (intentional exclusions)', () => {
@@ -244,8 +240,8 @@ describe('Sprint 4.3 - Field Parity Audit', () => {
 
     it('ParsedStep maps to StepData correctly', () => {
       const parsedStepFields: (keyof ParsedStep)[] = [
-        'step_order', 'title', 'body', 'duration_seconds', 'display_mode',
-        'phase_order', // Maps to phase_id via order lookup
+        'step_order', 'title', 'body', 'duration_seconds', 'leader_script',
+        'participant_prompt', 'board_text', 'optional',
       ];
 
       expect(parsedStepFields.length).toBeGreaterThan(5);

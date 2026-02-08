@@ -4411,6 +4411,16 @@
         "minimalJson": "Minimal JSON (1 game)",
         "orderResolution": "Order resolution in triggers",
         "orderResolutionDesc": "Triggers can reference stepOrder/phaseOrder/artifactOrder in condition/actions. Import resolves these to actual IDs.",
+        "copyPrompt": "Copy prompt",
+        "copyCsvHeader": "Copy CSV header",
+        "fixLoop": {
+          "title": "Fix-loop (Validate → Diagnose → Repair)",
+          "description": "Follow this loop when import shows errors:",
+          "step1": "<strong>Validate</strong> via dry-run in the import dialog.",
+          "step2": "<strong>Diagnose</strong> error type: UUID error, JSON escaping, or missing steps.",
+          "step3": "<strong>Repair</strong> in your file and run dry-run again.",
+          "step4": "<strong>Import</strong> only when dry-run shows green."
+        },
         "infoDialogTitle": "Information about games"
       },
       "playModes": {

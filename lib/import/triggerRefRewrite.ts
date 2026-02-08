@@ -22,9 +22,44 @@ import {
 // =============================================================================
 
 /**
- * ID mapping per entity type.
+ * ID mapping per entity type for trigger reference resolution.
+ *
  * Key: sourceRef (order number, temp ID, or existing UUID)
  * Value: resolvedId (DB UUID)
+ *
+ * ## Design Contract
+ *
+ * This interface is intentionally "thin":
+ * - Uses order-based Maps (`stepIdByOrder`, `phaseIdByOrder`, `artifactIdByOrder`)
+ *   for resolving numeric order references in trigger conditions/actions
+ * - Uses sourceId Maps (`artifactIdBySourceId`, etc.) for string-based references
+ * - Uses a SINGLE `importBatchUuids` Set for collision detection across ALL entity types
+ *
+ * We intentionally do NOT have separate sets per type (e.g., `roleIdsInBatch`,
+ * `artifactIdsInBatch`). The single union set provides:
+ * - Lower complexity
+ * - Same collision safety guarantee
+ * - No need to track "which type" for UUID reservation
+ *
+ * ## Invariant
+ *
+ * `importBatchUuids` is the union-set of ALL UUIDs created or used as target IDs
+ * in the import batch. It equals the union of all values from:
+ * - stepIdByOrder, phaseIdByOrder, artifactIdByOrder
+ * - artifactIdBySourceId, stepIdBySourceId, phaseIdBySourceId (if present)
+ *
+ * ## DO NOT ADD
+ *
+ * Do NOT add per-type sets like:
+ * - `roleIdsInBatch` ❌
+ * - `artifactIdsInBatch` ❌
+ * - `stepIdsInBatch` ❌
+ * - `phaseIdsInBatch` ❌
+ *
+ * These were tried and removed. The single `importBatchUuids` set is sufficient.
+ *
+ * If writing tests, use the `buildTriggerIdMap` helper from
+ * `tests/helpers/buildTriggerIdMap.ts` to ensure correct shape.
  */
 export interface TriggerIdMap {
   /** order → UUID for steps */
@@ -39,7 +74,11 @@ export interface TriggerIdMap {
   stepIdBySourceId?: Map<string, string>;
   /** sourceId → UUID for phases (when using string refs) */
   phaseIdBySourceId?: Map<string, string>;
-  /** Set of all UUIDs created in this import batch (for cross-ref validation) */
+  /**
+   * Union set of ALL UUIDs created in this import batch (steps, phases, artifacts, etc.)
+   * Used for cross-reference validation and collision detection.
+   * Intentionally a single set, not per-type sets.
+   */
   importBatchUuids?: Set<string>;
 }
 

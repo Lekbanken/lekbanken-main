@@ -25,7 +25,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import type { ImportableGame } from '../types';
-import type { ImportError, DryRunResult } from '@/types/csv-import';
+import type { ImportError, DryRunResult, ImportResult, CoverStatsByPurpose } from '@/types/csv-import';
+import { PhotoIcon } from '@heroicons/react/24/outline';
 
 type ImportFormat = 'csv' | 'json';
 
@@ -38,6 +39,9 @@ type GameImportDialogProps = {
 type ImportState = 'idle' | 'validating' | 'validated' | 'importing' | 'done';
 
 export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDialogProps) {
+  // DEBUG: Log when dialog opens to verify correct component is being used
+  console.log('[GameImportDialog] Dialog opened, using NEW import dialog with API route');
+  
   const t = useTranslations('admin.games.import');
   const [format, setFormat] = useState<ImportFormat>('csv');
   const [raw, setRaw] = useState('');
@@ -45,6 +49,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
   const [error, setError] = useState<string | null>(null);
   const [state, setState] = useState<ImportState>('idle');
   const [dryRunResult, setDryRunResult] = useState<DryRunResult | null>(null);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [upsertMode, setUpsertMode] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,6 +59,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
     setError(null);
     setState('idle');
     setDryRunResult(null);
+    setImportResult(null);
   }, []);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,6 +146,8 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
         return;
       }
 
+      // Store the import result for displaying coverStats
+      setImportResult(result as ImportResult);
       setState('done');
 
       // Call original onImport callback with empty array (data already saved via API)
@@ -342,6 +350,11 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
                           <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.mode')}</th>
                           <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.status')}</th>
                           <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.steps')}</th>
+                          <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.phases', { defaultMessage: 'Faser' })}</th>
+                          <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.artifacts', { defaultMessage: 'Artefakter' })}</th>
+                          <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.triggers', { defaultMessage: 'Triggers' })}</th>
+                          <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.roles', { defaultMessage: 'Roller' })}</th>
+                          <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.artifactTypes', { defaultMessage: 'Artefakt-typer' })}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -364,6 +377,20 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
                               </Badge>
                             </td>
                             <td className="px-3 py-2">{game.steps?.length || 0}</td>
+                            <td className="px-3 py-2">{game.phases_count || 0}</td>
+                            <td className="px-3 py-2">{game.artifacts_count || 0}</td>
+                            <td className="px-3 py-2">{game.triggers_count || 0}</td>
+                            <td className="px-3 py-2">{game.roles_count || 0}</td>
+                            <td className="px-3 py-2 max-w-[120px]">
+                              {game.artifact_types && game.artifact_types.length > 0 ? (
+                                <span className="font-mono text-xs text-muted-foreground truncate block" title={game.artifact_types.join(', ')}>
+                                  {game.artifact_types.slice(0, 3).join(', ')}
+                                  {game.artifact_types.length > 3 && ` +${game.artifact_types.length - 3}`}
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -425,11 +452,67 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
 
           {/* Success state */}
           {state === 'done' && (
-            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-              <div className="flex items-center gap-2 text-green-700">
-                <CheckCircleIcon className="h-5 w-5" />
-                <span className="font-medium">{t('importComplete')}</span>
+            <div className="space-y-4">
+              <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+                <div className="flex items-center gap-2 text-green-700">
+                  <CheckCircleIcon className="h-5 w-5" />
+                  <span className="font-medium">{t('importComplete')}</span>
+                </div>
               </div>
+
+              {/* Cover Stats - only show if coverStats exists */}
+              {importResult?.coverStats && (
+                <div className="rounded-lg border border-border p-4 space-y-3">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <PhotoIcon className="h-5 w-5 text-muted-foreground" />
+                    <span>Standardbilder</span>
+                  </div>
+                  
+                  <div className="space-y-1 text-sm">
+                    {importResult.coverStats.assigned > 0 && (
+                      <div className="flex items-center gap-2 text-green-700">
+                        <CheckCircleIcon className="h-4 w-4" />
+                        <span>{importResult.coverStats.assigned} spel fick standardbild</span>
+                      </div>
+                    )}
+                    
+                    {importResult.coverStats.skippedExisting > 0 && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <span className="ml-6">ℹ {importResult.coverStats.skippedExisting} spel hade redan standardbild</span>
+                      </div>
+                    )}
+                    
+                    {importResult.coverStats.missingTemplates > 0 && (
+                      <div className="flex items-center gap-2 text-amber-600">
+                        <ExclamationTriangleIcon className="h-4 w-4" />
+                        <span>{importResult.coverStats.missingTemplates} spel saknar standardbilder</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Missing templates by purpose */}
+                  {importResult.coverStats.missingTemplatesByPurpose.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground mb-1">Saknade standardbilder per syfte:</div>
+                      <ul className="text-xs space-y-0.5">
+                        {importResult.coverStats.missingTemplatesByPurpose.map((item: CoverStatsByPurpose, idx: number) => (
+                          <li key={idx} className="text-amber-700 flex items-center gap-1">
+                            <span>•</span>
+                            <span>
+                              {item.purposeName 
+                                ? item.purposeName 
+                                : item.purposeId 
+                                  ? <span className="font-mono text-xs" title={item.purposeId}>{item.purposeId.slice(0, 8)}...</span>
+                                  : 'Inget syfte'}
+                            </span>
+                            <span className="text-muted-foreground">({item.count})</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

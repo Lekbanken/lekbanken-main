@@ -90,7 +90,7 @@ export function WizardPanel({
   const isDraftPassed = resolved.isGatePassed('draft');
   const isPlayablePassed = resolved.isGatePassed('playable');
 
-  const handleModeChange = useCallback((mode: WizardMode) => {
+  const handleModeChange = useCallback((_mode: WizardMode) => {
     // Mode change is handled by WizardModeToggle via dispatch
     // We could track it here for analytics if needed
   }, []);

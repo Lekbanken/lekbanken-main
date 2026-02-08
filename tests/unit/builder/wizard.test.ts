@@ -19,6 +19,7 @@ import type { ArtifactFormData, TriggerFormData } from '@/types/games';
 
 import {
   resolveDraft,
+  type GameDraft,
 } from '@/lib/builder/resolver';
 
 import {
@@ -95,6 +96,34 @@ function applyActionsToState(
   }
 
   return state;
+}
+
+function stateToDraft(state: GameBuilderState): GameDraft {
+  return {
+    core: {
+      name: state.core.name,
+      main_purpose_id: state.core.main_purpose_id,
+      play_mode: state.core.play_mode,
+      description: state.core.description,
+      energy_level: state.core.energy_level,
+      location_type: state.core.location_type,
+      age_min: state.core.age_min,
+      age_max: state.core.age_max,
+      min_players: state.core.min_players,
+      max_players: state.core.max_players,
+    },
+    steps: state.steps,
+    phases: state.phases,
+    roles: state.roles,
+    artifacts: state.artifacts,
+    // Map triggers to ensure id is required for validation
+    triggers: state.triggers
+      .filter((t): t is typeof t & { id: string } => t.id !== undefined)
+      .map(t => ({ id: t.id, name: t.name })),
+    cover: state.cover,
+    is_demo_content: state.core.is_demo_content,
+    boardConfig: state.boardConfig ? { publicBoard: undefined } : undefined,
+  };
 }
 
 function createEmptyState(): GameBuilderState {
@@ -643,7 +672,7 @@ describe('Wizard Tripwires', () => {
         
         const actions = applyTemplate(template.id);
         const state = applyActionsToState(createEmptyState(), actions);
-        const resolved = resolveDraft(state);
+        const resolved = resolveDraft(stateToDraft(state));
         
         // Template should produce valid draft structure
         expect(resolved.isGatePassed('draft')).toBe(true);

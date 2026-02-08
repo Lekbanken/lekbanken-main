@@ -282,11 +282,11 @@ export function ValidationPanel({
                 {section === 'unknown' && 'Övrigt'}
               </div>
               <div className="space-y-2">
-                {items.map((item) => {
+                {items.map((item, idx) => {
                   const entityId = getEntityId(item);
                   return (
                     <ValidationItem
-                      key={entityId ? `${item.code}-${entityId}-${item.path}` : `${item.code}-${item.path}`}
+                      key={entityId ? `${item.code}-${entityId}-${item.path}-${idx}` : `${item.code}-${item.path}-${idx}`}
                       error={item}
                       onNavigate={
                         onNavigateToItem && entityId

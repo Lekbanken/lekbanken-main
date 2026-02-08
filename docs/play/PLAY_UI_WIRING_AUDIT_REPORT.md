@@ -1,9 +1,9 @@
 # Play UI Wiring Audit Report
 ## UI → API → DB Field Mapping (SSoT + Evidence)
 
-**Version:** 2.4  
-**Date:** 2026-02-08  
-**Status:** Reference Document (Verified + Full Contract Tests)  
+**Version:** 2.5  
+**Date:** 2026-02-09  
+**Status:** Reference Document (Verified + Full Contract Tests + Staging Runbook)  
 **Scope:** All Play domain UI components, API endpoints, and database tables
 
 ---
@@ -12,6 +12,7 @@
 
 | Version | Date | Changes |
 |---------|------|------|
+| v2.5 | 2026-02-09 | ✅ Types regenerated, TS cast removed, staging verification runbook added |
 | v2.4 | 2026-02-08 | ✅ Trigger Engine hardening: execute_once guard, idempotency, atomic RPC |
 | v2.3 | 2026-02-08 | ✅ Step index vs step_order audit + contract tests (13 tests) |
 | v2.2 | 2026-02-08 | ✅ Added phase contract tests, ✅ Added Design Invariants section |
@@ -495,7 +496,116 @@ This document provides a complete field-level audit of the Play UI wiring:
 
 ---
 
-## 10. References
+## 10. Staging Verification Runbook
+
+### 10.1 Quick Schema Check (SQL Editor)
+
+```sql
+-- Verify RPC exists
+SELECT EXISTS(
+  SELECT 1 FROM pg_proc WHERE proname = 'fire_trigger_v2_safe'
+) AS fire_trigger_v2_safe_exists;
+
+-- Verify idempotency table exists
+SELECT EXISTS(
+  SELECT 1 FROM pg_tables 
+  WHERE schemaname='public' AND tablename='session_trigger_idempotency'
+) AS idempotency_table_exists;
+```
+
+### 10.2 Find Test Data
+
+```sql
+-- Find active sessions with triggers
+SELECT
+  ps.id AS session_id,
+  ps.session_code,
+  ps.status,
+  ps.game_id,
+  COUNT(gt.id) AS trigger_count
+FROM public.participant_sessions ps
+JOIN public.game_triggers gt ON gt.game_id = ps.game_id
+WHERE ps.status = 'active'
+GROUP BY ps.id, ps.session_code, ps.status, ps.game_id
+ORDER BY trigger_count DESC, ps.updated_at DESC
+LIMIT 10;
+
+-- List triggers for a game (paste game_id)
+SELECT
+  gt.id AS game_trigger_id,
+  gt.name,
+  gt.execute_once,
+  gt.enabled
+FROM public.game_triggers gt
+WHERE gt.game_id = '<GAME_ID>'
+ORDER BY gt.created_at ASC;
+```
+
+### 10.3 DB-Level RPC Sanity Test
+
+```sql
+-- C1: First fire → expect status='fired'
+SELECT * FROM public.fire_trigger_v2_safe(
+  p_session_id := '<SESSION_ID>'::uuid,
+  p_game_trigger_id := '<TRIGGER_ID>'::uuid,
+  p_idempotency_key := 'test-key-1',
+  p_actor_user_id := NULL
+);
+
+-- C2: Replay with same key → expect status='noop', replay=true
+SELECT * FROM public.fire_trigger_v2_safe(
+  p_session_id := '<SESSION_ID>'::uuid,
+  p_game_trigger_id := '<TRIGGER_ID>'::uuid,
+  p_idempotency_key := 'test-key-1',
+  p_actor_user_id := NULL
+);
+
+-- C3: execute_once with new key → expect status='noop', reason='EXECUTE_ONCE_ALREADY_FIRED'
+SELECT * FROM public.fire_trigger_v2_safe(
+  p_session_id := '<SESSION_ID>'::uuid,
+  p_game_trigger_id := '<TRIGGER_ID>'::uuid,
+  p_idempotency_key := 'test-key-2',
+  p_actor_user_id := NULL
+);
+```
+
+### 10.4 Verify State & Events
+
+```sql
+-- Check trigger state
+SELECT
+  sts.session_id,
+  sts.game_trigger_id,
+  sts.status,
+  sts.fired_count,
+  sts.fired_at,
+  sts.last_error
+FROM public.session_trigger_state sts
+WHERE sts.session_id = '<SESSION_ID>'::uuid
+  AND sts.game_trigger_id = '<TRIGGER_ID>'::uuid;
+
+-- Check session_events logging
+SELECT
+  created_at,
+  event_type,
+  payload
+FROM public.session_events
+WHERE session_id = '<SESSION_ID>'::uuid
+  AND event_type = 'trigger_fire'
+ORDER BY created_at DESC
+LIMIT 10;
+```
+
+### 10.5 UI Sanity Test (Host Cockpit)
+
+1. Open an active session with triggers in Host Cockpit
+2. Click **Fire** on a trigger → expect `status: fired`
+3. Click **Fire** again → expect `status: noop` (execute_once or replay)
+4. Verify `session_events` has log entries
+
+---
+
+## 11. References
 
 ### Key Files
 

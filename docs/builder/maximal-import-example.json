@@ -1,0 +1,1359 @@
+[
+  {
+    "game_key": "maximal-import-example",
+    "name": "Maximal Import Example",
+    "short_description": "A comprehensive example exercising ALL supported import features.",
+    "description": "This example demonstrates every artifact type, every trigger condition, every trigger action, and all metadata schemas. Use this as a reference for the JSON import format.\n\n## Features Covered\n- All 22 artifact types\n- All 28 trigger condition types\n- All 30 trigger action types\n- All metadata schemas with canonical field names\n- Order-based aliases for portable references",
+    "play_mode": "facilitated",
+    "status": "draft",
+    "locale": "sv",
+    "energy_level": "medium",
+    "location_type": "indoor",
+    "time_estimate_min": 60,
+    "duration_max": 90,
+    "min_players": 4,
+    "max_players": 12,
+    "players_recommended": 8,
+    "age_min": 12,
+    "age_max": 99,
+    "difficulty": "medium",
+    "accessibility_notes": "Requires hearing for audio artifacts. Location check requires GPS.",
+    "space_requirements": "One large room with projection screen.",
+    "leader_tips": "Prepare all physical props before session starts.",
+    "main_purpose_id": null,
+    "sub_purpose_ids": [],
+    "product_id": null,
+    "owner_tenant_id": null,
+
+    "materials": {
+      "items": [
+        "UV flashlight",
+        "Printed QR codes (3x)",
+        "Physical prop: old key",
+        "Projector and screen"
+      ],
+      "safety_notes": "Keep UV flashlight away from eyes.",
+      "preparation": "Hide QR codes in designated locations. Test audio system."
+    },
+
+    "boardConfig": {
+      "show_game_name": true,
+      "show_current_phase": true,
+      "show_timer": true,
+      "show_participants": true,
+      "show_public_roles": true,
+      "show_leaderboard": false,
+      "show_qr_code": true,
+      "welcome_message": "Welcome to the Maximal Example! Scan the QR code to join.",
+      "theme": "mystery",
+      "background_color": "#1a1a2e",
+      "layout_variant": "standard"
+    },
+
+    "phases": [
+      {
+        "phase_order": 1,
+        "name": "Introduction",
+        "phase_type": "intro",
+        "duration_seconds": null,
+        "timer_visible": false,
+        "timer_style": "countdown",
+        "description": "Welcome and briefing phase.",
+        "board_message": "Welcome to the game!",
+        "auto_advance": false
+      },
+      {
+        "phase_order": 2,
+        "name": "Round 1: Discovery",
+        "phase_type": "round",
+        "duration_seconds": 900,
+        "timer_visible": true,
+        "timer_style": "countdown",
+        "description": "Find initial clues and solve basic puzzles.",
+        "board_message": "Round 1: Discovery - 15 minutes",
+        "auto_advance": false
+      },
+      {
+        "phase_order": 3,
+        "name": "Round 2: Challenge",
+        "phase_type": "round",
+        "duration_seconds": 1200,
+        "timer_visible": true,
+        "timer_style": "trafficlight",
+        "description": "Tackle harder puzzles and connect the dots.",
+        "board_message": "Round 2: Challenge - 20 minutes",
+        "auto_advance": true
+      },
+      {
+        "phase_order": 4,
+        "name": "Break",
+        "phase_type": "break",
+        "duration_seconds": 300,
+        "timer_visible": true,
+        "timer_style": "elapsed",
+        "description": "5 minute break.",
+        "board_message": "Take a 5 minute break!",
+        "auto_advance": true
+      },
+      {
+        "phase_order": 5,
+        "name": "Finale",
+        "phase_type": "finale",
+        "duration_seconds": null,
+        "timer_visible": false,
+        "timer_style": "countdown",
+        "description": "Conclusion and debrief.",
+        "board_message": "Congratulations!",
+        "auto_advance": false
+      }
+    ],
+
+    "steps": [
+      {
+        "step_order": 1,
+        "phase_order": 1,
+        "title": "Welcome & Briefing",
+        "body": "Read the scenario introduction to participants.",
+        "duration_seconds": 120,
+        "leader_script": "Welcome everyone! Today you'll be solving...",
+        "participant_prompt": "Listen to the facilitator.",
+        "board_text": "The adventure begins...",
+        "optional": false
+      },
+      {
+        "step_order": 2,
+        "phase_order": 1,
+        "title": "Assign Roles",
+        "body": "Distribute role cards to participants.",
+        "duration_seconds": 60,
+        "leader_script": "Each of you will receive a secret role...",
+        "optional": false
+      },
+      {
+        "step_order": 3,
+        "phase_order": 2,
+        "title": "First Puzzle",
+        "body": "Participants work on the keypad puzzle.",
+        "duration_seconds": 300,
+        "optional": false
+      },
+      {
+        "step_order": 4,
+        "phase_order": 2,
+        "title": "Riddle Challenge",
+        "body": "Solve the riddle to unlock the next clue.",
+        "duration_seconds": 300,
+        "optional": false
+      },
+      {
+        "step_order": 5,
+        "phase_order": 2,
+        "title": "Location Hunt",
+        "body": "Find the hidden QR code location.",
+        "duration_seconds": 300,
+        "optional": true
+      },
+      {
+        "step_order": 6,
+        "phase_order": 3,
+        "title": "Cipher Decoding",
+        "body": "Decode the secret message.",
+        "duration_seconds": 300,
+        "optional": false
+      },
+      {
+        "step_order": 7,
+        "phase_order": 3,
+        "title": "Final Puzzle",
+        "body": "Combine all clues to solve the mystery.",
+        "duration_seconds": 300,
+        "optional": false
+      },
+      {
+        "step_order": 8,
+        "phase_order": 5,
+        "title": "Debrief",
+        "body": "Discuss the solution and team dynamics.",
+        "duration_seconds": 180,
+        "leader_script": "Great work! Let's discuss how you solved it...",
+        "optional": false
+      }
+    ],
+
+    "roles": [
+      {
+        "role_order": 1,
+        "name": "The Investigator",
+        "icon": "🔍",
+        "color": "#3498db",
+        "public_description": "Expert at finding hidden clues.",
+        "private_instructions": "You notice small details others miss. The first clue is hidden behind the painting.",
+        "private_hints": "Look for UV-reactive ink on documents.",
+        "min_count": 1,
+        "max_count": 2,
+        "assignment_strategy": "random",
+        "scaling_rules": { "8": 2, "10": 2 },
+        "conflicts_with": []
+      },
+      {
+        "role_order": 2,
+        "name": "The Decoder",
+        "icon": "🔐",
+        "color": "#9b59b6",
+        "public_description": "Specialist in codes and ciphers.",
+        "private_instructions": "You have a decoder ring that helps with Caesar ciphers. Shift is always 7.",
+        "private_hints": "The cipher artifact uses shift 7.",
+        "min_count": 1,
+        "max_count": 2,
+        "assignment_strategy": "leader_picks",
+        "scaling_rules": null,
+        "conflicts_with": []
+      },
+      {
+        "role_order": 3,
+        "name": "The Historian",
+        "icon": "📚",
+        "color": "#e74c3c",
+        "public_description": "Knows historical context.",
+        "private_instructions": "Dates in documents refer to specific historical events. 1943 is the key year.",
+        "private_hints": "The keypad code is a year.",
+        "min_count": 1,
+        "max_count": null,
+        "assignment_strategy": "player_picks",
+        "scaling_rules": null,
+        "conflicts_with": ["The Decoder"]
+      }
+    ],
+
+    "artifacts": [
+      {
+        "artifact_order": 1,
+        "artifact_type": "card",
+        "title": "Scenario Card",
+        "description": "Introduction card with the story setup.",
+        "locale": "sv",
+        "tags": ["intro", "story"],
+        "metadata": {},
+        "variants": [
+          {
+            "variant_order": 1,
+            "visibility": "public",
+            "visible_to_role_id": null,
+            "title": "The Mystery Begins",
+            "body": "# The Mystery Begins\n\nYou've been summoned to the old archive. Something has been hidden here for 80 years...",
+            "media_ref": null,
+            "metadata": null
+          }
+        ]
+      },
+      {
+        "artifact_order": 2,
+        "artifact_type": "document",
+        "title": "Archive Document 1943-A",
+        "description": "A yellowed document with handwritten text.",
+        "tags": ["clue", "primary"],
+        "metadata": {
+          "content": "Source: National Archive\nDate: April 17, 1943\n\nThe signal was sent at midnight..."
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 3,
+        "artifact_type": "image",
+        "title": "Old Map",
+        "description": "A faded map with markings.",
+        "tags": ["clue", "visual"],
+        "metadata": {
+          "imageUrl": "https://example.com/map.jpg",
+          "altText": "Hand-drawn map with X marks"
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 4,
+        "artifact_type": "keypad",
+        "title": "Archive Safe Lock",
+        "description": "A 4-digit combination lock.",
+        "tags": ["puzzle", "primary"],
+        "metadata": {
+          "correctCode": "1943",
+          "codeLength": 4,
+          "maxAttempts": 5,
+          "lockOnFail": true,
+          "successMessage": "🔓 The safe clicks open!",
+          "failMessage": "❌ Wrong code. Try again.",
+          "lockedMessage": "🔒 Too many attempts. The lock is jammed."
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 5,
+        "artifact_type": "riddle",
+        "title": "The Archivist's Riddle",
+        "description": "A riddle written on old parchment.",
+        "tags": ["puzzle"],
+        "metadata": {
+          "promptText": "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?",
+          "correctAnswers": ["a map", "map", "karta", "en karta"],
+          "normalizeMode": "fuzzy",
+          "maxAttempts": null,
+          "hintText": "Think about what shows these things on paper.",
+          "showHintAfterAttempts": 3
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 6,
+        "artifact_type": "multi_answer",
+        "title": "Evidence Checklist",
+        "description": "Track which evidence has been found.",
+        "tags": ["tracking"],
+        "metadata": {
+          "items": [
+            "Found the hidden document",
+            "Decoded the cipher",
+            "Unlocked the safe",
+            "Scanned the QR code",
+            "Confirmed the prop"
+          ],
+          "requireAll": false,
+          "requiredCount": 3,
+          "showProgress": true
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 7,
+        "artifact_type": "counter",
+        "title": "Clue Counter",
+        "description": "Track how many clues have been found.",
+        "tags": ["tracking"],
+        "metadata": {
+          "target": 5,
+          "step": 1,
+          "initialValue": 0,
+          "label": "Clues Found"
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 8,
+        "artifact_type": "qr_gate",
+        "title": "Hidden QR Scanner",
+        "description": "Scan the QR code hidden in the room.",
+        "tags": ["puzzle", "physical"],
+        "metadata": {
+          "expectedValue": "ARCHIVE-SECRET-2024",
+          "mode": "qr",
+          "promptText": "Find and scan the hidden QR code.",
+          "allowedValues": ["ARCHIVE-SECRET-2024", "archive-secret-2024"],
+          "fallbackCode": "1943ARCHIVE",
+          "allowManualFallback": true
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 9,
+        "artifact_type": "hint_container",
+        "title": "Progressive Hints",
+        "description": "Hints available if stuck.",
+        "tags": ["hints"],
+        "metadata": {
+          "hints": [
+            { "id": "h1", "text": "Look at the dates on the documents.", "penaltySeconds": 0 },
+            { "id": "h2", "text": "The map has numbered markings.", "penaltySeconds": 30 },
+            { "id": "h3", "text": "The safe code is the year 1943.", "penaltySeconds": 60 }
+          ],
+          "penaltyPerHint": 30,
+          "maxHints": 3,
+          "cooldownSeconds": 60
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 10,
+        "artifact_type": "hotspot",
+        "title": "Map Hotspot Hunt",
+        "description": "Find all the marked locations on the map.",
+        "tags": ["puzzle", "interactive"],
+        "metadata": {
+          "imageUrl": "https://example.com/map-hotspot.jpg",
+          "hotspots": [
+            { "id": "hs1", "x": 25, "y": 30, "radius": 15, "label": "Location A", "required": true },
+            { "id": "hs2", "x": 60, "y": 45, "radius": 15, "label": "Location B", "required": true },
+            { "id": "hs3", "x": 80, "y": 70, "radius": 15, "label": "Location C", "required": false }
+          ],
+          "showProgress": true,
+          "hapticFeedback": true,
+          "requireAll": false
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 11,
+        "artifact_type": "tile_puzzle",
+        "title": "Scrambled Photo",
+        "description": "Unscramble the photo to reveal a clue.",
+        "tags": ["puzzle"],
+        "metadata": {
+          "imageUrl": "https://example.com/scrambled.jpg",
+          "gridSize": "3x3",
+          "showPreview": false
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 12,
+        "artifact_type": "cipher",
+        "title": "Caesar Cipher Message",
+        "description": "A coded message using Caesar cipher.",
+        "tags": ["puzzle", "crypto"],
+        "metadata": {
+          "encodedMessage": "OLNUHSLU ÄY UFJRLU",
+          "expectedPlaintext": "HEMLIGHET ÄR NYCKELN",
+          "cipherType": "caesar",
+          "caesarShift": 7,
+          "showDecoderUI": true,
+          "normalizeMode": "fuzzy"
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 13,
+        "artifact_type": "logic_grid",
+        "title": "Logic Puzzle",
+        "description": "Deduce the correct combinations.",
+        "tags": ["puzzle", "logic"],
+        "metadata": {
+          "categories": [
+            { "id": "people", "name": "People", "items": ["Alice", "Bob", "Carol"] },
+            { "id": "colors", "name": "Colors", "items": ["Red", "Blue", "Green"] },
+            { "id": "items", "name": "Items", "items": ["Key", "Map", "Book"] }
+          ],
+          "clues": [
+            "Alice has the red item.",
+            "The person with the key wears blue.",
+            "Carol does not have the map."
+          ],
+          "solution": [
+            { "person": "Alice", "color": "Red", "item": "Book" },
+            { "person": "Bob", "color": "Blue", "item": "Key" },
+            { "person": "Carol", "color": "Green", "item": "Map" }
+          ],
+          "title": "Who has what?"
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 14,
+        "artifact_type": "prop_confirmation",
+        "title": "Old Key Prop",
+        "description": "Confirm the physical key has been found.",
+        "tags": ["physical", "prop"],
+        "metadata": {
+          "propName": "The Old Archive Key",
+          "propImageUrl": "https://example.com/old-key.jpg",
+          "instructions": "Show the old key to the facilitator to verify.",
+          "requirePhoto": false
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 15,
+        "artifact_type": "location_check",
+        "title": "Archive Entrance GPS",
+        "description": "Verify you're at the archive entrance.",
+        "tags": ["location", "gps"],
+        "metadata": {
+          "checkType": "gps",
+          "latitude": 59.3293,
+          "longitude": 18.0686,
+          "radius": 50,
+          "locationName": "National Archive Entrance",
+          "showDistance": true,
+          "showCompass": true
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 16,
+        "artifact_type": "location_check",
+        "title": "QR Location Check",
+        "description": "Scan QR to verify location.",
+        "tags": ["location", "qr"],
+        "metadata": {
+          "checkType": "qr",
+          "qrCodeValue": "LOCATION-VERIFIED-2024",
+          "locationName": "Secret Room"
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 17,
+        "artifact_type": "sound_level",
+        "title": "Cheer Meter",
+        "description": "Cheer loud enough to trigger the next phase!",
+        "tags": ["interactive", "audio"],
+        "metadata": {
+          "instructions": "Cheer as loud as you can!",
+          "triggerMode": "sustained",
+          "thresholdLevel": 80,
+          "sustainDuration": 3,
+          "activityLabel": "Team Spirit Check",
+          "showMeter": true
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 18,
+        "artifact_type": "audio",
+        "title": "Mysterious Recording",
+        "description": "An old audio recording with clues.",
+        "tags": ["media", "clue"],
+        "metadata": {
+          "audioUrl": "https://example.com/mysterious-recording.mp3",
+          "autoPlay": false,
+          "loop": false,
+          "requireAck": true,
+          "showTranscript": true,
+          "transcriptText": "The key... is hidden... where the sun never shines..."
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 19,
+        "artifact_type": "conversation_cards_collection",
+        "title": "Discussion Cards",
+        "description": "Cards for group discussion.",
+        "tags": ["social", "discussion"],
+        "metadata": {
+          "conversation_card_collection_id": "00000000-0000-0000-0000-000000000001"
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 20,
+        "artifact_type": "signal_generator",
+        "title": "Emergency Signal",
+        "description": "Leader can send emergency signals.",
+        "tags": ["admin", "signal"],
+        "metadata": {
+          "signals": [
+            { "key": "pause", "label": "Pause Game", "icon": "⏸️" },
+            { "key": "hint", "label": "Send Hint", "icon": "💡" },
+            { "key": "warning", "label": "Warning", "icon": "⚠️" }
+          ]
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 21,
+        "artifact_type": "time_bank_step",
+        "title": "Time Bank Control",
+        "description": "Control time bank for the session.",
+        "tags": ["admin", "time"],
+        "metadata": {
+          "initialBalance": 300,
+          "minBalance": 0,
+          "maxBalance": 600
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 22,
+        "artifact_type": "replay_marker",
+        "title": "Session Marker",
+        "description": "Marks important moments for replay.",
+        "tags": ["admin", "replay"],
+        "metadata": {},
+        "variants": []
+      },
+      {
+        "artifact_order": 23,
+        "artifact_type": "empty_artifact",
+        "title": "Placeholder",
+        "description": "Reserved for future content.",
+        "tags": ["placeholder"],
+        "metadata": {},
+        "variants": []
+      },
+      {
+        "artifact_order": 24,
+        "artifact_type": "card",
+        "title": "Role-Specific Card",
+        "description": "Different content for different roles.",
+        "tags": ["clue", "role-based"],
+        "metadata": {},
+        "variants": [
+          {
+            "variant_order": 1,
+            "visibility": "role_private",
+            "visible_to_role_order": 1,
+            "title": "Investigator's Secret",
+            "body": "Only you know: The painting hides a secret compartment.",
+            "metadata": null
+          },
+          {
+            "variant_order": 2,
+            "visibility": "role_private",
+            "visible_to_role_order": 2,
+            "title": "Decoder's Secret",
+            "body": "Only you know: The cipher uses shift 7.",
+            "metadata": null
+          },
+          {
+            "variant_order": 3,
+            "visibility": "leader_only",
+            "title": "Leader Notes",
+            "body": "Remind players about the UV flashlight after 5 minutes.",
+            "metadata": null
+          }
+        ]
+      }
+    ],
+
+    "triggers": [
+      {
+        "name": "Phase 1 Started",
+        "description": "Welcome message when intro phase begins",
+        "enabled": true,
+        "condition": {
+          "type": "phase_started",
+          "phaseOrder": 1
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🎭 Welcome to the Maximal Example!",
+            "style": "dramatic"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 1
+      },
+      {
+        "name": "Step 1 Started",
+        "description": "Show leader script when briefing begins",
+        "enabled": true,
+        "condition": {
+          "type": "step_started",
+          "stepOrder": 1
+        },
+        "actions": [
+          {
+            "type": "show_leader_script",
+            "customScript": "Welcome everyone to the Maximal Example game!",
+            "autoDismissSeconds": 30
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 2
+      },
+      {
+        "name": "Step 1 Completed",
+        "description": "Advance when briefing done",
+        "enabled": true,
+        "condition": {
+          "type": "step_completed",
+          "stepOrder": 1
+        },
+        "actions": [
+          {
+            "type": "advance_step"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 3
+      },
+      {
+        "name": "Safe Unlocked",
+        "description": "When keypad code is correct",
+        "enabled": true,
+        "condition": {
+          "type": "keypad_correct",
+          "artifactOrder": 4
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🔓 The archive safe clicks open!",
+            "style": "dramatic"
+          },
+          {
+            "type": "reveal_artifact",
+            "artifactOrder": 2
+          },
+          {
+            "type": "increment_counter",
+            "counterKey": "clues",
+            "amount": 1
+          },
+          {
+            "type": "play_sound",
+            "soundId": "unlock-success"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 4
+      },
+      {
+        "name": "Safe Failed",
+        "description": "When keypad max attempts reached",
+        "enabled": true,
+        "condition": {
+          "type": "keypad_failed",
+          "artifactOrder": 4
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🔒 The safe has locked! Ask for a hint.",
+            "style": "normal"
+          },
+          {
+            "type": "send_hint",
+            "hintId": "h1",
+            "skipCooldown": true
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 5
+      },
+      {
+        "name": "Riddle Solved",
+        "description": "When riddle answered correctly",
+        "enabled": true,
+        "condition": {
+          "type": "riddle_correct",
+          "artifactOrder": 5
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "✅ Correct! The answer is a map!",
+            "style": "normal"
+          },
+          {
+            "type": "reveal_artifact",
+            "artifactOrder": 3
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 6
+      },
+      {
+        "name": "Counter Reached",
+        "description": "When 5 clues found",
+        "enabled": true,
+        "condition": {
+          "type": "counter_reached",
+          "counterKey": "clues",
+          "targetValue": 5
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🎉 All clues found! Final puzzle unlocked!",
+            "style": "dramatic"
+          },
+          {
+            "type": "advance_phase"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 2,
+        "sort_order": 7
+      },
+      {
+        "name": "Audio Acknowledged",
+        "description": "When mysterious recording heard",
+        "enabled": true,
+        "condition": {
+          "type": "audio_acknowledged",
+          "audioId": "audio-18"
+        },
+        "actions": [
+          {
+            "type": "reveal_artifact",
+            "artifactOrder": 14
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 8
+      },
+      {
+        "name": "QR Verified",
+        "description": "When hidden QR scanned",
+        "enabled": true,
+        "condition": {
+          "type": "scan_verified",
+          "scanGateId": "qr-8"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "📱 QR Code verified!",
+            "style": "normal"
+          },
+          {
+            "type": "increment_counter",
+            "counterKey": "clues"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 9
+      },
+      {
+        "name": "Multi-Answer Complete",
+        "description": "When evidence checklist done",
+        "enabled": true,
+        "condition": {
+          "type": "multi_answer_complete",
+          "multiAnswerId": "multi-6"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "📋 All evidence catalogued!",
+            "style": "normal"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 10
+      },
+      {
+        "name": "Hotspot Complete",
+        "description": "When all map hotspots found",
+        "enabled": true,
+        "condition": {
+          "type": "hotspot_hunt_complete",
+          "hotspotHuntId": "hotspot-10"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🗺️ All map locations found!",
+            "style": "normal"
+          },
+          {
+            "type": "increment_counter",
+            "counterKey": "clues"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 11
+      },
+      {
+        "name": "Single Hotspot Found",
+        "description": "When specific hotspot clicked",
+        "enabled": true,
+        "condition": {
+          "type": "hotspot_found",
+          "hotspotHuntId": "hotspot-10",
+          "hotspotId": "hs1"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "📍 Location A discovered!",
+            "style": "normal"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 12
+      },
+      {
+        "name": "Tile Puzzle Solved",
+        "description": "When photo unscrambled",
+        "enabled": true,
+        "condition": {
+          "type": "tile_puzzle_complete",
+          "tilePuzzleId": "tile-11"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🧩 Photo revealed!",
+            "style": "normal"
+          },
+          {
+            "type": "reveal_artifact",
+            "artifactOrder": 12
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 13
+      },
+      {
+        "name": "Cipher Decoded",
+        "description": "When cipher solved",
+        "enabled": true,
+        "condition": {
+          "type": "cipher_decoded",
+          "cipherId": "cipher-12"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🔐 The secret message: HEMLIGHET ÄR NYCKELN",
+            "style": "dramatic"
+          },
+          {
+            "type": "increment_counter",
+            "counterKey": "clues"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 14
+      },
+      {
+        "name": "Logic Grid Solved",
+        "description": "When logic puzzle completed",
+        "enabled": true,
+        "condition": {
+          "type": "logic_grid_solved",
+          "gridId": "grid-13"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🧠 Logic puzzle solved!",
+            "style": "normal"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 15
+      },
+      {
+        "name": "Prop Confirmed",
+        "description": "When old key shown to leader",
+        "enabled": true,
+        "condition": {
+          "type": "prop_confirmed",
+          "propId": "prop-14"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🔑 The old key has been verified!",
+            "style": "normal"
+          },
+          {
+            "type": "increment_counter",
+            "counterKey": "clues"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 16
+      },
+      {
+        "name": "Prop Rejected",
+        "description": "When wrong prop shown",
+        "enabled": true,
+        "condition": {
+          "type": "prop_rejected",
+          "propId": "prop-14"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "❌ That's not the right key!",
+            "style": "normal"
+          }
+        ],
+        "execute_once": false,
+        "delay_seconds": 0,
+        "sort_order": 17
+      },
+      {
+        "name": "Location Verified",
+        "description": "When GPS location confirmed",
+        "enabled": true,
+        "condition": {
+          "type": "location_verified",
+          "locationId": "location-15"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "📍 Location verified! You're at the archive entrance.",
+            "style": "normal"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 18
+      },
+      {
+        "name": "Sound Level Triggered",
+        "description": "When cheering reaches threshold",
+        "enabled": true,
+        "condition": {
+          "type": "sound_level_triggered",
+          "soundMeterId": "sound-17"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🎉 AMAZING TEAM SPIRIT!",
+            "style": "dramatic"
+          },
+          {
+            "type": "time_bank_apply_delta",
+            "deltaSeconds": 60,
+            "reason": "Bonus for great cheering!"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 19
+      },
+      {
+        "name": "Hint Requested",
+        "description": "When any hint is revealed",
+        "enabled": true,
+        "condition": {
+          "type": "hint_requested"
+        },
+        "actions": [
+          {
+            "type": "time_bank_apply_delta",
+            "deltaSeconds": -30,
+            "reason": "Hint penalty",
+            "minBalanceSeconds": 0
+          }
+        ],
+        "execute_once": false,
+        "delay_seconds": 0,
+        "sort_order": 20
+      },
+      {
+        "name": "Replay Marker Added",
+        "description": "When session moment marked",
+        "enabled": true,
+        "condition": {
+          "type": "replay_marker_added",
+          "markerType": "highlight"
+        },
+        "actions": [
+          {
+            "type": "send_signal",
+            "channel": "admin",
+            "message": "Moment marked for replay"
+          }
+        ],
+        "execute_once": false,
+        "delay_seconds": 0,
+        "sort_order": 21
+      },
+      {
+        "name": "Artifact Unlocked",
+        "description": "When document artifact is revealed",
+        "enabled": true,
+        "condition": {
+          "type": "artifact_unlocked",
+          "artifactOrder": 2
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "📄 A new document has been revealed!",
+            "style": "typewriter"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 22
+      },
+      {
+        "name": "Phase 3 Started",
+        "description": "Start timer when challenge phase begins",
+        "enabled": true,
+        "condition": {
+          "type": "phase_started",
+          "phaseOrder": 3
+        },
+        "actions": [
+          {
+            "type": "start_timer",
+            "duration": 1200,
+            "name": "Challenge Timer"
+          },
+          {
+            "type": "show_countdown",
+            "duration": 5,
+            "message": "Round 2 begins in..."
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 23
+      },
+      {
+        "name": "Timer Ended",
+        "description": "When challenge timer runs out",
+        "enabled": true,
+        "condition": {
+          "type": "timer_ended",
+          "timerId": "challenge-timer"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "⏰ Time's up! Moving to break...",
+            "style": "dramatic"
+          },
+          {
+            "type": "advance_phase"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 24
+      },
+      {
+        "name": "Phase Completed",
+        "description": "When round 2 phase completes",
+        "enabled": true,
+        "condition": {
+          "type": "phase_completed",
+          "phaseOrder": 3
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🏁 Round 2 complete!",
+            "style": "normal"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 25
+      },
+      {
+        "name": "Signal Received",
+        "description": "When emergency signal sent",
+        "enabled": true,
+        "condition": {
+          "type": "signal_received",
+          "channel": "emergency"
+        },
+        "actions": [
+          {
+            "type": "time_bank_pause",
+            "pause": true
+          },
+          {
+            "type": "send_message",
+            "message": "⚠️ GAME PAUSED - Emergency signal received",
+            "style": "dramatic"
+          }
+        ],
+        "execute_once": false,
+        "delay_seconds": 0,
+        "sort_order": 26
+      },
+      {
+        "name": "Signal Generator Triggered",
+        "description": "When leader triggers signal generator",
+        "enabled": true,
+        "condition": {
+          "type": "signal_generator_triggered",
+          "signalGeneratorId": "signal-20",
+          "signalKey": "hint"
+        },
+        "actions": [
+          {
+            "type": "send_hint",
+            "hintId": "next",
+            "skipCooldown": false
+          }
+        ],
+        "execute_once": false,
+        "delay_seconds": 0,
+        "sort_order": 27
+      },
+      {
+        "name": "Time Bank Expired",
+        "description": "When session time bank hits zero",
+        "enabled": true,
+        "condition": {
+          "type": "time_bank_expired"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "⏳ Time bank expired! Game over!",
+            "style": "dramatic"
+          },
+          {
+            "type": "advance_phase"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 28
+      },
+      {
+        "name": "Decision Resolved",
+        "description": "When vote completed",
+        "enabled": true,
+        "condition": {
+          "type": "decision_resolved",
+          "decisionId": "decision-1",
+          "outcome": "option_a"
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🗳️ The team voted for Option A!",
+            "style": "normal"
+          },
+          {
+            "type": "lock_decision",
+            "decisionId": "decision-1"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 29
+      },
+      {
+        "name": "Manual Trigger",
+        "description": "Host-only emergency button",
+        "enabled": true,
+        "condition": {
+          "type": "manual"
+        },
+        "actions": [
+          {
+            "type": "hide_artifact",
+            "artifactOrder": 23
+          },
+          {
+            "type": "unlock_decision",
+            "decisionId": "decision-2"
+          }
+        ],
+        "execute_once": false,
+        "delay_seconds": 0,
+        "sort_order": 30
+      },
+      {
+        "name": "Reset Puzzles",
+        "description": "Reset all puzzles on signal",
+        "enabled": true,
+        "condition": {
+          "type": "signal_received",
+          "channel": "reset"
+        },
+        "actions": [
+          {
+            "type": "reset_keypad",
+            "keypadId": "keypad-4"
+          },
+          {
+            "type": "reset_riddle",
+            "riddleId": "riddle-5"
+          },
+          {
+            "type": "reset_counter",
+            "counterKey": "clues"
+          },
+          {
+            "type": "reset_scan_gate",
+            "scanGateId": "qr-8"
+          },
+          {
+            "type": "reset_hotspot_hunt",
+            "hotspotHuntId": "hotspot-10"
+          },
+          {
+            "type": "reset_tile_puzzle",
+            "tilePuzzleId": "tile-11"
+          },
+          {
+            "type": "reset_cipher",
+            "cipherId": "cipher-12"
+          },
+          {
+            "type": "reset_logic_grid",
+            "gridId": "grid-13"
+          },
+          {
+            "type": "reset_prop",
+            "propId": "prop-14"
+          },
+          {
+            "type": "reset_location",
+            "locationId": "location-15"
+          },
+          {
+            "type": "reset_sound_meter",
+            "soundMeterId": "sound-17"
+          }
+        ],
+        "execute_once": false,
+        "delay_seconds": 0,
+        "sort_order": 31
+      },
+      {
+        "name": "Add Replay Marker",
+        "description": "Mark important moment",
+        "enabled": true,
+        "condition": {
+          "type": "counter_reached",
+          "counterKey": "clues",
+          "targetValue": 3
+        },
+        "actions": [
+          {
+            "type": "add_replay_marker",
+            "markerType": "milestone",
+            "label": "Halfway through clues"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 32
+      },
+      {
+        "name": "Trigger Signal Generator",
+        "description": "Trigger signal when finale starts",
+        "enabled": true,
+        "condition": {
+          "type": "phase_started",
+          "phaseOrder": 5
+        },
+        "actions": [
+          {
+            "type": "trigger_signal",
+            "signalGeneratorId": "signal-20"
+          },
+          {
+            "type": "time_bank_pause",
+            "pause": false
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 33
+      }
+    ]
+  }
+]

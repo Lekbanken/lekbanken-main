@@ -55,6 +55,9 @@ export interface PrecomputedData {
   
   /** Normalized and validated triggers */
   normalizedTriggers: ParsedTrigger[];
+  
+  /** Resolved phase_id for each step (by step_order) - null if no phase assigned */
+  stepPhaseIdByOrder: Map<number, string | null>;
 }
 
 // =============================================================================
@@ -183,7 +186,89 @@ export function runPreflightValidation(
   }
 
   // =========================================================================
-  // 5. Normalize and validate triggers (SERVER-SIDE CANONICALIZATION)
+  // 5. Validate and resolve step→phase references
+  // =========================================================================
+  // UUID regex for validation
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  
+  // Map to store resolved phase_id for each step
+  const resolvedStepPhaseIds = new Map<number, string | null>();
+  
+  for (let i = 0; i < (game.steps?.length ?? 0); i++) {
+    const step = game.steps![i];
+    const stepOrder = step.step_order ?? i + 1;
+    
+    const hasPhaseId = step.phase_id !== undefined && step.phase_id !== null;
+    const hasPhaseOrder = step.phase_order !== undefined && step.phase_order !== null;
+    
+    // Check: both phase_id and phase_order present → blocking error
+    if (hasPhaseId && hasPhaseOrder) {
+      blockingErrors.push({
+        row: i + 1,
+        column: `steps[${i}]`,
+        message: `Step ${stepOrder} has both phase_id and phase_order. Only one may be specified.`,
+        severity: 'error',
+        code: 'STEP_PHASE_REF_BOTH_PRESENT',
+      });
+      continue;
+    }
+    
+    // Validate phase_id if provided
+    if (hasPhaseId) {
+      if (!UUID_REGEX.test(step.phase_id!)) {
+        blockingErrors.push({
+          row: i + 1,
+          column: `steps[${i}].phase_id`,
+          message: `Step ${stepOrder} has invalid phase_id "${step.phase_id}". Must be a valid UUID.`,
+          severity: 'error',
+          code: 'STEP_PHASE_ID_INVALID',
+        });
+      } else {
+        resolvedStepPhaseIds.set(stepOrder, step.phase_id!);
+      }
+      continue;
+    }
+    
+    // Resolve phase_order to phase_id if provided
+    if (hasPhaseOrder) {
+      const phaseOrder = step.phase_order!;
+      
+      // Validate phase_order is a positive number
+      if (typeof phaseOrder !== 'number' || phaseOrder < 1 || !Number.isInteger(phaseOrder)) {
+        blockingErrors.push({
+          row: i + 1,
+          column: `steps[${i}].phase_order`,
+          message: `Step ${stepOrder} has invalid phase_order "${phaseOrder}". Must be a positive integer.`,
+          severity: 'error',
+          code: 'STEP_PHASE_ORDER_INVALID',
+        });
+        continue;
+      }
+      
+      // Check if phase_order exists in the phases array
+      const phaseId = phaseIdByOrder.get(phaseOrder);
+      if (!phaseId) {
+        blockingErrors.push({
+          row: i + 1,
+          column: `steps[${i}].phase_order`,
+          message: `Step ${stepOrder} references phase_order=${phaseOrder} which does not exist. Available phase orders: ${Array.from(phaseIdByOrder.keys()).sort((a, b) => a - b).join(', ') || 'none'}.`,
+          severity: 'error',
+          code: 'STEP_PHASE_ORDER_NOT_FOUND',
+        });
+        continue;
+      }
+      
+      // Successfully resolved
+      resolvedStepPhaseIds.set(stepOrder, phaseId);
+      continue;
+    }
+    
+    // Neither phase_id nor phase_order provided - step belongs to no phase (allowed)
+    resolvedStepPhaseIds.set(stepOrder, null);
+  }
+
+  // =========================================================================
+  // 6. Normalize and validate triggers (SERVER-SIDE CANONICALIZATION)
   // =========================================================================
   let triggerResult: TriggerNormalizationResult = {
     triggers: [],
@@ -212,10 +297,24 @@ export function runPreflightValidation(
   }
 
   // =========================================================================
-  // 6. Create normalized game with canonicalized triggers
+  // 7. Create normalized game with canonicalized triggers and resolved phase_ids
   // =========================================================================
+  // Normalize steps to have phase_id instead of phase_order
+  const normalizedSteps = game.steps?.map((step, i) => {
+    const stepOrder = step.step_order ?? i + 1;
+    const resolvedPhaseId = resolvedStepPhaseIds.get(stepOrder);
+    
+    // Create normalized step with only phase_id (remove phase_order)
+    const { phase_order: _removed, ...stepWithoutPhaseOrder } = step;
+    return {
+      ...stepWithoutPhaseOrder,
+      phase_id: resolvedPhaseId ?? null,
+    };
+  });
+
   const normalizedGame: ParsedGame = {
     ...game,
+    steps: normalizedSteps ?? game.steps,
     triggers: triggerResult.triggers.length > 0 ? triggerResult.triggers : undefined,
   };
 
@@ -231,6 +330,7 @@ export function runPreflightValidation(
       roleIdByOrder,
       roleIdByName,
       normalizedTriggers: triggerResult.triggers,
+      stepPhaseIdByOrder: resolvedStepPhaseIds,
     },
   };
 }

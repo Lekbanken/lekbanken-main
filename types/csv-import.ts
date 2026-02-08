@@ -93,6 +93,10 @@ export type ParsedStep = {
   participant_prompt?: string | null;
   board_text?: string | null;
   optional?: boolean;
+  /** Phase UUID (mutually exclusive with phase_order) */
+  phase_id?: string | null;
+  /** Phase order reference (resolved to phase_id during preflight) */
+  phase_order?: number | null;
 };
 
 export type ParsedMaterials = {
@@ -297,6 +301,11 @@ export type ImportErrorCode =
   | 'DUPLICATE_PHASE_ORDER'
   | 'DUPLICATE_ARTIFACT_ORDER'
   | 'DUPLICATE_ROLE_ORDER'
+  // Step-phase linkage errors
+  | 'STEP_PHASE_REF_BOTH_PRESENT'
+  | 'STEP_PHASE_ORDER_NOT_FOUND'
+  | 'STEP_PHASE_ID_INVALID'
+  | 'STEP_PHASE_ORDER_INVALID'
   // General errors
   | 'VALIDATION_ERROR'
   | 'PARSE_ERROR'

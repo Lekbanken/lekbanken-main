@@ -202,4 +202,130 @@ describe('runPreflightValidation', () => {
       expect(result.blockingErrors.length).toBeGreaterThan(0);
     });
   });
+
+  describe('step-phase linkage', () => {
+    it('should resolve phase_order to phase_id', () => {
+      const game = createMockGame({
+        phases: [
+          { phase_order: 1, name: 'Phase 1', phase_type: 'intro' },
+          { phase_order: 2, name: 'Phase 2', phase_type: 'main' },
+        ],
+        steps: [
+          { step_order: 1, title: 'Step 1', body: 'Body', duration_seconds: null, phase_order: 1 },
+          { step_order: 2, title: 'Step 2', body: 'Body', duration_seconds: null, phase_order: 2 },
+        ],
+      });
+
+      const result = runPreflightValidation(game, mockUUID());
+
+      expect(result.ok).toBe(true);
+      expect(result.precomputed.stepPhaseIdByOrder.size).toBe(2);
+      
+      // Verify phase_order was resolved to phase_id
+      const step1PhaseId = result.precomputed.stepPhaseIdByOrder.get(1);
+      const step2PhaseId = result.precomputed.stepPhaseIdByOrder.get(2);
+      const phase1Id = result.precomputed.phaseIdByOrder.get(1);
+      const phase2Id = result.precomputed.phaseIdByOrder.get(2);
+      
+      expect(step1PhaseId).toBe(phase1Id);
+      expect(step2PhaseId).toBe(phase2Id);
+      
+      // Verify normalized game has phase_id (not phase_order)
+      expect(result.normalizedGame.steps![0].phase_id).toBe(phase1Id);
+      expect(result.normalizedGame.steps![1].phase_id).toBe(phase2Id);
+    });
+
+    it('should block if both phase_id and phase_order are present', () => {
+      const game = createMockGame({
+        phases: [{ phase_order: 1, name: 'Phase 1', phase_type: 'intro' }],
+        steps: [
+          { 
+            step_order: 1, 
+            title: 'Step 1', 
+            body: 'Body', 
+            duration_seconds: null,
+            phase_id: '550e8400-e29b-41d4-a716-446655440000',
+            phase_order: 1,  // BOTH present = error
+          },
+        ],
+      });
+
+      const result = runPreflightValidation(game, mockUUID());
+
+      expect(result.ok).toBe(false);
+      expect(result.blockingErrors.some(e => e.code === 'STEP_PHASE_REF_BOTH_PRESENT')).toBe(true);
+    });
+
+    it('should block if phase_order references non-existent phase', () => {
+      const game = createMockGame({
+        phases: [{ phase_order: 1, name: 'Phase 1', phase_type: 'intro' }],
+        steps: [
+          { step_order: 1, title: 'Step 1', body: 'Body', duration_seconds: null, phase_order: 99 },  // No phase 99!
+        ],
+      });
+
+      const result = runPreflightValidation(game, mockUUID());
+
+      expect(result.ok).toBe(false);
+      expect(result.blockingErrors.some(e => e.code === 'STEP_PHASE_ORDER_NOT_FOUND')).toBe(true);
+      expect(result.blockingErrors[0].message).toContain('99');
+    });
+
+    it('should block if phase_id is not a valid UUID', () => {
+      const game = createMockGame({
+        steps: [
+          { step_order: 1, title: 'Step 1', body: 'Body', duration_seconds: null, phase_id: 'not-a-uuid' },
+        ],
+      });
+
+      const result = runPreflightValidation(game, mockUUID());
+
+      expect(result.ok).toBe(false);
+      expect(result.blockingErrors.some(e => e.code === 'STEP_PHASE_ID_INVALID')).toBe(true);
+    });
+
+    it('should allow valid phase_id UUID', () => {
+      const validUUID = '550e8400-e29b-41d4-a716-446655440000';
+      const game = createMockGame({
+        steps: [
+          { step_order: 1, title: 'Step 1', body: 'Body', duration_seconds: null, phase_id: validUUID },
+        ],
+      });
+
+      const result = runPreflightValidation(game, mockUUID());
+
+      expect(result.ok).toBe(true);
+      expect(result.precomputed.stepPhaseIdByOrder.get(1)).toBe(validUUID);
+    });
+
+    it('should allow steps without phase reference (null)', () => {
+      const game = createMockGame({
+        phases: [{ phase_order: 1, name: 'Phase 1', phase_type: 'intro' }],
+        steps: [
+          { step_order: 1, title: 'Step 1', body: 'Body', duration_seconds: null },  // No phase reference
+          { step_order: 2, title: 'Step 2', body: 'Body', duration_seconds: null, phase_order: 1 },
+        ],
+      });
+
+      const result = runPreflightValidation(game, mockUUID());
+
+      expect(result.ok).toBe(true);
+      expect(result.precomputed.stepPhaseIdByOrder.get(1)).toBeNull();
+      expect(result.precomputed.stepPhaseIdByOrder.get(2)).toBe(result.precomputed.phaseIdByOrder.get(1));
+    });
+
+    it('should block if phase_order is not a positive integer', () => {
+      const game = createMockGame({
+        phases: [{ phase_order: 1, name: 'Phase 1', phase_type: 'intro' }],
+        steps: [
+          { step_order: 1, title: 'Step 1', body: 'Body', duration_seconds: null, phase_order: -1 },
+        ],
+      });
+
+      const result = runPreflightValidation(game, mockUUID());
+
+      expect(result.ok).toBe(false);
+      expect(result.blockingErrors.some(e => e.code === 'STEP_PHASE_ORDER_INVALID')).toBe(true);
+    });
+  });
 });

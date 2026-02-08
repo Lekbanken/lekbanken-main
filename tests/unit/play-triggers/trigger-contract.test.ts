@@ -13,7 +13,7 @@
  * @vitest-environment node
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 // =============================================================================
 // Types matching the contract
@@ -116,7 +116,7 @@ function validateIdempotencyKey(
 
 describe('Trigger Engine V2.1 Contract', () => {
   const TRIGGER_ID = 'trigger-123';
-  const SESSION_ID = 'session-456';
+  const _SESSION_ID = 'session-456';
 
   describe('C2.1: Idempotency Key Requirement', () => {
     it('T5: missing X-Idempotency-Key for fire action → 400 TRIGGER_IDEMPOTENCY_KEY_REQUIRED', () => {

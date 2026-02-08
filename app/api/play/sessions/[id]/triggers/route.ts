@@ -217,14 +217,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   // Handle fire action via atomic RPC
   if (action === 'fire') {
-    // TODO(post-merge): Remove cast after running `supabase gen types typescript`
-    // fire_trigger_v2_safe is defined in migration 20260208000001 but not yet in generated types
-    const { data: rpcResult, error: rpcErr } = await (service.rpc as Function)(
+    // idempotencyKey is guaranteed non-null here (validated above)
+    const { data: rpcResult, error: rpcErr } = await service.rpc(
       'fire_trigger_v2_safe',
       {
         p_session_id: sessionId,
         p_game_trigger_id: triggerId,
-        p_idempotency_key: idempotencyKey,
+        p_idempotency_key: idempotencyKey!,
         p_actor_user_id: user.id,
       }
     );

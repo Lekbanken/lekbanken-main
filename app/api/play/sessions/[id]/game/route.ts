@@ -34,6 +34,8 @@ type StepInfo = {
   tag?: string;
   note?: string;
   leaderScript?: string;
+  /** Phase this step belongs to (null = unassigned). Exposed for debugging/future use. */
+  phaseId?: string | null;
 };
 
 type PhaseInfo = {
@@ -396,6 +398,8 @@ export async function GET(
         materials: materialsRow?.items ?? undefined,
         safety: materialsRow?.safety_notes ?? undefined,
         leaderScript: s.leader_script ?? undefined,
+        // Phase linkage (exposed for debugging/future phase-from-step derivation)
+        phaseId: s.phase_id ?? null,
         // Future fields (kept for compatibility with existing UI)
         tag: undefined,
         note: undefined,

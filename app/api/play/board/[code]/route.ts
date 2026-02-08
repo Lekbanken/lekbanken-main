@@ -49,15 +49,18 @@ export async function GET(
   }
 
   // Current phase name (best-effort)
+  // FIX: Use array indexing after ordering by phase_order, not direct phase_order lookup
+  // This avoids off-by-one if phase_order is 1-based while current_phase_index is 0-based
   let currentPhaseName: string | null = null;
   if (session.game_id) {
-    const { data: phase } = await service
+    const { data: phases } = await service
       .from('game_phases')
       .select('name')
       .eq('game_id', session.game_id)
-      .eq('phase_order', session.current_phase_index ?? 0)
-      .single();
+      .is('locale', null)
+      .order('phase_order', { ascending: true });
 
+    const phase = (phases ?? [])[session.current_phase_index ?? 0];
     currentPhaseName = (phase?.name as string | undefined) ?? null;
   }
 

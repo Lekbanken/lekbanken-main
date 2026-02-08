@@ -1,9 +1,9 @@
 # Play UI Wiring Audit Report
 ## UI → API → DB Field Mapping (SSoT + Evidence)
 
-**Version:** 2.1  
+**Version:** 2.2  
 **Date:** 2026-02-08  
-**Status:** Reference Document (Verified + Fixes Applied)  
+**Status:** Reference Document (Verified + Tests Added)  
 **Scope:** All Play domain UI components, API endpoints, and database tables
 
 ---
@@ -12,9 +12,34 @@
 
 | Version | Date | Changes |
 |---------|------|------|
+| v2.2 | 2026-02-08 | ✅ Added contract tests, ✅ Added Design Invariants section |
 | v2.1 | 2026-02-08 | ✅ Fixed Board phase off-by-one bug, ✅ Exposed `step.phaseId` in `/game` endpoint |
 | v2.0 | 2026-02-08 | Full verification audit with evidence, identified bugs |
 | v1.0 | 2026-01-24 | Initial audit |
+
+---
+
+## Design Invariants
+
+### Navigation vs Structure Truth
+
+> **INVARIANT:** UI phase navigation is controlled by runtime indices (`participant_sessions.current_phase_index`); `game_steps.phase_id` / `step.phaseId` is for observability and future derivation, **not currently authoritative for runtime**.
+
+This means:
+- **Runtime navigation**: `current_step_index` and `current_phase_index` in `participant_sessions` control what the UI shows
+- **Structural metadata**: `game_steps.phase_id` tells us which phase a step belongs to (design-time linkage)
+- **Do NOT derive phase from step**: Future devs must not "fix" navigation by deriving `current_phase_index` from `steps[current_step_index].phase_id` without explicit migration
+
+### Index vs Order Fields
+
+| Field | Base | Source | Usage |
+|-------|------|--------|-------|
+| `current_step_index` | 0-based | Runtime | Array index into ordered steps |
+| `current_phase_index` | 0-based | Runtime | Array index into ordered phases |
+| `step_order` | 1-based | Design | Sort key for ordering |
+| `phase_order` | 1-based | Design | Sort key for ordering |
+
+**Contract tests:** [tests/unit/play/board-phase-contract.test.ts](../../tests/unit/play/board-phase-contract.test.ts), [tests/unit/play/game-phaseId-contract.test.ts](../../tests/unit/play/game-phaseId-contract.test.ts)
 
 ---
 

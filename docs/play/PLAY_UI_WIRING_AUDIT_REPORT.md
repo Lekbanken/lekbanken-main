@@ -1,7 +1,7 @@
 # Play UI Wiring Audit Report
 ## UI → API → DB Field Mapping (SSoT + Evidence)
 
-**Version:** 2.3  
+**Version:** 2.4  
 **Date:** 2026-02-08  
 **Status:** Reference Document (Verified + Full Contract Tests)  
 **Scope:** All Play domain UI components, API endpoints, and database tables
@@ -12,6 +12,7 @@
 
 | Version | Date | Changes |
 |---------|------|------|
+| v2.4 | 2026-02-08 | ✅ Trigger Engine hardening: execute_once guard, idempotency, atomic RPC |
 | v2.3 | 2026-02-08 | ✅ Step index vs step_order audit + contract tests (13 tests) |
 | v2.2 | 2026-02-08 | ✅ Added phase contract tests, ✅ Added Design Invariants section |
 | v2.1 | 2026-02-08 | ✅ Fixed Board phase off-by-one bug, ✅ Exposed `step.phaseId` in `/game` endpoint |
@@ -54,6 +55,26 @@ This means:
 - [step-index-contract.test.ts](../../tests/unit/play/step-index-contract.test.ts) — 13 tests for step index→order mapping
 - [board-phase-contract.test.ts](../../tests/unit/play/board-phase-contract.test.ts) — 9 tests for phase index→order mapping
 - [game-phaseId-contract.test.ts](../../tests/unit/play/game-phaseId-contract.test.ts) — 6 tests for phaseId field presence
+
+### Trigger Engine Invariants
+
+> **Full contract documentation:** [TRIGGER_ENGINE_CONTRACT.md](TRIGGER_ENGINE_CONTRACT.md)
+
+| Invariant | Description | Status |
+|-----------|-------------|--------|
+| **I1: Authority** | Only session host can fire/disable/arm triggers | ✅ Enforced |
+| **I2: execute_once** | Triggers with `execute_once=true` fire only once per session | ✅ Enforced (v2.4) |
+| **I3: Idempotency** | Same `(session, trigger, key)` cannot cause duplicate fires | ✅ Enforced (v2.4) |
+| **I4: Atomicity** | State changes via atomic RPC, no JS read-modify-write | ✅ Enforced (v2.4) |
+| **I5: Observability** | Every fire attempt logged to session_events | ✅ Enforced (v2.4) |
+
+**Implementation:**
+- RPC: `fire_trigger_v2_safe()` with CASE guards
+- Table: `session_trigger_idempotency` for replay protection
+- Header: `X-Idempotency-Key` required for fire action
+
+**Contract tests:**
+- [trigger-contract.test.ts](../../tests/unit/play-triggers/trigger-contract.test.ts) — 19 tests for trigger fire contract
 
 ---
 
@@ -454,7 +475,16 @@ This document provides a complete field-level audit of the Play UI wiring:
 | `play_mode` routing | UI doesn't adapt based on `basic`/`facilitated`/`participants` | P1 | Open |
 | Offline resilience | Board has safe-mode, but could be stronger | P2 | Open |
 | Step-phase linkage | `phaseId` now exposed in `/game` endpoint, available for future use | P2 | ✅ AVAILABLE |
-| Trigger engine | Client-side evaluation exists, server-side fire queue pending | P1 | Open |
+| Trigger engine | execute_once guard, idempotency, atomic RPC, logging | P1 | ✅ FIXED (v2.4) |
+
+### Bugs Fixed (v2.4)
+
+| Bug | Severity | Fix | Evidence |
+|-----|----------|-----|----------|
+| execute_once not enforced | CRITICAL | Added guard in `fire_trigger_v2_safe` RPC | [migration#L160-L180](../../supabase/migrations/20260208000001_trigger_engine_hardening.sql) |
+| No idempotency protection | HIGH | Added `session_trigger_idempotency` table + header check | [route.ts#L167-L174](../../app/api/play/sessions/%5Bid%5D/triggers/route.ts) |
+| JS read-modify-write race | MEDIUM | Replaced with atomic RPC call | [route.ts#L176-L208](../../app/api/play/sessions/%5Bid%5D/triggers/route.ts) |
+| No session_events logging | MEDIUM | Added `log_session_event()` call in RPC | [migration#L130-L150](../../supabase/migrations/20260208000001_trigger_engine_hardening.sql) |
 
 ### Bugs Fixed (v2.1)
 
@@ -490,4 +520,4 @@ This document provides a complete field-level audit of the Play UI wiring:
 
 ---
 
-*Last updated: 2026-02-08*
+*Last updated: 2026-02-09*

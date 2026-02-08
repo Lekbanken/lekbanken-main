@@ -145,8 +145,26 @@ export async function POST(_request: Request, { params: _params }: { params: Pro
 }
 
 /**
+ * RPC result type for fire_trigger_v2_safe
+ */
+interface FireTriggerRpcResult {
+  ok: boolean;
+  status: 'fired' | 'noop' | 'error';
+  reason: string | null;
+  replay: boolean;
+  fired_count: number;
+  fired_at: string | null;
+  original_fired_at: string | null;
+}
+
+/**
  * PATCH /api/play/sessions/[id]/triggers
- * V2: Update trigger status in session_trigger_state.
+ * V2.1: Update trigger status with atomic guards.
+ * 
+ * For action='fire':
+ * - Requires X-Idempotency-Key header
+ * - Uses fire_trigger_v2_safe RPC with execute_once guard + idempotency
+ * 
  * Body: { triggerId: string, action: 'fire' | 'disable' | 'arm' }
  */
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -175,6 +193,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return jsonError('Invalid action. Must be fire, disable, or arm', 400);
   }
 
+  // V2.1: For fire action, require idempotency key (C2.1)
+  // Treat empty/whitespace-only key as missing
+  const rawIdempotencyKey = request.headers.get('X-Idempotency-Key');
+  const idempotencyKey = rawIdempotencyKey?.trim() || null;
+  if (action === 'fire' && !idempotencyKey) {
+    return NextResponse.json(
+      { ok: false, error: 'TRIGGER_IDEMPOTENCY_KEY_REQUIRED' },
+      { status: 400 }
+    );
+  }
+
   const service = createServiceRoleClient();
 
   // V2: Verify game trigger exists
@@ -186,7 +215,66 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   if (gtErr || !gameTrigger) return jsonError('Trigger not found', 404);
 
-  // V2: Get current state (may not exist yet)
+  // Handle fire action via atomic RPC
+  if (action === 'fire') {
+    // TODO(post-merge): Remove cast after running `supabase gen types typescript`
+    // fire_trigger_v2_safe is defined in migration 20260208000001 but not yet in generated types
+    const { data: rpcResult, error: rpcErr } = await (service.rpc as Function)(
+      'fire_trigger_v2_safe',
+      {
+        p_session_id: sessionId,
+        p_game_trigger_id: triggerId,
+        p_idempotency_key: idempotencyKey,
+        p_actor_user_id: user.id,
+      }
+    );
+
+    if (rpcErr) {
+      console.error('[PATCH triggers] RPC error:', rpcErr);
+      return jsonError('Failed to fire trigger', 500);
+    }
+
+    // RPC returns array, get first row
+    const result = (Array.isArray(rpcResult) ? rpcResult[0] : rpcResult) as FireTriggerRpcResult;
+
+    if (!result || !result.ok) {
+      return NextResponse.json(
+        { ok: false, error: result?.reason ?? 'TRIGGER_FIRE_FAILED' },
+        { status: 500 }
+      );
+    }
+
+    // Broadcast event
+    await broadcastPlayEvent(sessionId, {
+      type: 'trigger_update',
+      payload: {
+        action: 'fire',
+        triggerId,
+        name: gameTrigger.name,
+        newStatus: result.status === 'fired' ? 'fired' : 'armed',
+        noop: result.status === 'noop',
+        reason: result.reason,
+      },
+      timestamp: new Date().toISOString(),
+    });
+
+    // Return contract-compliant response
+    return NextResponse.json({
+      ok: true,
+      status: result.status,
+      reason: result.reason,
+      replay: result.replay,
+      trigger: {
+        id: triggerId,
+        status: result.status === 'fired' ? 'fired' : 'armed',
+        firedAt: result.fired_at,
+        firedCount: result.fired_count,
+      },
+      ...(result.replay && result.original_fired_at ? { originalFiredAt: result.original_fired_at } : {}),
+    });
+  }
+
+  // Handle disable/arm actions (non-atomic, simpler)
   const { data: currentState } = await service
     .from('session_trigger_state')
     .select('status, fired_count, fired_at')
@@ -194,18 +282,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     .eq('game_trigger_id', triggerId)
     .single();
 
-  // Determine new values
-  let newStatus: 'armed' | 'fired' | 'disabled';
-  let firedAt: string | null = currentState?.fired_at ?? null;
-  let firedCount = currentState?.fired_count ?? 0;
-  let enabled = true;
+  let newStatus: 'armed' | 'disabled';
+  let enabled: boolean;
 
   switch (action) {
-    case 'fire':
-      newStatus = 'fired';
-      firedAt = new Date().toISOString();
-      firedCount += 1;
-      break;
     case 'disable':
       newStatus = 'disabled';
       enabled = false;
@@ -214,9 +294,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       newStatus = 'armed';
       enabled = true;
       break;
+    default:
+      return jsonError('Invalid action', 400);
   }
 
-  // V2: Upsert state record
+  // Upsert state record (preserve fired_count and fired_at)
   const { error: updateErr } = await service
     .from('session_trigger_state')
     .upsert(
@@ -224,8 +306,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         session_id: sessionId,
         game_trigger_id: triggerId,
         status: newStatus,
-        fired_at: firedAt,
-        fired_count: firedCount,
+        fired_at: currentState?.fired_at ?? null,
+        fired_count: currentState?.fired_count ?? 0,
         enabled,
         updated_at: new Date().toISOString(),
       },
@@ -246,12 +328,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   });
 
   return NextResponse.json({
-    success: true,
+    ok: true,
+    status: newStatus,
+    reason: null,
+    replay: false,
     trigger: {
       id: triggerId,
       status: newStatus,
-      firedAt,
-      firedCount,
+      firedAt: currentState?.fired_at ?? null,
+      firedCount: currentState?.fired_count ?? 0,
     },
   });
 }

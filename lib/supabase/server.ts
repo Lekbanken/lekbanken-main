@@ -89,8 +89,25 @@ export function createServiceRoleClient() {
   return createServiceRoleSupabaseClient<Database>(supabaseUrl, supabaseServiceRoleKey)
 }
 
-// Export singleton for rare admin tasks on the server only
-export const supabaseAdmin = createServiceRoleClient()
+// Lazy-loaded singleton for admin tasks on the server only.
+// Uses getter to avoid throwing during Next.js build when env var may not be set.
+let _supabaseAdmin: ReturnType<typeof createServiceRoleClient> | null = null
+
+export function getSupabaseAdmin() {
+  if (!_supabaseAdmin) {
+    _supabaseAdmin = createServiceRoleClient()
+  }
+  return _supabaseAdmin
+}
+
+/**
+ * @deprecated Use getSupabaseAdmin() instead to avoid build-time errors
+ */
+export const supabaseAdmin = new Proxy({} as ReturnType<typeof createServiceRoleClient>, {
+  get(_, prop) {
+    return getSupabaseAdmin()[prop as keyof ReturnType<typeof createServiceRoleClient>]
+  },
+})
 
 export async function getRequestTenantId() {
   const headerStore = await headers()

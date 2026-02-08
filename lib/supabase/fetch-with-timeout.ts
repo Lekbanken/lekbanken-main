@@ -91,10 +91,38 @@ export function createFetchWithTimeout(
   const logEnabled = options.log ?? process.env.NODE_ENV === 'development'
   const logPrefix = options.logPrefix ?? '[supabase fetch]'
 
+  // Track request counts per URL (dev-only) to detect duplicates
+  // Only active when SUPABASE_TRACE_BOOTSTRAP=1 to avoid console noise
+  const requestCounts = new Map<string, number>()
+  const traceBootstrap = process.env.SUPABASE_TRACE_BOOTSTRAP === '1'
+
   return async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = safeUrlString(input)
     const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase()
     const timeoutMs = pickTimeoutMs(url, timeouts)
+
+    // Dev-only: Track and log duplicate requests with call stack
+    // Opt-in via SUPABASE_TRACE_BOOTSTRAP=1 to avoid console noise
+    if (logEnabled && traceBootstrap && process.env.NODE_ENV !== 'production') {
+      const urlKey = `${method}:${url}`
+      const count = (requestCounts.get(urlKey) || 0) + 1
+      requestCounts.set(urlKey, count)
+      
+      // For bootstrap endpoints, log stack trace to identify call sites
+      const isBootstrapUrl = url.includes('/auth/v1/user') || 
+                             url.includes('/rest/v1/users?') ||
+                             url.includes('/rest/v1/user_tenant_memberships')
+      
+      if (isBootstrapUrl) {
+        const stack = new Error().stack?.split('\n').slice(2, 10).join('\n') || ''
+        console.info(`${logPrefix} TRACE #${count}`, { 
+          method, 
+          url: url.replace(/https:\/\/[^/]+/, ''), // Strip domain for readability
+          requestNum: count,
+          stack 
+        })
+      }
+    }
 
     const controller = new AbortController()
     const removeAbortListeners: Array<() => void> = []

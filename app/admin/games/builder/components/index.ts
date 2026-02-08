@@ -16,3 +16,11 @@ export { SnapshotManager } from './SnapshotManager';
 export { DecisionEditor } from './DecisionEditor';
 export { MaterialEditor } from './MaterialEditor';
 export { GameOverview, GameFlowCanvas } from './overview';
+export {
+  BuilderResolvedProvider,
+  useBuilderResolved,
+  useGatePassed,
+  useBlockingErrors,
+  useValidationCounts,
+  type BuilderResolvedContextValue,
+} from './BuilderResolvedContext';

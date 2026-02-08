@@ -1,0 +1,221 @@
+[
+  {
+    "game_key": "arkivets-sista-signal",
+    "name": "Arkivets sista signal",
+    "description": "Ett digitalt escape room där 4–8 spelare samarbetar för att tyda gamla arkivhandlingar och knäcka koder innan tiden rinner ut.",
+    "short_description": "Tyda arkivhandlingar och knäck koder i detta digitala escape room.",
+    "min_players": 4,
+    "max_players": 8,
+    "time_estimate_min": 60,
+    "energy_level": "low",
+    "location_type": "indoor",
+    "age_min": 12,
+    "age_max": 99,
+    "play_mode": "facilitated",
+    "status": "draft",
+    "locale": "sv",
+    "phases": [
+      {
+        "phase_order": 1,
+        "name": "Introduktion",
+        "phase_type": "intro",
+        "timer_style": "countdown",
+        "timer_visible": false,
+        "duration_seconds": null,
+        "description": "Välkommen till Riksarkivet.",
+        "board_message": "Välkommen till Arkivets sista signal",
+        "auto_advance": false
+      },
+      {
+        "phase_order": 2,
+        "name": "Fas 1: Kartläggning",
+        "phase_type": "round",
+        "timer_style": "countdown",
+        "timer_visible": true,
+        "duration_seconds": 900,
+        "description": "Utforska de första ledtrådarna.",
+        "board_message": "Fas 1: Kartläggning – 15 minuter",
+        "auto_advance": false
+      },
+      {
+        "phase_order": 3,
+        "name": "Fas 2: Dechiffrering",
+        "phase_type": "round",
+        "timer_style": "countdown",
+        "timer_visible": true,
+        "duration_seconds": 900,
+        "description": "Lös chiffret och koppla ihop ledtrådarna.",
+        "board_message": "Fas 2: Dechiffrering – 15 minuter",
+        "auto_advance": false
+      },
+      {
+        "phase_order": 4,
+        "name": "Avslutning",
+        "phase_type": "finale",
+        "timer_style": "countdown",
+        "timer_visible": false,
+        "duration_seconds": null,
+        "description": "Grattis! Ni har löst mysteriet.",
+        "board_message": "Mysteriet är löst!",
+        "auto_advance": false
+      }
+    ],
+    "steps": [
+      {
+        "step_order": 1,
+        "title": "Briefing",
+        "body": "Läs upp scenariot för deltagarna."
+      },
+      {
+        "step_order": 2,
+        "title": "Tilldela roller",
+        "body": "Dela ut rollkorten till deltagarna."
+      },
+      {
+        "step_order": 3,
+        "title": "Hitta det gömda dokumentet",
+        "body": "Använd UV-lampan för att avslöja det osynliga meddelandet."
+      },
+      {
+        "step_order": 4,
+        "title": "Debrief",
+        "body": "Diskutera lösningen och hur teamet samarbetade."
+      }
+    ],
+    "roles": [
+      {
+        "role_order": 1,
+        "name": "Arkivarien",
+        "public_description": "Expert på gamla dokument och handskrifter.",
+        "private_instructions": "Du vet att dokumenten från 1943 innehåller en dold kod.",
+        "min_count": 1,
+        "max_count": 2
+      },
+      {
+        "role_order": 2,
+        "name": "Kryptografen",
+        "public_description": "Specialist på koder och chiffer.",
+        "private_instructions": "Chiffret är baserat på Caesar-cipher med förskjutning 7.",
+        "min_count": 1,
+        "max_count": 2
+      },
+      {
+        "role_order": 3,
+        "name": "Historikern",
+        "public_description": "Kunnig om 1940-talets händelser.",
+        "private_instructions": "Datumen i dokumenten pekar på specifika historiska händelser.",
+        "min_count": 1,
+        "max_count": 2
+      }
+    ],
+    "artifacts": [
+      {
+        "artifact_order": 1,
+        "artifact_type": "document",
+        "title": "Arkivhandling 1943-A",
+        "description": "Ett gulnat dokument med handskriven text.",
+        "tags": ["clue", "primary"],
+        "metadata": {
+          "content": "Källa: Riksarkivet\nDatum: 17 april 1943"
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 2,
+        "artifact_type": "keypad",
+        "title": "Arkivskåpets lås",
+        "description": "En fyrsiffrig kodinmatning.",
+        "tags": ["puzzle"],
+        "metadata": {
+          "correctCode": "1943",
+          "codeLength": 4
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 3,
+        "artifact_type": "riddle",
+        "title": "Chiffergåtan",
+        "description": "Ett krypterat meddelande.",
+        "tags": ["puzzle"],
+        "metadata": {
+          "promptText": "Tyda följande meddelande: OLNUHSLU ÄY UFJRLU",
+          "correctAnswers": ["HEMLIGHET ÄR NYCKELN", "hemlighet är nyckeln"],
+          "caseSensitive": false
+        },
+        "variants": []
+      },
+      {
+        "artifact_order": 4,
+        "artifact_type": "hint_container",
+        "title": "Ledtrådar Fas 1",
+        "description": "Tips om du kör fast i första fasen.",
+        "tags": ["hints"],
+        "metadata": {
+          "hints": [
+            { "text": "Titta noga på årtalet i dokumentet." },
+            { "text": "Kartan har markeringar som bildar siffror." },
+            { "text": "Koden är årtalet då signalen sändes: 1943." }
+          ]
+        },
+        "variants": []
+      }
+    ],
+    "triggers": [
+      {
+        "name": "Arkivskåp öppnat",
+        "description": "När koden 1943 matas in korrekt",
+        "enabled": true,
+        "condition": {
+          "type": "keypad_correct",
+          "artifactOrder": 2
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🔓 Arkivskåpet är öppnat!"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 1
+      },
+      {
+        "name": "Chiffret löst",
+        "description": "När gåtan besvaras korrekt",
+        "enabled": true,
+        "condition": {
+          "type": "riddle_correct",
+          "artifactOrder": 3
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "✅ Chiffret är löst!"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 2
+      },
+      {
+        "name": "Fas 2 startar",
+        "description": "Meddelande när fas 2 börjar",
+        "enabled": true,
+        "condition": {
+          "type": "phase_started",
+          "phaseOrder": 3
+        },
+        "actions": [
+          {
+            "type": "send_message",
+            "message": "🔐 Fas 2: Dechiffrering har börjat!"
+          }
+        ],
+        "execute_once": true,
+        "delay_seconds": 0,
+        "sort_order": 3
+      }
+    ]
+  }
+]

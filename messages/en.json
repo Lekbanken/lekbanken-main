@@ -4411,6 +4411,16 @@
         "minimalJson": "Minimal JSON (1 game)",
         "orderResolution": "Order resolution in triggers",
         "orderResolutionDesc": "Triggers can reference stepOrder/phaseOrder/artifactOrder in condition/actions. Import resolves these to actual IDs.",
+        "copyPrompt": "Copy prompt",
+        "copyCsvHeader": "Copy CSV header",
+        "fixLoop": {
+          "title": "Fix-loop (Validate → Diagnose → Repair)",
+          "description": "Follow this loop when import shows errors:",
+          "step1": "<strong>Validate</strong> via dry-run in the import dialog.",
+          "step2": "<strong>Diagnose</strong> error type: UUID error, JSON escaping, or missing steps.",
+          "step3": "<strong>Repair</strong> in your file and run dry-run again.",
+          "step4": "<strong>Import</strong> only when dry-run shows green."
+        },
         "infoDialogTitle": "Information about games"
       },
       "playModes": {
@@ -8062,6 +8072,86 @@
           "mfaEnabled": "MFA enabled",
           "mfaDisabled": "MFA not enabled",
           "enableMfa": "Enable now"
+        },
+        "organizations": {
+          "title": "Organizations",
+          "description": "Manage your organizations and roles",
+          "loadError": "Could not load organizations",
+          "initError": "Could not initialize database connection.",
+          "unexpectedError": "An unexpected error occurred.",
+          "loadingTakingLong": "This is taking longer than expected. Check Console/Network to see which request is stuck and try reloading the page.",
+          "retry": "Try again",
+          "reload": "Reload",
+          "role": "Role",
+          "roles": {
+            "owner": "Owner",
+            "admin": "Administrator",
+            "editor": "Editor",
+            "member": "Member"
+          },
+          "noOrgs": "You are not a member of any organizations",
+          "noOrgsDesc": "You are not a member of any organizations. Join an organization to collaborate with others.",
+          "stats": {
+            "total": "Organizations",
+            "adminRoles": "Admin roles",
+            "activeMemberships": "Active memberships"
+          },
+          "managedOrgs": {
+            "title": "Organizations you manage",
+            "description": "Organizations where you have admin rights."
+          },
+          "memberships": {
+            "title": "Memberships",
+            "description": "Organizations you are a member of."
+          },
+          "joinedAt": "Joined {date}"
+        },
+        "preferences": {
+          "title": "Preferences",
+          "description": "Customize your experience in Lekbanken",
+          "loadError": "Could not load preferences",
+          "initError": "Could not initialize database connection.",
+          "unexpectedError": "An unexpected error occurred.",
+          "loadingTakingLong": "This is taking longer than expected. Check Console/Network to see which request is stuck and try reloading the page.",
+          "retry": "Try again",
+          "reload": "Reload",
+          "language": "Language",
+          "theme": "Theme",
+          "timezone": "Timezone",
+          "accessibility": "Accessibility",
+          "fontSize": "Text size",
+          "reducedMotion": "Reduce motion",
+          "highContrast": "High contrast",
+          "saved": "Settings saved!",
+          "save": "Save changes",
+          "saving": "Saving...",
+          "languageSection": {
+            "description": "Choose which language to use in Lekbanken."
+          },
+          "themeSection": {
+            "description": "Choose how Lekbanken should look."
+          },
+          "accessibilitySection": {
+            "description": "Customize Lekbanken for your needs.",
+            "highContrastDesc": "Increase contrast for better readability.",
+            "reduceMotionDesc": "Reduce animations and motion in the interface."
+          },
+          "animationsSection": {
+            "title": "Animations and feedback",
+            "animations": "Animations",
+            "animationsDesc": "Enable animations and transitions."
+          },
+          "uiSection": {
+            "title": "Interface",
+            "compactMode": "Compact mode",
+            "compactModeDesc": "Reduce spacing to show more content.",
+            "screenReaderMode": "Screen reader mode",
+            "screenReaderModeDesc": "Optimize for screen readers and assistive technology."
+          },
+          "dateTime": {
+            "title": "Time and date",
+            "description": "Settings for how time and date are displayed."
+          }
         }
       },
       "tenant": {

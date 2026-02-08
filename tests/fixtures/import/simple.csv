@@ -1,0 +1,2 @@
+game_key,name,short_description,play_mode,status,step_1_title,step_1_body,step_1_duration,step_2_title,step_2_body,step_2_duration
+simple-basic-001,Simple Game,A basic game for testing,basic,draft,Welcome,Welcome to the game,60,Play,Let's play!,120

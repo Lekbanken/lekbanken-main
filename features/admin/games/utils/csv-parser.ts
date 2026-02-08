@@ -82,6 +82,7 @@ export function parseCsvGames(csvContent: string): CsvParseResult {
   if (csvResult.data.length === 0) {
     errors.push({
       row: 0,
+      column: 'csv_data',
       message: 'Ingen data hittades i CSV-filen',
       severity: 'error',
     });

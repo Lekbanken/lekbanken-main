@@ -3,13 +3,20 @@
  * 
  * Handles test/live key switching based on environment
  * and provides defensive error handling.
+ * 
+ * Uses lazy initialization to allow build-time static analysis
+ * without requiring env vars at build time.
  */
 
 import Stripe from 'stripe'
 
 // ============================================================================
-// ENV VALIDATION
+// ENV HELPERS (lazy - no throws at module load)
 // ============================================================================
+
+function getOptionalEnv(key: string): string | undefined {
+  return process.env[key]
+}
 
 function getRequiredEnv(key: string): string {
   const value = process.env[key]
@@ -22,113 +29,158 @@ function getRequiredEnv(key: string): string {
   return value
 }
 
-function getOptionalEnv(key: string): string | undefined {
-  return process.env[key]
+// ============================================================================
+// LAZY KEY RESOLUTION
+// ============================================================================
+
+function getUseLiveKeys(): boolean {
+  return getOptionalEnv('STRIPE_USE_LIVE_KEYS') === 'true'
+}
+
+function getSecretKey(): string {
+  const useLive = getUseLiveKeys()
+  return useLive && getOptionalEnv('STRIPE_LIVE_SECRET_KEY')
+    ? getRequiredEnv('STRIPE_LIVE_SECRET_KEY')
+    : getRequiredEnv('STRIPE_TEST_SECRET_KEY')
+}
+
+function getPublishableKey(): string {
+  const useLive = getUseLiveKeys()
+  return useLive && getOptionalEnv('NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY')
+    ? getRequiredEnv('NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY')
+    : getRequiredEnv('NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY')
+}
+
+function getWebhookSecret(): string {
+  const useLive = getUseLiveKeys()
+  return useLive && getOptionalEnv('STRIPE_LIVE_WEBHOOK_SECRET')
+    ? getRequiredEnv('STRIPE_LIVE_WEBHOOK_SECRET')
+    : getRequiredEnv('STRIPE_TEST_WEBHOOK_SECRET')
 }
 
 // ============================================================================
-// KEY SELECTION LOGIC
+// LAZY STRIPE CLIENT (singleton pattern)
 // ============================================================================
 
-const isDevelopment = process.env.NODE_ENV === 'development'
-const isProduction = process.env.NODE_ENV === 'production'
+let _stripeInstance: Stripe | null = null
+let _validated = false
+
+function validateKeys(secretKey: string, publishableKey: string): void {
+  if (_validated) return
+  
+  if (!secretKey.startsWith('sk_')) {
+    throw new Error('Invalid STRIPE_SECRET_KEY format. Must start with sk_')
+  }
+  
+  if (!publishableKey.startsWith('pk_')) {
+    throw new Error('Invalid STRIPE_PUBLISHABLE_KEY format. Must start with pk_')
+  }
+  
+  const expectedKeyPrefix = getUseLiveKeys() ? 'live' : 'test'
+  if (!secretKey.includes(expectedKeyPrefix)) {
+    console.warn(
+      `⚠️  WARNING: Using ${getUseLiveKeys() ? 'LIVE' : 'TEST'} keys but secret key doesn't match expected pattern.`
+    )
+  }
+  
+  _validated = true
+}
+
+function getStripeClient(): Stripe {
+  if (!_stripeInstance) {
+    const secretKey = getSecretKey()
+    const publishableKey = getPublishableKey()
+    
+    validateKeys(secretKey, publishableKey)
+    
+    _stripeInstance = new Stripe(secretKey, {
+      apiVersion: '2024-06-20',
+      typescript: true,
+      maxNetworkRetries: 3,
+      timeout: 30000,
+      appInfo: {
+        name: 'Lekbanken',
+        version: '1.0.0',
+        url: 'https://lekbanken.no',
+      },
+    })
+    
+    // Log on first init in dev
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔐 Stripe Configuration:', {
+        mode: getUseLiveKeys() ? 'live' : 'test',
+        publishableKey: publishableKey.substring(0, 20) + '...',
+        hasSecretKey: true,
+        hasWebhookSecret: !!getOptionalEnv('STRIPE_TEST_WEBHOOK_SECRET') || !!getOptionalEnv('STRIPE_LIVE_WEBHOOK_SECRET'),
+      })
+    }
+  }
+  return _stripeInstance
+}
 
 /**
- * Determines which Stripe keys to use based on environment.
- * 
- * LOGIC:
- * - Always use TEST keys unless explicitly enabled via STRIPE_USE_LIVE_KEYS=true
- * - This prevents accidental live charges during development/testing
+ * Lazy-loaded Stripe client via Proxy.
+ * All method calls are forwarded to the real client on first access.
  */
-const useLiveKeys = getOptionalEnv('STRIPE_USE_LIVE_KEYS') === 'true'
-
-// Get appropriate keys (fallback to test if live not available)
-const secretKey = useLiveKeys && getOptionalEnv('STRIPE_LIVE_SECRET_KEY')
-  ? getRequiredEnv('STRIPE_LIVE_SECRET_KEY')
-  : getRequiredEnv('STRIPE_TEST_SECRET_KEY')
-
-const publishableKey = useLiveKeys && getOptionalEnv('NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY')
-  ? getRequiredEnv('NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY')
-  : getRequiredEnv('NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY')
-
-const webhookSecret = useLiveKeys && getOptionalEnv('STRIPE_LIVE_WEBHOOK_SECRET')
-  ? getRequiredEnv('STRIPE_LIVE_WEBHOOK_SECRET')
-  : getRequiredEnv('STRIPE_TEST_WEBHOOK_SECRET')
-
-// ============================================================================
-// STRIPE CLIENT INITIALIZATION
-// ============================================================================
-
-/**
- * Singleton Stripe client instance.
- * Initialized with appropriate test/live keys.
- */
-export const stripe = new Stripe(secretKey, {
-  apiVersion: '2024-06-20', // Latest supported version by current Stripe package
-  typescript: true,
-  maxNetworkRetries: 3,
-  timeout: 30000, // 30s
-  appInfo: {
-    name: 'Lekbanken',
-    version: '1.0.0',
-    url: 'https://lekbanken.no',
+export const stripe: Stripe = new Proxy({} as Stripe, {
+  get(_target, prop) {
+    const client = getStripeClient()
+    const value = client[prop as keyof Stripe]
+    if (typeof value === 'function') {
+      return value.bind(client)
+    }
+    return value
   },
 })
 
 // ============================================================================
-// EXPORTS
+// LAZY EXPORTS (getters)
 // ============================================================================
 
 /**
  * Publishable key for client-side usage.
- * Safe to expose in browser.
+ * Safe to expose in browser. Lazy-loaded.
  */
-export const stripePublishableKey = publishableKey
+export function getStripePublishableKey(): string {
+  return getPublishableKey()
+}
+
+/** @deprecated Use getStripePublishableKey() instead */
+export const stripePublishableKey = new Proxy({} as { value: string }, {
+  get(_target, prop) {
+    if (prop === 'toString' || prop === 'valueOf' || prop === Symbol.toPrimitive) {
+      return () => getPublishableKey()
+    }
+    return getPublishableKey()
+  },
+}) as unknown as string
 
 /**
  * Webhook secret for signature verification.
- * NEVER expose this to client!
+ * NEVER expose this to client! Lazy-loaded.
  */
-export const stripeWebhookSecret = webhookSecret
+export function getStripeWebhookSecret(): string {
+  return getWebhookSecret()
+}
+
+/** @deprecated Use getStripeWebhookSecret() instead */
+export const stripeWebhookSecret = new Proxy({} as { value: string }, {
+  get(_target, prop) {
+    if (prop === 'toString' || prop === 'valueOf' || prop === Symbol.toPrimitive) {
+      return () => getWebhookSecret()
+    }
+    return getWebhookSecret()
+  },
+}) as unknown as string
 
 /**
  * Indicates which key set is being used.
  */
 export const stripeConfig = {
-  useLiveKeys,
-  isDevelopment,
-  isProduction,
-  mode: useLiveKeys ? 'live' : 'test',
-} as const
-
-// ============================================================================
-// STARTUP VALIDATION
-// ============================================================================
-
-// Log configuration on startup (without exposing secrets)
-if (isDevelopment) {
-  console.log('🔐 Stripe Configuration:', {
-    mode: stripeConfig.mode,
-    publishableKey: publishableKey.substring(0, 20) + '...',
-    hasSecretKey: !!secretKey,
-    hasWebhookSecret: !!webhookSecret,
-  })
-}
-
-// Validate key format
-if (!secretKey.startsWith('sk_')) {
-  throw new Error('Invalid STRIPE_SECRET_KEY format. Must start with sk_')
-}
-
-if (!publishableKey.startsWith('pk_')) {
-  throw new Error('Invalid STRIPE_PUBLISHABLE_KEY format. Must start with pk_')
-}
-
-const expectedKeyPrefix = useLiveKeys ? 'live' : 'test'
-if (!secretKey.includes(expectedKeyPrefix)) {
-  console.warn(
-    `⚠️  WARNING: Using ${useLiveKeys ? 'LIVE' : 'TEST'} keys but secret key doesn't match expected pattern.`
-  )
+  get useLiveKeys() { return getUseLiveKeys() },
+  get isDevelopment() { return process.env.NODE_ENV === 'development' },
+  get isProduction() { return process.env.NODE_ENV === 'production' },
+  get mode() { return getUseLiveKeys() ? 'live' as const : 'test' as const },
 }
 
 // ============================================================================
@@ -140,7 +192,15 @@ if (!secretKey.includes(expectedKeyPrefix)) {
  * Use this before making Stripe API calls in conditional flows.
  */
 export function isStripeConfigured(): boolean {
-  return !!(secretKey && publishableKey && webhookSecret)
+  try {
+    // Check if keys are available without throwing
+    const hasSecret = !!getOptionalEnv('STRIPE_TEST_SECRET_KEY') || !!getOptionalEnv('STRIPE_LIVE_SECRET_KEY')
+    const hasPublishable = !!getOptionalEnv('NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY') || !!getOptionalEnv('NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY')
+    const hasWebhook = !!getOptionalEnv('STRIPE_TEST_WEBHOOK_SECRET') || !!getOptionalEnv('STRIPE_LIVE_WEBHOOK_SECRET')
+    return hasSecret && hasPublishable && hasWebhook
+  } catch {
+    return false
+  }
 }
 
 /**

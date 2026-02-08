@@ -4,7 +4,10 @@
  * ValidationPanel Component
  * 
  * Displays validation errors and warnings for the Game Builder.
- * Task 2.6 - Session Cockpit Architecture
+ * 
+ * SPRINT 2: Updated to use ResolveResult from lib/builder/resolver
+ * SPRINT 3: Fixed gate semantics, entity accessors, stable sorting
+ * @see docs/builder/SPRINT3_CONSOLIDATION_PLAN.md
  */
 
 import { useMemo, useState } from 'react';
@@ -20,16 +23,60 @@ import {
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
-import type { ValidationResult, ValidationError } from '../utils/validateGameRefs';
+import type { ResolveResult } from '@/lib/builder/resolver';
+import type { BuilderError, EntityType, BuilderGate } from '@/types/builder-error';
 
 // =============================================================================
 // Types
 // =============================================================================
 
 interface ValidationPanelProps {
-  result: ValidationResult;
+  result: ResolveResult;
   onNavigateToItem?: (section: string, itemId: string) => void;
   className?: string;
+}
+
+// =============================================================================
+// Entity Accessors (robust fallback: root OR meta)
+// =============================================================================
+
+function getEntityType(e: BuilderError): EntityType | undefined {
+  // Support both root-level and meta-level entityType
+  return (e as { entityType?: EntityType }).entityType ?? e.meta?.entityType;
+}
+
+function getEntityId(e: BuilderError): string | undefined {
+  // Support both root-level and meta-level entityId
+  return (e as { entityId?: string }).entityId ?? e.meta?.entityId;
+}
+
+// Helper to map entityType to section name for navigation
+function entityTypeToSection(entityType: EntityType | undefined): string {
+  switch (entityType) {
+    case 'step': return 'steps';
+    case 'phase': return 'phases';
+    case 'artifact': return 'artifacts';
+    case 'trigger': return 'triggers';
+    case 'role': return 'roles';
+    case 'core': return 'core';
+    default: return 'unknown';
+  }
+}
+
+// =============================================================================
+// Stable Sorting (prevents UI jitter)
+// =============================================================================
+
+const GATE_RANK: Record<BuilderGate, number> = { draft: 1, playable: 2, publish: 3 };
+const SEVERITY_RANK: Record<string, number> = { error: 1, warning: 2, info: 3 };
+
+function stableSort(items: BuilderError[]): BuilderError[] {
+  return [...items].sort((a, b) => 
+    (GATE_RANK[a.gate] ?? 9) - (GATE_RANK[b.gate] ?? 9) ||
+    (SEVERITY_RANK[a.severity] ?? 9) - (SEVERITY_RANK[b.severity] ?? 9) ||
+    a.code.localeCompare(b.code) ||
+    a.path.localeCompare(b.path)
+  );
 }
 
 // =============================================================================
@@ -40,11 +87,12 @@ function ValidationItem({
   error,
   onNavigate,
 }: {
-  error: ValidationError;
+  error: BuilderError;
   onNavigate?: () => void;
 }) {
   const t = useTranslations('admin.games.builder');
   const isError = error.severity === 'error';
+  const section = entityTypeToSection(getEntityType(error));
   
   return (
     <div
@@ -70,12 +118,16 @@ function ValidationItem({
               {error.message}
             </div>
             <div className="text-xs text-muted-foreground mt-0.5">
-              {error.section === 'triggers' && t('validation.itemPrefix.triggers')}
-              {error.section === 'artifacts' && t('validation.itemPrefix.artifacts')}
-              {error.section === 'steps' && t('validation.itemPrefix.steps')}
-              {error.section === 'phases' && t('validation.itemPrefix.phases')}
-              {error.section === 'roles' && t('validation.itemPrefix.roles')}
-              <span className="font-medium">{error.itemName}</span>
+              {section === 'triggers' && t('validation.itemPrefix.triggers')}
+              {section === 'artifacts' && t('validation.itemPrefix.artifacts')}
+              {section === 'steps' && t('validation.itemPrefix.steps')}
+              {section === 'phases' && t('validation.itemPrefix.phases')}
+              {section === 'roles' && t('validation.itemPrefix.roles')}
+              {section === 'core' && t('validation.itemPrefix.core', { defaultValue: 'Grundinfo: ' })}
+              <span className="font-medium font-mono text-xs">{error.path}</span>
+            </div>
+            <div className="text-xs text-muted-foreground/70 mt-0.5 font-mono">
+              {error.code} ({error.gate})
             </div>
             {error.suggestion && (
               <div className="text-xs text-muted-foreground mt-1 italic">
@@ -111,17 +163,31 @@ export function ValidationPanel({
   const t = useTranslations('admin.games.builder');
   const [isExpanded, setIsExpanded] = useState(true);
   
-  const { errors, warnings, isValid } = result;
+  // =========================================================================
+  // GATE SEMANTICS (SPRINT 3 FIX)
+  // - isDraftOk:    draft gate passed (structure valid)
+  // - isPlayableOk: playable gate passed (can test/publish)
+  // - publishBlocked should show when !isPlayableOk, not !isDraftOk
+  // =========================================================================
+  const errors = result.errors;  // Trust contract: all are severity='error'
+  const warnings = result.warnings;
+  const isDraftOk = result.isGatePassed('draft');
+  const isPlayableOk = result.isGatePassed('playable');
   const hasIssues = errors.length > 0 || warnings.length > 0;
   
-  // Group by section
+  // Group by entity type with stable sorting
   const grouped = useMemo(() => {
-    const groups: Record<string, ValidationError[]> = {};
+    const groups: Record<string, BuilderError[]> = {};
     
     for (const error of [...errors, ...warnings]) {
-      const section = error.section;
+      const section = entityTypeToSection(getEntityType(error));
       if (!groups[section]) groups[section] = [];
       groups[section].push(error);
+    }
+    
+    // Apply stable sort to each group
+    for (const section of Object.keys(groups)) {
+      groups[section] = stableSort(groups[section]);
     }
     
     return groups;
@@ -151,14 +217,17 @@ export function ValidationPanel({
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
           'w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors',
-          !isValid && 'bg-destructive/5'
+          !isPlayableOk && 'bg-destructive/5',
+          isPlayableOk && !isDraftOk && 'bg-warning/5'
         )}
       >
         <div className="flex items-center gap-3">
-          {!isValid ? (
+          {!isPlayableOk ? (
             <ExclamationCircleIcon className="h-6 w-6 text-destructive" />
-          ) : (
+          ) : warnings.length > 0 ? (
             <ExclamationTriangleIcon className="h-6 w-6 text-warning" />
+          ) : (
+            <CheckCircleIcon className="h-6 w-6 text-emerald-500" />
           )}
           <div className="text-left">
             <div className="font-medium text-foreground">
@@ -209,24 +278,29 @@ export function ValidationPanel({
                 {section === 'steps' && t('validation.section.steps')}
                 {section === 'phases' && t('validation.section.phases')}
                 {section === 'roles' && t('validation.section.roles')}
+                {section === 'core' && t('validation.section.core', { defaultValue: 'Grundinfo' })}
+                {section === 'unknown' && 'Övrigt'}
               </div>
               <div className="space-y-2">
-                {items.map((item) => (
-                  <ValidationItem
-                    key={item.id}
-                    error={item}
-                    onNavigate={
-                      onNavigateToItem
-                        ? () => onNavigateToItem(item.section, item.itemId)
-                        : undefined
-                    }
-                  />
-                ))}
+                {items.map((item, idx) => {
+                  const entityId = getEntityId(item);
+                  return (
+                    <ValidationItem
+                      key={entityId ? `${item.code}-${entityId}-${item.path}-${idx}` : `${item.code}-${item.path}-${idx}`}
+                      error={item}
+                      onNavigate={
+                        onNavigateToItem && entityId
+                          ? () => onNavigateToItem(section, entityId)
+                          : undefined
+                      }
+                    />
+                  );
+                })}
               </div>
             </div>
           ))}
           
-          {!isValid && (
+          {!isPlayableOk && (
             <div className="pt-2 border-t">
               <div className="text-sm text-destructive font-medium">
                 {t('validation.publishBlocked')}

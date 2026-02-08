@@ -709,7 +709,9 @@
     "confirm": {
       "defaultConfirm": "Bekräfta",
       "defaultCancel": "Avbryt",
-      "typeToConfirm": "Skriv följande för att bekräfta:"
+      "typeToConfirm": "Skriv följande för att bekräfta:",
+      "waiting": "Vänta...",
+      "typePlaceholder": "Skriv {confirmText} för att bekräfta"
     },
     "commandPalette": {
       "searchPlaceholder": "Sök kommandon, navigera...",
@@ -4330,6 +4332,22 @@
     "games": {
       "pageTitle": "Spelhantering",
       "gameOverview": "Spelöversikt",
+      "bulk": {
+        "selectedCount": "{count} valda",
+        "ofTotal": "av {total} totalt",
+        "selectAll": "Markera alla ({count})",
+        "deselect": "Avmarkera",
+        "export": {
+          "title": "Exportera spel",
+          "description": "Exportera {count} valda spel.",
+          "formatLabel": "Format",
+          "includeRelations": "Inkludera relationer (steg, faser, roller, etc.)",
+          "jsonNote": "JSON-format inkluderar all relaterad data och kan importeras igen.",
+          "cancel": "Avbryt",
+          "exporting": "Exporterar...",
+          "exportButton": "Exportera"
+        }
+      },
       "import": {
         "title": "Importera spel",
         "description": "Ladda upp en CSV- eller JSON-fil för att importera spel.",
@@ -4363,7 +4381,12 @@
           "name": "Namn",
           "mode": "Läge",
           "status": "Status",
-          "steps": "Steg"
+          "steps": "Steg",
+          "phases": "Faser",
+          "artifacts": "Artefakter",
+          "triggers": "Triggers",
+          "roles": "Roller",
+          "artifactTypes": "Artefakt-typer"
         },
         "statusPublished": "Publicerad",
         "statusDraft": "Utkast",
@@ -4420,6 +4443,16 @@
         "minimalJson": "Minimal JSON (1 lek)",
         "orderResolution": "Order-resolution i triggers",
         "orderResolutionDesc": "Triggers kan referera till stepOrder/phaseOrder/artifactOrder i condition/actions. Importen resolverar det till faktiska ID:n.",
+        "copyPrompt": "Kopiera prompt",
+        "copyCsvHeader": "Kopiera CSV-header",
+        "fixLoop": {
+          "title": "Fix-loop (Validera → Diagnostisera → Reparera)",
+          "description": "Följ denna loop när importen visar fel:",
+          "step1": "<strong>Validera</strong> via dry-run i import-dialogen.",
+          "step2": "<strong>Diagnostisera</strong> feltypen: UUID-fel, JSON-escaping eller saknade steg.",
+          "step3": "<strong>Reparera</strong> i din fil och kör dry-run igen.",
+          "step4": "<strong>Importera</strong> först när dry-run visar grönt."
+        },
         "infoDialogTitle": "Information om lekar"
       },
       "export": {
@@ -5765,14 +5798,16 @@
             "artifacts": "📦 Artefakter",
             "steps": "📝 Steg",
             "phases": "🎬 Faser",
-            "roles": "👤 Roller"
+            "roles": "👤 Roller",
+            "core": "ℹ️ Grundinfo"
           },
           "itemPrefix": {
             "triggers": "🎯 Trigger: ",
             "artifacts": "📦 Artefakt: ",
             "steps": "📝 Steg: ",
             "phases": "🎬 Fas: ",
-            "roles": "👤 Roll: "
+            "roles": "👤 Roll: ",
+            "core": "ℹ️ Grundinfo: "
           },
           "navigate": "Gå till",
           "publishBlocked": "⚠️ Spelet kan inte publiceras förrän alla fel är åtgärdade"
@@ -8698,6 +8733,12 @@
         "preferences": {
           "title": "Preferenser",
           "description": "Anpassa din upplevelse i Lekbanken",
+          "loadError": "Kunde inte ladda preferenser",
+          "initError": "Det gick inte att initiera anslutningen till databasen.",
+          "unexpectedError": "Ett oväntat fel inträffade.",
+          "loadingTakingLong": "Det här tar ovanligt lång tid. Kolla Console/Network för vilken request som fastnat och prova att ladda om sidan.",
+          "retry": "Försök igen",
+          "reload": "Ladda om",
           "language": "Språk",
           "theme": "Tema",
           "showThemeToggle": "Visa tema-omkopplare i headern",
@@ -8761,6 +8802,12 @@
         "organizations": {
           "title": "Organisationer",
           "description": "Hantera dina organisationstillhörigheter och roller",
+          "loadError": "Kunde inte ladda organisationer",
+          "initError": "Det gick inte att initiera anslutningen till databasen.",
+          "unexpectedError": "Ett oväntat fel inträffade.",
+          "loadingTakingLong": "Det här tar ovanligt lång tid. Kolla Console/Network för vilken request som fastnat och prova att ladda om sidan.",
+          "retry": "Försök igen",
+          "reload": "Ladda om",
           "role": "Roll",
           "roles": {
             "owner": "Ägare",

@@ -321,9 +321,30 @@ export type ImportStats = {
   skipped: number;
 };
 
+/**
+ * Cover assignment statistics per purpose (for UI grouping)
+ */
+export type CoverStatsByPurpose = {
+  purposeId: string | null;
+  purposeName?: string; // Optional: enriched from purposes table
+  count: number;
+};
+
+/**
+ * Cover assignment statistics returned after successful import
+ */
+export type CoverStats = {
+  assigned: number;
+  skippedExisting: number;
+  missingTemplates: number;
+  missingTemplatesByPurpose: CoverStatsByPurpose[];
+};
+
 export type ImportResult = {
   success: boolean;
+  importRunId?: string;
   stats: ImportStats;
+  coverStats?: CoverStats;
   errors: ImportError[];
   warnings: ImportError[];
   preview?: GamePreview[];
@@ -350,6 +371,15 @@ export type DryRunGamePreview = {
   play_mode: PlayMode;
   status: 'draft' | 'published';
   steps?: ParsedStep[];
+  
+  // Advanced data counts (for UI preview)
+  phases_count: number;
+  artifacts_count: number;
+  triggers_count: number;
+  roles_count: number;
+  
+  // Artifact types present (for quick inspection)
+  artifact_types: string[];
 };
 
 // =============================================================================

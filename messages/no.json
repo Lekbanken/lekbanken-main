@@ -4692,6 +4692,16 @@
         "minimalJson": "Minimal JSON (1 spill)",
         "orderResolution": "Order-oppløsning i triggere",
         "orderResolutionDesc": "Triggere kan referere til stepOrder/phaseOrder/artifactOrder i condition/actions. Importen løser disse til faktiske ID-er.",
+        "copyPrompt": "Kopier prompt",
+        "copyCsvHeader": "Kopier CSV-header",
+        "fixLoop": {
+          "title": "Fix-loop (Valider → Diagnostiser → Reparer)",
+          "description": "Følg denne loopen når importen viser feil:",
+          "step1": "<strong>Valider</strong> via dry-run i import-dialogen.",
+          "step2": "<strong>Diagnostiser</strong> feiltype: UUID-feil, JSON-escaping eller manglende steg.",
+          "step3": "<strong>Reparer</strong> i filen din og kjør dry-run igjen.",
+          "step4": "<strong>Importer</strong> først når dry-run viser grønt."
+        },
         "infoDialogTitle": "Informasjon om spill"
       },
       "export": {
@@ -8199,6 +8209,86 @@
           "contact": {
             "title": "Kontakt oss",
             "description": "For GDPR-forespørsler eller spørsmål om dine personopplysninger, kontakt oss via e-post."
+          }
+        },
+        "organizations": {
+          "title": "Organisasjoner",
+          "description": "Administrer organisasjonstilhørighet og roller",
+          "loadError": "Kunne ikke laste organisasjoner",
+          "initError": "Kunne ikke initialisere databasetilkoblingen.",
+          "unexpectedError": "En uventet feil oppstod.",
+          "loadingTakingLong": "Dette tar uvanlig lang tid. Sjekk Console/Network for å se hvilken forespørsel som henger og prøv å laste siden på nytt.",
+          "retry": "Prøv igjen",
+          "reload": "Last på nytt",
+          "role": "Rolle",
+          "roles": {
+            "owner": "Eier",
+            "admin": "Administrator",
+            "editor": "Redaktør",
+            "member": "Medlem"
+          },
+          "noOrgs": "Du er ikke medlem av noen organisasjoner",
+          "noOrgsDesc": "Du er ikke medlem av noen organisasjoner. Bli med i en organisasjon for å samarbeide med andre.",
+          "stats": {
+            "total": "Organisasjoner",
+            "adminRoles": "Admin-roller",
+            "activeMemberships": "Aktive medlemskap"
+          },
+          "managedOrgs": {
+            "title": "Organisasjoner du administrerer",
+            "description": "Organisasjoner der du har administrative rettigheter."
+          },
+          "memberships": {
+            "title": "Medlemskap",
+            "description": "Organisasjoner du er medlem av."
+          },
+          "joinedAt": "Ble med {date}"
+        },
+        "preferences": {
+          "title": "Preferanser",
+          "description": "Tilpass opplevelsen din i Lekbanken",
+          "loadError": "Kunne ikke laste preferanser",
+          "initError": "Kunne ikke initialisere databasetilkoblingen.",
+          "unexpectedError": "En uventet feil oppstod.",
+          "loadingTakingLong": "Dette tar uvanlig lang tid. Sjekk Console/Network for å se hvilken forespørsel som henger og prøv å laste siden på nytt.",
+          "retry": "Prøv igjen",
+          "reload": "Last på nytt",
+          "language": "Språk",
+          "theme": "Tema",
+          "timezone": "Tidssone",
+          "accessibility": "Tilgjengelighet",
+          "fontSize": "Tekststørrelse",
+          "reducedMotion": "Reduser bevegelse",
+          "highContrast": "Høy kontrast",
+          "saved": "Innstillingene er lagret!",
+          "save": "Lagre endringer",
+          "saving": "Lagrer...",
+          "languageSection": {
+            "description": "Velg hvilket språk du vil bruke i Lekbanken."
+          },
+          "themeSection": {
+            "description": "Velg hvordan Lekbanken skal se ut."
+          },
+          "accessibilitySection": {
+            "description": "Tilpass Lekbanken for dine behov.",
+            "highContrastDesc": "Øk kontrasten for bedre lesbarhet.",
+            "reduceMotionDesc": "Reduser animasjoner og bevegelse i grensesnittet."
+          },
+          "animationsSection": {
+            "title": "Animasjoner og tilbakemeldinger",
+            "animations": "Animasjoner",
+            "animationsDesc": "Aktiver animasjoner og overganger."
+          },
+          "uiSection": {
+            "title": "Grensesnitt",
+            "compactMode": "Kompakt modus",
+            "compactModeDesc": "Reduser avstand for å vise mer innhold.",
+            "screenReaderMode": "Skjermlesermodus",
+            "screenReaderModeDesc": "Optimaliser for skjermlesere og hjelpemidler."
+          },
+          "dateTime": {
+            "title": "Tid og dato",
+            "description": "Innstillinger for hvordan tid og dato vises."
           }
         }
       },

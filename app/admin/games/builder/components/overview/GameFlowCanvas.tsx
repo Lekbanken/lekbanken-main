@@ -203,7 +203,7 @@ function GameFlowCanvasInner({ state, onNavigate }: GameFlowCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
   
   // Derive nodes and edges from state (includes validation)
-  const { nodes: derivedNodes, edges: derivedEdges, validationResult } = useGameFlowGraph(state);
+  const { nodes: derivedNodes, edges: derivedEdges, resolverResult } = useGameFlowGraph(state);
 
   // React Flow state (allows for internal updates like dragging)
   // Using 'any' to avoid React Flow's strict generic typing issues
@@ -335,8 +335,8 @@ function GameFlowCanvasInner({ state, onNavigate }: GameFlowCanvasProps) {
   const triggerCount = state.triggers.length;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const unresolvedCount = edges.filter((e: any) => e.data?.unresolved).length;
-  const errorCount = validationResult.counts.errors;
-  const warningCount = validationResult.counts.warnings;
+  const errorCount = resolverResult.counts.errors;
+  const warningCount = resolverResult.counts.warnings;
 
   // Empty state
   if (phaseCount === 0 && stepCount === 0 && artifactCount === 0) {

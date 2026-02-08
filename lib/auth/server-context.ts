@@ -8,13 +8,55 @@ import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import type { AuthContext, UserProfile } from '@/types/auth'
 import type { TenantMembership, TenantRole, TenantWithMembership } from '@/types/tenant'
 
-export async function getServerAuthContext(pathname?: string): Promise<AuthContext> {
-  return getServerAuthContextCached(pathname)
+/**
+ * Core user data that doesn't depend on pathname.
+ * This is cached ONCE per request regardless of pathname variations.
+ */
+interface ServerUserData {
+  user: AuthContext['user']
+  profile: UserProfile | null
+  effectiveGlobalRole: AuthContext['effectiveGlobalRole']
+  memberships: TenantMembership[]
 }
 
-// Cache within a single request to prevent duplicated `auth.getUser()` and related queries.
-const getServerAuthContextCached = cache(async (pathname?: string): Promise<AuthContext> => {
-  const cookieStore = await cookies()
+/**
+ * Request-scoped unique ID for tracing.
+ * Uses cache() to ensure same ID across all calls within a request.
+ * Useful for distinguishing "2x in same request" (bug) vs "2x across requests" (OK).
+ */
+const getRequestId = cache(() => crypto.randomUUID().slice(0, 8))
+
+/**
+ * Request-scoped counter for detecting cache() failures.
+ * Uses cache() itself to ensure counter is per-request, not global.
+ * Only active in development when SUPABASE_TRACE_BOOTSTRAP=1.
+ */
+const getBootstrapCallCounter = cache(() => ({ count: 0 }))
+
+/**
+ * Cached fetcher for user data - NO pathname in cache key.
+ * This ensures auth.getUser() and profile/membership queries only run ONCE per request,
+ * even if getServerAuthContext() is called with different pathnames.
+ */
+const getServerUserDataCached = cache(async (): Promise<ServerUserData> => {
+  // Dev-only: Detect if cache() is not working as expected
+  // Opt-in via SUPABASE_TRACE_BOOTSTRAP=1 to avoid console noise
+  if (process.env.NODE_ENV !== 'production' && process.env.SUPABASE_TRACE_BOOTSTRAP === '1') {
+    const requestId = getRequestId()
+    const counter = getBootstrapCallCounter()
+    counter.count++
+    
+    console.info(`[bootstrap] requestId=${requestId} call #${counter.count}`)
+    
+    if (counter.count > 1) {
+      const stack = new Error().stack?.split('\n').slice(2, 8).join('\n') || ''
+      console.warn(
+        `[getServerUserDataCached] WARNING: Bootstrap called ${counter.count}x in same request (${requestId})! ` +
+        `This indicates cache() is not deduplicating correctly.\n${stack}`
+      )
+    }
+  }
+
   const supabase = await createServerRlsClient()
   const {
     data: { user },
@@ -26,8 +68,6 @@ const getServerAuthContextCached = cache(async (pathname?: string): Promise<Auth
       profile: null,
       effectiveGlobalRole: null,
       memberships: [],
-      activeTenant: null,
-      activeTenantRole: null,
     }
   }
 
@@ -57,18 +97,43 @@ const getServerAuthContextCached = cache(async (pathname?: string): Promise<Auth
   const memberships = (membershipsResult.data as TenantMembership[] | null) ?? []
   const effectiveGlobalRole = deriveEffectiveGlobalRole(profile, user)
 
-  const { tenant, tenantRole } = await resolveTenant({
-    pathname,
-    cookieStore,
-    memberships,
-  })
-
   return {
     user,
     profile,
     effectiveGlobalRole,
     memberships,
+  }
+})
+
+export async function getServerAuthContext(pathname?: string): Promise<AuthContext> {
+  // Get user data from request-scoped cache (same for all pathname variations)
+  const userData = await getServerUserDataCached()
+
+  if (!userData.user) {
+    return {
+      user: null,
+      profile: null,
+      effectiveGlobalRole: null,
+      memberships: [],
+      activeTenant: null,
+      activeTenantRole: null,
+    }
+  }
+
+  // Resolve tenant based on pathname (this is the only pathname-dependent part)
+  const cookieStore = await cookies()
+  const { tenant, tenantRole } = await resolveTenant({
+    pathname,
+    cookieStore,
+    memberships: userData.memberships,
+  })
+
+  return {
+    user: userData.user,
+    profile: userData.profile,
+    effectiveGlobalRole: userData.effectiveGlobalRole,
+    memberships: userData.memberships,
     activeTenant: tenant as TenantWithMembership | null,
     activeTenantRole: (tenantRole as TenantRole | null) ?? null,
   }
-})
+}

@@ -3,13 +3,22 @@
  *
  * Derives React Flow nodes and edges from GameBuilderState.
  * This hook transforms the builder state into a format suitable for React Flow visualization.
+ *
+ * SPRINT 2: Migrated from validateGameRefs to resolveDraft
+ * @see docs/builder/SPRINT2_WIRING_PLAN.md
  */
 
 import { useMemo } from 'react';
 import type { GameBuilderState, StepData, PhaseData } from '@/types/game-builder-state';
 import type { ArtifactFormData } from '@/types/games';
 import type { TriggerCondition, TriggerAction } from '@/types/trigger';
-import { validateGameRefs, type ValidationError } from '../../utils/validateGameRefs';
+import {
+  resolveDraft,
+  errorsForEntity,
+  type ResolveResult,
+} from '@/lib/builder/resolver';
+import type { BuilderError } from '@/types/builder-error';
+import { getArtifactStepId } from '@/lib/builder/normalize';
 
 // ============================================================================
 // Types
@@ -21,12 +30,12 @@ export type FlowNode = any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FlowEdge = any;
 
-/** Validation info attached to nodes */
+/** Validation info attached to nodes - using BuilderError from resolver */
 export interface NodeValidation {
   hasErrors: boolean;
   hasWarnings: boolean;
-  errors: ValidationError[];
-  warnings: ValidationError[];
+  errors: BuilderError[];
+  warnings: BuilderError[];
 }
 
 export interface PhaseNodeData {
@@ -173,49 +182,32 @@ function entityExists(
 export function useGameFlowGraph(state: GameBuilderState): {
   nodes: FlowNode[];
   edges: FlowEdge[];
-  validationResult: ReturnType<typeof validateGameRefs>;
+  resolverResult: ResolveResult;
 } {
   return useMemo(() => {
     const nodes: FlowNode[] = [];
     const edges: FlowEdge[] = [];
 
-    // Run validation
-    const validationResult = validateGameRefs({
+    // Run validation using resolveDraft (single source of truth)
+    // Filter triggers to only include those with id (TriggerFormData has id?: string)
+    const triggersWithId = state.triggers.filter((t): t is typeof t & { id: string } => !!t.id);
+    const resolverResult = resolveDraft({
+      core: {
+        name: '', // Not needed for graph validation
+        main_purpose_id: '',
+      },
+      steps: state.steps,
+      phases: state.phases,
       artifacts: state.artifacts,
-      triggers: state.triggers
-        .filter((t) => t.id) // Filter out triggers without ID
-        .map((t) => ({
-          id: t.id as string,
-          name: t.name,
-          enabled: t.enabled,
-          condition: t.condition,
-          actions: t.actions,
-        })),
-      steps: state.steps.map((s) => ({ id: s.id, title: s.title })),
-      phases: state.phases.map((p) => ({ id: p.id, name: p.name })),
-      roles: state.roles.map((r) => ({ id: r.id, name: r.name })),
+      triggers: triggersWithId,
+      roles: state.roles,
     });
 
-    // Build validation lookup maps by entity ID
-    const errorsByEntity = new Map<string, ValidationError[]>();
-    const warningsByEntity = new Map<string, ValidationError[]>();
-
-    for (const error of validationResult.errors) {
-      const key = `${error.section}-${error.itemId}`;
-      if (!errorsByEntity.has(key)) errorsByEntity.set(key, []);
-      errorsByEntity.get(key)!.push(error);
-    }
-    for (const warning of validationResult.warnings) {
-      const key = `${warning.section}-${warning.itemId}`;
-      if (!warningsByEntity.has(key)) warningsByEntity.set(key, []);
-      warningsByEntity.get(key)!.push(warning);
-    }
-
-    /** Get validation for a specific entity */
-    const getValidation = (section: string, itemId: string): NodeValidation => {
-      const key = `${section}-${itemId}`;
-      const errors = errorsByEntity.get(key) || [];
-      const warnings = warningsByEntity.get(key) || [];
+    /** Get validation for a specific entity using resolver helpers */
+    const getValidation = (entityType: 'step' | 'phase' | 'artifact' | 'trigger' | 'role', entityId: string): NodeValidation => {
+      const entityErrors = errorsForEntity(resolverResult.errors, entityType, entityId);
+      const errors = entityErrors.filter(e => e.severity === 'error');
+      const warnings = entityErrors.filter(e => e.severity === 'warning');
       return {
         hasErrors: errors.length > 0,
         hasWarnings: warnings.length > 0,
@@ -295,7 +287,7 @@ export function useGameFlowGraph(state: GameBuilderState): {
             label: step.title || `Steg ${idx + 1}`,
             stepIndex: idx,
             phaseId: null,
-            validation: getValidation('steps', step.id),
+            validation: getValidation('step', step.id),
           },
           style: { width: PHASE_WIDTH - PHASE_PADDING * 2 },
         });
@@ -323,7 +315,7 @@ export function useGameFlowGraph(state: GameBuilderState): {
           label: phase.name || `Fas ${phaseIdx + 1}`,
           phaseIndex: phaseIdx,
           stepCount: phaseSteps.length,
-          validation: getValidation('phases', phase.id),
+          validation: getValidation('phase', phase.id),
         },
         style: {
           width: PHASE_WIDTH,
@@ -348,7 +340,7 @@ export function useGameFlowGraph(state: GameBuilderState): {
             label: step.title || `Steg ${stepIdx + 1}`,
             stepIndex: stepIdx,
             phaseId: phase.id,
-            validation: getValidation('steps', step.id),
+            validation: getValidation('step', step.id),
           },
           style: { width: PHASE_WIDTH - PHASE_PADDING * 2 },
         });
@@ -371,10 +363,33 @@ export function useGameFlowGraph(state: GameBuilderState): {
           artifact,
           label: artifact.title || `Artefakt ${idx + 1}`,
           artifactIndex: idx,
-          validation: getValidation('artifacts', artifact.id),
+          validation: getValidation('artifact', artifact.id),
         },
         style: { width: ARTIFACT_WIDTH },
       });
+
+      // Create Artifact→Step edge if artifact has metadata.step_id
+      const stepId = getArtifactStepId(artifact);
+      if (stepId) {
+        const stepExists = state.steps.some((s) => s.id === stepId);
+        edges.push({
+          id: `artifact-step-${artifact.id}-${stepId}`,
+          source: `artifact-${artifact.id}`,
+          target: `step-${stepId}`,
+          type: 'artifactStepEdge',
+          animated: false,
+          data: {
+            artifactId: artifact.id,
+            stepId,
+            unresolved: !stepExists,
+          },
+          style: {
+            stroke: stepExists ? '#6366f1' : '#ef4444', // indigo or red
+            strokeDasharray: stepExists ? '3,3' : '5,5',
+            strokeWidth: 1,
+          },
+        });
+      }
     });
 
     // Create edges from triggers
@@ -414,7 +429,7 @@ export function useGameFlowGraph(state: GameBuilderState): {
       });
     });
 
-    return { nodes, edges, validationResult };
+    return { nodes, edges, resolverResult };
   }, [state]);
 }
 

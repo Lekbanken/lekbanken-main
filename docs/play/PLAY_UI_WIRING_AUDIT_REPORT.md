@@ -1,9 +1,9 @@
 # Play UI Wiring Audit Report
 ## UI → API → DB Field Mapping (SSoT + Evidence)
 
-**Version:** 2.5  
+**Version:** 2.7  
 **Date:** 2026-02-09  
-**Status:** Reference Document (Verified + Full Contract Tests + Staging Runbook)  
+**Status:** Reference Document (Verified + Full Contract Tests + **Staging Verified**)  
 **Scope:** All Play domain UI components, API endpoints, and database tables
 
 ---
@@ -12,6 +12,8 @@
 
 | Version | Date | Changes |
 |---------|------|------|
+| v2.7 | 2026-02-09 | ✅ **play_mode routing complete:** Host/participant views gate on basic/facilitated/participants |
+| v2.6 | 2026-02-09 | ✅ **Staging verification complete:** C1/C2/C3 RPC tests passed, session_events logging verified |
 | v2.5 | 2026-02-09 | ✅ Types regenerated, TS cast removed, staging verification runbook added |
 | v2.4 | 2026-02-08 | ✅ Trigger Engine hardening: execute_once guard, idempotency, atomic RPC |
 | v2.3 | 2026-02-08 | ✅ Step index vs step_order audit + contract tests (13 tests) |
@@ -473,10 +475,27 @@ This document provides a complete field-level audit of the Play UI wiring:
 
 | Gap | Description | Priority | Status |
 |-----|-------------|----------|--------|
-| `play_mode` routing | UI doesn't adapt based on `basic`/`facilitated`/`participants` | P1 | Open |
+| `play_mode` routing | UI adapts based on `basic`/`facilitated`/`participants` | P1 | ✅ FIXED (v2.7) |
 | Offline resilience | Board has safe-mode, but could be stronger | P2 | Open |
 | Step-phase linkage | `phaseId` now exposed in `/game` endpoint, available for future use | P2 | ✅ AVAILABLE |
 | Trigger engine | execute_once guard, idempotency, atomic RPC, logging | P1 | ✅ FIXED (v2.4) |
+
+### Bugs Fixed (v2.7)
+
+| Bug | Severity | Fix | Evidence |
+|-----|----------|-----|----------|
+| HostPlayMode `participants` fallthrough | HIGH | Added explicit `case 'participants'` → FacilitatedPlayView | [HostPlayMode.tsx#L353-L378](../../features/play/components/HostPlayMode.tsx) |
+| ParticipantPlayMode no gating | MEDIUM | Added playMode gating: basic → "Follow Board" card | [ParticipantPlayMode.tsx#L120-L138](../../features/play/components/ParticipantPlayMode.tsx) |
+| No contract tests for routing | MEDIUM | Created 31 contract tests (19 pure + 12 component) | [play-mode-routing-contract.test.ts](../../tests/unit/play/play-mode-routing-contract.test.ts), [play-mode-routing-components.contract.test.tsx](../../tests/unit/play/play-mode-routing-components.contract.test.tsx) |
+
+**Contract Test Categories (31 tests):**
+
+| Category | Test File | Count | Scope |
+|----------|-----------|-------|-------|
+| Pure function | `play-mode-routing-contract.test.ts` | 19 | `determineViewType`, routing matrix, degradation |
+| Component render | `play-mode-routing-components.contract.test.tsx` | 12 | H1-H4 Host switch, P1-P6 Participant gating |
+
+**Test setup:** Centralized `@testing-library/jest-dom/vitest` import in [tests/setup.ts](../../tests/setup.ts), referenced via `vitest.config.ts` `setupFiles`.
 
 ### Bugs Fixed (v2.4)
 

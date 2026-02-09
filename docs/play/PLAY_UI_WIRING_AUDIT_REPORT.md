@@ -515,8 +515,10 @@ SELECT EXISTS(
 
 ### 10.2 Find Test Data
 
+> **⚠️ IMPORTANT:** Replace `<GAME_ID>`, `<SESSION_ID>`, and `<TRIGGER_ID>` with actual UUIDs from your query results before running!
+
 ```sql
--- Find active sessions with triggers
+-- STEP 1: Find active sessions with triggers (copy a session_id and game_id from results)
 SELECT
   ps.id AS session_id,
   ps.session_code,
@@ -530,46 +532,52 @@ GROUP BY ps.id, ps.session_code, ps.status, ps.game_id
 ORDER BY trigger_count DESC, ps.updated_at DESC
 LIMIT 10;
 
--- List triggers for a game (paste game_id)
+-- STEP 2: List triggers for a game (replace YOUR_GAME_ID with actual UUID from step 1)
+-- Example: WHERE gt.game_id = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
 SELECT
   gt.id AS game_trigger_id,
   gt.name,
   gt.execute_once,
   gt.enabled
 FROM public.game_triggers gt
-WHERE gt.game_id = '<GAME_ID>'
+WHERE gt.game_id = 'YOUR_GAME_ID_HERE'
 ORDER BY gt.created_at ASC;
 ```
 
 ### 10.3 DB-Level RPC Sanity Test
 
+> **⚠️ Replace `YOUR_SESSION_ID` and `YOUR_TRIGGER_ID` with actual UUIDs from step 10.2!**
+
 ```sql
 -- C1: First fire → expect status='fired'
+-- Example: p_session_id := 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'::uuid
 SELECT * FROM public.fire_trigger_v2_safe(
-  p_session_id := '<SESSION_ID>'::uuid,
-  p_game_trigger_id := '<TRIGGER_ID>'::uuid,
+  p_session_id := 'YOUR_SESSION_ID'::uuid,
+  p_game_trigger_id := 'YOUR_TRIGGER_ID'::uuid,
   p_idempotency_key := 'test-key-1',
   p_actor_user_id := NULL
 );
 
 -- C2: Replay with same key → expect status='noop', replay=true
 SELECT * FROM public.fire_trigger_v2_safe(
-  p_session_id := '<SESSION_ID>'::uuid,
-  p_game_trigger_id := '<TRIGGER_ID>'::uuid,
+  p_session_id := 'YOUR_SESSION_ID'::uuid,
+  p_game_trigger_id := 'YOUR_TRIGGER_ID'::uuid,
   p_idempotency_key := 'test-key-1',
   p_actor_user_id := NULL
 );
 
 -- C3: execute_once with new key → expect status='noop', reason='EXECUTE_ONCE_ALREADY_FIRED'
 SELECT * FROM public.fire_trigger_v2_safe(
-  p_session_id := '<SESSION_ID>'::uuid,
-  p_game_trigger_id := '<TRIGGER_ID>'::uuid,
+  p_session_id := 'YOUR_SESSION_ID'::uuid,
+  p_game_trigger_id := 'YOUR_TRIGGER_ID'::uuid,
   p_idempotency_key := 'test-key-2',
   p_actor_user_id := NULL
 );
 ```
 
 ### 10.4 Verify State & Events
+
+> **⚠️ Replace `YOUR_SESSION_ID` and `YOUR_TRIGGER_ID` with actual UUIDs!**
 
 ```sql
 -- Check trigger state
@@ -578,11 +586,10 @@ SELECT
   sts.game_trigger_id,
   sts.status,
   sts.fired_count,
-  sts.fired_at,
-  sts.last_error
+  sts.fired_at
 FROM public.session_trigger_state sts
-WHERE sts.session_id = '<SESSION_ID>'::uuid
-  AND sts.game_trigger_id = '<TRIGGER_ID>'::uuid;
+WHERE sts.session_id = 'YOUR_SESSION_ID'::uuid
+  AND sts.game_trigger_id = 'YOUR_TRIGGER_ID'::uuid;
 
 -- Check session_events logging
 SELECT
@@ -590,7 +597,7 @@ SELECT
   event_type,
   payload
 FROM public.session_events
-WHERE session_id = '<SESSION_ID>'::uuid
+WHERE session_id = 'YOUR_SESSION_ID'::uuid
   AND event_type = 'trigger_fire'
 ORDER BY created_at DESC
 LIMIT 10;

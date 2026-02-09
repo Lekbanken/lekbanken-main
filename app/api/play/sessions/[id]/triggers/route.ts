@@ -1,15 +1,17 @@
 /**
  * Session Triggers API (V2)
- * 
+ *
  * GET: List triggers with config from game_triggers + state from session_trigger_state
  * POST: DEPRECATED - returns 410 Gone (no snapshot needed in V2)
  * PATCH: Update trigger status (fire, disable, arm)
- * 
+ *
  * V2 Architecture:
  * - Config (condition, actions, execute_once, etc.) read from game_triggers
  * - Runtime state (status, fired_count, fired_at) stored in session_trigger_state
- * 
+ *
  * Host-only endpoint.
+ *
+ * @see docs/play/TRIGGER_ENGINE_CONTRACT.md for invariants & RPC contract
  */
 
 import { NextResponse } from 'next/server';

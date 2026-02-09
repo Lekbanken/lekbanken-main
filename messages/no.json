@@ -348,6 +348,14 @@
         "browseAction": "Utforsk aktiviteter"
       }
     },
+    "tenant": {
+      "personal": "Min konto",
+      "selectTenant": "Velg konto",
+      "sectionPersonal": "Personlig",
+      "sectionOrganizations": "Organisasjoner",
+      "noTenants": "Ingen kontoer",
+      "switchTo": "Bytt til {name}"
+    },
     "ui": {
       "audioEditor": {
         "autoplay": "Autoavspilling",
@@ -484,7 +492,60 @@
       "clearAll": "Tøm alle",
       "apply": "Bruk",
       "showLiked": "Vis likte",
-      "showLikedDescription": "Vis bare leker du har likt"
+      "showLikedDescription": "Vis bare leker du har likt",
+      "purpose": "Formål",
+      "energy": {
+        "label": "Energi",
+        "low": "Lav",
+        "medium": "Middels",
+        "high": "Høy"
+      },
+      "environment": {
+        "label": "Miljø",
+        "indoor": "Inne",
+        "outdoor": "Ute",
+        "both": "Begge"
+      },
+      "groupSize": {
+        "label": "Gruppestørrelse",
+        "small": "2-6 pers",
+        "medium": "6-14 pers",
+        "large": "15+ pers"
+      },
+      "time": "Tid",
+      "product": "Produkt",
+      "subPurpose": "Del-formål",
+      "age": "Alder",
+      "players": "Spillere",
+      "playMode": {
+        "label": "Spillmodus",
+        "basic": "Grunnleggende",
+        "facilitated": "Fasilitert",
+        "participants": "Deltakermodus"
+      },
+      "hasPhases": "Har faser",
+      "hasRoles": "Har roller",
+      "hasArtifacts": "Har artefakter",
+      "hasMaterials": "Har materiell",
+      "category": "Kategori",
+      "difficulty": {
+        "label": "Vanskelighet",
+        "easy": "Lett",
+        "medium": "Middels",
+        "hard": "Vanskelig"
+      },
+      "group": {
+        "basic": "Filter",
+        "facilitator": "Fasilitator",
+        "participants": "Deltakere",
+        "material": "Materiell",
+        "advanced": "Avansert"
+      },
+      "super": {
+        "title": "Avanserte filtre"
+      },
+      "showAdvanced": "Vis flere filtre",
+      "hideAdvanced": "Skjul avanserte filtre"
     },
     "environment": "Miljø",
     "players": "Spillere",
@@ -8107,6 +8168,21 @@
         "low": "Lav energi",
         "medium": "Middels energi",
         "high": "Høy energi"
+      },
+      "sidebar": {
+        "status": "Status",
+        "published": "Publisert",
+        "draft": "Utkast",
+        "addedAt": "Lagt til"
+      },
+      "actions": {
+        "share": "Del",
+        "favorite": "Lagre som favoritt",
+        "shareTitle": "Del dette spillet",
+        "like": "Lik",
+        "unlike": "Fjern likerklikk",
+        "dislike": "Mislik",
+        "addToPlan": "Legg til i plan"
       }
     },
     "gamification": {
@@ -8219,6 +8295,97 @@
           "title": "Personopplysninger",
           "description": "Administrer navn, avatar og kontaktinformasjon"
         },
+        "general": {
+          "title": "Generelle innstillinger",
+          "description": "Administrer din grunnleggende profilinformasjon",
+          "loading": "Laster...",
+          "avatar": {
+            "title": "Profilbilde",
+            "description": "Velg en avatar eller last opp ditt eget bilde",
+            "uploadLabel": "Last opp bilde",
+            "uploadHint": "JPG, PNG eller GIF. Maks 5MB.",
+            "selectPredefined": "Eller velg en forhåndsdefinert avatar",
+            "selected": "Avatar valgt",
+            "notSelected": "Ingen avatar valgt",
+            "remove": "Fjern profilbilde"
+          },
+          "personalInfo": {
+            "title": "Personopplysninger",
+            "description": "Din grunnleggende profilinformasjon",
+            "fullName": "Fullt navn",
+            "fullNamePlaceholder": "Navnet ditt",
+            "displayName": "Visningsnavn (valgfritt)",
+            "displayNamePlaceholder": "Kallenavn eller alias",
+            "email": "E-postadresse",
+            "emailChange": "Endre",
+            "emailHint": "E-postadressen endres under kontoinnstillinger",
+            "bio": "Om meg (valgfritt)",
+            "bioPlaceholder": "Fortell litt om deg selv...",
+            "bioCharCount": "{count}/500 tegn",
+            "phone": "Telefonnummer (valgfritt)",
+            "phonePlaceholder": "+47 912 34 567",
+            "location": "Sted (valgfritt)",
+            "locationPlaceholder": "Oslo, Norge",
+            "pronouns": "Pronomen (valgfritt)",
+            "pronounsPlaceholder": "hen/hen, han/ham, hun/henne"
+          },
+          "visibility": {
+            "title": "Profilsynlighet",
+            "description": "Kontroller hvem som kan se profilinformasjonen din",
+            "label": "Synlighet",
+            "hint": "Velg hvem som kan se profilen din",
+            "public": "Offentlig",
+            "private": "Privat",
+            "organization": "Kun organisasjon",
+            "showEmail": "Vis e-postadresse",
+            "showEmailDesc": "Tillat andre å se e-postadressen din på profilen din",
+            "showPhone": "Vis telefonnummer",
+            "showPhoneDesc": "Tillat andre å se telefonnummeret ditt på profilen din"
+          }
+        },
+        "account": {
+          "title": "Kontoinnstillinger",
+          "description": "Administrer e-post og passord",
+          "email": "E-postadresse",
+          "emailHint": "Din primære e-postadresse for innlogging og verifisering",
+          "changeEmail": "Endre e-post",
+          "newEmail": "Ny e-postadresse",
+          "newEmailPlaceholder": "din.nye@email.no",
+          "confirmWithPassword": "Bekreft med passordet ditt",
+          "currentPasswordPlaceholder": "Ditt nåværende passord",
+          "emailChangeSuccess": "Verifiseringslenke sendt til {email}. Sjekk e-posten din.",
+          "emailChangeHint": "En verifiseringslenke sendes til din nye e-postadresse. Du må verifisere den før endringen trer i kraft.",
+          "password": "Passord",
+          "passwordHint": "Sist endret: {date}",
+          "changePassword": "Endre passord",
+          "currentPassword": "Nåværende passord",
+          "newPassword": "Nytt passord",
+          "newPasswordPlaceholder": "Ditt nye passord",
+          "confirmPassword": "Bekreft passord",
+          "confirmPasswordPlaceholder": "Bekreft ditt nye passord",
+          "passwordMismatch": "Passordene samsvarer ikke",
+          "passwordChanged": "Passordet er endret",
+          "passwordRequirements": {
+            "title": "Passordkrav:",
+            "minLength": "Minst 8 tegn",
+            "uppercase": "Minst én stor bokstav (A-Z)",
+            "lowercase": "Minst én liten bokstav (a-z)",
+            "number": "Minst ett tall (0-9)",
+            "notMet": "Passordet oppfyller ikke kravene"
+          },
+          "updating": "Oppdaterer...",
+          "update": "Oppdater",
+          "cancel": "Avbryt",
+          "changing": "Endrer...",
+          "verified": "Verifisert",
+          "notVerified": "Ikke verifisert",
+          "accountInfo": {
+            "title": "Kontoinformasjon",
+            "createdAt": "Konto opprettet",
+            "lastLogin": "Siste innlogging"
+          },
+          "currentPasswordWrong": "Nåværende passord er feil"
+        },
         "security": {
           "title": "Sikkerhet",
           "emailVerified": "E-post bekreftet",
@@ -8324,11 +8491,85 @@
             "title": "Tid og dato",
             "description": "Innstillinger for hvordan tid og dato vises."
           }
+        },
+        "achievements": {
+          "title": "Dine utmerkelser",
+          "loading": "Laster utmerkelser...",
+          "progress": "{unlocked} av {total}",
+          "progressLabel": "utmerkelser opplåst",
+          "progressSection": "Fremgang",
+          "filters": {
+            "all": "Alle",
+            "unlocked": "Opplåst",
+            "locked": "Låst"
+          },
+          "emptyStates": {
+            "unlocked": "Ingen utmerkelser opplåst ennå. Fortsett å spille!",
+            "locked": "Gratulerer! Du har låst opp alle utmerkelser!",
+            "all": "Ingen utmerkelser funnet."
+          },
+          "details": "Detaljer",
+          "percentComplete": "{percent}% fullført",
+          "unlockedAt": "Opplåst {date}"
+        },
+        "coins": {
+          "title": "Mynthistorikk",
+          "subtitle": "Viser de siste 10 transaksjonene",
+          "totalBalance": "mynter totalt",
+          "earnedRecent": "Tjent (siste 10)",
+          "spentRecent": "Brukt (siste 10)",
+          "filters": {
+            "all": "Alle",
+            "earn": "Tjent",
+            "spend": "Brukt"
+          },
+          "loading": "Laster transaksjoner...",
+          "noTransactions": "Ingen transaksjoner å vise.",
+          "unknownTransaction": "Ukjent transaksjon",
+          "error": "Kunne ikke hente myntdata",
+          "shopLink": "Bruk myntene dine i butikken"
+        },
+        "friends": {
+          "title": "Venner",
+          "description": "Administrer vennene og venneforespørslene dine",
+          "loginRequired": "Du må være logget inn for å få tilgang til denne siden.",
+          "tabs": {
+            "friends": "Venner",
+            "requests": "Forespørsler",
+            "add": "Legg til"
+          },
+          "loading": "Laster...",
+          "noFriends": "Du har ingen venner ennå",
+          "addFirstFriend": "Legg til din første venn",
+          "remove": "Fjern",
+          "noPendingRequests": "Ingen ventende venneforespørsler",
+          "receivedRequests": "Mottatte forespørsler",
+          "sentRequests": "Sendte forespørsler",
+          "requestFrom": "Venneforespørsel fra:",
+          "pendingTo": "Ventende forespørsel til:",
+          "accept": "Aksepter",
+          "reject": "Avslå",
+          "pending": "Venter",
+          "searchUsers": "Søk etter brukere",
+          "searchPlaceholder": "Skriv inn e-postadresse",
+          "searching": "Søker...",
+          "results": "Resultater",
+          "noUserFound": "Ingen bruker funnet med den e-postadressen",
+          "addFriend": "Legg til"
         }
       },
       "achievementsShowcase": {
         "title": "Utmerkelser",
         "viewAll": "Vis alle"
+      },
+      "actions": {
+        "save": "Lagre endringer",
+        "saving": "Lagrer...",
+        "saved": "Endringer lagret",
+        "cancel": "Avbryt",
+        "edit": "Rediger",
+        "delete": "Slett",
+        "confirm": "Bekreft"
       },
       "tenant": {
         "title": "Organisasjon",
@@ -8837,7 +9078,37 @@
       },
       "percentComplete": "{percent}% fullført",
       "passedWith": "Bestått med {score}%",
-      "coins": "DiceCoin"
+      "coins": "DiceCoin",
+      "runner": {
+        "backToLearning": "Tilbake til utdanning",
+        "courseContent": "Kursinnhold",
+        "readingSections": "leseseksjoner",
+        "quizQuestions": "quizspørsmål",
+        "passThreshold": "Bestått-grense",
+        "startCourse": "Start kurs",
+        "retakeCourse": "Ta kurset på nytt",
+        "alreadyCompleted": "Du har allerede bestått dette kurset med {score}%",
+        "previous": "Forrige",
+        "next": "Neste",
+        "goToQuiz": "Gå til quiz",
+        "finish": "Avslutt",
+        "quiz": "Quiz",
+        "quizInstructions": "Svar på alle spørsmålene for å fullføre kurset. Du trenger minst {threshold}% riktig for å bestå.",
+        "grading": "Retter...",
+        "submitAnswers": "Send inn svar",
+        "passed": {
+          "title": "Gratulerer! Du har bestått!",
+          "score": "Du fikk {score}% riktig ({correct}/{total} spørsmål)"
+        },
+        "failed": {
+          "title": "Beklager, du bestod ikke",
+          "score": "Du fikk {score}% riktig, men trenger minst {threshold}%"
+        },
+        "correctAnswers": "riktige svar",
+        "tryAgain": "Prøv igjen",
+        "back": "Tilbake",
+        "backToCourses": "Tilbake til kurs"
+      }
     },
     "leaderboard": {
       "title": "Toppliste",

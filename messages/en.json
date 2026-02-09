@@ -8100,6 +8100,101 @@
         "savedMessage": "Your changes have been saved!"
       },
       "sections": {
+        "personalInfo": {
+          "title": "Personal Information",
+          "description": "Manage your name, avatar and contact information"
+        },
+        "general": {
+          "title": "General Settings",
+          "description": "Manage your basic profile information",
+          "loading": "Loading...",
+          "avatar": {
+            "title": "Profile Picture",
+            "description": "Choose an avatar or upload your own image",
+            "uploadLabel": "Upload image",
+            "uploadHint": "JPG, PNG or GIF. Max 5MB.",
+            "selectPredefined": "Or choose a predefined avatar",
+            "selected": "Avatar selected",
+            "notSelected": "No avatar selected",
+            "remove": "Remove profile picture"
+          },
+          "personalInfo": {
+            "title": "Personal Information",
+            "description": "Your basic profile information",
+            "fullName": "Full name",
+            "fullNamePlaceholder": "Your name",
+            "displayName": "Display name (optional)",
+            "displayNamePlaceholder": "Nickname or alias",
+            "email": "Email address",
+            "emailChange": "Change",
+            "emailHint": "Email address is changed under account settings",
+            "bio": "About me (optional)",
+            "bioPlaceholder": "Tell us a little about yourself...",
+            "bioCharCount": "{count}/500 characters",
+            "phone": "Phone number (optional)",
+            "phonePlaceholder": "+1 555 123 4567",
+            "location": "Location (optional)",
+            "locationPlaceholder": "New York, USA",
+            "pronouns": "Pronouns (optional)",
+            "pronounsPlaceholder": "they/them, he/him, she/her"
+          },
+          "visibility": {
+            "title": "Profile Visibility",
+            "description": "Control who can see your profile information",
+            "label": "Visibility",
+            "hint": "Choose who can see your profile",
+            "public": "Public",
+            "private": "Private",
+            "organization": "Organization only",
+            "showEmail": "Show email address",
+            "showEmailDesc": "Allow others to see your email address on your profile",
+            "showPhone": "Show phone number",
+            "showPhoneDesc": "Allow others to see your phone number on your profile"
+          }
+        },
+        "account": {
+          "title": "Account Settings",
+          "description": "Manage email and password",
+          "email": "Email address",
+          "emailHint": "Your primary email address for login and verification",
+          "changeEmail": "Change email",
+          "newEmail": "New email address",
+          "newEmailPlaceholder": "your.new@email.com",
+          "confirmWithPassword": "Confirm with your password",
+          "currentPasswordPlaceholder": "Your current password",
+          "emailChangeSuccess": "Verification link sent to {email}. Check your email.",
+          "emailChangeHint": "A verification link will be sent to your new email address. You must verify it before the change takes effect.",
+          "password": "Password",
+          "passwordHint": "Last changed: {date}",
+          "changePassword": "Change password",
+          "currentPassword": "Current password",
+          "newPassword": "New password",
+          "newPasswordPlaceholder": "Your new password",
+          "confirmPassword": "Confirm password",
+          "confirmPasswordPlaceholder": "Confirm your new password",
+          "passwordMismatch": "Passwords do not match",
+          "passwordChanged": "Password has been changed",
+          "passwordRequirements": {
+            "title": "Password requirements:",
+            "minLength": "At least 8 characters",
+            "uppercase": "At least one uppercase letter (A-Z)",
+            "lowercase": "At least one lowercase letter (a-z)",
+            "number": "At least one number (0-9)",
+            "notMet": "Password does not meet requirements"
+          },
+          "updating": "Updating...",
+          "update": "Update",
+          "cancel": "Cancel",
+          "changing": "Changing...",
+          "verified": "Verified",
+          "notVerified": "Not verified",
+          "accountInfo": {
+            "title": "Account Information",
+            "createdAt": "Account created",
+            "lastLogin": "Last login"
+          },
+          "currentPasswordWrong": "Current password is incorrect"
+        },
         "security": {
           "emailVerified": "Email verified",
           "emailNotVerified": "Email not verified",
@@ -8186,7 +8281,76 @@
             "title": "Time and date",
             "description": "Settings for how time and date are displayed."
           }
+        },
+        "achievements": {
+          "title": "Your achievements",
+          "loading": "Loading achievements...",
+          "progress": "{unlocked} of {total}",
+          "progressLabel": "achievements unlocked",
+          "progressSection": "Progress",
+          "filters": {
+            "all": "All",
+            "unlocked": "Unlocked",
+            "locked": "Locked"
+          },
+          "emptyStates": {
+            "unlocked": "No achievements unlocked yet. Keep playing!",
+            "locked": "Congratulations! You have unlocked all achievements!",
+            "all": "No achievements found."
+          },
+          "details": "Details",
+          "percentComplete": "{percent}% complete",
+          "unlockedAt": "Unlocked {date}"
+        },
+        "coins": {
+          "title": "Coin History",
+          "subtitle": "Showing last 10 transactions",
+          "totalBalance": "coins total",
+          "earnedRecent": "Earned (last 10)",
+          "spentRecent": "Spent (last 10)",
+          "filters": {
+            "all": "All",
+            "earn": "Earned",
+            "spend": "Spent"
+          },
+          "loading": "Loading transactions...",
+          "noTransactions": "No transactions to show.",
+          "unknownTransaction": "Unknown transaction",
+          "error": "Could not load coin data",
+          "shopLink": "Spend your coins in the shop"
+        },
+        "friends": {
+          "title": "Friends",
+          "description": "Manage your friends and friend requests",
+          "loginRequired": "You must be logged in to access this page.",
+          "tabs": {
+            "friends": "Friends",
+            "requests": "Requests",
+            "add": "Add"
+          },
+          "loading": "Loading...",
+          "noFriends": "You have no friends yet",
+          "addFirstFriend": "Add your first friend",
+          "remove": "Remove",
+          "noPendingRequests": "No pending friend requests",
+          "receivedRequests": "Received requests",
+          "sentRequests": "Sent requests",
+          "requestFrom": "Friend request from:",
+          "pendingTo": "Pending request to:",
+          "accept": "Accept",
+          "reject": "Reject",
+          "pending": "Pending",
+          "searchUsers": "Search users",
+          "searchPlaceholder": "Enter email address",
+          "searching": "Searching...",
+          "results": "Results",
+          "noUserFound": "No user found with that email address",
+          "addFriend": "Add"
         }
+      },
+      "achievementsShowcase": {
+        "title": "Achievements",
+        "viewAll": "View all"
       },
       "tenant": {
         "title": "Organisation",
@@ -8695,7 +8859,37 @@
       },
       "percentComplete": "{percent}% complete",
       "passedWith": "Passed with {score}%",
-      "coins": "DiceCoin"
+      "coins": "DiceCoin",
+      "runner": {
+        "backToLearning": "Back to learning",
+        "courseContent": "Course content",
+        "readingSections": "reading sections",
+        "quizQuestions": "quiz questions",
+        "passThreshold": "Pass threshold",
+        "startCourse": "Start course",
+        "retakeCourse": "Retake course",
+        "alreadyCompleted": "You have already completed this course with {score}%",
+        "previous": "Previous",
+        "next": "Next",
+        "goToQuiz": "Go to quiz",
+        "finish": "Finish",
+        "quiz": "Quiz",
+        "quizInstructions": "Answer all questions to complete the course. You need at least {threshold}% correct to pass.",
+        "grading": "Grading...",
+        "submitAnswers": "Submit answers",
+        "passed": {
+          "title": "Congratulations! You passed!",
+          "score": "You got {score}% correct ({correct}/{total} questions)"
+        },
+        "failed": {
+          "title": "Sorry, you did not pass",
+          "score": "You got {score}% correct, but need at least {threshold}%"
+        },
+        "correctAnswers": "correct answers",
+        "tryAgain": "Try again",
+        "back": "Back",
+        "backToCourses": "Back to courses"
+      }
     },
     "leaderboard": {
       "title": "Leaderboard",

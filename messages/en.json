@@ -11392,6 +11392,10 @@
       "waiting": {
         "title": "Waiting for activity",
         "description": "Game content will appear here when the host starts."
+      },
+      "basic": {
+        "title": "Follow the Board",
+        "description": "Your host is leading this session. Follow along on the shared screen or board."
       }
     },
     "hostPlayMode": {

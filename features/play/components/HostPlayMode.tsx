@@ -351,9 +351,33 @@ export function HostPlayMode({
         );
 
       case 'participants':
-        // ParticipantPlayMode remains unchanged for now
-        // Fall through to existing facilitated view logic
-        break;
+        // Participants mode uses FacilitatedPlayView with full controls
+        // Host still needs triggers, artifacts, roles etc. — same as facilitated
+        return (
+          <div className="space-y-4">
+            {showExitButton && (
+              <div className="flex justify-end border-b border-border pb-4">
+                <Button variant="ghost" size="sm" onClick={onExitPlayMode}>
+                  <ArrowLeftIcon className="h-4 w-4 mr-1" />
+                  {t('navigation.lobby')}
+                </Button>
+              </div>
+            )}
+            <FacilitatedPlayView
+              playData={playData}
+              caps={caps}
+              sessionId={sessionId}
+              triggers={triggers}
+              currentStepIndex={currentStepIndex}
+              currentPhaseIndex={currentPhaseIndex}
+              onStepChange={handleStepChange}
+              onPhaseChange={handlePhaseChange}
+              onTriggerAction={handleTriggerAction}
+              onComplete={handleEndSession}
+              onBack={onExitPlayMode}
+            />
+          </div>
+        );
     }
   }
 

@@ -3,6 +3,12 @@
  * 
  * Integrates ParticipantPlayView with the participant session client.
  * Shows game content when session is active and has a game linked.
+ * 
+ * Play mode gating:
+ * - basic: Simplified "follow board" view (participants watch, host leads)
+ * - facilitated/participants: Full ParticipantPlayView with prompts/artifacts
+ * 
+ * @see docs/play/PLAY_UI_WIRING_AUDIT_REPORT.md for play_mode routing spec
  */
 
 'use client';
@@ -13,7 +19,7 @@ import { ParticipantPlayView } from './ParticipantPlayView';
 import { getParticipantPlaySession, type ParticipantPlayData } from '../api';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ClockIcon } from '@heroicons/react/24/outline';
+import { ClockIcon, TvIcon } from '@heroicons/react/24/outline';
 
 // =============================================================================
 // Types
@@ -113,6 +119,32 @@ export function ParticipantPlayMode({
       </Card>
     );
   }
+
+  // Play mode gating: basic mode = "follow board" (host-led, minimal participant UI)
+  // Treat null/undefined as 'basic' for safety
+  const playMode = playData.playMode ?? 'basic';
+  
+  if (playMode === 'basic') {
+    // Basic mode: participants follow board, no interactive prompts
+    return (
+      <Card className="max-w-md mx-auto p-8 text-center">
+        <div className="flex justify-center mb-4">
+          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <TvIcon className="h-6 w-6 text-primary" />
+          </div>
+        </div>
+        <h2 className="text-lg font-semibold mb-2">{t('basic.title')}</h2>
+        <p className="text-muted-foreground">
+          {t('basic.description')}
+        </p>
+        <p className="mt-4 text-sm font-medium text-foreground">
+          {playData.gameTitle}
+        </p>
+      </Card>
+    );
+  }
+
+  // facilitated / participants mode: full interactive view
 
   // Build role for ParticipantPlayView (must match RoleCardData interface)
   const role = playData.assignedRole

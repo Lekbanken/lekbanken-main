@@ -12416,6 +12416,10 @@
         "title": "Väntar på aktivitet",
         "description": "Sessionsinställningar för roller och runtime-justeringar.",
         "openStory": "Öppna Story"
+      },
+      "basic": {
+        "title": "Följ tavlan",
+        "description": "Din värd leder denna session. Följ med på den delade skärmen eller tavlan."
       }
     },
     "hostPlayMode": {

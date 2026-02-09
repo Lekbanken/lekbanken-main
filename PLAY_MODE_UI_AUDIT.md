@@ -2,7 +2,25 @@
 ## Granskning av adaptivt UI baserat på spelläge (play_mode)
 
 **Datum:** 2026-01-19  
-**Status:** Granskning för beslut
+**Uppdaterad:** 2026-02-09  
+**Status:** ✅ IMPLEMENTERAD (v2.7)
+
+---
+
+## Implementation Status (v2.7)
+
+| Komponent | Status | Evidens |
+|-----------|--------|---------|
+| HostPlayMode viewType routing | ✅ Done | `case 'participants'` → FacilitatedPlayView |
+| ParticipantPlayMode gating | ✅ Done | basic → "Follow Board" card |
+| useSessionCapabilities hook | ✅ Done | Graceful degradation implemented |
+| Contract tests | ✅ 19 tests | [play-mode-routing-contract.test.ts](tests/unit/play/play-mode-routing-contract.test.ts) |
+| Translation keys | ✅ Done | en/sv/no `participantPlayMode.basic.*` |
+
+**Key files changed:**
+- [HostPlayMode.tsx](features/play/components/HostPlayMode.tsx) — L353-378 participants case
+- [ParticipantPlayMode.tsx](features/play/components/ParticipantPlayMode.tsx) — L120-138 playMode gating
+- [useSessionCapabilities.ts](hooks/useSessionCapabilities.ts) — determineViewType with degradation
 
 ---
 
@@ -14,7 +32,7 @@ Enligt `PLAY_SYSTEM_DOCUMENTATION.md` och `inventory.json` var tanken att lekled
 - **`facilitated`** → Avancerat interface med faser, timer, board-toggle (`FacilitatedPlayView`)
 - **`participants`** → Fullt interface med roller, triggers, artifacts (`ParticipantPlayMode`)
 
-**Problem:** Denna adaptiva routing saknas i produktionskoden. Alla sessioner använder samma avancerade gränssnitt oavsett play_mode.
+**~~Problem:~~ LÖST (v2.7):** Adaptiv routing nu implementerad. HostPlayMode routar till rätt vy baserat på `viewType` från `useSessionCapabilities`. ParticipantPlayMode gatar på `playMode`.
 
 ---
 
@@ -24,14 +42,14 @@ Enligt `PLAY_SYSTEM_DOCUMENTATION.md` och `inventory.json` var tanken att lekled
 
 | Komponent | Beskrivning | Status |
 |-----------|-------------|--------|
-| `PlaySessionView` | Adapter som routar till rätt vy baserat på `play_mode` | ❌ **SAKNAS** |
-| `SimplePlayView` | Enkelt interface för basic-lekar | ✅ Finns (men används ej adaptivt) |
-| `FacilitatedPlayView` | Mellanläge med faser och board-toggle | ❌ **SAKNAS** |
-| `ParticipantPlayMode` | Fullt interface för spel med roller | ✅ Finns |
-| `useAdaptivePlayMode` | Hook för att bestämma vilken vy som ska visas | ❌ **SAKNAS** |
-| `lib/play-modes` | Service för play-mode-konfiguration | ❌ **SAKNAS** |
-| `features/play/components/shared/` | Delade komponenter för alla lägen | ❌ **TOM MAPP** |
-| `features/play/components/facilitated/` | Facilitated-specifika komponenter | ❌ **TOM MAPP** |
+| `HostPlayMode` | Adapter som routar till rätt vy baserat på `viewType` | ✅ **IMPLEMENTERAD** |
+| `BasicPlayView` | Enkelt interface för basic-lekar | ✅ Finns, används via routing |
+| `FacilitatedPlayView` | Mellanläge med faser och board-toggle | ✅ Finns, används via routing |
+| `ParticipantPlayMode` | Fullt interface för spel med roller + playMode gating | ✅ **IMPLEMENTERAD** |
+| `useSessionCapabilities` | Hook för att bestämma viewType och feature flags | ✅ **IMPLEMENTERAD** |
+| `lib/play-modes` | Service för play-mode-konfiguration | ❌ **EJ BEHÖVD** (inline i hook) |
+| `features/play/components/shared/` | Delade komponenter för alla lägen | ❌ **TOM MAPP** (ej prioriterad) |
+| `features/play/components/facilitated/` | Facilitated-specifika komponenter | ❌ **TOM MAPP** (ej prioriterad) |
 
 ### 2.2 Inventory-citat
 

@@ -11522,6 +11522,10 @@
       "waiting": {
         "title": "Venter på aktivitet",
         "description": "Spillinnhold vises her når verten starter."
+      },
+      "basic": {
+        "title": "Følg tavlen",
+        "description": "Verten leder denne sesjonen. Følg med på den delte skjermen eller tavlen."
       }
     },
     "hostPlayMode": {

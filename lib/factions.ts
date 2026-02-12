@@ -18,48 +18,48 @@ import type { FactionId, FactionTheme } from '@/types/journey'
 // =============================================================================
 
 export const FACTION_THEMES: Record<NonNullable<FactionId>, FactionTheme> = {
-  explorer: {
-    id: 'explorer',
-    name: 'Utforskare',
-    description: 'Nyfikna själar som söker nya horisonter',
-    accentColor: '#00c7b0',           // Teal
-    accentColorMuted: 'rgba(0, 199, 176, 0.12)',
-    gradientFrom: '#0d3d38',
+  forest: {
+    id: 'forest',
+    name: 'Forest',
+    description: 'Djup skog, mossa och organisk energi',
+    accentColor: '#10b981',           // Emerald
+    accentColorMuted: 'rgba(16, 185, 129, 0.12)',
+    gradientFrom: '#0b3d2e',
     gradientTo: '#1a1a2e',
-    glowColor: 'rgba(0, 199, 176, 0.25)',
+    glowColor: 'rgba(16, 185, 129, 0.25)',
     iconVariant: 'organic',
   },
-  guardian: {
-    id: 'guardian',
-    name: 'Väktare',
-    description: 'Beskyddare av tradition och gemenskap',
-    accentColor: '#4a90d9',           // Blue
-    accentColorMuted: 'rgba(74, 144, 217, 0.12)',
-    gradientFrom: '#1a2a4a',
+  sea: {
+    id: 'sea',
+    name: 'Sea',
+    description: 'Djupt hav, koraller och strömmande vatten',
+    accentColor: '#0ea5e9',           // Ocean blue
+    accentColorMuted: 'rgba(14, 165, 233, 0.12)',
+    gradientFrom: '#0c2d4a',
     gradientTo: '#1a1a2e',
-    glowColor: 'rgba(74, 144, 217, 0.25)',
+    glowColor: 'rgba(14, 165, 233, 0.25)',
     iconVariant: 'sharp',
   },
-  trickster: {
-    id: 'trickster',
-    name: 'Skojare',
-    description: 'Lekfulla andar som sprider glädje',
-    accentColor: '#ffd166',           // Gold
-    accentColorMuted: 'rgba(255, 209, 102, 0.12)',
+  sky: {
+    id: 'sky',
+    name: 'Sky',
+    description: 'Öppen himmel, solstrålar och fria vindar',
+    accentColor: '#f59e0b',           // Amber / Sun gold
+    accentColorMuted: 'rgba(245, 158, 11, 0.12)',
     gradientFrom: '#3d3520',
     gradientTo: '#1a1a2e',
-    glowColor: 'rgba(255, 209, 102, 0.25)',
+    glowColor: 'rgba(245, 158, 11, 0.25)',
     iconVariant: 'rounded',
   },
-  sage: {
-    id: 'sage',
-    name: 'Vis',
-    description: 'Tänkare som söker djupare förståelse',
-    accentColor: '#9b5de5',           // Purple
-    accentColorMuted: 'rgba(155, 93, 229, 0.12)',
-    gradientFrom: '#2a1f3d',
+  void: {
+    id: 'void',
+    name: 'Void',
+    description: 'Kosmisk rymd, stjärnor och oändlighet',
+    accentColor: '#7c3aed',           // Deep violet
+    accentColorMuted: 'rgba(124, 58, 237, 0.12)',
+    gradientFrom: '#1e1040',
     gradientTo: '#1a1a2e',
-    glowColor: 'rgba(155, 93, 229, 0.25)',
+    glowColor: 'rgba(124, 58, 237, 0.25)',
     iconVariant: 'organic',
   },
 }

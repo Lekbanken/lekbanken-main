@@ -9,7 +9,7 @@
 // Faction Types
 // =============================================================================
 
-export type FactionId = 'explorer' | 'guardian' | 'trickster' | 'sage' | null
+export type FactionId = 'forest' | 'sea' | 'sky' | 'void' | null
 
 export interface FactionTheme {
   id: FactionId

@@ -66,14 +66,7 @@ export function BadgePreviewEnhanced({ icon, theme, size = "md", showGlow = true
         )}
       </div>
 
-      {normalizedSize === "lg" && (
-        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {icon.base?.id && <span className="px-1.5 py-0.5 rounded bg-muted/50">{icon.base.id}</span>}
-            {icon.symbol?.id && <span className="px-1.5 py-0.5 rounded bg-muted/50">{icon.symbol.id}</span>}
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

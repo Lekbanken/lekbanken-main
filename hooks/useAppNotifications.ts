@@ -12,9 +12,9 @@
  * ```
  */
 
-import { useState, useEffect, useCallback, useTransition } from 'react';
+import { useState, useEffect, useCallback, useRef, useTransition } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
-import { withTimeout } from '@/lib/utils/withTimeout';
+import { withTimeout, TimeoutError } from '@/lib/utils/withTimeout';
 
 // =============================================================================
 // TYPES
@@ -91,12 +91,18 @@ type AnyRpc = any;
 let inFlightFetch: Promise<AppNotification[]> | null = null;
 let fetchGeneration = 0;
 
+/** Timeout for the main notifications fetch — a simple indexed query should be fast */
+const FETCH_TIMEOUT_MS = 5_000;
+/** Timeout for user-initiated actions (mark read, dismiss) */
+const ACTION_TIMEOUT_MS = 8_000;
+
 export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const hasLoadedOnce = useRef(false);
 
   // Client components can still render on the server in Next.js; avoid
   // calling `createBrowserClient()` when `window` is not available.
@@ -113,6 +119,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         setNotifications(result);
         setUnreadCount(result.filter((n) => !n.readAt).length);
         setIsLoading(false);
+        hasLoadedOnce.current = true;
       } catch {
         // Error already handled by the original request
       }
@@ -131,7 +138,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
             'get_user_notifications',
             { p_limit: limit }
           ) as Promise<{ data: NotificationRow[] | null; error: Error | null }>,
-          12000,
+          FETCH_TIMEOUT_MS,
           'rpc:get_user_notifications'
         );
 
@@ -162,11 +169,28 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       if (fetchGeneration === currentGeneration) {
         setNotifications(mapped);
         setUnreadCount(mapped.filter((n) => !n.readAt).length);
+        hasLoadedOnce.current = true;
       }
     } catch (err) {
-      console.error('[useAppNotifications] Error:', err);
       if (fetchGeneration === currentGeneration) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch notifications');
+        if (err instanceof TimeoutError) {
+          // Timeout is not critical — gracefully return empty notifications.
+          // The RPC may not exist yet, the DB may be cold, or the network slow.
+          // Don't leave users staring at broken UI for a non-essential feature.
+          console.warn('[useAppNotifications] Timed out — returning empty list');
+          if (!hasLoadedOnce.current) {
+            setNotifications([]);
+            setUnreadCount(0);
+          }
+          // Don't set error state for timeouts — the bell just shows 0
+        } else {
+          console.warn('[useAppNotifications] Fetch failed:', err instanceof Error ? err.message : err);
+          if (!hasLoadedOnce.current) {
+            setNotifications([]);
+            setUnreadCount(0);
+          }
+          setError(err instanceof Error ? err.message : 'Failed to fetch notifications');
+        }
       }
     } finally {
       inFlightFetch = null;
@@ -191,7 +215,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
             'mark_notification_read',
             { p_delivery_id: deliveryId }
           ) as Promise<{ error: Error | null }>,
-          12000,
+          ACTION_TIMEOUT_MS,
           'rpc:mark_notification_read'
         );
 
@@ -220,7 +244,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         (supabase.rpc as AnyRpc)(
           'mark_all_notifications_read'
         ) as Promise<{ error: Error | null }>,
-        12000,
+        ACTION_TIMEOUT_MS,
         'rpc:mark_all_notifications_read'
       );
 
@@ -247,7 +271,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
             'dismiss_notification',
             { p_delivery_id: deliveryId }
           ) as Promise<{ error: Error | null }>,
-          12000,
+          ACTION_TIMEOUT_MS,
           'rpc:dismiss_notification'
         );
 

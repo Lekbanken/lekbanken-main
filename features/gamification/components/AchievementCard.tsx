@@ -8,9 +8,10 @@ import { AchievementDetailModal } from "./AchievementDetailModal";
 
 type AchievementCardProps = {
   achievement: Achievement;
+  variant?: "standard" | "journey";
 };
 
-export function AchievementCard({ achievement }: AchievementCardProps) {
+export function AchievementCard({ achievement, variant = "standard" }: AchievementCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const progress = Math.min(100, Math.max(0, achievement.progress ?? 0));
@@ -25,11 +26,17 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
       <button
         onClick={() => setIsModalOpen(true)}
         className={`relative flex flex-col items-center rounded-2xl p-4 text-center transition-all min-h-[140px] w-full hover:scale-105 active:scale-100 cursor-pointer ${
-          isUnlocked
-            ? "bg-card border border-border/50 shadow-sm hover:shadow-md"
-            : isInProgress
-            ? "bg-card border-2 border-primary/30 hover:border-primary/50"
-            : "bg-muted/30 border border-border/30 hover:bg-muted/50"
+          variant === "journey"
+            ? isUnlocked
+              ? "bg-white/10 border border-white/20 shadow-sm hover:shadow-md backdrop-blur-sm"
+              : isInProgress
+              ? "bg-white/5 border-2 border-[var(--journey-accent)]/30 hover:border-[var(--journey-accent)]/50 backdrop-blur-sm"
+              : "bg-white/[0.03] border border-white/10 hover:bg-white/[0.06] backdrop-blur-sm"
+            : isUnlocked
+              ? "bg-card border border-border/50 shadow-sm hover:shadow-md"
+              : isInProgress
+              ? "bg-card border-2 border-primary/30 hover:border-primary/50"
+              : "bg-muted/30 border border-border/30 hover:bg-muted/50"
         }`}
       >
         {/* Status Badge - Top Right */}
@@ -52,7 +59,9 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
         {/* Name */}
         <p
           className={`text-xs font-semibold line-clamp-2 ${
-            isLocked ? "text-muted-foreground" : "text-foreground"
+            variant === "journey"
+              ? isLocked ? "text-white/30" : "text-white/90"
+              : isLocked ? "text-muted-foreground" : "text-foreground"
           }`}
         >
           {displayName}
@@ -61,13 +70,13 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
         {/* Status Indicator */}
         {isInProgress && (
           <div className="mt-2 flex items-center gap-1.5">
-            <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
+            <div className={`h-1.5 w-16 overflow-hidden rounded-full ${variant === "journey" ? "bg-white/10" : "bg-muted"}`}>
               <div
-                className="h-full rounded-full bg-primary"
+                className={`h-full rounded-full ${variant === "journey" ? "bg-[var(--journey-accent)]" : "bg-primary"}`}
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <span className="text-[10px] font-medium text-primary tabular-nums">
+            <span className={`text-[10px] font-medium tabular-nums ${variant === "journey" ? "text-[var(--journey-accent)]" : "text-primary"}`}>
               {progress}%
             </span>
           </div>
@@ -75,7 +84,7 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
 
         {isLocked && (
           <div className="mt-2">
-            <LockClosedIcon className="h-4 w-4 text-muted-foreground/50" />
+            <LockClosedIcon className={`h-4 w-4 ${variant === "journey" ? "text-white/20" : "text-muted-foreground/50"}`} />
           </div>
         )}
       </button>

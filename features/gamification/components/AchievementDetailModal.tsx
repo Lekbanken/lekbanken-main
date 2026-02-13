@@ -31,7 +31,7 @@ export function AchievementDetailModal({ achievement, open, onClose }: Achieveme
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-[#1f1f3a] border-white/10 text-white">
         <div className="flex flex-col items-center gap-6 py-4">
           {/* Badge Display */}
           <div className="relative">
@@ -49,7 +49,7 @@ export function AchievementDetailModal({ achievement, open, onClose }: Achieveme
               </div>
             )}
             {!isUnlocked && !isInProgress && (
-              <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground shadow-lg">
+              <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/50 shadow-lg">
                 <LockClosedIcon className="h-5 w-5" />
               </div>
             )}
@@ -57,10 +57,10 @@ export function AchievementDetailModal({ achievement, open, onClose }: Achieveme
 
           {/* Title & Description */}
           <div className="text-center space-y-2">
-            <DialogTitle className="text-xl font-bold">
+            <DialogTitle className="text-xl font-bold text-white">
               {isUnlocked || isInProgress ? achievement.name : '???'}
             </DialogTitle>
-            <DialogDescription className="text-base">
+            <DialogDescription className="text-base text-white/60">
               {isUnlocked || isInProgress ? achievement.description : achievement.hint || ''}
             </DialogDescription>
           </div>
@@ -69,11 +69,11 @@ export function AchievementDetailModal({ achievement, open, onClose }: Achieveme
           {isInProgress && (
             <div className="w-full max-w-xs">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">{progress}%</span>
+                <span className="text-sm text-white/50">{progress}%</span>
               </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/10">
                 <div
-                  className="h-full rounded-full bg-primary transition-all duration-500"
+                  className="h-full rounded-full bg-[#8661ff] transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -82,7 +82,7 @@ export function AchievementDetailModal({ achievement, open, onClose }: Achieveme
 
           {/* Unlock Date (for unlocked) */}
           {isUnlocked && achievement.unlockedAt && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-sm text-white/50">
               <CalendarIcon className="h-4 w-4" />
               <span>
                 {t('unlockedPrefix')} {formattedDate}
@@ -92,8 +92,8 @@ export function AchievementDetailModal({ achievement, open, onClose }: Achieveme
 
           {/* Hint (for locked, if available) */}
           {!isUnlocked && !isInProgress && achievement.hint && (
-            <div className="mt-4 p-3 rounded-lg bg-muted/50 text-center">
-              <p className="text-sm text-muted-foreground italic">
+            <div className="mt-4 p-3 rounded-lg bg-white/5 text-center">
+              <p className="text-sm text-white/50 italic">
                 💡 {achievement.hint}
               </p>
             </div>

@@ -50,7 +50,14 @@ export type ProgressSnapshot = {
   rewardAssetKey?: string;
 };
 
+export type GamificationIdentity = {
+  displayName: string;
+  avatarUrl: string | null;
+  factionId: string | null;
+};
+
 export type GamificationPayload = {
+  identity?: GamificationIdentity;
   achievements: Achievement[];
   coins: CoinsSummary;
   streak: StreakSummary;

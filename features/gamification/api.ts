@@ -51,6 +51,11 @@ export async function savePinnedAchievements(payload: { tenantId: string; achiev
 // Optional fallback for Storybook/sandbox while backend data is empty
 export async function fetchGamificationSnapshotMock(): Promise<GamificationPayload> {
   return {
+    identity: {
+      displayName: "Test Spelare",
+      avatarUrl: null,
+      factionId: null,
+    },
     achievements: [
       { id: "mock-1", name: "Session starter", description: "Starta din första session", status: "unlocked", icon: "SS", points: 50 },
       { id: "mock-2", name: "Planner pro", description: "Planera och kör en session", status: "in_progress", progress: 40, icon: "PP", points: 120 },

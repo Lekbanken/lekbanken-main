@@ -283,7 +283,11 @@
     },
     "achievementsTitle": "Prestationer",
     "achievementsSubtitle": "Din samling av badges och mål",
-    "overview": "Översikt"
+    "overview": "Översikt",
+    "faction": {
+      "label": "Fraktion",
+      "chooseFaction": "Välj fraktion"
+    }
   },
   "browse": {
     "pageTitle": "Utforska",

@@ -294,7 +294,11 @@
     },
     "achievementsTitle": "Achievements",
     "achievementsSubtitle": "Your collection of badges and goals",
-    "overview": "Overview"
+    "overview": "Overview",
+    "faction": {
+      "label": "Faction",
+      "chooseFaction": "Choose faction"
+    }
   },
   "browse": {
     "pageTitle": "Explore",

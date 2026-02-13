@@ -53,7 +53,7 @@ export type ProgressSnapshot = {
 export type GamificationIdentity = {
   displayName: string;
   avatarUrl: string | null;
-  factionId: string | null;
+  factionId: 'forest' | 'sea' | 'sky' | 'void' | null;
 };
 
 export type GamificationPayload = {

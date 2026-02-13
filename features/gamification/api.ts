@@ -1,8 +1,24 @@
+import type { FactionId } from "@/types/journey";
 import type { GamificationPayload } from "./types";
 
 const API_PATH = "/api/gamification";
 
 export type { GamificationPayload };
+
+/**
+ * Save the user's faction choice (or null to reset).
+ */
+export async function saveFaction(factionId: FactionId): Promise<{ factionId: FactionId }> {
+  const res = await fetch(`${API_PATH}/faction`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ factionId }),
+  });
+  if (!res.ok) {
+    throw new Error(`Faction API failed with status ${res.status}`);
+  }
+  return (await res.json()) as { factionId: FactionId };
+}
 
 export async function fetchGamificationSnapshot(): Promise<GamificationPayload> {
   const res = await fetch(API_PATH, { cache: "no-store" });

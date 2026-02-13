@@ -2,16 +2,17 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ErrorState } from "@/components/ui/error-state";
 import { JourneyScene } from "@/components/journey/JourneyScene";
 import { JourneyStats } from "@/components/journey/JourneyStats";
 import { ParticleField } from "@/components/journey/ParticleField";
 import { DEFAULT_THEME, getFactionTheme, getLevelProgress } from "@/lib/factions";
-import { fetchGamificationSnapshot, type GamificationPayload } from "./api";
+import { fetchGamificationSnapshot, saveFaction, type GamificationPayload } from "./api";
 import { AchievementsSection } from "./components/AchievementsSection";
 import { CoinsSection } from "./components/CoinsSection";
+import { FactionSelector } from "./components/FactionSelector";
 import { StreakSection } from "./components/StreakSection";
 import { CallToActionSection } from "./components/CallToActionSection";
 import { SectionDivider } from "./components/SectionDivider";
@@ -112,10 +113,26 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
 
   // Resolve theme – currently always DEFAULT, ready for faction_id
   const theme = identity.factionId
-    ? getFactionTheme(identity.factionId as "forest" | "sea" | "sky" | "void")
+    ? getFactionTheme(identity.factionId)
     : DEFAULT_THEME;
 
   const xpPercent = getLevelProgress(data.progress.currentXp, data.progress.nextLevelXp);
+
+  const handleFactionSelect = useCallback(
+    async (factionId: Parameters<typeof saveFaction>[0]) => {
+      await saveFaction(factionId);
+      // Optimistically update local state so theme switches instantly
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              identity: { ...prev.identity!, factionId },
+            }
+          : prev,
+      );
+    },
+    [],
+  );
 
   return (
     <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-10 sm:px-6">
@@ -169,6 +186,14 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
         {data.progress.levelName && (
           <p className="text-sm text-white/50">{data.progress.levelName}</p>
         )}
+
+        {/* ── Faction Selector ── */}
+        <div className="mt-4">
+          <FactionSelector
+            currentFactionId={identity.factionId}
+            onSelect={handleFactionSelect}
+          />
+        </div>
       </div>
 
       {/* ── XP Progress Bar ── */}

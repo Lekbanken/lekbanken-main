@@ -5,6 +5,7 @@ import type {
   Achievement,
   AchievementStatus,
   CoinsSummary,
+  GamificationIdentity,
   GamificationPayload,
   ProgressSnapshot,
   StreakSummary,
@@ -51,6 +52,7 @@ type UserProgressRow = {
   current_xp: number | null;
   next_level_xp: number | null;
   tenant_id?: string | null;
+  faction_id?: string | null;
 };
 
 type LevelDefinitionRow = {
@@ -186,7 +188,7 @@ export async function GET() {
   // First get progress to know tenant context
   const progressRes = await supabase
     .from("user_progress")
-    .select("level,current_xp,next_level_xp,tenant_id")
+    .select("level,current_xp,next_level_xp,tenant_id,faction_id")
     .eq("user_id", userId)
     .limit(1)
     .maybeSingle();
@@ -247,7 +249,24 @@ export async function GET() {
 
   const progress = applyLevelDefinitions(baseProgress, levelDefs);
 
+  // Identity – extracted from auth user metadata + faction from user_progress
+  const rawFaction = (progressRes.data as UserProgressRow | null)?.faction_id ?? null;
+  const VALID_FACTIONS = new Set<string>(["forest", "sea", "sky", "void"]);
+  const factionId = rawFaction && VALID_FACTIONS.has(rawFaction)
+    ? (rawFaction as "forest" | "sea" | "sky" | "void")
+    : null;
+  const identity: GamificationIdentity = {
+    displayName:
+      (user.user_metadata?.full_name as string | undefined) ??
+      user.email ??
+      "Spelare",
+    avatarUrl:
+      (user.user_metadata?.avatar_url as string | undefined) ?? null,
+    factionId,
+  };
+
   const payload: GamificationPayload = {
+    identity,
     achievements,
     coins,
     streak,

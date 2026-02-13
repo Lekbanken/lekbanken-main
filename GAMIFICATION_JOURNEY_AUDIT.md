@@ -702,10 +702,69 @@ Undersidor har återställts till standard app-styling:
 
 #### ⛔ Out of scope (NO-GO — fortfarande)
 - Events page alignment
-- Faction system (Steg 6)
-- Skill tree / cosmetic unlocks (Steg 7)
-- Avatar-uppgradering (3D-tilt, ramtyper) — kräver cosmetics-data
-- XP-bar skins — kräver cosmetics-system
+- Skill tree / cosmetic unlocks — kräver DB-schema + API
+- Avatar-uppgradering (ramtyper, effekter) — kräver cosmetics-data + faction
 - Fler sektioner (CoursePath, Shop, SkillTree) — kräver datamodeller
 - Journey-design på undersidor (achievements, coins)
-- Shop visuell alignment
+- Dark/Light mode toggle
+
+---
+
+### v2.6 — Layout Alignment (commit `843f49f`)
+
+#### v2.6.1 CoinsSection vault ✅
+- ✅ Saldo + transaktioner mergade till en enda vault-container (som sandbox DiceCoinVault)
+- ✅ Gradient `background` med accent-färg + accent `border`
+- ✅ 80px coin-illustration (uppgraderad från 48px)
+- ✅ Inline transaction-rader: `rounded-lg` med arrow-indikatorer (↑/↓), `text-[11px]`
+- ✅ Empty-state inom samma container
+
+#### v2.6.2 AchievementsSection hero showcase ✅
+- ✅ Hero badge centrerad vertikalt (`flex-col items-center py-8`) med `radial-gradient` ellipse
+- ✅ Badge uppgraderad till `size="lg"` (från md) med `hover:scale-110`
+- ✅ Sparkles repositionerade runt centrerad badge
+- ✅ Namn + beskrivning + datum-pill under badge
+- ✅ Grid ändrad till `grid-cols-3 gap-2` (matchar sandbox)
+- ✅ **Netto nya keyframes: 0** (återanvänder `ach-hero-glow`, `ach-sparkle`)
+
+---
+
+## v3 Roadmap (GPT-godkänd prioritering)
+
+> **Princip:** Faction persistence är grindvakten — inte palette-utils.
+> Avatar/cosmetics utan faction = hårdkodad pynt som måste göras om.
+
+### v3.0 — Personalization core
+
+| Prio | Steg | Effort | Beroende |
+|------|------|--------|----------|
+| P0 | **Faction persistence** — migration `user_progress.faction_id TEXT NULL`, `POST /api/gamification/faction`, GET inkluderar factionId från DB | S | Ingen |
+| P1 | **Faction selector UI** — modal eller litet kort på hubben, 4 factions + "neutral" | S | P0 |
+| P2 | **Theme switch** — JourneyScene byter visuellt tema per vald faction | S | P0 + P1 |
+| P3 | **Faction banner** — visar vald faction + memberSince | S | P0, kräver memberSince-källa (rek: `auth.users.created_at` om globalt, `user_progress.created_at` om per-tenant) |
+
+### v3.1 — Visual upgrades (kräver faction)
+
+| Prio | Steg | Effort | Beroende |
+|------|------|--------|----------|
+| P4 | **Palette utils** — `getColorPalette`, `hexToHSL`, `ColorMode` | S | P2 |
+| P5 | **XP-bar skins** — 2-3 visuella stilar (clean/segmented/warp) | M | P4 |
+| P6 | **Header frame overlay** — cosmetic lite | M | P4 |
+
+### v3.2+ — Produktfeatures (kräver produkt + data)
+
+| Prio | Steg | Effort | Beroende |
+|------|------|--------|----------|
+| P7 | **CourseJourneyPath** | M | Kursystem-integration |
+| P8 | **MilestoneBadge** (skippa om oklart vad "milestone" är) | M | Data-kontrakt |
+| P9 | **BackgroundEffectsLayer** | M | P4 |
+| P10 | **SkillTree + Cosmetic-system** | L | DB-schema, cosmetic_catalog |
+| P11 | **ShopShowcase + köpflöde** | L | P10 |
+| P12 | **Dark/Light mode** | L | Alla ovan bör vara klara |
+
+### Beslut att ta innan v3 startar
+
+1. **memberSince-källa:** `auth.users.created_at` (global) vs `user_progress.created_at` (per-tenant)?
+2. **Milestone-definition:** Level? Badge? Kurs? (om oklart → skippa i v3)
+3. **Faction-val permanent eller ändringsbart?** (rek: ändringsbart med cooldown)
+4. **Cosmetic-unlock triggers:** Level-gated? Coin-köp? Achievement-reward?

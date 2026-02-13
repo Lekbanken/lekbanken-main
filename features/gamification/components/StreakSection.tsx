@@ -36,10 +36,10 @@ export function StreakSection({ streak }: StreakSectionProps) {
           <div
             className="absolute left-1/2 top-6 -translate-x-1/2 w-24 h-24 rounded-full pointer-events-none"
             style={{
-              background: "radial-gradient(circle, #f5962325 0%, #f5962310 40%, transparent 70%)",
+              background: "radial-gradient(circle, #f5962335 0%, #f5962318 40%, transparent 70%)",
             }}
           />
-          <Image src="/icons/journey/streak_webp.webp" alt="Streak" width={40} height={40} className="relative mx-auto mb-1 drop-shadow-[0_0_8px_rgba(245,150,35,0.4)]" />
+          <Image src="/icons/journey/streak_webp.webp" alt="Streak" width={48} height={48} className="relative mx-auto mb-1 drop-shadow-[0_0_12px_rgba(245,150,35,0.5)]" />
           <p className="relative text-4xl font-bold text-white">{animatedStreak}</p>
           <p className="relative text-sm text-white/50">{t("streak.daysInARow")}</p>
         </div>

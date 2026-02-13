@@ -39,7 +39,7 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
       {/* Hero Badge — centered showcase (like Journey sandbox) */}
       {heroBadge && (
         <div
-          className="relative flex flex-col items-center py-8 mb-2 rounded-2xl overflow-hidden"
+          className="relative flex flex-col items-center pt-10 pb-8 mb-2 rounded-2xl overflow-hidden"
           style={{
             background: "radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.04) 0%, transparent 70%)",
           }}
@@ -48,7 +48,7 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
           <div
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full ach-hero-glow pointer-events-none"
             style={{
-              background: "radial-gradient(circle, var(--journey-accent, #8661ff)25 0%, var(--journey-accent, #8661ff)08 40%, transparent 70%)",
+              background: "radial-gradient(circle, var(--journey-accent, #8661ff)35 0%, var(--journey-accent, #8661ff)12 40%, transparent 70%)",
             }}
           />
 

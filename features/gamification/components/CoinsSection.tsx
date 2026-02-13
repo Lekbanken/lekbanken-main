@@ -79,8 +79,8 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
                   key={tx.id}
                   className="flex items-center justify-between py-1.5 px-3 rounded-lg"
                   style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.06)",
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.08)",
                   }}
                 >
                   <div className="flex items-center gap-2">

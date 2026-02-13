@@ -118,21 +118,21 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
   const xpPercent = getLevelProgress(data.progress.currentXp, data.progress.nextLevelXp);
 
   return (
-    <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-8 sm:px-6">
+    <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-10 sm:px-6">
       {/* ── Ambient particles ── */}
       <ParticleField accentColor={theme.accentColor} />
 
       {/* ── Hero: Avatar + Name + Level ── */}
-      <div className="mb-6 flex flex-col items-center text-center">
+      <div className="mb-8 flex flex-col items-center text-center">
         {/* Avatar */}
         <div className="relative mb-4">
           {/* Glow ring */}
           <div
-            className="absolute inset-0 w-24 h-24 rounded-full blur-xl opacity-40"
+            className="absolute -inset-1 w-[7.5rem] h-[7.5rem] rounded-full blur-xl opacity-50"
             style={{ backgroundColor: theme.accentColor }}
           />
           <div
-            className="relative w-24 h-24 rounded-full border-4 overflow-hidden bg-gradient-to-br from-white/10 to-white/5"
+            className="relative w-28 h-28 rounded-full border-4 overflow-hidden bg-gradient-to-br from-white/10 to-white/5"
             style={{ borderColor: theme.accentColor }}
           >
             {identity.avatarUrl ? (
@@ -173,17 +173,17 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
 
       {/* ── XP Progress Bar ── */}
       <div className="mx-auto mb-6 max-w-sm">
-        <div className="flex justify-between text-xs text-white/50 mb-1">
+        <div className="flex justify-between text-xs text-white/60 mb-1">
           <span>{data.progress.currentXp.toLocaleString("sv-SE")} XP</span>
           <span>{data.progress.nextLevelXp.toLocaleString("sv-SE")} XP</span>
         </div>
-        <div className="relative h-3 overflow-hidden rounded-full bg-white/10">
+        <div className="relative h-4 overflow-hidden rounded-full bg-white/10">
           <div
             className="h-full rounded-full transition-all duration-700 ease-out"
             style={{
               width: `${xpPercent}%`,
               backgroundColor: theme.accentColor,
-              boxShadow: `0 0 16px ${theme.glowColor}`,
+              boxShadow: `0 0 20px ${theme.glowColor}, 0 0 8px ${theme.accentColor}`,
             }}
           />
           {/* shimmer */}
@@ -236,7 +236,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
       </div>
 
       {/* ── Content Sections (glassmorphism cards) ── */}
-      <div className="space-y-6">
+      <div className="space-y-8">
         <CoinsSection summary={data.coins} />
         <SectionDivider variant="glow" />
         <StreakSection streak={data.streak} />

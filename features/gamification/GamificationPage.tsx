@@ -48,6 +48,21 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
     };
   }, [fetcher]);
 
+  const handleFactionSelect = useCallback(
+    async (factionId: Parameters<typeof saveFaction>[0]) => {
+      await saveFaction(factionId);
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              identity: { ...prev.identity!, factionId },
+            }
+          : prev,
+      );
+    },
+    [],
+  );
+
   if (error) {
     return (
       <ErrorState
@@ -117,22 +132,6 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
     : DEFAULT_THEME;
 
   const xpPercent = getLevelProgress(data.progress.currentXp, data.progress.nextLevelXp);
-
-  const handleFactionSelect = useCallback(
-    async (factionId: Parameters<typeof saveFaction>[0]) => {
-      await saveFaction(factionId);
-      // Optimistically update local state so theme switches instantly
-      setData((prev) =>
-        prev
-          ? {
-              ...prev,
-              identity: { ...prev.identity!, factionId },
-            }
-          : prev,
-      );
-    },
-    [],
-  );
 
   return (
     <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-10 sm:px-6">

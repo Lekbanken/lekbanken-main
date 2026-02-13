@@ -298,6 +298,13 @@
     "faction": {
       "label": "Faction",
       "chooseFaction": "Choose faction"
+    },
+    "skillTree": {
+      "title": "Design Tree",
+      "unlockedCount": "{unlocked} / {total} unlocked",
+      "hint": "Reach higher levels to unlock cosmetics",
+      "unlockAt": "Unlocks at level {level}",
+      "availableAt": "Available at level {level}"
     }
   },
   "browse": {

@@ -16,6 +16,7 @@ import { FactionSelector } from "./components/FactionSelector";
 import { StreakSection } from "./components/StreakSection";
 import { CallToActionSection } from "./components/CallToActionSection";
 import { SectionDivider } from "./components/SectionDivider";
+import { SkillTreeSection } from "./components/SkillTreeSection";
 
 type GamificationPageProps = {
   fetcher?: () => Promise<GamificationPayload>;
@@ -287,6 +288,12 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
         <StreakSection streak={data.streak} />
         <SectionDivider variant="ornament" />
         <AchievementsSection achievements={data.achievements} />
+        <SectionDivider variant="glow" label="Design Tree" />
+        <SkillTreeSection
+          factionId={identity.factionId}
+          userLevel={data.progress.level}
+          theme={theme}
+        />
         <SectionDivider variant="glow" label="Nästa steg" />
         <CallToActionSection />
       </div>

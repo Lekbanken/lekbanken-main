@@ -287,6 +287,13 @@
     "faction": {
       "label": "Fraktion",
       "chooseFaction": "Välj fraktion"
+    },
+    "skillTree": {
+      "title": "Design Tree",
+      "unlockedCount": "{unlocked} / {total} upplåsta",
+      "hint": "Nå högre nivåer för att låsa upp cosmetics",
+      "unlockAt": "Låser upp på level {level}",
+      "availableAt": "Tillgänglig på level {level}"
     }
   },
   "browse": {

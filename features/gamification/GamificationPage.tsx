@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ErrorState } from "@/components/ui/error-state";
 import { JourneyScene } from "@/components/journey/JourneyScene";
@@ -48,19 +48,40 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
     };
   }, [fetcher]);
 
+  // AbortController ref to cancel stale faction requests on rapid clicks
+  const factionAbortRef = useRef<AbortController | null>(null);
+
   const handleFactionSelect = useCallback(
     async (factionId: Parameters<typeof saveFaction>[0]) => {
-      await saveFaction(factionId);
+      // Abort any in-flight request
+      factionAbortRef.current?.abort();
+      const controller = new AbortController();
+      factionAbortRef.current = controller;
+
+      // Capture previous value for rollback
+      const prevFaction = data?.identity?.factionId ?? null;
+
+      // Optimistic update
       setData((prev) =>
         prev
-          ? {
-              ...prev,
-              identity: { ...prev.identity!, factionId },
-            }
+          ? { ...prev, identity: { ...prev.identity!, factionId } }
           : prev,
       );
+
+      try {
+        await saveFaction(factionId, controller.signal);
+      } catch (err) {
+        // Ignore aborted requests (user clicked another faction)
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        // Rollback on real failure
+        setData((prev) =>
+          prev
+            ? { ...prev, identity: { ...prev.identity!, factionId: prevFaction } }
+            : prev,
+        );
+      }
     },
-    [],
+    [data?.identity?.factionId],
   );
 
   if (error) {

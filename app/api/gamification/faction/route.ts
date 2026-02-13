@@ -3,6 +3,11 @@ import { createServerRlsClient } from "@/lib/supabase/server";
 
 const VALID_FACTIONS = new Set(["forest", "sea", "sky", "void"]);
 
+// faction_id column exists in DB but Supabase codegen hasn't been re-run yet.
+// Use a typed helper to send the update without fighting generated types.
+type FactionUpdate = { faction_id: string | null };
+type FactionInsert = { user_id: string; faction_id: string | null };
+
 /**
  * POST /api/gamification/faction
  * Body: { factionId: "forest" | "sea" | "sky" | "void" | null }
@@ -38,20 +43,31 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Upsert user_progress with faction_id.
-  // If row doesn't exist yet, create one with defaults.
-  const { error: upsertError } = await supabase
+  // Update the user's existing progress row.
+  // We match on user_id only — faction is global per user, regardless of tenant.
+  // If no row exists yet we insert one (tenant_id will be NULL = global).
+  const { data: existing } = await supabase
     .from("user_progress")
-    .upsert(
-      {
-        user_id: user.id,
-        faction_id: factionId as string | null,
-      },
-      { onConflict: "user_id,tenant_id" },
-    );
+    .select("id")
+    .eq("user_id", user.id)
+    .limit(1)
+    .maybeSingle();
 
-  if (upsertError) {
-    console.error("[POST /api/gamification/faction] upsert error:", upsertError);
+  const writeError = existing
+    ? (
+        await (supabase
+          .from("user_progress") as unknown as { update: (v: FactionUpdate) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } })
+          .update({ faction_id: factionId as string | null })
+          .eq("user_id", user.id)
+      ).error
+    : (
+        await (supabase
+          .from("user_progress") as unknown as { insert: (v: FactionInsert) => Promise<{ error: unknown }> })
+          .insert({ user_id: user.id, faction_id: factionId as string | null })
+      ).error;
+
+  if (writeError) {
+    console.error("[POST /api/gamification/faction] write error:", writeError);
     return NextResponse.json({ error: "Failed to save faction" }, { status: 500 });
   }
 

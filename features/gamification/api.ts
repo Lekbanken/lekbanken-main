@@ -7,12 +7,17 @@ export type { GamificationPayload };
 
 /**
  * Save the user's faction choice (or null to reset).
+ * Accepts an AbortSignal to cancel in-flight requests on rapid clicks.
  */
-export async function saveFaction(factionId: FactionId): Promise<{ factionId: FactionId }> {
+export async function saveFaction(
+  factionId: FactionId,
+  signal?: AbortSignal,
+): Promise<{ factionId: FactionId }> {
   const res = await fetch(`${API_PATH}/faction`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ factionId }),
+    signal,
   });
   if (!res.ok) {
     throw new Error(`Faction API failed with status ${res.status}`);

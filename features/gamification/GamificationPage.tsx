@@ -147,7 +147,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
     factionId: null,
   };
 
-  // Resolve theme – currently always DEFAULT, ready for faction_id
+  // Resolve theme from persisted faction
   const theme = identity.factionId
     ? getFactionTheme(identity.factionId)
     : DEFAULT_THEME;

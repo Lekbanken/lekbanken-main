@@ -160,6 +160,11 @@ export function AchievementUnlockCelebration({ achievement, onClose }: Achieveme
         .animate-pulse-glow {
           animation: pulse-glow 2s ease-in-out infinite;
         }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-confetti, .animate-pulse-glow {
+            animation: none !important;
+          }
+        }
       `}</style>
     </div>
   );

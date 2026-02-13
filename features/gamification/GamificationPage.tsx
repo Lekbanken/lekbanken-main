@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ErrorState } from "@/components/ui/error-state";
-import { Skeleton } from "@/components/ui/skeleton";
 import { JourneyScene } from "@/components/journey/JourneyScene";
 import { JourneyStats } from "@/components/journey/JourneyStats";
 import { ParticleField } from "@/components/journey/ParticleField";
@@ -71,15 +70,35 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
 
   if (isLoading || !data) {
     return (
-      <div className="space-y-6 pb-32">
-        <Skeleton className="h-7 w-40" />
-        <Skeleton className="h-48 w-full rounded-3xl" />
-        <div className="grid grid-cols-3 gap-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-32 rounded-2xl" />
+      <div className="min-h-screen rounded-2xl bg-gradient-to-b from-[#1a1a2e] to-[#16162a] px-4 pb-32 pt-8 sm:px-6 space-y-6">
+        {/* Avatar skeleton */}
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-24 h-24 rounded-full bg-white/10" />
+          <div className="h-5 w-32 rounded bg-white/10" />
+          <div className="h-3 w-20 rounded bg-white/8" />
+        </div>
+        {/* XP bar skeleton */}
+        <div className="mx-auto max-w-sm">
+          <div className="h-3 w-full rounded-full bg-white/10" />
+        </div>
+        {/* Stats pills skeleton */}
+        <div className="flex justify-center gap-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-10 w-24 rounded-full bg-white/10" />
           ))}
         </div>
-        <Skeleton className="h-32 w-full rounded-2xl" />
+        {/* Nav grid skeleton */}
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-16 rounded-2xl bg-white/5 border border-white/10" />
+          ))}
+        </div>
+        {/* Content sections skeleton */}
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-32 rounded-2xl bg-white/5 border border-white/10" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -205,7 +224,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
           <Link
             key={item.href}
             href={item.href}
-            className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--journey-accent,#8661ff)]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/10 hover:border-[var(--journey-accent)]/30 hover:shadow-[0_0_12px_var(--journey-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--journey-accent,#8661ff)]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             <Image src={item.icon} alt="" width={28} height={28} className="shrink-0" />
             <div>

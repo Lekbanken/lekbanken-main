@@ -616,3 +616,85 @@ Undersidor har återställts till standard app-styling:
 - Fler animationer utöver shimmer + count-up
 - Shop visuell alignment
 - Journey-design på undersidor (achievements, coins)
+
+---
+
+### v2 — Visual Polish (commit `0e5a789`)
+
+#### v2.1 ParticleField ✅
+- ✅ `components/journey/ParticleField.tsx` — CSS-only ambient floating particles (max 20)
+- ✅ `useMemo` particle generation, `aria-hidden="true"`, `enabled` prop toggle
+- ✅ `pf-float` keyframe + `prefers-reduced-motion: reduce` guard
+- ✅ Barrel export i `components/journey/index.ts`
+- ✅ Integrerad som första child i `JourneyScene` i GamificationPage
+
+#### v2.2 SectionDivider v2 ✅
+- ✅ 3 variants: `line` (default, behållen), `glow` (pulsande center node + blurred linjeglow), `ornament` (diamond SVGs + graderade dots)
+- ✅ Keyframes: `sd-glow-pulse`, `sd-glow-ring` + `prefers-reduced-motion` guard
+- ✅ GamificationPage använder `variant="glow"` och `variant="ornament"` mellan sektioner
+
+#### v2.3 CoinsSection vault polish ✅
+- ✅ Gold radial-gradient halo bakom DiceCoin (`#f5a623` + pulse keyframe)
+- ✅ 3 floating mini coins (CSS `coins-float` keyframes, `aria-hidden`)
+- ✅ Coin bounce animation på huvudkonen
+- ✅ Keyframes: `coins-halo`, `coins-float`, `coins-bounce` + `prefers-reduced-motion` guard
+
+#### v2.4 AchievementsSection hero sparkle ✅
+- ✅ Ambient radial glow div bakom hero badge (faction-themed)
+- ✅ 4 orbiting sparkle orbs (CSS `ach-sparkle` keyframes, `aria-hidden`)
+- ✅ Keyframes: `ach-hero-glow`, `ach-sparkle` + `prefers-reduced-motion` guard
+
+### v2.5 — Ship Polish (constraints: max 1 ny keyframe totalt, dark skeleton 0 keyframes)
+
+#### QA Gate #1 (kod-nivå) ✅
+- ✅ **Fix:** `AchievementCard` button saknade `focus-visible` ring → tillagd
+- ✅ **Fix:** `AchievementUnlockCelebration` saknade `prefers-reduced-motion` guard → tillagd
+- ✅ Modal theming: explicit `bg-[#1f1f3a]` — OK
+- ✅ CSS var scoping: inline `style={cssVars}` — OK
+- ✅ `aria-hidden` på alla dekorativa element — OK
+
+#### v2.5.1 StreakSection polish ✅ (0 nya keyframes)
+- ✅ Warm ambient glow bakom flame-ikon (statisk `radial-gradient`, ingen keyframe)
+- ✅ `drop-shadow` på streak-ikon för flame-glow
+- ✅ Aktiva veckodagar: `transition-all duration-300` + `scale-110` + förstärkt shadow
+- ✅ "Idag"-dot: `scale-125` + `ring-2` + starkare glow shadow
+- ✅ **Netto nya keyframes: 0**
+
+#### v2.5.2 Journey skeleton ✅ (0 nya keyframes)
+- ✅ Mörkt tema-skelett (`bg-white/10`, `border-white/10`) istället för standard `Skeleton`
+- ✅ Matchar JourneyScene gradient (`from-[#1a1a2e] to-[#16162a]`)
+- ✅ Layout speglar faktisk sida: avatar → XP bar → stat pills → nav grid → content cards
+- ✅ Borttagen `Skeleton` import (oanvänd)
+- ✅ **Netto nya keyframes: 0**
+
+#### v2.5.3 Quick Nav hover glow ✅ (0 nya keyframes)
+- ✅ `transition-all duration-200` + `hover:border-[var(--journey-accent)]/30` + `hover:shadow-[0_0_12px_var(--journey-glow)]`
+- ✅ Rent CSS transition, ingen keyframe
+
+### Keyframe-inventering (v2.5 final)
+
+| # | Keyframe | Fil | Typ |
+|---|----------|-----|-----|
+| 1 | `xp-shimmer` | GamificationPage | XP bar shimmer |
+| 2 | `pf-float` | ParticleField | Ambient partikelrörelse |
+| 3 | `sd-glow-pulse` | SectionDivider | Divider center node pulse |
+| 4 | `sd-glow-ring` | SectionDivider | Divider expanding ring |
+| 5 | `coins-halo` | CoinsSection | Gold glow bakom mynt |
+| 6 | `coins-float` | CoinsSection | Floating mini coins |
+| 7 | `coins-bounce` | CoinsSection | Huvudmynt bounce |
+| 8 | `ach-hero-glow` | AchievementsSection | Glow bakom hero badge |
+| 9 | `ach-sparkle` | AchievementsSection | Orbiting sparkle dots |
+| 10 | `confetti-fall` | AchievementUnlockCelebration | Confetti (event-only) |
+| 11 | `pulse-glow` | AchievementUnlockCelebration | Badge glow (event-only) |
+
+**Totalt: 11/15 budget. 4 slots kvar. Alla har `prefers-reduced-motion` guard.**
+
+#### ⛔ Out of scope (NO-GO — fortfarande)
+- Events page alignment
+- Faction system (Steg 6)
+- Skill tree / cosmetic unlocks (Steg 7)
+- Avatar-uppgradering (3D-tilt, ramtyper) — kräver cosmetics-data
+- XP-bar skins — kräver cosmetics-system
+- Fler sektioner (CoursePath, Shop, SkillTree) — kräver datamodeller
+- Journey-design på undersidor (achievements, coins)
+- Shop visuell alignment

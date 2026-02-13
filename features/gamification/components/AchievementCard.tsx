@@ -25,7 +25,7 @@ export function AchievementCard({ achievement, variant = "standard" }: Achieveme
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className={`relative flex flex-col items-center rounded-2xl p-4 text-center transition-all min-h-[140px] w-full hover:scale-105 active:scale-100 cursor-pointer ${
+        className={`relative flex flex-col items-center rounded-2xl p-4 text-center transition-all min-h-[140px] w-full hover:scale-105 active:scale-100 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--journey-accent,#8661ff)]/60 ${
           variant === "journey"
             ? isUnlocked
               ? "bg-white/10 border border-white/20 shadow-sm hover:shadow-md backdrop-blur-sm"

@@ -31,10 +31,17 @@ export function StreakSection({ streak }: StreakSectionProps) {
       {/* Streak Cards Row */}
       <div className="flex gap-3">
         {/* Current Streak - Hero */}
-        <div className="flex-1 rounded-2xl border border-white/10 bg-white/5 p-5 text-center backdrop-blur-sm">
-          <Image src="/icons/journey/streak_webp.webp" alt="Streak" width={40} height={40} className="mx-auto mb-1" />
-          <p className="text-4xl font-bold text-white">{animatedStreak}</p>
-          <p className="text-sm text-white/50">{t("streak.daysInARow")}</p>
+        <div className="relative flex-1 rounded-2xl border border-white/10 bg-white/5 p-5 text-center backdrop-blur-sm overflow-hidden">
+          {/* Warm ambient glow (static, no keyframe) */}
+          <div
+            className="absolute left-1/2 top-6 -translate-x-1/2 w-24 h-24 rounded-full pointer-events-none"
+            style={{
+              background: "radial-gradient(circle, #f5962325 0%, #f5962310 40%, transparent 70%)",
+            }}
+          />
+          <Image src="/icons/journey/streak_webp.webp" alt="Streak" width={40} height={40} className="relative mx-auto mb-1 drop-shadow-[0_0_8px_rgba(245,150,35,0.4)]" />
+          <p className="relative text-4xl font-bold text-white">{animatedStreak}</p>
+          <p className="relative text-sm text-white/50">{t("streak.daysInARow")}</p>
         </div>
 
         {/* Side Stats */}
@@ -64,12 +71,16 @@ export function StreakSection({ streak }: StreakSectionProps) {
               <div key={`${day}-${index}`} className="flex flex-col items-center">
                 <span className="text-[10px] text-white/40 mb-1">{day}</span>
                 <div
-                  className={`h-4 w-4 rounded-full transition-all ${
+                  className={`h-4 w-4 rounded-full transition-all duration-300 ${
                     isActive
-                      ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.4)]"
+                      ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.4)] scale-110"
                       : "bg-white/10"
                   } ${
-                    isToday && !isActive ? "ring-2 ring-[var(--journey-accent)]" : ""
+                    isToday
+                      ? isActive
+                        ? "ring-2 ring-emerald-400/50 shadow-[0_0_12px_rgba(52,211,153,0.6)] scale-125"
+                        : "ring-2 ring-[var(--journey-accent)] shadow-[0_0_8px_var(--journey-glow)]"
+                      : ""
                   }`}
                 />
               </div>

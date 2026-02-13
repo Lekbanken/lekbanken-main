@@ -8,6 +8,7 @@ import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { JourneyScene } from "@/components/journey/JourneyScene";
 import { JourneyStats } from "@/components/journey/JourneyStats";
+import { ParticleField } from "@/components/journey/ParticleField";
 import { DEFAULT_THEME, getFactionTheme, getLevelProgress } from "@/lib/factions";
 import { fetchGamificationSnapshot, type GamificationPayload } from "./api";
 import { AchievementsSection } from "./components/AchievementsSection";
@@ -99,6 +100,9 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
 
   return (
     <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-8 sm:px-6">
+      {/* ── Ambient particles ── */}
+      <ParticleField accentColor={theme.accentColor} />
+
       {/* ── Hero: Avatar + Name + Level ── */}
       <div className="mb-6 flex flex-col items-center text-center">
         {/* Avatar */}
@@ -215,11 +219,11 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
       {/* ── Content Sections (glassmorphism cards) ── */}
       <div className="space-y-6">
         <CoinsSection summary={data.coins} />
-        <SectionDivider />
+        <SectionDivider variant="glow" />
         <StreakSection streak={data.streak} />
-        <SectionDivider />
+        <SectionDivider variant="ornament" />
         <AchievementsSection achievements={data.achievements} />
-        <SectionDivider label="Nästa steg" />
+        <SectionDivider variant="glow" label="Nästa steg" />
         <CallToActionSection />
       </div>
 

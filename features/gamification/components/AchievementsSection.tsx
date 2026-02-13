@@ -38,15 +38,71 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
 
       {/* Hero Badge (most recently unlocked) */}
       {heroBadge && (
-        <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-          <BadgeIcon iconConfig={heroBadge.icon_config} size="md" showGlow />
-          <div className="flex-1 min-w-0">
+        <div className="relative flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm overflow-hidden">
+          {/* Ambient radial glow behind badge */}
+          <div
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-20 h-20 rounded-full ach-hero-glow pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle, var(--journey-accent, #8661ff)25 0%, var(--journey-accent, #8661ff)08 50%, transparent 75%)",
+            }}
+          />
+
+          {/* Sparkle orbs */}
+          <div className="absolute inset-0 pointer-events-none" aria-hidden>
+            {[
+              { left: "8%", top: "18%", size: 4, delay: 0 },
+              { left: "22%", top: "72%", size: 3, delay: 0.6 },
+              { left: "35%", top: "10%", size: 3.5, delay: 1.2 },
+              { left: "14%", top: "45%", size: 2.5, delay: 1.8 },
+            ].map((s, i) => (
+              <span
+                key={i}
+                className={`absolute rounded-full ach-sparkle-${i}`}
+                style={{
+                  left: s.left,
+                  top: s.top,
+                  width: s.size,
+                  height: s.size,
+                  backgroundColor: "var(--journey-accent, #8661ff)",
+                  boxShadow: "0 0 4px var(--journey-accent, #8661ff)",
+                  animationDelay: `${s.delay}s`,
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="relative">
+            <BadgeIcon iconConfig={heroBadge.icon_config} size="md" showGlow />
+          </div>
+          <div className="relative flex-1 min-w-0">
             <p className="text-xs font-medium text-[var(--journey-accent)] uppercase tracking-wide">
               Senast upplåst
             </p>
             <p className="text-sm font-semibold text-white truncate">{heroBadge.name}</p>
             <p className="text-xs text-white/50 truncate">{heroBadge.description}</p>
           </div>
+
+          <style jsx>{`
+            @keyframes ach-hero-glow {
+              0%, 100% { transform: translateY(-50%) scale(1); opacity: 0.5; }
+              50% { transform: translateY(-50%) scale(1.08); opacity: 0.8; }
+            }
+            @keyframes ach-sparkle {
+              0%, 100% { opacity: 0; transform: scale(0.5); }
+              50% { opacity: 1; transform: scale(1); }
+            }
+            .ach-hero-glow { animation: ach-hero-glow 3s ease-in-out infinite; }
+            .ach-sparkle-0 { animation: ach-sparkle 2.4s ease-in-out infinite; }
+            .ach-sparkle-1 { animation: ach-sparkle 2.8s ease-in-out infinite; }
+            .ach-sparkle-2 { animation: ach-sparkle 3.2s ease-in-out infinite; }
+            .ach-sparkle-3 { animation: ach-sparkle 2.6s ease-in-out infinite; }
+            @media (prefers-reduced-motion: reduce) {
+              .ach-hero-glow, .ach-sparkle-0, .ach-sparkle-1, .ach-sparkle-2, .ach-sparkle-3 {
+                animation: none !important;
+              }
+            }
+          `}</style>
         </div>
       )}
 

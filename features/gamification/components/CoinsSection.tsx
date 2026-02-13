@@ -13,19 +13,29 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
   return (
     <section className="space-y-4">
       {/* Section Header */}
-      <div className="flex items-center gap-2">
-        <Image src="/icons/journey/dicecoin_webp.webp" alt="" width={22} height={22} />
-        <h2 className="text-sm font-semibold text-white">{t("coins")}</h2>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Image src="/icons/journey/dicecoin_webp.webp" alt="" width={22} height={22} />
+          <h2 className="text-sm font-semibold text-white">{t("coins")}</h2>
+        </div>
+        <span className="text-xs text-white/40">Valuta</span>
       </div>
 
-      {/* Balance Card */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-sm">
+      {/* Unified Vault Card — balance + transactions in one container */}
+      <div
+        className="relative overflow-hidden rounded-2xl p-6 backdrop-blur-sm"
+        style={{
+          background: "linear-gradient(135deg, var(--journey-accent, #8661ff)14 0%, var(--journey-accent, #8661ff)06 50%, var(--journey-accent, #8661ff)08 100%)",
+          border: "1px solid var(--journey-accent, #8661ff)25",
+          boxShadow: "0 0 40px var(--journey-accent, #8661ff)10",
+        }}
+      >
         {/* Shimmer overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-[shimmer_3s_infinite] -translate-x-full" />
 
         {/* Gold halo glow */}
         <div
-          className="absolute left-1/2 top-6 -translate-x-1/2 w-24 h-24 rounded-full coins-halo pointer-events-none"
+          className="absolute left-1/2 top-6 -translate-x-1/2 w-28 h-28 rounded-full coins-halo pointer-events-none"
           style={{
             background: "radial-gradient(circle, #f5a62325 0%, #f5a62310 40%, transparent 70%)",
           }}
@@ -34,9 +44,9 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
         {/* Floating mini coins */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
           {[
-            { left: "15%", top: "20%", size: 14, delay: 0 },
-            { left: "78%", top: "30%", size: 12, delay: 0.8 },
-            { left: "60%", top: "12%", size: 10, delay: 1.6 },
+            { left: "10%", top: "15%", size: 14, delay: 0 },
+            { left: "82%", top: "22%", size: 12, delay: 0.8 },
+            { left: "65%", top: "8%", size: 10, delay: 1.6 },
           ].map((c, i) => (
             <Image
               key={i}
@@ -50,11 +60,64 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
           ))}
         </div>
 
-        <Image src="/icons/journey/dicecoin_webp.webp" alt="DiceCoin" width={48} height={48} className="relative mx-auto mb-1 coins-bounce" />
-        <p className="relative text-3xl font-bold text-white tabular-nums">
-          {animatedBalance.toLocaleString()}
-        </p>
-        <p className="relative text-sm text-white/50">DiceCoin</p>
+        {/* Center: coin illustration + balance */}
+        <div className="relative z-10 flex flex-col items-center">
+          <Image src="/icons/journey/dicecoin_webp.webp" alt="DiceCoin" width={80} height={80} className="coins-bounce mb-2 drop-shadow-[0_0_20px_rgba(245,166,35,0.3)]" />
+          <p className="text-3xl font-black text-white tabular-nums tracking-tight">
+            {animatedBalance.toLocaleString("sv-SE")}
+          </p>
+          <p className="text-[10px] uppercase tracking-[0.15em] mt-0.5 text-[#f5a623]">DiceCoin</p>
+        </div>
+
+        {/* Recent transactions — inside the same card */}
+        {summary.recentTransactions.length > 0 && (
+          <div className="relative z-10 mt-5 space-y-2">
+            {summary.recentTransactions.slice(0, 3).map((tx) => {
+              const isEarn = tx.type === "earn";
+              return (
+                <div
+                  key={tx.id}
+                  className="flex items-center justify-between py-1.5 px-3 rounded-lg"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
+                      style={{
+                        backgroundColor: isEarn ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
+                        color: isEarn ? "#22c55e" : "#ef4444",
+                      }}
+                    >
+                      {isEarn ? "↑" : "↓"}
+                    </div>
+                    <span className="text-[11px] text-white/80 truncate max-w-[160px]">
+                      {tx.description}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`text-[11px] font-bold tabular-nums ${
+                        isEarn ? "text-emerald-400" : "text-rose-400"
+                      }`}
+                    >
+                      {isEarn ? "+" : "-"}{tx.amount}
+                    </span>
+                    <span className="text-[9px] text-white/30">{tx.date}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {summary.recentTransactions.length === 0 && (
+          <p className="relative z-10 mt-4 text-center text-xs text-white/40">
+            {t("noCoinsActivityYet")}
+          </p>
+        )}
 
         <style jsx>{`
           @keyframes coins-halo {
@@ -80,47 +143,6 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
             }
           }
         `}</style>
-      </div>
-
-      {/* Recent Transactions */}
-      <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-white/40 px-1">
-          Senaste transaktioner
-        </p>
-
-        <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden backdrop-blur-sm">
-          {summary.recentTransactions.length === 0 ? (
-            <div className="p-4 text-center text-sm text-white/50">
-              {t("noCoinsActivityYet")}
-            </div>
-          ) : (
-            summary.recentTransactions.slice(0, 3).map((tx, index) => {
-              const isEarn = tx.type === "earn";
-              return (
-                <div
-                  key={tx.id}
-                  className={`flex items-center gap-3 px-4 py-3 ${
-                    index < summary.recentTransactions.length - 1 ? "border-b border-white/10" : ""
-                  }`}
-                >
-                  <span
-                    className={`w-12 text-sm font-bold tabular-nums ${
-                      isEarn ? "text-emerald-400" : "text-rose-400"
-                    }`}
-                  >
-                    {isEarn ? "+" : "-"}{tx.amount}
-                  </span>
-                  <p className="flex-1 text-sm text-white/80 truncate">
-                    {tx.description}
-                  </p>
-                  <span className="text-xs text-white/40">
-                    {tx.date}
-                  </span>
-                </div>
-              );
-            })
-          )}
-        </div>
       </div>
     </section>
   );

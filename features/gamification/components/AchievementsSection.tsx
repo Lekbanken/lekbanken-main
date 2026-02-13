@@ -36,25 +36,29 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
         </span>
       </div>
 
-      {/* Hero Badge (most recently unlocked) */}
+      {/* Hero Badge — centered showcase (like Journey sandbox) */}
       {heroBadge && (
-        <div className="relative flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm overflow-hidden">
+        <div
+          className="relative flex flex-col items-center py-8 mb-2 rounded-2xl overflow-hidden"
+          style={{
+            background: "radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.04) 0%, transparent 70%)",
+          }}
+        >
           {/* Ambient radial glow behind badge */}
           <div
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-20 h-20 rounded-full ach-hero-glow pointer-events-none"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full ach-hero-glow pointer-events-none"
             style={{
-              background:
-                "radial-gradient(circle, var(--journey-accent, #8661ff)25 0%, var(--journey-accent, #8661ff)08 50%, transparent 75%)",
+              background: "radial-gradient(circle, var(--journey-accent, #8661ff)25 0%, var(--journey-accent, #8661ff)08 40%, transparent 70%)",
             }}
           />
 
           {/* Sparkle orbs */}
           <div className="absolute inset-0 pointer-events-none" aria-hidden>
             {[
-              { left: "8%", top: "18%", size: 4, delay: 0 },
-              { left: "22%", top: "72%", size: 3, delay: 0.6 },
-              { left: "35%", top: "10%", size: 3.5, delay: 1.2 },
-              { left: "14%", top: "45%", size: 2.5, delay: 1.8 },
+              { left: "35%", top: "15%", size: 4, delay: 0 },
+              { left: "65%", top: "70%", size: 3, delay: 0.6 },
+              { left: "25%", top: "55%", size: 3.5, delay: 1.2 },
+              { left: "70%", top: "25%", size: 2.5, delay: 1.8 },
             ].map((s, i) => (
               <span
                 key={i}
@@ -72,21 +76,28 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
             ))}
           </div>
 
-          <div className="relative">
-            <BadgeIcon iconConfig={heroBadge.icon_config} size="md" showGlow />
+          {/* The badge — big, no box border, center stage */}
+          <div className="relative transition-transform duration-300 hover:scale-110">
+            <BadgeIcon iconConfig={heroBadge.icon_config} size="lg" showGlow />
           </div>
-          <div className="relative flex-1 min-w-0">
-            <p className="text-xs font-medium text-[var(--journey-accent)] uppercase tracking-wide">
-              Senast upplåst
+
+          {/* Name + description */}
+          <div className="mt-4 text-center relative z-10">
+            <h4 className="text-base font-bold text-white">{heroBadge.name}</h4>
+            <p className="text-xs mt-0.5 text-white/50">{heroBadge.description}</p>
+          </div>
+
+          {/* Earned date pill */}
+          {heroBadge.unlockedAt && (
+            <p className="mt-2 text-[10px] text-[var(--journey-accent)]/70 uppercase tracking-wide relative z-10">
+              Upplåst {new Date(heroBadge.unlockedAt).toLocaleDateString("sv-SE")}
             </p>
-            <p className="text-sm font-semibold text-white truncate">{heroBadge.name}</p>
-            <p className="text-xs text-white/50 truncate">{heroBadge.description}</p>
-          </div>
+          )}
 
           <style jsx>{`
             @keyframes ach-hero-glow {
-              0%, 100% { transform: translateY(-50%) scale(1); opacity: 0.5; }
-              50% { transform: translateY(-50%) scale(1.08); opacity: 0.8; }
+              0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+              50% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.8; }
             }
             @keyframes ach-sparkle {
               0%, 100% { opacity: 0; transform: scale(0.5); }
@@ -106,7 +117,7 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
         </div>
       )}
 
-      {/* Achievement Grid */}
+      {/* Achievement Grid — 3 columns like sandbox */}
       {achievements.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm">
           <TrophyEmptyIcon className="mb-2 h-10 w-10 text-white/20" />
@@ -116,7 +127,7 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-3 gap-2">
           {achievements.slice(0, 6).map((achievement) => (
             <AchievementCard key={achievement.id} achievement={achievement} variant="journey" />
           ))}

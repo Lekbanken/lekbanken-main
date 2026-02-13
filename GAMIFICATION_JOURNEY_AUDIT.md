@@ -1,7 +1,7 @@
 # Implementeringsaudit: Journey som design för /app/gamification
 
 > **Datum:** 2026-02-13  
-> **Status:** 🔒 v1 LÅST — Steg 0-5 + hardening klart. Visuell QA före ship. Steg 6+ efter staging-godkännande.  
+> **Status:** 🔒 v2.5 LÅST — v1 + v2 (particles, dividers, coins vault, badge sparkle) + v2.5 (streak glow, dark skeleton, nav hover, QA fixes). UI-QA före staging.  
 > **Mål:** Uppgradera `/app/gamification` med Journey-designspråk och funktionalitet
 
 ### Arkitekturbeslut (2026-02-13)
@@ -600,13 +600,7 @@ Undersidor har återställts till standard app-styling:
 - ✅ `AchievementsSection` — skickar `variant="journey"` till `AchievementCard`
 - ✅ `tsc --noEmit` — 0 errors efter återställning
 
-#### 🔒 v1 Ship Gate
-- [ ] Manuell visuell QA: öppna `/app/gamification`, tabba runt, öppna 2-3 modals
-- [ ] Navigera bort till vanlig sida — kontrollera att inga styles hänger kvar
-- [ ] Öppna `/app/gamification/achievements` — kontrollera standard app-tema
-- [ ] Öppna `/app/gamification/coins` — kontrollera standard app-tema
-- [ ] Desktop + mobil screenshot för design review
-- **Efter godkännande → committa och skeppa. Ingen ytterligare scope.**
+#### 🔒 v1 Ship Gate ✅ (ersatt av v2.5 Ship Gate nedan)
 
 #### ⛔ Out of scope för v1 (NO-GO)
 - Events page alignment
@@ -688,6 +682,23 @@ Undersidor har återställts till standard app-styling:
 | 11 | `pulse-glow` | AchievementUnlockCelebration | Badge glow (event-only) |
 
 **Totalt: 11/15 budget. 4 slots kvar. Alla har `prefers-reduced-motion` guard.**
+
+> **⚖️ Keyframe Constitution** (regel för framtida tillägg):
+> 1. Alla nya keyframes **måste** läggas till i inventory-tabellen ovan
+> 2. Alla nya keyframes **måste** ha `@media (prefers-reduced-motion: reduce)` guard
+> 3. Alla nya keyframes **måste** motiveras med "impact per keyframe" — ingen animation utan tydligt UX-syfte
+>
+> **Obs:** `pulse-glow` (AchievementUnlockCelebration) kan bli visuellt "för mycket" om den triggas ofta. Godkänd så länge celebration enbart triggas vid sällsynta unlock-events.
+
+#### 🔒 v2.5 Ship Gate (UI-QA)
+- [ ] **Mobile scroll** på hubben — blur + gradients + particles renderar korrekt, ingen stutter
+- [ ] **Modal open/close** (AchievementDetailModal) × 3 — focus trap fungerar, ingen flash, bakgrund scrollar inte
+- [ ] **Navigera bort** till vanlig sida (`/app/learning` eller `/app/play`) — kontrollera att inga Journey-styles hänger kvar
+- [ ] **Tabba igenom** hela hubben — alla interaktiva element har synlig focus ring
+- [ ] `/app/gamification/achievements` — standard app-tema (ej Journey)
+- [ ] `/app/gamification/coins` — standard app-tema (ej Journey)
+- [ ] Desktop + mobil screenshot → design review sign-off
+- **Efter godkännande → skeppa staging. Ingen ytterligare scope.**
 
 #### ⛔ Out of scope (NO-GO — fortfarande)
 - Events page alignment

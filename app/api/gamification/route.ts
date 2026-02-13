@@ -52,7 +52,6 @@ type UserProgressRow = {
   current_xp: number | null;
   next_level_xp: number | null;
   tenant_id?: string | null;
-  faction_id?: string | null;
 };
 
 type LevelDefinitionRow = {
@@ -188,12 +187,27 @@ export async function GET() {
   // First get progress to know tenant context
   const progressRes = await supabase
     .from("user_progress")
-    .select("level,current_xp,next_level_xp,tenant_id,faction_id")
+    .select("level,current_xp,next_level_xp,tenant_id")
     .eq("user_id", userId)
     .limit(1)
     .maybeSingle();
 
   const tenantId = (progressRes.data as { tenant_id?: string | null } | null)?.tenant_id ?? null;
+
+  // Faction lives in its own table — 1 row per user, no tenant dependency.
+  type PrefsRow = { faction_id: string | null };
+  const prefsRes = await (
+    supabase.from("user_journey_preferences" as never) as unknown as {
+      select: (cols: string) => {
+        eq: (col: string, val: string) => {
+          maybeSingle: () => Promise<{ data: PrefsRow | null; error: unknown }>;
+        };
+      };
+    }
+  )
+    .select("faction_id")
+    .eq("user_id", userId)
+    .maybeSingle();
 
   // Build achievements query: global (tenant_id IS NULL) + tenant-specific active achievements
   let achievementsQuery = supabase
@@ -249,8 +263,8 @@ export async function GET() {
 
   const progress = applyLevelDefinitions(baseProgress, levelDefs);
 
-  // Identity – extracted from auth user metadata + faction from user_progress
-  const rawFaction = (progressRes.data as UserProgressRow | null)?.faction_id ?? null;
+  // Identity — auth metadata + faction from user_journey_preferences
+  const rawFaction = (prefsRes.data as { faction_id?: string | null } | null)?.faction_id ?? null;
   const VALID_FACTIONS = new Set<string>(["forest", "sea", "sky", "void"]);
   const factionId = rawFaction && VALID_FACTIONS.has(rawFaction)
     ? (rawFaction as "forest" | "sea" | "sky" | "void")

@@ -738,19 +738,27 @@ Undersidor har återställts till standard app-styling:
 
 | Prio | Steg | Status |
 |------|------|--------|
-| P0 | **Faction persistence** — migration `user_progress.faction_id TEXT NULL`, `POST /api/gamification/faction`, GET inkluderar factionId från DB | ✅ Done |
+| P0 | **Faction persistence** — `user_journey_preferences` table (PK user_id), POST upsert, GET reads from dedicated table | ✅ Done |
 | P1 | **Faction selector UI** — compact row of faction buttons on hub, 4 factions + "neutral" | ✅ Done |
-| P2 | **Theme switch** — JourneyScene byter visuellt tema per vald faction (optimistic update) | ✅ Done |
+| P2 | **Theme switch** — JourneyScene byter visuellt tema per vald faction (optimistic update + rollback) | ✅ Done |
 | P3 | **Faction banner** — visar vald faction + memberSince | ⏳ Deferred to v3.1 |
 
+**Hardening (GPT QA):**
+- POST: simple upsert on `user_journey_preferences.user_id` PK — no tenant dependency
+- GET: separate query to `user_journey_preferences` — deterministic, 1 row per user
+- Client: AbortController cancels stale requests on rapid clicks
+- UI: optimistic rollback on POST failure
+- Whitelist guard: invalid DB values fall back to `null`
+
 **Shipped files:**
-- `supabase/migrations/20260210000000_user_progress_faction_id.sql` — adds `faction_id` column
-- `app/api/gamification/faction/route.ts` — POST endpoint (validates, upserts)
-- `app/api/gamification/route.ts` — GET now reads `faction_id` from DB
+- `supabase/migrations/20260210000000_user_progress_faction_id.sql` — original (superseded)
+- `supabase/migrations/20260213000000_user_journey_preferences.sql` — dedicated table + RLS + data migration + cleanup
+- `app/api/gamification/faction/route.ts` — POST endpoint (validates, upserts to new table)
+- `app/api/gamification/route.ts` — GET reads faction from `user_journey_preferences`
 - `features/gamification/types.ts` — `factionId` aligned to `FactionId` union type
-- `features/gamification/api.ts` — `saveFaction()` client function
+- `features/gamification/api.ts` — `saveFaction()` with AbortSignal support
 - `features/gamification/components/FactionSelector.tsx` — compact row selector (0 new keyframes)
-- `features/gamification/GamificationPage.tsx` — integrated selector + optimistic theme switch
+- `features/gamification/GamificationPage.tsx` — integrated selector + optimistic theme switch + rollback
 - `messages/sv.json` + `messages/en.json` — i18n keys for faction UI
 
 ### v3.1 — Visual upgrades (kräver faction)

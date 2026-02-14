@@ -1,7 +1,7 @@
 # Implementeringsaudit: Journey som design för /app/gamification
 
-> **Datum:** 2026-02-13  
-> **Status:** 🔒 v2.5 LÅST — v1 + v2 (particles, dividers, coins vault, badge sparkle) + v2.5 (streak glow, dark skeleton, nav hover, QA fixes). UI-QA före staging.  
+> **Datum:** 2026-02-15  
+> **Status:** 🔒 v3.0 SHIPPED — faction persistence + skill tree preview. v1/v2/v2.5/v2.6 LÅST.  
 > **Mål:** Uppgradera `/app/gamification` med Journey-designspråk och funktionalitet
 
 ### Arkitekturbeslut (2026-02-13)
@@ -102,7 +102,7 @@
 | **Kursväg** | `CourseJourneyPath` — vertikal timeline med 4 kursnoder | ❌ Finns ej | ❌ Saknas | P3 |
 | **Shop showcase** | `ShopShowcase` — auto-roterande spotlight, rarity-glow | Separat sida (`/app/shop`) | ⚠️ Kan lägga till preview | P3 |
 | **Factions** | Full faction-väljare + visuellt tema per fraktion | ❌ Finns ej i gamification UI | ❌ Saknas | P1 |
-| **Skill tree** | `SkillTreeInline` — 9 noder per fraktion, cosmetic unlock | ❌ Finns ej | ❌ Saknas | P3 |
+| **Skill tree** | `SkillTreeInline` — 9 noder per fraktion, cosmetic unlock | ✅ `SkillTreeSection` — level-gated preview, SVG connections | ⚠️ Preview only (ej cosmetic apply) | ✅ Done |
 | **Sektionsavdelare** | `SectionDivider` — 8 stilar (glow, nebula, ornament etc.) | Ingen (bara `space-y-6`) | ❌ Saknas | P2 |
 | **Header frame** | `HeaderFrameOverlay` — 9 stilar (ornate, neon, aurora etc.) | Ingen | ❌ Saknas | P3 |
 | **Bakgrundseffekter** | `BackgroundEffectsLayer` — 12 effekter (partiklar, stjärnor etc.) | Ingen | ❌ Saknas | P3 |
@@ -116,7 +116,7 @@
 | Coins balance | snapshot.coinsBalance | gamification.coins.balance | ✅ Båda har det |
 | Achievement count | snapshot.unlockedAchievements | gamification.achievements[] | ✅ Båda har det |
 | Streak days | snapshot.streakDays | gamification.streak.currentDays | ✅ Båda har det |
-| Faction | ❌ Ej i API (mock i sandbox) | ❌ Ej i API | ❌ Ingen har det |
+| Faction | ❌ Ej i API (mock i sandbox) | ✅ `user_journey_preferences` + POST/GET | ✅ Shipped |
 | Activity feed | `/api/journey/feed` → items[] med type, title, href | ❌ Gamification saknar feed | ⚠️ Finns men ej kopplat |
 | Pinned achievements | Via gamification pins-API (`/api/gamification/pins`) | ✅ Finns | ✅ |
 | Cosmetics | `/api/cosmetics/loadout` | ✅ Finns i dashboard | ✅ |
@@ -215,9 +215,9 @@
 
 ---
 
-### Fas 4: Faction-system (P1 — kärna för personalisering)
+### Fas 4: Faction-system ✅ SHIPPED (v3.0)
 > **Mål:** Låta användaren välja faction som ändrar hela sidans visuella tema
-> **Estimat:** ~4-6 timmar
+> **Status:** ✅ Implementerat via `user_journey_preferences` tabell + POST/GET + FactionSelector UI
 
 #### 4A. Faction-väljare komponent
 - 4 factions: Forest 🌲 / Sea 🌊 / Sky ☀️ / Void 🌌
@@ -525,8 +525,9 @@ Efter Steg 0-5 (~9-13 h): Gamification-hubben har fullständig Journey-design me
 | Steg 4: Achievements-sida | ~1-2 h | Steg 1 |
 | Steg 5: Verify & polish | ~1 h | Steg 3+4 |
 | **Totalt fas 1 (Steg 0-5)** | **~9-13 h** | |
-| Steg 6: Faction (senare) | ~4-6 h | Steg 5 |
-| Steg 7: Avancerat (framtid) | ~6-10 h | Steg 6 |
+| Steg 6: Faction (v3.0) | ✅ Shipped | Steg 5 |
+| Steg 7: Skill tree preview (v3.0.1) | ✅ Shipped | Steg 6 |
+| Steg 8: Visual upgrades (v3.1) | ⏳ Nästa | Steg 7 |
 
 ### Redan klart
 
@@ -702,9 +703,9 @@ Undersidor har återställts till standard app-styling:
 
 #### ⛔ Out of scope (NO-GO — fortfarande)
 - Events page alignment
-- Skill tree / cosmetic unlocks — kräver DB-schema + API
+- ~~Skill tree / cosmetic unlocks — kräver DB-schema + API~~ → ✅ Preview shipped (v3.0.1). Cosmetic apply kvar (P10)
 - Avatar-uppgradering (ramtyper, effekter) — kräver cosmetics-data + faction
-- Fler sektioner (CoursePath, Shop, SkillTree) — kräver datamodeller
+- Fler sektioner (CoursePath, Shop) — kräver datamodeller
 - Journey-design på undersidor (achievements, coins)
 - Dark/Light mode toggle
 
@@ -761,28 +762,61 @@ Undersidor har återställts till standard app-styling:
 - `features/gamification/GamificationPage.tsx` — integrated selector + optimistic theme switch + rollback
 - `messages/sv.json` + `messages/en.json` — i18n keys for faction UI
 
-### v3.1 — Visual upgrades (kräver faction)
+### v3.0.1 — Skill Tree Preview ✅ SHIPPED (commit `000d087`)
 
-| Prio | Steg | Effort | Beroende |
-|------|------|--------|----------|
-| P4 | **Palette utils** — `getColorPalette`, `hexToHSL`, `ColorMode` | S | P2 |
-| P5 | **XP-bar skins** — 2-3 visuella stilar (clean/segmented/warp) | M | P4 |
-| P6 | **Header frame overlay** — cosmetic lite | M | P4 |
+| Prio | Steg | Status |
+|------|------|--------|
+| — | **Skill tree data defs** — `skill-trees.ts`: 4 faction trees × 9 nodes, level-gated resolver | ✅ Done |
+| — | **SkillTreeSection** — SVG bezier connections, 3-col grid, lock/available/unlocked states | ✅ Done |
+| — | **Hub integration** — between Achievements and CTA sections | ✅ Done |
+| — | **i18n** — sv + en keys for skill tree labels | ✅ Done |
+
+**Key design decisions:**
+- Preview only — no cosmetic application, no DB writes
+- Level-gated auto-unlock: `requiredLevel <= userLevel` → unlocked
+- 0 new keyframes (CSS transitions only) — budget stays 11/15
+- Faction-aware: tree changes per selected faction
+
+**Shipped files:**
+- `features/gamification/data/skill-trees.ts` — types + tree defs + `getSkillTree()` resolver
+- `features/gamification/components/SkillTreeSection.tsx` — SVG connections + node grid component
+- `features/gamification/GamificationPage.tsx` — section integrated
+- `messages/sv.json` + `messages/en.json` — i18n keys
+
+---
+
+### v3.1 — Visual upgrades (kräver faction) 🔜 NÄSTA
+
+| Prio | Steg | Effort | Beroende | Status |
+|------|------|--------|----------|--------|
+| P3 | **Faction banner** — visar vald faction + memberSince under avatar | S | v3.0 | ⏳ Redo |
+| P4 | **Palette utils** — `getColorPalette`, `hexToHSL`, `ColorMode` | S | v3.0 | ⏳ Redo |
+| P5 | **XP-bar skins** — 2-3 visuella stilar (clean/segmented/warp) | M | P4 | ⏳ |
+| P6 | **Header frame overlay** — cosmetic lite | M | P4 | ⏳ |
 
 ### v3.2+ — Produktfeatures (kräver produkt + data)
 
-| Prio | Steg | Effort | Beroende |
-|------|------|--------|----------|
-| P7 | **CourseJourneyPath** | M | Kursystem-integration |
-| P8 | **MilestoneBadge** (skippa om oklart vad "milestone" är) | M | Data-kontrakt |
-| P9 | **BackgroundEffectsLayer** | M | P4 |
-| P10 | **SkillTree + Cosmetic-system** | L | DB-schema, cosmetic_catalog |
-| P11 | **ShopShowcase + köpflöde** | L | P10 |
-| P12 | **Dark/Light mode** | L | Alla ovan bör vara klara |
+| Prio | Steg | Effort | Beroende | Status |
+|------|------|--------|----------|--------|
+| P7 | **CourseJourneyPath** | M | Kursystem-integration | ⏳ |
+| P8 | **MilestoneBadge** (skippa om oklart vad "milestone" är) | M | Data-kontrakt | ⏳ |
+| P9 | **BackgroundEffectsLayer** | M | P4 | ⏳ |
+| P10 | **Skill tree cosmetic apply** — click-to-preview, loadout save | L | DB-schema, cosmetic_catalog | ⏳ |
+| P11 | **ShopShowcase + köpflöde** | L | P10 | ⏳ |
+| P12 | **Dark/Light mode** | L | Alla ovan bör vara klara | ⏳ |
 
-### Beslut att ta innan v3 startar
+### Beslut att ta innan v3.1 startar
 
-1. **memberSince-källa:** `auth.users.created_at` (global) vs `user_progress.created_at` (per-tenant)?
-2. **Milestone-definition:** Level? Badge? Kurs? (om oklart → skippa i v3)
-3. **Faction-val permanent eller ändringsbart?** (rek: ändringsbart med cooldown)
-4. **Cosmetic-unlock triggers:** Level-gated? Coin-köp? Achievement-reward?
+1. ~~**memberSince-källa:** `auth.users.created_at` (global) vs `user_progress.created_at` (per-tenant)?~~ → Behövs för faction banner (P3)
+2. **Milestone-definition:** Level? Badge? Kurs? (om oklart → skippa)
+3. ~~**Faction-val permanent eller ändringsbart?**~~ → ✅ Ändringsbart utan cooldown (implementerat)
+4. **Cosmetic-unlock triggers:** Level-gated auto-unlock (skill tree preview visar detta). Coin-köp / achievement-reward TBD för v3.2+
+5. **XP-bar skin selection:** Skill tree unlock → auto-apply? Eller manuell toggle i settings?
+
+### Nästa steg (rekommenderad ordning)
+
+1. **P3: Faction banner** — visa vald faction namn + ikon under avatar. Kort steg (~30 min)
+2. **P4: Palette utils** — `hexToHSL()`, `getColorPalette()`. Foundation för XP skins + color modes
+3. **P5: XP-bar skins** — 2-3 visuella varianter, togglebar via skill tree unlock
+4. **QA: v2.5 Ship Gate** — mobile scroll, modal, scope leakage, focus tab (se checklistan ovan)
+5. **Staging deploy** — efter QA godkänd

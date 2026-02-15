@@ -13,6 +13,10 @@
 
 import type { FactionId, FactionTheme } from '@/types/journey'
 
+// Re-export palette utils for consumers that import from factions
+export { hexToHSL, hslToHex, lightenColor, darkenColor, withAlpha } from './palette'
+export type { ColorMode } from './palette'
+
 // =============================================================================
 // Faction Theme Definitions
 // =============================================================================

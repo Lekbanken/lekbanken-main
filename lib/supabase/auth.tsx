@@ -299,12 +299,18 @@ export function AuthProvider({
       }
 
       // Event matrix:
-      // - SIGNED_IN: Full refresh (user + profile + memberships) + router.refresh()
-      // - USER_UPDATED: Full refresh (metadata may affect profile/role)
+      // - SIGNED_IN: Full refresh (user + profile + memberships)
+      //   NOTE: We intentionally skip router.refresh() here. The login page
+      //   uses window.location.href (hard redirect) which triggers a full
+      //   server render. An RSC refresh on a guest-only path (/auth/login)
+      //   would race with the hard redirect — the proxy sees the now-authenticated
+      //   user on a guest-only path and returns a redirect, which can interfere
+      //   with the pending window.location navigation.
+      // - USER_UPDATED: Full refresh (metadata may affect profile/role) + router.refresh()
       // - TOKEN_REFRESHED: Just update user (reduce traffic, token refresh is frequent)
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
         await refreshAuthData(authUser)
-        if (event === 'SIGNED_IN') {
+        if (event === 'USER_UPDATED') {
           router.refresh()
         }
       } else {

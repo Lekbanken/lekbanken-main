@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { LanguageSwitcher } from '@/components/navigation/LanguageSwitcher'
 import { ThemeToggle } from '@/components/navigation/ThemeToggle'
 import { Alert } from '@/components/ui/alert'
@@ -24,7 +24,6 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const { language } = usePreferences()
   const copy = useMemo(() => getUiCopy(language), [language])
@@ -32,6 +31,7 @@ function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const redirectParam = searchParams.get('redirect')
   const isAdminRole = effectiveGlobalRole === 'system_admin'
@@ -39,22 +39,25 @@ function LoginForm() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.refresh()
-      router.replace(redirectTo)
+      // Hard redirect so every server component re-renders with fresh cookies
+      window.location.href = redirectTo
     }
-  }, [isAuthenticated, isLoading, redirectTo, router])
+  }, [isAuthenticated, isLoading, redirectTo])
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSubmitting) return
     setError('')
+    setIsSubmitting(true)
 
     try {
       await signIn(email, password)
-      // Refresh to ensure server state is updated before navigation
-      router.refresh()
-      router.push(redirectTo)
+      // Hard redirect — router.push() uses cached RSC payloads that
+      // were prefetched before login and won't include the auth cookies.
+      window.location.href = redirectTo
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
+      setIsSubmitting(false)
     }
   }
 
@@ -125,8 +128,8 @@ function LoginForm() {
                 </div>
               </div>
 
-              <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading ? 'Signing in...' : copy.auth.loginAction}
+              <Button type="submit" disabled={isLoading || isSubmitting} className="w-full">
+                {isSubmitting ? 'Signing in...' : copy.auth.loginAction}
               </Button>
             </form>
 

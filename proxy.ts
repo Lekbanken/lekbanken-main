@@ -182,7 +182,7 @@ export default async function proxy(request: NextRequest) {
   const requestId = generateRequestId()
   const pathname = request.nextUrl.pathname
 
-  const response = NextResponse.next()
+  let response = NextResponse.next({ request })
   response.headers.set('x-request-id', requestId)
 
   // ============================================
@@ -213,8 +213,17 @@ export default async function proxy(request: NextRequest) {
         return request.cookies.getAll()
       },
       setAll(cookiesToSet) {
+        // 1. Write refreshed tokens to request so downstream server code sees them
+        cookiesToSet.forEach(({ name, value }) => {
+          request.cookies.set(name, value)
+        })
+
+        // 2. Recreate response from modified request to propagate cookies
+        response = NextResponse.next({ request })
+        response.headers.set('x-request-id', requestId)
+
+        // 3. Write to response so the browser stores the refreshed tokens
         cookiesToSet.forEach(({ name, value, options }) => {
-          // Enhance cookie options with cross-subdomain domain for platform domains
           const enhancedOptions = enhanceCookieOptions(options, hostname)
           response.cookies.set(name, value, enhancedOptions)
         })

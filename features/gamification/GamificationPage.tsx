@@ -17,6 +17,8 @@ import { StreakSection } from "./components/StreakSection";
 import { CallToActionSection } from "./components/CallToActionSection";
 import { SectionDivider } from "./components/SectionDivider";
 import { SkillTreeSection } from "./components/SkillTreeSection";
+import { XPProgressBar, resolveXPBarSkin, resolveXPBarColorMode } from "./components/XPProgressBar";
+import { getSkillTree } from "./data/skill-trees";
 
 type GamificationPageProps = {
   fetcher?: () => Promise<GamificationPayload>;
@@ -155,6 +157,13 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
 
   const xpPercent = getLevelProgress(data.progress.currentXp, data.progress.nextLevelXp);
 
+  // Resolve XP bar skin from skill tree unlock
+  const xpNode = getSkillTree(identity.factionId, data.progress.level).find(
+    (n) => n.cosmeticCategory === "xp" && n.status === "unlocked",
+  );
+  const xpSkin = resolveXPBarSkin(xpNode?.cosmeticKey);
+  const xpColorMode = resolveXPBarColorMode(xpNode?.cosmeticKey);
+
   return (
     <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-10 sm:px-6">
       {/* ── Ambient particles ── */}
@@ -237,34 +246,17 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
       </div>
 
       {/* ── XP Progress Bar ── */}
-      <div className="mx-auto mb-6 max-w-sm">
-        <div className="flex justify-between text-xs text-white/60 mb-1">
-          <span>{data.progress.currentXp.toLocaleString("sv-SE")} XP</span>
-          <span>{data.progress.nextLevelXp.toLocaleString("sv-SE")} XP</span>
-        </div>
-        <div className="relative h-4 overflow-hidden rounded-full bg-white/10">
-          <div
-            className="h-full rounded-full transition-all duration-700 ease-out"
-            style={{
-              width: `${xpPercent}%`,
-              backgroundColor: theme.accentColor,
-              boxShadow: `0 0 20px ${theme.glowColor}, 0 0 8px ${theme.accentColor}`,
-            }}
-          />
-          {/* shimmer */}
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)",
-              animation: "xp-shimmer 2.5s infinite",
-            }}
-          />
-        </div>
-        <div className="flex justify-between text-[10px] text-white/40 mt-1">
-          <span>Level {data.progress.level}</span>
-          <span>Level {data.progress.level + 1}</span>
-        </div>
+      <div className="mb-6">
+        <XPProgressBar
+          percent={xpPercent}
+          currentXp={data.progress.currentXp}
+          nextLevelXp={data.progress.nextLevelXp}
+          level={data.progress.level}
+          accentColor={theme.accentColor}
+          glowColor={theme.glowColor}
+          skin={xpSkin}
+          colorMode={xpColorMode}
+        />
       </div>
 
       {/* ── Stat Pills (Coins · Badges · Streak) ── */}
@@ -317,14 +309,15 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
         <CallToActionSection />
       </div>
 
-      {/* XP shimmer keyframes + reduced-motion guard */}
+      {/* XP shimmer keyframe + reduced-motion guard */}
       <style jsx>{`
         @keyframes xp-shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .xp-shimmer, [style*="xp-shimmer"] {
+          [style*="xp-shimmer"],
+          [style*="xp-energy-flow"] {
             animation: none !important;
           }
         }

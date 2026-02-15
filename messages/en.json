@@ -311,6 +311,7 @@
       "unlockedCount": "{unlocked} / {total} unlocked",
       "hint": "Reach higher levels to unlock cosmetics",
       "hintClick": "Tap a node to see details",
+      "avatarHint": "Tap your avatar for Design Tree",
       "unlockAt": "Unlocks at level {level}",
       "availableAt": "Available at level {level}",
       "nodeUnlocked": "Unlocked"

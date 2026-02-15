@@ -308,7 +308,6 @@ type SkillTreeSectionProps = {
  * Shows the 9-node tree for the active faction with:
  * - Animated flowing dots on unlocked connections (SVG animateMotion, 0 keyframe cost)
  * - Click-to-inspect node popover with cosmetic details
- * - Pulse ring on available (next-to-unlock) nodes (1 keyframe: skill-node-pulse)
  * - Hover scale on interactive nodes
  */
 export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSectionProps) {
@@ -335,14 +334,9 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
-      {/* Keyframe + reduced-motion guard */}
+      {/* Reduced-motion guard */}
       <style>{`
-        @keyframes skill-node-pulse {
-          0%, 100% { box-shadow: 0 0 0 0px var(--pulse-color); }
-          50% { box-shadow: 0 0 0 5px transparent; }
-        }
         @media (prefers-reduced-motion: reduce) {
-          .skill-node-pulse { animation: none !important; }
           .skill-tree-dot { display: none; }
         }
       `}</style>
@@ -392,7 +386,6 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
                       "relative flex flex-col items-center justify-center gap-1 rounded-xl transition-all duration-200",
                       isInteractive && "cursor-pointer",
                       isInteractive && !isSelected && "hover:scale-105",
-                      isAvailable && "skill-node-pulse",
                     ]
                       .filter(Boolean)
                       .join(" ")}
@@ -419,12 +412,6 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
                         : isPrestige && isUnlocked
                           ? `0 0 16px ${accent}25`
                           : "none",
-                      ...(isAvailable
-                        ? ({
-                            "--pulse-color": `${accent}40`,
-                            animation: "skill-node-pulse 2.5s ease-in-out infinite",
-                          } as React.CSSProperties)
-                        : {}),
                     }}
                     onClick={() => handleNodeClick(node)}
                     onKeyDown={(e) => {

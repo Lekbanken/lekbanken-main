@@ -30,6 +30,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
   const [data, setData] = useState<GamificationPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSkillTreeOpen, setIsSkillTreeOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -176,81 +177,191 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
       {/* ── Ambient particles ── */}
       <ParticleField accentColor={theme.accentColor} />
 
-      {/* ── Hero: Avatar + Name + Level ── */}
-      <div className="mb-8 flex flex-col items-center text-center">
-        {/* Avatar */}
-        <div className="relative mb-4">
-          {/* Glow ring */}
-          <div
-            className="absolute -inset-1 w-[7.5rem] h-[7.5rem] rounded-full blur-xl opacity-50"
-            style={{ backgroundColor: theme.accentColor }}
-          />
-          {/* Cosmetic frame overlay */}
-          <AvatarFrame style={avatarFrameStyle} accentColor={theme.accentColor} />
-          <div
-            className="relative w-28 h-28 rounded-full border-4 overflow-hidden bg-gradient-to-br from-white/10 to-white/5"
-            style={{ borderColor: theme.accentColor }}
+      {/* ── Hero: Avatar + Name + Skill Tree ── */}
+      <div
+        className="relative mb-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden"
+        style={{
+          boxShadow: isSkillTreeOpen
+            ? `0 0 40px ${theme.glowColor}50`
+            : `0 0 16px ${theme.glowColor}15`,
+          transition: "box-shadow 500ms ease",
+        }}
+      >
+        {/* Avatar hint-pulse keyframe (replaces skill-node-pulse — same slot 13/15) */}
+        <style>{`
+          @keyframes avatar-tap-hint {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            [style*="avatar-tap-hint"] { animation: none !important; }
+          }
+        `}</style>
+
+        <div
+          className="relative z-10 flex flex-col items-center text-center"
+          style={{
+            padding: isSkillTreeOpen ? "16px 24px 12px" : "40px 24px",
+            transition: "padding 400ms ease",
+          }}
+        >
+          {/* Close button — top-right, only when tree is open */}
+          <button
+            onClick={() => setIsSkillTreeOpen(false)}
+            aria-label="Close"
+            className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all z-20"
+            style={{
+              opacity: isSkillTreeOpen ? 1 : 0,
+              pointerEvents: isSkillTreeOpen ? "auto" : "none",
+              transition: "opacity 300ms ease",
+            }}
           >
-            {identity.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={identity.avatarUrl}
-                alt={identity.displayName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-white/60">
-                <svg className="w-1/2 h-1/2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                </svg>
+            ✕
+          </button>
+
+          {/* Avatar — clickable, shrinks when tree is open */}
+          <div
+            onClick={() => setIsSkillTreeOpen((v) => !v)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setIsSkillTreeOpen((v) => !v);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={t("skillTree.avatarHint")}
+            className="relative cursor-pointer"
+            style={{
+              transform: isSkillTreeOpen ? "scale(0.55)" : "scale(1)",
+              transformOrigin: "top center",
+              marginBottom: isSkillTreeOpen ? 0 : 16,
+              transition: "transform 400ms ease, margin-bottom 400ms ease",
+            }}
+          >
+            {/* Glow ring — breathes when closed to hint interactivity */}
+            <div
+              className="absolute -inset-1 w-[7.5rem] h-[7.5rem] rounded-full blur-xl opacity-50"
+              style={{
+                backgroundColor: theme.accentColor,
+                ...(isSkillTreeOpen
+                  ? {}
+                  : { animation: "avatar-tap-hint 3s ease-in-out infinite" }),
+              }}
+            />
+            {/* Cosmetic frame overlay */}
+            <AvatarFrame style={avatarFrameStyle} accentColor={theme.accentColor} />
+            <div
+              className="relative w-28 h-28 rounded-full border-4 overflow-hidden bg-gradient-to-br from-white/10 to-white/5"
+              style={{ borderColor: theme.accentColor }}
+            >
+              {identity.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={identity.avatarUrl}
+                  alt={identity.displayName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white/60">
+                  <svg className="w-1/2 h-1/2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                  </svg>
+                </div>
+              )}
+            </div>
+            {/* Level badge */}
+            <div
+              className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full font-bold text-white text-sm shadow-lg"
+              style={{
+                backgroundColor: theme.accentColor,
+                boxShadow: `0 4px 14px ${theme.glowColor}`,
+              }}
+            >
+              Lvl {data.progress.level}
+            </div>
+          </div>
+
+          {/* Name + faction banner — collapses when tree is open */}
+          <div
+            style={{
+              opacity: isSkillTreeOpen ? 0 : 1,
+              maxHeight: isSkillTreeOpen ? 0 : 200,
+              overflow: "hidden",
+              pointerEvents: isSkillTreeOpen ? "none" : "auto",
+              transition: "opacity 250ms ease, max-height 400ms ease",
+            }}
+          >
+            <h1 className="mt-2 text-xl font-bold text-white">
+              {identity.displayName}
+            </h1>
+            {data.progress.levelName && (
+              <p className="text-sm text-white/50">{data.progress.levelName}</p>
+            )}
+            {identity.factionId && (
+              <div
+                className="mt-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5 border transition-all duration-300"
+                style={{
+                  backgroundColor: `${theme.accentColor}10`,
+                  borderColor: `${theme.accentColor}30`,
+                }}
+              >
+                <span
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: theme.accentColor, boxShadow: `0 0 8px ${theme.glowColor}` }}
+                />
+                <span className="text-xs font-medium text-white/70">
+                  {t(`faction.banner.${identity.factionId}`)}
+                </span>
               </div>
             )}
           </div>
-          {/* Level badge */}
-          <div
-            className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full font-bold text-white text-sm shadow-lg"
-            style={{
-              backgroundColor: theme.accentColor,
-              boxShadow: `0 4px 14px ${theme.glowColor}`,
-            }}
-          >
-            Lvl {data.progress.level}
-          </div>
-        </div>
 
-        {/* Display name */}
-        <h1 className="mt-2 text-xl font-bold text-white">
-          {identity.displayName}
-        </h1>
-        {data.progress.levelName && (
-          <p className="text-sm text-white/50">{data.progress.levelName}</p>
-        )}
-
-        {/* ── Faction Banner ── */}
-        {identity.factionId && (
-          <div
-            className="mt-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5 border transition-all duration-300"
-            style={{
-              backgroundColor: `${theme.accentColor}10`,
-              borderColor: `${theme.accentColor}30`,
-            }}
-          >
-            <span
-              className="w-2.5 h-2.5 rounded-full shrink-0"
-              style={{ backgroundColor: theme.accentColor,  boxShadow: `0 0 8px ${theme.glowColor}` }}
+          {/* Faction selector — always visible, shifts up when name collapses */}
+          <div style={{ marginTop: isSkillTreeOpen ? 4 : 16, transition: "margin-top 400ms ease" }}>
+            <FactionSelector
+              currentFactionId={identity.factionId}
+              onSelect={handleFactionSelect}
             />
-            <span className="text-xs font-medium text-white/70">
-              {t(`faction.banner.${identity.factionId}`)}
-            </span>
           </div>
-        )}
 
-        {/* ── Faction Selector ── */}
-        <div className="mt-4">
-          <FactionSelector
-            currentFactionId={identity.factionId}
-            onSelect={handleFactionSelect}
-          />
+          {/* Skill tree inline — slides up when tree is open */}
+          <div
+            style={{
+              opacity: isSkillTreeOpen ? 1 : 0,
+              maxHeight: isSkillTreeOpen ? 2000 : 0,
+              overflow: isSkillTreeOpen ? "visible" : "hidden",
+              transform: isSkillTreeOpen ? "translateY(0)" : "translateY(15px)",
+              pointerEvents: isSkillTreeOpen ? "auto" : "none",
+              transition: isSkillTreeOpen
+                ? "opacity 400ms ease 200ms, max-height 500ms ease, transform 400ms ease 200ms"
+                : "opacity 200ms ease, max-height 400ms ease 100ms, transform 200ms ease",
+              width: "100%",
+              marginTop: isSkillTreeOpen ? 8 : 0,
+            }}
+          >
+            {isSkillTreeOpen && (
+              <SkillTreeSection
+                factionId={identity.factionId}
+                userLevel={data.progress.level}
+                theme={theme}
+              />
+            )}
+          </div>
+
+          {/* Avatar tap hint — only visible when closed */}
+          <div
+            style={{
+              opacity: isSkillTreeOpen ? 0 : 1,
+              maxHeight: isSkillTreeOpen ? 0 : 30,
+              overflow: "hidden",
+              transition: "opacity 200ms ease, max-height 300ms ease",
+            }}
+          >
+            <p className="text-[10px] text-white/30 mt-2 select-none">
+              {t("skillTree.avatarHint")}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -308,12 +419,6 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
         <StreakSection streak={data.streak} />
         <SectionDivider variant="ornament" />
         <AchievementsSection achievements={data.achievements} />
-        <SectionDivider variant="glow" label="Design Tree" />
-        <SkillTreeSection
-          factionId={identity.factionId}
-          userLevel={data.progress.level}
-          theme={theme}
-        />
         <SectionDivider variant="glow" label="Nästa steg" />
         <CallToActionSection />
       </div>

@@ -300,6 +300,7 @@
       "unlockedCount": "{unlocked} / {total} upplåsta",
       "hint": "Nå högre nivåer för att låsa upp cosmetics",
       "hintClick": "Tryck på en nod för att se detaljer",
+      "avatarHint": "Tryck på din avatar för Design Tree",
       "unlockAt": "Låser upp på level {level}",
       "availableAt": "Tillgänglig på level {level}",
       "nodeUnlocked": "Upplåst"

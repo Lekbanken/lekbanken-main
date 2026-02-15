@@ -262,6 +262,11 @@
     "noAchievementsYet": "No achievements yet",
     "playToEarnBadges": "Play to earn badges!",
     "viewAllAchievements": "View all achievements",
+    "showcase": {
+      "earned": "Earned",
+      "emptySlot": "Empty slot",
+      "emptyHint": "Choose up to 4 badges to display here"
+    },
     "coins": "Coins",
     "noCoinsActivityYet": "No coin activity yet",
     "viewAllTransactions": "View all transactions",

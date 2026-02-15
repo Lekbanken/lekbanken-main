@@ -56,10 +56,20 @@ export type GamificationIdentity = {
   factionId: 'forest' | 'sea' | 'sky' | 'void' | null;
 };
 
+export type ShowcaseSlot = {
+  slot: 1 | 2 | 3 | 4;
+  achievement: Achievement | null;
+};
+
+export type ShowcaseSummary = {
+  slots: [ShowcaseSlot, ShowcaseSlot, ShowcaseSlot, ShowcaseSlot];
+};
+
 export type GamificationPayload = {
   identity?: GamificationIdentity;
   achievements: Achievement[];
   coins: CoinsSummary;
   streak: StreakSummary;
   progress: ProgressSnapshot;
+  showcase?: ShowcaseSummary;
 };

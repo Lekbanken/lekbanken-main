@@ -8,6 +8,8 @@ import type {
   GamificationIdentity,
   GamificationPayload,
   ProgressSnapshot,
+  ShowcaseSlot,
+  ShowcaseSummary,
   StreakSummary,
 } from "@/features/gamification/types";
 import type { Database } from "@/types/supabase";
@@ -224,7 +226,7 @@ export async function GET() {
     achievementsQuery = achievementsQuery.is("tenant_id", null);
   }
 
-  const [achievementsRes, userAchievementsRes, coinsRes, txRes, streakRes] = await Promise.all([
+  const [achievementsRes, userAchievementsRes, coinsRes, txRes, streakRes, showcaseRes] = await Promise.all([
     achievementsQuery,
     supabase.from("user_achievements").select("achievement_id,unlocked_at").eq("user_id", userId),
     supabase
@@ -246,6 +248,17 @@ export async function GET() {
       .eq("user_id", userId)
       .limit(1)
       .maybeSingle(),
+    // Showcase — user's pinned badges (max 4)
+    (supabase.from("user_achievement_showcase" as never) as unknown as {
+      select: (cols: string) => {
+        eq: (col: string, val: string) => {
+          order: (col: string, opts: { ascending: boolean }) => Promise<{ data: Array<{ slot: number; achievement_id: string }> | null; error: unknown }>;
+        };
+      };
+    })
+      .select("slot,achievement_id")
+      .eq("user_id", userId)
+      .order("slot", { ascending: true }),
   ]);
 
   const achievements = mapAchievements(achievementsRes.data ?? [], userAchievementsRes.data ?? []);
@@ -262,6 +275,25 @@ export async function GET() {
   }
 
   const progress = applyLevelDefinitions(baseProgress, levelDefs);
+
+  // Showcase — map pinned slots to Achievement objects
+  const showcaseRows = (showcaseRes as { data: Array<{ slot: number; achievement_id: string }> | null }).data ?? [];
+  const showcaseSlots: [ShowcaseSlot, ShowcaseSlot, ShowcaseSlot, ShowcaseSlot] = [
+    { slot: 1, achievement: null },
+    { slot: 2, achievement: null },
+    { slot: 3, achievement: null },
+    { slot: 4, achievement: null },
+  ];
+  for (const row of showcaseRows) {
+    const idx = row.slot - 1;
+    if (idx >= 0 && idx < 4) {
+      showcaseSlots[idx] = {
+        slot: row.slot as 1 | 2 | 3 | 4,
+        achievement: achievements.find((a) => a.id === row.achievement_id) ?? null,
+      };
+    }
+  }
+  const showcase: ShowcaseSummary = { slots: showcaseSlots };
 
   // Identity — auth metadata + faction from user_journey_preferences
   const rawFaction = (prefsRes.data as { faction_id?: string | null } | null)?.faction_id ?? null;
@@ -285,6 +317,7 @@ export async function GET() {
     coins,
     streak,
     progress,
+    showcase,
   };
 
   return NextResponse.json(payload, { status: 200 });

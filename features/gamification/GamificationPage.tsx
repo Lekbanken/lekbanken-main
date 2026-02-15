@@ -10,7 +10,7 @@ import { JourneyStats } from "@/components/journey/JourneyStats";
 import { ParticleField } from "@/components/journey/ParticleField";
 import { DEFAULT_THEME, getFactionTheme, getLevelProgress } from "@/lib/factions";
 import { fetchGamificationSnapshot, saveFaction, type GamificationPayload } from "./api";
-import { AchievementsSection } from "./components/AchievementsSection";
+import { BadgeShowcase } from "./components/BadgeShowcase";
 import { CoinsSection } from "./components/CoinsSection";
 import { FactionSelector } from "./components/FactionSelector";
 import { StreakSection } from "./components/StreakSection";
@@ -418,7 +418,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
         <SectionDivider variant="glow" />
         <StreakSection streak={data.streak} />
         <SectionDivider variant="ornament" />
-        <AchievementsSection achievements={data.achievements} />
+        <BadgeShowcase showcase={data.showcase!} achievements={data.achievements} />
         <SectionDivider variant="glow" label="Nästa steg" />
         <CallToActionSection />
       </div>

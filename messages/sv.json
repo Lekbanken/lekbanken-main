@@ -251,6 +251,11 @@
     "noAchievementsYet": "Inga prestationer än",
     "playToEarnBadges": "Spela för att tjäna badges!",
     "viewAllAchievements": "Visa alla prestationer",
+    "showcase": {
+      "earned": "Uppnådd",
+      "emptySlot": "Tom plats",
+      "emptyHint": "Välj upp till 4 utmärkelser att visa här"
+    },
     "coins": "Mynt",
     "noCoinsActivityYet": "Ingen myntaktivitet än",
     "viewAllTransactions": "Visa alla transaktioner",

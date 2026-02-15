@@ -36,6 +36,28 @@ export async function fetchGamificationSnapshot(): Promise<GamificationPayload> 
   return payload;
 }
 
+// ---------------------------------------------------------------------------
+// Showcase — user's 4 pinned achievement slots for Journey
+// ---------------------------------------------------------------------------
+
+export type ShowcaseSlotPayload = { slot: number; achievementId: string };
+
+export async function saveShowcase(
+  slots: ShowcaseSlotPayload[],
+  signal?: AbortSignal,
+): Promise<{ slots: ShowcaseSlotPayload[] }> {
+  const res = await fetch(`${API_PATH}/showcase`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slots }),
+    signal,
+  });
+  if (!res.ok) {
+    throw new Error(`Showcase API failed with status ${res.status}`);
+  }
+  return (await res.json()) as { slots: ShowcaseSlotPayload[] };
+}
+
 export type PinnedAchievementsPayload = {
   tenantId: string;
   pinnedIds: string[];

@@ -1,63 +1,93 @@
-// Avatar Builder Types
+// Avatar Builder v2 Types — PNG-based layered avatar system
 
-export type AvatarCategory = 'body' | 'face' | 'hair' | 'accessories' | 'outfit'
+export type AvatarCategory = 'face' | 'eyes' | 'nose' | 'mouth' | 'hair' | 'glasses'
 
-export const AVATAR_CATEGORIES: AvatarCategory[] = ['body', 'face', 'hair', 'accessories', 'outfit']
+export const AVATAR_CATEGORIES: AvatarCategory[] = [
+  'face',
+  'eyes',
+  'nose',
+  'mouth',
+  'hair',
+  'glasses',
+]
 
 // Layer rendering order (bottom to top)
-export const LAYER_ORDER: AvatarCategory[] = ['body', 'outfit', 'face', 'hair', 'accessories']
+export const LAYER_ORDER: AvatarCategory[] = [
+  'face',
+  'eyes',
+  'nose',
+  'mouth',
+  'hair',
+  'glasses',
+]
+
+// Category metadata for UI
+export const CATEGORY_META: Record<AvatarCategory, { label: string }> = {
+  face: { label: 'Ansikte' },
+  eyes: { label: 'Ögon' },
+  nose: { label: 'Näsa' },
+  mouth: { label: 'Mun' },
+  hair: { label: 'Hår' },
+  glasses: { label: 'Glasögon' },
+}
 
 export interface AvatarPart {
   id: string
   category: AvatarCategory
   name: string
-  svg: string // inline SVG string (single layer)
-  defaultColorToken?: string
-  supportsColor: boolean
-  thumbnailSvg?: string // optional, else derive from svg
+  src: string // path relative to public/
 }
 
-export interface Palette {
-  token: string
-  label: string
-  hex: string
+/**
+ * A color preset that tints a PNG layer via CSS filters.
+ * `filter` is a CSS filter string applied to the <img>.
+ * `canvasOps` describes how to replicate the effect on a <canvas> for export.
+ */
+export interface ColorPreset {
+  id: string
+  name: string
+  swatch: string  // hex color used for the UI swatch
+  filter: string  // CSS filter value (applied to <img>)
+  tint?: string   // hex color for mix-blend-mode tinting (skin tones)
 }
 
 export interface LayerConfig {
-  partId: string
-  color: string
+  partId: string | null  // null = none (hidden layer)
+  colorId?: string | null // reference to a ColorPreset id
 }
 
 export interface AvatarConfig {
   version: number
-  layers: {
-    body: LayerConfig
-    face: LayerConfig
-    hair: LayerConfig
-    accessories: LayerConfig
-    outfit: LayerConfig
-  }
+  layers: Record<AvatarCategory, LayerConfig>
 }
 
-export interface AvatarBuilderState {
-  config: AvatarConfig
-  activeCategory: AvatarCategory
-  isDirty: boolean
-  isSaved: boolean
+/** Categories that support color tinting */
+export const COLORABLE_CATEGORIES: AvatarCategory[] = ['hair', 'glasses']
+
+/**
+ * Categories that inherit their color from another category.
+ * Key = child category, Value = parent category to inherit color from.
+ */
+export const LINKED_COLOR_CATEGORIES: Partial<Record<AvatarCategory, AvatarCategory>> = {}
+
+/** Resolve which category to use for color lookup (follows linked parent) */
+export function getColorLookupCategory(category: AvatarCategory): AvatarCategory {
+  return LINKED_COLOR_CATEGORIES[category] ?? category
 }
 
-// Default empty config
+// Default config
 export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
-  version: 1,
+  version: 2,
   layers: {
-    body: { partId: 'body_01', color: 'body_tone_3' },
-    face: { partId: 'face_01', color: 'face_default' },
-    hair: { partId: 'hair_01', color: 'hair_brown' },
-    accessories: { partId: 'acc_none', color: 'acc_gold' },
-    outfit: { partId: 'outfit_01', color: 'outfit_primary' },
+    face: { partId: 'face_1', colorId: null },
+    eyes: { partId: 'eyes_1' },
+    nose: { partId: 'nose_1' },
+    mouth: { partId: 'mouth_1' },
+    hair: { partId: 'hair_1', colorId: null },
+    glasses: { partId: null, colorId: null },
   },
 }
 
 // LocalStorage keys
-export const STORAGE_KEY_CONFIG = 'sandbox.avatar_config_v1'
-export const STORAGE_KEY_PREVIEW = 'sandbox.avatar_preview_png'
+export const STORAGE_KEY_CONFIG = 'sandbox.avatar_config_v2'
+export const STORAGE_KEY_PREVIEW = 'sandbox.avatar_preview_png_v2'

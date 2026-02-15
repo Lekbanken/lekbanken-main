@@ -1,9 +1,11 @@
 'use client'
 
-import { forwardRef, useImperativeHandle, useRef, useCallback } from 'react'
+import { forwardRef, useImperativeHandle, useCallback, useState } from 'react'
+import Image from 'next/image'
 import type { AvatarConfig, AvatarCategory } from '../types'
-import { LAYER_ORDER } from '../types'
-import { getPartById, getColorHex } from '../seed-data'
+import { LAYER_ORDER, getColorLookupCategory } from '../types'
+import { getPartById, getLayerFilter, getLayerTint } from '../seed-data'
+import { cn } from '@/lib/utils'
 
 export interface AvatarRendererHandle {
   exportToPng: () => Promise<string | null>
@@ -15,92 +17,116 @@ interface AvatarRendererProps {
   className?: string
 }
 
+/** Load an image and return a promise */
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error(`Failed to load: ${src}`))
+    img.src = src
+  })
+}
+
 /**
- * AvatarRenderer
- * 
- * Renders stacked SVG layers based on the avatar configuration.
- * Exposes an imperative handle to export the avatar as a PNG data URL.
+ * AvatarRenderer v2
+ *
+ * Renders stacked PNG layers with optional CSS filter tinting.
+ * Exposes exportToPng() via imperative handle for canvas export.
  */
 export const AvatarRenderer = forwardRef<AvatarRendererHandle, AvatarRendererProps>(
   function AvatarRenderer({ config, size = 200, className = '' }, ref) {
-    const containerRef = useRef<HTMLDivElement>(null)
+    const [_loadedLayers, setLoadedLayers] = useState<Set<string>>(new Set())
 
-    // Export the avatar to PNG using canvas
+    // Export the composite avatar to a PNG data URL via canvas
     const exportToPng = useCallback(async (): Promise<string | null> => {
-      if (!containerRef.current) return null
-
       try {
-        // Create a combined SVG from all layers
-        const svgContent = buildCombinedSvg(config, size)
-        
-        // Create a blob URL for the SVG
-        const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
-        const svgUrl = URL.createObjectURL(svgBlob)
+        const s = size * 2 // 2x for retina
+        const canvas = document.createElement('canvas')
+        canvas.width = s
+        canvas.height = s
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return null
 
-        // Load into an image
-        const img = new Image()
-        img.width = size
-        img.height = size
+        // Circular clip + background
+        ctx.fillStyle = '#f1f5f9'
+        ctx.beginPath()
+        ctx.arc(s / 2, s / 2, s / 2, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.clip()
 
-        const loadPromise = new Promise<string>((resolve, reject) => {
-          img.onload = () => {
-            // Draw to canvas
-            const canvas = document.createElement('canvas')
-            canvas.width = size
-            canvas.height = size
-            const ctx = canvas.getContext('2d')
-            
-            if (!ctx) {
-              reject(new Error('Could not get canvas context'))
-              return
-            }
+        // Draw each layer in order, applying filter
+        for (const category of LAYER_ORDER) {
+          const layerConfig = config.layers[category]
+          if (!layerConfig?.partId) continue
 
-            // Fill background (optional - transparent by default)
-            ctx.fillStyle = '#f8fafc' // Light gray background
-            ctx.fillRect(0, 0, size, size)
-            
-            // Draw the image
-            ctx.drawImage(img, 0, 0, size, size)
-            
-            // Convert to data URL
-            const dataUrl = canvas.toDataURL('image/png')
-            URL.revokeObjectURL(svgUrl)
-            resolve(dataUrl)
+          const part = getPartById(category, layerConfig.partId)
+          if (!part) continue
+
+          // Resolve linked color (e.g. nose inherits face's skin color)
+          const lookupCat = getColorLookupCategory(category)
+          const effectiveColorId = config.layers[lookupCat]?.colorId
+          const tintColor = getLayerTint(lookupCat, effectiveColorId)
+          const filterStr = tintColor ? 'none' : getLayerFilter(lookupCat, effectiveColorId)
+          const img = await loadImage(part.src)
+
+          if (tintColor) {
+            // Tint via canvas composite: color-blend the tint onto the image
+            const tmp = document.createElement('canvas')
+            tmp.width = s
+            tmp.height = s
+            const tCtx = tmp.getContext('2d')!
+            // 1. Draw original image
+            tCtx.drawImage(img, 0, 0, s, s)
+            // 2. Apply 'color' blend (takes hue+sat from fill, luminance from image)
+            tCtx.globalCompositeOperation = 'color'
+            tCtx.fillStyle = tintColor
+            tCtx.fillRect(0, 0, s, s)
+            // 3. Clip to original alpha
+            tCtx.globalCompositeOperation = 'destination-in'
+            tCtx.drawImage(img, 0, 0, s, s)
+            // 4. Draw result onto main canvas
+            ctx.drawImage(tmp, 0, 0)
+          } else if (filterStr && filterStr !== 'none') {
+            ctx.save()
+            ctx.filter = filterStr
+            ctx.drawImage(img, 0, 0, s, s)
+            ctx.restore()
+          } else {
+            ctx.drawImage(img, 0, 0, s, s)
           }
+        }
 
-          img.onerror = () => {
-            URL.revokeObjectURL(svgUrl)
-            reject(new Error('Failed to load SVG'))
-          }
-        })
-
-        img.src = svgUrl
-        return await loadPromise
+        return canvas.toDataURL('image/png')
       } catch (error) {
         console.error('Failed to export avatar to PNG:', error)
         return null
       }
     }, [config, size])
 
-    // Expose the export function via ref
-    useImperativeHandle(ref, () => ({
-      exportToPng,
-    }), [exportToPng])
+    useImperativeHandle(ref, () => ({ exportToPng }), [exportToPng])
+
+    const handleLayerLoad = useCallback((category: string) => {
+      setLoadedLayers((prev) => new Set(prev).add(category))
+    }, [])
 
     return (
       <div
-        ref={containerRef}
-        className={`relative overflow-hidden rounded-full bg-gradient-to-br from-slate-100 to-slate-200 ${className}`}
+        className={cn(
+          'relative overflow-hidden rounded-full bg-gradient-to-br from-slate-100 to-slate-200',
+          className
+        )}
         style={{ width: size, height: size }}
       >
         {/* Render layers in correct z-order */}
         {LAYER_ORDER.map((category, index) => (
-          <LayerSvg
+          <LayerImage
             key={category}
             category={category}
             config={config}
             size={size}
             zIndex={index + 1}
+            onLoad={() => handleLayerLoad(category)}
           />
         ))}
       </div>
@@ -108,82 +134,65 @@ export const AvatarRenderer = forwardRef<AvatarRendererHandle, AvatarRendererPro
   }
 )
 
-// Individual layer component
-interface LayerSvgProps {
+// Individual PNG layer with optional CSS filter
+interface LayerImageProps {
   category: AvatarCategory
   config: AvatarConfig
   size: number
   zIndex: number
+  onLoad?: () => void
 }
 
-function LayerSvg({ category, config, size, zIndex }: LayerSvgProps) {
+function LayerImage({ category, config, size, zIndex, onLoad }: LayerImageProps) {
   const layerConfig = config.layers[category]
   if (!layerConfig?.partId) return null
 
   const part = getPartById(category, layerConfig.partId)
   if (!part) return null
 
-  // Get the color to apply
-  const colorHex = layerConfig.color 
-    ? getColorHex(category, layerConfig.color)
-    : part.defaultColorToken 
-      ? getColorHex(category, part.defaultColorToken)
-      : undefined
+  // Resolve linked color (e.g. nose inherits face's skin color)
+  const lookupCat = getColorLookupCategory(category)
+  const effectiveColorId = config.layers[lookupCat]?.colorId
+  const tintColor = getLayerTint(lookupCat, effectiveColorId)
+  const filterStr = tintColor ? undefined : getLayerFilter(lookupCat, effectiveColorId)
 
-  // Apply color to SVG via style
-  const style: React.CSSProperties = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: size,
-    height: size,
-    zIndex,
-    ...(colorHex && part.supportsColor ? { color: colorHex } : {}),
-  }
+  // Unique SVG filter ID per layer
+  const filterId = tintColor ? `avatar-tint-${category}` : null
 
   return (
-    <div
-      style={style}
-      dangerouslySetInnerHTML={{ __html: part.svg }}
-    />
+    <>
+      {/* Inline SVG filter: feFlood + feBlend(color) applies hue/sat from tint, keeps image luminance */}
+      {tintColor && filterId && (
+        <svg width="0" height="0" className="absolute" aria-hidden="true">
+          <defs>
+            <filter id={filterId} colorInterpolationFilters="sRGB">
+              <feFlood floodColor={tintColor} result="tint" />
+              <feBlend in="SourceGraphic" in2="tint" mode="color" result="tinted" />
+              <feComposite in="tinted" in2="SourceGraphic" operator="in" />
+            </filter>
+          </defs>
+        </svg>
+      )}
+      <Image
+        src={part.src}
+        alt={part.name}
+        width={size}
+        height={size}
+        className="absolute inset-0 w-full h-full object-contain transition-all duration-200"
+        style={{
+          zIndex,
+          filter: filterId
+            ? `url(#${filterId})`
+            : filterStr && filterStr !== 'none'
+              ? filterStr
+              : undefined,
+        }}
+        onLoad={onLoad}
+        draggable={false}
+        priority={category === 'face'}
+      />
+    </>
   )
-}
-
-// Build a combined SVG string for export
-function buildCombinedSvg(config: AvatarConfig, size: number): string {
-  const layers: string[] = []
-
-  for (const category of LAYER_ORDER) {
-    const layerConfig = config.layers[category]
-    if (!layerConfig?.partId) continue
-
-    const part = getPartById(category, layerConfig.partId)
-    if (!part) continue
-
-    // Get the color
-    const colorHex = layerConfig.color 
-      ? getColorHex(category, layerConfig.color)
-      : part.defaultColorToken 
-        ? getColorHex(category, part.defaultColorToken)
-        : '#888888'
-
-    // Extract the inner content of the SVG (without the wrapper)
-    const svgContent = part.svg
-      .replace(/<svg[^>]*>/, '')
-      .replace(/<\/svg>/, '')
-
-    // Wrap in a group with the color applied
-    if (part.supportsColor && colorHex) {
-      layers.push(`<g fill="${colorHex}" color="${colorHex}">${svgContent}</g>`)
-    } else {
-      layers.push(`<g>${svgContent}</g>`)
-    }
-  }
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${size}" height="${size}">
-    <rect width="100" height="100" fill="#f8fafc" rx="50"/>
-    ${layers.join('\n')}
-  </svg>`
 }
 
 export default AvatarRenderer

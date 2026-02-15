@@ -1,5 +1,5 @@
 export { AvatarRenderer, type AvatarRendererHandle } from './AvatarRenderer'
-export { AvatarPalette } from './AvatarPalette'
 export { AvatarPartGrid } from './AvatarPartGrid'
 export { AvatarTabs } from './AvatarTabs'
-export { AvatarBuilderShell } from './AvatarBuilderShell'
+export { AvatarColorPicker } from './AvatarColorPicker'
+export { AvatarDownloadButton } from './AvatarDownloadButton'

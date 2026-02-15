@@ -208,6 +208,25 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
           <p className="text-sm text-white/50">{data.progress.levelName}</p>
         )}
 
+        {/* ── Faction Banner ── */}
+        {identity.factionId && (
+          <div
+            className="mt-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5 border transition-all duration-300"
+            style={{
+              backgroundColor: `${theme.accentColor}10`,
+              borderColor: `${theme.accentColor}30`,
+            }}
+          >
+            <span
+              className="w-2.5 h-2.5 rounded-full shrink-0"
+              style={{ backgroundColor: theme.accentColor,  boxShadow: `0 0 8px ${theme.glowColor}` }}
+            />
+            <span className="text-xs font-medium text-white/70">
+              {t(`faction.banner.${identity.factionId}`)}
+            </span>
+          </div>
+        )}
+
         {/* ── Faction Selector ── */}
         <div className="mt-4">
           <FactionSelector

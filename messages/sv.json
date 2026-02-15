@@ -286,7 +286,14 @@
     "overview": "Översikt",
     "faction": {
       "label": "Fraktion",
-      "chooseFaction": "Välj fraktion"
+      "chooseFaction": "Välj fraktion",
+      "banner": {
+        "forest": "Skogens väktare",
+        "sea": "Havets utforskare",
+        "sky": "Himlens seglare",
+        "void": "Rymdens vandrare",
+        "neutral": "Ingen fraktion vald"
+      }
     },
     "skillTree": {
       "title": "Design Tree",

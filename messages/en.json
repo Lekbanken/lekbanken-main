@@ -297,7 +297,14 @@
     "overview": "Overview",
     "faction": {
       "label": "Faction",
-      "chooseFaction": "Choose faction"
+      "chooseFaction": "Choose faction",
+      "banner": {
+        "forest": "Guardian of the Forest",
+        "sea": "Explorer of the Sea",
+        "sky": "Sailor of the Sky",
+        "void": "Wanderer of the Void",
+        "neutral": "No faction chosen"
+      }
     },
     "skillTree": {
       "title": "Design Tree",

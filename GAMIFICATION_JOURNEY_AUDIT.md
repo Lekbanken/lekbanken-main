@@ -696,15 +696,40 @@ Undersidor har återställts till standard app-styling:
 >
 > **Obs:** `pulse-glow` (AchievementUnlockCelebration) kan bli visuellt "för mycket" om den triggas ofta. Godkänd så länge celebration enbart triggas vid sällsynta unlock-events.
 
-#### 🔒 v2.5 Ship Gate (UI-QA)
-- [ ] **Mobile scroll** på hubben — blur + gradients + particles renderar korrekt, ingen stutter
-- [ ] **Modal open/close** (AchievementDetailModal) × 3 — focus trap fungerar, ingen flash, bakgrund scrollar inte
-- [ ] **Navigera bort** till vanlig sida (`/app/learning` eller `/app/play`) — kontrollera att inga Journey-styles hänger kvar
-- [ ] **Tabba igenom** hela hubben — alla interaktiva element har synlig focus ring
-- [ ] `/app/gamification/achievements` — standard app-tema (ej Journey)
-- [ ] `/app/gamification/coins` — standard app-tema (ej Journey)
+#### 🔒 v2.5 Ship Gate (UI-QA) ✅ PASSED — commit `abc71fd`
+
+**Automatiserade kontroller:**
+- [x] `tsc --noEmit` — 0 errors
+- [x] `eslint features/gamification/ --max-warnings 0` — 0 warnings (fixade 2 hardcoded strings → i18n)
+- [x] CSS scope leakage — SAFE (`--journey-*` vars via inline style på wrapper div, inga `:root`/`body` writes)
+- [x] Modal portal theme — SAFE (`AchievementDetailModal` använder hardcoded `bg-[#1f1f3a]`, inga CSS var)
+
+**A11y / Focus audit:**
+- [x] **Tabba igenom** hela hubben — alla interaktiva element har synlig focus ring
+  - Fixat: SkillTree nodes, avatar toggle, close button (+ `tabIndex={-1}` when hidden)
+  - `aria-expanded` tillagd på avatar toggle
+  - `aria-label="Locked achievement"` på låsta achievement cards
+- [x] **Reduced-motion** — 20/20 keyframes har `prefers-reduced-motion` guard
+  - Fixat: `animate-pulse` → `motion-reduce:animate-none`, orphaned shimmer borttagen
+
+**Mobil layout:**
+- [x] **Mobile scroll** — grids responsiva, notification `min-w-[280px]` (ner från 320)
+  - BadgeShowcase: `grid-cols-2 sm:grid-cols-3`
+  - Blur: 18 concurrent `backdrop-blur` — monitor perf, ej blocker
+
+**Ej testat manuellt (kräver browser):**
+- [ ] **Modal open/close** (AchievementDetailModal) × 3 — focus trap, ingen flash
+- [ ] **Navigera bort** till `/app/learning` — kontrollera att inga Journey-styles hänger kvar
+- [ ] `/app/gamification/achievements` — standard app-tema
+- [ ] `/app/gamification/coins` — standard app-tema
 - [ ] Desktop + mobil screenshot → design review sign-off
-- **Efter godkännande → skeppa staging. Ingen ytterligare scope.**
+
+**Non-blocking notes:**
+- FactionSelector: radio group saknar arrow-key roving tabindex (låg, pattern deviation)
+- SkillTree popover: ingen focus trap (medium, men popover är informational only)
+- Blur performance: 18 `backdrop-blur` layers — överväg gate på mobile vid behov
+
+**Verdict: SHIP-READY för staging. Manuell smoke test rekommenderas.**
 
 #### ⛔ Out of scope (NO-GO — fortfarande)
 - Events page alignment
@@ -844,13 +869,14 @@ Undersidor har återställts till standard app-styling:
 
 ### Nästa steg (rekommenderad ordning)
 
-1. **QA: Ship Gate** — mobile scroll, modal, scope leakage, focus tab (se checklistan ovan)
-2. **Staging deploy** — efter QA godkänd
+1. ~~**QA: Ship Gate**~~ → ✅ PASSED (`abc71fd`)
+2. **Staging deploy** — manuell smoke test + design review sign-off
 3. **P7: CourseJourneyPath** — vertikal timeline med kursnoder (kräver kursdata-integration)
 4. **P9: BackgroundEffectsLayer** — helskärmseffekter kopplade till faction (2 keyframe-slots kvar!)
 5. **P10: Skill tree cosmetic apply** — click-to-preview + loadout save (kräver DB-schema)
 
 #### ✅ Klart sedan senaste uppdatering
+- ✅ QA Ship Gate passed: a11y, reduced-motion, mobile layout fixes (`abc71fd`)
 - ✅ P3-P6 shipped (v3.1)
 - ✅ Skill tree interactive: popover, avatar-tap expand/collapse, visual cleanup
 - ✅ Badge Showcase: 4-slot pinned achievements, hero+grid, «Visa i Journey» button

@@ -18,6 +18,7 @@ import { CallToActionSection } from "./components/CallToActionSection";
 import { SectionDivider } from "./components/SectionDivider";
 import { SkillTreeSection } from "./components/SkillTreeSection";
 import { XPProgressBar, resolveXPBarSkin, resolveXPBarColorMode } from "./components/XPProgressBar";
+import { AvatarFrame, resolveAvatarFrame } from "./components/AvatarFrame";
 import { getSkillTree } from "./data/skill-trees";
 
 type GamificationPageProps = {
@@ -157,12 +158,18 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
 
   const xpPercent = getLevelProgress(data.progress.currentXp, data.progress.nextLevelXp);
 
-  // Resolve XP bar skin from skill tree unlock
-  const xpNode = getSkillTree(identity.factionId, data.progress.level).find(
+  // Resolve cosmetics from skill tree
+  const skillTree = getSkillTree(identity.factionId, data.progress.level);
+  const xpNode = skillTree.find(
     (n) => n.cosmeticCategory === "xp" && n.status === "unlocked",
   );
   const xpSkin = resolveXPBarSkin(xpNode?.cosmeticKey);
   const xpColorMode = resolveXPBarColorMode(xpNode?.cosmeticKey);
+
+  const headerNode = skillTree.find(
+    (n) => n.cosmeticCategory === "header" && n.status === "unlocked",
+  );
+  const avatarFrameStyle = resolveAvatarFrame(headerNode?.cosmeticKey);
 
   return (
     <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-10 sm:px-6">
@@ -178,6 +185,8 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
             className="absolute -inset-1 w-[7.5rem] h-[7.5rem] rounded-full blur-xl opacity-50"
             style={{ backgroundColor: theme.accentColor }}
           />
+          {/* Cosmetic frame overlay */}
+          <AvatarFrame style={avatarFrameStyle} accentColor={theme.accentColor} />
           <div
             className="relative w-28 h-28 rounded-full border-4 overflow-hidden bg-gradient-to-br from-white/10 to-white/5"
             style={{ borderColor: theme.accentColor }}

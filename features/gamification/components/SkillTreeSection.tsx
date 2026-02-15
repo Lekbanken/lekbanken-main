@@ -96,21 +96,6 @@ function Connections({
                 strokeDasharray={active ? "none" : "4 4"}
                 opacity={active ? 0.7 : 0.4}
               />
-              {/* Animated flowing dot on active connections (SVG native, 0 keyframe cost) */}
-              {active && (
-                <circle
-                  r={2.5}
-                  fill={accent}
-                  opacity={0.9}
-                  className="skill-tree-dot"
-                >
-                  <animateMotion
-                    dur="2.5s"
-                    repeatCount="indefinite"
-                    path={d}
-                  />
-                </circle>
-              )}
             </g>
           );
         }),
@@ -333,14 +318,7 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
   const gridWidth = (maxCol + 1) * CELL_W + maxCol * GAP_X + 24;
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
-      {/* Reduced-motion guard */}
-      <style>{`
-        @media (prefers-reduced-motion: reduce) {
-          .skill-tree-dot { display: none; }
-        }
-      `}</style>
-
+    <div>
       {/* Header */}
       <div className="text-center mb-4">
         <h2 className="text-base font-bold text-white">{t("title")}</h2>
@@ -352,7 +330,7 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
       {/* Tree grid */}
       <div className="flex justify-center">
         <div
-          className="relative rounded-xl bg-white/[0.03] border border-white/[0.08] px-3 py-2"
+          className="relative px-3 py-2"
           style={{ width: gridWidth }}
         >
           <Connections tree={tree} accent={accent} />
@@ -397,14 +375,14 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
                         : isUnlocked
                           ? `${accent}15`
                           : isAvailable
-                            ? `${accent}08`
+                            ? "rgba(255,255,255,0.12)"
                             : "rgba(255,255,255,0.03)",
                       border: isSelected
                         ? `2px solid ${accent}`
                         : isUnlocked
                           ? `1.5px solid ${accent}50`
                           : isAvailable
-                            ? `1.5px solid ${accent}30`
+                            ? "1.5px solid rgba(255,255,255,0.35)"
                             : "1px solid rgba(255,255,255,0.08)",
                       opacity: isLocked ? 0.35 : 1,
                       boxShadow: isSelected
@@ -436,7 +414,7 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
                         color: isUnlocked
                           ? accent
                           : isAvailable
-                            ? `${accent}99`
+                            ? "rgba(255,255,255,0.9)"
                             : "rgba(255,255,255,0.3)",
                       }}
                     >
@@ -450,7 +428,7 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
                         color: isUnlocked
                           ? "rgba(255,255,255,0.85)"
                           : isAvailable
-                            ? "rgba(255,255,255,0.6)"
+                            ? "rgba(255,255,255,0.8)"
                             : "rgba(255,255,255,0.3)",
                       }}
                     >

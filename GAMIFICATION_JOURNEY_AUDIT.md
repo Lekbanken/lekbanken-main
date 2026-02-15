@@ -1,7 +1,7 @@
 # Implementeringsaudit: Journey som design för /app/gamification
 
 > **Datum:** 2026-02-15  
-> **Status:** 🔒 v3.0 SHIPPED — faction persistence + skill tree preview. v1/v2/v2.5/v2.6 LÅST.  
+> **Status:** 🔒 v3.1 SHIPPED — visual upgrades (P3-P6) + skill tree interactive + avatar-tap + badge showcase. v1/v2/v2.5/v2.6/v3.0/v3.0.1 LÅST.  
 > **Mål:** Uppgradera `/app/gamification` med Journey-designspråk och funktionalitet
 
 ### Arkitekturbeslut (2026-02-13)
@@ -33,7 +33,8 @@
 | `features/gamification/components/ProgressOverview.tsx` | 🔄 Ersatt | Ersatt av inline XP-bar + JourneyStats i GamificationPage |
 | `features/gamification/components/CoinsSection.tsx` | ✅ Uppdaterad | WebP-ikon istället för emoji, shimmer-animation, transaktionslista |
 | `features/gamification/components/StreakSection.tsx` | ✅ Uppdaterad | WebP-ikon istället för emoji, veckodags-dots, hero-kort |
-| `features/gamification/components/AchievementsSection.tsx` | ✅ Uppdaterad | WebP-ikon, BadgeIcon-rendering, grid 3×2 |
+| `features/gamification/components/AchievementsSection.tsx` | ✅ Uppdaterad | WebP-ikon, BadgeIcon-rendering, grid 3×2 (ersatt av BadgeShowcase i hubben) |
+| `features/gamification/components/BadgeShowcase.tsx` | ✅ Ny (v3.1) | 4-slot pinned showcase: hero slot 1 (lg) + 3-col grid, greyed placeholders |
 | `features/gamification/components/AchievementCard.tsx` | ✅ Fungerar | BadgeIcon, klick→modal, progress bar, status-badge |
 | `features/gamification/components/AchievementDetailModal.tsx` | ✅ Fungerar | Dialog med badge-preview, progress, hint |
 | `features/gamification/components/CallToActionSection.tsx` | ✅ Uppgraderad | WebP-ikon, glassmorfism, i18n-labels, inga emojis |
@@ -42,7 +43,7 @@
 ### 1.2 Undersidor
 | Sida | Status | Beskrivning |
 |------|--------|-------------|
-| `/app/gamification/achievements` | ✅ Fungerar | Full overview med pin-funktionalitet, AchievementCard grid |
+| `/app/gamification/achievements` | ✅ Uppdaterad | Full overview med «Visa i Journey»-knapp (showcase), AchievementCard grid |
 | `/app/gamification/coins` | ✅ Uppgraderad | JourneyScene dark theme, WebP-ikon, glassmorfism, filter funktion bevarad |
 | `/app/gamification/events` | ✅ Server-komponent | Supabase direkt-query, eventlogg med metadata |
 | `/app/shop` | ✅ Fungerar | Fullständig butik med kategorier, sök, rarity, köp |
@@ -96,13 +97,13 @@
 | **XP Progress bar** | `CleanProgressBar` — 8 skins, tick marks, shimmer | `ProgressOverview` — enkel gradient bar | ❌ Funktionsgap | P1 |
 | **Stat-pills** | `CleanStatCard` med 3D-tilt + burst click | Separata sektioner (Coins/Streak/Achievements) | ⚠️ Annorlunda struktur | P2 |
 | **Milestone-badge** | `CleanMilestoneBadge` — cirkulär SVG progress ring | `ProgressOverview` visar `nextReward` som text | ❌ Saknas | P2 |
-| **Badge showcase** | `BadgeShowcase` — hero badge + 4×3 grid + klick-modal | `AchievementsSection` — 3×2 grid + klick-modal | ⚠️ Liknande, men enklare | P3 |
+| **Badge showcase** | `BadgeShowcase` — hero badge + 4×3 grid + klick-modal | ✅ `BadgeShowcase` — 4-slot pinned, hero(lg)+3-grid, greyed placeholders | ✅ Done | — |
 | **DiceCoin vault** | `DiceCoinVault` — animerad counter, flytande mynt, 100px ikon | `CoinsSection` — saldo + 3 transaktioner | ❌ Funktionsgap | P2 |
 | **Streak-visualisering** | `StreakSection` — hero card + vecko-dots | Journey sandbox: streak som en siffra i stat-pill | ✅ Gamification bättre! | — |
 | **Kursväg** | `CourseJourneyPath` — vertikal timeline med 4 kursnoder | ❌ Finns ej | ❌ Saknas | P3 |
 | **Shop showcase** | `ShopShowcase` — auto-roterande spotlight, rarity-glow | Separat sida (`/app/shop`) | ⚠️ Kan lägga till preview | P3 |
 | **Factions** | Full faction-väljare + visuellt tema per fraktion | ❌ Finns ej i gamification UI | ❌ Saknas | P1 |
-| **Skill tree** | `SkillTreeInline` — 9 noder per fraktion, cosmetic unlock | ✅ `SkillTreeSection` — level-gated preview, SVG connections | ⚠️ Preview only (ej cosmetic apply) | ✅ Done |
+| **Skill tree** | `SkillTreeInline` — 9 noder per fraktion, cosmetic unlock | ✅ `SkillTreeSection` — interactive nodes, popover detail, avatar-tap expand/collapse | ⚠️ Preview only (ej cosmetic apply) | ✅ Done |
 | **Sektionsavdelare** | `SectionDivider` — 8 stilar (glow, nebula, ornament etc.) | Ingen (bara `space-y-6`) | ❌ Saknas | P2 |
 | **Header frame** | `HeaderFrameOverlay` — 9 stilar (ornate, neon, aurora etc.) | Ingen | ❌ Saknas | P3 |
 | **Bakgrundseffekter** | `BackgroundEffectsLayer` — 12 effekter (partiklar, stjärnor etc.) | Ingen | ❌ Saknas | P3 |
@@ -118,7 +119,7 @@
 | Streak days | snapshot.streakDays | gamification.streak.currentDays | ✅ Båda har det |
 | Faction | ❌ Ej i API (mock i sandbox) | ✅ `user_journey_preferences` + POST/GET | ✅ Shipped |
 | Activity feed | `/api/journey/feed` → items[] med type, title, href | ❌ Gamification saknar feed | ⚠️ Finns men ej kopplat |
-| Pinned achievements | Via gamification pins-API (`/api/gamification/pins`) | ✅ Finns | ✅ |
+| Pinned achievements | Via gamification pins-API (`/api/gamification/pins`) | ✅ `user_achievement_showcase` (4 slots, user-scoped) + POST `/api/gamification/showcase` | ✅ |
 | Cosmetics | `/api/cosmetics/loadout` | ✅ Finns i dashboard | ✅ |
 | Avatar URL | snapshot.avatarUrl | ❌ Saknas i gamification payload | ⚠️ Behövs |
 | Display name | snapshot.displayName | ❌ Saknas i gamification payload | ⚠️ Behövs |
@@ -527,7 +528,9 @@ Efter Steg 0-5 (~9-13 h): Gamification-hubben har fullständig Journey-design me
 | **Totalt fas 1 (Steg 0-5)** | **~9-13 h** | |
 | Steg 6: Faction (v3.0) | ✅ Shipped | Steg 5 |
 | Steg 7: Skill tree preview (v3.0.1) | ✅ Shipped | Steg 6 |
-| Steg 8: Visual upgrades (v3.1) | ⏳ Nästa | Steg 7 |
+| Steg 8: Visual upgrades (v3.1) | ✅ Shipped | Steg 7 |
+| Steg 9: Skill tree interactive (v3.1.1) | ✅ Shipped | Steg 8 |
+| Steg 10: Badge Showcase (v3.1.2) | ✅ Shipped | Steg 9 |
 
 ### Redan klart
 
@@ -677,12 +680,14 @@ Undersidor har återställts till standard app-styling:
 | 5 | `coins-halo` | CoinsSection | Gold glow bakom mynt |
 | 6 | `coins-float` | CoinsSection | Floating mini coins |
 | 7 | `coins-bounce` | CoinsSection | Huvudmynt bounce |
-| 8 | `ach-hero-glow` | AchievementsSection | Glow bakom hero badge |
-| 9 | `ach-sparkle` | AchievementsSection | Orbiting sparkle dots |
+| 8 | `ach-hero-glow` | AchievementsSection + BadgeShowcase | Glow bakom hero badge |
+| 9 | `ach-sparkle` | AchievementsSection + BadgeShowcase | Orbiting sparkle dots |
 | 10 | `confetti-fall` | AchievementUnlockCelebration | Confetti (event-only) |
 | 11 | `pulse-glow` | AchievementUnlockCelebration | Badge glow (event-only) |
+| 12 | `xp-energy-flow` | XPProgressBar | Energy skin flowing gradient |
+| 13 | `avatar-tap-hint` | GamificationPage | Breathing glow on avatar (tap hint) |
 
-**Totalt: 11/15 budget. 4 slots kvar. Alla har `prefers-reduced-motion` guard.**
+**Totalt: 13/15 budget. 2 slots kvar. Alla har `prefers-reduced-motion` guard.**
 
 > **⚖️ Keyframe Constitution** (regel för framtida tillägg):
 > 1. Alla nya keyframes **måste** läggas till i inventory-tabellen ovan
@@ -703,8 +708,9 @@ Undersidor har återställts till standard app-styling:
 
 #### ⛔ Out of scope (NO-GO — fortfarande)
 - Events page alignment
-- ~~Skill tree / cosmetic unlocks — kräver DB-schema + API~~ → ✅ Preview shipped (v3.0.1). Cosmetic apply kvar (P10)
-- Avatar-uppgradering (ramtyper, effekter) — kräver cosmetics-data + faction
+- ~~Skill tree / cosmetic unlocks — kräver DB-schema + API~~ → ✅ Preview shipped (v3.0.1). Interactive shipped (v3.1.1). Cosmetic apply kvar (P10)
+- ~~Badge showcase~~ → ✅ Shipped (v3.1.2) — 4-slot pinned achievements med «Visa i Journey»
+- ~~Avatar-uppgradering (ramtyper, effekter)~~ → ✅ AvatarFrame shipped (P6). Fler effekter kvar (P10)
 - Fler sektioner (CoursePath, Shop) — kräver datamodeller
 - Journey-design på undersidor (achievements, coins)
 - Dark/Light mode toggle
@@ -785,14 +791,37 @@ Undersidor har återställts till standard app-styling:
 
 ---
 
-### v3.1 — Visual upgrades (kräver faction) 🔜 NÄSTA
+### v3.1 — Visual upgrades ✅ SHIPPED
 
-| Prio | Steg | Effort | Beroende | Status |
-|------|------|--------|----------|--------|
-| P3 | **Faction banner** — visar vald faction + memberSince under avatar | S | v3.0 | ⏳ Redo |
-| P4 | **Palette utils** — `getColorPalette`, `hexToHSL`, `ColorMode` | S | v3.0 | ⏳ Redo |
-| P5 | **XP-bar skins** — 2-3 visuella stilar (clean/segmented/warp) | M | P4 | ⏳ |
-| P6 | **Header frame overlay** — cosmetic lite | M | P4 | ⏳ |
+| Prio | Steg | Effort | Beroende | Status | Commit |
+|------|------|--------|----------|--------|--------|
+| P3 | **Faction banner** — visar vald faction + accent dot + i18n title | S | v3.0 | ✅ Done | `25b824a` |
+| P4 | **Palette utils** — `hexToHSL`, `hslToHex`, color modes, gradient builders | S | v3.0 | ✅ Done | `24fe7c1` |
+| P5 | **XP-bar skins** — clean/shimmer/energy, skill tree auto-unlock | M | P4 | ✅ Done | `4661796` |
+| P6 | **Avatar frame overlay** — faction SVG cosmetics | M | P4 | ✅ Done | `c7eef0f` |
+
+### v3.1.1 — Skill tree interactive ✅ SHIPPED
+
+| Steg | Status | Commit |
+|------|--------|--------|
+| **Interactive nodes** — popover detail, animated connections, pulse ring, hover+a11y | ✅ Done | `75e055e` |
+| **Avatar-tap expand/collapse** — click avatar to reveal skill tree inline, name/banner collapses | ✅ Done | `bff18fc` |
+| **Visual cleanup** — remove animated dots, white available nodes, drop glass containers | ✅ Done | `ac6d434` |
+| **ESLint fixes** — React Compiler compat: remove useCallback, replace setState-in-effect with state-during-render pattern | ✅ Done | unstaged→committed |
+
+### v3.1.2 — Badge Showcase ✅ SHIPPED
+
+| Steg | Status | Commit |
+|------|--------|--------|
+| **DB migration** — `user_achievement_showcase` table (slot 1-4, RLS, unique per user+achievement) | ✅ Done | `688feda` |
+| **Types** — `ShowcaseSlot`, `ShowcaseSummary` added to `GamificationPayload` | ✅ Done | `688feda` |
+| **Snapshot GET** — queries showcase rows, maps to 4-slot structure with full Achievement objects | ✅ Done | `688feda` |
+| **POST endpoint** — `/api/gamification/showcase` replace-all with validation (max 4, no dups) | ✅ Done | `688feda` |
+| **Client API** — `saveShowcase()` function with `ShowcaseSlotPayload` type | ✅ Done | `688feda` |
+| **BadgeShowcase component** — hero slot 1 (lg + glow + sparkles), slots 2-4 grid, greyed placeholders, empty microcopy | ✅ Done | `688feda` |
+| **GamificationPage** — swaps `AchievementsSection` for `BadgeShowcase` | ✅ Done | `688feda` |
+| **Pin button rewire** — «Visa i Journey» replaces «Visa på dashboard», user-scoped (removed tenant dependency) | ✅ Done | `971ae73` |
+| **i18n** — showcase.earned/emptySlot/emptyHint/pinToJourney/pinnedInJourney/maxPinned (sv+en) | ✅ Done | `971ae73` |
 
 ### v3.2+ — Produktfeatures (kräver produkt + data)
 
@@ -815,8 +844,14 @@ Undersidor har återställts till standard app-styling:
 
 ### Nästa steg (rekommenderad ordning)
 
-1. **P3: Faction banner** — visa vald faction namn + ikon under avatar. Kort steg (~30 min)
-2. **P4: Palette utils** — `hexToHSL()`, `getColorPalette()`. Foundation för XP skins + color modes
-3. **P5: XP-bar skins** — 2-3 visuella varianter, togglebar via skill tree unlock
-4. **QA: v2.5 Ship Gate** — mobile scroll, modal, scope leakage, focus tab (se checklistan ovan)
-5. **Staging deploy** — efter QA godkänd
+1. **QA: Ship Gate** — mobile scroll, modal, scope leakage, focus tab (se checklistan ovan)
+2. **Staging deploy** — efter QA godkänd
+3. **P7: CourseJourneyPath** — vertikal timeline med kursnoder (kräver kursdata-integration)
+4. **P9: BackgroundEffectsLayer** — helskärmseffekter kopplade till faction (2 keyframe-slots kvar!)
+5. **P10: Skill tree cosmetic apply** — click-to-preview + loadout save (kräver DB-schema)
+
+#### ✅ Klart sedan senaste uppdatering
+- ✅ P3-P6 shipped (v3.1)
+- ✅ Skill tree interactive: popover, avatar-tap expand/collapse, visual cleanup
+- ✅ Badge Showcase: 4-slot pinned achievements, hero+grid, «Visa i Journey» button
+- ✅ ESLint fixes: React Compiler compat on SkillTreeSection

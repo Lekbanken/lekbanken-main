@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { FactionTheme } from "@/types/journey";
 import type { SkillNode, CosmeticCategory } from "../data/skill-trees";
@@ -303,15 +303,19 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
 
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
-  const handleNodeClick = useCallback((node: SkillNode) => {
+  const handleNodeClick = (node: SkillNode) => {
     if (node.status === "locked") return;
     setSelectedNode((prev) => (prev === node.id ? null : node.id));
-  }, []);
+  };
 
-  // Close popover when faction/level changes
-  useEffect(() => {
+  // Reset selection when faction/level changes (React-recommended pattern)
+  const [prevFactionId, setPrevFactionId] = useState(factionId);
+  const [prevLevel, setPrevLevel] = useState(userLevel);
+  if (prevFactionId !== factionId || prevLevel !== userLevel) {
+    setPrevFactionId(factionId);
+    setPrevLevel(userLevel);
     setSelectedNode(null);
-  }, [factionId, userLevel]);
+  }
 
   const maxCol = Math.max(...tree.map((n) => n.col));
   const maxRow = Math.max(...tree.map((n) => n.row));

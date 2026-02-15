@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * SectionDivider — themed separator between journey sections.
  * Three styles: line (default), glow (energy pulse), ornament (diamond SVGs).

@@ -265,7 +265,10 @@
     "showcase": {
       "earned": "Earned",
       "emptySlot": "Empty slot",
-      "emptyHint": "Choose up to 4 badges to display here"
+      "emptyHint": "Choose up to 4 badges to display here",
+      "pinToJourney": "Show in Journey",
+      "pinnedInJourney": "Shown in Journey",
+      "maxPinned": "Max 4 selected"
     },
     "coins": "Coins",
     "noCoinsActivityYet": "No coin activity yet",

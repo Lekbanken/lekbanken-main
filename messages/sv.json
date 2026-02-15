@@ -254,7 +254,10 @@
     "showcase": {
       "earned": "Uppnådd",
       "emptySlot": "Tom plats",
-      "emptyHint": "Välj upp till 4 utmärkelser att visa här"
+      "emptyHint": "Välj upp till 4 utmärkelser att visa här",
+      "pinToJourney": "Visa i Journey",
+      "pinnedInJourney": "Visas i Journey",
+      "maxPinned": "Max 4 valda"
     },
     "coins": "Mynt",
     "noCoinsActivityYet": "Ingen myntaktivitet än",

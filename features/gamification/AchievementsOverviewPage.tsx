@@ -9,8 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PageTitleHeader } from "@/components/app/PageTitleHeader";
 import { appNavItems } from "@/components/app/nav-items";
 import { Button } from "@/components/ui/button";
-import { useTenant } from "@/lib/context/TenantContext";
-import { fetchGamificationSnapshot, fetchPinnedAchievements, savePinnedAchievements, type GamificationPayload } from "./api";
+import { fetchGamificationSnapshot, saveShowcase, type GamificationPayload, type ShowcaseSlotPayload } from "./api";
 import { AchievementCard } from "./components/AchievementCard";
 
 type AchievementsOverviewPageProps = {
@@ -21,11 +20,10 @@ export function AchievementsOverviewPage({
   fetcher = fetchGamificationSnapshot,
 }: AchievementsOverviewPageProps) {
   const t = useTranslations("gamification");
-  const { currentTenant } = useTenant();
   const [data, setData] = useState<GamificationPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+  const [showcaseIds, setShowcaseIds] = useState<string[]>([]);
   const [isSavingPins, setIsSavingPins] = useState(false);
 
   const dicecoinIcon = appNavItems.find((item) => item.href === "/app/gamification")?.icon;
@@ -37,6 +35,11 @@ export function AchievementsOverviewPage({
         const result = await fetcher();
         if (isMounted) {
           setData(result);
+          // Extract showcase IDs from snapshot
+          const ids = (result.showcase?.slots ?? [])
+            .filter((s) => s.achievement !== null)
+            .map((s) => s.achievement!.id);
+          setShowcaseIds(ids);
           setError(null);
         }
       } catch {
@@ -52,32 +55,12 @@ export function AchievementsOverviewPage({
     };
   }, [fetcher]);
 
-  useEffect(() => {
-    let isMounted = true;
-    const loadPins = async () => {
-      if (!currentTenant?.id) return;
-      try {
-        const pins = await fetchPinnedAchievements(currentTenant.id);
-        if (!isMounted) return;
-        setPinnedIds(pins.pinnedIds ?? []);
-      } catch {
-        if (!isMounted) return;
-        setPinnedIds([]);
-      }
-    };
-
-    loadPins();
-    return () => {
-      isMounted = false;
-    };
-  }, [currentTenant?.id]);
-
   const unlockedCount = useMemo(
     () => data?.achievements.filter((a) => a.status === "unlocked").length ?? 0,
     [data]
   );
 
-  const canPinMore = pinnedIds.length < 3;
+  const canPinMore = showcaseIds.length < 4;
 
   if (error) {
     return (
@@ -162,27 +145,29 @@ export function AchievementsOverviewPage({
               <div key={achievement.id} className="space-y-2">
                 <AchievementCard achievement={achievement} />
 
-                {achievement.status === "unlocked" && currentTenant?.id ? (
+                {achievement.status === "unlocked" ? (
                   <div className="flex items-center justify-center">
                     <Button
-                      variant={pinnedIds.includes(achievement.id) ? "primary" : "outline"}
+                      variant={showcaseIds.includes(achievement.id) ? "primary" : "outline"}
                       size="sm"
-                      disabled={isSavingPins || (!pinnedIds.includes(achievement.id) && !canPinMore)}
+                      disabled={isSavingPins || (!showcaseIds.includes(achievement.id) && !canPinMore)}
                       loading={isSavingPins}
                       onClick={async () => {
-                        if (!currentTenant?.id) return;
-                        const isPinned = pinnedIds.includes(achievement.id);
-                        const next = isPinned
-                          ? pinnedIds.filter((id) => id !== achievement.id)
-                          : [...pinnedIds, achievement.id].slice(0, 3);
+                        const isPinned = showcaseIds.includes(achievement.id);
+                        const nextIds = isPinned
+                          ? showcaseIds.filter((id) => id !== achievement.id)
+                          : [...showcaseIds, achievement.id].slice(0, 4);
+
+                        // Build slot payloads (slot 1-based)
+                        const slots: ShowcaseSlotPayload[] = nextIds.map((id, i) => ({
+                          slot: i + 1,
+                          achievementId: id,
+                        }));
 
                         setIsSavingPins(true);
                         try {
-                          const saved = await savePinnedAchievements({
-                            tenantId: currentTenant.id,
-                            achievementIds: next,
-                          });
-                          setPinnedIds(saved.pinnedIds);
+                          await saveShowcase(slots);
+                          setShowcaseIds(nextIds);
                         } catch {
                           // keep local state unchanged
                         } finally {
@@ -190,7 +175,7 @@ export function AchievementsOverviewPage({
                         }
                       }}
                     >
-                      {pinnedIds.includes(achievement.id) ? "Visas på dashboard" : "Visa på dashboard"}
+                      {showcaseIds.includes(achievement.id) ? t("showcase.pinnedInJourney") : t("showcase.pinToJourney")}
                     </Button>
                   </div>
                 ) : null}

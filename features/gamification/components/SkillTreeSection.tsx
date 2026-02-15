@@ -1,12 +1,13 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { FactionTheme } from "@/types/journey";
-import type { SkillNode } from "../data/skill-trees";
+import type { SkillNode, CosmeticCategory } from "../data/skill-trees";
 import { getSkillTree, getUnlockedCount, NODES_PER_TREE } from "../data/skill-trees";
 
 // ---------------------------------------------------------------------------
-// SVG connection lines between nodes
+// Constants
 // ---------------------------------------------------------------------------
 
 const CELL_W = 80;
@@ -20,6 +21,25 @@ function cx(col: number) {
 function cy(row: number) {
   return row * (CELL_H + GAP_Y) + CELL_H / 2;
 }
+
+// ---------------------------------------------------------------------------
+// Cosmetic category → readable label + emoji
+// ---------------------------------------------------------------------------
+
+const CATEGORY_META: Record<CosmeticCategory, { emoji: string; sv: string; en: string }> = {
+  root: { emoji: "⭐", sv: "Startpunkt", en: "Starting point" },
+  bg: { emoji: "🌌", sv: "Bakgrundseffekt", en: "Background effect" },
+  avatar: { emoji: "👤", sv: "Avatar-effekt", en: "Avatar effect" },
+  xp: { emoji: "⚡", sv: "XP-bar skin", en: "XP bar skin" },
+  divider: { emoji: "✨", sv: "Sektionsavdelare", en: "Section divider" },
+  header: { emoji: "🖼️", sv: "Profilram", en: "Profile frame" },
+  color: { emoji: "🎨", sv: "Färgläge", en: "Color mode" },
+  prestige: { emoji: "👑", sv: "Prestigetitel", en: "Prestige title" },
+};
+
+// ---------------------------------------------------------------------------
+// SVG connection lines with animated flowing dots
+// ---------------------------------------------------------------------------
 
 function Connections({
   tree,
@@ -56,6 +76,7 @@ function Connections({
 
           return (
             <g key={`${fromId}-${node.id}`}>
+              {/* Glow layer */}
               {active && (
                 <path
                   d={d}
@@ -66,6 +87,7 @@ function Connections({
                   style={{ filter: "blur(4px)" }}
                 />
               )}
+              {/* Main line */}
               <path
                 d={d}
                 fill="none"
@@ -74,6 +96,21 @@ function Connections({
                 strokeDasharray={active ? "none" : "4 4"}
                 opacity={active ? 0.7 : 0.4}
               />
+              {/* Animated flowing dot on active connections (SVG native, 0 keyframe cost) */}
+              {active && (
+                <circle
+                  r={2.5}
+                  fill={accent}
+                  opacity={0.9}
+                  className="skill-tree-dot"
+                >
+                  <animateMotion
+                    dur="2.5s"
+                    repeatCount="indefinite"
+                    path={d}
+                  />
+                </circle>
+              )}
             </g>
           );
         }),
@@ -143,6 +180,120 @@ function LockIcon() {
 }
 
 // ---------------------------------------------------------------------------
+// Node detail popover
+// ---------------------------------------------------------------------------
+
+function NodePopover({
+  node,
+  accent,
+  onClose,
+  t,
+}: {
+  node: SkillNode;
+  accent: string;
+  onClose: () => void;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const meta = CATEGORY_META[node.cosmeticCategory];
+
+  // Close on click outside
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onClose();
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [onClose]);
+
+  // Close on Escape
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div
+      ref={ref}
+      className="absolute z-50 rounded-xl border bg-[#1a1a2e]/95 backdrop-blur-md shadow-xl p-3 min-w-[160px] max-w-[200px]"
+      style={{
+        border: `1px solid ${accent}40`,
+        boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 12px ${accent}15`,
+        bottom: "calc(100% + 8px)",
+        left: "50%",
+        transform: "translateX(-50%)",
+      }}
+    >
+      {/* Arrow */}
+      <div
+        className="absolute w-2 h-2 rotate-45"
+        style={{
+          bottom: -4,
+          left: "calc(50% - 4px)",
+          backgroundColor: "#1a1a2e",
+          borderRight: `1px solid ${accent}40`,
+          borderBottom: `1px solid ${accent}40`,
+        }}
+      />
+
+      {/* Category badge */}
+      <div className="flex items-center gap-1.5 mb-2">
+        <span className="text-sm">{meta.emoji}</span>
+        <span
+          className="text-[10px] font-semibold uppercase tracking-wide"
+          style={{ color: accent }}
+        >
+          {meta.sv}
+        </span>
+      </div>
+
+      {/* Node name */}
+      <p className="text-sm font-bold text-white mb-1">{node.label}</p>
+
+      {/* Status */}
+      {node.status === "unlocked" ? (
+        <div className="flex items-center gap-1">
+          <span
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: accent }}
+          />
+          <span className="text-[10px] text-white/60">{t("nodeUnlocked")}</span>
+        </div>
+      ) : node.status === "available" ? (
+        <div className="flex items-center gap-1">
+          <span
+            className="w-2 h-2 rounded-full border"
+            style={{ borderColor: accent }}
+          />
+          <span className="text-[10px] text-white/60">
+            {t("availableAt", { level: node.requiredLevel })}
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-center gap-1">
+          <LockIcon />
+          <span className="text-[10px] text-white/40">
+            {t("unlockAt", { level: node.requiredLevel })}
+          </span>
+        </div>
+      )}
+
+      {/* Cosmetic key preview */}
+      {node.cosmeticKey && (
+        <p className="text-[9px] text-white/25 mt-1.5 font-mono truncate">
+          {node.cosmeticKey}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // SkillTreeSection — the public component for the hub
 // ---------------------------------------------------------------------------
 
@@ -153,10 +304,12 @@ type SkillTreeSectionProps = {
 };
 
 /**
- * Skill tree preview section for the gamification hub.
- * Shows the 9-node tree for the active faction.
- * Nodes unlock automatically based on user level.
- * 0 new keyframes. Uses transitions only.
+ * Skill tree interactive section for the gamification hub.
+ * Shows the 9-node tree for the active faction with:
+ * - Animated flowing dots on unlocked connections (SVG animateMotion, 0 keyframe cost)
+ * - Click-to-inspect node popover with cosmetic details
+ * - Pulse ring on available (next-to-unlock) nodes (1 keyframe: skill-node-pulse)
+ * - Hover scale on interactive nodes
  */
 export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSectionProps) {
   const t = useTranslations("gamification.skillTree");
@@ -164,12 +317,36 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
   const unlocked = getUnlockedCount(factionId, userLevel);
   const accent = theme.accentColor;
 
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
+
+  const handleNodeClick = useCallback((node: SkillNode) => {
+    if (node.status === "locked") return;
+    setSelectedNode((prev) => (prev === node.id ? null : node.id));
+  }, []);
+
+  // Close popover when faction/level changes
+  useEffect(() => {
+    setSelectedNode(null);
+  }, [factionId, userLevel]);
+
   const maxCol = Math.max(...tree.map((n) => n.col));
   const maxRow = Math.max(...tree.map((n) => n.row));
-  const gridWidth = (maxCol + 1) * CELL_W + maxCol * GAP_X + 24; // +padding
+  const gridWidth = (maxCol + 1) * CELL_W + maxCol * GAP_X + 24;
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
+      {/* Keyframe + reduced-motion guard */}
+      <style>{`
+        @keyframes skill-node-pulse {
+          0%, 100% { box-shadow: 0 0 0 0px var(--pulse-color); }
+          50% { box-shadow: 0 0 0 5px transparent; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .skill-node-pulse { animation: none !important; }
+          .skill-tree-dot { display: none; }
+        }
+      `}</style>
+
       {/* Header */}
       <div className="text-center mb-4">
         <h2 className="text-base font-bold text-white">{t("title")}</h2>
@@ -205,36 +382,66 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
                 const isAvailable = node.status === "available";
                 const isLocked = node.status === "locked";
                 const isPrestige = node.cosmeticCategory === "prestige";
+                const isSelected = selectedNode === node.id;
+                const isInteractive = !isLocked;
 
                 return (
                   <div
                     key={node.id}
-                    className="relative flex flex-col items-center justify-center gap-1 rounded-xl transition-all duration-200"
+                    className={[
+                      "relative flex flex-col items-center justify-center gap-1 rounded-xl transition-all duration-200",
+                      isInteractive && "cursor-pointer",
+                      isInteractive && !isSelected && "hover:scale-105",
+                      isAvailable && "skill-node-pulse",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                     style={{
                       width: CELL_W,
                       height: CELL_H,
-                      backgroundColor: isUnlocked
-                        ? `${accent}15`
-                        : isAvailable
-                          ? `${accent}08`
-                          : "rgba(255,255,255,0.03)",
-                      border: isUnlocked
-                        ? `1.5px solid ${accent}50`
-                        : isAvailable
-                          ? `1.5px solid ${accent}30`
-                          : "1px solid rgba(255,255,255,0.08)",
+                      backgroundColor: isSelected
+                        ? `${accent}25`
+                        : isUnlocked
+                          ? `${accent}15`
+                          : isAvailable
+                            ? `${accent}08`
+                            : "rgba(255,255,255,0.03)",
+                      border: isSelected
+                        ? `2px solid ${accent}`
+                        : isUnlocked
+                          ? `1.5px solid ${accent}50`
+                          : isAvailable
+                            ? `1.5px solid ${accent}30`
+                            : "1px solid rgba(255,255,255,0.08)",
                       opacity: isLocked ? 0.35 : 1,
-                      boxShadow: isPrestige && isUnlocked
-                        ? `0 0 16px ${accent}25`
-                        : "none",
+                      boxShadow: isSelected
+                        ? `0 0 16px ${accent}30`
+                        : isPrestige && isUnlocked
+                          ? `0 0 16px ${accent}25`
+                          : "none",
+                      ...(isAvailable
+                        ? ({
+                            "--pulse-color": `${accent}40`,
+                            animation: "skill-node-pulse 2.5s ease-in-out infinite",
+                          } as React.CSSProperties)
+                        : {}),
                     }}
-                    title={
-                      isLocked
-                        ? t("unlockAt", { level: node.requiredLevel })
+                    onClick={() => handleNodeClick(node)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleNodeClick(node);
+                      }
+                    }}
+                    role={isInteractive ? "button" : undefined}
+                    tabIndex={isInteractive ? 0 : undefined}
+                    aria-label={`${node.label} — ${
+                      isUnlocked
+                        ? t("nodeUnlocked")
                         : isAvailable
                           ? t("availableAt", { level: node.requiredLevel })
-                          : node.label
-                    }
+                          : t("unlockAt", { level: node.requiredLevel })
+                    }`}
                   >
                     {/* Icon */}
                     <div
@@ -289,6 +496,16 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
                         ✓
                       </span>
                     )}
+
+                    {/* Click popover */}
+                    {isSelected && (
+                      <NodePopover
+                        node={node}
+                        accent={accent}
+                        onClose={() => setSelectedNode(null)}
+                        t={t}
+                      />
+                    )}
                   </div>
                 );
               }),
@@ -299,7 +516,7 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
 
       {/* Footer hint */}
       <p className="text-center text-[10px] text-white/30 mt-3">
-        {t("hint")}
+        {t("hintClick")}
       </p>
     </div>
   );

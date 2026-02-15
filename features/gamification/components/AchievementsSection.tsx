@@ -90,7 +90,7 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
           {/* Earned date pill */}
           {heroBadge.unlockedAt && (
             <p className="mt-2 text-[10px] text-[var(--journey-accent)]/70 uppercase tracking-wide relative z-10">
-              Upplåst {new Date(heroBadge.unlockedAt).toLocaleDateString("sv-SE")}
+              {t("unlockedDate", { date: new Date(heroBadge.unlockedAt).toLocaleDateString("sv-SE") })}
             </p>
           )}
 

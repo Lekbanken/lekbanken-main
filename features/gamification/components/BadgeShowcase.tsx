@@ -149,7 +149,7 @@ export function BadgeShowcase({ showcase, achievements }: BadgeShowcaseProps) {
       )}
 
       {/* Showcase grid — slots 2-4 (always show 3 cells) */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {gridSlots.map((slot, i) => (
           <div
             key={`slot-${i + 2}`}

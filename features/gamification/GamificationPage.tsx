@@ -209,7 +209,8 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
           <button
             onClick={() => setIsSkillTreeOpen(false)}
             aria-label="Close"
-            className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all z-20"
+            tabIndex={isSkillTreeOpen ? 0 : -1}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all z-20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
             style={{
               opacity: isSkillTreeOpen ? 1 : 0,
               pointerEvents: isSkillTreeOpen ? "auto" : "none",
@@ -231,7 +232,8 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
             role="button"
             tabIndex={0}
             aria-label={t("skillTree.avatarHint")}
-            className="relative cursor-pointer"
+            aria-expanded={isSkillTreeOpen}
+            className="relative cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--journey-accent,#8661ff)]/60"
             style={{
               transform: isSkillTreeOpen ? "scale(0.55)" : "scale(1)",
               transformOrigin: "top center",
@@ -419,7 +421,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
         <StreakSection streak={data.streak} />
         <SectionDivider variant="ornament" />
         <BadgeShowcase showcase={data.showcase!} achievements={data.achievements} />
-        <SectionDivider variant="glow" label="Nästa steg" />
+        <SectionDivider variant="glow" label={t("nextStepLabel")} />
         <CallToActionSection />
       </div>
 

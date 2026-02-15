@@ -262,6 +262,8 @@
     "noAchievementsYet": "No achievements yet",
     "playToEarnBadges": "Play to earn badges!",
     "viewAllAchievements": "View all achievements",
+    "nextStepLabel": "Next step",
+    "unlockedDate": "Unlocked {date}",
     "showcase": {
       "earned": "Earned",
       "emptySlot": "Empty slot",

@@ -251,6 +251,8 @@
     "noAchievementsYet": "Inga prestationer än",
     "playToEarnBadges": "Spela för att tjäna badges!",
     "viewAllAchievements": "Visa alla prestationer",
+    "nextStepLabel": "Nästa steg",
+    "unlockedDate": "Upplåst {date}",
     "showcase": {
       "earned": "Uppnådd",
       "emptySlot": "Tom plats",

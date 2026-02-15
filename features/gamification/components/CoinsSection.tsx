@@ -30,8 +30,8 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
           boxShadow: "0 0 40px var(--journey-accent, #8661ff)10",
         }}
       >
-        {/* Shimmer overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-[shimmer_3s_infinite] -translate-x-full" />
+        {/* Shimmer overlay — decorative only, no animation (keyframe not in scope) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full" />
 
         {/* Gold halo glow */}
         <div

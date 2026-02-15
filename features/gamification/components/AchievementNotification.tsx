@@ -144,7 +144,7 @@ export function AchievementNotification({
           'dark:from-amber-950/90 dark:to-yellow-900/80',
           'border-2 border-amber-400 dark:border-amber-500',
           'rounded-2xl shadow-2xl shadow-amber-500/30',
-          'px-6 py-5 min-w-[320px] max-w-[400px]',
+          'px-6 py-5 min-w-[280px] max-w-[400px]',
         )}>
           {/* Close button */}
           <button
@@ -161,7 +161,7 @@ export function AchievementNotification({
           </button>
 
           {/* Sparkle decoration */}
-          <div className="absolute -top-3 -left-3 animate-pulse">
+          <div className="absolute -top-3 -left-3 animate-pulse motion-reduce:animate-none">
             <SparklesIcon className="w-8 h-8 text-amber-400" />
           </div>
 

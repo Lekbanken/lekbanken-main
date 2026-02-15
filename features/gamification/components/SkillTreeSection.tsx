@@ -368,6 +368,7 @@ export function SkillTreeSection({ factionId, userLevel, theme }: SkillTreeSecti
                       "relative flex flex-col items-center justify-center gap-1 rounded-xl transition-all duration-200",
                       isInteractive && "cursor-pointer",
                       isInteractive && !isSelected && "hover:scale-105",
+                      isInteractive && "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--journey-accent,#8661ff)]/60",
                     ]
                       .filter(Boolean)
                       .join(" ")}

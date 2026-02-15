@@ -25,6 +25,7 @@ export function AchievementCard({ achievement, variant = "standard" }: Achieveme
     <>
       <button
         onClick={() => setIsModalOpen(true)}
+        aria-label={isLocked ? "Locked achievement" : achievement.name}
         className={`relative flex flex-col items-center rounded-2xl p-4 text-center transition-all min-h-[140px] w-full hover:scale-105 active:scale-100 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--journey-accent,#8661ff)]/60 ${
           variant === "journey"
             ? isUnlocked

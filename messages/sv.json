@@ -8552,7 +8552,12 @@
             "selectPredefined": "Eller välj en fördefinierad avatar",
             "selected": "Avatar vald",
             "notSelected": "Ingen avatar vald",
-            "remove": "Ta bort profilbild"
+            "remove": "Ta bort profilbild",
+            "createCustom": "Skapa egen avatar",
+            "builderTitle": "Skapa din avatar",
+            "builderDescription": "Välj delar och skapa en unik avatar som representerar dig.",
+            "builderSave": "Spara avatar",
+            "builderCancel": "Avbryt"
           },
           "personalInfo": {
             "title": "Personuppgifter",

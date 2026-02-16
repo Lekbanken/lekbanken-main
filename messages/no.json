@@ -8473,7 +8473,12 @@
             "selectPredefined": "Eller velg en forhåndsdefinert avatar",
             "selected": "Avatar valgt",
             "notSelected": "Ingen avatar valgt",
-            "remove": "Fjern profilbilde"
+            "remove": "Fjern profilbilde",
+            "createCustom": "Lag egen avatar",
+            "builderTitle": "Lag din avatar",
+            "builderDescription": "Velg deler og lag en unik avatar som representerer deg.",
+            "builderSave": "Lagre avatar",
+            "builderCancel": "Avbryt"
           },
           "personalInfo": {
             "title": "Personopplysninger",

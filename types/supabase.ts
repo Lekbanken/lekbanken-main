@@ -14080,6 +14080,8 @@ export type Database = {
       }
       users: {
         Row: {
+          avatar_config: Json | null
+          avatar_updated_at: string | null
           avatar_url: string | null
           created_at: string
           demo_last_used_at: string | null
@@ -14099,6 +14101,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          avatar_config?: Json | null
+          avatar_updated_at?: string | null
           avatar_url?: string | null
           created_at?: string
           demo_last_used_at?: string | null
@@ -14118,6 +14122,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          avatar_config?: Json | null
+          avatar_updated_at?: string | null
           avatar_url?: string | null
           created_at?: string
           demo_last_used_at?: string | null

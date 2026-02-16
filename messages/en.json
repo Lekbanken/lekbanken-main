@@ -8147,7 +8147,12 @@
             "selectPredefined": "Or choose a predefined avatar",
             "selected": "Avatar selected",
             "notSelected": "No avatar selected",
-            "remove": "Remove profile picture"
+            "remove": "Remove profile picture",
+            "createCustom": "Create custom avatar",
+            "builderTitle": "Create your avatar",
+            "builderDescription": "Choose parts and create a unique avatar that represents you.",
+            "builderSave": "Save avatar",
+            "builderCancel": "Cancel"
           },
           "personalInfo": {
             "title": "Personal Information",

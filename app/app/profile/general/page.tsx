@@ -3,16 +3,21 @@
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
+import { supabase } from '@/lib/supabase';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
   UserIcon,
   TrashIcon,
   CheckIcon,
+  PaintBrushIcon,
 } from '@heroicons/react/24/outline';
 import { avatarPresets } from '@/features/profile/avatarPresets';
+import { AvatarBuilderWidget } from '@/app/sandbox/avatar-builder/components/AvatarBuilderWidget';
+import type { AvatarConfig } from '@/app/sandbox/avatar-builder/types';
 import { cn } from '@/lib/utils';
 
 export default function GeneralSettingsPage() {
@@ -24,6 +29,7 @@ export default function GeneralSettingsPage() {
   const [displayName, setDisplayName] = useState('');
   const [phone, setPhone] = useState('');
 
+  const [showBuilder, setShowBuilder] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +85,56 @@ export default function GeneralSettingsPage() {
   const handleAvatarSelect = (src: string | null) => {
     setAvatarUrl(src);
   };
+
+  const handleBuilderSave = useCallback(
+    async ({ config, blob }: { config: AvatarConfig; blob: Blob }) => {
+      if (!user) return;
+
+      const storagePath = `custom/${user.id}.png`;
+
+      // Upload PNG to Supabase Storage (avatars bucket, upsert)
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(storagePath, blob, {
+          upsert: true,
+          contentType: 'image/png',
+        });
+
+      if (uploadError) {
+        setError(uploadError.message);
+        return;
+      }
+
+      // Build public URL with cache-busting
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(storagePath);
+
+      const publicUrl = `${urlData.publicUrl}?v=${Date.now()}`;
+
+      // Persist avatar_url + avatar_config via API
+      const res = await fetch('/api/accounts/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          avatar_url: publicUrl,
+          avatar_config: config,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || 'Failed to save avatar');
+        return;
+      }
+
+      // Update local state + auth context
+      setAvatarUrl(publicUrl);
+      await updateProfile({ avatar_url: publicUrl });
+      setShowBuilder(false);
+    },
+    [user, updateProfile],
+  );
 
   if (isLoading) {
     return (
@@ -159,6 +215,35 @@ export default function GeneralSettingsPage() {
               })}
             </div>
           </div>
+
+          {/* Create Custom Avatar */}
+          <div>
+            <Button variant="outline" onClick={() => setShowBuilder(true)}>
+              <PaintBrushIcon className="h-4 w-4 mr-2" />
+              {t('sections.general.avatar.createCustom')}
+            </Button>
+          </div>
+
+          {/* Avatar Builder Dialog */}
+          <Dialog open={showBuilder} onOpenChange={setShowBuilder}>
+            <DialogContent className="max-w-lg p-0 gap-0 overflow-hidden">
+              <DialogHeader className="px-6 pt-6 pb-0">
+                <DialogTitle>{t('sections.general.avatar.builderTitle')}</DialogTitle>
+                <DialogDescription>
+                  {t('sections.general.avatar.builderDescription')}
+                </DialogDescription>
+              </DialogHeader>
+              <AvatarBuilderWidget
+                initialConfig={(userProfile as Record<string, unknown> | null)?.avatar_config as AvatarConfig | undefined}
+                onSave={handleBuilderSave}
+                onCancel={() => setShowBuilder(false)}
+                hideDownload
+                saveLabel={t('sections.general.avatar.builderSave')}
+                cancelLabel={t('sections.general.avatar.builderCancel')}
+                className="border-0 shadow-none rounded-none"
+              />
+            </DialogContent>
+          </Dialog>
 
           {/* Remove Avatar */}
           {avatarUrl && (

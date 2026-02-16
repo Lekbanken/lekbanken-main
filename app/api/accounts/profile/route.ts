@@ -13,7 +13,7 @@ export async function GET() {
   const { data: userRow, error: userError } = await supabase
     .from('users')
     .select(
-      'id,email,full_name,language,avatar_url,preferred_theme,show_theme_toggle_in_header,global_role,role'
+      'id,email,full_name,language,avatar_url,avatar_config,avatar_updated_at,preferred_theme,show_theme_toggle_in_header,global_role,role'
     )
     .eq('id', user.id)
     .maybeSingle()
@@ -44,6 +44,7 @@ export async function PATCH(request: Request) {
     full_name?: string
     language?: string
     avatar_url?: string | null
+    avatar_config?: Record<string, unknown> | null
     preferred_theme?: string
     show_theme_toggle_in_header?: boolean
     display_name?: string
@@ -59,7 +60,13 @@ export async function PATCH(request: Request) {
   if (body.full_name !== undefined) userUpdate.full_name = body.full_name
   if (body.language !== undefined) userUpdate.language = body.language
   if (body.avatar_url !== undefined) userUpdate.avatar_url = body.avatar_url
+  if (body.avatar_config !== undefined) userUpdate.avatar_config = body.avatar_config
   if (body.preferred_theme !== undefined) userUpdate.preferred_theme = body.preferred_theme
+
+  // Auto-set avatar_updated_at when avatar changes
+  if (body.avatar_url !== undefined || body.avatar_config !== undefined) {
+    userUpdate.avatar_updated_at = new Date().toISOString()
+  }
   if (body.show_theme_toggle_in_header !== undefined)
     userUpdate.show_theme_toggle_in_header = body.show_theme_toggle_in_header
 
@@ -131,7 +138,7 @@ export async function PATCH(request: Request) {
   const { data: userRow, error: userError } = await supabase
     .from('users')
     .select(
-      'id,email,full_name,language,avatar_url,preferred_theme,show_theme_toggle_in_header,global_role,role'
+      'id,email,full_name,language,avatar_url,avatar_config,avatar_updated_at,preferred_theme,show_theme_toggle_in_header,global_role,role'
     )
     .eq('id', user.id)
     .maybeSingle()

@@ -435,8 +435,12 @@ export function AuthProvider({
     if (!response.ok) {
       let message = 'Failed to update profile'
       try {
-        const errorJson = (await response.json()) as { error?: string }
-        if (typeof errorJson?.error === 'string') message = errorJson.error
+        const errorJson = (await response.json()) as { error?: string; details?: string }
+        if (typeof errorJson?.error === 'string') {
+          message = errorJson.details
+            ? `${errorJson.error}: ${errorJson.details}`
+            : errorJson.error
+        }
       } catch (err) {
         console.warn('[auth] updateProfile error parsing response', err)
       }

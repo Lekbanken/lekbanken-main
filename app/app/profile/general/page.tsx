@@ -18,6 +18,7 @@ import {
 import { avatarPresets } from '@/features/profile/avatarPresets';
 import { AvatarBuilderWidget } from '@/app/sandbox/avatar-builder/components/AvatarBuilderWidget';
 import type { AvatarConfig } from '@/app/sandbox/avatar-builder/types';
+import type { UserProfile } from '@/types/auth';
 import { cn } from '@/lib/utils';
 
 export default function GeneralSettingsPage() {
@@ -90,48 +91,39 @@ export default function GeneralSettingsPage() {
     async ({ config, blob }: { config: AvatarConfig; blob: Blob }) => {
       if (!user) return;
 
-      const storagePath = `custom/${user.id}.png`;
+      try {
+        const storagePath = `custom/${user.id}.png`;
 
-      // Upload PNG to Supabase Storage (avatars bucket, upsert)
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(storagePath, blob, {
-          upsert: true,
-          contentType: 'image/png',
+        // Upload PNG to Supabase Storage (avatars bucket, upsert)
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(storagePath, blob, {
+            upsert: true,
+            contentType: 'image/png',
+          });
+
+        if (uploadError) throw uploadError;
+
+        // Build public URL with cache-busting
+        const { data: urlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(storagePath);
+
+        const publicUrl = `${urlData.publicUrl}?v=${Date.now()}`;
+
+        // Single updateProfile call: saves to DB + refreshes auth context
+        await updateProfile({
+          avatar_url: publicUrl,
+          avatar_config: config as unknown as UserProfile['avatar_config'],
         });
 
-      if (uploadError) {
-        setError(uploadError.message);
-        return;
+        // Update local state + close dialog
+        setAvatarUrl(publicUrl);
+        setShowBuilder(false);
+      } catch (err) {
+        console.error('Avatar builder save failed:', err);
+        setError(err instanceof Error ? err.message : 'Failed to save avatar');
       }
-
-      // Build public URL with cache-busting
-      const { data: urlData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(storagePath);
-
-      const publicUrl = `${urlData.publicUrl}?v=${Date.now()}`;
-
-      // Persist avatar_url + avatar_config via API
-      const res = await fetch('/api/accounts/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          avatar_url: publicUrl,
-          avatar_config: config,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error || 'Failed to save avatar');
-        return;
-      }
-
-      // Update local state + auth context
-      setAvatarUrl(publicUrl);
-      await updateProfile({ avatar_url: publicUrl });
-      setShowBuilder(false);
     },
     [user, updateProfile],
   );

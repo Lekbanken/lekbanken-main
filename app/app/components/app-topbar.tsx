@@ -40,7 +40,7 @@ export function AppTopbar({ canGoBack = false, onBack, backLabel }: AppTopbarPro
   };
 
   const handleHome = () => {
-    router.push("/app/browse");
+    router.push("/app");
   };
 
   return (

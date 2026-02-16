@@ -12,7 +12,7 @@ import type { AvatarRendererHandle } from '../components'
 
 export interface UseAvatarBuilderOptions {
   /** Starting config (falls back to DEFAULT_AVATAR_CONFIG) */
-  initialConfig?: AvatarConfig
+  initialConfig?: AvatarConfig | null
   /** Called on every config change (useful for autosave / dirty tracking) */
   onChange?: (config: AvatarConfig) => void
 }
@@ -53,9 +53,10 @@ export interface UseAvatarBuilderReturn {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function useAvatarBuilder(options: UseAvatarBuilderOptions = {}): UseAvatarBuilderReturn {
-  const { initialConfig = DEFAULT_AVATAR_CONFIG, onChange } = options
+  const { initialConfig, onChange } = options
+  const effectiveInitial = initialConfig ?? DEFAULT_AVATAR_CONFIG
 
-  const [config, setConfigRaw] = useState<AvatarConfig>(initialConfig)
+  const [config, setConfigRaw] = useState<AvatarConfig>(effectiveInitial)
   const [activeCategory, setActiveCategory] = useState<AvatarCategory>('face')
   const rendererRef = useRef<AvatarRendererHandle>(null)
 
@@ -76,8 +77,8 @@ export function useAvatarBuilder(options: UseAvatarBuilderOptions = {}): UseAvat
   const selectedPartId = config.layers[activeCategory]?.partId ?? null
 
   const canReset = useMemo(
-    () => JSON.stringify(config) !== JSON.stringify(initialConfig),
-    [config, initialConfig]
+    () => JSON.stringify(config) !== JSON.stringify(effectiveInitial),
+    [config, effectiveInitial]
   )
 
   // ── Actions ──────────────────────────────────────────────────────────────
@@ -116,8 +117,8 @@ export function useAvatarBuilder(options: UseAvatarBuilderOptions = {}): UseAvat
   }, [setConfig])
 
   const reset = useCallback(() => {
-    setConfig(initialConfig)
-  }, [initialConfig, setConfig])
+    setConfig(effectiveInitial)
+  }, [effectiveInitial, setConfig])
 
   // ── Export ───────────────────────────────────────────────────────────────
   const exportToPng = useCallback(async (): Promise<string | null> => {

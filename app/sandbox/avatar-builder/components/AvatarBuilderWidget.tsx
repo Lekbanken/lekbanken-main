@@ -13,7 +13,7 @@ import type { UseAvatarBuilderOptions } from '../hooks/useAvatarBuilder'
 
 export interface AvatarBuilderWidgetProps {
   /** Starting config (falls back to default) */
-  initialConfig?: AvatarConfig
+  initialConfig?: AvatarConfig | null
   /** Called on every config change (for dirty tracking / autosave) */
   onChange?: UseAvatarBuilderOptions['onChange']
   /** Called when user clicks "Save". Receives config + PNG blob. */

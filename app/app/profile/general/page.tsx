@@ -226,7 +226,7 @@ export default function GeneralSettingsPage() {
                 </DialogDescription>
               </DialogHeader>
               <AvatarBuilderWidget
-                initialConfig={(userProfile as Record<string, unknown> | null)?.avatar_config as AvatarConfig | undefined}
+                initialConfig={userProfile?.avatar_config as AvatarConfig | null | undefined}
                 onSave={handleBuilderSave}
                 onCancel={() => setShowBuilder(false)}
                 hideDownload

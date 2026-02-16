@@ -5,13 +5,12 @@ import {
   AvatarRenderer,
   AvatarTabs,
   AvatarPartGrid,
-  AvatarColorPicker,
   AvatarDownloadButton,
 } from './components'
 import type { AvatarRendererHandle } from './components'
 import type { AvatarConfig, AvatarCategory } from './types'
-import { STORAGE_KEY_CONFIG, STORAGE_KEY_PREVIEW, DEFAULT_AVATAR_CONFIG, CATEGORY_META, COLORABLE_CATEGORIES } from './types'
-import { AVATAR_PARTS, OPTIONAL_CATEGORIES, COLOR_PRESETS } from './seed-data'
+import { STORAGE_KEY_CONFIG, STORAGE_KEY_PREVIEW, DEFAULT_AVATAR_CONFIG, CATEGORY_META } from './types'
+import { AVATAR_PARTS, OPTIONAL_CATEGORIES } from './seed-data'
 import { SandboxShell } from '../components/shell/SandboxShellV2'
 
 export default function AvatarBuilderPage() {
@@ -43,9 +42,6 @@ export default function AvatarBuilderPage() {
   // ── Derived values ──────────────────────────────────────────────────────────
   const currentParts = AVATAR_PARTS[activeTab]
   const selectedPartId = config.layers[activeTab]?.partId ?? null
-  const selectedColorId = config.layers[activeTab]?.colorId ?? null
-  const currentColorPresets = COLOR_PRESETS[activeTab]
-  const showColorPicker = COLORABLE_CATEGORIES.includes(activeTab) && (currentColorPresets?.length ?? 0) > 0
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const handlePartSelect = useCallback(
@@ -61,19 +57,6 @@ export default function AvatarBuilderPage() {
     [activeTab]
   )
 
-  const handleColorSelect = useCallback(
-    (colorId: string | null) => {
-      setConfig((prev) => ({
-        ...prev,
-        layers: {
-          ...prev.layers,
-          [activeTab]: { ...prev.layers[activeTab], colorId },
-        },
-      }))
-    },
-    [activeTab]
-  )
-
   const handleRandomize = useCallback(() => {
     const newLayers = { ...config.layers }
 
@@ -83,18 +66,10 @@ export default function AvatarBuilderPage() {
 
       // 20% chance of "none" for optional categories
       if (isOptional && Math.random() < 0.2) {
-        newLayers[category] = { partId: null, colorId: null }
+        newLayers[category] = { partId: null }
       } else {
         const randomPart = parts[Math.floor(Math.random() * parts.length)]
-        // Random color if category supports it
-        const colorPresets = COLOR_PRESETS[category]
-        let randomColorId: string | null = null
-        if (colorPresets && colorPresets.length > 0) {
-          const randomColor = colorPresets[Math.floor(Math.random() * colorPresets.length)]
-          const isOriginal = randomColor.filter === 'none' && !randomColor.tint
-          randomColorId = isOriginal ? null : randomColor.id
-        }
-        newLayers[category] = { partId: randomPart.id, colorId: randomColorId }
+        newLayers[category] = { partId: randomPart.id }
       }
     }
 
@@ -215,18 +190,6 @@ export default function AvatarBuilderPage() {
             activeTab={activeTab}
             onTabChange={setActiveTab}
           />
-
-          {/* Color picker (for colorable categories) */}
-          {showColorPicker && currentColorPresets && (
-            <div>
-              <p className="mb-1.5 text-xs font-medium text-muted-foreground">Färg</p>
-              <AvatarColorPicker
-                presets={currentColorPresets}
-                selectedId={selectedColorId}
-                onSelect={handleColorSelect}
-              />
-            </div>
-          )}
 
           {/* Part grid */}
           <div>

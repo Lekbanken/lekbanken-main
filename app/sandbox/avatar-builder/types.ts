@@ -61,8 +61,8 @@ export interface AvatarConfig {
   layers: Record<AvatarCategory, LayerConfig>
 }
 
-/** Categories that support color tinting */
-export const COLORABLE_CATEGORIES: AvatarCategory[] = ['hair', 'glasses']
+/** Categories that support color tinting (currently none — colors removed in v2.1) */
+export const COLORABLE_CATEGORIES: AvatarCategory[] = []
 
 /**
  * Categories that inherit their color from another category.
@@ -79,12 +79,12 @@ export function getColorLookupCategory(category: AvatarCategory): AvatarCategory
 export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
   version: 2,
   layers: {
-    face: { partId: 'face_1', colorId: null },
+    face: { partId: 'face_1' },
     eyes: { partId: 'eyes_1' },
     nose: { partId: 'nose_1' },
     mouth: { partId: 'mouth_1' },
-    hair: { partId: 'hair_1', colorId: null },
-    glasses: { partId: null, colorId: null },
+    hair: { partId: 'hair_1' },
+    glasses: { partId: null },
   },
 }
 

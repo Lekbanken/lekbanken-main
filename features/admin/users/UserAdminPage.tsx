@@ -21,7 +21,7 @@ import {
   AdminBreadcrumbs,
 } from "@/components/admin/shared";
 import { useRbac } from "@/features/admin/shared/hooks/useRbac";
-import { supabase } from "@/lib/supabase/client";
+import { removeUserMemberships, lookupUserByEmail } from "./userActions.server";
 import type {
   AdminUserListItem,
   AdminUserStatus,
@@ -165,14 +165,11 @@ export function UserAdminPage({
 
   const handleRemove = useCallback(async (userId: string) => {
     try {
-      // Delete all memberships first
-      const { error: membershipError } = await supabase
-        .from("user_tenant_memberships")
-        .delete()
-        .eq("user_id", userId);
+      // Delete all memberships first via server action
+      const result = await removeUserMemberships(userId);
 
-      if (membershipError) {
-        console.warn("Failed to remove memberships:", membershipError);
+      if (!result.success) {
+        console.warn("Failed to remove memberships:", result.error);
       }
 
       // Remove from local state
@@ -189,15 +186,11 @@ export function UserAdminPage({
 
   const handleInviteSubmit = useCallback(async (payload: InvitePayload) => {
     try {
-      const { data: userRow, error: userError } = await supabase
-        .from("users")
-        .select("id, full_name")
-        .ilike("email", payload.email)
-        .maybeSingle();
+      const result = await lookupUserByEmail(payload.email);
 
-      if (userError) throw userError;
+      if (result.error) throw new Error(result.error);
       
-      if (!userRow) {
+      if (!result.found) {
         info(
           t('messages.userNotFound'),
           t('messages.userNotFoundTitle')

@@ -208,6 +208,69 @@ export async function deleteUser(userId: string): Promise<{ success: boolean; er
 }
 
 // =============================================================================
+// Remove All Memberships for a User
+// =============================================================================
+
+export async function removeUserMemberships(
+  userId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabaseAdmin
+      .from('user_tenant_memberships')
+      .delete()
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('[removeUserMemberships] Error:', error);
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath('/admin/users');
+    return { success: true };
+  } catch (error) {
+    console.error('[removeUserMemberships] Unexpected error:', error);
+    return { success: false, error: 'Ett oväntat fel uppstod' };
+  }
+}
+
+// =============================================================================
+// Lookup User by Email (for invite flow)
+// =============================================================================
+
+export async function lookupUserByEmail(
+  email: string
+): Promise<{
+  found: boolean;
+  user?: { id: string; fullName: string | null };
+  error?: string;
+}> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('users')
+      .select('id, full_name')
+      .ilike('email', email)
+      .maybeSingle();
+
+    if (error) {
+      console.error('[lookupUserByEmail] Error:', error);
+      return { found: false, error: error.message };
+    }
+
+    if (!data) {
+      return { found: false };
+    }
+
+    return {
+      found: true,
+      user: { id: data.id, fullName: data.full_name },
+    };
+  } catch (error) {
+    console.error('[lookupUserByEmail] Unexpected error:', error);
+    return { found: false, error: 'Ett oväntat fel uppstod' };
+  }
+}
+
+// =============================================================================
 // Get Available Tenants for User Creation
 // =============================================================================
 

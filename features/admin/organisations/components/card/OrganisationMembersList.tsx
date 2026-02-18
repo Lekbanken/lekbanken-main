@@ -36,8 +36,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/toast";
-import { supabase } from "@/lib/supabase/client";
-import { loadMembersData } from "../../organisationSections.server";
+import { loadMembersData, searchUsers, addMemberToTenant, changeMemberRole, removeMember } from "../../organisationSections.server";
 import type { MemberSummary } from "../../types";
 
 type TenantRole = 'owner' | 'admin' | 'member';
@@ -183,25 +182,25 @@ function AddMemberDialog({
     
     try {
       // Search for users by email (partial match)
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, email, full_name, avatar_url')
-        .ilike('email', `%${searchEmail.trim()}%`)
-        .limit(10);
+      const result = await searchUsers(searchEmail.trim());
       
-      if (error) throw error;
+      if (result.error) {
+        console.error('User search failed:', result.error);
+        setSearchError(t('searchFailed'));
+        return;
+      }
       
-      if (!data || data.length === 0) {
+      if (result.users.length === 0) {
         setSearchError(t('noUserFound'));
         return;
       }
       
       // Mark users that are already members
-      const results: UserSearchResult[] = data.map((user) => ({
+      const results: UserSearchResult[] = result.users.map((user) => ({
         id: user.id,
         email: user.email,
-        fullName: user.full_name,
-        avatarUrl: user.avatar_url,
+        fullName: user.fullName,
+        avatarUrl: user.avatarUrl,
         alreadyMember: existingMemberIds.includes(user.id),
       }));
       
@@ -228,37 +227,23 @@ function AddMemberDialog({
     
     setIsAdding(true);
     try {
-      // Insert membership
-      const { error } = await supabase
-        .from('user_tenant_memberships')
-        .insert({
-          tenant_id: tenantId,
-          user_id: selectedUser.id,
-          role: selectedRole,
-          is_primary: false,
-        });
+      // Insert membership via server action
+      const result = await addMemberToTenant({
+        tenantId,
+        userId: selectedUser.id,
+        role: selectedRole,
+        email: selectedUser.email,
+        fullName: selectedUser.fullName,
+      });
       
-      if (error) {
-        if (error.code === '23505') {
-          toastError(t('alreadyMemberError'));
-        } else {
-          throw error;
-        }
+      if (result.duplicate) {
+        toastError(t('alreadyMemberError'));
         return;
       }
       
-      // Log audit event
-      await supabase.from('tenant_audit_logs').insert({
-        tenant_id: tenantId,
-        event_type: 'member_added',
-        payload: {
-          userId: selectedUser.id,
-          email: selectedUser.email,
-          fullName: selectedUser.fullName,
-          role: selectedRole,
-          addedDirectly: true,
-        },
-      });
+      if (result.error) {
+        throw new Error(result.error);
+      }
       
       const roleLabel = selectedRole === 'owner' ? t('roleOwner') : selectedRole === 'admin' ? t('roleAdmin') : t('roleMember');
       success(t('memberAdded', { name: selectedUser.fullName || selectedUser.email, role: roleLabel.toLowerCase() }));
@@ -490,26 +475,17 @@ export function OrganisationMembersList({
   const handleRoleChange = async (memberId: string, newRole: TenantRole) => {
     setIsUpdatingRole(memberId);
     try {
-      const { error } = await supabase
-        .from('user_tenant_memberships')
-        .update({ role: newRole, updated_at: new Date().toISOString() })
-        .eq('id', memberId);
-      
-      if (error) throw error;
-      
-      // Log audit event
       const member = members.find(m => m.id === memberId);
-      await supabase.from('tenant_audit_logs').insert({
-        tenant_id: tenantId,
-        event_type: 'member_role_changed',
-        payload: { 
-          memberId,
-          userId: member?.userId,
-          email: member?.email,
-          from: member?.role,
-          to: newRole,
-        },
+      const result = await changeMemberRole({
+        tenantId,
+        memberId,
+        newRole,
+        userId: member?.userId,
+        email: member?.email,
+        oldRole: member?.role,
       });
+      
+      if (result.error) throw new Error(result.error);
       
       const roleLabel = newRole === 'owner' ? t('roleOwner') : newRole === 'admin' ? t('roleAdmin') : t('roleMember');
       success(t('roleChanged', { role: roleLabel }));
@@ -539,24 +515,15 @@ export function OrganisationMembersList({
     }
     
     try {
-      const { error } = await supabase
-        .from('user_tenant_memberships')
-        .delete()
-        .eq('id', memberId);
-      
-      if (error) throw error;
-      
-      // Log audit event
-      await supabase.from('tenant_audit_logs').insert({
-        tenant_id: tenantId,
-        event_type: 'member_removed',
-        payload: { 
-          memberId,
-          userId: member.userId,
-          email: member.email,
-          role: member.role,
-        },
+      const result = await removeMember({
+        tenantId,
+        memberId,
+        userId: member.userId,
+        email: member.email,
+        role: member.role,
       });
+      
+      if (result.error) throw new Error(result.error);
       
       success(t('memberRemoved'));
       loadMembers();

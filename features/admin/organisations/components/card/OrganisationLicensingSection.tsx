@@ -6,8 +6,7 @@ import { useTranslations } from 'next-intl';
 import { AdminCard, AdminEmptyState, AdminErrorState } from '@/components/admin/shared';
 import { Badge, Button, Input } from '@/components/ui';
 import { useToast } from '@/components/ui/toast';
-import { supabase } from '@/lib/supabase/client';
-import { loadLicensingData } from '../../organisationSections.server';
+import { loadLicensingData, grantEntitlement, revokeEntitlement } from '../../organisationSections.server';
 import type { ProductRow, EntitlementRow } from '../../organisationSections.server';
 
 type Props = {
@@ -72,25 +71,20 @@ export function OrganisationLicensingSection({ tenantId }: Props) {
       return;
     }
 
-    const quantity = Number.isFinite(seats) ? Math.max(1, Math.floor(seats)) : 1;
-
     try {
-      const { data: authData } = await supabase.auth.getUser();
-      const createdBy = authData.user?.id ?? null;
-
-      const { error: insertError } = await supabase.from('tenant_product_entitlements').insert({
-        tenant_id: tenantId,
-        product_id: productId,
-        status: 'active',
-        source: 'admin_grant',
-        quantity_seats: quantity,
-        valid_from: new Date().toISOString(),
-        valid_to: validTo ? new Date(validTo).toISOString() : null,
-        metadata: reason ? { reason } : {},
-        created_by: createdBy,
+      const result = await grantEntitlement({
+        tenantId,
+        productId,
+        seats,
+        validTo: validTo || null,
+        reason,
       });
 
-      if (insertError) throw insertError;
+      if (result.error) {
+        console.error('[handleGrant] Server action error:', result.error);
+        warning(t('toasts.createFailed'));
+        return;
+      }
 
       success(t('toasts.entitlementCreated'));
       setReason('');
@@ -104,12 +98,13 @@ export function OrganisationLicensingSection({ tenantId }: Props) {
 
   const handleRevoke = async (entitlementId: string) => {
     try {
-      const { error: updateError } = await supabase
-        .from('tenant_product_entitlements')
-        .update({ status: 'revoked', valid_to: new Date().toISOString() })
-        .eq('id', entitlementId);
+      const result = await revokeEntitlement(entitlementId);
 
-      if (updateError) throw updateError;
+      if (result.error) {
+        console.error('[handleRevoke] Server action error:', result.error);
+        warning(t('toasts.revokeFailed'));
+        return;
+      }
 
       success(t('toasts.entitlementRevoked'));
       await load();

@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/toast";
 import { supabase } from "@/lib/supabase/client";
+import { loadMembersData } from "../../organisationSections.server";
 import type { MemberSummary } from "../../types";
 
 type TenantRole = 'owner' | 'admin' | 'member';
@@ -433,41 +434,26 @@ export function OrganisationMembersList({
   const loadMembers = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('user_tenant_memberships')
-        .select(`
-          id,
-          user_id,
-          role,
-          status,
-          is_primary,
-          created_at,
-          users:user_id (
-            email,
-            full_name,
-            avatar_url
-          )
-        `)
-        .eq('tenant_id', tenantId)
-        .order('created_at', { ascending: true });
-      
-      if (error) throw error;
-      
-      const mappedMembers: Member[] = (data || []).map((m) => {
-        const user = m.users as unknown as { email: string; full_name: string | null; avatar_url: string | null } | null;
-        return {
-          id: m.id,
-          userId: m.user_id,
-          email: user?.email || t('unknown'),
-          fullName: user?.full_name || null,
-          avatarUrl: user?.avatar_url || null,
-          role: m.role as TenantRole,
-          status: m.status,
-          isPrimary: m.is_primary,
-          createdAt: m.created_at,
-        };
-      });
-      
+      const result = await loadMembersData(tenantId);
+
+      if (result.error) {
+        toastError(t('loadFailed'));
+        console.error('[OrganisationMembersList] Server action error:', result.error);
+        return;
+      }
+
+      const mappedMembers: Member[] = result.members.map((m) => ({
+        id: m.id,
+        userId: m.userId,
+        email: m.email,
+        fullName: m.fullName,
+        avatarUrl: m.avatarUrl,
+        role: m.role as TenantRole,
+        status: m.status,
+        isPrimary: m.isPrimary,
+        createdAt: m.createdAt,
+      }));
+
       setMembers(mappedMembers);
     } catch (err) {
       console.error('Failed to load members:', err);

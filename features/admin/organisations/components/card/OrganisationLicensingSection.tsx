@@ -7,23 +7,8 @@ import { AdminCard, AdminEmptyState, AdminErrorState } from '@/components/admin/
 import { Badge, Button, Input } from '@/components/ui';
 import { useToast } from '@/components/ui/toast';
 import { supabase } from '@/lib/supabase/client';
-
-type ProductRow = {
-  id: string;
-  name: string | null;
-  product_key: string | null;
-};
-
-type EntitlementRow = {
-  id: string;
-  status: string;
-  source: string;
-  quantity_seats: number;
-  valid_from: string;
-  valid_to: string | null;
-  created_at: string;
-  product: ProductRow | null;
-};
+import { loadLicensingData } from '../../organisationSections.server';
+import type { ProductRow, EntitlementRow } from '../../organisationSections.server';
 
 type Props = {
   tenantId: string;
@@ -49,38 +34,20 @@ export function OrganisationLicensingSection({ tenantId }: Props) {
     setError(null);
 
     try {
-      // Fetch products via API (uses server-side RLS client)
-      const productsRes = await fetch('/api/products');
-      if (!productsRes.ok) {
-        console.error('[OrganisationLicensingSection] Products fetch failed:', productsRes.status, productsRes.statusText);
-        throw new Error('Failed to load products');
+      const result = await loadLicensingData(tenantId);
+
+      if (result.error) {
+        setError(`${t('errorDescription')} (${result.error})`);
+        return;
       }
-      const productsJson = (await productsRes.json()) as { products: Array<{ id: string; name: string | null; product_key: string | null }> };
-      console.log('[OrganisationLicensingSection] Products loaded:', productsJson.products?.length ?? 0);
 
-      // Fetch entitlements via Supabase client (RLS allows tenant members)
-      const { data: entData, error: entError } = await supabase
-        .from('tenant_product_entitlements')
-        .select(
-          'id, status, source, quantity_seats, valid_from, valid_to, created_at, product:products(id, name, product_key)'
-        )
-        .eq('tenant_id', tenantId)
-        .order('created_at', { ascending: false });
-
-      if (entError) {
-        console.error('[OrganisationLicensingSection] Entitlements fetch error:', entError);
-        throw entError;
-      }
-      console.log('[OrganisationLicensingSection] Entitlements loaded:', entData?.length ?? 0);
-
-      const p = (productsJson.products ?? []).filter((r) => typeof r?.id === 'string');
-      setProducts(p);
-      if (!productId && p.length > 0) setProductId(p[0].id);
-
-      setEntitlements(((entData as EntitlementRow[] | null) ?? []).filter((r) => typeof r?.id === 'string'));
+      setProducts(result.products);
+      if (!productId && result.products.length > 0) setProductId(result.products[0].id);
+      setEntitlements(result.entitlements);
     } catch (err) {
       console.error(err);
-      setError(t('errorDescription'));
+      const details = err instanceof Error ? err.message : String(err);
+      setError(`${t('errorDescription')} (${details})`);
     } finally {
       setIsLoading(false);
     }

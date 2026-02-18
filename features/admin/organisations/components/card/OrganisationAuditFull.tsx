@@ -22,7 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
-import { supabase } from "@/lib/supabase/client";
+import { loadAuditData } from "../../organisationSections.server";
 import type { AuditEvent } from "../../types";
 
 type OrganisationAuditFullProps = {
@@ -151,31 +151,24 @@ export function OrganisationAuditFull({
   const loadEvents = useCallback(async () => {
     setIsLoading(true);
     try {
-      let query = supabase
-        .from('tenant_audit_logs')
-        .select('id, event_type, payload, created_at, actor_user_id', { count: 'exact' })
-        .eq('tenant_id', tenantId)
-        .order('created_at', { ascending: false })
-        .range(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE - 1);
-      
-      if (eventTypeFilter !== 'all') {
-        query = query.eq('event_type', eventTypeFilter);
+      const result = await loadAuditData(tenantId, currentPage, PAGE_SIZE, eventTypeFilter);
+
+      if (result.error) {
+        console.error('[OrganisationAuditFull] Server action error:', result.error);
+        toastError(t('loadFailed'));
+        return;
       }
-      
-      const { data, error, count } = await query;
-      
-      if (error) throw error;
-      
-      const mappedEvents: AuditEvent[] = (data || []).map((e) => ({
+
+      const mappedEvents: AuditEvent[] = result.events.map((e) => ({
         id: e.id,
-        eventType: e.event_type,
-        payload: e.payload as Record<string, unknown> | null,
-        createdAt: e.created_at,
-        actor: null, // Would need to join users table
+        eventType: e.eventType,
+        payload: e.payload,
+        createdAt: e.createdAt,
+        actor: null,
       }));
-      
+
       setEvents(mappedEvents);
-      setTotalCount(count ?? 0);
+      setTotalCount(result.totalCount);
     } catch (err) {
       console.error('Failed to load audit events:', err);
       toastError(t('loadFailed'));

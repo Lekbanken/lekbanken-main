@@ -11,7 +11,7 @@ type CoinIdleProps = {
 
 export function CoinIdle({
   size = 64,
-  src = "/icons/app-nav/lekvaluta.png",
+  src = "/icons/app-nav/dicecoin_v2.webp",
   className = "",
   ariaLabel = "DiceCoin",
   paused = false,

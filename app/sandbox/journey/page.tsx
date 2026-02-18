@@ -4296,7 +4296,7 @@ function BadgeShowcase({
               border: `1px solid rgba(245,166,35,0.2)`,
             }}
           >
-            <Image src="/icons/app-nav/lekvaluta.png" alt="coins" width={14} height={14} />
+            <Image src="/icons/app-nav/dicecoin_v2.webp" alt="coins" width={14} height={14} />
             <span className="text-xs font-semibold" style={{ color: '#f5a623' }}>
               {featured.achievement.rewardCoins}
             </span>
@@ -4432,7 +4432,7 @@ function BadgeShowcase({
 
               <div className="flex items-center justify-center gap-4 mt-4">
                 <div className="flex items-center gap-1.5">
-                  <Image src="/icons/app-nav/lekvaluta.png" alt="coins" width={16} height={16} />
+                  <Image src="/icons/app-nav/dicecoin_v2.webp" alt="coins" width={16} height={16} />
                   <span className="text-sm font-semibold" style={{ color: '#f5a623' }}>
                     {selected.achievement.rewardCoins}
                   </span>
@@ -4536,7 +4536,7 @@ function DiceCoinVault({
             }}
           >
             <Image
-              src="/icons/app-nav/lekvaluta.png"
+              src="/icons/app-nav/dicecoin_v2.webp"
               alt=""
               width={22}
               height={22}
@@ -4790,7 +4790,7 @@ function ShopShowcase({
                   </p>
                   <div className="flex items-center gap-1 mt-0.5">
                     <div className="w-3 h-3 relative">
-                      <Image src="/icons/app-nav/lekvaluta.png" alt="" width={12} height={12} className="object-contain" />
+                      <Image src="/icons/app-nav/dicecoin_v2.webp" alt="" width={12} height={12} className="object-contain" />
                     </div>
                     <span className="text-[10px] font-bold" style={{ color: isActive ? '#f5a623' : textMuted }}>{item.price}</span>
                   </div>

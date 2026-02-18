@@ -91,19 +91,19 @@ const SAMPLE_ARROWS = [
 const SAMPLE_BALL = { x: 300, y: 480 };
 
 const PLAYER_MARKER_BY_SPORT = {
-  basketball: '/coach-diagram/markers/basketball-player.png',
-  football: '/coach-diagram/markers/football-player.png',
-  handball: '/coach-diagram/markers/football-player.png',
-  hockey: '/coach-diagram/markers/hockeyjersey-player.png',
-  innebandy: '/coach-diagram/markers/football-player.png',
+  basketball: '/coach-diagram/markers/basketball-player_v2.webp',
+  football: '/coach-diagram/markers/football-player_v2.webp',
+  handball: '/coach-diagram/markers/football-player_v2.webp',
+  hockey: '/coach-diagram/markers/hockeyjersey-player_v2.webp',
+  innebandy: '/coach-diagram/markers/football-player_v2.webp',
 } as const;
 
 const BALL_MARKER_BY_SPORT = {
-  basketball: '/coach-diagram/markers/basketball-ball.png',
-  football: '/coach-diagram/markers/football-ball.png',
-  handball: '/coach-diagram/markers/handball-ball.png',
-  hockey: '/coach-diagram/markers/hockeypuck-ball.png',
-  innebandy: '/coach-diagram/markers/innebandyball-ball.png',
+  basketball: '/coach-diagram/markers/basketball-ball_v2.webp',
+  football: '/coach-diagram/markers/football-ball_v2.webp',
+  handball: '/coach-diagram/markers/handball-ball_v2.webp',
+  hockey: '/coach-diagram/markers/hockeypuck-ball_v2.webp',
+  innebandy: '/coach-diagram/markers/innebandyball-ball_v2.webp',
 } as const;
 
 const ZONE_COLORS = {

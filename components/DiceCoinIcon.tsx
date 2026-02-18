@@ -12,7 +12,7 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-const DICECOIN_ASSET = "/icons/app-nav/lekvaluta.png";
+const DICECOIN_ASSET = "/icons/app-nav/dicecoin_v2.webp";
 
 type SizePreset = "xs" | "sm" | "md" | "lg" | "xl";
 

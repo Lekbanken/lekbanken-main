@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useColors, useSpacing } from '../../store/sandbox-store';
 import { CoinIdle } from '@/components/CoinIdle';
 
-const coinPngSrc = '/icons/app-nav/lekvaluta.png';
+const coinPngSrc = '/icons/app-nav/dicecoin_v2.webp';
 
 export function CoinBalance() {
   const { accentHue } = useColors();

@@ -604,6 +604,15 @@ export const sandboxCategories: SandboxCategory[] = [
         routes: ['/sandbox/scenes'],
       },
       { 
+        id: 'spatial-editor', 
+        label: 'Spatial Editor', 
+        href: '/sandbox/spatial-editor', 
+        description: 'SVG-baserad 2D scene-editor: A4-format, drag & drop, pan/zoom, objekt-palette', 
+        status: 'design',
+        components: ['@/app/sandbox/spatial-editor/*'],
+        routes: ['/sandbox/spatial-editor'],
+      },
+      { 
         id: 'play', 
         label: 'Play Sandbox Hub', 
         href: '/sandbox/play', 

@@ -28,8 +28,8 @@ const iconBrowseActive = navPngIcon({ src: "/icons/app-nav/browse_v2.webp", alt:
 const iconLekvaluta = navPngIcon({ src: "/icons/app-nav/dicecoin_v2.webp", alt: "DiceCoin", size: 32 });
 const iconLekvalutaActive = navPngIcon({ src: "/icons/app-nav/dicecoin_v2.webp", alt: "DiceCoin", size: 32, className: "block drop-shadow-lg" });
 
-const iconPlanning = navPngIcon({ src: "/icons/app-nav/planner_v3.webp", alt: "Planera", size: 32 });
-const iconPlanningActive = navPngIcon({ src: "/icons/app-nav/planner_v3.webp", alt: "Planera", size: 32, className: "block drop-shadow-lg" });
+const iconPlanning = navPngIcon({ src: "/icons/app-nav/planner_v4.webp", alt: "Planera", size: 32 });
+const iconPlanningActive = navPngIcon({ src: "/icons/app-nav/planner_v4.webp", alt: "Planera", size: 32, className: "block drop-shadow-lg" });
 
 // Hero Play button - even larger
 const iconPlay = navPngIcon({ src: "/icons/app-nav/play_v2.webp", alt: "Spela", size: 36 });

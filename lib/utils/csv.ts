@@ -288,12 +288,27 @@ export function parseJsonCell<T>(
     const guidance =
       ' Tips: JSON måste använda dubbla citattecken (\") och om JSON ligger i en CSV-cell måste alla \" i JSON skrivas som \"\" (dubbla citattecken) för att CSV ska vara giltig.';
 
+    const trimmed = value.trim();
+    const firstChar = trimmed[0];
+    const looksLikeJson =
+      firstChar === '{' ||
+      firstChar === '[' ||
+      firstChar === '"' ||
+      trimmed === 'null' ||
+      trimmed === 'true' ||
+      trimmed === 'false' ||
+      /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(trimmed);
+
+    const columnShiftHint = looksLikeJson
+      ? ''
+      : ' Tips: Värdet ser inte ut som JSON (bör ofta börja med { eller [). Om du importerar CSV kan kolumnerna vara förskjutna pga saknade kommatecken för tomma fält — säkerställ att varje kolumn i headern har en plats i varje rad, även när cellen är tom.';
+
     return {
       success: false,
       error: {
         row: rowNumber,
         column: columnName,
-        message: `Invalid JSON in ${columnName}: ${error}.${contextInfo}${guidance}`,
+        message: `Invalid JSON in ${columnName}: ${error}.${contextInfo}${guidance}${columnShiftHint}`,
       },
     };
   }

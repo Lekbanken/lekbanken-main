@@ -44,6 +44,21 @@ type Product = {
   name: string;
 };
 
+function formatImportErrors(baseMessage: string, errors: unknown): string {
+  if (!Array.isArray(errors) || errors.length === 0) return baseMessage;
+
+  const typed = errors as ImportError[];
+  const lines = typed.slice(0, 8).map((e) => {
+    const where = `Rad ${e.row}${e.column ? ` [${e.column}]` : ''}`;
+    return `${where}: ${e.message}`;
+  });
+
+  const remaining = typed.length - lines.length;
+  const more = remaining > 0 ? `… +${remaining} till` : null;
+
+  return [baseMessage, '', ...lines, more].filter(Boolean).join('\n');
+}
+
 export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDialogProps) {
   // DEBUG: Log when dialog opens to verify correct component is being used
   console.log('[GameImportDialog] Dialog opened, using NEW import dialog with API route');
@@ -141,7 +156,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || t('validationError'));
+        setError(formatImportErrors(result.error || t('validationError'), result.errors));
         setState('idle');
         return;
       }
@@ -175,7 +190,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || t('importFailed'));
+        setError(formatImportErrors(result.error || t('importFailed'), result.errors));
         setState('validated');
         return;
       }
@@ -386,9 +401,9 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
           {/* Error display */}
           {error && (
             <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
-              <div className="flex items-center gap-2 text-destructive">
+              <div className="flex items-start gap-2 text-destructive">
                 <XCircleIcon className="h-5 w-5" />
-                <span className="font-medium">{error}</span>
+                <pre className="m-0 whitespace-pre-wrap text-sm font-medium leading-snug">{error}</pre>
               </div>
             </div>
           )}

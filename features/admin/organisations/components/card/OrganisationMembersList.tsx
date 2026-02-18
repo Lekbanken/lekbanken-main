@@ -645,7 +645,7 @@ export function OrganisationMembersList({
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filteredMembers.map((member) => {
-                    const RoleIcon = roleIcons[member.role];
+                    const RoleIcon = roleIcons[member.role] ?? UserIcon;
                     const roleLabel = member.role === 'owner' ? t('roleOwner') : member.role === 'admin' ? t('roleAdmin') : t('roleMember');
                     return (
                       <tr key={member.id} className="hover:bg-muted/30 transition-colors">
@@ -670,7 +670,7 @@ export function OrganisationMembersList({
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${roleColors[member.role]}`}>
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${roleColors[member.role] ?? roleColors.member}`}>
                             <RoleIcon className="h-3.5 w-3.5" />
                             {roleLabel}
                           </span>

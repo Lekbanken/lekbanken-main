@@ -11,6 +11,7 @@
 // =============================================================================
 
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { spatialDocumentSchemaV1 } from '@/lib/validation/spatialDocumentSchemaV1';
 import { fromSpatialArtifacts } from './db';
 
 // ---------------------------------------------------------------------------
@@ -111,6 +112,16 @@ export async function saveSpatialArtifact(params: {
 
   if (!user) return { error: 'Unauthorized' };
 
+  // Validate document structure (Zod schema)
+  const docResult = spatialDocumentSchemaV1.safeParse(params.document);
+  if (!docResult.success) {
+    const issues = docResult.error.issues
+      .map((i) => `${i.path.join('.')}: ${i.message}`)
+      .join('; ');
+    return { error: `Invalid document: ${issues}` };
+  }
+  const validatedDoc = docResult.data;
+
   // Derive visibility from tenantId if not explicitly set
   const visibility = params.visibility
     ?? (params.tenantId ? 'tenant' : 'private');
@@ -141,7 +152,7 @@ export async function saveSpatialArtifact(params: {
       description: params.description ?? '',
       mode: params.mode ?? 'free',
       visibility,
-      document: params.document as Record<string, unknown>,
+      document: validatedDoc as unknown as Record<string, unknown>,
       updated_at: new Date().toISOString(),
     };
 
@@ -179,7 +190,7 @@ export async function saveSpatialArtifact(params: {
       description: params.description ?? '',
       mode: params.mode ?? 'free',
       visibility,
-      document: params.document as Record<string, unknown>,
+      document: validatedDoc as unknown as Record<string, unknown>,
     })
     .select('id')
     .single();

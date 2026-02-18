@@ -7765,6 +7765,51 @@
         "creating": "Creating…",
         "newDiagram": "New diagram"
       },
+      "spatialEditor": {
+        "toolbar": {
+          "save": "Save",
+          "load": "Load",
+          "json": "JSON",
+          "png": "PNG",
+          "bundle": "Bundle",
+          "bundleTooltip": "Download map.png + manifest.json + manifest.csv",
+          "clear": "Clear",
+          "saveToLibrary": "Save to library",
+          "library": "Library"
+        },
+        "modal": {
+          "titleSave": "Save to library",
+          "titleUpdate": "Update map",
+          "titleLabel": "Title",
+          "titlePlaceholder": "My map",
+          "visibility": "Visibility",
+          "private": "Private",
+          "tenant": "Organisation",
+          "updateInfo": "Updating existing map",
+          "cancel": "Cancel",
+          "saving": "Saving…",
+          "save": "Save"
+        },
+        "sidebar": {
+          "tools": "Tools",
+          "stickyPlace": "Sticky place",
+          "oneShotPlace": "One-shot place",
+          "background": "Background",
+          "mapBackgrounds": "Map backgrounds",
+          "opacity": "Opacity",
+          "uploadImage": "Upload image",
+          "mapCapture": "Map capture",
+          "removeImage": "Remove background image",
+          "stations": "Stations",
+          "properties": "Properties"
+        },
+        "tips": {
+          "shortcuts": "Scroll = zoom • Space+drag = pan • Del = delete • Shift+click = multi-select"
+        },
+        "statusBar": {
+          "reset": "reset"
+        }
+      },
       "badges": {
         "breadcrumbs": {
           "home": "Home",

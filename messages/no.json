@@ -8055,6 +8055,51 @@
         "creating": "Oppretter…",
         "newDiagram": "Nytt diagram"
       },
+      "spatialEditor": {
+        "toolbar": {
+          "save": "Lagre",
+          "load": "Last",
+          "json": "JSON",
+          "png": "PNG",
+          "bundle": "Bundle",
+          "bundleTooltip": "Last ned map.png + manifest.json + manifest.csv",
+          "clear": "Tøm",
+          "saveToLibrary": "Lagre i bibliotek",
+          "library": "Bibliotek"
+        },
+        "modal": {
+          "titleSave": "Lagre i bibliotek",
+          "titleUpdate": "Oppdater kart",
+          "titleLabel": "Tittel",
+          "titlePlaceholder": "Mitt kart",
+          "visibility": "Synlighet",
+          "private": "Privat",
+          "tenant": "Organisasjon",
+          "updateInfo": "Oppdaterer eksisterende kart",
+          "cancel": "Avbryt",
+          "saving": "Lagrer…",
+          "save": "Lagre"
+        },
+        "sidebar": {
+          "tools": "Verktøy",
+          "stickyPlace": "Sticky place",
+          "oneShotPlace": "One-shot place",
+          "background": "Bakgrunn",
+          "mapBackgrounds": "Kartbakgrunner",
+          "opacity": "Opasitet",
+          "uploadImage": "Last opp bilde",
+          "mapCapture": "Kartfangst",
+          "removeImage": "Fjern bakgrunnsbilde",
+          "stations": "Stasjoner",
+          "properties": "Egenskaper"
+        },
+        "tips": {
+          "shortcuts": "Scroll = zoom • Space+dra = panorer • Del = slett • Shift+klikk = multi-velg"
+        },
+        "statusBar": {
+          "reset": "reset"
+        }
+      },
       "badges": {
         "breadcrumbs": {
           "home": "Hjem",

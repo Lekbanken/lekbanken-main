@@ -6,6 +6,7 @@
 
 import { type ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useSpatialEditorStore } from '../store/spatial-editor-store';
 import { SpatialCanvas } from './SpatialCanvas';
 import { AssetPalette } from './AssetPalette';
@@ -25,6 +26,7 @@ import Link from 'next/link';
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: string } = {}) {
+  const t = useTranslations('admin.library.spatialEditor');
   const svgRef = useRef<SVGSVGElement>(null);
   const doc = useSpatialEditorStore((s) => s.doc);
   const dirty = useSpatialEditorStore((s) => s.dirty);
@@ -318,43 +320,43 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
             onClick={save}
             className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-700 dark:hover:bg-gray-700"
           >
-            💾 Spara{dirty ? ' •' : ''}
+            💾 {t('toolbar.save')}{dirty ? ' •' : ''}
           </button>
           <button
             type="button"
             onClick={load}
             className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-700 dark:hover:bg-gray-700"
           >
-            📂 Ladda
+            📂 {t('toolbar.load')}
           </button>
           <button
             type="button"
             onClick={() => copyDocumentJson(doc)}
             className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-700 dark:hover:bg-gray-700"
           >
-            📋 JSON
+            📋 {t('toolbar.json')}
           </button>
           <button
             type="button"
             onClick={handleExportPng}
             className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-700 dark:hover:bg-gray-700"
           >
-            🖼 PNG
+            🖼 {t('toolbar.png')}
           </button>
           <button
             type="button"
             onClick={handleExportBundle}
             className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-700 dark:hover:bg-gray-700"
-            title="Ladda ner map.png + manifest.json + manifest.csv"
+            title={t('toolbar.bundleTooltip')}
           >
-            📦 Bundle
+            📦 {t('toolbar.bundle')}
           </button>
           <button
             type="button"
             onClick={reset}
             className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-red-600 shadow-sm ring-1 ring-gray-200 hover:bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:ring-gray-700 dark:hover:bg-gray-700"
           >
-            🗑 Rensa
+            🗑 {t('toolbar.clear')}
           </button>
 
           <span className="w-px h-6 bg-gray-200 dark:bg-gray-700" />
@@ -364,14 +366,14 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
             onClick={handleOpenSaveModal}
             className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700"
           >
-            📚 {artifactId ? 'Spara' : 'Spara i bibliotek'}{dirty ? ' •' : ''}
+            📚 {artifactId ? t('toolbar.save') : t('toolbar.saveToLibrary')}{dirty ? ' •' : ''}
           </button>
 
           <Link
             href="/admin/library/spatial-editor"
             className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-700 dark:hover:bg-gray-700"
           >
-            📂 Bibliotek
+            📂 {t('toolbar.library')}
           </Link>
         </div>
 
@@ -380,17 +382,17 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30">
             <div className="rounded-xl bg-white p-6 shadow-xl w-80 dark:bg-gray-800">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                {artifactId ? 'Uppdatera karta' : 'Spara i bibliotek'}
+                {artifactId ? t('modal.titleUpdate') : t('modal.titleSave')}
               </h3>
               <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                Titel
+                {t('modal.titleLabel')}
               </label>
               <input
                 type="text"
                 value={saveTitle}
                 onChange={(e) => setSaveTitle(e.target.value)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                placeholder="Min karta"
+                placeholder={t('modal.titlePlaceholder')}
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSaveToLibrary();
@@ -398,7 +400,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
                 }}
               />
               <label className="block text-xs text-gray-500 dark:text-gray-400 mt-3 mb-1">
-                Synlighet
+                {t('modal.visibility')}
               </label>
               <div className="flex gap-1">
                 <button
@@ -410,7 +412,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
                       : 'border-gray-200 text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700'
                   }`}
                 >
-                  🔒 Privat
+                  🔒 {t('modal.private')}
                 </button>
                 {activeTenantId && (
                   <button
@@ -422,13 +424,13 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
                         : 'border-gray-200 text-gray-500 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700'
                     }`}
                   >
-                    👥 Organisation
+                    👥 {t('modal.tenant')}
                   </button>
                 )}
               </div>
               {artifactId && (
                 <p className="mt-2 text-[11px] text-gray-400 dark:text-gray-500">
-                  Uppdaterar befintlig karta
+                  {t('modal.updateInfo')}
                 </p>
               )}
               <div className="flex gap-2 mt-4">
@@ -437,7 +439,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
                   onClick={() => setShowSaveModal(false)}
                   className="flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  Avbryt
+                  {t('modal.cancel')}
                 </button>
                 <button
                   type="button"
@@ -445,7 +447,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
                   disabled={saving || !saveTitle.trim()}
                   className="flex-1 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {saving ? 'Sparar…' : '💾 Spara'}
+                  {saving ? t('modal.saving') : `💾 ${t('modal.save')}`}
                 </button>
               </div>
             </div>
@@ -476,13 +478,13 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
             onClick={resetView}
             className="ml-1 underline text-blue-500 hover:text-blue-700 dark:text-blue-400"
           >
-            reset
+            {t('statusBar.reset')}
           </button>
         </div>
 
         {/* Tips overlay */}
         <div className="absolute bottom-3 right-3 z-10 text-[10px] text-gray-400 dark:text-gray-500 text-right leading-relaxed">
-          <span>Scroll = zoom • Space+drag = panorera • Del = ta bort • Shift+klick = multi-select</span>
+          <span>{t('tips.shortcuts')}</span>
         </div>
 
         <SpatialCanvas ref={svgRef} />
@@ -494,7 +496,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
         {/* Palette */}
         <section>
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-            Verktyg
+            {t('sidebar.tools')}
           </h2>
           <AssetPalette />
           {/* Place policy toggle */}
@@ -504,7 +506,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
               onClick={() => setPlacePolicy(placePolicy === 'sticky' ? 'one-shot' : 'sticky')}
               className="text-[11px] text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              {placePolicy === 'sticky' ? '📌 Sticky place' : '☝️ One-shot place'}
+              {placePolicy === 'sticky' ? `📌 ${t('sidebar.stickyPlace')}` : `☝️ ${t('sidebar.oneShotPlace')}`}
             </button>
           </div>
         </section>
@@ -512,7 +514,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
         {/* Background selector */}
         <section>
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-            Bakgrund
+            {t('sidebar.background')}
           </h2>
           <div className="flex flex-wrap gap-1">
             {SPORT_FIELD_VARIANTS.map((v) => {
@@ -543,7 +545,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
 
           {/* Map backgrounds */}
           <h3 className="mt-3 mb-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">
-            Kartbakgrunder
+            {t('sidebar.mapBackgrounds')}
           </h3>
           <div className="flex flex-wrap gap-1">
             {MAP_BG_VARIANTS.map((v) => {
@@ -572,7 +574,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
           {(background.type === 'sport-field' || background.type === 'image') && (
             <div className="mt-3 flex flex-col gap-1">
               <label className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
-                <span>Opacitet</span>
+                <span>{t('sidebar.opacity')}</span>
                 <span className="font-mono text-gray-700 dark:text-gray-200">
                   {Math.round((background.opacity ?? 1) * 100)}%
                 </span>
@@ -608,14 +610,14 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
                   : 'bg-gray-50 text-gray-600 ring-1 ring-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:ring-gray-600 dark:hover:bg-gray-600'
               }`}
             >
-              📷 Ladda upp bild
+              📷 {t('sidebar.uploadImage')}
             </button>
             <Link
               href="/sandbox/spatial-capture"
               target="_blank"
               className="rounded-md px-2.5 py-1.5 text-xs font-medium text-center bg-gray-50 text-gray-600 ring-1 ring-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:ring-gray-600 dark:hover:bg-gray-600 transition-colors"
             >
-              🗺️ Kartfångst
+              🗺️ {t('sidebar.mapCapture')}
             </Link>
             {background.type === 'image' && background.src && (
               <div className="flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
@@ -626,7 +628,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
                   type="button"
                   onClick={() => setBackground({ type: 'grid' })}
                   className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                  title="Ta bort bakgrundsbild"
+                  title={t('sidebar.removeImage')}
                 >
                   ✕
                 </button>
@@ -638,7 +640,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
         {/* Station list */}
         <section>
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-            Stationer
+            {t('sidebar.stations')}
           </h2>
           <StationListPanel />
         </section>
@@ -646,7 +648,7 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
         {/* Inspector */}
         <section>
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-            Egenskaper
+            {t('sidebar.properties')}
           </h2>
           <InspectorPanel />
         </section>

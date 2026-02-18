@@ -8124,6 +8124,51 @@
         "creating": "Skapar…",
         "newDiagram": "Nytt diagram"
       },
+      "spatialEditor": {
+        "toolbar": {
+          "save": "Spara",
+          "load": "Ladda",
+          "json": "JSON",
+          "png": "PNG",
+          "bundle": "Bundle",
+          "bundleTooltip": "Ladda ner map.png + manifest.json + manifest.csv",
+          "clear": "Rensa",
+          "saveToLibrary": "Spara i bibliotek",
+          "library": "Bibliotek"
+        },
+        "modal": {
+          "titleSave": "Spara i bibliotek",
+          "titleUpdate": "Uppdatera karta",
+          "titleLabel": "Titel",
+          "titlePlaceholder": "Min karta",
+          "visibility": "Synlighet",
+          "private": "Privat",
+          "tenant": "Organisation",
+          "updateInfo": "Uppdaterar befintlig karta",
+          "cancel": "Avbryt",
+          "saving": "Sparar…",
+          "save": "Spara"
+        },
+        "sidebar": {
+          "tools": "Verktyg",
+          "stickyPlace": "Sticky place",
+          "oneShotPlace": "One-shot place",
+          "background": "Bakgrund",
+          "mapBackgrounds": "Kartbakgrunder",
+          "opacity": "Opacitet",
+          "uploadImage": "Ladda upp bild",
+          "mapCapture": "Kartfångst",
+          "removeImage": "Ta bort bakgrundsbild",
+          "stations": "Stationer",
+          "properties": "Egenskaper"
+        },
+        "tips": {
+          "shortcuts": "Scroll = zoom • Space+drag = panorera • Del = ta bort • Shift+klick = multi-select"
+        },
+        "statusBar": {
+          "reset": "reset"
+        }
+      },
       "badges": {
         "breadcrumbs": {
           "home": "Startsida",

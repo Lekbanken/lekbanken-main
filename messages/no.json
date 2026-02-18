@@ -8098,6 +8098,21 @@
         },
         "statusBar": {
           "reset": "reset"
+        },
+        "libraryPage": {
+          "title": "Kartbibliotek",
+          "description": "Lagrede kart og baner fra Spatial Editor.",
+          "newMap": "Nytt kart",
+          "loading": "Laster\u2026",
+          "noMaps": "Ingen lagrede kart",
+          "noMapsDescription": "Opprett ditt første kart i Spatial Editor.",
+          "createNew": "Opprett nytt kart",
+          "confirmDelete": "Er du sikker på at du vil slette dette kartet?",
+          "open": "Åpne",
+          "delete": "Slett",
+          "public": "Offentlig",
+          "tenant": "Organisasjon",
+          "private": "Privat"
         }
       },
       "badges": {

@@ -18,7 +18,7 @@ import { listSpatialArtifacts, deleteSpatialArtifact } from './lib/artifact-acti
 import type { SpatialArtifactListItem } from './lib/artifact-actions';
 
 export function SpatialEditorLibraryPage() {
-  const t = useTranslations('admin.library');
+  const t = useTranslations('admin.library.spatialEditor.libraryPage');
   const { currentTenant } = useTenant();
   const router = useRouter();
   const [artifacts, setArtifacts] = useState<SpatialArtifactListItem[]>([]);
@@ -46,7 +46,7 @@ export function SpatialEditorLibraryPage() {
   }, [tenantId]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Vill du verkligen ta bort denna karta?')) return;
+    if (!confirm(t('confirmDelete'))) return;
     setDeleting(id);
     const artifact = artifacts.find((a) => a.id === id);
     await deleteSpatialArtifact(id, artifact?.tenant_id);
@@ -68,11 +68,11 @@ export function SpatialEditorLibraryPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Kartbibliotek"
-        description="Sparade kartor och banor från Spatial Editor."
+        title={t('title')}
+        description={t('description')}
         actions={
           <Link href="/admin/library/spatial-editor/new">
-            <Button>+ Ny karta</Button>
+            <Button>+ {t('newMap')}</Button>
           </Link>
         }
       />
@@ -80,17 +80,17 @@ export function SpatialEditorLibraryPage() {
       {/* Loading */}
       {loading && (
         <div className="text-sm text-gray-400 dark:text-gray-500 py-12 text-center">
-          Laddar…
+          {t('loading')}
         </div>
       )}
 
       {/* Empty state */}
       {!loading && artifacts.length === 0 && (
         <AdminEmptyState
-          title="Inga sparade kartor"
-          description="Skapa din första karta i Spatial Editor."
+          title={t('noMaps')}
+          description={t('noMapsDescription')}
           action={{
-            label: 'Skapa ny karta',
+            label: t('createNew'),
             onClick: () => router.push('/admin/library/spatial-editor/new'),
           }}
         />
@@ -130,8 +130,8 @@ export function SpatialEditorLibraryPage() {
                     artifact.visibility === 'public' ? 'bg-green-400' :
                     artifact.visibility === 'tenant' ? 'bg-blue-400' : 'bg-gray-400'
                   }`} />
-                  {artifact.visibility === 'public' ? 'Publik' :
-                   artifact.visibility === 'tenant' ? 'Organisation' : 'Privat'}
+                  {artifact.visibility === 'public' ? t('public') :
+                   artifact.visibility === 'tenant' ? t('tenant') : t('private')}
                   {' · '}
                   {formatDate(artifact.updated_at)}
                 </p>
@@ -143,7 +143,7 @@ export function SpatialEditorLibraryPage() {
                   href={`/admin/library/spatial-editor/${artifact.id}`}
                   className="flex-1 py-2 text-center text-xs font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950 rounded-bl-lg"
                 >
-                  ✏️ Öppna
+                  ✏️ {t('open')}
                 </Link>
                 <button
                   type="button"
@@ -151,7 +151,7 @@ export function SpatialEditorLibraryPage() {
                   onClick={() => handleDelete(artifact.id)}
                   className="flex-1 py-2 text-center text-xs font-medium text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950 rounded-br-lg disabled:opacity-50"
                 >
-                  {deleting === artifact.id ? '…' : '🗑 Ta bort'}
+                  {deleting === artifact.id ? '…' : `🗑 ${t('delete')}`}
                 </button>
               </div>
             </Card>

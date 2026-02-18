@@ -8167,6 +8167,21 @@
         },
         "statusBar": {
           "reset": "reset"
+        },
+        "libraryPage": {
+          "title": "Kartbibliotek",
+          "description": "Sparade kartor och banor från Spatial Editor.",
+          "newMap": "Ny karta",
+          "loading": "Laddar\u2026",
+          "noMaps": "Inga sparade kartor",
+          "noMapsDescription": "Skapa din första karta i Spatial Editor.",
+          "createNew": "Skapa ny karta",
+          "confirmDelete": "Vill du verkligen ta bort denna karta?",
+          "open": "Öppna",
+          "delete": "Ta bort",
+          "public": "Publik",
+          "tenant": "Organisation",
+          "private": "Privat"
         }
       },
       "badges": {

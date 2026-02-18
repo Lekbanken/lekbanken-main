@@ -7808,6 +7808,21 @@
         },
         "statusBar": {
           "reset": "reset"
+        },
+        "libraryPage": {
+          "title": "Map Library",
+          "description": "Saved maps and courses from Spatial Editor.",
+          "newMap": "New map",
+          "loading": "Loading\u2026",
+          "noMaps": "No saved maps",
+          "noMapsDescription": "Create your first map in Spatial Editor.",
+          "createNew": "Create new map",
+          "confirmDelete": "Are you sure you want to delete this map?",
+          "open": "Open",
+          "delete": "Delete",
+          "public": "Public",
+          "tenant": "Organisation",
+          "private": "Private"
         }
       },
       "badges": {

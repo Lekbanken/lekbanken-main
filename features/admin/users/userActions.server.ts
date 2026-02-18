@@ -209,14 +209,21 @@ export async function deleteUser(userId: string): Promise<{ success: boolean; er
     }
 
     // 3. Delete from auth.users
+    //    If the auth record is already gone (orphaned profile), treat as success.
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
     if (error) {
-      console.error('[deleteUser] Auth delete error:', error);
-      return {
-        success: false,
-        error: error.message || 'Kunde inte ta bort användare',
-      };
+      const msg = (error.message || '').toLowerCase();
+      const isNotFound = msg.includes('not found') || msg.includes('not_found');
+      if (!isNotFound) {
+        console.error('[deleteUser] Auth delete error:', error);
+        return {
+          success: false,
+          error: error.message || 'Kunde inte ta bort användare',
+        };
+      }
+      // Auth user already gone — that's fine, we cleaned up public.users above
+      console.info('[deleteUser] Auth user already removed, orphan cleaned up');
     }
 
     revalidatePath('/admin/users');

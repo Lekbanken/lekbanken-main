@@ -14612,6 +14612,7 @@
       "yes": "Ja",
       "no": "Nej",
       "openInAdmin": "Öppna i admin",
+      "openInSpatialEditor": "Öppna i Kartverktyget",
       "openSvg": "Öppna SVG"
     }
   },

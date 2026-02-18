@@ -78,6 +78,7 @@ export function CoachDiagramBuilderV1({
   const [error, setError] = useState<string | null>(null);
 
   const [doc, setDoc] = useState<CoachDiagramDocumentV1 | null>(null);
+  const [diagramSource, setDiagramSource] = useState<string | null>(null);
   const [mode, setMode] = useState<EditorMode>('select');
   const [selection, setSelection] = useState<Selection>({ kind: 'none' });
   const [pendingArrowStart, setPendingArrowStart] = useState<{ x: number; y: number } | null>(null);
@@ -149,6 +150,7 @@ export function CoachDiagramBuilderV1({
     setLoading(true);
     setError(null);
     setDoc(null);
+    setDiagramSource(null);
     setSelection({ kind: 'none' });
     setMode('select');
     setPendingArrowStart(null);
@@ -159,10 +161,18 @@ export function CoachDiagramBuilderV1({
         const body = (await res.json().catch(() => null)) as { error?: string } | null;
         throw new Error(body?.error || `Request failed (${res.status})`);
       }
-      const json = (await res.json()) as { diagram?: { document: unknown } };
-      const parsed = coachDiagramDocumentSchemaV1.safeParse(json.diagram?.document);
-      if (!parsed.success) throw new Error('Invalid diagram document');
-      setDoc(parsed.data);
+      const json = (await res.json()) as { diagram?: { document: unknown; source?: string | null } };
+      const source = json.diagram?.source ?? null;
+      setDiagramSource(source);
+
+      // Spatial diagrams are read-only in the toolbelt — link out to Spatial Editor
+      if (source === 'spatial') {
+        setDoc(null);
+      } else {
+        const parsed = coachDiagramDocumentSchemaV1.safeParse(json.diagram?.document);
+        if (!parsed.success) throw new Error('Invalid diagram document');
+        setDoc(parsed.data);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load diagram');
       setDoc(null);
@@ -628,6 +638,13 @@ export function CoachDiagramBuilderV1({
             )}
 
             <div className="pt-2 border-t text-xs text-muted-foreground">
+              {diagramSource === 'spatial' && (
+                <div className="mb-1">
+                  <Link className="underline font-medium" href={`/admin/library/spatial-editor/${selectedDiagramId}`} target="_blank" rel="noreferrer">
+                    {t('openInSpatialEditor')}
+                  </Link>
+                </div>
+              )}
               <div>
                 <Link className="underline" href={`/admin/library/coach-diagrams/${selectedDiagramId}`} target="_blank" rel="noreferrer">
                   {t('openInAdmin')}
@@ -644,7 +661,7 @@ export function CoachDiagramBuilderV1({
           <Card className="p-3">
             {loading ? (
               <div className="text-sm text-muted-foreground">{t('loading')}</div>
-            ) : isParticipant ? (
+            ) : isParticipant || diagramSource === 'spatial' ? (
               <div className="aspect-[3/5] w-full overflow-hidden rounded-xl border bg-background">
                 <Image
                   src={`/api/coach-diagrams/${selectedDiagramId}/svg`}
@@ -654,6 +671,18 @@ export function CoachDiagramBuilderV1({
                   className="h-full w-full object-contain"
                   unoptimized
                 />
+                {diagramSource === 'spatial' && !isParticipant && (
+                  <div className="mt-2 text-center">
+                    <Link
+                      href={`/admin/library/spatial-editor/${selectedDiagramId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-primary underline"
+                    >
+                      ✏️ {t('openInSpatialEditor')}
+                    </Link>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="aspect-[3/5] w-full overflow-hidden rounded-xl border bg-background">

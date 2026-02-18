@@ -13732,6 +13732,7 @@
       "yes": "Yes",
       "no": "No",
       "openInAdmin": "Open in admin",
+      "openInSpatialEditor": "Open in Spatial Editor",
       "openSvg": "Open SVG"
     }
   },

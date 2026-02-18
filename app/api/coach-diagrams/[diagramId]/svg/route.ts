@@ -3,6 +3,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { Database } from '@/types/supabase';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { renderSpatialSvg } from '@/features/admin/library/spatial-editor/lib/svg-export';
+import type { SpatialDocumentV1 } from '@/features/admin/library/spatial-editor/lib/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,26 +14,40 @@ type CoachDiagramExportsTable = {
     tenant_id: string | null;
     scope_type: string;
     svg: string;
+    source: string | null;
   };
   Insert: {
     id?: string;
     tenant_id?: string | null;
     scope_type: string;
     svg: string;
+    source?: string | null;
   };
   Update: {
     id?: string;
     tenant_id?: string | null;
     scope_type?: string;
     svg?: string;
+    source?: string | null;
   };
   Relationships: [];
 };
 
-type DatabaseWithCoachDiagramExports = Database & {
+type SpatialArtifactsRow = {
+  id: string;
+  document: unknown; // jsonb — SpatialDocumentV1
+};
+
+type DatabaseWithTables = Database & {
   public: {
     Tables: Database['public']['Tables'] & {
       coach_diagram_exports: CoachDiagramExportsTable;
+      spatial_artifacts: {
+        Row: SpatialArtifactsRow;
+        Insert: Partial<SpatialArtifactsRow>;
+        Update: Partial<SpatialArtifactsRow>;
+        Relationships: [];
+      };
     };
   };
 };
@@ -50,7 +66,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ dia
     data: { user },
   } = await supabase.auth.getUser();
 
-  const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithCoachDiagramExports>;
+  const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithTables>;
 
   if (!user) {
     if (!participantToken) {
@@ -109,9 +125,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ dia
     }
   }
 
+  // ---- Fetch the diagram row (includes source column for adapter dispatch) ----
   const { data, error } = await admin
     .from('coach_diagram_exports')
-    .select('id, scope_type, tenant_id, svg')
+    .select('id, scope_type, tenant_id, svg, source')
     .eq('id', diagramId)
     .single();
 
@@ -119,9 +136,34 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ dia
     return new NextResponse('Not found', { status: 404 });
   }
 
-  const svg = data.svg;
-  if (!svg) {
-    return new NextResponse('Not found', { status: 404 });
+  let svg: string;
+
+  if (data.source === 'spatial') {
+    // ---- Spatial adapter: render on-demand from spatial_artifacts document ----
+    const { data: artifact } = await admin
+      .from('spatial_artifacts')
+      .select('id, document')
+      .eq('id', diagramId)
+      .single();
+
+    if (!artifact?.document) {
+      return new NextResponse('Not found', { status: 404 });
+    }
+
+    const proto = _req.headers.get('x-forwarded-proto') ?? 'https';
+    const host = _req.headers.get('host') ?? 'localhost:3000';
+    const baseUrl = `${proto}://${host}`;
+
+    svg = renderSpatialSvg(artifact.document as SpatialDocumentV1, {
+      baseUrl,
+      includeGrid: false,
+    });
+  } else {
+    // ---- Legacy: serve pre-rendered SVG from the svg column ----
+    if (!data.svg) {
+      return new NextResponse('Not found', { status: 404 });
+    }
+    svg = data.svg;
   }
 
   return new NextResponse(svg, {

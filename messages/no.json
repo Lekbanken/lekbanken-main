@@ -765,6 +765,7 @@
         "planner": "Planlegger",
         "badges": "Badges",
         "coachDiagrams": "Coach Diagrams",
+        "spatialEditor": "Kartverktøyet",
         "diceSimulator": "Terningsimulator",
         "conversationCards": "Samtalekort",
         "dicecoinXp": "DiceCoin & XP",
@@ -837,6 +838,7 @@
       "purposes": "Formål",
       "badges": "Badges",
       "coachDiagrams": "Coach Diagrams",
+      "spatialEditor": "Kartverktøyet",
       "library": "Bibliotek",
       "mediaFiles": "Mediefiler",
       "tools": "Verktøy",
@@ -8226,7 +8228,8 @@
       "loggedInAs": "Du er logget inn som",
       "viewProfile": "Vis profil",
       "marketing": "Markedsføring",
-      "visitWebsite": "Besøk nettsiden"
+      "visitWebsite": "Besøk nettsiden",
+      "manageApp": "Administrer plattformen"
     },
     "notifications": {
       "title": "Varsler",

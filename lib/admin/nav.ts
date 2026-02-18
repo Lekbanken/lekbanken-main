@@ -111,6 +111,7 @@ const systemAdminCategories: AdminNavCategory[] = [
     items: [
       { id: 'badges', labelKey: 'badges', href: '/admin/library/badges', icon: 'achievements', permission: 'admin.achievements.list' },
       { id: 'coach-diagrams', labelKey: 'coachDiagrams', href: '/admin/library/coach-diagrams', icon: 'content', permission: 'admin.content.list' },
+      { id: 'spatial-editor', labelKey: 'spatialEditor', href: '/admin/library/spatial-editor', icon: 'content', permission: 'admin.content.list' },
       { id: 'media', labelKey: 'mediaFiles', href: '/admin/media', icon: 'content', permission: 'admin.content.list' },
     ],
   },

@@ -3,8 +3,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { Database } from '@/types/supabase';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { renderSpatialSvg } from '@/app/sandbox/spatial-editor/lib/svg-export';
-import type { SpatialDocumentV1 } from '@/app/sandbox/spatial-editor/lib/types';
+import { renderSpatialSvg } from '@/features/admin/library/spatial-editor/lib/svg-export';
+import type { SpatialDocumentV1 } from '@/features/admin/library/spatial-editor/lib/types';
 
 export const dynamic = 'force-dynamic';
 

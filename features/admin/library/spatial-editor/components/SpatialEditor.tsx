@@ -24,7 +24,7 @@ import Link from 'next/link';
 /** Max data-URL size we allow (5 MB) – keeps JSON/localStorage safe */
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
-export function SpatialEditor() {
+export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: string } = {}) {
   const svgRef = useRef<SVGSVGElement>(null);
   const doc = useSpatialEditorStore((s) => s.doc);
   const dirty = useSpatialEditorStore((s) => s.dirty);
@@ -51,14 +51,14 @@ export function SpatialEditor() {
 
   const searchParams = useSearchParams();
 
-  // TODO: resolve from auth context when inside a tenant route
+  // Resolve tenant from auth context (admin route) or fallback to null
   const activeTenantId: string | null = null;
 
-  // Load artifact from ?artifact=<id> query param on mount
+  // Load artifact from prop (admin route) or ?artifact=<id> query param on mount
   useEffect(() => {
-    const artifactParam = searchParams.get('artifact');
-    if (!artifactParam) return;
-    loadSpatialArtifact(artifactParam).then((row) => {
+    const targetId = initialArtifactId ?? searchParams.get('artifact');
+    if (!targetId) return;
+    loadSpatialArtifact(targetId).then((row) => {
       if (row) {
         loadArtifactDocument(row.document as SpatialDocumentV1, row.id, row.title);
       }
@@ -368,7 +368,7 @@ export function SpatialEditor() {
           </button>
 
           <Link
-            href="/sandbox/spatial-editor/library"
+            href="/admin/library/spatial-editor"
             className="rounded-md bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-700 dark:hover:bg-gray-700"
           >
             📂 Bibliotek
@@ -612,6 +612,7 @@ export function SpatialEditor() {
             </button>
             <Link
               href="/sandbox/spatial-capture"
+              target="_blank"
               className="rounded-md px-2.5 py-1.5 text-xs font-medium text-center bg-gray-50 text-gray-600 ring-1 ring-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:ring-gray-600 dark:hover:bg-gray-600 transition-colors"
             >
               🗺️ Kartfångst

@@ -10,7 +10,7 @@
 // Uses RLS client — policies enforce access.
 // =============================================================================
 
-import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { fromSpatialArtifacts } from './db';
 
 // ---------------------------------------------------------------------------
@@ -44,6 +44,50 @@ export interface SpatialArtifactListItem {
   preview_url: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Media shadow row helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Upsert a shadow row in the `media` table so games can reference this
+ * spatial artifact via the standard game_media → media chain.
+ *
+ * Uses service_role because media write-RLS requires is_system_admin().
+ * This matches the existing coach diagram pattern in
+ * app/api/admin/coach-diagrams/route.ts.
+ */
+async function upsertMediaRow(params: {
+  artifactId: string;
+  title: string;
+  tenantId: string | null;
+  appUrl: string;
+}): Promise<void> {
+  try {
+    const admin = createServiceRoleClient();
+    const mediaUrl = `${params.appUrl}/api/spatial-artifacts/${params.artifactId}/svg`;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (admin as any)
+      .from('media')
+      .upsert(
+        {
+          id: params.artifactId,
+          name: params.title,
+          type: 'diagram',
+          url: mediaUrl,
+          alt_text: params.title,
+          tenant_id: params.tenantId ?? null,
+          metadata: { kind: 'spatial_artifact', schemaVersion: 1 },
+        },
+        { onConflict: 'id' },
+      );
+  } catch (err) {
+    // Non-fatal: diagram is saved even if media sync fails.
+    // Logged for debugging; can be retried manually.
+    console.error('[spatial-artifacts] media upsert failed:', err);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -85,6 +129,11 @@ export async function saveSpatialArtifact(params: {
     return { error: 'Tenant visibility requires a tenantId.' };
   }
 
+  // Resolve app URL for media row (server-side, headers not easily available in server actions)
+  const appUrl = process.env.NEXT_PUBLIC_SITE_URL
+    ?? process.env.NEXT_PUBLIC_APP_URL
+    ?? 'https://app.lekbanken.se';
+
   if (params.id) {
     // Update existing
     const updatePayload: Record<string, unknown> = {
@@ -109,6 +158,15 @@ export async function saveSpatialArtifact(params: {
 
     const { error } = await query;
     if (error) return { error: error.message };
+
+    // Sync shadow media row (non-blocking, non-fatal)
+    void upsertMediaRow({
+      artifactId: params.id,
+      title: params.title,
+      tenantId: params.tenantId ?? null,
+      appUrl,
+    });
+
     return { id: params.id };
   }
 
@@ -127,6 +185,15 @@ export async function saveSpatialArtifact(params: {
     .single();
 
   if (error || !data) return { error: error?.message ?? 'Insert failed' };
+
+  // Sync shadow media row (non-blocking, non-fatal)
+  void upsertMediaRow({
+    artifactId: data.id,
+    title: params.title,
+    tenantId: params.tenantId ?? null,
+    appUrl,
+  });
+
   return { id: data.id };
 }
 

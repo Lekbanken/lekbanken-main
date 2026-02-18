@@ -284,6 +284,7 @@ export function GameAdminPageV2() {
   // State
   const [games, setGames] = useState<GameAdminRow[]>([]);
   const [totalGames, setTotalGames] = useState(0);
+  const [globalStats, setGlobalStats] = useState({ total: 0, published: 0, drafts: 0, withErrors: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -314,15 +315,8 @@ export function GameAdminPageV2() {
   const canView = can('admin.games.list');
   const canEdit = can('admin.games.edit');
 
-  // Stats
-  const stats = useMemo(() => {
-    return {
-      total: totalGames,
-      published: games.filter((g) => g.status === 'published').length,
-      drafts: games.filter((g) => g.status === 'draft').length,
-      withErrors: games.filter((g) => g.validation_state === 'errors').length,
-    };
-  }, [games, totalGames]);
+  // Stats — use server-provided global counts (all games, not just current page)
+  const stats = globalStats;
 
   // Count active filters
   const activeFilterCount = useMemo(() => {
@@ -362,6 +356,9 @@ export function GameAdminPageV2() {
       const data: GameListResponse = await response.json();
       setGames(data.games);
       setTotalGames(data.total);
+      if (data.globalStats) {
+        setGlobalStats(data.globalStats);
+      }
     } catch (err) {
       console.error('[GameAdminPageV2] Load error:', err);
       setError(err instanceof Error ? err.message : 'Failed to load games');

@@ -225,13 +225,29 @@ export async function POST(request: Request) {
     
     const total = count || 0;
     const hasMore = page * pageSize < total;
-    
+
+    // Global stats across ALL games (unfiltered) for the overview cards
+    const [publishedCount, draftCount, errorCount] = await Promise.all([
+      supabase.from('games').select('*', { count: 'exact', head: true }).eq('status', 'published'),
+      supabase.from('games').select('*', { count: 'exact', head: true }).eq('status', 'draft'),
+      // "errors" = games where name is null/empty (the only error-level check in computeValidationState)
+      supabase.from('games').select('*', { count: 'exact', head: true }).or('name.is.null,name.eq.'),
+    ]);
+
+    const globalTotal = (publishedCount.count ?? 0) + (draftCount.count ?? 0);
+
     const response: GameListResponse = {
       games,
       total,
       page,
       pageSize,
       hasMore,
+      globalStats: {
+        total: globalTotal,
+        published: publishedCount.count ?? 0,
+        drafts: draftCount.count ?? 0,
+        withErrors: errorCount.count ?? 0,
+      },
       metadata: {
         appliedFilters: parsed.data,
       },

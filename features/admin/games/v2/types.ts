@@ -368,6 +368,13 @@ export type GameListResponse = {
   page: number;
   pageSize: number;
   hasMore: boolean;
+  /** Global stats across ALL games (unfiltered, unpaginated) */
+  globalStats: {
+    total: number;
+    published: number;
+    drafts: number;
+    withErrors: number;
+  };
   metadata: {
     filterCounts?: Record<string, number>;
     appliedFilters?: GameAdminFilters;

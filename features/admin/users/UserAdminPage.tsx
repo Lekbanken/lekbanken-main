@@ -21,7 +21,7 @@ import {
   AdminBreadcrumbs,
 } from "@/components/admin/shared";
 import { useRbac } from "@/features/admin/shared/hooks/useRbac";
-import { removeUserMemberships, lookupUserByEmail, deleteUser } from "./userActions.server";
+import { lookupUserByEmail, deleteUser } from "./userActions.server";
 import type {
   AdminUserListItem,
   AdminUserStatus,
@@ -165,14 +165,7 @@ export function UserAdminPage({
 
   const handleRemove = useCallback(async (userId: string) => {
     try {
-      // Delete all memberships first via server action
-      const membershipResult = await removeUserMemberships(userId);
-
-      if (!membershipResult.success) {
-        console.warn("Failed to remove memberships:", membershipResult.error);
-      }
-
-      // Delete the user from auth + DB
+      // deleteUser now handles memberships + public.users + auth.users cleanup
       const deleteResult = await deleteUser(userId);
 
       if (!deleteResult.success) {

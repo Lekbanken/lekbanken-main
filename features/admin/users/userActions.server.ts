@@ -184,11 +184,35 @@ export async function updateUserPassword(
 
 export async function deleteUser(userId: string): Promise<{ success: boolean; error?: string }> {
   try {
-    // Delete from auth (this will cascade to profiles via trigger or manually)
+    // 1. Remove tenant memberships first (FK dependency)
+    const { error: membershipError } = await supabaseAdmin
+      .from('user_tenant_memberships')
+      .delete()
+      .eq('user_id', userId);
+
+    if (membershipError) {
+      console.error('[deleteUser] Membership cleanup error:', membershipError);
+      // Continue — best-effort cleanup
+    }
+
+    // 2. Remove the public.users profile row
+    //    (No cascade/trigger exists from auth.users → public.users,
+    //     so we must delete it explicitly.)
+    const { error: profileError } = await supabaseAdmin
+      .from('users')
+      .delete()
+      .eq('id', userId);
+
+    if (profileError) {
+      console.error('[deleteUser] Profile cleanup error:', profileError);
+      // Continue — still try to remove the auth record
+    }
+
+    // 3. Delete from auth.users
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
     if (error) {
-      console.error('[deleteUser] Error:', error);
+      console.error('[deleteUser] Auth delete error:', error);
       return {
         success: false,
         error: error.message || 'Kunde inte ta bort användare',

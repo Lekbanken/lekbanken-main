@@ -1,16 +1,21 @@
 'use server';
 
-import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServerRlsClient, supabaseAdmin } from '@/lib/supabase/server';
 
 /**
  * Upload a custom avatar PNG to Supabase Storage.
  * Overwrites any previous custom avatar for the user.
+ *
+ * Uses supabaseAdmin for the storage upload because the avatars bucket
+ * has no DELETE policy, and Supabase upsert internally does delete+insert.
+ * Auth is validated via the RLS client first.
  *
  * Returns the public URL (with cache-busting query param).
  */
 export async function uploadCustomAvatar(
   formData: FormData
 ): Promise<{ url: string } | { error: string }> {
+  // Authenticate via RLS client (uses request cookies)
   const supabase = await createServerRlsClient();
   const {
     data: { user },
@@ -31,8 +36,9 @@ export async function uploadCustomAvatar(
 
   const storagePath = `custom/${user.id}.png`;
 
-  // Upload with upsert so it always overwrites the existing file
-  const { error: uploadError } = await supabase.storage
+  // Use admin client for storage — the bucket lacks a DELETE policy,
+  // and Supabase upsert does delete+insert internally which fails with RLS.
+  const { error: uploadError } = await supabaseAdmin.storage
     .from('avatars')
     .upload(storagePath, blob, {
       upsert: true,
@@ -45,7 +51,7 @@ export async function uploadCustomAvatar(
   }
 
   // Build public URL with cache-busting
-  const { data: urlData } = supabase.storage
+  const { data: urlData } = supabaseAdmin.storage
     .from('avatars')
     .getPublicUrl(storagePath);
 

@@ -109,7 +109,7 @@ export function Select({
 
           <ListboxOptions
             anchor="bottom start"
-            className="z-50 mt-1 max-h-60 w-[var(--button-width)] overflow-auto rounded-lg border border-border bg-popover py-1 text-sm shadow-lg focus:outline-none"
+            className="z-50 mt-1 max-h-60 w-[var(--button-width)] overflow-auto rounded-lg border border-border bg-background py-1 text-sm shadow-xl ring-1 ring-black/5 focus:outline-none"
           >
             {options.map((option) => (
               <ListboxOption

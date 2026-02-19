@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
-import { supabase } from '@/lib/supabase';
+import { uploadCustomAvatar } from './avatarActions.server';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -92,24 +92,14 @@ export default function GeneralSettingsPage() {
       if (!user) return;
 
       try {
-        const storagePath = `custom/${user.id}.png`;
+        // Upload via server action (browser supabase storage hangs in v2.86+)
+        const fd = new FormData();
+        fd.append('file', blob, 'avatar.png');
+        const result = await uploadCustomAvatar(fd);
 
-        // Upload PNG to Supabase Storage (avatars bucket, upsert)
-        const { error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(storagePath, blob, {
-            upsert: true,
-            contentType: 'image/png',
-          });
+        if ('error' in result) throw new Error(result.error);
 
-        if (uploadError) throw uploadError;
-
-        // Build public URL with cache-busting
-        const { data: urlData } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(storagePath);
-
-        const publicUrl = `${urlData.publicUrl}?v=${Date.now()}`;
+        const publicUrl = result.url;
 
         // Single updateProfile call: saves to DB + refreshes auth context
         await updateProfile({

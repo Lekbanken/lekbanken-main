@@ -16,7 +16,6 @@ import { loadSpatialArtifact } from '../lib/artifact-actions';
 export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: string } = {}) {
   const svgRef = useRef<SVGSVGElement>(null);
   const loadArtifactDocument = useSpatialEditorStore((s) => s.loadArtifactDocument);
-  const setBackground = useSpatialEditorStore((s) => s.setBackground);
 
   const searchParams = useSearchParams();
 
@@ -29,35 +28,6 @@ export function SpatialEditor({ initialArtifactId }: { initialArtifactId?: strin
         loadArtifactDocument(row.document as SpatialDocumentV1, row.id, row.title);
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only on mount
-
-  // Import map snapshot from Spatial Capture tool via sessionStorage
-  useEffect(() => {
-    const mapParam = searchParams.get('mapSnapshot');
-    if (!mapParam) return;
-    try {
-      const raw = sessionStorage.getItem('spatial-capture-snapshot');
-      if (!raw) return;
-      const snapshot = JSON.parse(raw) as {
-        dataUrl: string;
-        exportSize: { w: number; h: number };
-        centerLatLng?: { lat: number; lon: number };
-        zoom?: number;
-        provider?: string;
-        capturedAt?: string;
-      };
-      setBackground({
-        type: 'image',
-        src: snapshot.dataUrl,
-        imageWidth: snapshot.exportSize.w,
-        imageHeight: snapshot.exportSize.h,
-        opacity: 0.6,
-      });
-      sessionStorage.removeItem('spatial-capture-snapshot');
-    } catch (err) {
-      console.warn('[spatial-editor] failed to import map snapshot:', err);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only on mount
 

@@ -9,7 +9,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
-import { Button, Input, Textarea } from '@/components/ui';
+import { Button, Input, Textarea, Select } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import {
   Dialog,
@@ -207,20 +207,15 @@ export function AwardAchievementModal({
           {/* Tenant Mode */}
           {mode === 'tenant' && (
             <div className="space-y-2">
-              <Label htmlFor="tenant">{t('tenant.label')}</Label>
-              <select
+              <Select
                 id="tenant"
+                label={t('tenant.label')}
                 value={selectedTenant}
                 onChange={(e) => setSelectedTenant(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <option value="">{t('tenant.placeholder')}</option>
-                {tenants.map((tenant) => (
-                  <option key={tenant.id} value={tenant.id}>
-                    {tenant.name}
-                  </option>
-                ))}
-              </select>
+                placeholder={t('tenant.placeholder')}
+                options={tenants.map((tenant) => ({ value: tenant.id, label: tenant.name }))}
+                className="w-full"
+              />
               {selectedTenantName && (
                 <p className="text-sm text-muted-foreground">
                   {t('tenant.helper', { tenantName: selectedTenantName })}

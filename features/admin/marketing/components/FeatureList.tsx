@@ -8,7 +8,7 @@ import {
   StarIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
-import { Card, CardContent, CardHeader, CardTitle, Badge, Button, Input } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Badge, Button, Input, Select } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import type { MarketingFeature } from '@/lib/marketing/types';
 import { AUDIENCE_OPTIONS, USE_CASE_OPTIONS, STATUS_OPTIONS } from '@/lib/marketing/types';
@@ -63,16 +63,11 @@ export function FeatureList({ features, onEdit, onDelete, selectedId, isPending 
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1"
           />
-          <select
+          <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="all">Alla status</option>
-            {STATUS_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+            options={[{ value: 'all', label: 'Alla status' }, ...STATUS_OPTIONS]}
+          />
         </div>
       </CardHeader>
       <CardContent className="p-0">

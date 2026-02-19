@@ -8,6 +8,7 @@ import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { cn } from '@/lib/utils';
 import { PageTitleHeader } from '@/components/app/PageTitleHeader';
 import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { MarkdownContent } from '@/components/legal/MarkdownContent';
 
@@ -124,22 +125,15 @@ function TabSelector({ documents, activeDocId, acceptedDocs, onSelect, selectLab
   return (
     <div className="mb-6">
       {/* Mobile: Dropdown select */}
-      <div className="grid grid-cols-1 sm:hidden relative">
-        <select
+      <div className="sm:hidden">
+        <Select
           value={activeDocId}
           onChange={(e) => onSelect(e.target.value)}
           aria-label={selectLabel}
-          className="col-start-1 row-start-1 w-full appearance-none rounded-xl border border-border bg-card py-3 pr-10 pl-4 text-base text-foreground shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-        >
-          {documents.map((doc) => (
-            <option key={doc.id} value={doc.id}>
-              {acceptedDocs.has(doc.id) ? '✓ ' : ''}{doc.title}
-            </option>
-          ))}
-        </select>
-        <ChevronDownIcon
-          aria-hidden="true"
-          className="pointer-events-none col-start-1 row-start-1 mr-3 size-5 self-center justify-self-end text-muted-foreground"
+          options={documents.map((doc) => ({
+            value: doc.id,
+            label: `${acceptedDocs.has(doc.id) ? '✓ ' : ''}${doc.title}`,
+          }))}
         />
       </div>
       

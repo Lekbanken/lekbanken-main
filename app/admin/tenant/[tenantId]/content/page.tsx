@@ -10,7 +10,7 @@ import {
   AdminErrorState,
   AdminCard,
 } from "@/components/admin/shared";
-import { Input } from "@/components/ui";
+import { Input, Select } from "@/components/ui";
 import { useTenant } from "@/lib/context/TenantContext";
 import { getContentItems, type ContentItem } from "@/lib/services/contentService";
 
@@ -92,16 +92,16 @@ export default function TenantContentPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-80"
         />
-        <select
+        <Select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value as ContentType)}
-          className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
-        >
-          <option value="all">{t('filter.allTypes')}</option>
-          <option value="game">{t('filter.game')}</option>
-          <option value="lesson">{t('filter.lesson')}</option>
-          <option value="resource">{t('filter.resource')}</option>
-        </select>
+          options={[
+            { value: 'all', label: t('filter.allTypes') },
+            { value: 'game', label: t('filter.game') },
+            { value: 'lesson', label: t('filter.lesson') },
+            { value: 'resource', label: t('filter.resource') },
+          ]}
+        />
       </div>
 
       {isLoading ? (

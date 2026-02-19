@@ -10,7 +10,7 @@ import {
   AdminPageHeader,
   AdminPageLayout,
 } from '@/components/admin/shared';
-import { Badge, Button } from '@/components/ui';
+import { Badge, Button, Select } from '@/components/ui';
 import { useToast } from '@/components/ui/toast';
 import { useTenant } from '@/lib/context/TenantContext';
 import { supabase } from '@/lib/supabase/client';
@@ -240,20 +240,17 @@ export default function TenantLicensesPage() {
               >
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <select
-                      className="h-9 rounded-md border bg-background px-3 text-sm"
+                    <Select
                       value={selectedMemberByEntitlement[ent.id] ?? ''}
                       onChange={(e) =>
                         setSelectedMemberByEntitlement((prev) => ({ ...prev, [ent.id]: e.target.value }))
                       }
-                    >
-                      <option value="">{t('labels.selectMember')}</option>
-                      {membersSorted.map((m) => (
-                        <option key={m.user_id} value={m.user_id}>
-                          {m.user?.full_name || m.user?.email || m.user_id}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder={t('labels.selectMember')}
+                      options={membersSorted.map((m) => ({
+                        value: m.user_id,
+                        label: m.user?.full_name || m.user?.email || m.user_id,
+                      }))}
+                    />
 
                     <Button
                       size="sm"

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Input, Textarea } from '@/components/ui';
+import { Button, Input, Textarea, Select } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -281,20 +281,15 @@ export function ShopItemEditorDrawer({
 
           {subtypes.length > 0 && (
             <div className="space-y-2">
-              <Label htmlFor="subtype">{t('fields.subtype.label')}</Label>
-              <select
+              <Select
                 id="subtype"
+                label={t('fields.subtype.label')}
                 value={categorySubtype}
                 onChange={(e) => setCategorySubtype(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <option value="">{t('fields.subtype.placeholder')}</option>
-                {subtypes.map((st) => (
-                  <option key={st.value} value={st.value}>
-                    {st.label}
-                  </option>
-                ))}
-              </select>
+                placeholder={t('fields.subtype.placeholder')}
+                options={subtypes.map((st) => ({ value: st.value, label: st.label }))}
+                className="w-full"
+              />
             </div>
           )}
 
@@ -335,21 +330,15 @@ export function ShopItemEditorDrawer({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="currency">{t('fields.currency.label')}</Label>
-              <select
+              <Select
                 id="currency"
+                label={t('fields.currency.label')}
                 value={currencyId}
                 onChange={(e) => setCurrencyId(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                required
-              >
-                <option value="">{t('fields.currency.placeholder')}</option>
-                {currencies.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.symbol ? `${c.symbol} ${c.name}` : c.name}
-                  </option>
-                ))}
-              </select>
+                placeholder={t('fields.currency.placeholder')}
+                options={currencies.map((c) => ({ value: c.id, label: c.symbol ? `${c.symbol} ${c.name}` : c.name }))}
+                className="w-full"
+              />
             </div>
           </div>
 

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from 'next-intl';
 import { UsersIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState, AdminErrorState, AdminCard } from "@/components/admin/shared";
-import { Badge, Button, Input } from "@/components/ui";
+import { Badge, Button, Input, Select } from "@/components/ui";
 import { useToast } from "@/components/ui/toast";
 import { useTenant } from "@/lib/context/TenantContext";
 import { supabase } from "@/lib/supabase/client";
@@ -327,8 +327,8 @@ export default function TenantMembersPage() {
                 <p className="text-xs font-medium text-muted-foreground">{t('licensing.title')}</p>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <select
-                    className="h-9 flex-1 min-w-[200px] rounded-md border bg-background px-3 text-sm"
+                  <Select
+                    className="min-w-[200px]"
                     value={selectedEntitlementByMember[member.user?.id ?? ''] ?? ''}
                     onChange={(e) => {
                       const uid = member.user?.id;
@@ -336,21 +336,16 @@ export default function TenantMembersPage() {
                       setSelectedEntitlementByMember((prev) => ({ ...prev, [uid]: e.target.value }));
                     }}
                     disabled={!member.user?.id || entitlementsSorted.length === 0}
-                  >
-                    <option value="">{t('licensing.selectPlaceholder')}</option>
-                    {entitlementsSorted
+                    placeholder={t('licensing.selectPlaceholder')}
+                    options={entitlementsSorted
                       .filter((e) => e.status === 'active')
                       .map((e) => {
                         const label = e.product?.name ?? e.product?.product_key ?? e.id;
                         const used = usedSeatsByEntitlement.get(e.id) ?? 0;
                         const max = e.quantity_seats;
-                        return (
-                          <option key={e.id} value={e.id}>
-                            {label} ({used}/{max})
-                          </option>
-                        );
+                        return { value: e.id, label: `${label} (${used}/${max})` };
                       })}
-                  </select>
+                  />
 
                   <Button
                     size="sm"

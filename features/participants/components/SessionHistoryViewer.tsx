@@ -9,6 +9,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
+import { Select } from '@/components/ui/select';
 
 interface SessionSummary {
   id: string;
@@ -148,23 +149,23 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex items-center gap-4 bg-white p-4 rounded-lg shadow">
-        <label className="text-sm font-medium text-gray-700">{t('filters.label')}</label>
-        <select
+        <Select
+          label={t('filters.label')}
           value={statusFilter}
           onChange={(e) => {
             setStatusFilter(e.target.value);
             setOffset(0);
           }}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="all">{t('filters.all')}</option>
-          <option value="active">{t('filters.active')}</option>
-          <option value="paused">{t('filters.paused')}</option>
-          <option value="locked">{t('filters.locked')}</option>
-          <option value="ended">{t('filters.ended')}</option>
-          <option value="cancelled">{t('filters.cancelled')}</option>
-          <option value="archived">{t('filters.archived')}</option>
-        </select>
+          options={[
+            { value: 'all', label: t('filters.all') },
+            { value: 'active', label: t('filters.active') },
+            { value: 'paused', label: t('filters.paused') },
+            { value: 'locked', label: t('filters.locked') },
+            { value: 'ended', label: t('filters.ended') },
+            { value: 'cancelled', label: t('filters.cancelled') },
+            { value: 'archived', label: t('filters.archived') },
+          ]}
+        />
 
         <div className="ml-auto text-sm text-gray-600">
           {t('summary.count', { count: totalCount })}

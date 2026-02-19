@@ -9,7 +9,7 @@ import {
   MapIcon,
 } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
-import { Button, Input, Textarea } from '@/components/ui';
+import { Button, Input, Textarea, Select } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -428,57 +428,34 @@ export function PathEditorDrawer({
               </div>
 
               {scope === 'tenant' && (
-                <div className="space-y-2">
-                  <Label htmlFor="tenant">{t('fields.tenant')}</Label>
-                  <select
-                    id="tenant"
-                    value={tenantId}
-                    onChange={(e) => setTenantId(e.target.value)}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    required
-                  >
-                    <option value="">{t('fields.tenantPlaceholder')}</option>
-                    {tenants.map((tenant) => (
-                      <option key={tenant.id} value={tenant.id}>
-                        {tenant.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label={t('fields.tenant')}
+                  value={tenantId}
+                  onChange={(e) => setTenantId(e.target.value)}
+                  options={[
+                    { value: '', label: t('fields.tenantPlaceholder') },
+                    ...tenants.map((tenant) => ({ value: tenant.id, label: tenant.name })),
+                  ]}
+                  className="w-full"
+                />
               )}
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="status">{t('fields.status')}</Label>
-                  <select
-                    id="status"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as typeof status)}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    {statusOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label={t('fields.status')}
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as typeof status)}
+                  options={statusOptions}
+                  className="w-full"
+                />
 
-                <div className="space-y-2">
-                  <Label htmlFor="kind">{t('fields.kind')}</Label>
-                  <select
-                    id="kind"
-                    value={kind}
-                    onChange={(e) => setKind(e.target.value as 'onboarding' | 'role' | 'theme' | 'compliance')}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    {kindOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label={t('fields.kind')}
+                  value={kind}
+                  onChange={(e) => setKind(e.target.value as 'onboarding' | 'role' | 'theme' | 'compliance')}
+                  options={kindOptions}
+                  className="w-full"
+                />
               </div>
             </div>
           )}
@@ -532,20 +509,20 @@ export function PathEditorDrawer({
 
                   {/* Add course selector */}
                   <div className="flex gap-2">
-                    <select
+                    <Select
                       value={selectedCourseId}
                       onChange={(e) => setSelectedCourseId(e.target.value)}
-                      className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    >
-                      <option value="">{t('nodes.addCoursePlaceholder')}</option>
-                      {courses
-                        .filter(c => !coursesInPath.includes(c.id))
-                        .map((course) => (
-                          <option key={course.id} value={course.id}>
-                            {course.title} {course.tenant_id ? t('nodes.courseScope.org') : t('nodes.courseScope.global')}
-                          </option>
-                        ))}
-                    </select>
+                      options={[
+                        { value: '', label: t('nodes.addCoursePlaceholder') },
+                        ...courses
+                          .filter(c => !coursesInPath.includes(c.id))
+                          .map((course) => ({
+                            value: course.id,
+                            label: `${course.title} ${course.tenant_id ? t('nodes.courseScope.org') : t('nodes.courseScope.global')}`,
+                          })),
+                      ]}
+                      className="flex-1"
+                    />
                     <Button
                       type="button"
                       variant="outline"
@@ -610,33 +587,33 @@ export function PathEditorDrawer({
                 <div className="space-y-2 rounded-lg border border-border p-4">
                   <Label className="text-sm">{t('edges.addTitle')}</Label>
                   <div className="flex flex-wrap gap-2 items-center">
-                    <select
+                    <Select
                       value={selectedEdgeFrom}
                       onChange={(e) => setSelectedEdgeFrom(e.target.value)}
-                      className="flex-1 min-w-[150px] rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    >
-                      <option value="">{t('edges.addFromPlaceholder')}</option>
-                      {nodes.map((node) => (
-                        <option key={node.id} value={node.course_id}>
-                          {node.course_title}
-                        </option>
-                      ))}
-                    </select>
+                      options={[
+                        { value: '', label: t('edges.addFromPlaceholder') },
+                        ...nodes.map((node) => ({
+                          value: node.course_id,
+                          label: node.course_title ?? node.course_id,
+                        })),
+                      ]}
+                      className="flex-1 min-w-[150px]"
+                    />
                     <ArrowRightIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <select
+                    <Select
                       value={selectedEdgeTo}
                       onChange={(e) => setSelectedEdgeTo(e.target.value)}
-                      className="flex-1 min-w-[150px] rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    >
-                      <option value="">{t('edges.addToPlaceholder')}</option>
-                      {nodes
-                        .filter(n => n.course_id !== selectedEdgeFrom)
-                        .map((node) => (
-                          <option key={node.id} value={node.course_id}>
-                            {node.course_title}
-                          </option>
-                        ))}
-                    </select>
+                      options={[
+                        { value: '', label: t('edges.addToPlaceholder') },
+                        ...nodes
+                          .filter(n => n.course_id !== selectedEdgeFrom)
+                          .map((node) => ({
+                            value: node.course_id,
+                            label: node.course_title ?? node.course_id,
+                          })),
+                      ]}
+                      className="flex-1 min-w-[150px]"
+                    />
                     <Button
                       type="button"
                       variant="outline"

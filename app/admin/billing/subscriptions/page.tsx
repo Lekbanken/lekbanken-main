@@ -14,7 +14,7 @@ import {
   AdminTableToolbar,
   AdminPagination,
 } from '@/components/admin/shared';
-import { Button, Badge, EmptyState } from '@/components/ui';
+import { Button, Badge, EmptyState, Select } from '@/components/ui';
 import {
   CreditCardIcon,
   ArrowLeftIcon,
@@ -260,17 +260,17 @@ export default function SubscriptionsPage() {
         searchPlaceholder={t('search')}
         className="mb-4"
         filters={
-          <select
+          <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="all">{t('filter.all')}</option>
-            <option value="active">{t('filter.active')}</option>
-            <option value="trial">{t('filter.trial')}</option>
-            <option value="paused">{t('filter.paused')}</option>
-            <option value="canceled">{t('filter.canceled')}</option>
-          </select>
+            options={[
+              { value: 'all', label: t('filter.all') },
+              { value: 'active', label: t('filter.active') },
+              { value: 'trial', label: t('filter.trial') },
+              { value: 'paused', label: t('filter.paused') },
+              { value: 'canceled', label: t('filter.canceled') },
+            ]}
+          />
         }
       />
 

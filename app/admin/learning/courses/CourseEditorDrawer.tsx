@@ -10,7 +10,7 @@ import {
   Bars3Icon,
 } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
-import { Button, Input, Textarea } from '@/components/ui';
+import { Button, Input, Textarea, Select } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -511,23 +511,16 @@ export function CourseEditorDrawer({
               )}
 
               {scope === 'tenant' && isSystemAdmin && (
-                <div className="space-y-2">
-                  <Label htmlFor="tenant">{t('fields.tenant')}</Label>
-                  <select
-                    id="tenant"
-                    value={tenantId}
-                    onChange={(e) => setTenantId(e.target.value)}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    required
-                  >
-                    <option value="">{t('fields.tenantPlaceholder')}</option>
-                    {tenants.map((tenant) => (
-                      <option key={tenant.id} value={tenant.id}>
-                        {tenant.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label={t('fields.tenant')}
+                  value={tenantId}
+                  onChange={(e) => setTenantId(e.target.value)}
+                  options={[
+                    { value: '', label: t('fields.tenantPlaceholder') },
+                    ...tenants.map((tenant) => ({ value: tenant.id, label: tenant.name })),
+                  ]}
+                  className="w-full"
+                />
               )}
 
               {!isSystemAdmin && currentTenantId && (
@@ -539,37 +532,21 @@ export function CourseEditorDrawer({
               )}
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="status">{t('fields.status')}</Label>
-                  <select
-                    id="status"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as typeof status)}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    {statusOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label={t('fields.status')}
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as typeof status)}
+                  options={statusOptions}
+                  className="w-full"
+                />
 
-                <div className="space-y-2">
-                  <Label htmlFor="difficulty">{t('fields.difficulty')}</Label>
-                  <select
-                    id="difficulty"
-                    value={difficulty}
-                    onChange={(e) => setDifficulty(e.target.value)}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    {difficultyOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label={t('fields.difficulty')}
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  options={difficultyOptions}
+                  className="w-full"
+                />
 
                 <div className="space-y-2">
                   <Label htmlFor="duration">{t('fields.duration')}</Label>

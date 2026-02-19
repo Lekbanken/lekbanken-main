@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Select } from '@/components/ui';
 import { BellIcon, GlobeAltIcon, BuildingOfficeIcon, UsersIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { AdminPageLayout, AdminPageHeader, AdminEmptyState, AdminErrorState } from '@/components/admin/shared';
 import {
@@ -309,21 +309,16 @@ export default function NotificationsAdminPage() {
 
             {/* Tenant selector (for tenant and users scope) */}
             {(scope === 'tenant' || scope === 'users') && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">{t('form.selectOrg')}</label>
-                <select
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                  value={selectedTenantId}
-                  onChange={(e) => handleTenantChange(e.target.value)}
-                >
-                  <option value="">{t('options.selectOrg')}</option>
-                  {tenants.map((tenant) => (
-                    <option key={tenant.id} value={tenant.id}>
-                      {tenant.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                label={t('form.selectOrg')}
+                value={selectedTenantId}
+                onChange={(e) => handleTenantChange(e.target.value)}
+                placeholder={t('options.selectOrg')}
+                options={tenants.map((tenant) => ({
+                  value: tenant.id,
+                  label: tenant.name,
+                }))}
+              />
             )}
 
             {/* User selector (for users scope) */}
@@ -390,20 +385,18 @@ export default function NotificationsAdminPage() {
                   placeholder={t('placeholders.title')}
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">{t('form.type')}</label>
-                <select
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                  value={notificationType}
-                  onChange={(e) => setNotificationType(e.target.value as typeof notificationType)}
-                >
-                  <option value="info">Info</option>
-                  <option value="success">Success</option>
-                  <option value="warning">Warning</option>
-                  <option value="error">Error</option>
-                  <option value="system">System</option>
-                </select>
-              </div>
+              <Select
+                label={t('form.type')}
+                value={notificationType}
+                onChange={(e) => setNotificationType(e.target.value as typeof notificationType)}
+                options={[
+                  { value: 'info', label: 'Info' },
+                  { value: 'success', label: 'Success' },
+                  { value: 'warning', label: 'Warning' },
+                  { value: 'error', label: 'Error' },
+                  { value: 'system', label: 'System' },
+                ]}
+              />
             </div>
 
             <div className="space-y-2">
@@ -418,21 +411,19 @@ export default function NotificationsAdminPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">{t('form.category')}</label>
-                <select
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                  value={notificationCategory}
-                  onChange={(e) => setNotificationCategory(e.target.value)}
-                >
-                  <option value="system">{t('categories.system')}</option>
-                  <option value="support">{t('categories.support')}</option>
-                  <option value="billing">{t('categories.billing')}</option>
-                  <option value="learning">{t('categories.learning')}</option>
-                  <option value="gamification">{t('categories.gamification')}</option>
-                  <option value="announcement">{t('categories.announcement')}</option>
-                </select>
-              </div>
+              <Select
+                label={t('form.category')}
+                value={notificationCategory}
+                onChange={(e) => setNotificationCategory(e.target.value)}
+                options={[
+                  { value: 'system', label: t('categories.system') },
+                  { value: 'support', label: t('categories.support') },
+                  { value: 'billing', label: t('categories.billing') },
+                  { value: 'learning', label: t('categories.learning') },
+                  { value: 'gamification', label: t('categories.gamification') },
+                  { value: 'announcement', label: t('categories.announcement') },
+                ]}
+              />
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">
                   {t('form.actionUrl')} <span className="text-muted-foreground">({t('optional')})</span>

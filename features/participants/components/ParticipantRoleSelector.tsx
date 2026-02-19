@@ -9,6 +9,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Select } from '@/components/ui/select';
 import type { Database } from '@/types/supabase';
 
 type ParticipantRole = Database['public']['Enums']['participant_role'];
@@ -87,19 +88,13 @@ export function ParticipantRoleSelector({
   
   return (
     <div className="relative">
-      <select
+      <Select
         value={selectedRole}
         onChange={(e) => handleRoleChange(e.target.value as ParticipantRole)}
         disabled={disabled || loading}
-        className="block w-full rounded-md border-gray-300 py-1.5 pl-3 pr-10 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-100"
-        title={roleDescriptions[selectedRole]}
-      >
-        {Object.entries(roleLabels).map(([value, label]) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
-      </select>
+        aria-label={roleDescriptions[selectedRole]}
+        options={Object.entries(roleLabels).map(([value, label]) => ({ value, label }))}
+      />
       
       {loading && (
         <div className="absolute right-8 top-1/2 -translate-y-1/2">

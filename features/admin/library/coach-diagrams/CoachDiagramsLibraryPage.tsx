@@ -11,6 +11,7 @@ import { AdminEmptyState, AdminPageHeader, AdminPageLayout } from '@/components/
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DiagramThumbnail } from '@/components/ui/diagram-thumbnail';
+import { Select } from '@/components/ui/select';
 import { coachDiagramDocumentSchemaV1, type CoachDiagramDocumentV1 } from '@/lib/validation/coachDiagramSchemaV1';
 import { renderDiagramSvg } from './svg';
 
@@ -305,20 +306,16 @@ export function CoachDiagramsLibraryPage() {
       {/* Filter */}
       {diagrams.length > 0 && (
         <div className="flex items-center gap-3 mb-4">
-          <label className="text-sm font-medium text-muted-foreground">Filter:</label>
-          <select
+          <Select
+            label="Filter"
             value={filterTenantId}
             onChange={(e) => setFilterTenantId(e.target.value)}
-            className="text-sm border rounded-md px-2 py-1 bg-background"
-          >
-            <option value="all">Alla ({diagrams.length})</option>
-            {tenantOptions.hasGlobal && <option value="global">Globala</option>}
-            {tenantOptions.tenantIds.map((id) => (
-              <option key={id} value={id}>
-                Tenant: {id.slice(0, 8)}...
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: 'all', label: `Alla (${diagrams.length})` },
+              ...(tenantOptions.hasGlobal ? [{ value: 'global', label: 'Globala' }] : []),
+              ...tenantOptions.tenantIds.map((id) => ({ value: id, label: `Tenant: ${id.slice(0, 8)}...` })),
+            ]}
+          />
           <span className="text-xs text-muted-foreground">
             Visar {filteredDiagrams.length} av {diagrams.length} diagram
           </span>

@@ -12,7 +12,7 @@ import {
   FlagIcon,
   DocumentTextIcon,
 } from '@heroicons/react/24/outline';
-import { Card, CardContent, CardHeader, CardTitle, Badge, Button, Input } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Badge, Button, Input, Select } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import type { MarketingUpdate, UpdateType } from '@/lib/marketing/types';
 import { UPDATE_TYPE_OPTIONS, STATUS_OPTIONS } from '@/lib/marketing/types';
@@ -89,26 +89,16 @@ export function UpdateList({ updates, onEdit, onDelete, onPublish, selectedId, i
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1"
           />
-          <select
+          <Select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="all">Alla typer</option>
-            {UPDATE_TYPE_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <select
+            options={[{ value: 'all', label: 'Alla typer' }, ...UPDATE_TYPE_OPTIONS]}
+          />
+          <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="all">Alla status</option>
-            {STATUS_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+            options={[{ value: 'all', label: 'Alla status' }, ...STATUS_OPTIONS]}
+          />
         </div>
       </CardHeader>
       <CardContent className="p-0">

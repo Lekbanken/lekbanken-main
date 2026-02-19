@@ -5,6 +5,7 @@ import { SandboxShell } from '../components/shell/SandboxShellV2';
 import { getModuleById } from '../config/sandbox-modules';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Select } from '@/components/ui/select';
 import { ArtifactRenderer } from './ArtifactRenderer';
 import {
   InteractiveImageEditor,
@@ -368,18 +369,15 @@ export default function SandboxArtifactsPage() {
         <Card className="p-4">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Scenario</label>
-              <select
-                className="h-11 rounded-md border border-input bg-background px-3 text-sm"
+              <Select
+                label="Scenario"
                 value={activeScenarioId}
                 onChange={(e) => setActiveScenario(e.target.value as SandboxArtifactScenarioId)}
-              >
-                {sandboxArtifactScenarios.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
+                options={sandboxArtifactScenarios.map((s) => ({
+                  value: s.id,
+                  label: s.label,
+                }))}
+              />
               {scenario?.description && (
                 <p className="text-xs text-muted-foreground">{scenario.description}</p>
               )}

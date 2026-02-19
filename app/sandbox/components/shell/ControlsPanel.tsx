@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { Select } from '@/components/ui/select';
 
 interface ControlsPanelProps {
   children: ReactNode;
@@ -95,18 +96,12 @@ interface SelectControlProps {
 export function SelectControl({ label, value, options, onChange }: SelectControlProps) {
   return (
     <div className="mb-4 last:mb-0">
-      <label className="mb-1.5 block text-xs font-medium text-foreground">{label}</label>
-      <select
+      <Select
+        label={label}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        options={options}
+      />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
-import { Card, CardContent, CardHeader, CardTitle, Button, Badge, Input } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button, Badge, Input, Select } from '@/components/ui';
 import { ShoppingBagIcon } from '@heroicons/react/24/outline';
 import {
   getShopItems,
@@ -447,41 +447,36 @@ export default function MarketplaceAdminPage() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
-                    <select
+                    <Select
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="bg-muted border border-border text-foreground px-3 py-2 rounded-lg"
-                    >
-                      {formData.category && !ITEM_CATEGORIES.includes(formData.category) && (
-                        <option value={formData.category}>{formData.category}</option>
-                      )}
-                      {ITEM_CATEGORIES.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                        </option>
-                      ))}
-                    </select>
+                      options={[
+                        ...(formData.category && !ITEM_CATEGORIES.includes(formData.category)
+                          ? [{ value: formData.category, label: formData.category }]
+                          : []),
+                        ...ITEM_CATEGORIES.map((cat) => ({
+                          value: cat,
+                          label: cat.charAt(0).toUpperCase() + cat.slice(1),
+                        })),
+                      ]}
+                    />
                     <Input
                       type="number"
                       placeholder="Price"
                       value={formData.price}
                       onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
                     />
-                    <select
+                    <Select
                       value={formData.currency_id}
                       onChange={(e) => setFormData({ ...formData, currency_id: e.target.value })}
-                      className="bg-muted border border-border text-foreground px-3 py-2 rounded-lg"
-                    >
-                      {currencies.length === 0 ? (
-                        <option value="">No currencies</option>
-                      ) : (
-                        currencies.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.name} ({c.code})
-                          </option>
-                        ))
-                      )}
-                    </select>
+                      options={currencies.length === 0
+                        ? [{ value: '', label: 'No currencies' }]
+                        : currencies.map((c) => ({
+                            value: c.id,
+                            label: `${c.name} (${c.code})`,
+                          }))
+                      }
+                    />
                     <Input
                       type="number"
                       placeholder="Quantity Limit (optional)"

@@ -1,4 +1,5 @@
 import { AdjustmentsHorizontalIcon, Squares2X2Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Select } from "@/components/ui/select";
 import { ListBulletIcon } from "@heroicons/react/24/solid";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
@@ -100,20 +101,12 @@ export function FilterBar({ filters, options, sort, view, total, onOpen, onClear
 
       <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
         <span className="hidden sm:inline">{t("activitiesCount", { count: total })}</span>
-        <label className="flex items-center gap-1">
-          <span className="text-xs text-muted-foreground">{t("sort")}</span>
-          <select
-            value={sort}
-            onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="rounded-lg border border-border/60 bg-card px-2 py-1 text-xs text-foreground"
-          >
-            {Object.entries(sortLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          value={sort}
+          onChange={(e) => onSortChange(e.target.value as SortOption)}
+          options={Object.entries(sortLabels).map(([value, label]) => ({ value, label }))}
+          className="w-auto min-w-[120px] text-xs"
+        />
 
         <div className="flex items-center rounded-full border border-border/60 bg-card">
           <button

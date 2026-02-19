@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Card, Button } from '@/components/ui';
+import { Card, Button, Select } from '@/components/ui';
 import {
   PlayIcon,
   PauseIcon,
@@ -222,17 +222,17 @@ export function SessionReplay({ sessionId, events: initialEvents, autoLoad = tru
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <select
-            value={playbackSpeed}
+          <Select
+            value={String(playbackSpeed)}
             onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
-            className="text-sm border rounded px-2 py-1 bg-background"
-          >
-            <option value={0.5}>0.5x</option>
-            <option value={1}>1x</option>
-            <option value={2}>2x</option>
-            <option value={5}>5x</option>
-            <option value={10}>10x</option>
-          </select>
+            options={[
+              { value: '0.5', label: '0.5x' },
+              { value: '1', label: '1x' },
+              { value: '2', label: '2x' },
+              { value: '5', label: '5x' },
+              { value: '10', label: '10x' },
+            ]}
+          />
         </div>
       </div>
 

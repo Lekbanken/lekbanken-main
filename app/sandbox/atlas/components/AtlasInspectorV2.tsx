@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
+import { Select } from '@/components/ui/select';
 import type { AtlasEdge, AtlasEntity, AtlasSelection } from '../types';
 import {
   CLEANUP_STATUS_OPTIONS,
@@ -426,35 +427,23 @@ export function AtlasInspectorV2({
 
         {/* Cleanup status */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-muted-foreground">Cleanup Status</label>
-          <select
+          <Select
+            label="Cleanup Status"
             value={annotation?.cleanup_status ?? 'not_started'}
             onChange={(e) => onSetCleanupStatus(selected.id, e.target.value as CleanupStatus)}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            {CLEANUP_STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            options={CLEANUP_STATUS_OPTIONS}
+          />
         </div>
 
         {/* Translation status (only for routes) */}
         {isRoute && (
           <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">Translation Status</label>
-            <select
+            <Select
+              label="Translation Status"
               value={annotation?.translation_status ?? 'n/a'}
               onChange={(e) => onSetTranslationStatus(selected.id, e.target.value as TranslationStatus)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              {TRANSLATION_STATUS_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+              options={TRANSLATION_STATUS_OPTIONS}
+            />
           </div>
         )}
 

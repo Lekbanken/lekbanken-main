@@ -6,7 +6,7 @@ import {
   XMarkIcon,
   CheckIcon,
 } from '@heroicons/react/24/outline';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Textarea, Label, Badge } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Textarea, Label, Badge, Select } from '@/components/ui';
 import type { MarketingFeature } from '@/lib/marketing/types';
 import type { FeatureFormData } from '../types';
 import { EMPTY_FEATURE_FORM } from '../types';
@@ -145,44 +145,32 @@ export function FeatureEditor({ feature, onSave, onCancel, isPending }: FeatureE
 
           {/* Filter dimensions */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="audience">{t('audience')}</Label>
-              <select
+            <div>
+              <Select
                 id="audience"
                 value={formData.audience}
                 onChange={(e) => setFormData(prev => ({ ...prev, audience: e.target.value as typeof formData.audience }))}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                {AUDIENCE_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+                options={AUDIENCE_OPTIONS}
+                label={t('audience')}
+              />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="useCase">{t('useCase')}</Label>
-              <select
+            <div>
+              <Select
                 id="useCase"
                 value={formData.useCase}
                 onChange={(e) => setFormData(prev => ({ ...prev, useCase: e.target.value as typeof formData.useCase }))}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                {USE_CASE_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+                options={USE_CASE_OPTIONS}
+                label={t('useCase')}
+              />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="context">{t('context')}</Label>
-              <select
+            <div>
+              <Select
                 id="context"
                 value={formData.context}
                 onChange={(e) => setFormData(prev => ({ ...prev, context: e.target.value as typeof formData.context }))}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                {CONTEXT_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+                options={CONTEXT_OPTIONS}
+                label={t('context')}
+              />
             </div>
           </div>
 
@@ -243,18 +231,14 @@ export function FeatureEditor({ feature, onSave, onCancel, isPending }: FeatureE
                 onChange={(e) => setFormData(prev => ({ ...prev, priority: parseInt(e.target.value) || 0 }))}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">{t('status')}</Label>
-              <select
+            <div>
+              <Select
                 id="status"
                 value={formData.status}
                 onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as typeof formData.status }))}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                {STATUS_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+                options={STATUS_OPTIONS}
+                label={t('status')}
+              />
             </div>
           </div>
 

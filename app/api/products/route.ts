@@ -3,23 +3,31 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 import { validateProductPayload } from '@/lib/validation/products'
 import { isSystemAdmin } from '@/lib/utils/tenantAuth'
 import type { Database } from '@/types/supabase'
+import { TimeoutError } from '@/lib/utils/withTimeout'
 
 type ProductRow = Database['public']['Tables']['products']['Row']
 
 export async function GET() {
-  const supabase = await createServerRlsClient()
+  try {
+    const supabase = await createServerRlsClient()
 
-  const { data, error } = await supabase
-    .from('products')
-    .select('*,purposes:product_purposes(purpose:purposes(*))')
-    .order('created_at', { ascending: false })
+    const { data, error } = await supabase
+      .from('products')
+      .select('*,purposes:product_purposes(purpose:purposes(*))')
+      .order('created_at', { ascending: false })
 
-  if (error) {
-    console.error('[api/products] fetch error', error)
-    return NextResponse.json({ error: 'Failed to load products' }, { status: 500 })
+    if (error) {
+      console.error('[api/products] fetch error', error)
+      return NextResponse.json({ error: 'Failed to load products' }, { status: 500 })
+    }
+
+    return NextResponse.json({ products: data ?? [] })
+  } catch (err) {
+    const status = err instanceof TimeoutError ? 504 : 500
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[api/products] unhandled error', err)
+    return NextResponse.json({ error: 'Failed to load products', details: message }, { status })
   }
-
-  return NextResponse.json({ products: data ?? [] })
 }
 
 export async function POST(request: Request) {

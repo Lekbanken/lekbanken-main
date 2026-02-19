@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { Select } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { ArrowPathIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { usePlayBroadcast } from '@/features/play/hooks/usePlayBroadcast';
@@ -318,17 +319,15 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
           </label>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-          <label className="flex items-center gap-2">
-            {t('countdown.variantLabel')}
-            <select
-              className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
-              value={countdownVariant}
-              onChange={(e) => setCountdownVariant(e.target.value as 'default' | 'dramatic')}
-            >
-              <option value="default">{t('countdown.variantDefault')}</option>
-              <option value="dramatic">{t('countdown.variantDramatic')}</option>
-            </select>
-          </label>
+          <Select
+            label={t('countdown.variantLabel')}
+            value={countdownVariant}
+            onChange={(e) => setCountdownVariant(e.target.value as 'default' | 'dramatic')}
+            options={[
+              { value: 'default', label: t('countdown.variantDefault') },
+              { value: 'dramatic', label: t('countdown.variantDramatic') },
+            ]}
+          />
           <div className="ml-auto flex gap-2">
             <Button
               size="sm"
@@ -368,51 +367,37 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
-          <label className="text-xs text-muted-foreground space-y-1">
-            {t('storyOverlay.sourceLabel')}
-            <select
-              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
-              value={storySource}
-              onChange={(e) => setStorySource(e.target.value as 'step' | 'phase' | 'custom')}
-            >
-              <option value="step">{t('storyOverlay.sourceStep')}</option>
-              <option value="phase">{t('storyOverlay.sourcePhase')}</option>
-              <option value="custom">{t('storyOverlay.sourceCustom')}</option>
-            </select>
-          </label>
+          <Select
+            label={t('storyOverlay.sourceLabel')}
+            value={storySource}
+            onChange={(e) => setStorySource(e.target.value as 'step' | 'phase' | 'custom')}
+            options={[
+              { value: 'step', label: t('storyOverlay.sourceStep') },
+              { value: 'phase', label: t('storyOverlay.sourcePhase') },
+              { value: 'custom', label: t('storyOverlay.sourceCustom') },
+            ]}
+          />
 
           {storySource === 'step' && (
-            <label className="text-xs text-muted-foreground space-y-1 md:col-span-2">
-              {t('storyOverlay.stepLabel')}
-              <select
-                className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+            <div className="md:col-span-2">
+              <Select
+                label={t('storyOverlay.stepLabel')}
                 value={storyStepId}
                 onChange={(e) => setStoryStepId(e.target.value)}
-              >
-                {steps.map((step, index) => (
-                  <option key={step.id} value={step.id}>
-                    {index + 1}. {step.title}
-                  </option>
-                ))}
-              </select>
-            </label>
+                options={steps.map((step, index) => ({ value: step.id, label: `${index + 1}. ${step.title}` }))}
+              />
+            </div>
           )}
 
           {storySource === 'phase' && (
-            <label className="text-xs text-muted-foreground space-y-1 md:col-span-2">
-              {t('storyOverlay.phaseLabel')}
-              <select
-                className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+            <div className="md:col-span-2">
+              <Select
+                label={t('storyOverlay.phaseLabel')}
                 value={storyPhaseId}
                 onChange={(e) => setStoryPhaseId(e.target.value)}
-              >
-                {phases.map((phase, index) => (
-                  <option key={phase.id} value={phase.id}>
-                    {index + 1}. {phase.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+                options={phases.map((phase, index) => ({ value: phase.id, label: `${index + 1}. ${phase.name}` }))}
+              />
+            </div>
           )}
         </div>
 
@@ -436,33 +421,29 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
         </label>
 
         <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-          <label className="flex items-center gap-2">
-            {t('storyOverlay.speedLabel')}
-            <select
-              className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
-              value={storySpeed}
-              onChange={(e) =>
-                setStorySpeed(e.target.value as 'fast' | 'normal' | 'dramatic' | 'instant')
-              }
-            >
-              <option value="instant">{t('storyOverlay.speedInstant')}</option>
-              <option value="fast">{t('storyOverlay.speedFast')}</option>
-              <option value="normal">{t('storyOverlay.speedNormal')}</option>
-              <option value="dramatic">{t('storyOverlay.speedDramatic')}</option>
-            </select>
-          </label>
-          <label className="flex items-center gap-2">
-            {t('storyOverlay.themeLabel')}
-            <select
-              className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
-              value={storyTheme}
-              onChange={(e) => setStoryTheme(e.target.value as 'dark' | 'light' | 'dramatic')}
-            >
-              <option value="dark">{t('storyOverlay.themeDark')}</option>
-              <option value="light">{t('storyOverlay.themeLight')}</option>
-              <option value="dramatic">{t('storyOverlay.themeDramatic')}</option>
-            </select>
-          </label>
+          <Select
+            label={t('storyOverlay.speedLabel')}
+            value={storySpeed}
+            onChange={(e) =>
+              setStorySpeed(e.target.value as 'fast' | 'normal' | 'dramatic' | 'instant')
+            }
+            options={[
+              { value: 'instant', label: t('storyOverlay.speedInstant') },
+              { value: 'fast', label: t('storyOverlay.speedFast') },
+              { value: 'normal', label: t('storyOverlay.speedNormal') },
+              { value: 'dramatic', label: t('storyOverlay.speedDramatic') },
+            ]}
+          />
+          <Select
+            label={t('storyOverlay.themeLabel')}
+            value={storyTheme}
+            onChange={(e) => setStoryTheme(e.target.value as 'dark' | 'light' | 'dramatic')}
+            options={[
+              { value: 'dark', label: t('storyOverlay.themeDark') },
+              { value: 'light', label: t('storyOverlay.themeLight') },
+              { value: 'dramatic', label: t('storyOverlay.themeDramatic') },
+            ]}
+          />
           <div className="flex items-center gap-2">
             <Switch
               id="story-progress"
@@ -662,28 +643,20 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
                       }}
                     />
                   </label>
-                  <label className="flex items-center gap-2">
-                    {t('steps.displayLabel')}
-                    <select
-                      className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
-                      value={displayMode ?? 'instant'}
-                      onChange={(e) =>
-                        setStepDrafts((prev) => ({
-                          ...prev,
-                          [step.id]: {
-                            ...prev[step.id],
-                            display_mode: e.target.value as StepDraft['display_mode'],
-                          },
-                        }))
-                      }
-                    >
-                      {Object.entries(displayModeLabels).map(([value, label]) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <Select
+                    label={t('steps.displayLabel')}
+                    value={displayMode ?? 'instant'}
+                    onChange={(e) =>
+                      setStepDrafts((prev) => ({
+                        ...prev,
+                        [step.id]: {
+                          ...prev[step.id],
+                          display_mode: e.target.value as StepDraft['display_mode'],
+                        },
+                      }))
+                    }
+                    options={Object.entries(displayModeLabels).map(([value, label]) => ({ value, label }))}
+                  />
                 </div>
               </Card>
             );

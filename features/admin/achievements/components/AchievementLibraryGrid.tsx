@@ -3,6 +3,7 @@
 import type { ChangeEvent } from "react";
 import { MagnifyingGlassIcon, FunnelIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui";
+import { Select } from "@/components/ui/select";
 import type { AchievementFilters, AchievementItem, AchievementTheme } from "../types";
 import { AchievementLibraryCard } from "./AchievementLibraryCard";
 
@@ -63,47 +64,42 @@ export function AchievementLibraryGrid({
         {/* Theme Filter */}
         <div className="flex items-center gap-2">
           <FunnelIcon className="h-4 w-4 text-muted-foreground" />
-          <select
+          <Select
             aria-label="Filter by theme"
             value={filters.theme}
             onChange={handleTheme}
-            className="rounded-lg border border-border/60 bg-background px-3 py-2 text-sm 
-                       cursor-pointer transition-colors hover:border-primary/40
-                       focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="all">All themes</option>
-            {Object.entries(themes).map(([id, theme]) => (
-              <option key={id} value={id}>{theme.name}</option>
-            ))}
-          </select>
+            options={[
+              { value: 'all', label: 'All themes' },
+              ...Object.entries(themes).map(([id, theme]) => ({
+                value: id,
+                label: theme.name,
+              })),
+            ]}
+          />
         </div>
 
         {/* Status Filter */}
-        <select
+        <Select
           aria-label="Filter by status"
           value={filters.status}
           onChange={handleStatus}
-          className="rounded-lg border border-border/60 bg-background px-3 py-2 text-sm 
-                     cursor-pointer transition-colors hover:border-primary/40
-                     focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-        >
-          <option value="all">All statuses</option>
-          <option value="draft">Draft</option>
-          <option value="published">Published</option>
-        </select>
+          options={[
+            { value: 'all', label: 'All statuses' },
+            { value: 'draft', label: 'Draft' },
+            { value: 'published', label: 'Published' },
+          ]}
+        />
 
         {/* Sort */}
-        <select
+        <Select
           aria-label="Sort achievements"
           value={filters.sort}
           onChange={handleSort}
-          className="rounded-lg border border-border/60 bg-background px-3 py-2 text-sm 
-                     cursor-pointer transition-colors hover:border-primary/40
-                     focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-        >
-          <option value="recent">Most rewarding</option>
-          <option value="name">Name A-Z</option>
-        </select>
+          options={[
+            { value: 'recent', label: 'Most rewarding' },
+            { value: 'name', label: 'Name A-Z' },
+          ]}
+        />
 
         {/* Create Button */}
         <Button size="sm" onClick={onCreate} className="gap-1.5 ml-auto">

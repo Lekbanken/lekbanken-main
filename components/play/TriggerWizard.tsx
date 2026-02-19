@@ -13,6 +13,7 @@ import type {
 import { CONDITION_OPTIONS, ACTION_OPTIONS, getActionIcon } from '@/types/trigger';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -399,20 +400,20 @@ export const TriggerWizard = forwardRef<HTMLDivElement, TriggerWizardProps>(
               {/* Target Selection */}
               {conditionNeedsTarget && (
                 <div className="mt-4 p-4 bg-surface-secondary rounded-lg">
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Select target:
-                  </label>
                   {getTargetOptions().length > 0 ? (
-                    <select
+                    <Select
+                      label="Select target:"
                       value={conditionTargetId}
                       onChange={(e) => setConditionTargetId(e.target.value)}
-                      className="w-full px-3 py-2 bg-surface-primary border border-border rounded-md text-foreground"
-                    >
-                      <option value="">Choose...</option>
-                      {getTargetOptions().map(opt => (
-                        <option key={opt.id} value={opt.id}>{opt.name}</option>
-                      ))}
-                    </select>
+                      placeholder="Choose..."
+                      options={[
+                        { value: '', label: 'Choose...' },
+                        ...getTargetOptions().map(opt => ({
+                          value: opt.id,
+                          label: opt.name,
+                        })),
+                      ]}
+                    />
                   ) : (
                     <Input
                       value={conditionTargetId}

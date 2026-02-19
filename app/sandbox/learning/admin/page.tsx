@@ -13,6 +13,7 @@ import {
   ArchiveBoxIcon
 } from '@heroicons/react/24/outline'
 import type { CourseStatus, CourseDifficulty } from '@/types/learning'
+import { Select } from '@/components/ui/select'
 
 // Simplified mock type for sandbox (avoids strict typing for prototyping)
 type MockCourse = {
@@ -194,18 +195,17 @@ export default function AdminCoursesPage() {
               className="w-full rounded-lg border border-border bg-background py-2 pl-10 pr-4 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
-          <div className="relative">
-            <FunnelIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <select
+          <div>
+            <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as CourseStatus | 'all')}
-              className="rounded-lg border border-border bg-background py-2 pl-10 pr-8 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            >
-              <option value="all">Alla status</option>
-              <option value="active">Aktiva</option>
-              <option value="draft">Utkast</option>
-              <option value="archived">Arkiverade</option>
-            </select>
+              options={[
+                { value: 'all', label: 'Alla status' },
+                { value: 'active', label: 'Aktiva' },
+                { value: 'draft', label: 'Utkast' },
+                { value: 'archived', label: 'Arkiverade' },
+              ]}
+            />
           </div>
         </div>
 
@@ -327,16 +327,16 @@ export default function AdminCoursesPage() {
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-foreground">Nivå</label>
-                    <select
-                      defaultValue={selectedCourse?.difficulty || 'beginner'}
-                      className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                    >
-                      <option value="beginner">Nybörjare</option>
-                      <option value="intermediate">Medel</option>
-                      <option value="advanced">Avancerad</option>
-                      <option value="expert">Expert</option>
-                    </select>
+                    <Select
+                      label="Nivå"
+                      value={selectedCourse?.difficulty || 'beginner'}
+                      options={[
+                        { value: 'beginner', label: 'Nybörjare' },
+                        { value: 'intermediate', label: 'Medel' },
+                        { value: 'advanced', label: 'Avancerad' },
+                        { value: 'expert', label: 'Expert' },
+                      ]}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground">Godkänd poäng (%)</label>

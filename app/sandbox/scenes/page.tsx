@@ -7,6 +7,7 @@ import { getModuleById } from '../config/sandbox-modules';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 
 import { ArtifactRenderer } from '../artifacts/ArtifactRenderer';
 import { getSandboxArtifactScenarioById } from '../artifacts/registry';
@@ -119,18 +120,15 @@ export default function SandboxScenesPrototypePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <div className="text-sm font-medium">Participant</div>
-              <select
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+              <Select
+                label="Participant"
                 value={activeParticipantId}
                 onChange={(e) => setActiveParticipant(e.target.value)}
-              >
-                {participants.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} ({p.currentSceneKey})
-                  </option>
-                ))}
-              </select>
+                options={participants.map((p) => ({
+                  value: p.id,
+                  label: `${p.name} (${p.currentSceneKey})`,
+                }))}
+              />
 
               <div className="text-xs text-muted-foreground">
                 currentSceneKey: <span className="font-mono">{activeSceneKey}</span>

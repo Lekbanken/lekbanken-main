@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from '@/components/ui'
 import {
   PuzzlePieceIcon,
   MagnifyingGlassIcon,
@@ -185,26 +185,24 @@ export default function AdminContentSandbox() {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <select
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  <Select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                  >
-                    <option value="">Alla kategorier</option>
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                  <select
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    options={[
+                      { value: '', label: 'Alla kategorier' },
+                      ...CATEGORIES.map((cat) => ({ value: cat, label: cat })),
+                    ]}
+                  />
+                  <Select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                  >
-                    <option value="">Alla status</option>
-                    <option value="published">Publicerad</option>
-                    <option value="draft">Utkast</option>
-                    <option value="pending">Granskas</option>
-                  </select>
+                    options={[
+                      { value: '', label: 'Alla status' },
+                      { value: 'published', label: 'Publicerad' },
+                      { value: 'draft', label: 'Utkast' },
+                      { value: 'pending', label: 'Granskas' },
+                    ]}
+                  />
                 </div>
               </div>
 
@@ -295,20 +293,20 @@ export default function AdminContentSandbox() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
-                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                  <Select
+                    label="Kategori"
+                    options={CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
-                    <option value="draft">Utkast</option>
-                    <option value="pending">Skicka för granskning</option>
-                    <option value="published">Publicerad</option>
-                  </select>
+                  <Select
+                    label="Status"
+                    options={[
+                      { value: 'draft', label: 'Utkast' },
+                      { value: 'pending', label: 'Skicka för granskning' },
+                      { value: 'published', label: 'Publicerad' },
+                    ]}
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4">

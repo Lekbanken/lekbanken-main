@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Select } from '@/components/ui/select'
 import { ArrowPathIcon, ChartBarIcon } from '@heroicons/react/24/outline'
 
 interface UsageMeter {
@@ -121,35 +122,29 @@ export default function UsageAdminPage() {
       {/* Filters */}
       <div className="flex gap-4">
         <div className="w-48">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-            {t('filterMeter')}
-          </label>
-          <select
+          <Select
+            label={t('filterMeter')}
             value={selectedMeter}
             onChange={(e) => setSelectedMeter(e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="all">{t('allMeters')}</option>
-            {data?.meters.map((meter) => (
-              <option key={meter.id} value={meter.slug}>
-                {meter.name}
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: 'all', label: t('allMeters') },
+              ...(data?.meters.map((meter) => ({ value: meter.slug, label: meter.name })) ?? []),
+            ]}
+            className="w-full"
+          />
         </div>
         <div className="w-48">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-            {t('filterPeriod')}
-          </label>
-          <select
+          <Select
+            label={t('filterPeriod')}
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="current">{t('periodCurrent')}</option>
-            <option value="previous">{t('periodPrevious')}</option>
-            <option value="30days">{t('period30Days')}</option>
-          </select>
+            options={[
+              { value: 'current', label: t('periodCurrent') },
+              { value: 'previous', label: t('periodPrevious') },
+              { value: '30days', label: t('period30Days') },
+            ]}
+            className="w-full"
+          />
         </div>
       </div>
 

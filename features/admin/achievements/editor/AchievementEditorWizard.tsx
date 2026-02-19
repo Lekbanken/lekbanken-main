@@ -11,6 +11,7 @@ import { CircleBackgroundPicker, CardBackgroundPicker } from './components/Previ
 import { ContrastTip } from './components/ContrastTip';
 import { RandomizeButton, useRandomBadge } from './components/RandomBadgeGenerator';
 import { PresetManager } from './components/PresetManager';
+import { Select } from '@/components/ui/select';
 import { getAssetsByType, getAssetById, resolveAssetUrl } from '../assets';
 import type { AchievementItem, AchievementIconConfig, AchievementTheme } from '../types';
 import { themes } from '../data';
@@ -618,20 +619,21 @@ function MetadataStep({ draft, updateDraft }: MetadataStepProps) {
 
         {/* Category */}
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground">{t('categoryLabel')}</label>
-          <select
+          <Select
+            label={t('categoryLabel')}
             value={draft.category || ''}
             onChange={(e) => updateDraft({ category: e.target.value || undefined })}
-            className="w-full px-4 py-2.5 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="">{t('categoryPlaceholder')}</option>
-            <option value="spel">{t('categories.games')}</option>
-            <option value="social">{t('categories.social')}</option>
-            <option value="prestation">{t('categories.achievement')}</option>
-            <option value="larande">{t('categories.learning')}</option>
-            <option value="event">{t('categories.event')}</option>
-            <option value="special">{t('categories.special')}</option>
-          </select>
+            placeholder={t('categoryPlaceholder')}
+            options={[
+              { value: '', label: t('categoryPlaceholder') },
+              { value: 'spel', label: t('categories.games') },
+              { value: 'social', label: t('categories.social') },
+              { value: 'prestation', label: t('categories.achievement') },
+              { value: 'larande', label: t('categories.learning') },
+              { value: 'event', label: t('categories.event') },
+              { value: 'special', label: t('categories.special') },
+            ]}
+          />
           <p className="text-xs text-muted-foreground">
             {t('categoryTip')}
           </p>

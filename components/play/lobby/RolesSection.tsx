@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { Role, Participant } from '@/types/lobby';
 import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 import {
   PlusIcon,
   PencilIcon,
@@ -293,19 +294,19 @@ export const RolesSection = forwardRef<HTMLDivElement, RolesSectionProps>(
                   <UserIcon className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">{participant.name}</span>
                   {canEdit && onAssignRole && roles.length > 0 && (
-                    <select
+                    <Select
                       value=""
                       onChange={(e) => onAssignRole(participant.id, e.target.value || undefined)}
-                      className="text-xs bg-muted border border-border rounded px-1.5 py-0.5 ml-2"
                       aria-label={`Tilldela roll till ${participant.name}`}
-                    >
-                      <option value="">Tilldela...</option>
-                      {roles.map((role) => (
-                        <option key={role.id} value={role.id}>
-                          {role.icon ? `${role.icon} ` : ''}{role.name}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="Tilldela..."
+                      options={[
+                        { value: '', label: 'Tilldela...' },
+                        ...roles.map((role) => ({
+                          value: role.id,
+                          label: `${role.icon ? `${role.icon} ` : ''}${role.name}`,
+                        })),
+                      ]}
+                    />
                   )}
                 </div>
               ))}

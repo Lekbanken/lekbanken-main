@@ -13,7 +13,7 @@ import {
   AdminErrorState,
 } from '@/components/admin/shared';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge, Input } from '@/components/ui';
+import { Badge, Input, Select } from '@/components/ui';
 import {
   KeyIcon,
   CheckCircleIcon,
@@ -201,17 +201,17 @@ export default function LicensesPage() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full sm:w-80"
         />
-        <select
+        <Select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-          className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
-        >
-          <option value="all">Alla statusar</option>
-          <option value="active">Aktiv</option>
-          <option value="trial">Testperiod</option>
-          <option value="expired">Utgången</option>
-          <option value="suspended">Pausad</option>
-        </select>
+          options={[
+            { value: 'all', label: 'Alla statusar' },
+            { value: 'active', label: 'Aktiv' },
+            { value: 'trial', label: 'Testperiod' },
+            { value: 'expired', label: 'Utgången' },
+            { value: 'suspended', label: 'Pausad' },
+          ]}
+        />
       </div>
 
       {isLoading ? (

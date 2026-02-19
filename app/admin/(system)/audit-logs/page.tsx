@@ -10,7 +10,7 @@ import {
   AdminStatCard,
   AdminStatGrid,
 } from '@/components/admin/shared'
-import { Card, CardContent, CardHeader, CardTitle, Badge } from '@/components/ui'
+import { Card, CardContent, CardHeader, CardTitle, Badge, Select } from '@/components/ui'
 import {
   ClipboardDocumentListIcon,
   FunnelIcon,
@@ -262,39 +262,39 @@ export default function AuditLogsPage() {
 
             {/* Action Type */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">{t('filters.action')}</label>
-              <select
+              <Select
+                label={t('filters.action')}
                 value={actionFilter}
                 onChange={(e) => setActionFilter(e.target.value as ActionType)}
-                className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
-              >
-                <option value="all">{t('filters.actions.all')}</option>
-                <option value="create">{t('filters.actions.create')}</option>
-                <option value="update">{t('filters.actions.update')}</option>
-                <option value="delete">{t('filters.actions.delete')}</option>
-                <option value="login">{t('filters.actions.login')}</option>
-                <option value="logout">{t('filters.actions.logout')}</option>
-              </select>
+                options={[
+                  { value: 'all', label: t('filters.actions.all') },
+                  { value: 'create', label: t('filters.actions.create') },
+                  { value: 'update', label: t('filters.actions.update') },
+                  { value: 'delete', label: t('filters.actions.delete') },
+                  { value: 'login', label: t('filters.actions.login') },
+                  { value: 'logout', label: t('filters.actions.logout') },
+                ]}
+                className="w-full"
+              />
             </div>
 
             {/* Resource Type */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                {t('filters.resourceType')}
-              </label>
-              <select
+              <Select
+                label={t('filters.resourceType')}
                 value={resourceFilter}
                 onChange={(e) => setResourceFilter(e.target.value as ResourceType)}
-                className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
-              >
-                <option value="all">{t('filters.resources.all')}</option>
-                <option value="game">{t('filters.resources.game')}</option>
-                <option value="product">{t('filters.resources.product')}</option>
-                <option value="user">{t('filters.resources.user')}</option>
-                <option value="tenant">{t('filters.resources.tenant')}</option>
-                <option value="media">{t('filters.resources.media')}</option>
-                <option value="achievement">{t('filters.resources.achievement')}</option>
-              </select>
+                options={[
+                  { value: 'all', label: t('filters.resources.all') },
+                  { value: 'game', label: t('filters.resources.game') },
+                  { value: 'product', label: t('filters.resources.product') },
+                  { value: 'user', label: t('filters.resources.user') },
+                  { value: 'tenant', label: t('filters.resources.tenant') },
+                  { value: 'media', label: t('filters.resources.media') },
+                  { value: 'achievement', label: t('filters.resources.achievement') },
+                ]}
+                className="w-full"
+              />
             </div>
           </div>
 

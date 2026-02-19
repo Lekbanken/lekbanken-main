@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui';
+import { useToast, Select } from '@/components/ui';
 import { CopyButton } from '@/components/ui/copy-button';
 import {
   FieldLabel,
@@ -232,18 +232,13 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
                 description={t('fields.unitLabelDescription', { unit: unitLabel })}
                 required
               />
-              <select
+              <Select
                 value={unitLabel}
                 onChange={(e) => setUnitLabel(e.target.value as UnitLabelType)}
-                className="w-full mt-2 px-3 py-2 border border-input rounded-md bg-background text-sm"
+                options={UNIT_LABELS}
                 disabled={isSaving}
-              >
-                {UNIT_LABELS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                className="w-full mt-2"
+              />
             </div>
 
             {/* Statement Descriptor */}
@@ -285,18 +280,13 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
                 fieldName="feature_tier"
                 description={t('fields.featureTierDescription')}
               />
-              <select
+              <Select
                 value={featureTier}
                 onChange={(e) => setFeatureTier(e.target.value as FeatureTierType)}
-                className="w-full mt-2 px-3 py-2 border border-input rounded-md bg-background text-sm"
+                options={FEATURE_TIERS}
                 disabled={isSaving}
-              >
-                {FEATURE_TIERS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                className="w-full mt-2"
+              />
             </div>
 
             {/* Read-only Stripe Info */}

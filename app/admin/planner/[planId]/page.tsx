@@ -13,7 +13,7 @@ import {
   AdminErrorState,
   AdminConfirmDialog,
 } from "@/components/admin/shared";
-import { Badge, Button, LoadingState, useToast } from "@/components/ui";
+import { Badge, Button, LoadingState, Select, useToast } from "@/components/ui";
 import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { useTenant } from "@/lib/context/TenantContext";
 import { StatusBadge } from "@/features/planner/components/StatusBadge";
@@ -363,20 +363,19 @@ export default function AdminPlannerDetailPage() {
               </span>
             )}
             {plan._capabilities?.canUpdate && plan.status !== 'archived' && (
-              <select
+              <Select
                 value={plan.visibility}
                 onChange={(event) =>
                   void handleVisibilityChange(event.target.value as PlannerVisibility)
                 }
                 disabled={isPending}
-                className="rounded-lg border border-border bg-background px-2 py-1 text-xs"
-              >
-                {(["private", "tenant", "public"] as const).map((value) => (
-                  <option key={value} value={value} disabled={!canSetVisibility(plan, value)}>
-                    {VISIBILITY_LABELS[value]}
-                  </option>
-                ))}
-              </select>
+                options={(["private", "tenant", "public"] as const).map((value) => ({
+                  value,
+                  label: VISIBILITY_LABELS[value],
+                  disabled: !canSetVisibility(plan, value),
+                }))}
+                className="w-auto min-w-[120px] text-xs"
+              />
             )}
             {plan._capabilities?.canStartRun && plan.status !== 'archived' && (
               <Button size="sm" variant="outline" href={`/app/play/${plan.id}/start`}>

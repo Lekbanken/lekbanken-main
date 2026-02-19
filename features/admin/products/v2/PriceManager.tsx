@@ -30,7 +30,7 @@ import { StarIcon } from '@heroicons/react/24/solid';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui';
+import { useToast, Select } from '@/components/ui';
 
 // =============================================================================
 // TYPES
@@ -590,44 +590,32 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
         
         {/* Currency */}
         <div>
-          <label className="block text-sm font-medium mb-1">{t('form.currency')}</label>
-          <select
+          <Select
             value={currency}
             onChange={(e) => setCurrency(e.target.value as 'NOK' | 'SEK' | 'EUR')}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            {CURRENCIES.map(c => (
-              <option key={c.value} value={c.value}>{c.label}</option>
-            ))}
-          </select>
+            options={CURRENCIES}
+            label={t('form.currency')}
+          />
         </div>
         
         {/* Interval */}
         <div>
-          <label className="block text-sm font-medium mb-1">{t('form.billing')}</label>
-          <select
+          <Select
             value={interval}
             onChange={(e) => handleIntervalChange(e.target.value as 'month' | 'year' | 'one_time')}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            {INTERVALS.map(i => (
-              <option key={i.value} value={i.value}>{i.label}</option>
-            ))}
-          </select>
+            options={INTERVALS}
+            label={t('form.billing')}
+          />
         </div>
         
         {/* Tax Behavior */}
         <div>
-          <label className="block text-sm font-medium mb-1">{t('form.taxBehavior')}</label>
-          <select
+          <Select
             value={taxBehavior}
             onChange={(e) => handleTaxBehaviorChange(e.target.value as 'inclusive' | 'exclusive' | 'unspecified')}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            {TAX_BEHAVIORS.map(tb => (
-              <option key={tb.value} value={tb.value}>{tb.label}</option>
-            ))}
-          </select>
+            options={TAX_BEHAVIORS}
+            label={t('form.taxBehavior')}
+          />
           {showTaxWarning && stripeProductId && (
             <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
               <ExclamationTriangleIcon className="h-3 w-3" />

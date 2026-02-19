@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@/components/ui'
+import { Card, CardContent, CardHeader, CardTitle, Badge, Button, Select } from '@/components/ui'
 import {
   BellIcon,
   ArrowPathIcon,
@@ -166,29 +166,27 @@ export default function NotificationHistoryPage() {
             
             <div className="flex gap-2 flex-wrap items-center">
               {isSystemAdmin && tenants.length > 0 && (
-                <select
+                <Select
                   value={selectedTenantId ?? ''}
                   onChange={(e) => setSelectedTenantId(e.target.value || undefined)}
-                  className="px-3 py-1.5 border border-border rounded-lg text-sm bg-background text-foreground"
-                >
-                  <option value="">{t('filters.allOrganizations')}</option>
-                  {tenants.map(tenant => (
-                    <option key={tenant.id} value={tenant.id}>{tenant.name}</option>
-                  ))}
-                </select>
+                  options={[
+                    { value: '', label: t('filters.allOrganizations') },
+                    ...tenants.map(tenant => ({ value: tenant.id, label: tenant.name })),
+                  ]}
+                />
               )}
               
-              <select
+              <Select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-3 py-1.5 border border-border rounded-lg text-sm bg-background text-foreground"
-              >
-                <option value="">{t('filters.allCategories')}</option>
-                <option value="support">{t('categories.support')}</option>
-                <option value="system">{t('categories.system')}</option>
-                <option value="learning">{t('categories.learning')}</option>
-                <option value="gamification">{t('categories.gamification')}</option>
-              </select>
+                options={[
+                  { value: '', label: t('filters.allCategories') },
+                  { value: 'support', label: t('categories.support') },
+                  { value: 'system', label: t('categories.system') },
+                  { value: 'learning', label: t('categories.learning') },
+                  { value: 'gamification', label: t('categories.gamification') },
+                ]}
+              />
               
               <Button
                 variant={showUnreadOnly ? 'default' : 'outline'}

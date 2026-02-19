@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Alert } from '@/components/ui/alert'
+import { Select } from '@/components/ui/select'
 import { DemoConversionModal } from '@/components/demo/DemoConversionModal'
 import { UserIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline'
 
@@ -276,23 +277,17 @@ export default function CheckoutStartPage() {
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t('start.fields.plan.label')}</label>
-            <select
-              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+            <Select
+              label={t('start.fields.plan.label')}
               value={selectedPriceId}
               onChange={(e) => setSelectedPriceId(e.target.value)}
               disabled={priceOptions.length === 0}
-            >
-              {priceOptions.length === 0 ? (
-                <option value="">{t('start.fields.plan.loading')}</option>
-              ) : (
-                priceOptions.map((opt) => (
-                  <option key={opt.id} value={opt.id}>
-                    {opt.label}
-                  </option>
-                ))
-              )}
-            </select>
+              options={
+                priceOptions.length === 0
+                  ? [{ value: '', label: t('start.fields.plan.loading') }]
+                  : priceOptions.map((opt) => ({ value: opt.id, label: opt.label }))
+              }
+            />
             <p className="text-xs text-muted-foreground">
               {t('start.noAccount')}{' '}
               <Link href="/auth/signup" className="text-primary hover:text-primary/80">

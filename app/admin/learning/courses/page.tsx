@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -249,51 +250,47 @@ export default function AdminCoursesPage() {
           />
         </div>
 
-        <select
+        <Select
           value={statusFilter}
           onChange={(e) => {
             setStatusFilter(e.target.value as typeof statusFilter);
             setPage(1);
           }}
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-        >
-          <option value="all">{t('filter.allStatuses')}</option>
-          <option value="draft">{t('status.draft')}</option>
-          <option value="active">{t('status.active')}</option>
-          <option value="archived">{t('status.archived')}</option>
-        </select>
+          options={[
+            { value: 'all', label: t('filter.allStatuses') },
+            { value: 'draft', label: t('status.draft') },
+            { value: 'active', label: t('status.active') },
+            { value: 'archived', label: t('status.archived') },
+          ]}
+        />
 
         {isSystemAdmin && (
           <>
-            <select
+            <Select
               value={scopeFilter}
               onChange={(e) => {
                 setScopeFilter(e.target.value as typeof scopeFilter);
                 setPage(1);
               }}
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              <option value="all">{t('filter.allScopes')}</option>
-              <option value="global">{t('filter.global')}</option>
-              <option value="tenant">{t('filter.tenant')}</option>
-            </select>
+              options={[
+                { value: 'all', label: t('filter.allScopes') },
+                { value: 'global', label: t('filter.global') },
+                { value: 'tenant', label: t('filter.tenant') },
+              ]}
+            />
 
             {(scopeFilter === 'tenant' || scopeFilter === 'all') && (
-              <select
+              <Select
                 value={tenantFilter}
                 onChange={(e) => {
                   setTenantFilter(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <option value="">{t('filter.allOrganizations')}</option>
-                {tenants.map((tenant) => (
-                  <option key={tenant.id} value={tenant.id}>
-                    {tenant.name}
-                  </option>
-                ))}
-              </select>
+                options={[
+                  { value: '', label: t('filter.allOrganizations') },
+                  ...tenants.map((tenant) => ({ value: tenant.id, label: tenant.name })),
+                ]}
+              />
             )}
           </>
         )}

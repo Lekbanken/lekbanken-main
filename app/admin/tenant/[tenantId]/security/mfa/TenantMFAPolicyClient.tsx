@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 import { 
   ShieldCheckIcon,
   ShieldExclamationIcon,
@@ -293,24 +294,18 @@ export default function TenantMFAPolicyClient({
         {/* Grace Period */}
         {isEnforced && (
           <div className="space-y-3 pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-foreground">
-              {t('policy.gracePeriod')}
-            </label>
-            <p className="text-sm text-muted-foreground">
-              {t('policy.gracePeriodHelp')}
-            </p>
-            <select
-              value={gracePeriodDays}
+            <Select
+              label={t('policy.gracePeriod')}
+              hint={t('policy.gracePeriodHelp')}
+              value={String(gracePeriodDays)}
               onChange={(e) => setGracePeriodDays(Number(e.target.value))}
               disabled={!canManage}
-              className="w-full md:w-64 px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              {GRACE_PERIOD_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              className="w-full md:w-64"
+              options={GRACE_PERIOD_OPTIONS.map((option) => ({
+                value: String(option.value),
+                label: option.label,
+              }))}
+            />
           </div>
         )}
 
@@ -339,21 +334,17 @@ export default function TenantMFAPolicyClient({
           
           {allowTrustedDevices && (
             <div className="pl-4 border-l-2 border-border ml-2">
-              <label className="block text-sm text-muted-foreground mb-2">
-                {t('policy.trustedDeviceDuration')}
-              </label>
-              <select
-                value={trustedDeviceDays}
+              <Select
+                label={t('policy.trustedDeviceDuration')}
+                value={String(trustedDeviceDays)}
                 onChange={(e) => setTrustedDeviceDays(Number(e.target.value))}
                 disabled={!canManage}
-                className="w-full md:w-64 px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                {DEVICE_TRUST_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                className="w-full md:w-64"
+                options={DEVICE_TRUST_OPTIONS.map((option) => ({
+                  value: String(option.value),
+                  label: option.label,
+                }))}
+              />
             </div>
           )}
         </div>

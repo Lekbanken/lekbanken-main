@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Alert } from '@/components/ui/alert';
+import { Select } from '@/components/ui/select';
 import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
 import {
@@ -343,21 +344,13 @@ export default function PreferencesPage() {
         <CardContent className="space-y-6">
           {/* Timezone */}
           <div>
-            <label htmlFor="timezone" className="block text-sm font-medium text-foreground mb-2">
-              {t('sections.preferences.timezone')}
-            </label>
-            <select
+            <Select
               id="timezone"
+              label={t('sections.preferences.timezone')}
               value={preferences.timezone}
               onChange={(e) => handlePreferenceChange('timezone', e.target.value)}
-              className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground"
-            >
-              {timezones.map((tz) => (
-                <option key={tz.value} value={tz.value}>
-                  {tz.label}
-                </option>
-              ))}
-            </select>
+              options={timezones}
+            />
           </div>
 
           {/* Time Format */}

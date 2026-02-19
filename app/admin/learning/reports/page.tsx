@@ -18,6 +18,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -125,43 +126,33 @@ export default function AdminLearningReportsPage() {
 
       {/* Filters */}
       <div className="mt-6 flex flex-wrap gap-3">
-        <select
-          value={days}
+        <Select
+          value={String(days)}
           onChange={(e) => setDays(Number(e.target.value))}
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-        >
-          {daysOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          options={daysOptions.map((opt) => ({ value: String(opt.value), label: opt.label }))}
+        />
 
         {isSystemAdmin && (
           <>
-            <select
+            <Select
               value={scopeFilter}
               onChange={(e) => setScopeFilter(e.target.value as typeof scopeFilter)}
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              <option value="all">{t('filters.scope.all')}</option>
-              <option value="global">{t('filters.scope.global')}</option>
-              <option value="tenant">{t('filters.scope.tenant')}</option>
-            </select>
+              options={[
+                { value: 'all', label: t('filters.scope.all') },
+                { value: 'global', label: t('filters.scope.global') },
+                { value: 'tenant', label: t('filters.scope.tenant') },
+              ]}
+            />
 
             {(scopeFilter === 'tenant' || scopeFilter === 'all') && (
-              <select
+              <Select
                 value={tenantFilter}
                 onChange={(e) => setTenantFilter(e.target.value)}
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <option value="">{t('filters.tenants.all')}</option>
-                {tenants.map((tenant) => (
-                  <option key={tenant.id} value={tenant.id}>
-                    {tenant.name}
-                  </option>
-                ))}
-              </select>
+                options={[
+                  { value: '', label: t('filters.tenants.all') },
+                  ...tenants.map((tenant) => ({ value: tenant.id, label: tenant.name })),
+                ]}
+              />
             )}
           </>
         )}

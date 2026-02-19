@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select } from '@/components/ui/select';
 import {
   CheckCircleIcon,
   SparklesIcon,
@@ -258,20 +259,21 @@ export default function DemoUpgradePage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="teamSize">{t('form.size')}</Label>
-                  <select
+                  <Select
                     id="teamSize"
                     name="teamSize"
+                    label={t('form.size')}
                     value={formData.teamSize}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  >
-                    <option value="">{t('form.sizePlaceholder')}</option>
-                    <option value="1-10">{t('form.sizeOptions.small')}</option>
-                    <option value="11-50">{t('form.sizeOptions.medium')}</option>
-                    <option value="51-200">{t('form.sizeOptions.large')}</option>
-                    <option value="200+">{t('form.sizeOptions.enterprise')}</option>
-                  </select>
+                    placeholder={t('form.sizePlaceholder')}
+                    options={[
+                      { value: '', label: t('form.sizePlaceholder') },
+                      { value: '1-10', label: t('form.sizeOptions.small') },
+                      { value: '11-50', label: t('form.sizeOptions.medium') },
+                      { value: '51-200', label: t('form.sizeOptions.large') },
+                      { value: '200+', label: t('form.sizeOptions.enterprise') },
+                    ]}
+                  />
                 </div>
 
                 <div>

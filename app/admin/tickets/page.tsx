@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Card, Badge, Input, Button } from '@/components/ui';
+import { Card, Badge, Input, Button, Select } from '@/components/ui';
 import { 
   TicketIcon, 
   ArrowPathIcon, 
@@ -362,49 +362,39 @@ export default function AdminTicketsPage() {
               
               {/* Tenant filter - only for system admin with multiple tenants */}
               {isSystemAdmin && tenants.length > 0 && (
-                <select
+                <Select
                   value={tenantFilter}
                   onChange={(e) => {
                     setTenantFilter(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="px-3 py-2 border border-border rounded-lg text-sm bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="">{t('filters.allOrganizations')}</option>
-                  {tenants.map(t => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
+                  options={[
+                    { value: '', label: t('filters.allOrganizations') },
+                    ...tenants.map(t => ({ value: t.id, label: t.name })),
+                  ]}
+                />
               )}
             </div>
 
             {/* Status and priority filter row */}
             <div className="flex gap-2 flex-wrap items-center">
-              <select
+              <Select
                 value={statusFilter}
                 onChange={(e) => {
                   setStatusFilter(e.target.value as StatusFilter);
                   setCurrentPage(1);
                 }}
-                className="px-3 py-2 border border-border rounded-lg text-sm bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
-                {STATUS_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+                options={STATUS_OPTIONS}
+              />
 
-              <select
+              <Select
                 value={priorityFilter}
                 onChange={(e) => {
                   setPriorityFilter(e.target.value as PriorityFilter);
                   setCurrentPage(1);
                 }}
-                className="px-3 py-2 border border-border rounded-lg text-sm bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
-                {PRIORITY_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+                options={PRIORITY_OPTIONS}
+              />
 
               <Button 
                 variant="outline" 
@@ -596,51 +586,29 @@ export default function AdminTicketsPage() {
 
               {/* Status & Priority controls */}
               <div className="space-y-3">
-                <div>
-                  <label className="text-xs text-muted-foreground font-medium mb-1 block">
-                    {t('detail.status')}
-                  </label>
-                  <select
-                    value={selectedTicket.status}
-                    onChange={(e) => handleStatusChange(selectedTicket.id, e.target.value)}
-                    className="w-full px-2 py-1.5 text-sm border border-border rounded-lg bg-background text-foreground"
-                  >
-                    {STATUS_UPDATE_OPTIONS.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label={t('detail.status')}
+                  value={selectedTicket.status}
+                  onChange={(e) => handleStatusChange(selectedTicket.id, e.target.value)}
+                  options={STATUS_UPDATE_OPTIONS}
+                />
 
-                <div>
-                  <label className="text-xs text-muted-foreground font-medium mb-1 block">
-                    {t('detail.priority')}
-                  </label>
-                  <select
-                    value={selectedTicket.priority}
-                    onChange={(e) => handlePriorityChange(selectedTicket.id, e.target.value)}
-                    className="w-full px-2 py-1.5 text-sm border border-border rounded-lg bg-background text-foreground"
-                  >
-                    {PRIORITY_UPDATE_OPTIONS.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label={t('detail.priority')}
+                  value={selectedTicket.priority}
+                  onChange={(e) => handlePriorityChange(selectedTicket.id, e.target.value)}
+                  options={PRIORITY_UPDATE_OPTIONS}
+                />
 
-                <div>
-                  <label className="text-xs text-muted-foreground font-medium mb-1 block">
-                    {t('detail.assignedTo')}
-                  </label>
-                  <select
-                    value={selectedTicket.assigned_to_user_id || ''}
-                    onChange={(e) => handleAssignChange(selectedTicket.id, e.target.value)}
-                    className="w-full px-2 py-1.5 text-sm border border-border rounded-lg bg-background text-foreground"
-                  >
-                    <option value="">{t('detail.unassigned')}</option>
-                    {assignableUsers.map(u => (
-                      <option key={u.id} value={u.id}>{u.email || u.id}</option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  label={t('detail.assignedTo')}
+                  value={selectedTicket.assigned_to_user_id || ''}
+                  onChange={(e) => handleAssignChange(selectedTicket.id, e.target.value)}
+                  options={[
+                    { value: '', label: t('detail.unassigned') },
+                    ...assignableUsers.map(u => ({ value: u.id, label: u.email || u.id })),
+                  ]}
+                />
               </div>
 
               {/* Messages */}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from '@/components/ui'
 import {
   UsersIcon,
   MagnifyingGlassIcon,
@@ -229,30 +229,28 @@ export default function AdminUsersSandbox() {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <select
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  <Select
                     value={roleFilter}
                     onChange={(e) => setRoleFilter(e.target.value)}
-                  >
-                    <option value="">Alla roller</option>
-                    {ROLES.map((role) => (
-                      <option key={role} value={role}>
-                        {role.charAt(0).toUpperCase() + role.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    options={[
+                      { value: '', label: 'Alla roller' },
+                      ...ROLES.map((role) => ({
+                        value: role,
+                        label: role.charAt(0).toUpperCase() + role.slice(1),
+                      })),
+                    ]}
+                  />
+                  <Select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                  >
-                    <option value="">Alla status</option>
-                    {STATUSES.map((status) => (
-                      <option key={status} value={status}>
-                        {getStatusLabel(status)}
-                      </option>
-                    ))}
-                  </select>
+                    options={[
+                      { value: '', label: 'Alla status' },
+                      ...STATUSES.map((status) => ({
+                        value: status,
+                        label: getStatusLabel(status),
+                      })),
+                    ]}
+                  />
                   <Button variant="outline" size="sm">
                     <FunnelIcon className="h-4 w-4" />
                   </Button>

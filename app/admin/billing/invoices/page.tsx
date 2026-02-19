@@ -13,7 +13,7 @@ import {
   AdminTableToolbar,
   AdminPagination,
 } from '@/components/admin/shared';
-import { Button, Badge, EmptyState } from '@/components/ui';
+import { Button, Badge, EmptyState, Select } from '@/components/ui';
 import {
   DocumentTextIcon,
   CheckCircleIcon,
@@ -464,19 +464,19 @@ export default function InvoicesPage() {
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
         filters={
-          <select
+          <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="all">{t('filter.all')}</option>
-            <option value="paid">{t('filter.paid')}</option>
-            <option value="sent">{t('filter.sent')}</option>
-            <option value="issued">{t('filter.issued')}</option>
-            <option value="overdue">{t('filter.overdue')}</option>
-            <option value="draft">{t('filter.draft')}</option>
-            <option value="canceled">{t('filter.canceled')}</option>
-          </select>
+            options={[
+              { value: 'all', label: t('filter.all') },
+              { value: 'paid', label: t('filter.paid') },
+              { value: 'sent', label: t('filter.sent') },
+              { value: 'issued', label: t('filter.issued') },
+              { value: 'overdue', label: t('filter.overdue') },
+              { value: 'draft', label: t('filter.draft') },
+              { value: 'canceled', label: t('filter.canceled') },
+            ]}
+          />
         }
       />
 
@@ -537,16 +537,16 @@ export default function InvoicesPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <select
+                    <Select
                       value={p.status}
                       onChange={(e) => handleUpdatePaymentStatus(p.id, e.target.value as PaymentStatus)}
-                      className="rounded-md border border-border bg-background px-2 py-1 text-sm"
-                    >
-                      <option value="pending">{t('paymentStatus.pending')}</option>
-                      <option value="confirmed">{t('paymentStatus.confirmed')}</option>
-                      <option value="failed">{t('paymentStatus.failed')}</option>
-                      <option value="refunded">{t('paymentStatus.refunded')}</option>
-                    </select>
+                      options={[
+                        { value: 'pending', label: t('paymentStatus.pending') },
+                        { value: 'confirmed', label: t('paymentStatus.confirmed') },
+                        { value: 'failed', label: t('paymentStatus.failed') },
+                        { value: 'refunded', label: t('paymentStatus.refunded') },
+                      ]}
+                    />
                     <Button variant="outline" size="sm" onClick={() => handleUpdatePaymentStatus(p.id, 'confirmed')}>
                       {t('markAsPaid')}
                     </Button>

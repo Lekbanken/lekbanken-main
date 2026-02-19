@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from 'react';
 import { TrophyIcon } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
-import { Button, Input, Textarea } from '@/components/ui';
+import { Button, Input, Textarea, Select } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import {
   Sheet,
@@ -228,39 +228,28 @@ export function AchievementEditorDrawer({
           {/* Tenant (conditional) */}
           {scope === 'tenant' && (
             <div className="space-y-2">
-              <Label htmlFor="tenant">{t('fields.tenant.label')}</Label>
-              <select
+              <Select
                 id="tenant"
+                label={t('fields.tenant.label')}
                 value={tenantId}
                 onChange={(e) => setTenantId(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                required
-              >
-                <option value="">{t('fields.tenant.placeholder')}</option>
-                {tenants.map((tenant) => (
-                  <option key={tenant.id} value={tenant.id}>
-                    {tenant.name}
-                  </option>
-                ))}
-              </select>
+                placeholder={t('fields.tenant.placeholder')}
+                options={tenants.map((tenant) => ({ value: tenant.id, label: tenant.name }))}
+                className="w-full"
+              />
             </div>
           )}
 
           {/* Condition Type */}
           <div className="space-y-2">
-            <Label htmlFor="conditionType">{t('fields.conditionType.label')}</Label>
-            <select
+            <Select
               id="conditionType"
+              label={t('fields.conditionType.label')}
               value={conditionType}
               onChange={(e) => setConditionType(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              {conditionTypes.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
+              options={conditionTypes.map((type) => ({ value: type.value, label: type.label }))}
+              className="w-full"
+            />
             <p className="text-sm text-muted-foreground">
               {conditionTypes.find((type) => type.value === conditionType)?.description}
             </p>
@@ -287,19 +276,14 @@ export function AchievementEditorDrawer({
 
           {/* Status */}
           <div className="space-y-2">
-            <Label htmlFor="status">{t('fields.status.label')}</Label>
-            <select
+            <Select
               id="status"
+              label={t('fields.status.label')}
               value={status}
               onChange={(e) => setStatus(e.target.value as typeof status)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              {statusOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              options={statusOptions.map((option) => ({ value: option.value, label: option.label }))}
+              className="w-full"
+            />
           </div>
 
           {/* Error */}

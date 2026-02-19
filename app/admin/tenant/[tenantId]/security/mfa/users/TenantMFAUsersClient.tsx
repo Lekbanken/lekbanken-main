@@ -21,6 +21,8 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/outline';
 
+import { Select } from '@/components/ui/select';
+
 interface TenantMFAUsersClientProps {
   tenantId: string;
   canManage: boolean;
@@ -245,20 +247,20 @@ export default function TenantMFAUsersClient({ tenantId, canManage }: TenantMFAU
         </div>
         
         <div className="flex items-center gap-3">
-          <select
+          <Select
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value as MFAStatusFilter);
               setPage(1);
             }}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-          >
-            <option value="all">{t('filterAll')}</option>
-            <option value="enabled">{t('filterEnabled')}</option>
-            <option value="disabled">{t('filterDisabled')}</option>
-            <option value="required">{t('filterRequired')}</option>
-            <option value="grace_period">{t('filterGracePeriod')}</option>
-          </select>
+            options={[
+              { value: 'all', label: t('filterAll') },
+              { value: 'enabled', label: t('filterEnabled') },
+              { value: 'disabled', label: t('filterDisabled') },
+              { value: 'required', label: t('filterRequired') },
+              { value: 'grace_period', label: t('filterGracePeriod') },
+            ]}
+          />
           
           <button
             onClick={loadUsers}

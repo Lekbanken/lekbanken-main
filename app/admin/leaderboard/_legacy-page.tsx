@@ -14,7 +14,7 @@ import {
   AdminTableToolbar,
   AdminPagination,
 } from '@/components/admin/shared';
-import { Button, Badge, EmptyState } from '@/components/ui';
+import { Button, Badge, EmptyState, Select } from '@/components/ui';
 import {
   TrophyIcon,
   UsersIcon,
@@ -370,35 +370,35 @@ export default function LeaderboardAdminPage() {
         className="mb-4"
         filters={
           <>
-            <select
+            <Select
               value={timeframe}
               onChange={(e) => setTimeframe(e.target.value as TimeframeFilter)}
-              className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            >
-              <option value="7d">{t('timeframe.7d')}</option>
-              <option value="30d">{t('timeframe.30d')}</option>
-              <option value="90d">{t('timeframe.90d')}</option>
-              <option value="all">{t('timeframe.all')}</option>
-            </select>
-            <select
+              options={[
+                { value: '7d', label: t('timeframe.7d') },
+                { value: '30d', label: t('timeframe.30d') },
+                { value: '90d', label: t('timeframe.90d') },
+                { value: 'all', label: t('timeframe.all') },
+              ]}
+            />
+            <Select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
-              className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            >
-              <option value="all">{t('typeFilter.all')}</option>
-              <option value="users">{t('typeFilter.users')}</option>
-              <option value="organisations">{t('typeFilter.organisations')}</option>
-            </select>
-            <select
+              options={[
+                { value: 'all', label: t('typeFilter.all') },
+                { value: 'users', label: t('typeFilter.users') },
+                { value: 'organisations', label: t('typeFilter.organisations') },
+              ]}
+            />
+            <Select
               value={metricFilter}
               onChange={(e) => setMetricFilter(e.target.value as MetricFilter)}
-              className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            >
-              <option value="score">{t('metricSort.score')}</option>
-              <option value="coins">{t('metricSort.coins')}</option>
-              <option value="games">{t('metricSort.games')}</option>
-              <option value="achievements">{t('metricSort.achievements')}</option>
-            </select>
+              options={[
+                { value: 'score', label: t('metricSort.score') },
+                { value: 'coins', label: t('metricSort.coins') },
+                { value: 'games', label: t('metricSort.games') },
+                { value: 'achievements', label: t('metricSort.achievements') },
+              ]}
+            />
           </>
         }
       />

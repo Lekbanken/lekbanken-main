@@ -11,6 +11,7 @@ import {
 import type { BugReportWithUser } from '@/app/actions/bug-reports-admin';
 import { listTenantsForSupportHub } from '@/app/actions/support-hub';
 import { checkSupportHubAccess } from '@/app/actions/support-hub';
+import { Select } from '@/components/ui/select';
 
 export default function BugReportsAdminPage() {
   const router = useRouter();
@@ -177,31 +178,27 @@ export default function BugReportsAdminPage() {
       {/* Filters */}
       <div className="flex flex-wrap gap-4 items-center">
         {isSystemAdmin && tenants.length > 0 && (
-          <select
+          <Select
             value={selectedTenant}
             onChange={(e) => setSelectedTenant(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          >
-            <option value="all">All Tenants</option>
-            {tenants.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: 'all', label: 'All Tenants' },
+              ...tenants.map((t) => ({ value: t.id, label: t.name })),
+            ]}
+          />
         )}
 
-        <select
+        <Select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-        >
-          <option value="all">All Statuses</option>
-          <option value="new">New</option>
-          <option value="investigating">Investigating</option>
-          <option value="resolved">Resolved</option>
-          <option value="wont_fix">Won&apos;t Fix</option>
-        </select>
+          options={[
+            { value: 'all', label: 'All Statuses' },
+            { value: 'new', label: 'New' },
+            { value: 'investigating', label: 'Investigating' },
+            { value: 'resolved', label: 'Resolved' },
+            { value: 'wont_fix', label: "Won't Fix" },
+          ]}
+        />
 
         <input
           type="text"
@@ -365,16 +362,16 @@ export default function BugReportsAdminPage() {
 
               {/* Actions */}
               <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <select
+                <Select
                   value={selectedReport.status}
                   onChange={(e) => handleStatusChange(selectedReport.id, e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                >
-                  <option value="new">New</option>
-                  <option value="investigating">Investigating</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="wont_fix">Won&apos;t Fix</option>
-                </select>
+                  options={[
+                    { value: 'new', label: 'New' },
+                    { value: 'investigating', label: 'Investigating' },
+                    { value: 'resolved', label: 'Resolved' },
+                    { value: 'wont_fix', label: "Won't Fix" },
+                  ]}
+                />
 
                 <button
                   onClick={() => handleResolve(selectedReport.id, !selectedReport.is_resolved)}

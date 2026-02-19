@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { Select } from '@/components/ui/select';
 
 interface AdminErrorStateProps {
   /** Error title */
@@ -180,26 +181,17 @@ export function AdminFilterSelect({
   className = '',
 }: AdminFilterSelectProps) {
   return (
-    <div className={`relative ${className}`}>
-      <label className="sr-only">{label}</label>
-      <select
+    <div className={className}>
+      <Select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none rounded-lg border border-border bg-background py-2.5 pl-3 pr-8 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         aria-label={label}
-      >
-        <option value="">{placeholder}</option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-        <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </div>
+        placeholder={placeholder}
+        options={[
+          { value: '', label: placeholder },
+          ...options,
+        ]}
+      />
     </div>
   );
 }

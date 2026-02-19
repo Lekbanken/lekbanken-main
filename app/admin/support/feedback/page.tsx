@@ -9,6 +9,7 @@ import {
 } from '@/app/actions/feedback-admin';
 import type { FeedbackWithUser } from '@/app/actions/feedback-admin';
 import { listTenantsForSupportHub, checkSupportHubAccess } from '@/app/actions/support-hub';
+import { Select } from '@/components/ui/select';
 
 export default function FeedbackAdminPage() {
   const router = useRouter();
@@ -200,44 +201,40 @@ export default function FeedbackAdminPage() {
       {/* Filters */}
       <div className="flex flex-wrap gap-4 items-center">
         {isSystemAdmin && tenants.length > 0 && (
-          <select
+          <Select
             value={selectedTenant}
             onChange={(e) => setSelectedTenant(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          >
-            <option value="all">All Tenants</option>
-            {tenants.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: 'all', label: 'All Tenants' },
+              ...tenants.map((t) => ({ value: t.id, label: t.name })),
+            ]}
+          />
         )}
 
-        <select
+        <Select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-        >
-          <option value="all">All Types</option>
-          <option value="suggestion">Suggestion</option>
-          <option value="compliment">Compliment</option>
-          <option value="complaint">Complaint</option>
-          <option value="question">Question</option>
-          <option value="other">Other</option>
-        </select>
+          options={[
+            { value: 'all', label: 'All Types' },
+            { value: 'suggestion', label: 'Suggestion' },
+            { value: 'compliment', label: 'Compliment' },
+            { value: 'complaint', label: 'Complaint' },
+            { value: 'question', label: 'Question' },
+            { value: 'other', label: 'Other' },
+          ]}
+        />
 
-        <select
+        <Select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-        >
-          <option value="all">All Statuses</option>
-          <option value="received">Received</option>
-          <option value="reviewed">Reviewed</option>
-          <option value="actioned">Actioned</option>
-          <option value="archived">Archived</option>
-        </select>
+          options={[
+            { value: 'all', label: 'All Statuses' },
+            { value: 'received', label: 'Received' },
+            { value: 'reviewed', label: 'Reviewed' },
+            { value: 'actioned', label: 'Actioned' },
+            { value: 'archived', label: 'Archived' },
+          ]}
+        />
 
         <input
           type="text"
@@ -384,16 +381,16 @@ export default function FeedbackAdminPage() {
 
               {/* Actions */}
               <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <select
+                <Select
                   value={selectedFeedback.status}
                   onChange={(e) => handleStatusChange(selectedFeedback.id, e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                >
-                  <option value="received">Received</option>
-                  <option value="reviewed">Reviewed</option>
-                  <option value="actioned">Actioned</option>
-                  <option value="archived">Archived</option>
-                </select>
+                  options={[
+                    { value: 'received', label: 'Received' },
+                    { value: 'reviewed', label: 'Reviewed' },
+                    { value: 'actioned', label: 'Actioned' },
+                    { value: 'archived', label: 'Archived' },
+                  ]}
+                />
               </div>
             </div>
           ) : (

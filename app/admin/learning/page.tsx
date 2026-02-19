@@ -16,7 +16,7 @@ import {
   AdminPageLayout,
   AdminBreadcrumbs,
 } from "@/components/admin/shared";
-import { Card, CardContent, Badge } from "@/components/ui";
+import { Card, CardContent, Badge, Select } from "@/components/ui";
 import {
   getLearningHubStats,
   listTenantsForLearningAdmin,
@@ -162,29 +162,25 @@ export default function LearningHubPage() {
       {/* Scope Filters (System Admin Only) */}
       {isSystemAdmin && (
         <div className="mt-6 flex flex-wrap gap-3">
-          <select
+          <Select
             value={scopeFilter}
             onChange={(e) => setScopeFilter(e.target.value as typeof scopeFilter)}
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          >
-            <option value="all">{t('filters.all')}</option>
-            <option value="global">{t('filters.global')}</option>
-            <option value="tenant">{t('filters.tenant')}</option>
-          </select>
+            options={[
+              { value: 'all', label: t('filters.all') },
+              { value: 'global', label: t('filters.global') },
+              { value: 'tenant', label: t('filters.tenant') },
+            ]}
+          />
 
           {scopeFilter === 'tenant' && (
-            <select
+            <Select
               value={tenantFilter}
               onChange={(e) => setTenantFilter(e.target.value)}
-              className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              <option value="">{t('filters.selectOrganization')}</option>
-              {tenants.map((tenant) => (
-                <option key={tenant.id} value={tenant.id}>
-                  {tenant.name}
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: '', label: t('filters.selectOrganization') },
+                ...tenants.map((tenant) => ({ value: tenant.id, label: tenant.name })),
+              ]}
+            />
           )}
         </div>
       )}

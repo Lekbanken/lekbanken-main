@@ -15,6 +15,7 @@ import {
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Select } from '@/components/ui/select'
 import { AdminEmptyState, AdminCard } from '@/components/admin/shared'
 
 // ============================================================================
@@ -156,17 +157,17 @@ export function ConsentAuditTab() {
           {/* Filter */}
           <div className="flex items-center gap-2">
             <FunnelIcon className="h-4 w-4 text-muted-foreground" />
-            <select
+            <Select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm"
-            >
-              <option value="all">All Events</option>
-              <option value="granted">{t('eventTypes.granted')}</option>
-              <option value="denied">{t('eventTypes.denied')}</option>
-              <option value="updated">{t('eventTypes.updated')}</option>
-              <option value="withdrawn">{t('eventTypes.withdrawn')}</option>
-            </select>
+              options={[
+                { value: 'all', label: 'All Events' },
+                { value: 'granted', label: t('eventTypes.granted') },
+                { value: 'denied', label: t('eventTypes.denied') },
+                { value: 'updated', label: t('eventTypes.updated') },
+                { value: 'withdrawn', label: t('eventTypes.withdrawn') },
+              ]}
+            />
           </div>
           
           {/* Export */}

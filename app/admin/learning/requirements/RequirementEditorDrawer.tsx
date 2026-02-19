@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Input } from '@/components/ui';
+import { Button, Input, Select } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import {
   Sheet,
@@ -203,19 +203,13 @@ export function RequirementEditorDrawer({
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           {/* Requirement Type */}
           <div className="space-y-2">
-            <Label htmlFor="requirementType">{t('labels.requirementType')} *</Label>
-            <select
-              id="requirementType"
+            <Select
+              label={t('labels.requirementType') + ' *'}
               value={requirementType}
               onChange={(e) => setRequirementType(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              {REQUIREMENT_TYPES.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
+              options={REQUIREMENT_TYPES.map((type) => ({ value: type.value, label: type.label }))}
+              className="w-full"
+            />
             <p className="text-xs text-muted-foreground">
               {REQUIREMENT_TYPES.find(rt => rt.value === requirementType)?.description}
             </p>
@@ -223,19 +217,13 @@ export function RequirementEditorDrawer({
 
           {/* Target Kind */}
           <div className="space-y-2">
-            <Label htmlFor="targetKind">{t('labels.targetKind')} *</Label>
-            <select
-              id="targetKind"
+            <Select
+              label={t('labels.targetKind') + ' *'}
               value={targetKind}
               onChange={(e) => setTargetKind(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              {TARGET_KINDS.map((kind) => (
-                <option key={kind.value} value={kind.value}>
-                  {kind.label}
-                </option>
-              ))}
-            </select>
+              options={TARGET_KINDS}
+              className="w-full"
+            />
           </div>
 
           {/* Target ID */}
@@ -312,23 +300,16 @@ export function RequirementEditorDrawer({
 
           {/* Tenant selector - only when creating */}
           {scope === 'tenant' && isSystemAdmin && !isEditing && (
-            <div className="space-y-2">
-              <Label htmlFor="tenant">{t('labels.organization')} *</Label>
-              <select
-                id="tenant"
-                value={tenantId}
-                onChange={(e) => setTenantId(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                required
-              >
-                <option value="">{t('placeholders.selectOrganization')}</option>
-                {tenants.map((tenant) => (
-                  <option key={tenant.id} value={tenant.id}>
-                    {tenant.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label={t('labels.organization') + ' *'}
+              value={tenantId}
+              onChange={(e) => setTenantId(e.target.value)}
+              options={[
+                { value: '', label: t('placeholders.selectOrganization') },
+                ...tenants.map((tenant) => ({ value: tenant.id, label: tenant.name })),
+              ]}
+              className="w-full"
+            />
           )}
 
           {/* Tenant display for non-system admin */}
@@ -342,21 +323,19 @@ export function RequirementEditorDrawer({
 
           {/* Required Course */}
           <div className="space-y-2">
-            <Label htmlFor="course">{t('labels.requiredCourse')} *</Label>
-            <select
-              id="course"
+            <Select
+              label={t('labels.requiredCourse') + ' *'}
               value={requiredCourseId}
               onChange={(e) => setRequiredCourseId(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              required
-            >
-              <option value="">{t('placeholders.selectCourse')}</option>
-              {courses.map((course) => (
-                <option key={course.id} value={course.id}>
-                  {course.title} {course.tenant_id === null ? `(${t('scope.global')})` : ''}
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: '', label: t('placeholders.selectCourse') },
+                ...courses.map((course) => ({
+                  value: course.id,
+                  label: `${course.title}${course.tenant_id === null ? ` (${t('scope.global')})` : ''}`,
+                })),
+              ]}
+              className="w-full"
+            />
             <p className="text-xs text-muted-foreground">
               {t('form.courseHelp')}
             </p>

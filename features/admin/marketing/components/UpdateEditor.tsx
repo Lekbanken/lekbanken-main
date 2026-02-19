@@ -6,7 +6,7 @@ import {
   XMarkIcon,
   CheckIcon,
 } from '@heroicons/react/24/outline';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Textarea, Label, Badge } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Textarea, Label, Badge, Select } from '@/components/ui';
 import type { MarketingUpdate } from '@/lib/marketing/types';
 import type { UpdateFormData } from '../types';
 import { EMPTY_UPDATE_FORM } from '../types';
@@ -79,18 +79,14 @@ export function UpdateEditor({ update, onSave, onCancel, isPending }: UpdateEdit
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Type */}
-          <div className="space-y-2">
-            <Label htmlFor="type">{t('type')} *</Label>
-            <select
+          <div>
+            <Select
               id="type"
               value={formData.type}
               onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as typeof formData.type }))}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              {UPDATE_TYPE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+              options={UPDATE_TYPE_OPTIONS}
+              label={`${t('type')} *`}
+            />
           </div>
 
           {/* Title */}
@@ -175,18 +171,14 @@ export function UpdateEditor({ update, onSave, onCancel, isPending }: UpdateEdit
                 onChange={(e) => setFormData(prev => ({ ...prev, publishedAt: e.target.value }))}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">{t('status')}</Label>
-              <select
+            <div>
+              <Select
                 id="status"
                 value={formData.status}
                 onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as typeof formData.status }))}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                {STATUS_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+                options={STATUS_OPTIONS}
+                label={t('status')}
+              />
             </div>
           </div>
 

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { KeyIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
 import { AdminCard, AdminEmptyState, AdminErrorState } from '@/components/admin/shared';
-import { Badge, Button, Input } from '@/components/ui';
+import { Badge, Button, Input, Select } from '@/components/ui';
 import { useToast } from '@/components/ui/toast';
 import { loadLicensingData, grantEntitlement, revokeEntitlement } from '../../organisationSections.server';
 import type { ProductRow, EntitlementRow } from '../../organisationSections.server';
@@ -114,6 +114,12 @@ export function OrganisationLicensingSection({ tenantId }: Props) {
     }
   };
 
+  const productOptions = isLoading
+    ? [{ value: '', label: t('loading') }]
+    : productsSorted.length === 0
+      ? [{ value: '', label: t('noProducts') }]
+      : productsSorted.map((p) => ({ value: p.id, label: p.name ?? p.product_key ?? p.id }));
+
   return (
     <div className="space-y-4">
       {error && (
@@ -130,27 +136,13 @@ export function OrganisationLicensingSection({ tenantId }: Props) {
         icon={<PlusIcon className="h-5 w-5 text-primary" />}
       >
         <div className="grid gap-3 md:grid-cols-2">
-          <label className="space-y-1">
-            <span className="text-sm font-medium">{t('labels.product')}</span>
-            <select
-              className="h-10 w-full rounded-md border bg-background px-3 text-sm"
-              value={productId}
-              onChange={(e) => setProductId(e.target.value)}
-              disabled={isLoading || productsSorted.length === 0}
-            >
-              {isLoading ? (
-                <option value="">{t('loading')}</option>
-              ) : productsSorted.length === 0 ? (
-                <option value="">{t('noProducts')}</option>
-              ) : (
-                productsSorted.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name ?? p.product_key ?? p.id}
-                  </option>
-                ))
-              )}
-            </select>
-          </label>
+          <Select
+            label={t('labels.product')}
+            value={productId}
+            onChange={(e) => setProductId(e.target.value)}
+            disabled={isLoading || productsSorted.length === 0}
+            options={productOptions}
+          />
 
           <label className="space-y-1">
             <span className="text-sm font-medium">{t('labels.seats')}</span>

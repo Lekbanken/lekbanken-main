@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
+import { Select } from '@/components/ui/select'
 import { supabase } from '@/lib/supabase/client'
 import type { CookieCatalogItem } from './CookieCatalogTab'
 
@@ -172,18 +173,19 @@ export function CookieFormDialog({ open, onClose, onSave, cookie }: CookieFormDi
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="cookie-category">{t('fields.category')}</Label>
-                <select
+                <Select
                   id="cookie-category"
+                  label={t('fields.category')}
                   value={formData.category}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChange('category', e.target.value)}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="necessary">{t('categories.necessary')}</option>
-                  <option value="functional">{t('categories.functional')}</option>
-                  <option value="analytics">{t('categories.analytics')}</option>
-                  <option value="marketing">{t('categories.marketing')}</option>
-                </select>
+                  onChange={(e) => handleChange('category', e.target.value)}
+                  options={[
+                    { value: 'necessary', label: t('categories.necessary') },
+                    { value: 'functional', label: t('categories.functional') },
+                    { value: 'analytics', label: t('categories.analytics') },
+                    { value: 'marketing', label: t('categories.marketing') },
+                  ]}
+                  className="w-full"
+                />
               </div>
 
               <div className="space-y-2">

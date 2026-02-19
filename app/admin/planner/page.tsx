@@ -13,7 +13,7 @@ import {
   AdminErrorState,
   AdminConfirmDialog,
 } from "@/components/admin/shared";
-import { Badge, Button, Input, LoadingState, useToast } from "@/components/ui";
+import { Badge, Button, Input, LoadingState, Select, useToast } from "@/components/ui";
 import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { useTenant } from "@/lib/context/TenantContext";
 import { StatusBadge } from "@/features/planner/components/StatusBadge";
@@ -437,43 +437,28 @@ export default function AdminPlannerPage() {
             onChange={(event) => setSearchInput(event.target.value)}
             className="w-full md:w-72"
           />
-          <select
+          <Select
             value={statusFilter}
             onChange={(event) =>
               setStatusFilter(event.target.value as PlannerStatus | "all")
             }
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
-          >
-            {STATUS_FILTER_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <select
+            options={STATUS_FILTER_OPTIONS}
+            className="w-auto min-w-[150px]"
+          />
+          <Select
             value={visibilityFilter}
             onChange={(event) =>
               setVisibilityFilter(event.target.value as PlannerVisibility | "all")
             }
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
-          >
-            {VISIBILITY_FILTER_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <select
+            options={VISIBILITY_FILTER_OPTIONS}
+            className="w-auto min-w-[150px]"
+          />
+          <Select
             value={sort}
             onChange={(event) => setSort(event.target.value as PlanSortOption)}
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
-          >
-            {SORT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            options={SORT_OPTIONS}
+            className="w-auto min-w-[150px]"
+          />
         </div>
       </AdminSection>
 
@@ -545,7 +530,7 @@ export default function AdminPlannerPage() {
                         </Button>
                       )}
                       {plan._capabilities?.canUpdate && (
-                        <select
+                        <Select
                           value={plan.visibility}
                           onChange={(event) =>
                             void handleVisibilityChange(
@@ -554,20 +539,15 @@ export default function AdminPlannerPage() {
                             )
                           }
                           disabled={isPending}
-                          className="rounded-lg border border-border bg-background px-2 py-1 text-xs"
-                        >
-                          {(["private", "tenant", "public"] as const).map(
-                            (value) => (
-                              <option
-                                key={value}
-                                value={value}
-                                disabled={!canSetVisibility(plan, value)}
-                              >
-                                {VISIBILITY_LABELS[value]}
-                              </option>
-                            )
+                          options={(["private", "tenant", "public"] as const).map(
+                            (value) => ({
+                              value,
+                              label: VISIBILITY_LABELS[value],
+                              disabled: !canSetVisibility(plan, value),
+                            })
                           )}
-                        </select>
+                          className="w-auto min-w-[120px] text-xs"
+                        />
                       )}
                       {plan._capabilities?.canDelete && (
                         <Button

@@ -456,10 +456,10 @@ export function AuthProvider({
       setUserProfile(profile ?? null)
     }
 
-    const { data: refreshedAuth } = await supabase.auth.getUser()
-    if (refreshedAuth?.user) {
-      setUser(refreshedAuth.user)
-    }
+    // NOTE: Previously called supabase.auth.getUser() here to refresh auth
+    // state, but the browser supabase client hangs in v2.86+ due to Web Locks.
+    // Profile data lives in users/user_profiles (not auth metadata), so the
+    // API response above already contains everything we need.
   }, [fetchProfile, user])
 
   const value: AuthContextType = {

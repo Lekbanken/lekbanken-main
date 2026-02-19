@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { useTranslations } from 'next-intl';
 import { useSpatialEditorStore } from '../store/spatial-editor-store';
 import type { PointObjectType, EditorTool } from '../lib/types';
 import {
@@ -117,6 +118,7 @@ export function ObjectsPopover() {
   const placePolicy = useSpatialEditorStore((s) => s.placePolicy);
   const setPlacePolicy = useSpatialEditorStore((s) => s.setPlacePolicy);
 
+  const t = useTranslations('admin.library.spatialEditor.objects');
   const [activeCategory, setActiveCategory] = useState<ObjCategory>('sport');
 
   const currentTypes = CATEGORY_TYPES[activeCategory];
@@ -203,13 +205,13 @@ export function ObjectsPopover() {
 
           {/* Sticky mode toggle */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-2 flex items-center justify-between">
-            <span className="text-[11px] text-gray-500 dark:text-gray-400">Placeringsläge</span>
+            <span className="text-[11px] text-gray-500 dark:text-gray-400">{t('placementMode')}</span>
             <button
               type="button"
               onClick={() => setPlacePolicy(placePolicy === 'sticky' ? 'one-shot' : 'sticky')}
               className="text-[11px] text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              {placePolicy === 'sticky' ? '📌 Håll kvar' : '☝️ En åt gången'}
+              {placePolicy === 'sticky' ? `📌 ${t('stickyMode')}` : `☝️ ${t('oneShotMode')}`}
             </button>
           </div>
         </div>

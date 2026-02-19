@@ -6,6 +6,7 @@
 
 import { type ChangeEvent, useCallback, useRef, useState } from 'react';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { useTranslations } from 'next-intl';
 import { useSpatialEditorStore } from '../store/spatial-editor-store';
 import { SPORT_FIELD_VARIANTS, MAP_BG_VARIANTS } from './SportFieldBackgrounds';
 import { SpatialCaptureDialog } from './SpatialCaptureDialog';
@@ -14,6 +15,7 @@ import { SpatialCaptureDialog } from './SpatialCaptureDialog';
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 export function BackgroundPopover() {
+  const t = useTranslations('admin.library.spatialEditor.background');
   const background = useSpatialEditorStore((s) => s.doc.background);
   const setBackground = useSpatialEditorStore((s) => s.setBackground);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -83,7 +85,7 @@ export function BackgroundPopover() {
                   : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700'
               }`}
             >
-              ⬜ Tom (rutnät)
+              ⬜ {t('emptyGrid')}
             </button>
 
             {/* Sport fields */}
@@ -185,9 +187,8 @@ export function BackgroundPopover() {
                 onClick={() => { close(); setShowCapture(true); }}
                 className="w-full text-left rounded-lg px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
               >
-                🗺️ Fånga karta (Spatial Capture)
+                🗺️ {t('mapCapture')}
               </button>
-              <SpatialCaptureDialog open={showCapture} onClose={() => setShowCapture(false)} />
               {background.type === 'image' && background.src && (
                 <div className="flex items-center gap-2 px-3 text-[11px] text-gray-500 dark:text-gray-400">
                   <span className="truncate flex-1">{background.imageWidth}×{background.imageHeight} px</span>
@@ -196,7 +197,7 @@ export function BackgroundPopover() {
                     onClick={() => setBackground({ type: 'grid' })}
                     className="text-red-500 hover:text-red-700 dark:text-red-400"
                   >
-                    ✕ Ta bort
+                    ✕ {t('remove')}
                   </button>
                 </div>
               )}
@@ -204,6 +205,9 @@ export function BackgroundPopover() {
           </div>
         )}
       </PopoverPanel>
+
+      {/* Rendered outside PopoverPanel so it stays mounted after panel closes */}
+      <SpatialCaptureDialog open={showCapture} onClose={() => setShowCapture(false)} />
     </Popover>
   );
 }

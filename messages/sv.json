@@ -8182,6 +8182,50 @@
           "public": "Publik",
           "tenant": "Organisation",
           "private": "Privat"
+        },
+        "background": {
+          "emptyGrid": "Tom (rutnät)",
+          "mapCapture": "Fånga karta (Spatial Capture)",
+          "remove": "Ta bort"
+        },
+        "info": {
+          "resetView": "Återställ vy",
+          "settings": "Inställningar",
+          "snapToGrid": "Snap till rutnät",
+          "snapHint": "(Alt = av)",
+          "constrainToArea": "Håll innanför yta",
+          "showTrail": "Visa rutt",
+          "lockBackground": "Lås bakgrund",
+          "keyboardShortcuts": "Tangentbordsgenvägar",
+          "stations": "Stationer"
+        },
+        "objects": {
+          "placementMode": "Placeringsläge",
+          "stickyMode": "Håll kvar",
+          "oneShotMode": "En åt gången"
+        },
+        "save": {
+          "saveLocal": "Spara lokalt",
+          "unsaved": "(osparad)",
+          "loadLocal": "Ladda lokalt",
+          "copyJson": "Kopiera JSON",
+          "exportPng": "Exportera PNG",
+          "exportBundle": "Exportera paket",
+          "bundleHint": "PNG + JSON + CSV",
+          "updateInLibrary": "Uppdatera i bibliotek",
+          "saveToLibrary": "Spara till bibliotek",
+          "openLibrary": "Öppna bibliotek",
+          "clearAll": "Rensa allt"
+        },
+        "capture": {
+          "title": "Kartfångst",
+          "searchPlaceholder": "Sök plats… (t.ex. Fridhemsskolan Stockholm)",
+          "captureButton": "Fånga kartbild",
+          "capturing": "Fångar…",
+          "capturedTitle": "Kartbild fångad",
+          "useAsBackground": "Använd som bakgrund",
+          "tips": "Dra i kartan för att panorera. Scrolla för att zooma. Kartdata: OpenStreetMap.",
+          "placeholder": "Tryck på \"Fånga kartbild\" så visas förhandsgranskningen här. Du kan sedan använda den som bakgrund i editorn."
         }
       },
       "badges": {

@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { useTranslations } from 'next-intl';
 import { useSpatialEditorStore } from '../store/spatial-editor-store';
 import { StationListPanel } from './StationListPanel';
 import { WORLD_WIDTH } from '../lib/types';
@@ -30,6 +31,7 @@ export function InfoDialog() {
   const zoomPercent = Math.round((WORLD_WIDTH / viewBox.w) * 100);
 
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const t = useTranslations('admin.library.spatialEditor.info');
 
   return (
     <Popover className="relative">
@@ -55,7 +57,7 @@ export function InfoDialog() {
               onClick={resetView}
               className="ml-auto underline text-blue-500 hover:text-blue-700 dark:text-blue-400 text-[10px] font-sans"
             >
-              Återställ vy
+              {t('resetView')}
             </button>
           </div>
 
@@ -64,12 +66,12 @@ export function InfoDialog() {
           {/* Toggles */}
           <div className="flex flex-col gap-2">
             <h4 className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-              Inställningar
+              {t('settings')}
             </h4>
-            <Toggle label="Snap till rutnät" hint="(Alt = av)" checked={snapEnabled} onChange={toggleSnap} />
-            <Toggle label="Håll innanför yta" checked={constrainToContentBox} onChange={toggleConstrainToContentBox} />
-            <Toggle label="Visa rutt" checked={showTrail} onChange={toggleShowTrail} />
-            <Toggle label="Lås bakgrund" checked={backgroundLocked} onChange={toggleBackgroundLocked} />
+            <Toggle label={t('snapToGrid')} hint={t('snapHint')} checked={snapEnabled} onChange={toggleSnap} />
+            <Toggle label={t('constrainToArea')} checked={constrainToContentBox} onChange={toggleConstrainToContentBox} />
+            <Toggle label={t('showTrail')} checked={showTrail} onChange={toggleShowTrail} />
+            <Toggle label={t('lockBackground')} checked={backgroundLocked} onChange={toggleBackgroundLocked} />
           </div>
 
           <div className="border-t border-gray-200 dark:border-gray-700" />
@@ -81,7 +83,7 @@ export function InfoDialog() {
               onClick={() => setShowShortcuts(!showShortcuts)}
               className="text-[11px] font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
             >
-              ⌨️ Tangentbordsgenvägar {showShortcuts ? '▴' : '▾'}
+              ⌨️ {t('keyboardShortcuts')} {showShortcuts ? '▴' : '▾'}
             </button>
             {showShortcuts && (
               <div className="mt-2 text-[10px] text-gray-500 dark:text-gray-400 space-y-0.5">
@@ -102,7 +104,7 @@ export function InfoDialog() {
           {/* Station list */}
           <div>
             <h4 className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">
-              Stationer
+              {t('stations')}
             </h4>
             <StationListPanel />
           </div>

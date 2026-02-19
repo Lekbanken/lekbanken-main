@@ -19,19 +19,13 @@ export interface NominatimResult {
  * Returns up to `limit` results.
  */
 export async function geocode(query: string, limit = 5): Promise<NominatimResult[]> {
-  const url = new URL('https://nominatim.openstreetmap.org/search');
+  const url = new URL('/api/geocode', window.location.origin);
   url.searchParams.set('q', query);
-  url.searchParams.set('format', 'json');
   url.searchParams.set('limit', String(limit));
-  url.searchParams.set('addressdetails', '1');
 
-  const res = await fetch(url.toString(), {
-    headers: {
-      'User-Agent': 'Lekbanken-SpatialCapture/1.0',
-    },
-  });
+  const res = await fetch(url.toString());
 
-  if (!res.ok) throw new Error(`Nominatim error: ${res.status}`);
+  if (!res.ok) throw new Error(`Geocode error: ${res.status}`);
   return res.json();
 }
 

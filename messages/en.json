@@ -7823,6 +7823,50 @@
           "public": "Public",
           "tenant": "Organisation",
           "private": "Private"
+        },
+        "background": {
+          "emptyGrid": "Empty (grid)",
+          "mapCapture": "Capture map (Spatial Capture)",
+          "remove": "Remove"
+        },
+        "info": {
+          "resetView": "Reset view",
+          "settings": "Settings",
+          "snapToGrid": "Snap to grid",
+          "snapHint": "(Alt = off)",
+          "constrainToArea": "Keep inside area",
+          "showTrail": "Show trail",
+          "lockBackground": "Lock background",
+          "keyboardShortcuts": "Keyboard shortcuts",
+          "stations": "Stations"
+        },
+        "objects": {
+          "placementMode": "Placement mode",
+          "stickyMode": "Keep active",
+          "oneShotMode": "One at a time"
+        },
+        "save": {
+          "saveLocal": "Save locally",
+          "unsaved": "(unsaved)",
+          "loadLocal": "Load locally",
+          "copyJson": "Copy JSON",
+          "exportPng": "Export PNG",
+          "exportBundle": "Export bundle",
+          "bundleHint": "PNG + JSON + CSV",
+          "updateInLibrary": "Update in library",
+          "saveToLibrary": "Save to library",
+          "openLibrary": "Open library",
+          "clearAll": "Clear all"
+        },
+        "capture": {
+          "title": "Map Capture",
+          "searchPlaceholder": "Search place… (e.g. Central Park New York)",
+          "captureButton": "Capture map image",
+          "capturing": "Capturing…",
+          "capturedTitle": "Map image captured",
+          "useAsBackground": "Use as background",
+          "tips": "Drag the map to pan. Scroll to zoom. Map data: OpenStreetMap.",
+          "placeholder": "Press \"Capture map image\" to see the preview here. You can then use it as background in the editor."
         }
       },
       "badges": {

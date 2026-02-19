@@ -6,6 +6,7 @@
 
 import { useCallback, useState } from 'react';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { useTranslations } from 'next-intl';
 import { useSpatialEditorStore } from '../store/spatial-editor-store';
 import { copyDocumentJson } from '../lib/storage';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../lib/types';
@@ -139,6 +140,7 @@ export function SavePopover({ svgRef }: { svgRef: React.RefObject<SVGSVGElement 
   const artifactTitle = useSpatialEditorStore((s) => s.artifactTitle);
   const setArtifactMeta = useSpatialEditorStore((s) => s.setArtifactMeta);
 
+  const t = useTranslations('admin.library.spatialEditor.save');
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [saveTitle, setSaveTitle] = useState('');
   const [saveVisibility, setSaveVisibility] = useState<ArtifactVisibility>('private');
@@ -195,7 +197,7 @@ export function SavePopover({ svgRef }: { svgRef: React.RefObject<SVGSVGElement 
     <>
       <Popover className="relative">
         <PopoverButton className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 bg-white/90 shadow-sm ring-1 ring-black/10 hover:bg-gray-50 focus:outline-none dark:bg-gray-800/90 dark:text-gray-200 dark:ring-white/10 dark:hover:bg-gray-700">
-          💾 Spara{dirty ? ' •' : ''}
+          💾 {t('saveLocal')}{dirty ? ' •' : ''}
         </PopoverButton>
         <PopoverPanel
           className="absolute left-0 top-full mt-2 z-50 w-56 rounded-xl bg-white p-2 shadow-xl ring-1 ring-black/10 dark:bg-gray-800 dark:ring-white/10"
@@ -220,7 +222,7 @@ export function SavePopover({ svgRef }: { svgRef: React.RefObject<SVGSVGElement 
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
               >
                 <span>📂</span>
-                <span>Öppna bibliotek</span>
+                <span>{t('openLibrary')}</span>
               </Link>
               <div className="my-1 border-t border-gray-200 dark:border-gray-700" />
               <MenuItem icon="🗑" label="Rensa allt" danger onClick={() => { reset(); close(); }} />

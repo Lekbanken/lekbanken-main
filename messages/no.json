@@ -8113,6 +8113,50 @@
           "public": "Offentlig",
           "tenant": "Organisasjon",
           "private": "Privat"
+        },
+        "background": {
+          "emptyGrid": "Tom (rutenett)",
+          "mapCapture": "Fang kart (Spatial Capture)",
+          "remove": "Fjern"
+        },
+        "info": {
+          "resetView": "Tilbakestill visning",
+          "settings": "Innstillinger",
+          "snapToGrid": "Snap til rutenett",
+          "snapHint": "(Alt = av)",
+          "constrainToArea": "Hold innenfor område",
+          "showTrail": "Vis rute",
+          "lockBackground": "Lås bakgrunn",
+          "keyboardShortcuts": "Hurtigtaster",
+          "stations": "Stasjoner"
+        },
+        "objects": {
+          "placementMode": "Plasseringsmodus",
+          "stickyMode": "Hold aktiv",
+          "oneShotMode": "Én om gangen"
+        },
+        "save": {
+          "saveLocal": "Lagre lokalt",
+          "unsaved": "(ulagret)",
+          "loadLocal": "Last lokalt",
+          "copyJson": "Kopier JSON",
+          "exportPng": "Eksporter PNG",
+          "exportBundle": "Eksporter pakke",
+          "bundleHint": "PNG + JSON + CSV",
+          "updateInLibrary": "Oppdater i bibliotek",
+          "saveToLibrary": "Lagre til bibliotek",
+          "openLibrary": "Åpne bibliotek",
+          "clearAll": "Tøm alt"
+        },
+        "capture": {
+          "title": "Kartfangst",
+          "searchPlaceholder": "Søk sted… (f.eks. Vigeland-parken Oslo)",
+          "captureButton": "Fang kartbilde",
+          "capturing": "Fanger…",
+          "capturedTitle": "Kartbilde fanget",
+          "useAsBackground": "Bruk som bakgrunn",
+          "tips": "Dra i kartet for å panorere. Scroll for å zoome. Kartdata: OpenStreetMap.",
+          "placeholder": "Trykk på \"Fang kartbilde\" for å se forhåndsvisningen her. Du kan deretter bruke den som bakgrunn i editoren."
         }
       },
       "badges": {

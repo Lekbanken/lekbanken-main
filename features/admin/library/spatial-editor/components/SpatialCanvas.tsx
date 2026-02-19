@@ -667,6 +667,101 @@ function RenderObject({
         );
       }
 
+      // Arrow-chain: polyline with arrowhead marker
+      const acPts = obj.props.points as { x: number; y: number }[] | undefined;
+      if (obj.type === 'arrow-chain' && acPts && acPts.length >= 2) {
+        const acColor = (obj.props.color as string) ?? '#6b7280';
+        const acStrokeW = (obj.props.strokeWidth as number) ?? 3;
+        const acPattern = (obj.props.pattern as string) ?? 'solid';
+        const hasArrowhead = obj.props.arrowhead !== false;
+        const markerId = `arrowhead-${obj.id}`;
+        const polyStr = acPts
+          .map((p) => {
+            const { wx: px, wy: py } = normalizedToWorld(p.x, p.y);
+            return `${px},${py}`;
+          })
+          .join(' ');
+
+        return (
+          <g {...common}>
+            {/* Arrowhead marker definition */}
+            {hasArrowhead && (
+              <defs>
+                <marker
+                  id={markerId}
+                  markerWidth="10" markerHeight="7"
+                  refX="9" refY="3.5"
+                  orient="auto"
+                  markerUnits="strokeWidth"
+                >
+                  <polygon
+                    points="0 0, 10 3.5, 0 7"
+                    fill={acColor}
+                  />
+                </marker>
+              </defs>
+            )}
+            {/* Wide invisible hit target */}
+            <polyline
+              points={polyStr}
+              fill="none"
+              stroke="transparent"
+              strokeWidth={ARROW_HIT_WIDTH}
+            />
+            {isSelected && (
+              <polyline
+                points={polyStr}
+                fill="none"
+                stroke="#2563eb"
+                strokeWidth={acStrokeW + 4}
+                strokeDasharray="6 3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                data-selection-ring
+              />
+            )}
+            {/* White halo */}
+            <polyline
+              points={polyStr}
+              fill="none"
+              stroke="#fff"
+              strokeWidth={acStrokeW + 2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeOpacity={0.7}
+              pointerEvents="none"
+            />
+            {/* Actual arrow-chain line */}
+            <polyline
+              points={polyStr}
+              fill="none"
+              stroke={acColor}
+              strokeWidth={acStrokeW}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeDasharray={acPattern === 'dashed' ? '10 5' : undefined}
+              markerEnd={hasArrowhead ? `url(#${markerId})` : undefined}
+              pointerEvents="none"
+            />
+            {/* Vertex dots */}
+            {acPts.map((p, i) => {
+              const { wx: px, wy: py } = normalizedToWorld(p.x, p.y);
+              return (
+                <circle
+                  key={i}
+                  cx={px}
+                  cy={py}
+                  r={isSelected ? 5 : 3}
+                  fill={isSelected ? '#2563eb' : acColor}
+                  fillOpacity={0.6}
+                  pointerEvents="none"
+                />
+              );
+            })}
+          </g>
+        );
+      }
+
       // Surroundings assets (tree, house, water, treasure, etc.)
       const Renderer = SURROUNDINGS_RENDERERS[obj.type];
       if (!Renderer) return null;
@@ -787,6 +882,8 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
   const pendingPolygonType = useSpatialEditorStore((s) => s.pendingPolygonType);
   const handlePathClick = useSpatialEditorStore((s) => s.handlePathClick);
   const pendingPathPoints = useSpatialEditorStore((s) => s.pendingPathPoints);
+  const handleArrowChainClick = useSpatialEditorStore((s) => s.handleArrowChainClick);
+  const pendingArrowChainPoints = useSpatialEditorStore((s) => s.pendingArrowChainPoints);
   const moveSelected = useSpatialEditorStore((s) => s.moveSelected);
   const moveArrowEndpoint = useSpatialEditorStore((s) => s.moveArrowEndpoint);
   const setViewBox = useSpatialEditorStore((s) => s.setViewBox);
@@ -930,6 +1027,11 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
           store.cancelPath();
           return;
         }
+        // Cancel arrow-chain mode if active
+        if (store.pendingArrowChainPoints.length > 0 || store.activeTool === 'arrow-chain') {
+          store.cancelArrowChain();
+          return;
+        }
         store.setActivePlaceType(null);
         if (store.activeTool !== 'select') {
           store.setTool('select');
@@ -946,6 +1048,11 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
         if (store.activeTool === 'polygon' && store.pendingPolygonPoints.length >= 3) {
           e.preventDefault();
           store.finalizePolygon();
+          return;
+        }
+        if (store.activeTool === 'arrow-chain' && store.pendingArrowChainPoints.length >= 2) {
+          e.preventDefault();
+          store.finalizeArrowChain();
           return;
         }
       }
@@ -1034,6 +1141,12 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
           return;
         }
 
+        // Multi-click arrow-chain mode
+        if (activeTool === 'arrow-chain') {
+          handleArrowChainClick(nx, ny);
+          return;
+        }
+
         // Point placement mode
         if (activeTool === 'place' && activePlaceType) {
           placeAt(nx, ny);
@@ -1046,7 +1159,7 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
         }
       }
     },
-    [activeTool, activePlaceType, viewBox, select, placeAt, handleArrowClick, handleZoneClick, handlePolygonClick, handlePathClick, eventToNormalized, backgroundLocked],
+    [activeTool, activePlaceType, viewBox, select, placeAt, handleArrowClick, handleZoneClick, handlePolygonClick, handlePathClick, handleArrowChainClick, eventToNormalized, backgroundLocked],
   );
 
   // ------ Object pointer down (select + start drag) ------
@@ -1055,7 +1168,7 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
       e.stopPropagation();
       if (e.button !== 0) return;
       // Don't start drag if we're in a creation mode
-      if (activeTool === 'arrow' || activeTool === 'zone' || activeTool === 'polygon' || activeTool === 'path') return;
+      if (activeTool === 'arrow' || activeTool === 'zone' || activeTool === 'polygon' || activeTool === 'path' || activeTool === 'arrow-chain') return;
 
       // Shift+click → toggle multi-select
       if (e.shiftKey) {
@@ -1226,6 +1339,16 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
         setGhostTarget({ nx, ny });
       }
 
+      // Ghost preview tracking — arrow-chain mode
+      if (activeTool === 'arrow-chain') {
+        let { nx, ny } = eventToNormalized(e);
+        if (constrainToContentBox) {
+          const box = getActiveContentBox(doc);
+          if (box) { const c = clampToBox(nx, ny, box); nx = c.nx; ny = c.ny; }
+        }
+        setGhostTarget({ nx, ny });
+      }
+
       // Ghost preview for place mode (checkpoint hover pin, etc.)
       if (activeTool === 'place') {
         let { nx, ny } = eventToNormalized(e);
@@ -1327,7 +1450,7 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
   // ------ Cursor style ------
   let cursorClass = 'cursor-default';
   if (isPanning || isSpaceDown || activeTool === 'hand') cursorClass = 'cursor-grab';
-  if (activeTool === 'place' || activeTool === 'arrow' || activeTool === 'zone') cursorClass = 'cursor-crosshair';
+  if (activeTool === 'place' || activeTool === 'arrow' || activeTool === 'zone' || activeTool === 'arrow-chain') cursorClass = 'cursor-crosshair';
 
   const vb = `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`;
 
@@ -1882,6 +2005,125 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
                 x={worldPts[0].wx + 14} y={worldPts[0].wy - 12}
                 fontSize={11 * (viewBox.w / WORLD_WIDTH)}
                 fill={pathColor}
+                fillOpacity={0.8}
+              >
+                {pts.length < 2 ? 'Lägg till fler punkter...' : 'Enter = klar, Esc = avbryt'}
+              </text>
+            )}
+          </g>
+        );
+      })()}
+
+      {/* Ghost preview for arrow-chain creation */}
+      {activeTool === 'arrow-chain' && (() => {
+        const acColor = '#6b7280';
+        const pts = pendingArrowChainPoints;
+        const cursor = ghostTarget ? normalizedToWorld(ghostTarget.nx, ghostTarget.ny) : null;
+
+        if (pts.length === 0 && cursor) {
+          return (
+            <g pointerEvents="none" data-selection-ring>
+              <circle
+                cx={cursor.wx} cy={cursor.wy} r={6}
+                fill={acColor} fillOpacity={0.4}
+                stroke={acColor} strokeWidth={2} strokeOpacity={0.6}
+              />
+              <text
+                x={cursor.wx + 14} y={cursor.wy - 10}
+                fontSize={12 * (viewBox.w / WORLD_WIDTH)}
+                fill={acColor}
+                fillOpacity={0.8}
+              >
+                Klicka för att sätta punkt
+              </text>
+            </g>
+          );
+        }
+
+        const worldPts = pts.map((p) => normalizedToWorld(p.x, p.y));
+
+        return (
+          <g pointerEvents="none" data-selection-ring>
+            {/* Lines between vertices */}
+            {worldPts.map((p, i) => {
+              const next = i < worldPts.length - 1 ? worldPts[i + 1] : cursor;
+              if (!next) return null;
+              return (
+                <line
+                  key={i}
+                  x1={p.wx} y1={p.wy}
+                  x2={next.wx} y2={next.wy}
+                  stroke={acColor}
+                  strokeWidth={3}
+                  strokeOpacity={0.5}
+                  strokeDasharray="10 5"
+                  strokeLinecap="round"
+                />
+              );
+            })}
+
+            {/* White halo on existing lines */}
+            {worldPts.length >= 2 && (() => {
+              const polyStr = worldPts.map((p) => `${p.wx},${p.wy}`).join(' ');
+              return (
+                <polyline
+                  points={polyStr}
+                  fill="none"
+                  stroke="#fff"
+                  strokeWidth={5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeOpacity={0.4}
+                />
+              );
+            })()}
+
+            {/* Arrowhead preview on last segment */}
+            {worldPts.length >= 1 && cursor && (() => {
+              const lastPt = worldPts[worldPts.length - 1];
+              const dx = cursor.wx - lastPt.wx;
+              const dy = cursor.wy - lastPt.wy;
+              const len = Math.sqrt(dx * dx + dy * dy);
+              if (len < 1) return null;
+              const ux = dx / len;
+              const uy = dy / len;
+              const tipX = cursor.wx;
+              const tipY = cursor.wy;
+              const sz = 12;
+              return (
+                <polygon
+                  points={`${tipX},${tipY} ${tipX - ux * sz + uy * sz * 0.4},${tipY - uy * sz - ux * sz * 0.4} ${tipX - ux * sz - uy * sz * 0.4},${tipY - uy * sz + ux * sz * 0.4}`}
+                  fill={acColor}
+                  fillOpacity={0.5}
+                />
+              );
+            })()}
+
+            {/* Vertex dots */}
+            {worldPts.map((p, i) => (
+              <circle
+                key={i}
+                cx={p.wx} cy={p.wy} r={5}
+                fill={acColor} fillOpacity={0.5}
+                stroke={acColor} strokeWidth={2} strokeOpacity={0.7}
+              />
+            ))}
+
+            {/* Cursor dot */}
+            {cursor && (
+              <circle
+                cx={cursor.wx} cy={cursor.wy} r={5}
+                fill={acColor} fillOpacity={0.4}
+                stroke={acColor} strokeWidth={2} strokeOpacity={0.6}
+              />
+            )}
+
+            {/* Hint text */}
+            {worldPts.length > 0 && (
+              <text
+                x={worldPts[0].wx + 14} y={worldPts[0].wy - 12}
+                fontSize={11 * (viewBox.w / WORLD_WIDTH)}
+                fill={acColor}
                 fillOpacity={0.8}
               >
                 {pts.length < 2 ? 'Lägg till fler punkter...' : 'Enter = klar, Esc = avbryt'}

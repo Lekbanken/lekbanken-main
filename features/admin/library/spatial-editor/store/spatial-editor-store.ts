@@ -23,6 +23,7 @@ import {
   createZone,
   createPolygonObject,
   createPathObject,
+  createArrowChainObject,
   clamp01,
   SNAP_STEP,
   WORLD_WIDTH,
@@ -98,6 +99,9 @@ interface SpatialEditorState {
   /** Accumulated path vertices for multi-click path creation */
   pendingPathPoints: { x: number; y: number }[];
 
+  /** Accumulated arrow-chain vertices for multi-click arrow-chain creation */
+  pendingArrowChainPoints: { x: number; y: number }[];
+
   /** Whether snap-to-grid is enabled (default true, Alt key temporarily disables) */
   snapEnabled: boolean;
 
@@ -146,6 +150,14 @@ interface SpatialEditorState {
   finalizePath: () => void;
   /** Cancel the pending path */
   cancelPath: () => void;
+  /** Start multi-click arrow-chain creation */
+  startArrowChain: () => void;
+  /** Add a vertex to the pending arrow-chain */
+  handleArrowChainClick: (nx: number, ny: number) => void;
+  /** Finalize the pending arrow-chain (create polyline object with arrowhead) */
+  finalizeArrowChain: () => void;
+  /** Cancel the pending arrow-chain */
+  cancelArrowChain: () => void;
   select: (id: string | null) => void;
   toggleSelect: (id: string) => void;
   moveSelected: (positions: Map<string, { nx: number; ny: number }>) => void;
@@ -224,6 +236,7 @@ export const useSpatialEditorStore = create<SpatialEditorState>()((set, get) => 
   pendingPolygonPoints: [],
   pendingPolygonType: null,
   pendingPathPoints: [],
+  pendingArrowChainPoints: [],
   snapEnabled: true,
   constrainToContentBox: false,
   showTrail: true,
@@ -246,6 +259,7 @@ export const useSpatialEditorStore = create<SpatialEditorState>()((set, get) => 
       pendingPolygonPoints: tool === 'polygon' ? get().pendingPolygonPoints : [],
       pendingPolygonType: tool === 'polygon' ? get().pendingPolygonType : null,
       pendingPathPoints: tool === 'path' ? get().pendingPathPoints : [],
+      pendingArrowChainPoints: tool === 'arrow-chain' ? get().pendingArrowChainPoints : [],
       selectedIds: (tool === 'select' || tool === 'hand') ? get().selectedIds : [],
     }),
 
@@ -467,6 +481,58 @@ export const useSpatialEditorStore = create<SpatialEditorState>()((set, get) => 
   cancelPath: () => {
     set({
       pendingPathPoints: [],
+      activeTool: 'select',
+    });
+  },
+
+  // ---- Multi-click arrow-chain creation ----
+  startArrowChain: () => {
+    set({
+      activeTool: 'arrow-chain',
+      pendingArrowChainPoints: [],
+      activePlaceType: null,
+      selectedIds: [],
+      pendingStart: null,
+      pendingPolygonPoints: [],
+      pendingPolygonType: null,
+      pendingPathPoints: [],
+    });
+  },
+
+  handleArrowChainClick: (nx, ny) => {
+    const { pendingArrowChainPoints, doc, constrainToContentBox } = get();
+    const box = constrainToContentBox ? getActiveContentBox(doc) : null;
+    let cx = nx, cy = ny;
+    if (box) { const c = clampToBox(cx, cy, box); cx = c.nx; cy = c.ny; }
+
+    set({ pendingArrowChainPoints: [...pendingArrowChainPoints, { x: cx, y: cy }] });
+  },
+
+  finalizeArrowChain: () => {
+    const { pendingArrowChainPoints, doc } = get();
+    if (pendingArrowChainPoints.length < 2) {
+      set({
+        pendingArrowChainPoints: [],
+        activeTool: 'select',
+      });
+      return;
+    }
+
+    const obj = createArrowChainObject(pendingArrowChainPoints);
+    const newDoc = addObjectToDoc(doc, obj);
+
+    set({
+      doc: newDoc,
+      selectedIds: [obj.id],
+      activeTool: 'select',
+      pendingArrowChainPoints: [],
+      dirty: true,
+    });
+  },
+
+  cancelArrowChain: () => {
+    set({
+      pendingArrowChainPoints: [],
       activeTool: 'select',
     });
   },
@@ -852,6 +918,7 @@ export const useSpatialEditorStore = create<SpatialEditorState>()((set, get) => 
       pendingPolygonPoints: [],
       pendingPolygonType: null,
       pendingPathPoints: [],
+      pendingArrowChainPoints: [],
       artifactId: null,
       artifactTitle: 'Untitled',
     });

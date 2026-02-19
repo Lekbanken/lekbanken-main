@@ -80,9 +80,10 @@ export const SPATIAL_OBJECT_TYPES = [
   ...POINT_OBJECT_TYPES,
   'arrow' as const,
   'zone' as const,
+  'arrow-chain' as const,
 ];
 
-export type SpatialObjectType = PointObjectType | 'arrow' | 'zone';
+export type SpatialObjectType = PointObjectType | 'arrow' | 'zone' | 'arrow-chain';
 
 /** Kind variants for checkpoint objects */
 export type CheckpointKind = 'station' | 'checkpoint' | 'start' | 'finish';
@@ -165,7 +166,7 @@ export interface SpatialDocumentV1 {
 // Editor state (non-document)
 // ---------------------------------------------------------------------------
 
-export type EditorTool = 'select' | 'hand' | 'place' | 'arrow' | 'zone' | 'polygon' | 'path';
+export type EditorTool = 'select' | 'hand' | 'place' | 'arrow' | 'zone' | 'polygon' | 'path' | 'arrow-chain';
 
 /** Sticky = stay in place-mode after each placement. One-shot = return to select. */
 export type PlacePolicy = 'sticky' | 'one-shot';
@@ -482,6 +483,34 @@ export function createPolygonObject(
       color,
       fillOpacity,
       polygonVariant: variant,
+    },
+  };
+}
+
+/**
+ * Create an arrow-chain (polyline with arrowhead) from an array of normalized points.
+ * Like a path but rendered with an arrowhead on the last segment.
+ */
+export function createArrowChainObject(
+  points: { x: number; y: number }[],
+): SpatialObjectBase {
+  if (points.length < 2) {
+    throw new Error('Arrow chain requires at least 2 points');
+  }
+
+  const cx = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+  const cy = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+
+  return {
+    id: stableId(),
+    type: 'arrow-chain',
+    t: { x: clamp01(cx), y: clamp01(cy) },
+    props: {
+      points: points.map((p) => ({ x: clamp01(p.x), y: clamp01(p.y) })),
+      color: '#6b7280',
+      strokeWidth: 3,
+      pattern: 'solid',
+      arrowhead: true,
     },
   };
 }

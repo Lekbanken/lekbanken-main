@@ -234,7 +234,7 @@ DECLARE
   missing_count integer := 0;
   -- Source of truth: every function called via supabase.rpc() from browser code
   browser_rpcs text[] := ARRAY[
-    'public.add_initial_tenant_owner(uuid, text)',
+    'public.add_initial_tenant_owner(uuid, tenant_role_enum)',
     'public.get_user_notifications(integer)',
     'public.get_unread_notification_count()',
     'public.mark_notification_read(uuid)',

@@ -52,6 +52,20 @@ DO $$
 DECLARE
   fn RECORD;
   -- Functions to revoke from authenticated (never called via user RPC)
+  --
+  -- VERIFIED: Every function below was grep-checked against all .rpc()
+  -- callsites. Functions called via createServerRlsClient (authenticated)
+  -- or browser client are NOT in this list.
+  --
+  -- EXCLUDED (need authenticated EXECUTE):
+  --   add_initial_tenant_owner     — browser RPC (OrganisationAdminPage, TenantContext)
+  --   admin_award_achievement_v1   — server action via createServerRlsClient
+  --   get_tenant_user_ids          — server action via createServerRlsClient
+  --   get_scheduled_jobs_status    — route handler via createServerRlsClient
+  --   mark_demo_session_converted  — route handler via createServerRlsClient
+  --   add_demo_feature_usage       — route handler via createServerRlsClient
+  --   learning_prerequisites_met   — server action via createServerRlsClient (NOT a trigger)
+  --
   revoke_list text[] := ARRAY[
     -- Trigger functions (PostgreSQL fires these regardless of EXECUTE grants)
     'handle_new_user',
@@ -65,7 +79,6 @@ DECLARE
     'spatial_artifacts_guard_scope',
     'learning_all_requirements_satisfied',
     'learning_course_completed',
-    'learning_prerequisites_met',
     'learning_requirement_satisfied',
 
     -- Cron / scheduled functions (called by pg_cron as superuser)
@@ -79,21 +92,15 @@ DECLARE
     'aggregate_usage_for_period',
 
     -- Internal / billing (only called via service_role client)
-    'add_demo_feature_usage',
-    'add_initial_tenant_owner',
     'apply_ticket_routing_rules',
     'expand_bundle_entitlements',
     'log_data_access',
     'log_dunning_action',
     'log_product_event',
     'log_quote_activity',
-    'mark_demo_session_converted',
 
     -- Admin analytics (called via service_role in admin API routes)
-    'admin_award_achievement_v1',
-    'admin_get_campaign_analytics_v1',
-    'get_scheduled_jobs_status',
-    'get_tenant_user_ids'
+    'admin_get_campaign_analytics_v1'
   ];
 BEGIN
   FOR fn IN

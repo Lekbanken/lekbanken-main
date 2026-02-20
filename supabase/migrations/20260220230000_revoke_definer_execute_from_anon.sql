@@ -115,11 +115,6 @@ DECLARE
     'get_current_demo_session_id',
     'get_next_plan_version_number',
     'get_softcap_config_v1',
-    'dismiss_notification',
-    'mark_notification_read',
-    'mark_all_notifications_read',
-    'get_user_notifications',
-    'get_unread_notification_count',
     'session_trigger_clear_error',
     'session_trigger_record_error',
     'session_triggers_disable_all',
@@ -187,7 +182,14 @@ DECLARE
     'get_game_reactions_batch',              -- game-reactions.server.ts + route
     'get_liked_game_ids',                    -- game-reactions.server.ts + search
     'badge_preset_increment_usage',          -- award-builder presets route
-    'tenant_award_achievement_v1'            -- tenant-achievements-admin.ts:482
+    'tenant_award_achievement_v1',           -- tenant-achievements-admin.ts:482
+
+    -- ── Browser notification RPCs (useAppNotifications.ts) ───────────────
+    'get_user_notifications',                -- useAppNotifications:221 (rpc)
+    'get_unread_notification_count',         -- useAppNotifications (rpc)
+    'mark_notification_read',                -- useAppNotifications:431 (rpc)
+    'mark_all_notifications_read',           -- useAppNotifications:461 (rpc)
+    'dismiss_notification'                   -- useAppNotifications:494 (rpc)
   ];
 BEGIN
   FOR fn IN

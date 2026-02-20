@@ -1,16 +1,22 @@
 -- =============================================================================
 -- Migration: 20260220233000_search_path_hardening.sql
--- Description: Fix search_path on ALL SECURITY DEFINER functions in public
+-- Description: Fix search_path on ALL SECURITY DEFINER functions + revoke
+--              anon SELECT on ALL public views (catch-all hardening)
 -- =============================================================================
--- CONTEXT: Audit query B shows ~55 SECURITY DEFINER functions with unsafe
+-- CONTEXT:
+-- Step 1: Audit query B shows ~55 SECURITY DEFINER functions with unsafe
 -- search_path: either 'public' (schema-squatting risk) or '""' (empty,
 -- inherits caller's settings). All should be 'pg_catalog, public'.
 --
 -- Uses ALTER FUNCTION (not CREATE OR REPLACE) — only changes the config
 -- setting without touching the function body. This is safe and idempotent.
 --
--- The dynamic loop catches ALL current and future insecure functions,
--- regardless of count.
+-- Step 2: Audit query F shows all 4 public views are SELECT-able by anon.
+-- v_gamification_leaderboard JOINs users and exposes u.email.
+-- Dynamic loop revokes anon SELECT on ALL public views as catch-all.
+--
+-- Both loops are dynamic — they catch ALL current objects regardless of count,
+-- making this safe to re-run as a periodic hardening sweep if needed.
 -- =============================================================================
 
 -- NOTE: No BEGIN/COMMIT — Supabase SQL Editor handles DDL atomically
@@ -59,13 +65,28 @@ BEGIN
 END;
 $$;
 
--- ─── Step 2: Revoke anon SELECT on views that expose sensitive data ─────────
--- v_gamification_leaderboard joins users table and exposes u.email
--- Other views have no business being readable by anonymous users
-REVOKE SELECT ON public.v_gamification_leaderboard FROM anon;
-REVOKE SELECT ON public.v_gamification_daily_economy FROM anon;
-REVOKE SELECT ON public.cookie_consent_statistics FROM anon;
-REVOKE SELECT ON public.tenant_memberships FROM anon;
+-- ─── Step 2: Revoke anon SELECT on ALL public views (catch-all) ─────────────
+-- v_gamification_leaderboard JOINs users and exposes u.email.
+-- No public view should be anon-readable — use dynamic loop so future views
+-- are also covered if this migration is re-run as a hardening sweep.
+DO $$
+DECLARE
+  rec RECORD;
+  revoked_count INTEGER := 0;
+BEGIN
+  FOR rec IN
+    SELECT quote_ident(schemaname) || '.' || quote_ident(viewname) AS v,
+           viewname
+    FROM pg_views
+    WHERE schemaname = 'public'
+  LOOP
+    EXECUTE 'REVOKE SELECT ON ' || rec.v || ' FROM anon';
+    revoked_count := revoked_count + 1;
+    RAISE NOTICE 'Revoked anon SELECT on %', rec.v;
+  END LOOP;
+  RAISE NOTICE '── Total views revoked from anon: % ──', revoked_count;
+END;
+$$;
 
 -- =============================================================================
 -- VERIFICATION: Run after applying

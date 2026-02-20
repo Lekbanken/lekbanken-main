@@ -108,7 +108,6 @@ DECLARE
     -- ── Not called via RPC at all (internal SQL helpers / unused) ────────
     'apply_xp_transaction_v1',
     'create_session_with_snapshot',
-    'get_session_event_stats',
     'get_session_events',
     'log_session_event',
     'get_effective_design',
@@ -189,7 +188,10 @@ DECLARE
     'get_unread_notification_count',         -- useAppNotifications (rpc)
     'mark_notification_read',                -- useAppNotifications:431 (rpc)
     'mark_all_notifications_read',           -- useAppNotifications:461 (rpc)
-    'dismiss_notification'                   -- useAppNotifications:494 (rpc)
+    'dismiss_notification',                  -- useAppNotifications:494 (rpc)
+
+    -- ── Browser session events RPC (useSessionEvents.ts) ─────────────────
+    'get_session_event_stats'                -- useSessionEvents:433 (rpc)
   ];
 BEGIN
   FOR fn IN

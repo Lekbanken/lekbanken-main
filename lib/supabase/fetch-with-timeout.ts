@@ -174,7 +174,10 @@ export function createFetchWithTimeout(
         }
         throw timeoutError
       }
-      if (logEnabled) {
+      // AbortError from external signals (e.g. React cleanup / navigation)
+      // is expected in dev — downgrade to debug to avoid console noise.
+      const isAbort = err instanceof DOMException && err.name === 'AbortError'
+      if (logEnabled && !isAbort) {
         console.warn(`${logPrefix} error`, { method, url, err })
       }
       throw err

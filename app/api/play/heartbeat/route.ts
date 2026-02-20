@@ -1,9 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
 import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
+import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const rate = applyRateLimitMiddleware(request, 'api');
+  if (rate) return rate;
+
   const token = request.headers.get('x-participant-token');
   const url = new URL(request.url);
   const sessionCode = url.searchParams.get('session_code');

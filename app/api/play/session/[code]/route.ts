@@ -1,17 +1,26 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
-import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
+import {
+  normalizeSessionCode,
+  isValidSessionCodeFormat,
+} from '@/lib/services/participants/session-code-generator';
+import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
 
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
+  const rate = applyRateLimitMiddleware(request, 'api');
+  if (rate) return rate;
+
   const { code } = await params;
-  if (!code || code.length < 3) {
-    return NextResponse.json({ error: 'Invalid code' }, { status: 400 });
+  const normalized = normalizeSessionCode(code ?? '');
+
+  // Uniform 404 for both invalid format and non-existent codes (anti-enumeration)
+  if (!isValidSessionCodeFormat(normalized)) {
+    return NextResponse.json({ error: 'Session not found' }, { status: 404 });
   }
 
-  const normalized = normalizeSessionCode(code);
   const session = await ParticipantSessionService.getSessionByCode(normalized);
   if (!session) {
     return NextResponse.json({ error: 'Session not found' }, { status: 404 });
@@ -30,7 +39,6 @@ export async function GET(
       startedAt: session.started_at,
       endedAt: session.ended_at,
       gameId: session.game_id,
-      planId: session.plan_id,
     },
   });
 }

@@ -1,15 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
 
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
+  const rate = applyRateLimitMiddleware(request, 'api');
+  if (rate) return rate;
+
   const { code } = await params;
 
   const session = await ParticipantSessionService.getSessionByCode(code);
@@ -148,10 +152,11 @@ export async function GET(
       };
     });
 
-  // Find highlighted variant
+  // Find highlighted variant (only public + revealed to prevent secret leak)
   const highlightedVariant = (gameVariants ?? []).find((v) => {
+    const visibility = v.visibility as string;
     const state = variantStateMap.get(v.id as string);
-    return state?.highlighted_at;
+    return visibility === 'public' && state?.revealed_at && state?.highlighted_at;
   });
 
   const highlighted = highlightedVariant

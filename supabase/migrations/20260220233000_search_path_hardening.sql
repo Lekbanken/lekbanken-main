@@ -48,6 +48,7 @@ BEGIN
             AND (
               c LIKE 'search_path=pg_catalog, public%'
               OR c LIKE 'search_path="pg_catalog, public"%'
+              OR c LIKE 'search_path=pg_catalog,public%'
             )
         )
       )
@@ -58,7 +59,7 @@ BEGIN
       rec.proname, rec.args
     );
     fixed_count := fixed_count + 1;
-    RAISE NOTICE 'Fixed search_path: public.%(%)', rec.proname, rec.args;
+    RAISE NOTICE 'Fixed search_path: public.% (args: %)', rec.proname, rec.args;
   END LOOP;
 
   RAISE NOTICE '── Total functions fixed: % ──', fixed_count;

@@ -13,7 +13,8 @@
 -- regardless of count.
 -- =============================================================================
 
-BEGIN;
+-- NOTE: No BEGIN/COMMIT — Supabase SQL Editor handles DDL atomically
+-- and explicit transactions can cause issues with DO blocks.
 
 DO $$
 DECLARE
@@ -58,7 +59,13 @@ BEGIN
 END;
 $$;
 
-COMMIT;
+-- ─── Step 2: Revoke anon SELECT on views that expose sensitive data ─────────
+-- v_gamification_leaderboard joins users table and exposes u.email
+-- Other views have no business being readable by anonymous users
+REVOKE SELECT ON public.v_gamification_leaderboard FROM anon;
+REVOKE SELECT ON public.v_gamification_daily_economy FROM anon;
+REVOKE SELECT ON public.cookie_consent_statistics FROM anon;
+REVOKE SELECT ON public.tenant_memberships FROM anon;
 
 -- =============================================================================
 -- VERIFICATION: Run after applying

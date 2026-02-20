@@ -104,6 +104,16 @@ END;
 $$;
 
 -- =============================================================================
+-- Step 3: Reload PostgREST schema cache
+-- =============================================================================
+-- The search_path changes above alter function metadata that PostgREST
+-- caches. Without a reload, PostgREST may fail to route RPC calls (they
+-- hang or return 404) until it naturally refreshes. This NOTIFY triggers
+-- an immediate cache reload.
+-- =============================================================================
+NOTIFY pgrst, 'reload schema';
+
+-- =============================================================================
 -- VERIFICATION: Run after applying (all counts should be 0)
 -- =============================================================================
 --

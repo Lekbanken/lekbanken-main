@@ -95,11 +95,15 @@ interface NotificationRow {
 type AnyRpc = any;
 
 /** Timeout for the main notifications fetch */
-const FETCH_TIMEOUT_MS = 15_000;
+const FETCH_TIMEOUT_MS = 10_000;
 /** Timeout for user-initiated actions (mark read, dismiss) */
 const ACTION_TIMEOUT_MS = 10_000;
 /** Fallback polling interval (ms) */
 const POLL_INTERVAL_MS = 30_000;
+/** Max backoff interval on consecutive failures (ms) */
+const MAX_BACKOFF_MS = 120_000;
+/** How many consecutive failures before we start backing off */
+const BACKOFF_THRESHOLD = 2;
 
 /** Map RPC rows → AppNotification[] */
 function mapRows(rows: NotificationRow[]): AppNotification[] {
@@ -165,6 +169,9 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // New fetches abort the previous one so that timed-out HTTP requests
   // don't pile up and exhaust the browser's connection pool (~6/origin).
   const abortRef = useRef<AbortController | null>(null);
+
+  // Consecutive failure counter for exponential backoff on polling
+  const consecutiveFailures = useRef(0);
 
   // Client components can still render on the server in Next.js; avoid
   // calling `createBrowserClient()` when `window` is not available.
@@ -292,13 +299,17 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       // --- Apply result ---
       if (!ac.signal.aborted && mountedRef.current) {
         if (mapped) {
+          consecutiveFailures.current = 0; // Reset backoff on success
           setNotifications(mapped);
           setUnreadCount(mapped.filter((n) => !n.readAt).length);
           hasLoadedOnce.current = true;
-        } else if (!hasLoadedOnce.current) {
-          setNotifications([]);
-          setUnreadCount(0);
-          setError('Kunde inte hämta notifikationer');
+        } else {
+          consecutiveFailures.current += 1;
+          if (!hasLoadedOnce.current) {
+            setNotifications([]);
+            setUnreadCount(0);
+            setError('Kunde inte hämta notifikationer');
+          }
         }
       }
     } finally {
@@ -345,10 +356,12 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
 
   // =========================================================================
   // Refetch when tab becomes visible (user switches back to this tab)
+  // Also resets backoff since the user is actively looking at the page.
   // =========================================================================
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
+        consecutiveFailures.current = 0; // Reset backoff on tab return
         fetchNotifications();
       }
     };
@@ -395,16 +408,45 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   }, [supabase, fetchNotifications, limit]);
 
   // =========================================================================
-  // Fallback polling — keeps bell correct even if realtime misses
+  // Fallback polling — keeps bell correct even if realtime misses.
+  // Visibility-gated: skips fetch when tab is hidden to avoid wasting
+  // connections. Uses exponential backoff on consecutive failures.
   // =========================================================================
   useEffect(() => {
     if (!supabase) return;
 
-    const id = setInterval(() => {
-      fetchNotifications();
-    }, POLL_INTERVAL_MS);
+    let timerId: ReturnType<typeof setTimeout> | null = null;
 
-    return () => clearInterval(id);
+    const schedulePoll = () => {
+      // Exponential backoff: double interval for each failure past threshold
+      const failCount = consecutiveFailures.current;
+      const delay =
+        failCount < BACKOFF_THRESHOLD
+          ? POLL_INTERVAL_MS
+          : Math.min(
+              POLL_INTERVAL_MS * Math.pow(2, failCount - BACKOFF_THRESHOLD),
+              MAX_BACKOFF_MS
+            );
+
+      timerId = setTimeout(async () => {
+        // Skip fetch when tab is hidden — visibility handler will catch up
+        if (document.visibilityState === 'visible') {
+          await fetchNotifications();
+        }
+        // Schedule next poll (recursive setTimeout instead of setInterval
+        // ensures we wait for the current fetch to complete before starting
+        // the next timer, preventing pile-up on slow connections)
+        if (mountedRef.current) {
+          schedulePoll();
+        }
+      }, delay);
+    };
+
+    schedulePoll();
+
+    return () => {
+      if (timerId) clearTimeout(timerId);
+    };
   }, [supabase, fetchNotifications]);
 
   // =========================================================================

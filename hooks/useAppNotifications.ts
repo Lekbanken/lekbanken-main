@@ -94,8 +94,16 @@ interface NotificationRow {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyRpc = any;
 
-/** Timeout for the main notifications fetch */
-const FETCH_TIMEOUT_MS = 10_000;
+/**
+ * Timeout for the main notifications fetch.
+ *
+ * This is a SAFETY NET above the per-endpoint timeouts in fetch-with-timeout.
+ * The Supabase client may resolve the auth session (including Web Lock
+ * acquisition + JWT refresh at ~5 s) BEFORE making the actual HTTP request
+ * (REST timeout ~8 s). The outer timeout must exceed auth + fetch combined
+ * so that it never fires before the real timeout.
+ */
+const FETCH_TIMEOUT_MS = 20_000;
 /** Timeout for user-initiated actions (mark read, dismiss) */
 const ACTION_TIMEOUT_MS = 10_000;
 /** Fallback polling interval (ms) */
@@ -104,6 +112,8 @@ const POLL_INTERVAL_MS = 30_000;
 const MAX_BACKOFF_MS = 120_000;
 /** How many consecutive failures before we start backing off */
 const BACKOFF_THRESHOLD = 2;
+/** Stop polling entirely after this many consecutive failures */
+const MAX_CONSECUTIVE_FAILURES = 6;
 
 /** Map RPC rows → AppNotification[] */
 function mapRows(rows: NotificationRow[]): AppNotification[] {
@@ -208,6 +218,35 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // =========================================================================
   const fetchNotifications = useCallback(async () => {
     if (!supabase) return;
+
+    // ---- Circuit breaker: stop trying after too many consecutive failures ----
+    if (consecutiveFailures.current >= MAX_CONSECUTIVE_FAILURES) {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug(
+          '[useAppNotifications] Circuit breaker open — skipping fetch after',
+          consecutiveFailures.current,
+          'consecutive failures'
+        );
+      }
+      return;
+    }
+
+    // ---- Session pre-check (reads localStorage, no network call) ----
+    // If there's no session, the Supabase client will try to refresh the token
+    // (acquiring a Web Lock → hitting /auth/v1/token), which can block for
+    // seconds before the actual REST call even starts.
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[useAppNotifications] No active session — skipping fetch');
+        }
+        return;
+      }
+    } catch {
+      // getSession failed — skip this cycle
+      return;
+    }
 
     // Cancel any previous in-flight request (frees browser connections)
     abortRef.current?.abort();
@@ -354,15 +393,24 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  // Ref so the visibility handler can restart polling after circuit breaker
+  const restartPollingRef = useRef<(() => void) | null>(null);
+
   // =========================================================================
   // Refetch when tab becomes visible (user switches back to this tab)
-  // Also resets backoff since the user is actively looking at the page.
+  // Also resets backoff + circuit breaker since the user is actively looking.
   // =========================================================================
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
-        consecutiveFailures.current = 0; // Reset backoff on tab return
+        const wasCircuitOpen = consecutiveFailures.current >= MAX_CONSECUTIVE_FAILURES;
+        consecutiveFailures.current = 0; // Reset backoff + circuit breaker
+        setError(null);
         fetchNotifications();
+        // If polling had stopped (circuit breaker), restart it
+        if (wasCircuitOpen && restartPollingRef.current) {
+          restartPollingRef.current();
+        }
       }
     };
     document.addEventListener('visibilitychange', onVisible);
@@ -433,6 +481,18 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         if (document.visibilityState === 'visible') {
           await fetchNotifications();
         }
+        // Circuit breaker: stop polling entirely if too many failures
+        if (consecutiveFailures.current >= MAX_CONSECUTIVE_FAILURES) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(
+              '[useAppNotifications] Polling stopped — circuit breaker open after',
+              consecutiveFailures.current,
+              'consecutive failures. Will retry on next tab focus.'
+            );
+          }
+          setError('Notifikationer kunde inte laddas. Prova att ladda om sidan.');
+          return; // Don't schedule another poll
+        }
         // Schedule next poll (recursive setTimeout instead of setInterval
         // ensures we wait for the current fetch to complete before starting
         // the next timer, preventing pile-up on slow connections)
@@ -444,8 +504,13 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
 
     schedulePoll();
 
+    // Expose restart function so the visibility handler can resume polling
+    // after a circuit breaker reset.
+    restartPollingRef.current = schedulePoll;
+
     return () => {
       if (timerId) clearTimeout(timerId);
+      restartPollingRef.current = null;
     };
   }, [supabase, fetchNotifications]);
 

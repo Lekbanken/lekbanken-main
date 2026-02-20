@@ -167,10 +167,12 @@ export function createFetchWithTimeout(
 
       return response
     } catch (err) {
+      const elapsedMs = Math.round(nowMs() - startedAt)
+
       if (didTimeout) {
         const timeoutError = new TimeoutError(timeoutMs, `Supabase ${method} ${url}`)
         if (logEnabled) {
-          console.warn(`${logPrefix} timeout`, { method, url, timeoutMs })
+          console.warn(`${logPrefix} timeout`, { method, url, timeoutMs, elapsedMs })
         }
         throw timeoutError
       }
@@ -178,7 +180,9 @@ export function createFetchWithTimeout(
       // is expected in dev — downgrade to debug to avoid console noise.
       const isAbort = err instanceof DOMException && err.name === 'AbortError'
       if (logEnabled && !isAbort) {
-        console.warn(`${logPrefix} error`, { method, url, err })
+        const errName = (err as Error)?.name ?? 'unknown'
+        const errMsg = (err as Error)?.message ?? String(err)
+        console.warn(`${logPrefix} failed`, { method, url, elapsedMs, name: errName, message: errMsg })
       }
       throw err
     } finally {

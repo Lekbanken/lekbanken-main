@@ -11,10 +11,11 @@
 -- Uses ALTER FUNCTION (not CREATE OR REPLACE) — only changes the config
 -- setting without touching the function body. This is safe and idempotent.
 --
--- Step 2: Revoke ALL privileges from anon on ALL tables, partitions,
--- sequences and views in public schema. supabase_admin default privileges
--- auto-grant to anon (platform limitation we can't fix), so this catch-all
--- neutralizes the leak. Does NOT touch 'authenticated' (RLS needs grants).
+-- Step 2: Revoke ALL privileges from anon AND PUBLIC on ALL relations in
+-- public schema (tables, partitions, views, materialized views, sequences,
+-- foreign tables). supabase_admin default privileges auto-grant to anon
+-- (platform limitation we can't fix), so this catch-all neutralizes the
+-- leak. Does NOT touch 'authenticated' (RLS needs table grants to evaluate).
 --
 -- Both loops are dynamic — they catch ALL current objects regardless of count,
 -- making this safe to re-run as a periodic hardening sweep if needed.
@@ -67,11 +68,15 @@ BEGIN
 END;
 $$;
 
--- ─── Step 2: Revoke anon ALL on ALL public relations (catch-all) ────────────
--- Removes table/view/sequence grants from anon in one sweep.
+-- ─── Step 2: Revoke anon + PUBLIC on ALL public relations (catch-all) ───────
+-- Removes grants from anon AND PUBLIC on every relation type in one sweep.
 -- supabase_admin default privileges auto-grant to anon on new objects,
 -- and we cannot ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin on managed
 -- Supabase. This catch-all neutralizes the leak regardless of owner.
+--
+-- relkind coverage:
+--   r = ordinary tables, p = partitioned tables, v = views,
+--   m = materialized views, S = sequences, f = foreign tables
 --
 -- NOTE: We do NOT revoke from 'authenticated' — RLS needs table grants to
 -- evaluate policies. Revoking from authenticated would return 0 rows on
@@ -79,26 +84,30 @@ $$;
 DO $$
 DECLARE
   r RECORD;
-  revoked_count INTEGER := 0;
+  revoked_anon INTEGER := 0;
+  revoked_public INTEGER := 0;
 BEGIN
   FOR r IN
     SELECT quote_ident(n.nspname) || '.' || quote_ident(c.relname) AS rel
     FROM pg_class c
     JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE n.nspname = 'public'
-      AND c.relkind IN ('r', 'p', 'S', 'v')  -- tables, partitions, sequences, views
+      AND c.relkind IN ('r', 'p', 'v', 'm', 'S', 'f')
   LOOP
     EXECUTE 'REVOKE ALL ON ' || r.rel || ' FROM anon';
-    revoked_count := revoked_count + 1;
+    revoked_anon := revoked_anon + 1;
+    EXECUTE 'REVOKE ALL ON ' || r.rel || ' FROM PUBLIC';
+    revoked_public := revoked_public + 1;
   END LOOP;
-  RAISE NOTICE '── Revoked anon privileges on % relations ──', revoked_count;
+  RAISE NOTICE '── Revoked anon on % relations, PUBLIC on % relations ──', revoked_anon, revoked_public;
 END;
 $$;
 
 -- =============================================================================
--- VERIFICATION: Run after applying
+-- VERIFICATION: Run after applying (all counts should be 0)
 -- =============================================================================
--- Count should be 0:
+--
+-- 1) Insecure SECURITY DEFINER search_path (should be 0):
 --
 -- SELECT count(*) AS insecure_definers
 -- FROM pg_proc p
@@ -118,7 +127,35 @@ $$;
 --     )
 --   );
 --
--- Full list (should all show pg_catalog, public):
+-- 2) Anon relation grants (should be 0):
+--
+-- SELECT count(*) AS anon_relation_grants
+-- FROM pg_class c
+-- JOIN pg_namespace n ON n.oid = c.relnamespace
+-- WHERE n.nspname = 'public'
+--   AND c.relkind IN ('r','p','v','m','S','f')
+--   AND c.relacl IS NOT NULL
+--   AND array_to_string(c.relacl, ',') LIKE '%anon=%';
+--
+-- 3) PUBLIC relation grants (should be 0):
+--
+-- SELECT count(*) AS public_relation_grants
+-- FROM pg_class c
+-- JOIN pg_namespace n ON n.oid = c.relnamespace
+-- WHERE n.nspname = 'public'
+--   AND c.relkind IN ('r','p','v','m','S','f')
+--   AND c.relacl IS NOT NULL
+--   AND array_to_string(c.relacl, ',') LIKE '%=/=%';
+--
+-- 4) Tables WITHOUT RLS enabled (should be 0 or a known allowlist):
+--
+-- SELECT schemaname, tablename, rowsecurity
+-- FROM pg_tables
+-- WHERE schemaname = 'public'
+--   AND rowsecurity = false
+-- ORDER BY tablename;
+--
+-- 5) Full SECURITY DEFINER list (should all show pg_catalog, public):
 --
 -- SELECT p.proname, pg_get_function_identity_arguments(p.oid) AS args, p.proconfig
 -- FROM pg_proc p

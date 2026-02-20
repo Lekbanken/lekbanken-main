@@ -142,15 +142,20 @@ END $$;
 -- STEP 3: Re-grant authenticated EXECUTE for functions that ARE called
 -- via createServerRlsClient or browser client.
 --
--- Includes: RLS policy helpers, user-facing RPCs, server actions using
--- cookie-based auth.
+-- Sub-groups:
+--   A) RLS policy helpers (MUST have authenticated EXECUTE or queries fail)
+--   B) Browser RPCs (called from createBrowserClient / hooks)
+--   C) Server actions via createServerRlsClient (cookie-based auth)
+--
+-- ⚠️ ADDING A NEW BROWSER RPC?
+--    Add it to group B below AND to the browser_rpcs guardrail in Step 5.
 -- =============================================================================
 DO $$
 DECLARE
   fn RECORD;
   granted_count integer := 0;
   grant_to_auth text[] := ARRAY[
-    -- ── RLS policy helpers (MUST have authenticated EXECUTE) ─────────────
+    -- ─── A) RLS policy helpers (MUST have authenticated EXECUTE) ─────────
     'is_system_admin',
     'is_system_admin_jwt_only',
     'is_global_admin',
@@ -158,10 +163,18 @@ DECLARE
     'has_tenant_role',
     'get_user_tenant_ids',
 
-    -- ── Browser RPC (OrganisationAdminPage + TenantContext) ──────────────
-    'add_initial_tenant_owner',
+    -- ─── B) Browser RPCs (called from createBrowserClient / hooks) ───────
+    -- These are called directly from the browser via supabase.rpc().
+    -- Revoking EXECUTE here causes immediate 42501 errors for users.
+    'add_initial_tenant_owner',              -- OrganisationAdminPage + TenantContext
+    'get_user_notifications',                -- useAppNotifications:221
+    'get_unread_notification_count',         -- useAppNotifications
+    'mark_notification_read',                -- useAppNotifications:431
+    'mark_all_notifications_read',           -- useAppNotifications:461
+    'dismiss_notification',                  -- useAppNotifications:494
+    'get_session_event_stats',               -- useSessionEvents:433
 
-    -- ── Server actions via createServerRlsClient ─────────────────────────
+    -- ─── C) Server actions via createServerRlsClient ─────────────────────
     'admin_award_achievement_v1',            -- achievements-admin.ts:437
     'get_tenant_user_ids',                   -- achievements-admin.ts:496
     'add_demo_feature_usage',                -- demo/track route
@@ -181,17 +194,7 @@ DECLARE
     'get_game_reactions_batch',              -- game-reactions.server.ts + route
     'get_liked_game_ids',                    -- game-reactions.server.ts + search
     'badge_preset_increment_usage',          -- award-builder presets route
-    'tenant_award_achievement_v1',           -- tenant-achievements-admin.ts:482
-
-    -- ── Browser notification RPCs (useAppNotifications.ts) ───────────────
-    'get_user_notifications',                -- useAppNotifications:221 (rpc)
-    'get_unread_notification_count',         -- useAppNotifications (rpc)
-    'mark_notification_read',                -- useAppNotifications:431 (rpc)
-    'mark_all_notifications_read',           -- useAppNotifications:461 (rpc)
-    'dismiss_notification',                  -- useAppNotifications:494 (rpc)
-
-    -- ── Browser session events RPC (useSessionEvents.ts) ─────────────────
-    'get_session_event_stats'                -- useSessionEvents:433 (rpc)
+    'tenant_award_achievement_v1'            -- tenant-achievements-admin.ts:482
   ];
 BEGIN
   FOR fn IN
@@ -217,6 +220,44 @@ END $$;
 GRANT EXECUTE ON FUNCTION public.get_tenant_id_by_hostname(text) TO anon;
 
 -- =============================================================================
+-- STEP 5: Browser-RPC guardrail — warn if any browser-facing function
+-- lacks authenticated EXECUTE after this migration.
+--
+-- This catches the exact class of regression we hit with
+-- get_user_notifications / get_session_event_stats.
+--
+-- ⚠️ When adding a new browser RPC: add it BOTH to Step 3 group B AND here.
+-- =============================================================================
+DO $$
+DECLARE
+  sig text;
+  missing_count integer := 0;
+  -- Source of truth: every function called via supabase.rpc() from browser code
+  browser_rpcs text[] := ARRAY[
+    'public.add_initial_tenant_owner(uuid, text)',
+    'public.get_user_notifications(integer)',
+    'public.get_unread_notification_count()',
+    'public.mark_notification_read(uuid)',
+    'public.mark_all_notifications_read()',
+    'public.dismiss_notification(uuid)',
+    'public.get_session_event_stats(uuid)'
+  ];
+BEGIN
+  FOREACH sig IN ARRAY browser_rpcs
+  LOOP
+    IF NOT has_function_privilege('authenticated', sig, 'execute') THEN
+      RAISE WARNING 'GUARDRAIL: authenticated lacks EXECUTE on % — browser users will get 42501!', sig;
+      missing_count := missing_count + 1;
+    END IF;
+  END LOOP;
+  IF missing_count = 0 THEN
+    RAISE NOTICE 'Step 5: All % browser RPCs have authenticated EXECUTE ✓', array_length(browser_rpcs, 1);
+  ELSE
+    RAISE WARNING 'Step 5: % browser RPCs MISSING authenticated EXECUTE — fix Step 3!', missing_count;
+  END IF;
+END $$;
+
+-- =============================================================================
 -- VERIFICATION (run after migration):
 -- =============================================================================
 -- SELECT p.proname,
@@ -232,7 +273,7 @@ GRANT EXECUTE ON FUNCTION public.get_tenant_id_by_hostname(text) TO anon;
 -- Expected results:
 --   public_exec  = false for ALL
 --   anon_exec    = true  ONLY for get_tenant_id_by_hostname
---   auth_exec    = true  ONLY for RLS helpers + user RPCs (~20 functions)
+--   auth_exec    = true  ONLY for RLS helpers + user RPCs (~30 functions)
 --   service_exec = true  for ALL
 
 -- =============================================================================

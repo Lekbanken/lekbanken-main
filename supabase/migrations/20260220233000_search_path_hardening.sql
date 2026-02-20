@@ -1,7 +1,7 @@
 -- =============================================================================
 -- Migration: 20260220233000_search_path_hardening.sql
 -- Description: Fix search_path on ALL SECURITY DEFINER functions + revoke
---              anon SELECT on ALL public views (catch-all hardening)
+--              anon ALL on ALL public relations (catch-all hardening)
 -- =============================================================================
 -- CONTEXT:
 -- Step 1: Audit query B shows ~55 SECURITY DEFINER functions with unsafe
@@ -11,9 +11,10 @@
 -- Uses ALTER FUNCTION (not CREATE OR REPLACE) — only changes the config
 -- setting without touching the function body. This is safe and idempotent.
 --
--- Step 2: Audit query F shows all 4 public views are SELECT-able by anon.
--- v_gamification_leaderboard JOINs users and exposes u.email.
--- Dynamic loop revokes anon SELECT on ALL public views as catch-all.
+-- Step 2: Revoke ALL privileges from anon on ALL tables, partitions,
+-- sequences and views in public schema. supabase_admin default privileges
+-- auto-grant to anon (platform limitation we can't fix), so this catch-all
+-- neutralizes the leak. Does NOT touch 'authenticated' (RLS needs grants).
 --
 -- Both loops are dynamic — they catch ALL current objects regardless of count,
 -- making this safe to re-run as a periodic hardening sweep if needed.
@@ -66,26 +67,31 @@ BEGIN
 END;
 $$;
 
--- ─── Step 2: Revoke anon SELECT on ALL public views (catch-all) ─────────────
--- v_gamification_leaderboard JOINs users and exposes u.email.
--- No public view should be anon-readable — use dynamic loop so future views
--- are also covered if this migration is re-run as a hardening sweep.
+-- ─── Step 2: Revoke anon ALL on ALL public relations (catch-all) ────────────
+-- Removes table/view/sequence grants from anon in one sweep.
+-- supabase_admin default privileges auto-grant to anon on new objects,
+-- and we cannot ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin on managed
+-- Supabase. This catch-all neutralizes the leak regardless of owner.
+--
+-- NOTE: We do NOT revoke from 'authenticated' — RLS needs table grants to
+-- evaluate policies. Revoking from authenticated would return 0 rows on
+-- every query (PostgreSQL checks GRANT before RLS).
 DO $$
 DECLARE
-  rec RECORD;
+  r RECORD;
   revoked_count INTEGER := 0;
 BEGIN
-  FOR rec IN
-    SELECT quote_ident(schemaname) || '.' || quote_ident(viewname) AS v,
-           viewname
-    FROM pg_views
-    WHERE schemaname = 'public'
+  FOR r IN
+    SELECT quote_ident(n.nspname) || '.' || quote_ident(c.relname) AS rel
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+      AND c.relkind IN ('r', 'p', 'S', 'v')  -- tables, partitions, sequences, views
   LOOP
-    EXECUTE 'REVOKE SELECT ON ' || rec.v || ' FROM anon';
+    EXECUTE 'REVOKE ALL ON ' || r.rel || ' FROM anon';
     revoked_count := revoked_count + 1;
-    RAISE NOTICE 'Revoked anon SELECT on %', rec.v;
   END LOOP;
-  RAISE NOTICE '── Total views revoked from anon: % ──', revoked_count;
+  RAISE NOTICE '── Revoked anon privileges on % relations ──', revoked_count;
 END;
 $$;
 

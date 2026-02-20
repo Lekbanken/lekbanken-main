@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { burnCoins, checkUserPurchaseLimit } from '@/lib/services/gamification-burn.server'
+import { requireCronOrAdmin, AuthError } from '@/lib/api/auth-guard'
 import type { Json } from '@/types/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -30,11 +31,8 @@ interface BurnRequestBody {
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    // Verify service role authorization
-    const authHeader = req.headers.get('authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // Verify caller is cron job or system admin
+    await requireCronOrAdmin()
 
     const body: BurnRequestBody = await req.json()
 
@@ -89,6 +87,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       newBalance: result.newBalance,
     })
   } catch (error) {
+    if (error instanceof AuthError) return NextResponse.json({ error: error.message }, { status: error.status })
     console.error('[POST /api/gamification/burn] Error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

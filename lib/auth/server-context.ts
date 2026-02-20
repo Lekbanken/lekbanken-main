@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { cache } from 'react'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { resolveTenant } from '@/lib/tenant/resolver'
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
@@ -106,6 +106,15 @@ const getServerUserDataCached = cache(async (): Promise<ServerUserData> => {
 })
 
 export async function getServerAuthContext(pathname?: string): Promise<AuthContext> {
+  // Detect if middleware flagged auth as degraded (timeout / network error).
+  // When degraded, middleware let the request through instead of redirecting
+  // to login, so we still attempt auth here — the server-side Supabase client
+  // has its own timeout and may succeed even if middleware's shorter timeout
+  // didn't. If both fail, we surface authDegraded so UI can show "retrying"
+  // instead of hard-redirecting to login.
+  const headerStore = await headers()
+  const middlewareAuthDegraded = headerStore.get('x-auth-degraded') === '1'
+
   // Get user data from request-scoped cache (same for all pathname variations)
   const userData = await getServerUserDataCached()
 
@@ -117,6 +126,9 @@ export async function getServerAuthContext(pathname?: string): Promise<AuthConte
       memberships: [],
       activeTenant: null,
       activeTenantRole: null,
+      // If middleware auth timed out AND server auth also returned no user,
+      // the session might still be valid — flag as degraded so UI can retry.
+      authDegraded: middlewareAuthDegraded,
     }
   }
 

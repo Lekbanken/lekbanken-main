@@ -6,7 +6,8 @@
  * Supports 24h expiry (default) and no-expiry tokens (quota-limited).
  */
 
-import { createServiceRoleClient } from '@/lib/supabase/server';
+import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase';
 
 type Participant = Database['public']['Tables']['participants']['Row'];
@@ -62,7 +63,7 @@ export async function verifyParticipantToken(
   }
   
   // Check if participant is blocked or kicked
-  if (participant.status === 'blocked' || participant.status === 'kicked') {
+  if (REJECTED_PARTICIPANT_STATUSES.has(participant.status)) {
     return null; // Not allowed to rejoin
   }
   

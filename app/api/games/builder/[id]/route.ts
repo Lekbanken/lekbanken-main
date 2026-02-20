@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { requireAuth, AuthError } from '@/lib/api/auth-guard';
 import type { Database, Json } from '@/types/supabase';
 import { TOOL_REGISTRY } from '@/features/tools/registry';
 
@@ -262,6 +263,8 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  try {
+  await requireAuth();
   const { id } = await params;
   const supabase = createServiceRoleClient();
 
@@ -429,12 +432,18 @@ export async function GET(
     artifacts: artifactsWithVariants,
     triggers: triggers || [],
   });
+  } catch (err) {
+    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
+    throw err;
+  }
 }
 
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  try {
+  await requireAuth();
   const { id } = await params;
   const supabase = createServiceRoleClient();
   const body = (await request.json().catch(() => ({}))) as BuilderBody;
@@ -828,4 +837,8 @@ export async function PUT(
   }
 
   return NextResponse.json({ success: true });
+  } catch (err) {
+    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
+    throw err;
+  }
 }

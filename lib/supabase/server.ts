@@ -86,7 +86,15 @@ export function createServiceRoleClient() {
   if (!supabaseServiceRoleKey) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured')
   }
-  return createServiceRoleSupabaseClient<Database>(supabaseUrl, supabaseServiceRoleKey)
+  return createServiceRoleSupabaseClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
+    global: {
+      fetch: createFetchWithTimeout(fetch, {
+        logPrefix: '[supabase fetch:service-role]',
+        restMs: 15_000,
+        authMs: 10_000,
+      }),
+    },
+  })
 }
 
 // Lazy-loaded singleton for admin tasks on the server only.

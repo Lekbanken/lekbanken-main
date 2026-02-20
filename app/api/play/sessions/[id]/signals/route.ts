@@ -2,52 +2,13 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { resolveSessionViewer } from '@/lib/api/play-auth';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseAny = any;
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
-}
-
-type Sender =
-  | { type: 'host'; userId: string }
-  | { type: 'participant'; participantId: string; participantName: string };
-
-async function resolveSender(sessionId: string, request: Request): Promise<Sender | null> {
-  const token = request.headers.get('x-participant-token');
-  if (token) {
-    const supabase = await createServiceRoleClient();
-    const { data: participant } = await supabase
-      .from('participants')
-      .select('id, display_name, token_expires_at, status')
-      .eq('participant_token', token)
-      .eq('session_id', sessionId)
-      .single();
-
-    if (!participant) return null;
-    if (participant.status === 'blocked' || participant.status === 'kicked') return null;
-    if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) return null;
-
-    return {
-      type: 'participant',
-      participantId: participant.id,
-      participantName: participant.display_name,
-    };
-  }
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return null;
-  if (session.host_user_id !== user.id) return null;
-
-  return { type: 'host', userId: user.id };
 }
 
 async function broadcastPlayEvent(sessionId: string, event: unknown) {
@@ -118,7 +79,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
 
-  const sender = await resolveSender(sessionId, request);
+  const sender = await resolveSessionViewer(sessionId, request);
   if (!sender) return jsonError('Unauthorized', 401);
 
   const body = await request.json().catch(() => ({}));

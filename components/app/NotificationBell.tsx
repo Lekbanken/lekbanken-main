@@ -4,7 +4,10 @@
  * NotificationBell Component
  *
  * Bell icon with unread badge for the App topbar.
- * Opens a dropdown with notification list.
+ * Uses custom webp bell images:
+ * - bell_rest_V2.webp  → grey/resting (0 unread)
+ * - bell_active_v2.webp → gold/active  (≥1 unread)
+ * Falls back to Heroicon SVGs if images fail to load.
  *
  * @example
  * ```tsx
@@ -13,12 +16,17 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { BellAlertIcon } from '@heroicons/react/24/solid';
 import { cn } from '@/lib/utils';
 import { useAppNotifications, type AppNotification } from '@/hooks/useAppNotifications';
+
+// Bell image paths (public dir)
+const BELL_REST_SRC = '/icons/app-shell/bell_rest_V2.webp';
+const BELL_ACTIVE_SRC = '/icons/app-shell/bell_active_v2.webp';
 
 // =============================================================================
 // TYPES
@@ -61,6 +69,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
   const t = useTranslations('app.notifications');
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -72,6 +81,12 @@ export function NotificationBell({ className }: NotificationBellProps) {
     markAllAsRead,
     dismiss,
   } = useAppNotifications();
+
+  // Reset image error flag when switching between active/rest bell
+  const isActive = unreadCount > 0;
+  useEffect(() => {
+    setImgError(false);
+  }, [isActive]);
 
   // Close on click outside
   useEffect(() => {
@@ -137,10 +152,25 @@ export function NotificationBell({ className }: NotificationBellProps) {
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        {unreadCount > 0 ? (
-          <BellAlertIcon className="h-5 w-5" />
+        {/* Bell icon — webp images with Heroicon fallback */}
+        {imgError ? (
+          // Fallback: Heroicon SVG
+          unreadCount > 0 ? (
+            <BellAlertIcon className="h-5 w-5" />
+          ) : (
+            <BellIcon className="h-5 w-5" />
+          )
         ) : (
-          <BellIcon className="h-5 w-5" />
+          <Image
+            key={unreadCount > 0 ? 'bell-active' : 'bell-rest'}
+            src={unreadCount > 0 ? BELL_ACTIVE_SRC : BELL_REST_SRC}
+            alt={t('title')}
+            width={24}
+            height={24}
+            className="h-6 w-6 object-contain"
+            onError={() => setImgError(true)}
+            unoptimized
+          />
         )}
 
         {/* Unread Badge */}

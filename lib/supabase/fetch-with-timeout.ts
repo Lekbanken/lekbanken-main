@@ -22,11 +22,11 @@ export type FetchWithTimeoutOptions = Partial<TimeoutConfig> & {
 
 const defaultTimeouts: TimeoutConfig = {
   // Keep a reasonable ceiling to avoid “infinite loading” when network/DB hangs.
-  defaultMs: 30_000,
-  // Normal PostgREST queries should be fast; if they aren’t, we want to surface it.
-  restMs: 15_000,
-  // Auth endpoints can be slower during token refresh but should not hang.
-  authMs: 15_000,
+  defaultMs: 15_000,
+  // PostgREST queries should complete within a few seconds; fail fast if not.
+  restMs: 8_000,
+  // Auth endpoints should be fast; token refresh is the slowest path.
+  authMs: 5_000,
   // Edge functions may do more work.
   functionsMs: 30_000,
   // Upload/download can be larger; allow longer.

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { resolveParticipant } from '@/lib/api/play-auth';
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
@@ -52,28 +53,16 @@ export async function POST(
 
   const current = getCurrentStepPhase(session);
 
-  const token = request.headers.get('x-participant-token');
-  if (!token) return jsonError('Unauthorized', 401);
-
-  const service = await createServiceRoleClient();
-
-  const { data: participant } = await service
-    .from('participants')
-    .select('id, token_expires_at')
-    .eq('participant_token', token)
-    .eq('session_id', sessionId)
-    .single();
-
-  if (!participant) return jsonError('Unauthorized', 401);
-  if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) {
-    return jsonError('Unauthorized', 401);
-  }
+  const resolved = await resolveParticipant(request, sessionId);
+  if (!resolved) return jsonError('Unauthorized', 401);
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return jsonError('Invalid body', 400);
 
   const optionKey = typeof body.optionKey === 'string' ? body.optionKey.trim() : '';
   if (!optionKey) return jsonError('Missing optionKey', 400);
+
+  const service = await createServiceRoleClient();
 
   const { data: decision, error: dErr } = await service
     .from('session_decisions')
@@ -105,7 +94,7 @@ export async function POST(
   if (!valid) return jsonError('Invalid optionKey', 400);
 
   // Enforce single-choice: clear previous votes for this decision + participant
-  const participantId = participant.id as string;
+  const participantId = resolved.participantId;
 
   const { error: upsertErr } = await service
     .from('session_votes')

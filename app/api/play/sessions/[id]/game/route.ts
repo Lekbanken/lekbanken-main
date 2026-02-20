@@ -10,6 +10,7 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
 import type { Database } from '@/types/supabase';
 import type { BoardTheme } from '@/types/games';
 
@@ -225,7 +226,7 @@ export async function GET(
         .single();
 
       if (participant) {
-        if (participant.status === 'blocked' || participant.status === 'kicked') {
+        if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
           return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
         }
 

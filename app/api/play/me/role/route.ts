@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
+import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
 
 export async function GET(request: Request) {
   try {
@@ -46,7 +47,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Participant not found' }, { status: 404 });
     }
 
-    if (participant.status === 'blocked' || participant.status === 'kicked') {
+    if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
       return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
     }
 

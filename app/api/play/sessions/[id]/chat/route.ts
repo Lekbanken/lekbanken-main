@@ -1,11 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { resolveSessionViewer, type Viewer } from '@/lib/api/play-auth';
 
 type Visibility = 'public' | 'host';
-
-type Viewer =
-  | { type: 'host'; userId: string }
-  | { type: 'participant'; participantId: string; participantName: string };
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
@@ -18,51 +15,6 @@ function safeTrimMessage(value: unknown): string | null {
   // Keep this conservative; adjust if you want longer messages.
   if (trimmed.length > 1000) return null;
   return trimmed;
-}
-
-async function resolveViewer(sessionId: string, request: Request): Promise<Viewer | null> {
-  const token = request.headers.get('x-participant-token');
-  if (token) {
-    const supabase = await createServiceRoleClient();
-    const { data: participant } = await supabase
-      .from('participants')
-      .select('id, display_name, token_expires_at')
-      .eq('participant_token', token)
-      .eq('session_id', sessionId)
-      .single();
-
-    if (!participant) return null;
-    if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) {
-      return null;
-    }
-
-    return {
-      type: 'participant',
-      participantId: participant.id,
-      participantName: participant.display_name,
-    };
-  }
-
-  // Host path (cookie/session auth)
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  // Verify host
-  const service = await createServiceRoleClient();
-  const { data: session } = await service
-    .from('participant_sessions')
-    .select('host_user_id')
-    .eq('id', sessionId)
-    .single();
-
-  if (!session) return null;
-  if (session.host_user_id !== user.id) return null;
-
-  return { type: 'host', userId: user.id };
 }
 
 async function getSessionExists(sessionId: string): Promise<boolean> {
@@ -81,7 +33,7 @@ export async function GET(
     return jsonError('Session not found', 404);
   }
 
-  const viewer = await resolveViewer(sessionId, request);
+  const viewer = await resolveSessionViewer(sessionId, request);
   if (!viewer) return jsonError('Unauthorized', 401);
 
   const url = new URL(request.url);
@@ -174,7 +126,7 @@ export async function POST(
     return jsonError('Session not found', 404);
   }
 
-  const viewer = await resolveViewer(sessionId, request);
+  const viewer = await resolveSessionViewer(sessionId, request);
   if (!viewer) return jsonError('Unauthorized', 401);
 
   const body = await request.json().catch(() => null);

@@ -10777,6 +10777,19 @@
         "couldNotJoin": "Kunne ikke bli med i økten"
       }
     },
+    "joinSessionForm": {
+      "sessionCodeLabel": "Sesjonskode",
+      "charLabel": "Tegn {current} av {total}",
+      "displayNameLabel": "Ditt visningsnavn",
+      "displayNamePlaceholder": "F.eks. Anna",
+      "charCount": "{current}/20 tegn",
+      "connecting": "Kobler til...",
+      "joinNow": "Bli med nå",
+      "errors": {
+        "incompleteCode": "Skriv inn en fullstendig sesjonskode",
+        "invalidName": "Skriv inn et visningsnavn (minst 2 tegn)"
+      }
+    },
     "killSwitch": {
       "emergencyStopActive": "Nødstopp aktivt",
       "triggersActive": "Triggere aktive",
@@ -12744,7 +12757,8 @@
         "notConfigured": "Hotspot-bilde ikke konfigurert"
       },
       "tilePuzzle": {
-        "title": "Puslespill"
+        "title": "Puslespill",
+        "missingConfig": "Puslespillbilde mangler eller er ikke konfigurert."
       },
       "logicGrid": {
         "title": "Logikkpuslespill",

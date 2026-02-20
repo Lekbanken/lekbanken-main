@@ -8,6 +8,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { requireSessionHost, AuthError } from '@/lib/api/auth-guard';
 
 interface RevokeTokenRequest {
   participant_token?: string;
@@ -30,10 +31,10 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceRoleClient();
 
-    // Build query based on provided identifier
+    // Build query based on provided identifier — first look up to get session_id for auth
     let query = supabase
       .from('participants')
-      .select('*, participant_sessions!inner(tenant_id)');
+      .select('*, participant_sessions!inner(tenant_id, host_user_id)');
 
     if (participant_token) {
       query = query.eq('participant_token', participant_token);
@@ -52,6 +53,9 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Auth: session host or system_admin
+    await requireSessionHost(participant.session_id);
 
     // Extract tenant_id from joined session data
     const tenantId = (participant.participant_sessions as { tenant_id: string }).tenant_id;
@@ -99,6 +103,9 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error('Error in token revocation:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

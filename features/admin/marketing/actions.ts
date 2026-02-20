@@ -4,7 +4,11 @@
  * Marketing Admin Server Actions
  */
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
+import { requireSystemAdmin } from '@/lib/api/auth-guard';
+
+/** Immediately invalidate a cache tag (Next.js 16 requires a profile). */
+const invalidateTag = (tag: string) => revalidateTag(tag, { expire: 0 });
 import {
   createFeature,
   updateFeature,
@@ -24,6 +28,7 @@ import type { MarketingFeatureInput, MarketingUpdateInput } from '@/lib/marketin
 
 export async function fetchAllFeaturesAction() {
   try {
+    await requireSystemAdmin();
     const result = await getAllFeatures();
     return { success: true, data: result };
   } catch (error) {
@@ -34,6 +39,7 @@ export async function fetchAllFeaturesAction() {
 
 export async function fetchAllUpdatesAction() {
   try {
+    await requireSystemAdmin();
     const result = await getAllUpdates();
     return { success: true, data: result };
   } catch (error) {
@@ -48,7 +54,9 @@ export async function fetchAllUpdatesAction() {
 
 export async function createFeatureAction(input: MarketingFeatureInput) {
   try {
+    await requireSystemAdmin();
     const feature = await createFeature(input);
+    invalidateTag('marketing-features');
     revalidatePath('/admin/marketing/features');
     revalidatePath('/'); // Revalidate marketing page
     revalidatePath('/features');
@@ -61,7 +69,9 @@ export async function createFeatureAction(input: MarketingFeatureInput) {
 
 export async function updateFeatureAction(id: string, input: Partial<MarketingFeatureInput>) {
   try {
+    await requireSystemAdmin();
     const feature = await updateFeature(id, input);
+    invalidateTag('marketing-features');
     revalidatePath('/admin/marketing/features');
     revalidatePath('/');
     revalidatePath('/features');
@@ -74,7 +84,9 @@ export async function updateFeatureAction(id: string, input: Partial<MarketingFe
 
 export async function deleteFeatureAction(id: string) {
   try {
+    await requireSystemAdmin();
     await deleteFeature(id);
+    invalidateTag('marketing-features');
     revalidatePath('/admin/marketing/features');
     revalidatePath('/');
     revalidatePath('/features');
@@ -91,7 +103,9 @@ export async function deleteFeatureAction(id: string) {
 
 export async function createUpdateAction(input: MarketingUpdateInput) {
   try {
+    await requireSystemAdmin();
     const update = await createUpdate(input);
+    invalidateTag('marketing-updates');
     revalidatePath('/admin/marketing/updates');
     revalidatePath('/');
     return { success: true, data: update };
@@ -103,7 +117,9 @@ export async function createUpdateAction(input: MarketingUpdateInput) {
 
 export async function updateUpdateAction(id: string, input: Partial<MarketingUpdateInput>) {
   try {
+    await requireSystemAdmin();
     const update = await updateUpdate(id, input);
+    invalidateTag('marketing-updates');
     revalidatePath('/admin/marketing/updates');
     revalidatePath('/');
     return { success: true, data: update };
@@ -115,7 +131,9 @@ export async function updateUpdateAction(id: string, input: Partial<MarketingUpd
 
 export async function deleteUpdateAction(id: string) {
   try {
+    await requireSystemAdmin();
     await deleteUpdate(id);
+    invalidateTag('marketing-updates');
     revalidatePath('/admin/marketing/updates');
     revalidatePath('/');
     return { success: true };
@@ -127,7 +145,9 @@ export async function deleteUpdateAction(id: string) {
 
 export async function publishUpdateAction(id: string) {
   try {
+    await requireSystemAdmin();
     const update = await publishUpdate(id);
+    invalidateTag('marketing-updates');
     revalidatePath('/admin/marketing/updates');
     revalidatePath('/');
     return { success: true, data: update };

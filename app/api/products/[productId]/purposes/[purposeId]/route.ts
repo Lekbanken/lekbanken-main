@@ -1,11 +1,14 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { requireAuth, AuthError } from '@/lib/api/auth-guard'
 
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ productId: string; purposeId: string }> }
 ) {
+  try {
+  await requireAuth()
   const { productId, purposeId } = await params
   const supabase = await createServerRlsClient()
 
@@ -25,4 +28,8 @@ export async function DELETE(
   }
 
   return NextResponse.json({ success: true })
+  } catch (err) {
+    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status })
+    throw err
+  }
 }

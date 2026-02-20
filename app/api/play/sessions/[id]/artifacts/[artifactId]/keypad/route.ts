@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { resolveParticipant } from '@/lib/api/play-auth';
 import type { Json } from '@/types/supabase';
 
 /**
@@ -81,24 +82,6 @@ function parseKeypadStateFromState(stateJson: Json | null): KeypadState {
   };
 }
 
-async function resolveParticipant(sessionId: string, request: Request) {
-  const token = request.headers.get('x-participant-token');
-  if (!token) return null;
-
-  const supabase = await createServiceRoleClient();
-  const { data: participant } = await supabase
-    .from('participants')
-    .select('id, display_name, token_expires_at')
-    .eq('participant_token', token)
-    .eq('session_id', sessionId)
-    .single();
-
-  if (!participant) return null;
-  if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) return null;
-
-  return { participantId: participant.id, displayName: participant.display_name };
-}
-
 async function broadcastKeypadEvent(
   sessionId: string, 
   artifactId: string, 
@@ -143,7 +126,7 @@ export async function POST(
   }
 
   // Resolve participant (only participants can attempt keypad)
-  const participant = await resolveParticipant(sessionId, request);
+  const participant = await resolveParticipant(request, sessionId);
   if (!participant) {
     return jsonError('Unauthorized - participant token required', 401);
   }
@@ -291,7 +274,7 @@ export async function GET(
 ) {
   const { id: sessionId, artifactId: gameArtifactId } = await params;
 
-  const participant = await resolveParticipant(sessionId, request);
+  const participant = await resolveParticipant(request, sessionId);
   if (!participant) {
     return jsonError('Unauthorized - participant token required', 401);
   }

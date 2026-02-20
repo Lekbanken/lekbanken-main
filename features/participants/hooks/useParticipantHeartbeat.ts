@@ -58,7 +58,8 @@ export function useParticipantHeartbeat({
           status: isIdle ? 'idle' : 'active',
         })
         .eq('participant_token', participantToken)
-        .eq('session_id', sessionId);
+        .eq('session_id', sessionId)
+        .not('status', 'in', '(blocked,kicked)');
       
       if (error) {
         console.error('[Heartbeat] Failed to update:', error);
@@ -135,6 +136,7 @@ export function useParticipantHeartbeat({
         })
         .eq('participant_token', participantToken)
         .eq('session_id', sessionId)
+        .not('status', 'in', '(blocked,kicked)')
         .then(({ error }) => {
           if (error) {
             console.error('[Heartbeat] Failed to mark as disconnected:', error);

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { resolveParticipant } from '@/lib/api/play-auth';
 import type { Json } from '@/types/supabase';
 import {
   normalizeRiddleAnswer,
@@ -41,32 +42,6 @@ type PuzzleSubmitResponse = {
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
-}
-
-async function resolveParticipant(
-  sessionId: string,
-  request: Request
-): Promise<{ participantId: string; participantName: string } | null> {
-  const token = request.headers.get('x-participant-token');
-  if (!token) return null;
-
-  const supabase = await createServiceRoleClient();
-  const { data: participant } = await supabase
-    .from('participants')
-    .select('id, display_name, token_expires_at')
-    .eq('participant_token', token)
-    .eq('session_id', sessionId)
-    .single();
-
-  if (!participant) return null;
-  if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) {
-    return null;
-  }
-
-  return {
-    participantId: participant.id,
-    participantName: participant.display_name,
-  };
 }
 
 // =============================================================================
@@ -419,7 +394,7 @@ export async function POST(
     const { id: sessionId, artifactId: gameArtifactId } = await params;
 
     // Resolve participant
-    const participant = await resolveParticipant(sessionId, request);
+    const participant = await resolveParticipant(request, sessionId);
     if (!participant) {
       return jsonError('Unauthorized', 401);
     }
@@ -507,7 +482,7 @@ export async function GET(
   try {
     const { id: sessionId, artifactId: gameArtifactId } = await params;
 
-    const participant = await resolveParticipant(sessionId, request);
+    const participant = await resolveParticipant(request, sessionId);
     if (!participant) {
       return jsonError('Unauthorized', 401);
     }

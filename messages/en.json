@@ -12401,7 +12401,8 @@
         "notConfigured": "Hotspot image not configured"
       },
       "tilePuzzle": {
-        "title": "Tile puzzle"
+        "title": "Tile puzzle",
+        "missingConfig": "Puzzle image is missing or not configured."
       },
       "logicGrid": {
         "title": "Logic puzzle",

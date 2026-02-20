@@ -10,7 +10,7 @@ import {
   AdminStatCard,
   AdminStatGrid,
 } from '@/components/admin/shared';
-import { Badge, Card, CardContent, CardHeader, CardTitle, useToast } from '@/components/ui';
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
 import { PlayIcon } from '@heroicons/react/24/outline';
 
@@ -64,7 +64,6 @@ export function SessionDetailPage({ sessionId }: Props) {
   const t = useTranslations('admin.sessions');
   const tDetail = useTranslations('admin.sessions.detail');
   const { can } = useRbac();
-  const { success, warning } = useToast();
   const [session, setSession] = useState<SessionDetail | null>(null);
   const [log, setLog] = useState<ActionLogEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -170,59 +169,6 @@ export function SessionDetailPage({ sessionId }: Props) {
           <CardTitle>{tDetail('actionsAndLog')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-3">
-          <div className="flex flex-wrap gap-2">
-            <button
-              className="rounded border px-3 py-1 text-sm"
-              onClick={async () => {
-                const res = await fetch(`/api/sessions/${session.id}/actions`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ action: 'mute' }),
-                });
-                const json = await res.json().catch(() => ({}));
-                if (json?.logEntry) {
-                  setLog((prev) => [json.logEntry, ...prev]);
-                }
-                success(tDetail('muteSent'));
-              }}
-            >
-              {tDetail('muteParticipant')}
-            </button>
-            <button
-              className="rounded border px-3 py-1 text-sm"
-              onClick={async () => {
-                const res = await fetch(`/api/sessions/${session.id}/actions`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ action: 'kick' }),
-                });
-                const json = await res.json().catch(() => ({}));
-                if (json?.logEntry) {
-                  setLog((prev) => [json.logEntry, ...prev]);
-                }
-                warning(tDetail('kickSent'));
-              }}
-            >
-              {tDetail('kickSession')}
-            </button>
-            <button
-              className="rounded border px-3 py-1 text-sm"
-              onClick={async () => {
-                const res = await fetch(`/api/sessions/${session.id}/actions`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ action: 'ban' }),
-                });
-                const json = await res.json().catch(() => ({}));
-                if (json?.logEntry) {
-                  setLog((prev) => [json.logEntry, ...prev]);
-                }
-                warning(tDetail('banSent'));
-              }}
-            >
-              {tDetail('banParticipant')}
-            </button>
-          </div>
           <div className="space-y-2">
             {log.length === 0 ? (
               <p className="text-sm text-muted-foreground">{tDetail('noLogYet')}</p>

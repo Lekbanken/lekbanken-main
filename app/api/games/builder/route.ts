@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { requireAuth, AuthError } from '@/lib/api/auth-guard';
 import type { Database, Json } from '@/types/supabase';
 import { TOOL_REGISTRY } from '@/features/tools/registry';
 
@@ -190,6 +191,8 @@ function normalizeToolScope(value: unknown): 'host' | 'participants' | 'both' {
 }
 
 export async function POST(request: Request) {
+  try {
+  await requireAuth();
   const supabase = createServiceRoleClient();
   const body = (await request.json().catch(() => ({}))) as BuilderBody;
 
@@ -388,4 +391,8 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ gameId: game.id, session: game });
+  } catch (err) {
+    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
+    throw err;
+  }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
+import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
 
 export async function GET(request: Request) {
   const token = request.headers.get('x-participant-token');
@@ -36,6 +37,10 @@ export async function GET(request: Request) {
 
   if (participantError || !participant) {
     return NextResponse.json({ error: 'Participant not found' }, { status: 404 });
+  }
+
+  if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
+    return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
   }
 
   if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) {

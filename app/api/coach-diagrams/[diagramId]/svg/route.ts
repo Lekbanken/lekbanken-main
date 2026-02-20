@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { Database } from '@/types/supabase';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
 import { renderSpatialSvg } from '@/features/admin/library/spatial-editor/lib/svg-export';
 import type { SpatialDocumentV1 } from '@/features/admin/library/spatial-editor/lib/types';
 
@@ -80,7 +81,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ dia
       .eq('participant_token', participantToken)
       .maybeSingle();
 
-    if (!participant || participant.status === 'blocked' || participant.status === 'kicked') {
+    if (!participant || REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

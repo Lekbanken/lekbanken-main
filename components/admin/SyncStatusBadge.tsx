@@ -74,7 +74,10 @@ export function SyncStatusBadge({
 
 function formatRelativeTime(date: string): string {
   const now = new Date();
-  const then = new Date(date);
+  // Append 'Z' if no timezone indicator — DB TIMESTAMP columns return bare ISO strings
+  const then = (!date.endsWith('Z') && !date.includes('+') && !/\d{2}-\d{2}$/.test(date.slice(-5)))
+    ? new Date(date + 'Z')
+    : new Date(date);
   const diffMs = now.getTime() - then.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMins / 60);

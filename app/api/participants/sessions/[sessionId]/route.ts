@@ -14,6 +14,7 @@ import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
+import { requireSessionHost, AuthError } from '@/lib/api/auth-guard';
 
 export async function GET(
   _request: NextRequest,
@@ -84,6 +85,9 @@ export async function DELETE(
         { status: 400 }
       );
     }
+
+    // Auth: session host or system_admin
+    await requireSessionHost(sessionId);
 
     const supabase = createServiceRoleClient();
 
@@ -184,6 +188,9 @@ export async function DELETE(
     });
 
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error('Error in session deletion:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

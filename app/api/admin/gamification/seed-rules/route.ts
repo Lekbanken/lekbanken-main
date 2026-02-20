@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { requireSystemAdmin, AuthError } from '@/lib/api/auth-guard'
 import type { Database } from '@/types/supabase'
 
 type AutomationRuleRow = Database['public']['Tables']['gamification_automation_rules']['Row']
@@ -187,6 +188,7 @@ const DEFAULT_RULES = [
 // GET: Fetch existing rules and compare with defaults
 export async function GET(request: Request) {
   try {
+    await requireSystemAdmin()
     const { searchParams } = new URL(request.url)
     const tenantId = searchParams.get('tenantId')
     
@@ -252,6 +254,7 @@ export async function GET(request: Request) {
       }
     })
   } catch (err) {
+    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status })
     console.error('Error fetching rules:', err)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -263,6 +266,7 @@ export async function GET(request: Request) {
 // POST: Seed missing rules or update existing
 export async function POST(request: Request) {
   try {
+    await requireSystemAdmin()
     const body = await request.json()
     const { tenantId, mode = 'missing', userId } = body as {
       tenantId?: string | null
@@ -342,6 +346,7 @@ export async function POST(request: Request) {
       message: `${inserted?.length || 0} regler har lagts till`,
     })
   } catch (err) {
+    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status })
     console.error('Error seeding rules:', err)
     return NextResponse.json(
       { error: 'Internal server error' },

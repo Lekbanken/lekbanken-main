@@ -8,6 +8,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { requireSessionHost, AuthError } from '@/lib/api/auth-guard';
+import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
 
 interface ExtendTokenRequest {
   participant_token: string;
@@ -51,12 +53,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if participant is blocked or kicked
-    if (participant.status === 'blocked' || participant.status === 'kicked') {
+    if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
       return NextResponse.json(
         { error: 'Cannot extend token for blocked or kicked participant' },
         { status: 403 }
       );
     }
+
+    // Auth: session host or system_admin
+    await requireSessionHost(participant.session_id);
 
     // Extract tenant_id from joined session data
     const tenantId = (participant.participant_sessions as { tenant_id: string }).tenant_id;
@@ -104,6 +109,9 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error('Error in token extension:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

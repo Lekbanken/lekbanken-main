@@ -1,6 +1,7 @@
 'use server';
 
 import { supabaseAdmin } from '@/lib/supabase/server';
+import { requireSystemAdmin } from '@/lib/api/auth-guard';
 import { revalidatePath } from 'next/cache';
 import type { Database } from '@/types/supabase';
 
@@ -43,6 +44,7 @@ export type UpdatePasswordResult = {
 
 export async function createUser(input: CreateUserInput): Promise<CreateUserResult> {
   try {
+    await requireSystemAdmin();
     // Create user via Supabase Admin API
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: input.email,
@@ -125,6 +127,7 @@ export async function createUser(input: CreateUserInput): Promise<CreateUserResu
 
 export async function sendPasswordResetEmail(email: string): Promise<ResetPasswordResult> {
   try {
+    await requireSystemAdmin();
     const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password`,
     });
@@ -156,6 +159,7 @@ export async function updateUserPassword(
   newPassword: string
 ): Promise<UpdatePasswordResult> {
   try {
+    await requireSystemAdmin();
     const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
       password: newPassword,
     });
@@ -184,6 +188,7 @@ export async function updateUserPassword(
 
 export async function deleteUser(userId: string): Promise<{ success: boolean; error?: string }> {
   try {
+    await requireSystemAdmin();
     // 1. Remove tenant memberships first (FK dependency)
     const { error: membershipError } = await supabaseAdmin
       .from('user_tenant_memberships')
@@ -246,6 +251,7 @@ export async function removeUserMemberships(
   userId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    await requireSystemAdmin();
     const { error } = await supabaseAdmin
       .from('user_tenant_memberships')
       .delete()
@@ -276,6 +282,7 @@ export async function lookupUserByEmail(
   error?: string;
 }> {
   try {
+    await requireSystemAdmin();
     const { data, error } = await supabaseAdmin
       .from('users')
       .select('id, full_name')
@@ -310,6 +317,7 @@ export async function getTenantsForUserCreation(): Promise<{
   error?: string;
 }> {
   try {
+    await requireSystemAdmin();
     const { data, error } = await supabaseAdmin
       .from('tenants')
       .select('id, name')

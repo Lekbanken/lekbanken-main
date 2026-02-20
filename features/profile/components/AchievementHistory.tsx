@@ -68,7 +68,10 @@ export function AchievementHistory({
   }, [userId, maxDisplay]);
 
   const formatRelativeTime = (dateString: string): string => {
-    const date = new Date(dateString);
+    // Append 'Z' if no timezone indicator — DB TIMESTAMP columns return bare ISO strings
+    const date = (!dateString.endsWith('Z') && !dateString.includes('+') && !/\d{2}-\d{2}$/.test(dateString.slice(-5)))
+      ? new Date(dateString + 'Z')
+      : new Date(dateString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));

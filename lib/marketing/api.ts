@@ -11,6 +11,7 @@
 import 'server-only';
 
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { unstable_cache } from 'next/cache';
 import { transformFeatureRow, transformUpdateRow, transformFeatureInput, transformUpdateInput } from './transformers';
 import type {
   MarketingFeature,
@@ -36,49 +37,64 @@ const FEATURES_TABLE = 'marketing_features' as const;
 const UPDATES_TABLE = 'marketing_updates' as const;
 
 // =============================================================================
-// Public Read Functions (uses RLS client - returns only published)
+// Public Read Functions (cached — data is public so safe to share across requests)
+// Uses unstable_cache with 5-min TTL to eliminate redundant DB queries.
+// Admin publish actions should call revalidateTag('marketing-features') / 'marketing-updates'.
 // =============================================================================
 
 /**
- * Fetch published features for public display
+ * Fetch published features for public display (cached 5 min)
  */
 export async function getPublishedFeatures(filters?: FeatureFilters): Promise<FeaturesResponse> {
-  const supabase = await createServerRlsClient() as AnySupabaseClient;
-  
-  let query = supabase
-    .from(FEATURES_TABLE)
-    .select('*', { count: 'exact' })
-    .eq('status', 'published')
-    .order('priority', { ascending: false });
-
-  if (filters?.audience && filters.audience !== 'all') {
-    query = query.or(`audience.eq.${filters.audience},audience.eq.all`);
-  }
-  if (filters?.useCase) {
-    query = query.eq('use_case', filters.useCase);
-  }
-  if (filters?.context && filters.context !== 'any') {
-    query = query.or(`context.eq.${filters.context},context.eq.any`);
-  }
-  if (filters?.isFeatured !== undefined) {
-    query = query.eq('is_featured', filters.isFeatured);
-  }
-  if (filters?.search) {
-    query = query.or(`title.ilike.%${filters.search}%,subtitle.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
-  }
-
-  const { data, error, count } = await query;
-
-  if (error) {
-    console.error('[getPublishedFeatures] Error:', error);
-    throw new Error('Failed to fetch features');
-  }
-
-  return {
-    features: (data as MarketingFeatureRow[]).map(transformFeatureRow),
-    total: count ?? 0,
-  };
+  // Serialize filters to a stable string for cache key
+  const filterKey = filters ? JSON.stringify(filters, Object.keys(filters).sort()) : 'none';
+  return getPublishedFeaturesCached(filterKey);
 }
+
+const getPublishedFeaturesCached = unstable_cache(
+  async (filterKey: string): Promise<FeaturesResponse> => {
+    const filters: FeatureFilters | undefined = filterKey === 'none' ? undefined : JSON.parse(filterKey);
+    // Use service role for cached queries — data is public (RLS: status='published')
+    // and the cache is shared across requests/users.
+    const supabase = createServiceRoleClient() as AnySupabaseClient;
+    
+    let query = supabase
+      .from(FEATURES_TABLE)
+      .select('*', { count: 'exact' })
+      .eq('status', 'published')
+      .order('priority', { ascending: false });
+
+    if (filters?.audience && filters.audience !== 'all') {
+      query = query.or(`audience.eq.${filters.audience},audience.eq.all`);
+    }
+    if (filters?.useCase) {
+      query = query.eq('use_case', filters.useCase);
+    }
+    if (filters?.context && filters.context !== 'any') {
+      query = query.or(`context.eq.${filters.context},context.eq.any`);
+    }
+    if (filters?.isFeatured !== undefined) {
+      query = query.eq('is_featured', filters.isFeatured);
+    }
+    if (filters?.search) {
+      query = query.or(`title.ilike.%${filters.search}%,subtitle.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+    }
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      console.error('[getPublishedFeatures] Error:', error);
+      throw new Error('Failed to fetch features');
+    }
+
+    return {
+      features: (data as MarketingFeatureRow[]).map(transformFeatureRow),
+      total: count ?? 0,
+    };
+  },
+  ['marketing-published-features'],
+  { revalidate: 300, tags: ['marketing-features'] }
+);
 
 /**
  * Fetch featured features only (for homepage grid)
@@ -89,29 +105,37 @@ export async function getFeaturedFeatures(): Promise<MarketingFeature[]> {
 }
 
 /**
- * Fetch published updates for public display
+ * Fetch published updates for public display (cached 5 min)
  */
 export async function getPublishedUpdates(limit = 10): Promise<UpdatesResponse> {
-  const supabase = await createServerRlsClient() as AnySupabaseClient;
-  
-  const { data, error, count } = await supabase
-    .from(UPDATES_TABLE)
-    .select('*', { count: 'exact' })
-    .eq('status', 'published')
-    .not('published_at', 'is', null)
-    .order('published_at', { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    console.error('[getPublishedUpdates] Error:', error);
-    throw new Error('Failed to fetch updates');
-  }
-
-  return {
-    updates: (data as MarketingUpdateRow[]).map(transformUpdateRow),
-    total: count ?? 0,
-  };
+  return getPublishedUpdatesCached(limit);
 }
+
+const getPublishedUpdatesCached = unstable_cache(
+  async (limit: number): Promise<UpdatesResponse> => {
+    const supabase = createServiceRoleClient() as AnySupabaseClient;
+    
+    const { data, error, count } = await supabase
+      .from(UPDATES_TABLE)
+      .select('*', { count: 'exact' })
+      .eq('status', 'published')
+      .not('published_at', 'is', null)
+      .order('published_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('[getPublishedUpdates] Error:', error);
+      throw new Error('Failed to fetch updates');
+    }
+
+    return {
+      updates: (data as MarketingUpdateRow[]).map(transformUpdateRow),
+      total: count ?? 0,
+    };
+  },
+  ['marketing-published-updates'],
+  { revalidate: 300, tags: ['marketing-updates'] }
+);
 
 // =============================================================================
 // Admin Functions (uses service role client - full access)

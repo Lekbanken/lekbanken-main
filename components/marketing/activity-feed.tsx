@@ -62,12 +62,13 @@ function UpdateCard({ update, t }: UpdateCardProps) {
   const config = getTypeConfig(update.type, t);
   const Icon = config.icon;
   
-  const formattedDate = update.publishedAt 
+  const publishedDate = update.publishedAt ? new Date(update.publishedAt) : null;
+  const formattedDate = publishedDate 
     ? new Intl.DateTimeFormat('sv-SE', { 
         day: 'numeric', 
         month: 'short',
-        year: update.publishedAt.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
-      }).format(update.publishedAt)
+        year: publishedDate.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+      }).format(publishedDate)
     : null;
 
   return (

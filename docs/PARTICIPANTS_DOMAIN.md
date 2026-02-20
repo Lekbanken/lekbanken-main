@@ -114,7 +114,6 @@ These endpoints are implemented using a service role client, update participant 
 - `GET /api/participants` returns a simplified participant list.
 - `POST /api/participants/[participantId]/role` updates role with host ownership check.
 - `GET /api/participants/[participantId]` attempts DB lookup but falls back to mock data on failure.
-- `POST /api/participants/[participantId]/actions` is a stub (returns a synthetic log entry).
 
 ---
 

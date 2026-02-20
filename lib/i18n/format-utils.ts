@@ -116,7 +116,15 @@ const relativeTimeLabelsMap: Record<string, RelativeTimeLabels> = {
  */
 export function formatRelativeTime(value: string | Date | null | undefined, locale: string = defaultLocale): string {
   if (!value) return '—'
-  const date = value instanceof Date ? value : new Date(value)
+  let date: Date
+  if (value instanceof Date) {
+    date = value
+  } else {
+    // Append 'Z' (UTC) when no timezone indicator — bare TIMESTAMP columns
+    // from PostgREST omit the suffix, causing new Date() to use local time.
+    const needsUtc = !value.endsWith('Z') && !value.includes('+') && !/\d{2}-\d{2}$/.test(value.slice(-5))
+    date = new Date(needsUtc ? value + 'Z' : value)
+  }
   if (Number.isNaN(date.getTime())) return '—'
 
   const now = new Date()

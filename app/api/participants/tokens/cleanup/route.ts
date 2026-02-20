@@ -7,9 +7,13 @@
 
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { requireCronOrAdmin, AuthError } from '@/lib/api/auth-guard';
 
 export async function POST() {
   try {
+    // Auth: cron secret or system_admin
+    await requireCronOrAdmin();
+
     const supabase = createServiceRoleClient();
     const now = new Date().toISOString();
 
@@ -104,6 +108,9 @@ export async function POST() {
     });
 
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error('Error in token cleanup:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

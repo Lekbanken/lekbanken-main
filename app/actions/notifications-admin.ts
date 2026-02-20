@@ -363,11 +363,20 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
         }
         
         // Always create deliveries for specific users (even if scheduled)
-        const deliveries = params.userIds!.map((userId) => ({
-          notification_id: notification.id,
-          user_id: userId,
-          delivered_at: isScheduled ? null : new Date().toISOString(),
-        }))
+        // Note: delivered_at has NOT NULL DEFAULT now() — omit the field for
+        // scheduled sends so the DB default kicks in; passing null would violate
+        // the constraint.
+        const now = new Date().toISOString()
+        const deliveries = params.userIds!.map((userId) => {
+          const base: Record<string, unknown> = {
+            notification_id: notification.id,
+            user_id: userId,
+          }
+          if (!isScheduled) {
+            base.delivered_at = now
+          }
+          return base
+        })
         
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error: deliveryError } = await (supabase as any)

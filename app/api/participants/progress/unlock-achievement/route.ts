@@ -8,6 +8,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
 import type { Database, Json } from '@/types/supabase';
 
 interface UnlockAchievementRequest {
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     // Get participant by token
     const { data: participant, error: participantError } = await supabase
       .from('participants')
-      .select('id, session_id, status')
+      .select('id, session_id, status, token_expires_at')
       .eq('participant_token', participant_token)
       .single();
 
@@ -46,10 +47,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Check participant status
-    if (participant.status === 'blocked' || participant.status === 'kicked') {
+    if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
       return NextResponse.json(
         { error: 'Participant is blocked or kicked' },
         { status: 403 }
+      );
+    }
+
+    // Check token expiry
+    if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) {
+      return NextResponse.json(
+        { error: 'Token expired' },
+        { status: 401 }
       );
     }
 

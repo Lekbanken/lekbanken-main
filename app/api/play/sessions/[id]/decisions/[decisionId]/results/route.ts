@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { resolveSessionViewer } from '@/lib/api/play-auth';
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
-
-type Viewer =
-  | { type: 'host'; userId: string }
-  | { type: 'participant'; participantId: string };
 
 function getCurrentStepPhase(session: {
   current_step_index?: number | null;
@@ -31,42 +28,6 @@ function isUnlockedForPosition(
   return current.currentPhase >= itemPhase;
 }
 
-async function resolveViewer(sessionId: string, request: Request): Promise<Viewer | null> {
-  const token = request.headers.get('x-participant-token');
-  if (token) {
-    const supabase = await createServiceRoleClient();
-    const { data: participant } = await supabase
-      .from('participants')
-      .select('id, token_expires_at')
-      .eq('participant_token', token)
-      .eq('session_id', sessionId)
-      .single();
-
-    if (!participant) return null;
-    if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) return null;
-
-    return { type: 'participant', participantId: participant.id };
-  }
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-
-  const service = await createServiceRoleClient();
-  const { data: session } = await service
-    .from('participant_sessions')
-    .select('host_user_id')
-    .eq('id', sessionId)
-    .single();
-
-  if (!session) return null;
-  if (session.host_user_id !== user.id) return null;
-
-  return { type: 'host', userId: user.id };
-}
-
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string; decisionId: string }> }
@@ -78,7 +39,7 @@ export async function GET(
 
   const current = getCurrentStepPhase(session);
 
-  const viewer = await resolveViewer(sessionId, request);
+  const viewer = await resolveSessionViewer(sessionId, request);
   if (!viewer) return jsonError('Unauthorized', 401);
 
   const service = await createServiceRoleClient();

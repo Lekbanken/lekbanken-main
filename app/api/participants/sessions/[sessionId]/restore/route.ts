@@ -8,6 +8,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { requireSessionHost, AuthError } from '@/lib/api/auth-guard';
 
 export async function POST(
   request: NextRequest,
@@ -22,6 +23,9 @@ export async function POST(
         { status: 400 }
       );
     }
+
+    // Auth: session host or system_admin
+    await requireSessionHost(sessionId);
 
     const supabase = createServiceRoleClient();
 
@@ -92,6 +96,9 @@ export async function POST(
     });
 
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error('Error in session restore:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

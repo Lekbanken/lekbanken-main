@@ -9,11 +9,9 @@
 
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
 import type { Database } from '@/types/supabase';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 interface RejoinRequest {
   participantToken: string;
@@ -23,7 +21,7 @@ interface RejoinRequest {
 export async function POST(request: NextRequest) {
   try {
     // Use service role client for token validation (bypass RLS)
-    const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
+    const supabase = await createServiceRoleClient();
     
     const body = await request.json() as RejoinRequest;
     const { participantToken, sessionId } = body;
@@ -62,16 +60,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Check if participant is blocked
-    if (participant.status === 'blocked') {
-      return NextResponse.json(
-        { error: 'You have been blocked from this session' },
-        { status: 403 }
-      );
-    }
-    
-    // Check if participant was kicked
-    if (participant.status === 'kicked') {
+    // Check if participant is blocked or kicked
+    if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
       return NextResponse.json(
         { error: 'You have been removed from this session' },
         { status: 403 }

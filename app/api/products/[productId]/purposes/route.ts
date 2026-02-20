@@ -1,6 +1,7 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { requireAuth, AuthError } from '@/lib/api/auth-guard'
 import type { Database } from '@/types/supabase'
 
 type ProductPurposeRow = Database['public']['Tables']['product_purposes']['Row']
@@ -9,6 +10,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ productId: string }> }
 ) {
+  try {
+  await requireAuth()
   const { productId } = await params
   const supabase = await createServerRlsClient()
   const body = (await request.json().catch(() => ({}))) as { purpose_id?: string }
@@ -34,4 +37,8 @@ export async function POST(
   }
 
   return NextResponse.json({ mapping: data })
+  } catch (err) {
+    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status })
+    throw err
+  }
 }

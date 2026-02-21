@@ -13995,7 +13995,8 @@
         "readyButton": "Redo",
         "readyActive": "Redo ✓",
         "openChat": "Chatt",
-        "leave": "Lämna"
+        "leave": "Lämna",
+        "connectionLost": "Anslutningen tappades — försöker återansluta…"
       },
       "secrets": {
         "title": "Hemliga instruktioner",

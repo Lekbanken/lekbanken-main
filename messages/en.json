@@ -13117,7 +13117,8 @@
         "readyButton": "Ready",
         "readyActive": "Ready ✓",
         "openChat": "Chat",
-        "leave": "Leave"
+        "leave": "Leave",
+        "connectionLost": "Connection lost — trying to reconnect…"
       },
       "secrets": {
         "title": "Secret instructions",

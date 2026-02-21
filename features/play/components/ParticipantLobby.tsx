@@ -30,6 +30,7 @@ import {
   ArrowRightStartOnRectangleIcon,
   UserIcon,
   ChatBubbleLeftRightIcon,
+  WifiIcon,
 } from '@heroicons/react/24/outline';
 import type { LobbyParticipant } from '@/features/play-participant/api';
 
@@ -70,6 +71,8 @@ export interface ParticipantLobbyProps {
   enableChat?: boolean;
   /** Session status */
   status: string;
+  /** Connection quality — drives inline feedback instead of floating banner */
+  connectionState?: 'connected' | 'degraded' | 'offline';
 }
 
 // =============================================================================
@@ -173,6 +176,7 @@ export function ParticipantLobby({
   chatUnreadCount = 0,
   enableChat = false,
   status,
+  connectionState = 'connected',
 }: ParticipantLobbyProps) {
   const t = useTranslations('play.participantView.waitingRoom');
   const [codeCopied, setCodeCopied] = useState(false);
@@ -328,6 +332,14 @@ export function ParticipantLobby({
                   ? t('allReady')
                   : t('waitingForOthers')}
               </p>
+            </div>
+          )}
+
+          {/* Inline connection feedback — subtle, inside the card */}
+          {connectionState === 'offline' && (
+            <div className="flex items-center justify-center gap-1.5 mt-4 text-xs text-amber-600 dark:text-amber-400">
+              <WifiIcon className="h-3.5 w-3.5 animate-pulse" />
+              <span>{t('connectionLost')}</span>
             </div>
           )}
         </div>

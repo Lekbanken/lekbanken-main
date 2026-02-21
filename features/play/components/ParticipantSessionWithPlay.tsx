@@ -79,64 +79,80 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
   // Load session and participant data
   const loadData = useCallback(async () => {
     const token = getToken();
-    
+
+    // -----------------------------------------------------------------------
+    // 1. Fetch public session info (always works, no auth needed)
+    // -----------------------------------------------------------------------
+    let sessionOk = false;
     try {
-      // Get public session info
       const sessionRes = await getPublicSession(code);
       setSession(sessionRes.session);
 
       // Update lobby participant list from polling
       if (Array.isArray(sessionRes.participants)) {
-        const pList = sessionRes.participants as LobbyParticipant[];
-        setLobbyParticipants(pList);
+        setLobbyParticipants(sessionRes.participants as LobbyParticipant[]);
       }
 
-      // If we have a token, get our participant info
-      if (token) {
+      sessionOk = true;
+    } catch (err) {
+      // Session fetch failed — either network is fully down or session gone
+      if (!session) {
+        setError(err instanceof Error ? err.message : t('couldNotGetSession'));
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 2. Fetch own participant info (requires token, may fail independently)
+    // -----------------------------------------------------------------------
+    if (token) {
+      try {
         const meRes = await getParticipantMe(code, token);
         setParticipant(meRes.participant);
 
         // Sync own readiness from the lobby participant list
-        if (Array.isArray(sessionRes.participants)) {
-          const me = (sessionRes.participants as LobbyParticipant[])
-            .find((p) => p.id === meRes.participant?.id);
-          if (me) setIsReady(me.isReady);
-        }
+        const me = lobbyParticipants.find((p) => p.id === meRes.participant?.id);
+        if (me) setIsReady(me.isReady);
+      } catch {
+        // Participant fetch failed but session is fine — not a full disconnect.
+        // This commonly happens when the tab was backgrounded or the
+        // participant was briefly marked idle.  We silently ignore it —
+        // the lobby list still updates via the session endpoint.
       }
+    }
 
+    // -----------------------------------------------------------------------
+    // 3. Determine connection state
+    // -----------------------------------------------------------------------
+    if (sessionOk) {
+      // Session endpoint reachable ⇒ we are connected
       setError(null);
       setIsReconnecting(false);
       setReconnectAttempts(0);
-    } catch (err) {
-      // If we were connected before, show reconnecting state
-      // but only in statuses where connectivity matters
-      const currentStatus = session?.status;
+    } else if (session) {
+      // Had a previous session but this poll failed
+      const currentStatus = session.status;
       const connectivityRelevant =
         currentStatus === 'lobby' ||
         currentStatus === 'active' ||
         currentStatus === 'paused' ||
         currentStatus === 'locked';
 
-      if (session && connectivityRelevant) {
+      if (connectivityRelevant) {
         setIsReconnecting(true);
         setReconnectAttempts((prev) => prev + 1);
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.debug('[ParticipantLobby:reconnect]', {
+          console.debug('[ParticipantSession:reconnect]', {
             status: currentStatus,
-            sessionId: session?.id,
+            sessionId: session.id,
             attempt: reconnectAttempts + 1,
-            error: err instanceof Error ? err.message : String(err),
           });
         }
-      } else if (!session) {
-        setError(err instanceof Error ? err.message : t('couldNotGetSession'));
       }
-      // If ended/cancelled/draft and fetch fails, just silently ignore
-    } finally {
-      setLoading(false);
     }
-  }, [code, getToken, session, t]);
+
+    setLoading(false);
+  }, [code, getToken, session, lobbyParticipants, t, reconnectAttempts]);
 
   // Send heartbeat
   const sendHeartbeat = useCallback(async () => {
@@ -348,13 +364,6 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
   // Regular lobby view (no game or waiting)
   return (
     <div className="min-h-[80vh] flex flex-col px-4 py-6">
-      {/* Reconnecting banner */}
-      <ReconnectingBanner
-        isReconnecting={isReconnecting}
-        attemptCount={reconnectAttempts}
-        maxAttempts={5}
-        onRetry={handleRetry}
-      />
 
       {/* ------------------------------------------------------------------ */}
       {/* LOBBY MODE: rich waiting room with avatar grid + readiness          */}
@@ -381,6 +390,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
             chatUnreadCount={chat.unreadCount}
             enableChat={isInLobby}
             status={session.status}
+            connectionState={isReconnecting ? 'offline' : 'connected'}
           />
 
           {/* Chat modal for lobby */}
@@ -401,6 +411,14 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
           {/* -------------------------------------------------------------- */}
           {/* FALLBACK: non-lobby statuses (active / paused / locked / etc)   */}
           {/* -------------------------------------------------------------- */}
+
+          {/* Floating reconnect banner (only for non-lobby views) */}
+          <ReconnectingBanner
+            isReconnecting={isReconnecting}
+            attemptCount={reconnectAttempts}
+            maxAttempts={5}
+            onRetry={handleRetry}
+          />
 
           {/* Session header */}
           <div className="text-center mb-6">

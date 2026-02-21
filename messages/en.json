@@ -13103,6 +13103,7 @@
       "waitingRoom": {
         "title": "Waiting Room",
         "statusWaiting": "Waiting to start",
+        "lobbyWelcome": "Welcome to the Lobby",
         "statusActive": "Session in progress",
         "statusPaused": "Paused",
         "sessionCode": "Session code",

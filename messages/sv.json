@@ -13981,6 +13981,7 @@
       "waitingRoom": {
         "title": "Vänterum",
         "statusWaiting": "Väntar på start",
+        "lobbyWelcome": "Välkommen till Lobbyn",
         "statusActive": "Sessionen pågår",
         "statusPaused": "Paus",
         "sessionCode": "Sessionskod",

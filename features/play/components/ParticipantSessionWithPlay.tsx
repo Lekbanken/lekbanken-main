@@ -85,11 +85,18 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
   const inFlightRef = useRef(false);
   const mountedRef = useRef(true);
   const backoffMsRef = useRef(POLL_INTERVAL);
+  const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const connectionStateRef = useRef<ConnectionState>('connected');
+  const degradedReasonRef = useRef<DegradedReason>(null);
+  const reconnectingRef = useRef(false);
 
   // Keep refs in sync with state
   sessionRef.current = session;
   lobbyParticipantsRef.current = lobbyParticipants;
   reconnectAttemptsRef.current = reconnectAttempts;
+  connectionStateRef.current = connectionState;
+  degradedReasonRef.current = degradedReason;
+  reconnectingRef.current = isReconnecting;
 
   // Active session mode UI state
   const [activeSessionOpen, setActiveSessionOpen] = useState(false);
@@ -117,6 +124,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       // -----------------------------------------------------------------------
       let sessionOk = false;
       let sessionFailIsNetwork = false;
+      let retryAfterHint = 0; // ms, from Retry-After header
 
       try {
         const sessionRes = await getPublicSession(code);
@@ -136,6 +144,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
         if (err instanceof ApiError) {
           // Server responded with HTTP error (5xx, 429, etc.) — NOT network issue
           sessionFailIsNetwork = false;
+          if (err.retryAfterMs > 0) retryAfterHint = err.retryAfterMs;
         } else {
           // TypeError: Failed to fetch — real network / DNS / timeout failure
           sessionFailIsNetwork = true;
@@ -174,6 +183,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
               // 429, 5xx, or other server errors
               meFailReason = 'temporary';
             }
+            if (err.retryAfterMs > 0) retryAfterHint = Math.max(retryAfterHint, err.retryAfterMs);
           } else {
             // Network error (fetch threw, not an HTTP response)
             meFailReason = 'temporary';
@@ -192,27 +202,31 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       //    degraded  = session reachable but /me fails, OR session 5xx (server error)
       //    connected = both OK
       // -----------------------------------------------------------------------
+      // Helper: only update state when value actually changes (avoids re-renders)
+      const setIfChanged = <T,>(setter: React.Dispatch<React.SetStateAction<T>>, ref: React.MutableRefObject<T>, next: T) => {
+        if (ref.current !== next) { setter(next); ref.current = next; }
+      };
+
       if (sessionOk && meOk) {
-        setConnectionState('connected');
-        setDegradedReason(null);
+        setIfChanged(setConnectionState, connectionStateRef, 'connected' as ConnectionState);
+        setIfChanged(setDegradedReason, degradedReasonRef, null as DegradedReason);
         setError(null);
-        setIsReconnecting(false);
-        setReconnectAttempts(0);
-        reconnectAttemptsRef.current = 0;
+        if (reconnectingRef.current) { setIsReconnecting(false); reconnectingRef.current = false; }
+        if (reconnectAttemptsRef.current !== 0) { setReconnectAttempts(0); reconnectAttemptsRef.current = 0; }
         setLastSyncedAt(new Date());
         // Success → reset backoff to base interval
         backoffMsRef.current = POLL_INTERVAL;
       } else if (sessionOk && !meOk) {
         // Session reachable but participant fetch failed
-        setConnectionState('degraded');
-        setDegradedReason(meFailReason);
+        setIfChanged(setConnectionState, connectionStateRef, 'degraded' as ConnectionState);
+        setIfChanged(setDegradedReason, degradedReasonRef, meFailReason);
         setError(null);
-        setIsReconnecting(false);
-        setReconnectAttempts(0);
-        reconnectAttemptsRef.current = 0;
-        setLastSyncedAt(new Date()); // session data is still fresh
-        // Mild backoff for degraded
-        backoffMsRef.current = Math.min(backoffMsRef.current * 1.5, MAX_BACKOFF);
+        if (reconnectingRef.current) { setIsReconnecting(false); reconnectingRef.current = false; }
+        if (reconnectAttemptsRef.current !== 0) { setReconnectAttempts(0); reconnectAttemptsRef.current = 0; }
+        setLastSyncedAt(new Date()); // session data IS fresh
+        // Mild backoff — respect Retry-After if present
+        const base = Math.min(backoffMsRef.current * 1.5, MAX_BACKOFF);
+        backoffMsRef.current = retryAfterHint > 0 ? Math.max(base, retryAfterHint) : base;
       } else if (currentSession) {
         if (sessionFailIsNetwork) {
           // True network failure (no HTTP response at all) → offline
@@ -224,24 +238,24 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
             currentStatus === 'locked';
 
           if (connectivityRelevant) {
-            setConnectionState('offline');
-            setDegradedReason(null);
-            setIsReconnecting(true);
+            setIfChanged(setConnectionState, connectionStateRef, 'offline' as ConnectionState);
+            setIfChanged(setDegradedReason, degradedReasonRef, null as DegradedReason);
+            if (!reconnectingRef.current) { setIsReconnecting(true); reconnectingRef.current = true; }
             const next = reconnectAttemptsRef.current + 1;
             setReconnectAttempts(next);
             reconnectAttemptsRef.current = next;
           }
         } else {
           // Server responded with HTTP error (5xx/429) — NOT a network issue
-          // Treat as degraded:temporary (server problem, not user's internet)
-          setConnectionState('degraded');
-          setDegradedReason('temporary');
+          setIfChanged(setConnectionState, connectionStateRef, 'degraded' as ConnectionState);
+          setIfChanged(setDegradedReason, degradedReasonRef, 'temporary' as DegradedReason);
           setError(null);
-          setIsReconnecting(false);
+          if (reconnectingRef.current) { setIsReconnecting(false); reconnectingRef.current = false; }
         }
-        // Error → exponential backoff with jitter
+        // Error → exponential backoff with jitter, respect Retry-After
         const jitter = Math.random() * 1000;
-        backoffMsRef.current = Math.min(backoffMsRef.current * 2 + jitter, MAX_BACKOFF);
+        const base = Math.min(backoffMsRef.current * 2 + jitter, MAX_BACKOFF);
+        backoffMsRef.current = retryAfterHint > 0 ? Math.max(base, retryAfterHint) : base;
       }
 
       setLoading(false);
@@ -268,13 +282,19 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
 
   // -----------------------------------------------------------------------
   // Single poller — setTimeout chain with adaptive backoff + visibility pause
+  // Uses pollTimerRef to prevent double-resume on visibilitychange.
   // -----------------------------------------------------------------------
   useEffect(() => {
     mountedRef.current = true;
-
-    let pollTimer: ReturnType<typeof setTimeout>;
     let heartbeatTimer: ReturnType<typeof setInterval>;
     let stopped = false;
+
+    const clearPollTimer = () => {
+      if (pollTimerRef.current !== null) {
+        clearTimeout(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
+    };
 
     const doPoll = async () => {
       await loadDataRef.current();
@@ -283,7 +303,9 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
     // Schedule next poll AFTER current one completes (no overlap)
     const schedulePoll = () => {
       if (stopped) return;
-      pollTimer = setTimeout(async () => {
+      clearPollTimer(); // Guarantee no stale timer
+      pollTimerRef.current = setTimeout(async () => {
+        pollTimerRef.current = null;
         if (stopped) return;
         await doPoll();
         schedulePoll();
@@ -297,13 +319,15 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
 
     heartbeatTimer = setInterval(() => void sendHeartbeat(), HEARTBEAT_INTERVAL);
 
-    // Pause polling when tab is hidden, resume immediately when visible
+    // Pause polling when tab is hidden, resume immediately when visible.
+    // Guard: only resume if no timer is already pending and no request in-flight.
     const handleVisibility = () => {
+      if (stopped) return;
       if (document.hidden) {
-        clearTimeout(pollTimer);
+        clearPollTimer();
       } else {
-        // Tab regained focus — poll immediately, then resume schedule
-        clearTimeout(pollTimer);
+        // Tab regained focus — only poll if idle (no pending timer, no in-flight)
+        if (pollTimerRef.current !== null || inFlightRef.current) return;
         void doPoll().then(() => {
           if (!stopped) schedulePoll();
         });
@@ -314,7 +338,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
     return () => {
       stopped = true;
       mountedRef.current = false;
-      clearTimeout(pollTimer);
+      clearPollTimer();
       clearInterval(heartbeatTimer);
       document.removeEventListener('visibilitychange', handleVisibility);
     };

@@ -38,19 +38,34 @@ export interface Participant {
  * rate-limit (429), server errors (5xx), and network failures.
  */
 export class ApiError extends Error {
+  /** Parsed Retry-After header value in milliseconds (0 if absent) */
+  public readonly retryAfterMs: number;
+
   constructor(
     message: string,
     public readonly status: number,
+    retryAfterMs = 0,
   ) {
     super(message);
     this.name = 'ApiError';
+    this.retryAfterMs = retryAfterMs;
   }
+}
+
+/** Parse Retry-After header → milliseconds (0 if absent/unparseable) */
+function parseRetryAfter(res: Response): number {
+  const raw = res.headers.get('Retry-After');
+  if (!raw) return 0;
+  const seconds = Number(raw);
+  if (!Number.isNaN(seconds) && seconds > 0) return seconds * 1000;
+  // RFC 7231 allows HTTP-date; ignore for simplicity
+  return 0;
 }
 
 async function parseJson(res: Response) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new ApiError(data.error || 'Request failed', res.status);
+    throw new ApiError(data.error || 'Request failed', res.status, parseRetryAfter(res));
   }
   return data;
 }

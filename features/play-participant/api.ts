@@ -17,6 +17,10 @@ export interface PlaySession {
   gameId?: string | null;
   planId?: string | null;
   settings?: Record<string, unknown> | null;
+  /** Game name resolved from game_id → games.name */
+  gameName?: string | null;
+  /** Game cover image URL resolved via game_media → media */
+  gameCoverUrl?: string | null;
 }
 
 export interface Participant {
@@ -166,4 +170,33 @@ export async function setParticipantPosition(sessionId: string, participantId: s
     body: JSON.stringify({ action: 'setPosition', position }),
   });
   return parseJson(res);
+}
+
+/**
+ * Toggle participant readiness in the lobby.
+ */
+export async function setParticipantReady(
+  sessionCode: string,
+  token: string,
+  isReady: boolean,
+): Promise<{ ok: boolean; isReady: boolean }> {
+  const res = await fetch(
+    `/api/play/ready?session_code=${encodeURIComponent(sessionCode)}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-participant-token': token,
+      },
+      body: JSON.stringify({ isReady }),
+    },
+  );
+  return parseJson(res);
+}
+
+/** Lightweight participant info returned by public session endpoint. */
+export interface LobbyParticipant {
+  id: string;
+  displayName: string;
+  isReady: boolean;
 }

@@ -13100,6 +13100,25 @@
         "leaveSession": "Leave session",
         "activeSession": "Active session"
       },
+      "waitingRoom": {
+        "title": "Waiting Room",
+        "statusWaiting": "Waiting to start",
+        "statusActive": "Session in progress",
+        "statusPaused": "Paused",
+        "sessionCode": "Session code",
+        "codeCopied": "Code copied!",
+        "codeCopyFailed": "Could not copy the code",
+        "tapToCopy": "Tap to copy",
+        "copied": "Copied!",
+        "participantsTitle": "Participants",
+        "readyCount": "{ready} of {total} ready",
+        "allReady": "All ready!",
+        "waitingForOthers": "Waiting for others…",
+        "readyButton": "Ready",
+        "readyActive": "Ready ✓",
+        "openChat": "Chat",
+        "leave": "Leave"
+      },
       "secrets": {
         "title": "Secret instructions",
         "clickToShow": "Click to show your secret instructions.",

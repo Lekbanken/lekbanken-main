@@ -15,8 +15,10 @@ import {
   getParticipantMe, 
   heartbeat, 
   rejoinSession,
+  setParticipantReady,
   type PlaySession,
   type Participant,
+  type LobbyParticipant,
 } from '@/features/play-participant/api';
 import { 
   SessionStatusBadge, 
@@ -24,6 +26,7 @@ import {
   SessionStatusMessage,
 } from '@/components/play';
 import { ParticipantPlayMode } from './ParticipantPlayMode';
+import { ParticipantLobby } from './ParticipantLobby';
 import { ActiveSessionShell } from './ActiveSessionShell';
 import { SessionChatModal } from '@/features/play/components/SessionChatModal';
 import { useSessionChat } from '@/features/play/hooks/useSessionChat';
@@ -56,6 +59,11 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
+  // Lobby readiness state
+  const [lobbyParticipants, setLobbyParticipants] = useState<LobbyParticipant[]>([]);
+  const [isReady, setIsReady] = useState(false);
+  const [readyLoading, setReadyLoading] = useState(false);
+
   // Active session mode UI state
   const [activeSessionOpen, setActiveSessionOpen] = useState(false);
   const [joinGateSecondsLeft, setJoinGateSecondsLeft] = useState<number | null>(null);
@@ -77,10 +85,23 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       const sessionRes = await getPublicSession(code);
       setSession(sessionRes.session);
 
+      // Update lobby participant list from polling
+      if (Array.isArray(sessionRes.participants)) {
+        const pList = sessionRes.participants as LobbyParticipant[];
+        setLobbyParticipants(pList);
+      }
+
       // If we have a token, get our participant info
       if (token) {
         const meRes = await getParticipantMe(code, token);
         setParticipant(meRes.participant);
+
+        // Sync own readiness from the lobby participant list
+        if (Array.isArray(sessionRes.participants)) {
+          const me = (sessionRes.participants as LobbyParticipant[])
+            .find((p) => p.id === meRes.participant?.id);
+          if (me) setIsReady(me.isReady);
+        }
       }
 
       setError(null);
@@ -88,12 +109,30 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       setReconnectAttempts(0);
     } catch (err) {
       // If we were connected before, show reconnecting state
-      if (session) {
+      // but only in statuses where connectivity matters
+      const currentStatus = session?.status;
+      const connectivityRelevant =
+        currentStatus === 'lobby' ||
+        currentStatus === 'active' ||
+        currentStatus === 'paused' ||
+        currentStatus === 'locked';
+
+      if (session && connectivityRelevant) {
         setIsReconnecting(true);
         setReconnectAttempts((prev) => prev + 1);
-      } else {
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.debug('[ParticipantLobby:reconnect]', {
+            status: currentStatus,
+            sessionId: session?.id,
+            attempt: reconnectAttempts + 1,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+      } else if (!session) {
         setError(err instanceof Error ? err.message : t('couldNotGetSession'));
       }
+      // If ended/cancelled/draft and fetch fails, just silently ignore
     } finally {
       setLoading(false);
     }
@@ -154,6 +193,20 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
     router.push('/play');
   };
 
+  const handleToggleReady = useCallback(async () => {
+    const tkn = getToken();
+    if (!tkn) return;
+    setReadyLoading(true);
+    try {
+      const res = await setParticipantReady(code, tkn, !isReady);
+      setIsReady(res.isReady);
+    } catch {
+      // Silently ignore — next poll will reconcile
+    } finally {
+      setReadyLoading(false);
+    }
+  }, [code, getToken, isReady]);
+
   const setJoinPreference = useCallback((value: 'join' | 'later') => {
     if (typeof window === 'undefined') return;
     try {
@@ -182,12 +235,18 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
 
   const shouldRenderActiveSessionShell = Boolean(token && canEnterActiveSession && activeSessionOpen);
 
+  // Enable chat in both the active session shell AND the lobby
+  const isInLobby = Boolean(session?.status === 'lobby' && participant && token);
+  const chatEnabled = Boolean(
+    (shouldRenderActiveSessionShell || isInLobby) && token && session?.id,
+  );
+
   const chat = useSessionChat({
     sessionId: session?.id ?? '',
     role: 'participant',
     participantToken: token ?? undefined,
     isOpen: chatOpen,
-    enabled: Boolean(shouldRenderActiveSessionShell && token && session?.id),
+    enabled: chatEnabled,
   });
 
   const { markAllRead } = chat;
@@ -297,130 +356,178 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
         onRetry={handleRetry}
       />
 
-      {/* Session header */}
-      <div className="text-center mb-6">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <span className="font-mono text-lg font-bold text-primary tracking-wider">
-            {code}
-          </span>
-          <SessionStatusBadge status={session?.status ?? 'active'} size="sm" />
-        </div>
-        <h1 className="text-2xl font-bold text-foreground">
-          {session?.displayName}
-        </h1>
-      </div>
+      {/* ------------------------------------------------------------------ */}
+      {/* LOBBY MODE: rich waiting room with avatar grid + readiness          */}
+      {/* ------------------------------------------------------------------ */}
+      {session?.status === 'lobby' && participant ? (
+        <>
+          <ParticipantLobby
+            code={code}
+            sessionName={session.displayName}
+            gameName={session.gameName}
+            gameCoverUrl={session.gameCoverUrl}
+            myParticipantId={participant.id}
+            myDisplayName={participant.displayName}
+            participants={lobbyParticipants}
+            maxParticipants={
+              (session.settings as { max_participants?: number } | null)
+                ?.max_participants ?? null
+            }
+            isReady={isReady}
+            readyLoading={readyLoading}
+            onToggleReady={handleToggleReady}
+            onLeave={handleLeave}
+            onOpenChat={() => setChatOpen(true)}
+            chatUnreadCount={chat.unreadCount}
+            enableChat={isInLobby}
+            status={session.status}
+          />
 
-      {/* Participant info */}
-      {participant && (
-        <Card variant="elevated" className="max-w-lg mx-auto w-full p-6 mb-6">
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground mb-1">{t('participatingAs')}</p>
-            <p className="text-xl font-semibold text-foreground">
-              {participant.displayName}
-            </p>
-            <p className="text-sm text-muted-foreground capitalize">
-              {participant.role === 'player' && t('rolePlayer')}
-              {participant.role === 'observer' && t('roleObserver')}
-              {participant.role === 'team_lead' && t('roleTeamLead')}
-              {participant.role === 'facilitator' && t('roleFacilitator')}
-            </p>
-          </div>
-        </Card>
-      )}
+          {/* Chat modal for lobby */}
+          {chatOpen && (
+            <SessionChatModal
+              open={chatOpen}
+              onClose={() => setChatOpen(false)}
+              role="participant"
+              messages={chat.messages}
+              error={chat.error}
+              sending={chat.sending}
+              onSend={chat.send}
+            />
+          )}
+        </>
+      ) : (
+        <>
+          {/* -------------------------------------------------------------- */}
+          {/* FALLBACK: non-lobby statuses (active / paused / locked / etc)   */}
+          {/* -------------------------------------------------------------- */}
 
-      {/* Session status */}
-      {session?.status === 'paused' && (
-        <SessionStatusMessage
-          type="warning"
-          title={t('sessionPaused')}
-          message={t('awaitInstructions')}
-          className="max-w-lg mx-auto w-full mb-6"
-        />
-      )}
-
-      {session?.status === 'locked' && (
-        <SessionStatusMessage
-          type="info"
-          title={t('sessionLocked')}
-          message={t('noNewParticipants')}
-          className="max-w-lg mx-auto w-full mb-6"
-        />
-      )}
-
-      {/* Stats */}
-      <div className="flex items-center justify-center gap-6 text-muted-foreground mb-8">
-        <div className="flex items-center gap-2">
-          <UserGroupIcon className="h-5 w-5" />
-          <span>{t('participants', { count: session?.participantCount ?? 0 })}</span>
-        </div>
-        {session?.createdAt && (
-          <div className="flex items-center gap-2">
-            <ClockIcon className="h-5 w-5" />
-            <span>{t('started')}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Main content area - waiting message */}
-      <Card variant="default" className="max-w-2xl mx-auto w-full flex-1 p-8 flex items-center justify-center">
-        <div className="text-center text-muted-foreground">
-          <p className="text-lg">{t('waitingForActivity')}</p>
-          <p className="text-sm mt-2">
-            {hasGame 
-              ? t('gameContentWillShow')
-              : t('contentWillShow')}
-          </p>
-
-          {canEnterActiveSession && !activeSessionOpen && getJoinPreference() === 'later' && (
-            <div className="mt-6">
-              <Button variant="primary" onClick={() => {
-                setJoinPreference('join');
-                setActiveSessionOpen(true);
-              }}>
-                {t('joinSession')}
-              </Button>
+          {/* Session header */}
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="font-mono text-lg font-bold text-primary tracking-wider">
+                {code}
+              </span>
+              <SessionStatusBadge status={session?.status ?? 'active'} size="sm" />
             </div>
+            <h1 className="text-2xl font-bold text-foreground">
+              {session?.displayName}
+            </h1>
+          </div>
+
+          {/* Participant info */}
+          {participant && (
+            <Card variant="elevated" className="max-w-lg mx-auto w-full p-6 mb-6">
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground mb-1">{t('participatingAs')}</p>
+                <p className="text-xl font-semibold text-foreground">
+                  {participant.displayName}
+                </p>
+                <p className="text-sm text-muted-foreground capitalize">
+                  {participant.role === 'player' && t('rolePlayer')}
+                  {participant.role === 'observer' && t('roleObserver')}
+                  {participant.role === 'team_lead' && t('roleTeamLead')}
+                  {participant.role === 'facilitator' && t('roleFacilitator')}
+                </p>
+              </div>
+            </Card>
           )}
 
-          {canEnterActiveSession && !activeSessionOpen && joinGateSecondsLeft !== null && (
-            <div className="mt-6 space-y-3">
-              <div className="text-sm text-muted-foreground">{t('sessionIsActive')}</div>
-              <div className="text-2xl font-semibold text-foreground">
-                {t('countdownSeconds', { seconds: joinGateSecondsLeft })}
+          {/* Session status */}
+          {session?.status === 'paused' && (
+            <SessionStatusMessage
+              type="warning"
+              title={t('sessionPaused')}
+              message={t('awaitInstructions')}
+              className="max-w-lg mx-auto w-full mb-6"
+            />
+          )}
+
+          {session?.status === 'locked' && (
+            <SessionStatusMessage
+              type="info"
+              title={t('sessionLocked')}
+              message={t('noNewParticipants')}
+              className="max-w-lg mx-auto w-full mb-6"
+            />
+          )}
+
+          {/* Stats */}
+          <div className="flex items-center justify-center gap-6 text-muted-foreground mb-8">
+            <div className="flex items-center gap-2">
+              <UserGroupIcon className="h-5 w-5" />
+              <span>{t('participants', { count: session?.participantCount ?? 0 })}</span>
+            </div>
+            {session?.createdAt && (
+              <div className="flex items-center gap-2">
+                <ClockIcon className="h-5 w-5" />
+                <span>{t('started')}</span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  variant="primary"
-                  onClick={() => {
+            )}
+          </div>
+
+          {/* Main content area - waiting message */}
+          <Card variant="default" className="max-w-2xl mx-auto w-full flex-1 p-8 flex items-center justify-center">
+            <div className="text-center text-muted-foreground">
+              <p className="text-lg">{t('waitingForActivity')}</p>
+              <p className="text-sm mt-2">
+                {hasGame 
+                  ? t('gameContentWillShow')
+                  : t('contentWillShow')}
+              </p>
+
+              {canEnterActiveSession && !activeSessionOpen && getJoinPreference() === 'later' && (
+                <div className="mt-6">
+                  <Button variant="primary" onClick={() => {
                     setJoinPreference('join');
-                    setJoinGateSecondsLeft(null);
                     setActiveSessionOpen(true);
-                  }}
-                >
-                  {t('joinNow')}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setJoinPreference('later');
-                    setJoinGateSecondsLeft(null);
-                    setActiveSessionOpen(false);
-                  }}
-                >
-                  {t('notYet')}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </Card>
+                  }}>
+                    {t('joinSession')}
+                  </Button>
+                </div>
+              )}
 
-      {/* Leave button */}
-      <div className="mt-8 text-center">
-        <Button variant="ghost" size="sm" onClick={handleLeave}>
-          {t('leaveSession')}
-        </Button>
-      </div>
+              {canEnterActiveSession && !activeSessionOpen && joinGateSecondsLeft !== null && (
+                <div className="mt-6 space-y-3">
+                  <div className="text-sm text-muted-foreground">{t('sessionIsActive')}</div>
+                  <div className="text-2xl font-semibold text-foreground">
+                    {t('countdownSeconds', { seconds: joinGateSecondsLeft })}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant="primary"
+                      onClick={() => {
+                        setJoinPreference('join');
+                        setJoinGateSecondsLeft(null);
+                        setActiveSessionOpen(true);
+                      }}
+                    >
+                      {t('joinNow')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setJoinPreference('later');
+                        setJoinGateSecondsLeft(null);
+                        setActiveSessionOpen(false);
+                      }}
+                    >
+                      {t('notYet')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Leave button */}
+          <div className="mt-8 text-center">
+            <Button variant="ghost" size="sm" onClick={handleLeave}>
+              {t('leaveSession')}
+            </Button>
+          </div>
+        </>
+      )}
 
       {shouldRenderActiveSessionShell && token && (
         <ActiveSessionShell

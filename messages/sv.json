@@ -13978,6 +13978,25 @@
         "leaveSession": "Lämna session",
         "activeSession": "Aktiv session"
       },
+      "waitingRoom": {
+        "title": "Vänterum",
+        "statusWaiting": "Väntar på start",
+        "statusActive": "Sessionen pågår",
+        "statusPaused": "Paus",
+        "sessionCode": "Sessionskod",
+        "codeCopied": "Kod kopierad!",
+        "codeCopyFailed": "Kunde inte kopiera koden",
+        "tapToCopy": "Tryck för att kopiera",
+        "copied": "Kopierad!",
+        "participantsTitle": "Deltagare",
+        "readyCount": "{ready} av {total} redo",
+        "allReady": "Alla redo!",
+        "waitingForOthers": "Väntar på övriga…",
+        "readyButton": "Redo",
+        "readyActive": "Redo ✓",
+        "openChat": "Chatt",
+        "leave": "Lämna"
+      },
       "secrets": {
         "title": "Hemliga instruktioner",
         "clickToShow": "Klicka för att visa dina hemliga instruktioner.",

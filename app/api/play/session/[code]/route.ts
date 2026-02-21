@@ -5,6 +5,7 @@ import {
   isValidSessionCodeFormat,
 } from '@/lib/services/participants/session-code-generator';
 import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 
 export async function GET(
   request: NextRequest,
@@ -26,6 +27,67 @@ export async function GET(
     return NextResponse.json({ error: 'Session not found' }, { status: 404 });
   }
 
+  // ---------------------------------------------------------------------------
+  // Resolve game name + cover image (if a game is linked)
+  // ---------------------------------------------------------------------------
+  let gameName: string | null = null;
+  let gameCoverUrl: string | null = null;
+
+  if (session.game_id) {
+    try {
+      const supabase = await createServiceRoleClient();
+      const { data: game } = await supabase
+        .from('games')
+        .select('name, game_media(kind, media(url))')
+        .eq('id', session.game_id)
+        .single();
+
+      if (game) {
+        gameName = game.name ?? null;
+        const mediaArr = game.game_media as Array<{
+          kind: string;
+          media: { url: string } | null;
+        }> | null;
+        const cover = mediaArr?.find((m) => m.kind === 'cover') ?? mediaArr?.[0];
+        gameCoverUrl = cover?.media?.url ?? null;
+      }
+    } catch {
+      // Non-critical — lobby still works without game metadata
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Lightweight participant list (id, displayName, isReady)
+  // No auth required — this is the public lobby view
+  // ---------------------------------------------------------------------------
+  let participants: Array<{
+    id: string;
+    displayName: string;
+    isReady: boolean;
+  }> = [];
+
+  try {
+    const supabase = await createServiceRoleClient();
+    const { data: rows } = await supabase
+      .from('participants')
+      .select('id, display_name, progress, status')
+      .eq('session_id', session.id)
+      .in('status', ['active', 'idle'])
+      .order('joined_at', { ascending: true });
+
+    if (rows) {
+      participants = rows.map((p) => ({
+        id: p.id,
+        displayName: p.display_name,
+        isReady: Boolean(
+          (p.progress as Record<string, unknown> | null)?.isReady
+        ),
+      }));
+    }
+  } catch {
+    // Non-critical — participant list fails silently
+  }
+
   return NextResponse.json({
     session: {
       id: session.id,
@@ -39,6 +101,9 @@ export async function GET(
       startedAt: session.started_at,
       endedAt: session.ended_at,
       gameId: session.game_id,
+      gameName,
+      gameCoverUrl,
     },
+    participants,
   });
 }

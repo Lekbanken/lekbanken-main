@@ -16,6 +16,7 @@ import {
   heartbeat, 
   rejoinSession,
   setParticipantReady,
+  ApiError,
   type PlaySession,
   type Participant,
   type LobbyParticipant,
@@ -58,6 +59,13 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
   const [error, setError] = useState<string | null>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
+
+  // 3-state connection model: connected / degraded / offline
+  type ConnectionState = 'connected' | 'degraded' | 'offline';
+  type DegradedReason = 'auth' | 'not-found' | 'temporary' | null;
+  const [connectionState, setConnectionState] = useState<ConnectionState>('connected');
+  const [degradedReason, setDegradedReason] = useState<DegradedReason>(null);
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
 
   // Lobby readiness state
   const [lobbyParticipants, setLobbyParticipants] = useState<LobbyParticipant[]>([]);
@@ -104,32 +112,63 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
     // -----------------------------------------------------------------------
     // 2. Fetch own participant info (requires token, may fail independently)
     // -----------------------------------------------------------------------
+    let meOk = false;
+    let meFailReason: DegradedReason = null;
+
     if (token) {
       try {
         const meRes = await getParticipantMe(code, token);
         setParticipant(meRes.participant);
+        meOk = true;
 
         // Sync own readiness from the lobby participant list
         const me = lobbyParticipants.find((p) => p.id === meRes.participant?.id);
         if (me) setIsReady(me.isReady);
-      } catch {
-        // Participant fetch failed but session is fine — not a full disconnect.
-        // This commonly happens when the tab was backgrounded or the
-        // participant was briefly marked idle.  We silently ignore it —
-        // the lobby list still updates via the session endpoint.
+      } catch (err) {
+        // Classify the failure by HTTP status
+        if (err instanceof ApiError) {
+          const s = err.status;
+          if (s === 401 || s === 403) {
+            meFailReason = 'auth';
+          } else if (s === 404) {
+            meFailReason = 'not-found';
+          } else {
+            // 429, 5xx, or other server errors
+            meFailReason = 'temporary';
+          }
+        } else {
+          // Network error (fetch threw, not an HTTP response)
+          meFailReason = 'temporary';
+        }
       }
+    } else {
+      // No token → treat as "me not available" but not degraded
+      meOk = true;
     }
 
     // -----------------------------------------------------------------------
-    // 3. Determine connection state
+    // 3. Derive connection state
+    //    offline  = session endpoint unreachable (real network issue)
+    //    degraded = session OK but /me fails (tab idle, token, rate-limit)
+    //    connected = both OK
     // -----------------------------------------------------------------------
-    if (sessionOk) {
-      // Session endpoint reachable ⇒ we are connected
+    if (sessionOk && meOk) {
+      setConnectionState('connected');
+      setDegradedReason(null);
       setError(null);
       setIsReconnecting(false);
       setReconnectAttempts(0);
+      setLastSyncedAt(new Date());
+    } else if (sessionOk && !meOk) {
+      // Session reachable but participant fetch failed
+      setConnectionState('degraded');
+      setDegradedReason(meFailReason);
+      setError(null);
+      setIsReconnecting(false);
+      setReconnectAttempts(0);
+      setLastSyncedAt(new Date()); // session data is still fresh
     } else if (session) {
-      // Had a previous session but this poll failed
+      // Had a previous session but session endpoint now fails
       const currentStatus = session.status;
       const connectivityRelevant =
         currentStatus === 'lobby' ||
@@ -138,6 +177,8 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
         currentStatus === 'locked';
 
       if (connectivityRelevant) {
+        setConnectionState('offline');
+        setDegradedReason(null);
         setIsReconnecting(true);
         setReconnectAttempts((prev) => prev + 1);
         if (process.env.NODE_ENV === 'development') {
@@ -201,6 +242,21 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
     setReconnectAttempts(0);
     void loadData();
   };
+
+  /** Lightweight retry — only re-fetch /me (for degraded state) */
+  const handleRetryMe = useCallback(async () => {
+    const tkn = getToken();
+    if (!tkn) return;
+    try {
+      const meRes = await getParticipantMe(code, tkn);
+      setParticipant(meRes.participant);
+      setConnectionState('connected');
+      setDegradedReason(null);
+      setLastSyncedAt(new Date());
+    } catch {
+      // Will self-heal on next poll cycle
+    }
+  }, [code, getToken]);
 
   const handleLeave = () => {
     if (typeof window !== 'undefined') {
@@ -390,7 +446,10 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
             chatUnreadCount={chat.unreadCount}
             enableChat={isInLobby}
             status={session.status}
-            connectionState={isReconnecting ? 'offline' : 'connected'}
+            connectionState={connectionState}
+            degradedReason={degradedReason}
+            lastSyncedAt={lastSyncedAt}
+            onRetry={connectionState === 'degraded' ? handleRetryMe : handleRetry}
           />
 
           {/* Chat modal for lobby */}

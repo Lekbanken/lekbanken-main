@@ -28,6 +28,7 @@ import {
   ClipboardDocumentIcon,
   CheckIcon,
   ArrowRightStartOnRectangleIcon,
+  ArrowPathIcon,
   UserIcon,
   ChatBubbleLeftRightIcon,
   WifiIcon,
@@ -73,6 +74,12 @@ export interface ParticipantLobbyProps {
   status: string;
   /** Connection quality — drives inline feedback instead of floating banner */
   connectionState?: 'connected' | 'degraded' | 'offline';
+  /** Why is the connection degraded? */
+  degradedReason?: 'auth' | 'not-found' | 'temporary' | null;
+  /** Last successful sync timestamp */
+  lastSyncedAt?: Date | null;
+  /** Retry action (re-fetch /me for degraded, full loadData for offline) */
+  onRetry?: () => void;
 }
 
 // =============================================================================
@@ -177,6 +184,9 @@ export function ParticipantLobby({
   enableChat = false,
   status,
   connectionState = 'connected',
+  degradedReason = null,
+  lastSyncedAt = null,
+  onRetry,
 }: ParticipantLobbyProps) {
   const t = useTranslations('play.participantView.waitingRoom');
   const [codeCopied, setCodeCopied] = useState(false);
@@ -336,10 +346,59 @@ export function ParticipantLobby({
           )}
 
           {/* Inline connection feedback — subtle, inside the card */}
+          {connectionState === 'degraded' && (
+            <div className="flex flex-col items-center gap-1.5 mt-4">
+              <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                <WifiIcon className="h-3.5 w-3.5" />
+                <span>
+                  {degradedReason === 'auth'
+                    ? t('degradedAuth')
+                    : degradedReason === 'not-found'
+                      ? t('degradedNotFound')
+                      : t('degradedTemporary')}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                {onRetry && (
+                  <button
+                    type="button"
+                    onClick={onRetry}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                  >
+                    <ArrowPathIcon className="h-3 w-3" />
+                    {degradedReason === 'auth' ? t('retryReconnect') : t('retryAction')}
+                  </button>
+                )}
+                {lastSyncedAt && (
+                  <span className="text-[10px] text-muted-foreground">
+                    {t('lastSynced', {
+                      time: lastSyncedAt.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                      }),
+                    })}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
           {connectionState === 'offline' && (
-            <div className="flex items-center justify-center gap-1.5 mt-4 text-xs text-amber-600 dark:text-amber-400">
-              <WifiIcon className="h-3.5 w-3.5 animate-pulse" />
-              <span>{t('connectionLost')}</span>
+            <div className="flex flex-col items-center gap-1.5 mt-4">
+              <div className="flex items-center gap-1.5 text-xs text-destructive dark:text-red-400">
+                <WifiIcon className="h-3.5 w-3.5 animate-pulse" />
+                <span>{t('connectionOffline')}</span>
+              </div>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                >
+                  <ArrowPathIcon className="h-3 w-3" />
+                  {t('retryAction')}
+                </button>
+              )}
             </div>
           )}
         </div>

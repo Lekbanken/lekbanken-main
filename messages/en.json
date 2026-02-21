@@ -13118,7 +13118,13 @@
         "readyActive": "Ready ✓",
         "openChat": "Chat",
         "leave": "Leave",
-        "connectionLost": "Connection lost — trying to reconnect…"
+        "degradedAuth": "Your session needs to reconnect.",
+        "degradedNotFound": "You no longer seem to be in this session.",
+        "degradedTemporary": "Temporary issue — retrying…",
+        "connectionOffline": "No connection — trying to reconnect…",
+        "retryAction": "Try again",
+        "retryReconnect": "Reconnect",
+        "lastSynced": "Last synced: {time}"
       },
       "secrets": {
         "title": "Secret instructions",

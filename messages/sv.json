@@ -13996,7 +13996,13 @@
         "readyActive": "Redo ✓",
         "openChat": "Chatt",
         "leave": "Lämna",
-        "connectionLost": "Anslutningen tappades — försöker återansluta…"
+        "degradedAuth": "Din session behöver anslutas igen.",
+        "degradedNotFound": "Du verkar inte vara med i sessionen längre.",
+        "degradedTemporary": "Tillfälligt problem — försöker igen…",
+        "connectionOffline": "Ingen anslutning — försöker återansluta…",
+        "retryAction": "Försök igen",
+        "retryReconnect": "Anslut igen",
+        "lastSynced": "Senast synkad: {time}"
       },
       "secrets": {
         "title": "Hemliga instruktioner",

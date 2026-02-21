@@ -32,10 +32,25 @@ export interface Participant {
   lastSeenAt?: string;
 }
 
+/**
+ * Error class that preserves HTTP status from API responses.
+ * Allows callers to distinguish auth (401/403), not-found (404),
+ * rate-limit (429), server errors (5xx), and network failures.
+ */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 async function parseJson(res: Response) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(data.error || 'Request failed');
+    throw new ApiError(data.error || 'Request failed', res.status);
   }
   return data;
 }

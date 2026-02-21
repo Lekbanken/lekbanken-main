@@ -8166,6 +8166,12 @@
         "unlike": "Unlike",
         "dislike": "Dislike",
         "addToPlan": "Add to plan"
+      },
+      "directorPreview": {
+        "button": "Director Mode",
+        "title": "Preview",
+        "backToGame": "Back to game",
+        "noSteps": "This game has no steps to display."
       }
     },
     "gamification": {
@@ -11377,6 +11383,8 @@
     "directorDrawer": {
       "tabs": {
         "play": "Play",
+        "time": "Time",
+        "artifacts": "Artifacts",
         "triggers": "Triggers",
         "signals": "Signals",
         "events": "Events"
@@ -11385,13 +11393,18 @@
         "dash": "–"
       },
       "header": {
-        "participants": "{count} participants",
+        "participants": "{count}",
         "separator": "•",
+        "statusDraft": "DRAFT",
+        "statusLobby": "LOBBY",
         "statusLive": "LIVE",
         "statusPaused": "PAUSED",
+        "statusLocked": "LOCKED",
         "statusEnded": "ENDED",
         "pause": "Pause",
-        "resume": "Resume"
+        "resume": "Resume",
+        "fullscreen": "Fullscreen",
+        "preview": "PREVIEW"
       },
       "leaderScript": {
         "title": "LEADER SCRIPT"
@@ -11399,7 +11412,9 @@
       "steps": {
         "noSteps": "No steps available yet",
         "stepOf": "Step {current} of {total}",
-        "notStarted": "Not started"
+        "notStarted": "Not started",
+        "previous": "Previous",
+        "next": "Next"
       },
       "triggers": {
         "armedLabel": "🟢 ARMED ({count})",
@@ -11447,15 +11462,28 @@
         "paused": "PAUSED",
         "manualAdjustment": "Manual adjustment"
       },
+      "stepTimer": {
+        "title": "Step timings",
+        "current": "Current step",
+        "elapsed": "Elapsed",
+        "planned": "Planned",
+        "noData": "No timing information for steps",
+        "minutes": "{count} min",
+        "noDuration": "No time set"
+      },
       "quickActions": {
         "title": "Quick actions",
         "story": "Story",
         "giveHint": "Give hint",
         "reset": "Reset",
+        "confirmReset": "Confirm reset?",
         "message": "Message"
       },
-      "footer": {
-        "backToLobby": "Back to Lobby"
+      "artifacts": {
+        "noArtifacts": "No artifacts in this session",
+        "hidden": "Hidden",
+        "available": "Available",
+        "shown": "Shown"
       }
     },
     "eventFeed": {

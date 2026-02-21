@@ -8551,6 +8551,12 @@
         "unlike": "Sluta gilla",
         "dislike": "Gilla inte",
         "addToPlan": "Lägg till i plan"
+      },
+      "directorPreview": {
+        "button": "Director Mode",
+        "title": "Förhandsvisning",
+        "backToGame": "Tillbaka till leken",
+        "noSteps": "Leken har inga steg att visa."
       }
     },
     "play": {
@@ -12206,6 +12212,8 @@
     "directorDrawer": {
       "tabs": {
         "play": "Spela",
+        "time": "Tid",
+        "artifacts": "Artefakter",
         "triggers": "Triggers",
         "signals": "Signaler",
         "events": "Händelser"
@@ -12214,13 +12222,18 @@
         "dash": "–"
       },
       "header": {
-        "participants": "{count} deltagare",
+        "participants": "{count}",
         "separator": "•",
+        "statusDraft": "UTKAST",
+        "statusLobby": "LOBBY",
         "statusLive": "LIVE",
         "statusPaused": "PAUSAD",
+        "statusLocked": "LÅST",
         "statusEnded": "AVSLUTAD",
         "pause": "Pausa",
-        "resume": "Fortsätt"
+        "resume": "Fortsätt",
+        "fullscreen": "Helskärm",
+        "preview": "FÖRHANDSVISNING"
       },
       "leaderScript": {
         "title": "LEADER SCRIPT"
@@ -12228,7 +12241,9 @@
       "steps": {
         "noSteps": "Inga steg tillgängliga ännu",
         "stepOf": "Steg {current} av {total}",
-        "notStarted": "Ej startat"
+        "notStarted": "Ej startat",
+        "previous": "Föregående",
+        "next": "Nästa"
       },
       "triggers": {
         "armedLabel": "🟢 ARMED ({count})",
@@ -12276,15 +12291,28 @@
         "paused": "PAUSAD",
         "manualAdjustment": "Manuell justering"
       },
+      "stepTimer": {
+        "title": "Stegtider",
+        "current": "Nuvarande steg",
+        "elapsed": "Förflutit",
+        "planned": "Planerat",
+        "noData": "Ingen tidsinformation för stegen",
+        "minutes": "{count} min",
+        "noDuration": "Ingen tid satt"
+      },
       "quickActions": {
         "title": "Snabbåtgärder",
         "story": "Berättelse",
         "giveHint": "Ge ledtråd",
         "reset": "Reset",
+        "confirmReset": "Bekräfta reset?",
         "message": "Meddelande"
       },
-      "footer": {
-        "backToLobby": "Tillbaka till Lobby"
+      "artifacts": {
+        "noArtifacts": "Inga artefakter i denna session",
+        "hidden": "Hemliga",
+        "available": "Tillgängliga",
+        "shown": "Visade"
       }
     },
     "eventFeed": {

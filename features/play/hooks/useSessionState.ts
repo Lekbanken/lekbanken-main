@@ -20,6 +20,7 @@ import type {
   Signal,
   SignalOutputType,
 } from '@/types/session-cockpit';
+import { getPollingConfig } from '@/lib/play/realtime-gate';
 import {
   DEFAULT_SIGNAL_CAPABILITIES,
   DEFAULT_TIMEBANK_RULES,
@@ -1079,28 +1080,31 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
     void loadAll();
   }, [loadAll]);
 
-  // Polling - reduced in draft mode since no participants can join
+  // Polling - gated via realtime-gate SSoT
   useEffect(() => {
     if (!enableRealtime) return;
 
-    // In draft mode, skip participant polling entirely (no participants can join)
-    // Only poll runtime state at a reduced rate
-    const isDraft = state.status === 'draft';
-    const effectivePollInterval = isDraft ? pollInterval * 5 : pollInterval; // 5x slower in draft
+    const pollingConfig = getPollingConfig({
+      status: state.status,
+      sessionId,
+      basePollInterval: pollInterval,
+    });
+
+    if (!pollingConfig.enabled) return;
 
     pollRef.current = setInterval(() => {
-      if (!isDraft) {
+      if (!pollingConfig.skipParticipants) {
         void loadParticipants();
       }
       void loadRuntimeState();
-    }, effectivePollInterval);
+    }, pollingConfig.interval);
 
     return () => {
       if (pollRef.current) {
         clearInterval(pollRef.current);
       }
     };
-  }, [enableRealtime, pollInterval, loadParticipants, loadRuntimeState, state.status]);
+  }, [enableRealtime, pollInterval, sessionId, loadParticipants, loadRuntimeState, state.status]);
 
   // ==========================================================================
   // Return

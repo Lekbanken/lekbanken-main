@@ -94,6 +94,28 @@ const PlayIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const EyeIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    className={className}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+    />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+    />
+  </svg>
+);
+
 const PlusIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -158,8 +180,10 @@ export function GameStartActions({
   labels = {},
 }: GameStartActionsProps) {
   const t = useTranslations('app.play.startSession');
+  const tDetail = useTranslations('app.gameDetail');
   const router = useRouter();
   const [isStarting, setIsStarting] = useState(false);
+  const [isOpeningPreview, setIsOpeningPreview] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -222,6 +246,21 @@ export function GameStartActions({
         >
           <PlayIcon className="h-5 w-5 mr-2" />
           {isStarting ? startingSession : startSession}
+        </Button>
+
+        {/* SECONDARY: Director Mode Preview */}
+        <Button
+          variant="secondary"
+          size="lg"
+          className="w-full"
+          loading={isOpeningPreview}
+          onClick={() => {
+            setIsOpeningPreview(true);
+            router.push(`/app/games/${gameId}/director-preview`);
+          }}
+        >
+          <EyeIcon className="h-5 w-5 mr-2" />
+          {tDetail('directorPreview.button')}
         </Button>
 
         {/* SECONDARY: Add to Plan */}

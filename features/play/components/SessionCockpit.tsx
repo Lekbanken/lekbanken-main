@@ -35,6 +35,7 @@ import {
 import { cn } from '@/lib/utils';
 import { isFeatureEnabled } from '@/lib/config/env';
 import { resolveUiState } from '@/lib/play/ui-state';
+import { shouldEnableRealtime, getPollingConfig } from '@/lib/play/realtime-gate';
 import {
   PlayIcon,
   UserGroupIcon,
@@ -58,22 +59,54 @@ import {
 } from '@heroicons/react/24/outline';
 import { CheckIcon } from '@heroicons/react/20/solid';
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import dynamic from 'next/dynamic';
 import { useSessionState } from '../hooks/useSessionState';
 import { useSignalCapabilities } from '../hooks/useSignalCapabilities';
 import { useSessionChat } from '../hooks/useSessionChat';
 import { useSessionEvents } from '../hooks/useSessionEvents';
-import { DirectorModeDrawer } from './DirectorModeDrawer';
 import { PreflightChecklist, type ChecklistItem } from './PreflightChecklist';
-import { ArtifactsPanel } from './ArtifactsPanel';
-import { SessionChatModal } from './SessionChatModal';
-import { StorylineModal } from './StorylineModal';
-import { LeaveSessionModal } from './LeaveSessionModal';
 import { Toolbelt } from '@/features/tools/components/Toolbelt';
+import {
+  DirectorModeSkeleton,
+  ArtifactsPanelSkeleton,
+  ChatModalSkeleton,
+  StorylineModalSkeleton,
+  LeaveSessionModalSkeleton,
+} from './LobbySkeletons';
 import { updateSessionRoles, type SessionRoleUpdate } from '@/features/play/api/session-api';
 import { approveParticipant, kickParticipant, setNextStarter } from '@/features/play-participant/api';
 import type { SessionCockpitState, CockpitParticipant, UseSessionStateReturn, SessionEvent as CockpitEvent } from '@/types/session-cockpit';
 import type { SessionEvent as EventFeedEvent } from '@/types/session-event';
 import type { SessionRole } from '@/types/play-runtime';
+
+// =============================================================================
+// Dynamically imported heavy components (lazy-loaded with skeletons)
+// =============================================================================
+
+const DirectorModeDrawer = dynamic(
+  () => import('./DirectorModeDrawer'),
+  { loading: () => <DirectorModeSkeleton />, ssr: false }
+);
+
+const ArtifactsPanel = dynamic(
+  () => import('./ArtifactsPanel').then((mod) => ({ default: mod.ArtifactsPanel })),
+  { loading: () => <ArtifactsPanelSkeleton />, ssr: false }
+);
+
+const SessionChatModal = dynamic(
+  () => import('./SessionChatModal').then((mod) => ({ default: mod.SessionChatModal })),
+  { loading: () => <ChatModalSkeleton />, ssr: false }
+);
+
+const StorylineModal = dynamic(
+  () => import('./StorylineModal').then((mod) => ({ default: mod.StorylineModal })),
+  { loading: () => <StorylineModalSkeleton />, ssr: false }
+);
+
+const LeaveSessionModal = dynamic(
+  () => import('./LeaveSessionModal').then((mod) => ({ default: mod.LeaveSessionModal })),
+  { loading: () => <LeaveSessionModalSkeleton />, ssr: false }
+);
 
 // =============================================================================
 // Context
@@ -715,15 +748,17 @@ function SessionSummaryCard({
         </div>
       </div>
 
-      {/* Leave Session Modal */}
-      <LeaveSessionModal
-        open={showBackDialog}
-        onClose={() => setShowBackDialog(false)}
-        status={status}
-        onGoBack={onBack}
-        onTakeOffline={onTakeOffline}
-        onEndSession={onEndSession}
-      />
+      {/* Leave Session Modal (only mount when open → on-demand chunk load) */}
+      {showBackDialog && (
+        <LeaveSessionModal
+          open={showBackDialog}
+          onClose={() => setShowBackDialog(false)}
+          status={status}
+          onGoBack={onBack}
+          onTakeOffline={onTakeOffline}
+          onEndSession={onEndSession}
+        />
+      )}
 
       {/* QR Code Modal */}
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
@@ -1429,6 +1464,7 @@ export function SessionCockpit({
     safetyInfo,
     preflightItems,
     canStartDirectorMode,
+    artifactStates,
     // Actions
     enterDirectorMode,
     exitDirectorMode,
@@ -1735,14 +1771,34 @@ export function SessionCockpit({
   }, [sessionEvents, showEvents]);
 
   // Enter director mode
-  const handleEnterDirectorMode = useCallback(async () => {
+  // Director Mode is a pure view overlay — it MUST NOT trigger status
+  // transitions. Starting a session is an explicit host action in the
+  // lobby, never a side-effect of opening Director Mode.
+  const handleEnterDirectorMode = useCallback(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const rtEnabled = shouldEnableRealtime({ status, sessionId });
+      const polling = getPollingConfig({ status, sessionId });
+      // eslint-disable-next-line no-console
+      console.debug('[DirectorMode:open]', { status, sessionId, rtEnabled, polling });
+    }
+    enterDirectorMode();
+    setDirectorModeOpen(true);
+  }, [enterDirectorMode, status, sessionId]);
+
+  // Start session AND open director mode — used by the explicit
+  // "Starta session" button in the lobby. This is the ONLY place
+  // where opening director mode is coupled with a status transition.
+  const handleStartAndDirector = useCallback(async () => {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.debug('[DirectorMode:startAndOpen]', { status, sessionId });
+    }
     if (status === 'lobby') {
-      // Start session first
       await startSession();
     }
     enterDirectorMode();
     setDirectorModeOpen(true);
-  }, [status, startSession, enterDirectorMode]);
+  }, [status, startSession, enterDirectorMode, sessionId]);
 
   // Exit director mode
   const handleExitDirectorMode = useCallback(() => {
@@ -1770,11 +1826,8 @@ export function SessionCockpit({
     { id: 'settings', label: '', icon: <Cog6ToothIcon className="h-5 w-5" />, title: tTabs('settings') },
   ] as Array<{ id: CockpitTab; label: string; icon?: ReactNode; badge?: number; title?: string }>;
 
-  // Map status for drawer
-  const drawerStatus: 'active' | 'paused' | 'ended' = 
-    status === 'active' ? 'active' : 
-    status === 'paused' ? 'paused' : 
-    status === 'ended' ? 'ended' : 'active';
+  // Map status for drawer - pass real status through, not a simplified version
+  const drawerStatus = status;
 
   return (
     <SessionCockpitContext.Provider value={sessionState}>
@@ -1815,7 +1868,7 @@ export function SessionCockpit({
                   }
                 }}
                 status={status}
-                onStart={handleEnterDirectorMode}
+                onStart={handleStartAndDirector}
                 onPublish={publishSession}
                 onPause={pauseSession}
                 onResume={resumeSession}
@@ -1846,7 +1899,7 @@ export function SessionCockpit({
                 <LobbyPreflightCard
                   preflight={checklistData}
                   onShowFullChecklist={() => setShowChecklist(true)}
-                  onStartSession={handleEnterDirectorMode}
+                  onStartSession={handleStartAndDirector}
                   onPublishSession={publishSession}
                   isStarting={isLoading}
                   sessionStatus={status}
@@ -2091,6 +2144,8 @@ export function SessionCockpit({
           timeBankBalance={timeBankBalance}
           timeBankPaused={timeBankPaused}
           participantCount={participants.length}
+          artifacts={artifacts}
+          artifactStates={artifactStates}
           onPause={pauseSession}
           onResume={resumeSession}
           onNextStep={nextStep}
@@ -2100,21 +2155,26 @@ export function SessionCockpit({
           onSendSignal={sendSignal}
           onExecuteSignal={handleExecuteSignal}
           onTimeBankDelta={applyTimeBankDelta}
+          onOpenChat={() => setChatOpen(true)}
+          chatUnreadCount={chat.unreadCount}
         />
 
-        <SessionChatModal
-          open={chatOpen}
-          onClose={() => setChatOpen(false)}
-          role="host"
-          messages={chat.messages}
-          error={chat.error}
-          sending={chat.sending}
-          onSend={chat.send}
-          participants={participants.map(p => ({
-            id: p.id,
-            displayName: p.displayName || 'Anonym',
-          }))}
-        />
+        {/* Chat modal: only mount when open → on-demand chunk load */}
+        {chatOpen && (
+          <SessionChatModal
+            open={chatOpen}
+            onClose={() => setChatOpen(false)}
+            role="host"
+            messages={chat.messages}
+            error={chat.error}
+            sending={chat.sending}
+            onSend={chat.send}
+            participants={participants.map(p => ({
+              id: p.id,
+              displayName: p.displayName || 'Anonym',
+            }))}
+          />
+        )}
 
         {/* Preflight Checklist Modal */}
         {showChecklist && (
@@ -2131,7 +2191,7 @@ export function SessionCockpit({
                 canStart={canStartDirectorMode}
                 onStart={() => {
                   setShowChecklist(false);
-                  handleEnterDirectorMode();
+                  handleStartAndDirector();
                 }}
                 isStarting={isLoading}
               />
@@ -2139,15 +2199,17 @@ export function SessionCockpit({
           </div>
         )}
 
-        {/* Storyline Modal */}
-        <StorylineModal
-          open={showStoryline}
-          onClose={() => setShowStoryline(false)}
-          title={displayName || tStoryline('title')}
-          steps={steps}
-          phases={phases}
-          safetyInfo={safetyInfo}
-        />
+        {/* Storyline Modal: only mount when open → on-demand chunk load */}
+        {showStoryline && (
+          <StorylineModal
+            open={showStoryline}
+            onClose={() => setShowStoryline(false)}
+            title={displayName || tStoryline('title')}
+            steps={steps}
+            phases={phases}
+            safetyInfo={safetyInfo}
+          />
+        )}
       </div>
     </SessionCockpitContext.Provider>
   );

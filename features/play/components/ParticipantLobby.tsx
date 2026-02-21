@@ -22,7 +22,6 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   CheckIcon,
@@ -175,7 +174,6 @@ export function ParticipantLobby({
   myParticipantId,
   myDisplayName: _myDisplayName,
   participants,
-  maxParticipants,
   isReady,
   readyLoading,
   onToggleReady,
@@ -208,10 +206,6 @@ export function ParticipantLobby({
     }
   }, [code]);
 
-  // Build avatar grid — fill remaining slots up to maxParticipants or at least participants.length + 3
-  const totalSlots = maxParticipants
-    ? Math.max(maxParticipants, participants.length)
-    : Math.max(participants.length + 3, 6);
   const readyCount = participants.filter((p) => p.isReady).length;
 
   const statusLabel =
@@ -263,119 +257,81 @@ export function ParticipantLobby({
       )}
 
       {/* ================================================================= */}
-      {/* 4. READY BUTTON                                                   */}
+      {/* 4. CHAT + READY ROW                                               */}
       {/* ================================================================= */}
-      <Button
-        size="sm"
-        className={cn(
-          'w-full text-base font-bold py-5 shadow-sm transition-all mb-5',
-          isReady
-            ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white'
-            : 'bg-primary hover:bg-primary/90 text-primary-foreground',
+      <div className="flex items-center gap-3 w-full mb-5">
+        {/* Chat button (left) */}
+        {enableChat && onOpenChat && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={onOpenChat}
+          >
+            <ChatBubbleLeftRightIcon className="h-4 w-4 mr-1.5" />
+            {t('openChat')}
+            {chatUnreadCount > 0 && (
+              <Badge variant="destructive" size="sm" className="ml-1.5">
+                {chatUnreadCount}
+              </Badge>
+            )}
+          </Button>
         )}
-        onClick={onToggleReady}
-        loading={readyLoading}
-      >
-        {isReady ? t('readyActive') : t('readyButton')}
-      </Button>
+
+        {/* Ready button (right) */}
+        <Button
+          size="sm"
+          className={cn(
+            'flex-1 text-sm font-bold shadow-sm transition-all',
+            isReady
+              ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white'
+              : 'bg-primary hover:bg-primary/90 text-primary-foreground',
+          )}
+          onClick={onToggleReady}
+          loading={readyLoading}
+        >
+          {isReady ? t('readyActive') : t('readyButton')}
+        </Button>
+      </div>
 
       {/* ================================================================= */}
-      {/* 5. PARTICIPANTS + CHAT (inside same card)                         */}
+      {/* 5. PARTICIPANTS (clean purple card)                               */}
       {/* ================================================================= */}
-      <Card className="w-full mb-5">
-        <div className="px-5 py-4">
-          {/* Header row */}
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-foreground">
-              {t('participantsTitle')}
-            </h2>
-            <span className="text-xs text-muted-foreground">
-              {t('readyCount', { ready: readyCount, total: participants.length })}
-            </span>
-          </div>
-
-          {/* Avatar grid */}
+      <div className="w-full mb-5 rounded-xl bg-primary/10 dark:bg-primary/15 px-5 py-4">
+        {/* Active participants only */}
+        {participants.length > 0 && (
           <div className="flex flex-wrap gap-4 justify-center">
-            {Array.from({ length: totalSlots }).map((_, i) => {
-              const p = participants[i];
-              return (
-                <AvatarSlot
-                  key={p?.id ?? `empty-${i}`}
-                  participant={p}
-                  isMe={p?.id === myParticipantId}
-                />
-              );
-            })}
+            {participants.map((p) => (
+              <AvatarSlot
+                key={p.id}
+                participant={p}
+                isMe={p.id === myParticipantId}
+              />
+            ))}
           </div>
+        )}
 
-          {/* Ready progress bar */}
-          {participants.length > 0 && (
-            <div className="mt-5">
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-green-500 rounded-full transition-all duration-500 ease-out"
-                  style={{
-                    width: `${(readyCount / participants.length) * 100}%`,
-                  }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground text-center mt-1.5">
-                {readyCount === participants.length && participants.length > 0
-                  ? t('allReady')
-                  : t('waitingForOthers')}
-              </p>
-            </div>
-          )}
+        {/* Status text */}
+        <p className="text-xs text-muted-foreground text-center mt-3">
+          {readyCount === participants.length && participants.length > 0
+            ? t('allReady')
+            : t('waitingForOthers')}
+        </p>
 
-          {/* Inline connection feedback */}
-          {connectionState === 'degraded' && (
-            <div className="flex flex-col items-center gap-1.5 mt-4">
-              <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
-                <WifiIcon className="h-3.5 w-3.5" />
-                <span>
-                  {degradedReason === 'auth'
-                    ? t('degradedAuth')
-                    : degradedReason === 'not-found'
-                      ? t('degradedNotFound')
-                      : t('degradedTemporary')}
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                {onRetry && (
-                  <button
-                    type="button"
-                    onClick={onRetry}
-                    disabled={retrying}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ArrowPathIcon className={cn('h-3 w-3', retrying && 'animate-spin')} />
-                    {degradedReason === 'auth'
-                      ? t('retryReconnect')
-                      : degradedReason === 'not-found'
-                        ? t('retryGoBack')
-                        : t('retryAction')}
-                  </button>
-                )}
-                {lastSyncedAt && (
-                  <span className="text-[10px] text-muted-foreground">
-                    {t('lastSynced', {
-                      time: lastSyncedAt.toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                      }),
-                    })}
-                  </span>
-                )}
-              </div>
+        {/* Inline connection feedback */}
+        {connectionState === 'degraded' && (
+          <div className="flex flex-col items-center gap-1.5 mt-4">
+            <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+              <WifiIcon className="h-3.5 w-3.5" />
+              <span>
+                {degradedReason === 'auth'
+                  ? t('degradedAuth')
+                  : degradedReason === 'not-found'
+                    ? t('degradedNotFound')
+                    : t('degradedTemporary')}
+              </span>
             </div>
-          )}
-          {connectionState === 'offline' && (
-            <div className="flex flex-col items-center gap-1.5 mt-4">
-              <div className="flex items-center gap-1.5 text-xs text-destructive dark:text-red-400">
-                <WifiIcon className="h-3.5 w-3.5 animate-pulse" />
-                <span>{t('connectionOffline')}</span>
-              </div>
+            <div className="flex items-center gap-3">
               {onRetry && (
                 <button
                   type="button"
@@ -384,33 +340,48 @@ export function ParticipantLobby({
                   className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ArrowPathIcon className={cn('h-3 w-3', retrying && 'animate-spin')} />
-                  {t('retryAction')}
+                  {degradedReason === 'auth'
+                    ? t('retryReconnect')
+                    : degradedReason === 'not-found'
+                      ? t('retryGoBack')
+                      : t('retryAction')}
                 </button>
               )}
+              {lastSyncedAt && (
+                <span className="text-[10px] text-muted-foreground">
+                  {t('lastSynced', {
+                    time: lastSyncedAt.toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    }),
+                  })}
+                </span>
+              )}
             </div>
-          )}
-
-          {/* Chat button — inside participants card */}
-          {enableChat && onOpenChat && (
-            <div className="mt-4 pt-4 border-t border-border/50">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                onClick={onOpenChat}
+          </div>
+        )}
+        {connectionState === 'offline' && (
+          <div className="flex flex-col items-center gap-1.5 mt-4">
+            <div className="flex items-center gap-1.5 text-xs text-destructive dark:text-red-400">
+              <WifiIcon className="h-3.5 w-3.5 animate-pulse" />
+              <span>{t('connectionOffline')}</span>
+            </div>
+            {onRetry && (
+              <button
+                type="button"
+                onClick={onRetry}
+                disabled={retrying}
+                className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
-                {t('openChat')}
-                {chatUnreadCount > 0 && (
-                  <Badge variant="destructive" size="sm" className="ml-2">
-                    {chatUnreadCount}
-                  </Badge>
-                )}
-              </Button>
-            </div>
-          )}
-        </div>
-      </Card>
+                <ArrowPathIcon className={cn('h-3 w-3', retrying && 'animate-spin')} />
+                {t('retryAction')}
+              </button>
+            )}
+          </div>
+        )}
+
+      </div>
 
       {/* ================================================================= */}
       {/* 6. FOOTER: Leave left + Session code right                        */}

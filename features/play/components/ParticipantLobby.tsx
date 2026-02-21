@@ -227,30 +227,20 @@ export function ParticipantLobby({
   return (
     <div className="min-h-[80vh] flex flex-col items-center px-4 py-6 max-w-lg mx-auto w-full">
       {/* ================================================================= */}
-      {/* HEADER                                                            */}
+      {/* 1. HEADER: "Lobby" left + status right                            */}
       {/* ================================================================= */}
-      <div className="text-center mb-6 w-full">
-        <Badge
-          variant="secondary"
-          size="sm"
-          className="mb-3"
-          dot
-        >
+      <div className="flex items-center justify-between w-full mb-5">
+        <h1 className="text-xl font-bold text-foreground">Lobby</h1>
+        <Badge variant="secondary" size="sm" dot>
           {statusLabel}
         </Badge>
-        <h1 className="text-2xl font-bold text-foreground">
-          {t('title')}
-        </h1>
-        {gameName && (
-          <p className="text-sm text-muted-foreground mt-1">{gameName}</p>
-        )}
       </div>
 
       {/* ================================================================= */}
-      {/* GAME COVER IMAGE                                                  */}
+      {/* 2. GAME COVER IMAGE                                               */}
       {/* ================================================================= */}
       {gameCoverUrl && (
-        <div className="w-full mb-6 rounded-xl overflow-hidden shadow-sm border border-border/50">
+        <div className="w-full mb-5 rounded-xl overflow-hidden shadow-sm border border-border/50">
           <div className="relative aspect-[16/9] bg-muted">
             <Image
               src={gameCoverUrl}
@@ -265,45 +255,74 @@ export function ParticipantLobby({
       )}
 
       {/* ================================================================= */}
-      {/* SESSION CODE                                                      */}
+      {/* 3. GAME NAME + SESSION CODE (single card)                         */}
       {/* ================================================================= */}
-      <Card
-        className={cn(
-          'w-full mb-6 cursor-pointer transition-colors',
-          'hover:bg-muted/50 active:bg-muted/70',
-        )}
-        onClick={handleCopyCode}
-      >
-        <div className="flex items-center justify-between px-5 py-4">
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              {t('sessionCode')}
-            </p>
-            <p className="font-mono text-2xl font-bold text-primary tracking-[0.25em] mt-0.5">
-              {code}
-            </p>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            {codeCopied ? (
-              <CheckIcon className="h-5 w-5 text-green-500" />
-            ) : (
-              <ClipboardDocumentIcon className="h-5 w-5" />
-            )}
-            <span className={cn('text-xs', codeCopyFailed && 'text-destructive')}>
-              {codeCopied
-                ? t('copied')
-                : codeCopyFailed
-                  ? t('codeCopyFailed')
-                  : t('tapToCopy')}
-            </span>
+      <Card className="w-full mb-5">
+        <div className="px-5 py-4 space-y-2">
+          {gameName && (
+            <p className="text-sm font-semibold text-foreground">{gameName}</p>
+          )}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={handleCopyCode}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') void handleCopyCode(); }}
+            className="flex items-center justify-between cursor-pointer rounded-lg -mx-2 px-2 py-1.5 transition-colors hover:bg-muted/50 active:bg-muted/70"
+          >
+            <div>
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                {t('sessionCode')}
+              </p>
+              <p className="font-mono text-xl font-bold text-primary tracking-[0.25em]">
+                {code}
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              {codeCopied ? (
+                <CheckIcon className="h-4 w-4 text-green-500" />
+              ) : (
+                <ClipboardDocumentIcon className="h-4 w-4" />
+              )}
+              <span className={cn('text-xs', codeCopyFailed && 'text-destructive')}>
+                {codeCopied
+                  ? t('copied')
+                  : codeCopyFailed
+                    ? t('codeCopyFailed')
+                    : t('tapToCopy')}
+              </span>
+            </div>
           </div>
         </div>
       </Card>
 
       {/* ================================================================= */}
-      {/* PARTICIPANTS GRID                                                 */}
+      {/* 4. READY BUTTON                                                   */}
       {/* ================================================================= */}
-      <Card className="w-full mb-6">
+      <Button
+        size="lg"
+        className={cn(
+          'w-full text-lg font-bold py-6 shadow-sm transition-all mb-5',
+          isReady
+            ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white'
+            : 'bg-primary hover:bg-primary/90 text-primary-foreground',
+        )}
+        onClick={onToggleReady}
+        loading={readyLoading}
+      >
+        {isReady ? (
+          <>
+            <CheckIcon className="h-6 w-6 mr-2" />
+            {t('readyActive')}
+          </>
+        ) : (
+          t('readyButton')
+        )}
+      </Button>
+
+      {/* ================================================================= */}
+      {/* 5. PARTICIPANTS + CHAT (inside same card)                         */}
+      {/* ================================================================= */}
+      <Card className="w-full mb-5">
         <div className="px-5 py-4">
           {/* Header row */}
           <div className="flex items-center justify-between mb-4">
@@ -410,57 +429,33 @@ export function ParticipantLobby({
               )}
             </div>
           )}
+
+          {/* Chat button — inside participants card */}
+          {enableChat && onOpenChat && (
+            <div className="mt-4 pt-4 border-t border-border/50">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={onOpenChat}
+              >
+                <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
+                {t('openChat')}
+                {chatUnreadCount > 0 && (
+                  <Badge variant="destructive" size="sm" className="ml-2">
+                    {chatUnreadCount}
+                  </Badge>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       </Card>
 
       {/* ================================================================= */}
-      {/* READY BUTTON                                                      */}
+      {/* 6. LEAVE BUTTON (bottom)                                          */}
       {/* ================================================================= */}
-      <Button
-        size="lg"
-        className={cn(
-          'w-full text-lg font-bold py-6 shadow-sm transition-all',
-          isReady
-            ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white'
-            : 'bg-primary hover:bg-primary/90 text-primary-foreground',
-        )}
-        onClick={onToggleReady}
-        loading={readyLoading}
-      >
-        {isReady ? (
-          <>
-            <CheckIcon className="h-6 w-6 mr-2" />
-            {t('readyActive')}
-          </>
-        ) : (
-          t('readyButton')
-        )}
-      </Button>
-
-      {/* ================================================================= */}
-      {/* CHAT BUTTON (feature-flagged)                                     */}
-      {/* ================================================================= */}
-      {enableChat && onOpenChat && (
-        <Button
-          variant="outline"
-          size="lg"
-          className="w-full mt-3"
-          onClick={onOpenChat}
-        >
-          <ChatBubbleLeftRightIcon className="h-5 w-5 mr-2" />
-          {t('openChat')}
-          {chatUnreadCount > 0 && (
-            <Badge variant="destructive" size="sm" className="ml-2">
-              {chatUnreadCount}
-            </Badge>
-          )}
-        </Button>
-      )}
-
-      {/* ================================================================= */}
-      {/* LEAVE BUTTON                                                      */}
-      {/* ================================================================= */}
-      <div className="mt-6">
+      <div className="mt-auto pt-4">
         <Button
           variant="ghost"
           size="sm"

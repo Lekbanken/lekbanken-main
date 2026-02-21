@@ -447,12 +447,16 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
   const handleToggleReady = useCallback(async () => {
     const tkn = getToken();
     if (!tkn) return;
+    // Optimistic update — instant UI feedback
+    const prev = isReady;
+    setIsReady(!prev);
     setReadyLoading(true);
     try {
-      const res = await setParticipantReady(code, tkn, !isReady);
+      const res = await setParticipantReady(code, tkn, !prev);
       setIsReady(res.isReady);
     } catch {
-      // Silently ignore — next poll will reconcile
+      // Revert on failure — next poll will reconcile anyway
+      setIsReady(prev);
     } finally {
       setReadyLoading(false);
     }

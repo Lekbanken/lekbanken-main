@@ -13115,7 +13115,7 @@
         "allReady": "All ready!",
         "waitingForOthers": "Waiting for others…",
         "readyButton": "Ready",
-        "readyActive": "Ready ✓",
+        "readyActive": "Ready",
         "openChat": "Chat",
         "leave": "Leave",
         "degradedAuth": "Your connection needs to be renewed.",

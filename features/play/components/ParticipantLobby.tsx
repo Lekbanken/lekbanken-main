@@ -25,7 +25,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  ClipboardDocumentIcon,
   CheckIcon,
   ArrowRightStartOnRectangleIcon,
   ArrowPathIcon,
@@ -240,7 +239,7 @@ export function ParticipantLobby({
       {/* 2. GAME COVER IMAGE                                               */}
       {/* ================================================================= */}
       {gameCoverUrl && (
-        <div className="w-full mb-5 rounded-xl overflow-hidden shadow-sm border border-border/50">
+        <div className="w-full mb-4 rounded-xl overflow-hidden shadow-sm border border-border/50">
           <div className="relative aspect-[16/9] bg-muted">
             <Image
               src={gameCoverUrl}
@@ -255,53 +254,21 @@ export function ParticipantLobby({
       )}
 
       {/* ================================================================= */}
-      {/* 3. GAME NAME + SESSION CODE (single card)                         */}
+      {/* 3. GAME NAME (free, large, centered)                              */}
       {/* ================================================================= */}
-      <Card className="w-full mb-5">
-        <div className="px-5 py-4 space-y-2">
-          {gameName && (
-            <p className="text-sm font-semibold text-foreground">{gameName}</p>
-          )}
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={handleCopyCode}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') void handleCopyCode(); }}
-            className="flex items-center justify-between cursor-pointer rounded-lg -mx-2 px-2 py-1.5 transition-colors hover:bg-muted/50 active:bg-muted/70"
-          >
-            <div>
-              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                {t('sessionCode')}
-              </p>
-              <p className="font-mono text-xl font-bold text-primary tracking-[0.25em]">
-                {code}
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              {codeCopied ? (
-                <CheckIcon className="h-4 w-4 text-green-500" />
-              ) : (
-                <ClipboardDocumentIcon className="h-4 w-4" />
-              )}
-              <span className={cn('text-xs', codeCopyFailed && 'text-destructive')}>
-                {codeCopied
-                  ? t('copied')
-                  : codeCopyFailed
-                    ? t('codeCopyFailed')
-                    : t('tapToCopy')}
-              </span>
-            </div>
-          </div>
-        </div>
-      </Card>
+      {gameName && (
+        <h2 className="text-lg font-semibold text-foreground text-center w-full mb-5">
+          {gameName}
+        </h2>
+      )}
 
       {/* ================================================================= */}
       {/* 4. READY BUTTON                                                   */}
       {/* ================================================================= */}
       <Button
-        size="lg"
+        size="sm"
         className={cn(
-          'w-full text-lg font-bold py-6 shadow-sm transition-all mb-5',
+          'w-full text-base font-bold py-5 shadow-sm transition-all mb-5',
           isReady
             ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white'
             : 'bg-primary hover:bg-primary/90 text-primary-foreground',
@@ -309,14 +276,7 @@ export function ParticipantLobby({
         onClick={onToggleReady}
         loading={readyLoading}
       >
-        {isReady ? (
-          <>
-            <CheckIcon className="h-6 w-6 mr-2" />
-            {t('readyActive')}
-          </>
-        ) : (
-          t('readyButton')
-        )}
+        {isReady ? t('readyActive') : t('readyButton')}
       </Button>
 
       {/* ================================================================= */}
@@ -367,7 +327,7 @@ export function ParticipantLobby({
             </div>
           )}
 
-          {/* Inline connection feedback — subtle, inside the card */}
+          {/* Inline connection feedback */}
           {connectionState === 'degraded' && (
             <div className="flex flex-col items-center gap-1.5 mt-4">
               <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
@@ -453,9 +413,9 @@ export function ParticipantLobby({
       </Card>
 
       {/* ================================================================= */}
-      {/* 6. LEAVE BUTTON (bottom)                                          */}
+      {/* 6. FOOTER: Leave left + Session code right                        */}
       {/* ================================================================= */}
-      <div className="mt-auto pt-4">
+      <div className="mt-auto pt-4 flex items-center justify-between w-full">
         <Button
           variant="ghost"
           size="sm"
@@ -465,6 +425,21 @@ export function ParticipantLobby({
           <ArrowRightStartOnRectangleIcon className="h-4 w-4 mr-1.5" />
           {t('leave')}
         </Button>
+
+        <button
+          type="button"
+          onClick={handleCopyCode}
+          className={cn(
+            'font-mono text-sm font-semibold tracking-wider transition-colors',
+            codeCopied
+              ? 'text-green-500'
+              : codeCopyFailed
+                ? 'text-destructive'
+                : 'text-muted-foreground hover:text-primary',
+          )}
+        >
+          {codeCopied ? t('copied') : code}
+        </button>
       </div>
     </div>
   );

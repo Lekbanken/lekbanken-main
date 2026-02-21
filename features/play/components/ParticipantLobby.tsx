@@ -24,7 +24,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/toast';
 import {
   ClipboardDocumentIcon,
   CheckIcon,
@@ -176,21 +175,22 @@ export function ParticipantLobby({
   status,
 }: ParticipantLobbyProps) {
   const t = useTranslations('play.participantView.waitingRoom');
-  const { addToast } = useToast();
   const [codeCopied, setCodeCopied] = useState(false);
+  const [codeCopyFailed, setCodeCopyFailed] = useState(false);
 
   // Copy session code to clipboard
   const handleCopyCode = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(code);
       setCodeCopied(true);
-      addToast({ title: t('codeCopied'), message: '', variant: 'success' });
+      setCodeCopyFailed(false);
       setTimeout(() => setCodeCopied(false), 2000);
     } catch {
       // Fallback for browsers that deny clipboard
-      addToast({ title: t('codeCopyFailed'), message: '', variant: 'error' });
+      setCodeCopyFailed(true);
+      setTimeout(() => setCodeCopyFailed(false), 2000);
     }
-  }, [code, addToast, t]);
+  }, [code]);
 
   // Build avatar grid — fill remaining slots up to maxParticipants or at least participants.length + 3
   const totalSlots = maxParticipants
@@ -272,8 +272,12 @@ export function ParticipantLobby({
             ) : (
               <ClipboardDocumentIcon className="h-5 w-5" />
             )}
-            <span className="text-xs">
-              {codeCopied ? t('copied') : t('tapToCopy')}
+            <span className={cn('text-xs', codeCopyFailed && 'text-destructive')}>
+              {codeCopied
+                ? t('copied')
+                : codeCopyFailed
+                  ? t('codeCopyFailed')
+                  : t('tapToCopy')}
             </span>
           </div>
         </div>

@@ -220,20 +220,29 @@ export function ParticipantLobby({
   return (
     <div className="min-h-[80vh] flex flex-col items-center px-4 py-6 max-w-lg mx-auto w-full">
       {/* ================================================================= */}
-      {/* 1. HEADER: "Lobby" left + status right                            */}
+      {/* 1. GAME NAME (top, large, centered)                               */}
+      {/* ================================================================= */}
+      {gameName && (
+        <h1 className="text-2xl font-bold text-foreground text-center w-full mb-4">
+          {gameName}
+        </h1>
+      )}
+
+      {/* ================================================================= */}
+      {/* 2. HEADER: "Lobby" left + status right                            */}
       {/* ================================================================= */}
       <div className="flex items-center justify-between w-full mb-5">
-        <h1 className="text-xl font-bold text-foreground">Lobby</h1>
+        <span className="text-sm font-semibold text-muted-foreground">Lobby</span>
         <Badge variant="secondary" size="sm" dot>
           {statusLabel}
         </Badge>
       </div>
 
       {/* ================================================================= */}
-      {/* 2. GAME COVER IMAGE                                               */}
+      {/* 3. GAME COVER IMAGE                                               */}
       {/* ================================================================= */}
       {gameCoverUrl && (
-        <div className="w-full mb-4 rounded-xl overflow-hidden shadow-sm border border-border/50">
+        <div className="w-full mb-5 rounded-xl overflow-hidden shadow-sm border border-border/50">
           <div className="relative aspect-[16/9] bg-muted">
             <Image
               src={gameCoverUrl}
@@ -248,15 +257,6 @@ export function ParticipantLobby({
       )}
 
       {/* ================================================================= */}
-      {/* 3. GAME NAME (free, large, centered)                              */}
-      {/* ================================================================= */}
-      {gameName && (
-        <h2 className="text-lg font-semibold text-foreground text-center w-full mb-5">
-          {gameName}
-        </h2>
-      )}
-
-      {/* ================================================================= */}
       {/* 4. CHAT + READY ROW                                               */}
       {/* ================================================================= */}
       <div className="flex items-center gap-3 w-full mb-5">
@@ -265,7 +265,7 @@ export function ParticipantLobby({
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-1 py-3"
             onClick={onOpenChat}
           >
             <ChatBubbleLeftRightIcon className="h-4 w-4 mr-1.5" />
@@ -282,7 +282,7 @@ export function ParticipantLobby({
         <Button
           size="sm"
           className={cn(
-            'flex-1 text-sm font-bold shadow-sm transition-all',
+            'flex-1 text-sm font-bold py-3 shadow-sm transition-all',
             isReady
               ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white'
               : 'bg-primary hover:bg-primary/90 text-primary-foreground',
@@ -297,7 +297,7 @@ export function ParticipantLobby({
       {/* ================================================================= */}
       {/* 5. PARTICIPANTS (clean purple card)                               */}
       {/* ================================================================= */}
-      <div className="w-full mb-5 rounded-xl bg-primary/10 dark:bg-primary/15 px-5 py-4">
+      <div className="w-full mb-5 rounded-xl bg-primary/10 dark:bg-primary/15 px-6 py-6">
         {/* Active participants only */}
         {participants.length > 0 && (
           <div className="flex flex-wrap gap-4 justify-center">

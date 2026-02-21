@@ -232,7 +232,7 @@ export function ParticipantLobby({
       {/* 2. HEADER: "Lobby" left + status right                            */}
       {/* ================================================================= */}
       <div className="flex items-center justify-between w-full mb-5">
-        <span className="text-sm font-semibold text-muted-foreground">Lobby</span>
+        <span className="text-sm font-semibold text-muted-foreground">Välkommen till Lobbyn</span>
         <Badge variant="secondary" size="sm" dot>
           {statusLabel}
         </Badge>

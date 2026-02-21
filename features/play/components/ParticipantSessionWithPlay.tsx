@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { 
@@ -45,6 +45,7 @@ const SESSION_STORAGE_KEY = 'lekbanken_participant_token';
 const ACTIVE_JOIN_PREF_KEY = 'lekbanken_active_join_pref';
 const HEARTBEAT_INTERVAL = 10000; // 10 seconds
 const POLL_INTERVAL = 3000; // 3 seconds
+const MAX_BACKOFF = 30000; // 30 seconds max between retries
 
 type ParticipantSessionWithPlayProps = {
   code: string;
@@ -72,6 +73,24 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
   const [isReady, setIsReady] = useState(false);
   const [readyLoading, setReadyLoading] = useState(false);
 
+  // Retry button in-flight state
+  const [retrying, setRetrying] = useState(false);
+
+  // -----------------------------------------------------------------------
+  // Refs for stable polling (avoid recreating loadData on every state change)
+  // -----------------------------------------------------------------------
+  const sessionRef = useRef<PlaySession | null>(null);
+  const lobbyParticipantsRef = useRef<LobbyParticipant[]>([]);
+  const reconnectAttemptsRef = useRef(0);
+  const inFlightRef = useRef(false);
+  const mountedRef = useRef(true);
+  const backoffMsRef = useRef(POLL_INTERVAL);
+
+  // Keep refs in sync with state
+  sessionRef.current = session;
+  lobbyParticipantsRef.current = lobbyParticipants;
+  reconnectAttemptsRef.current = reconnectAttempts;
+
   // Active session mode UI state
   const [activeSessionOpen, setActiveSessionOpen] = useState(false);
   const [joinGateSecondsLeft, setJoinGateSecondsLeft] = useState<number | null>(null);
@@ -84,118 +103,154 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
     return sessionStorage.getItem(`${SESSION_STORAGE_KEY}_${code}`);
   }, [code]);
 
-  // Load session and participant data
+  // Load session and participant data (stable identity — reads mutable state via refs)
   const loadData = useCallback(async () => {
-    const token = getToken();
+    if (inFlightRef.current) return; // Prevent overlapping requests
+    inFlightRef.current = true;
 
-    // -----------------------------------------------------------------------
-    // 1. Fetch public session info (always works, no auth needed)
-    // -----------------------------------------------------------------------
-    let sessionOk = false;
     try {
-      const sessionRes = await getPublicSession(code);
-      setSession(sessionRes.session);
+      const token = getToken();
+      const currentSession = sessionRef.current;
 
-      // Update lobby participant list from polling
-      if (Array.isArray(sessionRes.participants)) {
-        setLobbyParticipants(sessionRes.participants as LobbyParticipant[]);
-      }
+      // -----------------------------------------------------------------------
+      // 1. Fetch public session info (always works, no auth needed)
+      // -----------------------------------------------------------------------
+      let sessionOk = false;
+      let sessionFailIsNetwork = false;
 
-      sessionOk = true;
-    } catch (err) {
-      // Session fetch failed — either network is fully down or session gone
-      if (!session) {
-        setError(err instanceof Error ? err.message : t('couldNotGetSession'));
-      }
-    }
-
-    // -----------------------------------------------------------------------
-    // 2. Fetch own participant info (requires token, may fail independently)
-    // -----------------------------------------------------------------------
-    let meOk = false;
-    let meFailReason: DegradedReason = null;
-
-    if (token) {
       try {
-        const meRes = await getParticipantMe(code, token);
-        setParticipant(meRes.participant);
-        meOk = true;
+        const sessionRes = await getPublicSession(code);
+        if (!mountedRef.current) return;
+        setSession(sessionRes.session);
+        sessionRef.current = sessionRes.session;
 
-        // Sync own readiness from the lobby participant list
-        const me = lobbyParticipants.find((p) => p.id === meRes.participant?.id);
-        if (me) setIsReady(me.isReady);
+        // Update lobby participant list from polling
+        if (Array.isArray(sessionRes.participants)) {
+          setLobbyParticipants(sessionRes.participants as LobbyParticipant[]);
+          lobbyParticipantsRef.current = sessionRes.participants as LobbyParticipant[];
+        }
+
+        sessionOk = true;
       } catch (err) {
-        // Classify the failure by HTTP status
+        if (!mountedRef.current) return;
         if (err instanceof ApiError) {
-          const s = err.status;
-          if (s === 401 || s === 403) {
-            meFailReason = 'auth';
-          } else if (s === 404) {
-            meFailReason = 'not-found';
+          // Server responded with HTTP error (5xx, 429, etc.) — NOT network issue
+          sessionFailIsNetwork = false;
+        } else {
+          // TypeError: Failed to fetch — real network / DNS / timeout failure
+          sessionFailIsNetwork = true;
+        }
+        if (!currentSession) {
+          setError(err instanceof Error ? err.message : t('couldNotGetSession'));
+        }
+      }
+
+      // -----------------------------------------------------------------------
+      // 2. Fetch own participant info (requires token, may fail independently)
+      // -----------------------------------------------------------------------
+      let meOk = false;
+      let meFailReason: DegradedReason = null;
+
+      if (token) {
+        try {
+          const meRes = await getParticipantMe(code, token);
+          if (!mountedRef.current) return;
+          setParticipant(meRes.participant);
+          meOk = true;
+
+          // Sync own readiness from the lobby participant list
+          const me = lobbyParticipantsRef.current.find((p) => p.id === meRes.participant?.id);
+          if (me) setIsReady(me.isReady);
+        } catch (err) {
+          if (!mountedRef.current) return;
+          // Classify the failure by HTTP status
+          if (err instanceof ApiError) {
+            const s = err.status;
+            if (s === 401 || s === 403) {
+              meFailReason = 'auth';
+            } else if (s === 404) {
+              meFailReason = 'not-found';
+            } else {
+              // 429, 5xx, or other server errors
+              meFailReason = 'temporary';
+            }
           } else {
-            // 429, 5xx, or other server errors
+            // Network error (fetch threw, not an HTTP response)
             meFailReason = 'temporary';
           }
-        } else {
-          // Network error (fetch threw, not an HTTP response)
-          meFailReason = 'temporary';
         }
+      } else {
+        // No token → treat as "me not available" but not degraded
+        meOk = true;
       }
-    } else {
-      // No token → treat as "me not available" but not degraded
-      meOk = true;
-    }
 
-    // -----------------------------------------------------------------------
-    // 3. Derive connection state
-    //    offline  = session endpoint unreachable (real network issue)
-    //    degraded = session OK but /me fails (tab idle, token, rate-limit)
-    //    connected = both OK
-    // -----------------------------------------------------------------------
-    if (sessionOk && meOk) {
-      setConnectionState('connected');
-      setDegradedReason(null);
-      setError(null);
-      setIsReconnecting(false);
-      setReconnectAttempts(0);
-      setLastSyncedAt(new Date());
-    } else if (sessionOk && !meOk) {
-      // Session reachable but participant fetch failed
-      setConnectionState('degraded');
-      setDegradedReason(meFailReason);
-      setError(null);
-      setIsReconnecting(false);
-      setReconnectAttempts(0);
-      setLastSyncedAt(new Date()); // session data is still fresh
-    } else if (session) {
-      // Had a previous session but session endpoint now fails
-      const currentStatus = session.status;
-      const connectivityRelevant =
-        currentStatus === 'lobby' ||
-        currentStatus === 'active' ||
-        currentStatus === 'paused' ||
-        currentStatus === 'locked';
+      if (!mountedRef.current) return;
 
-      if (connectivityRelevant) {
-        setConnectionState('offline');
+      // -----------------------------------------------------------------------
+      // 3. Derive connection state
+      //    offline   = session endpoint unreachable (real network failure only)
+      //    degraded  = session reachable but /me fails, OR session 5xx (server error)
+      //    connected = both OK
+      // -----------------------------------------------------------------------
+      if (sessionOk && meOk) {
+        setConnectionState('connected');
         setDegradedReason(null);
-        setIsReconnecting(true);
-        setReconnectAttempts((prev) => prev + 1);
-        if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.debug('[ParticipantSession:reconnect]', {
-            status: currentStatus,
-            sessionId: session.id,
-            attempt: reconnectAttempts + 1,
-          });
+        setError(null);
+        setIsReconnecting(false);
+        setReconnectAttempts(0);
+        reconnectAttemptsRef.current = 0;
+        setLastSyncedAt(new Date());
+        // Success → reset backoff to base interval
+        backoffMsRef.current = POLL_INTERVAL;
+      } else if (sessionOk && !meOk) {
+        // Session reachable but participant fetch failed
+        setConnectionState('degraded');
+        setDegradedReason(meFailReason);
+        setError(null);
+        setIsReconnecting(false);
+        setReconnectAttempts(0);
+        reconnectAttemptsRef.current = 0;
+        setLastSyncedAt(new Date()); // session data is still fresh
+        // Mild backoff for degraded
+        backoffMsRef.current = Math.min(backoffMsRef.current * 1.5, MAX_BACKOFF);
+      } else if (currentSession) {
+        if (sessionFailIsNetwork) {
+          // True network failure (no HTTP response at all) → offline
+          const currentStatus = currentSession.status;
+          const connectivityRelevant =
+            currentStatus === 'lobby' ||
+            currentStatus === 'active' ||
+            currentStatus === 'paused' ||
+            currentStatus === 'locked';
+
+          if (connectivityRelevant) {
+            setConnectionState('offline');
+            setDegradedReason(null);
+            setIsReconnecting(true);
+            const next = reconnectAttemptsRef.current + 1;
+            setReconnectAttempts(next);
+            reconnectAttemptsRef.current = next;
+          }
+        } else {
+          // Server responded with HTTP error (5xx/429) — NOT a network issue
+          // Treat as degraded:temporary (server problem, not user's internet)
+          setConnectionState('degraded');
+          setDegradedReason('temporary');
+          setError(null);
+          setIsReconnecting(false);
         }
+        // Error → exponential backoff with jitter
+        const jitter = Math.random() * 1000;
+        backoffMsRef.current = Math.min(backoffMsRef.current * 2 + jitter, MAX_BACKOFF);
       }
+
+      setLoading(false);
+    } finally {
+      inFlightRef.current = false;
     }
+  }, [code, getToken, t]); // Stable deps only — mutable state read via refs
 
-    setLoading(false);
-  }, [code, getToken, session, lobbyParticipants, t, reconnectAttempts]);
-
-  // Send heartbeat
+  // Send heartbeat (stable — no state deps)
   const sendHeartbeat = useCallback(async () => {
     const token = getToken();
     if (!token) return;
@@ -207,27 +262,75 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
     }
   }, [code, getToken]);
 
-  // Initial load and polling
-  useEffect(() => {
-    void loadData();
+  // Ref to always call the latest loadData without changing effect deps
+  const loadDataRef = useRef(loadData);
+  loadDataRef.current = loadData;
 
-    const pollInterval = setInterval(() => void loadData(), POLL_INTERVAL);
-    const heartbeatInterval = setInterval(() => void sendHeartbeat(), HEARTBEAT_INTERVAL);
+  // -----------------------------------------------------------------------
+  // Single poller — setTimeout chain with adaptive backoff + visibility pause
+  // -----------------------------------------------------------------------
+  useEffect(() => {
+    mountedRef.current = true;
+
+    let pollTimer: ReturnType<typeof setTimeout>;
+    let heartbeatTimer: ReturnType<typeof setInterval>;
+    let stopped = false;
+
+    const doPoll = async () => {
+      await loadDataRef.current();
+    };
+
+    // Schedule next poll AFTER current one completes (no overlap)
+    const schedulePoll = () => {
+      if (stopped) return;
+      pollTimer = setTimeout(async () => {
+        if (stopped) return;
+        await doPoll();
+        schedulePoll();
+      }, backoffMsRef.current);
+    };
+
+    // Initial load
+    void doPoll().then(() => {
+      if (!stopped) schedulePoll();
+    });
+
+    heartbeatTimer = setInterval(() => void sendHeartbeat(), HEARTBEAT_INTERVAL);
+
+    // Pause polling when tab is hidden, resume immediately when visible
+    const handleVisibility = () => {
+      if (document.hidden) {
+        clearTimeout(pollTimer);
+      } else {
+        // Tab regained focus — poll immediately, then resume schedule
+        clearTimeout(pollTimer);
+        void doPoll().then(() => {
+          if (!stopped) schedulePoll();
+        });
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
-      clearInterval(pollInterval);
-      clearInterval(heartbeatInterval);
+      stopped = true;
+      mountedRef.current = false;
+      clearTimeout(pollTimer);
+      clearInterval(heartbeatTimer);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [loadData, sendHeartbeat]);
+  }, [code, loadData, sendHeartbeat]); // loadData is stable (deps: code, getToken, t)
 
-  // Try to rejoin if we have a token but no participant
+  // Try to rejoin if we have a token but no participant (fires once)
+  const rejoinAttemptedRef = useRef(false);
   useEffect(() => {
+    if (rejoinAttemptedRef.current) return;
     const token = getToken();
     if (session && token && !participant && !loading) {
+      rejoinAttemptedRef.current = true;
       void (async () => {
         try {
           await rejoinSession({ sessionCode: code, participantToken: token });
-          await loadData();
+          await loadDataRef.current();
         } catch {
           // Token might be invalid, clear it
           if (typeof window !== 'undefined') {
@@ -236,34 +339,86 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
         }
       })();
     }
-  }, [session, participant, loading, code, getToken, loadData]);
+  }, [session, participant, loading, code, getToken]);
 
-  const handleRetry = () => {
-    setReconnectAttempts(0);
-    void loadData();
-  };
-
-  /** Lightweight retry — only re-fetch /me (for degraded state) */
-  const handleRetryMe = useCallback(async () => {
-    const tkn = getToken();
-    if (!tkn) return;
-    try {
-      const meRes = await getParticipantMe(code, tkn);
-      setParticipant(meRes.participant);
-      setConnectionState('connected');
-      setDegradedReason(null);
-      setLastSyncedAt(new Date());
-    } catch {
-      // Will self-heal on next poll cycle
-    }
-  }, [code, getToken]);
-
-  const handleLeave = () => {
+  const handleLeave = useCallback(() => {
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem(`${SESSION_STORAGE_KEY}_${code}`);
     }
     router.push('/play');
-  };
+  }, [code, router]);
+
+  /**
+   * Unified retry / reconnect handler — behaviour depends on connectionState + degradedReason.
+   * - offline           → full reload (loadData) with backoff reset
+   * - degraded:auth     → attempt rejoin flow, redirect to /play on failure
+   * - degraded:not-found → redirect to /play (no longer in session)
+   * - degraded:temporary → lightweight /me re-fetch
+   * Button is disabled while in-flight via `retrying` state.
+   */
+  const handleConnectionRetry = useCallback(async () => {
+    if (retrying || inFlightRef.current) return;
+    setRetrying(true);
+
+    try {
+      if (connectionState === 'offline') {
+        // Full reload — reset backoff so next poll is immediate
+        backoffMsRef.current = POLL_INTERVAL;
+        setReconnectAttempts(0);
+        reconnectAttemptsRef.current = 0;
+        await loadData();
+        return;
+      }
+
+      // Degraded states
+      if (degradedReason === 'not-found') {
+        // Not in session → redirect
+        handleLeave();
+        return;
+      }
+
+      const tkn = getToken();
+      if (!tkn) {
+        handleLeave();
+        return;
+      }
+
+      if (degradedReason === 'auth') {
+        // Auth issue → try rejoin flow first
+        try {
+          await rejoinSession({ sessionCode: code, participantToken: tkn });
+          const meRes = await getParticipantMe(code, tkn);
+          if (mountedRef.current) {
+            setParticipant(meRes.participant);
+            setConnectionState('connected');
+            setDegradedReason(null);
+            setLastSyncedAt(new Date());
+            backoffMsRef.current = POLL_INTERVAL;
+          }
+        } catch {
+          // Rejoin failed → clear token and redirect
+          handleLeave();
+        }
+        return;
+      }
+
+      // temporary → lightweight /me re-fetch
+      try {
+        const meRes = await getParticipantMe(code, tkn);
+        if (mountedRef.current) {
+          setParticipant(meRes.participant);
+          setConnectionState('connected');
+          setDegradedReason(null);
+          setLastSyncedAt(new Date());
+          backoffMsRef.current = POLL_INTERVAL;
+        }
+      } catch {
+        // Will self-heal on next poll cycle
+      }
+    } finally {
+      if (mountedRef.current) setRetrying(false);
+    }
+  }, [connectionState, degradedReason, retrying, code, getToken, loadData, handleLeave]);
 
   const handleToggleReady = useCallback(async () => {
     const tkn = getToken();
@@ -449,7 +604,8 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
             connectionState={connectionState}
             degradedReason={degradedReason}
             lastSyncedAt={lastSyncedAt}
-            onRetry={connectionState === 'degraded' ? handleRetryMe : handleRetry}
+            onRetry={handleConnectionRetry}
+            retrying={retrying}
           />
 
           {/* Chat modal for lobby */}
@@ -476,7 +632,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
             isReconnecting={isReconnecting}
             attemptCount={reconnectAttempts}
             maxAttempts={5}
-            onRetry={handleRetry}
+            onRetry={handleConnectionRetry}
           />
 
           {/* Session header */}
@@ -619,7 +775,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
             isReconnecting={isReconnecting}
             attemptCount={reconnectAttempts}
             maxAttempts={5}
-            onRetry={handleRetry}
+            onRetry={handleConnectionRetry}
           />
 
           <ParticipantPlayMode

@@ -13996,12 +13996,13 @@
         "readyActive": "Redo ✓",
         "openChat": "Chatt",
         "leave": "Lämna",
-        "degradedAuth": "Din session behöver anslutas igen.",
+        "degradedAuth": "Din anslutning behöver förnyas.",
         "degradedNotFound": "Du verkar inte vara med i sessionen längre.",
-        "degradedTemporary": "Tillfälligt problem — försöker igen…",
-        "connectionOffline": "Ingen anslutning — försöker återansluta…",
+        "degradedTemporary": "Tillfälligt synkproblem — försöker igen…",
+        "connectionOffline": "Ingen internetanslutning — försöker återansluta…",
         "retryAction": "Försök igen",
         "retryReconnect": "Anslut igen",
+        "retryGoBack": "Gå tillbaka",
         "lastSynced": "Senast synkad: {time}"
       },
       "secrets": {

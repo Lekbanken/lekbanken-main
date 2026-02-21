@@ -80,6 +80,8 @@ export interface ParticipantLobbyProps {
   lastSyncedAt?: Date | null;
   /** Retry action (re-fetch /me for degraded, full loadData for offline) */
   onRetry?: () => void;
+  /** Whether a retry request is currently in-flight (disables retry button) */
+  retrying?: boolean;
 }
 
 // =============================================================================
@@ -187,6 +189,7 @@ export function ParticipantLobby({
   degradedReason = null,
   lastSyncedAt = null,
   onRetry,
+  retrying = false,
 }: ParticipantLobbyProps) {
   const t = useTranslations('play.participantView.waitingRoom');
   const [codeCopied, setCodeCopied] = useState(false);
@@ -363,10 +366,15 @@ export function ParticipantLobby({
                   <button
                     type="button"
                     onClick={onRetry}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                    disabled={retrying}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <ArrowPathIcon className="h-3 w-3" />
-                    {degradedReason === 'auth' ? t('retryReconnect') : t('retryAction')}
+                    <ArrowPathIcon className={cn('h-3 w-3', retrying && 'animate-spin')} />
+                    {degradedReason === 'auth'
+                      ? t('retryReconnect')
+                      : degradedReason === 'not-found'
+                        ? t('retryGoBack')
+                        : t('retryAction')}
                   </button>
                 )}
                 {lastSyncedAt && (
@@ -393,9 +401,10 @@ export function ParticipantLobby({
                 <button
                   type="button"
                   onClick={onRetry}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                  disabled={retrying}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ArrowPathIcon className="h-3 w-3" />
+                  <ArrowPathIcon className={cn('h-3 w-3', retrying && 'animate-spin')} />
                   {t('retryAction')}
                 </button>
               )}

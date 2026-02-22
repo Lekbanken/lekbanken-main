@@ -201,20 +201,16 @@ function logMetrics(label: string, metrics: PerfMetrics) {
 // Test Suite
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe('Large Game Performance Tests', () => {
+const HAS_CREDENTIALS = Boolean(SUPABASE_URL && SERVICE_ROLE_KEY);
+
+describe.skipIf(!HAS_CREDENTIALS)('Large Game Performance Tests', () => {
   let serviceClient: SupabaseClient;
   let testTenantId: string;
   let testPurposeId: string;
   const createdGameIds: string[] = [];
 
   beforeAll(async () => {
-    if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
-      throw new Error(
-        'Missing TEST_SUPABASE_URL or TEST_SUPABASE_SERVICE_ROLE_KEY'
-      );
-    }
-
-    serviceClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+    serviceClient = createClient(SUPABASE_URL!, SERVICE_ROLE_KEY!);
 
     // Create test tenant
     testTenantId = randomUUID();

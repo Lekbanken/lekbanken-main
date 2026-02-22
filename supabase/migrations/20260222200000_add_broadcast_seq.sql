@@ -40,7 +40,7 @@ AS $$
 DECLARE
   v_seq BIGINT;
 BEGIN
-  UPDATE participant_sessions
+  UPDATE public.participant_sessions
      SET broadcast_seq = broadcast_seq + 1
    WHERE id = p_session_id
    RETURNING broadcast_seq INTO v_seq;

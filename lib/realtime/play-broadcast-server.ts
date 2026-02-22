@@ -34,7 +34,7 @@ async function nextSeq(sessionId: string): Promise<number> {
       // P0002 = session not found — signals a bug in the calling route.
       // Other errors (e.g. RPC doesn't exist yet) are expected pre-migration.
       const level = error.code === 'P0002' ? 'error' : 'warn';
-      console[level]('[broadcastPlayEvent] increment_broadcast_seq RPC failed, falling back to Date.now():', error.message);
+      console[level]('[broadcastPlayEvent] increment_broadcast_seq failed for session %s: %s (code=%s)', sessionId, error.message, error.code);
       return Date.now();
     }
     if (typeof data === 'number') {

@@ -38,6 +38,8 @@ export interface DrawerOverlayProps {
   open: boolean;
   /** Called when user taps backdrop, presses ESC, etc. */
   onClose: () => void;
+  /** Optional title — renders a standard header with title + X close button */
+  title?: string;
   /** Desktop modal width — 'sm' for participant, 'lg' for director */
   size?: DrawerSize;
   /** Show drag handle on mobile (default true) */
@@ -64,6 +66,7 @@ const SIZE_CLASS: Record<DrawerSize, string> = {
 export function DrawerOverlay({
   open,
   onClose,
+  title,
   size = 'sm',
   showHandle = true,
   className,
@@ -91,6 +94,22 @@ export function DrawerOverlay({
           {showHandle && (
             <div className={MOTION_DRAWER_HANDLE}>
               <div className={MOTION_DRAWER_HANDLE_BAR} />
+            </div>
+          )}
+          {/* Standard header with title + X close button */}
+          {title && (
+            <div className="flex items-center justify-between px-4 pt-3 pb-2 lg:px-5 lg:pt-4 lg:pb-2">
+              <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-lg p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Close"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
             </div>
           )}
           <div className={MOTION_DRAWER_CONTENT}>

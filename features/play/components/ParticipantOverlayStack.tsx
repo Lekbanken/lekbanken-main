@@ -155,6 +155,17 @@ export function ParticipantOverlayStack({
 }: ParticipantOverlayStackProps) {
   const t = useTranslations('play.participantView');
 
+  // Drawer title — used by DrawerOverlay standard header
+  const drawerTitle = useMemo(() => {
+    if (!activeDrawer) return undefined;
+    const titles: Record<string, string> = {
+      artifacts: t('artifactsDrawer.title'),
+      decisions: t('decisionsDrawer.title'),
+      role: t('header.role'),
+    };
+    return titles[activeDrawer];
+  }, [activeDrawer, t]);
+
   // ---------------------------------------------------------------------------
   // Overlay Priority Arbiter
   // Deterministic: only ONE blocking overlay is active at a time.
@@ -261,6 +272,7 @@ export function ParticipantOverlayStack({
         open={activeDrawer != null}
         onClose={() => onToggleDrawer(null)}
         size="sm"
+        title={drawerTitle}
       >
         {activeDrawer === 'artifacts' && renderArtifactDrawer?.()}
         {activeDrawer === 'decisions' && renderDecisionDrawer?.()}

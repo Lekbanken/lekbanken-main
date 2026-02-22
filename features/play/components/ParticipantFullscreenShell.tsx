@@ -282,7 +282,7 @@ export function ParticipantFullscreenShell({
       <div className="hidden lg:block absolute inset-0 bg-black/40" aria-hidden="true" />
 
       {/* Container: fullscreen mobile; centred modal desktop (PlaySurface owns the single border) */}
-      <PlaySurface>
+      <PlaySurface className="lg:shadow-xl">
         {/* ---------------------------------------------------------------- */}
         {/* TOP AREA — SSoT shared PlayTopArea (header + portal slot)        */}
         {/* Mirrors Director: PlayHeader + NowSummaryRow + ChipLane inside   */}

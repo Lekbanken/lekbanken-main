@@ -201,7 +201,7 @@ export function ParticipantArtifactDrawer({
   variantsByArtifactId,
   artifactsError,
   onRefresh,
-  onClose,
+  onClose: _onClose,
   isOpen = false,
   keypadCodes,
   keypadSubmitting,
@@ -270,17 +270,11 @@ export function ParticipantArtifactDrawer({
 
   return (
     <Card className="p-4 space-y-3">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-foreground">{t('artifactsDrawer.title')}</p>
-        <div className="flex gap-1">
-          <Button type="button" size="sm" variant="ghost" onClick={onRefresh} className="h-7 w-7 p-0" aria-label="Refresh">
-            ↻
-          </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={onClose} className="h-7 w-7 p-0" aria-label="Close">
-            ✕
-          </Button>
-        </div>
+      {/* Refresh — title + X are now in DrawerOverlay */}
+      <div className="flex items-center justify-end">
+        <Button type="button" size="sm" variant="ghost" onClick={onRefresh} className="h-7 w-7 p-0" aria-label="Refresh">
+          ↻
+        </Button>
       </div>
 
       {/* Inventory summary — compact stat strip */}

@@ -1022,6 +1022,7 @@ export function DirectorModePanel({
         open={activeDrawer != null}
         onClose={() => setActiveDrawer(null)}
         size="lg"
+        title={activeDrawer ? drawerPills.find(p => p.id === activeDrawer)?.label : undefined}
       >
         {activeDrawer === 'time' && (
           <TimeBankTab

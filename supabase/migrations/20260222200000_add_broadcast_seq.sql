@@ -32,13 +32,32 @@ COMMENT ON COLUMN public.participant_sessions.broadcast_seq IS
 
 CREATE OR REPLACE FUNCTION public.increment_broadcast_seq(p_session_id UUID)
 RETURNS BIGINT
-LANGUAGE sql
+LANGUAGE plpgsql
 VOLATILE
 SECURITY DEFINER
 SET search_path = public
 AS $$
+DECLARE
+  v_seq BIGINT;
+BEGIN
   UPDATE participant_sessions
      SET broadcast_seq = broadcast_seq + 1
    WHERE id = p_session_id
-   RETURNING broadcast_seq;
+   RETURNING broadcast_seq INTO v_seq;
+
+  IF v_seq IS NULL THEN
+    RAISE EXCEPTION 'participant_sessions.id % not found', p_session_id
+      USING ERRCODE = 'P0002';
+  END IF;
+
+  RETURN v_seq;
+END;
 $$;
+
+-- ---------------------------------------------------------------------------
+-- Permissions: only service_role may call this function.
+-- API routes use createServiceRoleClient() so this is transparent.
+-- Revoking from PUBLIC prevents any client-side abuse via anon/authenticated.
+-- ---------------------------------------------------------------------------
+REVOKE ALL ON FUNCTION public.increment_broadcast_seq(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.increment_broadcast_seq(UUID) TO service_role;

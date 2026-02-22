@@ -30,13 +30,18 @@ async function nextSeq(sessionId: string): Promise<number> {
     const { data, error } = await supabase.rpc('increment_broadcast_seq', {
       p_session_id: sessionId,
     });
-    if (!error && typeof data === 'number') {
+    if (error) {
+      // P0002 = session not found — signals a bug in the calling route.
+      // Other errors (e.g. RPC doesn't exist yet) are expected pre-migration.
+      const level = error.code === 'P0002' ? 'error' : 'warn';
+      console[level]('[broadcastPlayEvent] increment_broadcast_seq RPC failed, falling back to Date.now():', error.message);
+      return Date.now();
+    }
+    if (typeof data === 'number') {
       return data;
     }
-    if (error) {
-      // Expected when migration hasn't been applied yet — warn once
-      console.warn('[broadcastPlayEvent] increment_broadcast_seq RPC failed, falling back to Date.now():', error.message);
-    }
+    // Unexpected: RPC returned non-number without error (should not happen)
+    console.warn('[broadcastPlayEvent] increment_broadcast_seq returned non-number:', data);
   } catch {
     // swallow — fall through to Date.now()
   }

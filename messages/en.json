@@ -11531,7 +11531,16 @@
       "signalInbox": {
         "title": "SIGNAL INBOX",
         "empty": "No signals received yet",
-        "markHandled": "Done"
+        "markHandled": "Done",
+        "channels": {
+          "pause": "Pause",
+          "hint": "Hint",
+          "attention": "Attention",
+          "flash": "Flash",
+          "ready": "Ready",
+          "found": "Found",
+          "sos": "SOS"
+        }
       }
     },
     "eventFeed": {

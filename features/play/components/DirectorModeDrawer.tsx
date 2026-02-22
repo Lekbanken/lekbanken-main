@@ -39,6 +39,7 @@ import { DirectorModePanel } from './DirectorModePanel';
 import { PlaySurface } from './shared/PlaySurface';
 import { useDirectorChips } from './DirectorChipLane';
 import type { DirectorChipType } from './DirectorChipLane';
+import { getSignalChannelLabel } from '@/features/play/utils/signalHelpers';
 
 // =============================================================================
 // Types
@@ -260,7 +261,9 @@ export function DirectorModeDrawer({
       const newEvents = events.slice(0, events.length - prevLen);
       for (const evt of newEvents) {
         if (evt.type.includes('signal')) {
-          pushDirectorChip('SIGNAL_RECEIVED', evt.payload?.channel as string | undefined);
+          const raw = (evt.payload?.channel as string) ?? evt.type;
+          const label = getSignalChannelLabel(raw, (k) => t(`signalInbox.${k}`));
+          pushDirectorChip('SIGNAL_RECEIVED', label);
         } else if (evt.type.includes('trigger') && evt.type.includes('fire')) {
           pushDirectorChip('TRIGGER_FIRED');
         } else if (evt.type.includes('participant') && evt.type.includes('join')) {

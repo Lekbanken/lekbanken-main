@@ -55,6 +55,11 @@ export function countUnhandledSignals<T extends SignalEventLike>(
 
 /**
  * Extract display metadata from a signal event's payload.
+ *
+ * Fallback chain for channel:
+ * 1. payload.channel (server audit events & fixed client emitter)
+ * 2. payload.targetName (legacy client events via SessionCockpit mapping)
+ * 3. evt.type (absolute fallback)
  */
 export function extractSignalMeta(evt: SignalEventLike): {
   channel: string;
@@ -62,8 +67,53 @@ export function extractSignalMeta(evt: SignalEventLike): {
   message: string | undefined;
 } {
   return {
-    channel: (evt.payload?.channel as string) ?? evt.type,
+    channel:
+      (evt.payload?.channel as string) ??
+      (evt.payload?.targetName as string) ??
+      evt.type,
     sender: (evt.payload?.participant_name as string) ?? (evt.payload?.sender as string),
     message: evt.payload?.message as string | undefined,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Signal channel → human-readable label
+// ---------------------------------------------------------------------------
+
+/**
+ * Canonical lookup table mapping known signal channel names (lower-case)
+ * to i18n key suffixes under `play.directorDrawer.signalInbox.channels.*`.
+ *
+ * Both DirectorModePanel presets (pause / hint / attention / flash) and
+ * SignalPanel presets (READY / HINT / ATTENTION / PAUSE / FOUND / SOS) are
+ * covered.  Unknown/custom channels fall back to the raw name.
+ */
+const CHANNEL_KEY_MAP: Record<string, string> = {
+  pause: 'pause',
+  hint: 'hint',
+  attention: 'attention',
+  flash: 'flash',
+  ready: 'ready',
+  found: 'found',
+  sos: 'sos',
+};
+
+/**
+ * Return a human-readable label for a signal channel.
+ *
+ * @param channel  Raw channel string from the event (e.g. "pause", "HINT")
+ * @param tInbox   Translation function scoped to `play.directorDrawer.signalInbox`
+ *                 — expects keys like `channels.pause`, `channels.hint`, etc.
+ *                 If omitted, returns a capitalised fallback.
+ */
+export function getSignalChannelLabel(
+  channel: string,
+  tInbox?: (key: string) => string,
+): string {
+  const key = CHANNEL_KEY_MAP[channel.toLowerCase()];
+  if (key && tInbox) {
+    return tInbox(`channels.${key}`);
+  }
+  // Fallback: capitalise first letter, rest lower-case
+  return channel.charAt(0).toUpperCase() + channel.slice(1).toLowerCase();
 }

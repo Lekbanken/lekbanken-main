@@ -629,7 +629,7 @@ export function createEventEmitters(
         targetType: 'signal',
         targetId: channel,
         targetName: channel,
-        payload: { signalType },
+        payload: { signalType, channel },
       }),
 
     // TimeBank events

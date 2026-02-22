@@ -12360,7 +12360,16 @@
       "signalInbox": {
         "title": "SIGNAL INKORG",
         "empty": "Inga signaler mottagna ännu",
-        "markHandled": "Klar"
+        "markHandled": "Klar",
+        "channels": {
+          "pause": "Paus",
+          "hint": "Ledtråd",
+          "attention": "Fokus",
+          "flash": "Blink",
+          "ready": "Redo",
+          "found": "Hittat",
+          "sos": "SOS"
+        }
       }
     },
     "eventFeed": {

@@ -11859,7 +11859,16 @@
       "signalInbox": {
         "title": "SIGNAL INNBOKS",
         "empty": "Ingen signaler mottatt enn\u00e5",
-        "markHandled": "Ferdig"
+        "markHandled": "Ferdig",
+        "channels": {
+          "pause": "Pause",
+          "hint": "Hint",
+          "attention": "Oppmerksomhet",
+          "flash": "Blink",
+          "ready": "Klar",
+          "found": "Funnet",
+          "sos": "SOS"
+        }
       }
     },
     "eventFeed": {

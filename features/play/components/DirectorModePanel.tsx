@@ -63,6 +63,7 @@ import {
   selectLatestUnhandledSignal,
   countUnhandledSignals,
   extractSignalMeta,
+  getSignalChannelLabel,
 } from '@/features/play/utils/signalHelpers';
 
 // =============================================================================
@@ -179,6 +180,7 @@ function SignalStrip({
   if (!latestSignal) return null;
 
   const { channel, sender } = extractSignalMeta(latestSignal);
+  const channelLabel = getSignalChannelLabel(channel, (k) => t(`signalInbox.${k}`));
   const timestamp = new Date(latestSignal.timestamp);
   const timeStr = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -194,7 +196,7 @@ function SignalStrip({
       </span>
       <div className="min-w-0 flex-1">
         <span className="text-xs font-medium text-foreground">
-          {channel.toUpperCase()}
+          {channelLabel}
           {sender && <span className="text-muted-foreground ml-1">— {sender}</span>}
         </span>
       </div>
@@ -656,6 +658,7 @@ function SignalInbox({
       <div className="space-y-1 max-h-[240px] overflow-y-auto">
         {signalEvents.map((evt) => {
           const { channel, sender, message } = extractSignalMeta(evt);
+          const channelLabel = getSignalChannelLabel(channel, (k) => t(`signalInbox.${k}`));
           const isHandled = handledSignalIds.has(evt.id);
           return (
             <div
@@ -675,7 +678,7 @@ function SignalInbox({
                 )}
                 <div className="min-w-0">
                   <div className="text-xs font-medium text-foreground truncate">
-                    {channel.toUpperCase()}
+                    {channelLabel}
                     {sender && <span className="text-muted-foreground ml-1">— {sender}</span>}
                   </div>
                   {message && (

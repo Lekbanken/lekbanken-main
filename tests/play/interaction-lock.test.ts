@@ -42,6 +42,8 @@
  * 38. SSoT Header — StatusPill + PlayHeader + LeaderScriptSections
  * 39. SSoT Guardrails — canonical types, no duplicate mapping, role-assignment boundary
  *
+ * Contract: PLAY_UI_CONTRACT.md (rules 1–12, enforced by tests 39j–39p)
+ *
  * Run: npx vitest run tests/play/interaction-lock.test.ts
  */
 
@@ -3167,8 +3169,9 @@ describe('SSoT Guardrails', () => {
 
     const banned = /\beventLogging\b|FEATURE_EVENT_LOGGING/;
     // Allowlist: contract doc mentions the old name as a negative example,
-    // and this test file itself contains the banned pattern in its regex.
-    const allowlist = new Set(['PLAY_UI_CONTRACT.md', 'interaction-lock.test.ts']);
+    // this test file itself contains the banned pattern in its regex,
+    // and architecture doc references it in migration history.
+    const allowlist = new Set(['PLAY_UI_CONTRACT.md', 'interaction-lock.test.ts', 'SESSION_COCKPIT_ARCHITECTURE.md']);
 
     const scan = (dir: string) => {
       for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -3186,5 +3189,47 @@ describe('SSoT Guardrails', () => {
       }
     };
     scan('.');
+  });
+
+  // 39n. Drawer title keys must come from header.* (not drawer-specific keys)
+  // ---------------------------------------------------------------------------
+  it('Participant drawer titles use header.* keys (pill === drawer-title)', async () => {
+    const fs = await import('fs');
+    const src = fs.readFileSync('features/play/components/ParticipantOverlayStack.tsx', 'utf-8');
+    // drawerTitle mapping must use header.* keys, never artifactsDrawer.* or decisionsDrawer.*
+    expect(src).not.toMatch(/drawerTitle[\s\S]{0,200}artifactsDrawer\.title/);
+    expect(src).not.toMatch(/drawerTitle[\s\S]{0,200}decisionsDrawer\.title/);
+    // Positive: header.artifacts and header.decisions must be present in title mapping
+    expect(src).toMatch(/header\.artifacts/);
+    expect(src).toMatch(/header\.decisions/);
+  });
+
+  // 39o. Drawer children must not render their own close buttons (DrawerOverlay owns chrome)
+  // ---------------------------------------------------------------------------
+  it('Drawer children do not contain close buttons (DrawerOverlay owns chrome)', async () => {
+    const fs = await import('fs');
+    const drawerChildren = [
+      'features/play/components/ParticipantArtifactDrawer.tsx',
+      'features/play/components/ParticipantDecisionOverlay.tsx',
+    ];
+    for (const file of drawerChildren) {
+      const src = fs.readFileSync(file, 'utf-8');
+      // No ✕ close buttons (the DrawerOverlay X button is the only close affordance)
+      expect(src).not.toMatch(/aria-label["']?\s*[:=]\s*["']Close["']/);
+    }
+  });
+
+  // 39p. Stage padding must be p-5 in both Director and Participant
+  // ---------------------------------------------------------------------------
+  it('Stage container uses p-5 in both Director and Participant', async () => {
+    const fs = await import('fs');
+    const dirSrc = fs.readFileSync('features/play/components/DirectorModePanel.tsx', 'utf-8');
+    const partSrc = fs.readFileSync('features/play/components/ParticipantFullscreenShell.tsx', 'utf-8');
+    // Both stage scroll containers must include p-5
+    expect(dirSrc).toMatch(/overflow-y-auto[\s\S]{0,40}p-5/);
+    expect(partSrc).toMatch(/overflow-y-auto[\s\S]{0,40}p-5/);
+    // Ban old padding patterns in those same files' stage containers
+    // (px-4 py-4 or sm:px-6 were the old Participant values)
+    expect(partSrc).not.toMatch(/overflow-y-auto[\s\S]{0,40}(?:px-4|py-4|sm:px-6)/);
   });
 });

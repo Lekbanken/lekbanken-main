@@ -150,8 +150,43 @@ export function useLiveSession({
   
   // Supabase client (memoized)
   const supabase = useMemo(() => createBrowserClient(), []);
+
+  // ---------------------------------------------------------------------------
+  // Callback refs — keep references stable so the channel subscription effect
+  // never re-runs due to consumer callback identity changes.
+  // Without this, every render creates new inline callbacks → handleBroadcastEvent
+  // changes → channel unsubscribes/resubscribes → broadcasts lost in the gap.
+  // ---------------------------------------------------------------------------
+  const onStateChangeRef = useRef(onStateChange);
+  const onTimerUpdateRef = useRef(onTimerUpdate);
+  const onRoleUpdateRef = useRef(onRoleUpdate);
+  const onBoardUpdateRef = useRef(onBoardUpdate);
+  const onTurnUpdateRef = useRef(onTurnUpdate);
+  const onArtifactUpdateRef = useRef(onArtifactUpdate);
+  const onDecisionUpdateRef = useRef(onDecisionUpdate);
+  const onOutcomeUpdateRef = useRef(onOutcomeUpdate);
+  const onCountdownRef = useRef(onCountdown);
+  const onStoryOverlayRef = useRef(onStoryOverlay);
+  const onSignalReceivedRef = useRef(onSignalReceived);
+  const onTimeBankChangedRef = useRef(onTimeBankChanged);
+  const onPuzzleUpdateRef = useRef(onPuzzleUpdate);
+
+  // Sync refs on every render (cheap — just pointer assignments)
+  onStateChangeRef.current = onStateChange;
+  onTimerUpdateRef.current = onTimerUpdate;
+  onRoleUpdateRef.current = onRoleUpdate;
+  onBoardUpdateRef.current = onBoardUpdate;
+  onTurnUpdateRef.current = onTurnUpdate;
+  onArtifactUpdateRef.current = onArtifactUpdate;
+  onDecisionUpdateRef.current = onDecisionUpdate;
+  onOutcomeUpdateRef.current = onOutcomeUpdate;
+  onCountdownRef.current = onCountdown;
+  onStoryOverlayRef.current = onStoryOverlay;
+  onSignalReceivedRef.current = onSignalReceived;
+  onTimeBankChangedRef.current = onTimeBankChanged;
+  onPuzzleUpdateRef.current = onPuzzleUpdate;
   
-  // Handle incoming broadcast event
+  // Handle incoming broadcast event — stable identity (no callback deps)
   const handleBroadcastEvent = useCallback((event: PlayBroadcastEvent) => {
     setLastEventAt(event.timestamp);
     
@@ -169,7 +204,7 @@ export function useLiveSession({
           setStatus(payload.status as SessionRuntimeState['status']);
         }
         
-        onStateChange?.(payload as Partial<SessionRuntimeState>);
+        onStateChangeRef.current?.(payload as Partial<SessionRuntimeState>);
         break;
       }
       
@@ -177,13 +212,13 @@ export function useLiveSession({
         const payload = (event as TimerBroadcast).payload;
         setTimerState(payload.timer_state);
         setTimerDisplay(calculateTimerDisplay(payload.timer_state));
-        onTimerUpdate?.(payload.action, payload.timer_state);
+        onTimerUpdateRef.current?.(payload.action, payload.timer_state);
         break;
       }
       
       case 'role_update': {
         const payload = (event as RoleBroadcast).payload;
-        onRoleUpdate?.(payload);
+        onRoleUpdateRef.current?.(payload);
         break;
       }
       
@@ -194,80 +229,67 @@ export function useLiveSession({
           message: payload.message ?? prev?.message,
           overrides: payload.overrides ?? prev?.overrides,
         }));
-        onBoardUpdate?.(payload);
+        onBoardUpdateRef.current?.(payload);
         break;
       }
 
       case 'turn_update': {
         const payload = (event as TurnBroadcast).payload;
         setNextStarterParticipantId(payload.next_starter_participant_id);
-        onTurnUpdate?.(payload);
+        onTurnUpdateRef.current?.(payload);
         break;
       }
 
       case 'artifact_update': {
         const payload = (event as ArtifactBroadcast).payload;
-        onArtifactUpdate?.(payload);
+        onArtifactUpdateRef.current?.(payload);
         break;
       }
 
       case 'decision_update': {
         const payload = (event as DecisionBroadcast).payload;
-        onDecisionUpdate?.(payload);
+        onDecisionUpdateRef.current?.(payload);
         break;
       }
 
       case 'outcome_update': {
         const payload = (event as OutcomeBroadcast).payload;
-        onOutcomeUpdate?.(payload);
+        onOutcomeUpdateRef.current?.(payload);
         break;
       }
 
       case 'countdown': {
         const payload = (event as CountdownBroadcast).payload;
-        onCountdown?.(payload);
+        onCountdownRef.current?.(payload);
         break;
       }
 
       case 'story_overlay': {
         const payload = (event as StoryOverlayBroadcast).payload;
-        onStoryOverlay?.(payload);
+        onStoryOverlayRef.current?.(payload);
         break;
       }
 
       case 'signal_received': {
         const payload = (event as SignalReceivedBroadcast).payload;
-        onSignalReceived?.(payload);
+        onSignalReceivedRef.current?.(payload);
         break;
       }
 
       case 'time_bank_changed': {
         const payload = (event as TimeBankChangedBroadcast).payload;
-        onTimeBankChanged?.(payload);
+        onTimeBankChangedRef.current?.(payload);
         break;
       }
 
       case 'puzzle_update': {
         const payload = (event as PuzzleBroadcast).payload;
-        onPuzzleUpdate?.(payload);
+        onPuzzleUpdateRef.current?.(payload);
         break;
       }
     }
-  }, [
-    onStateChange,
-    onTimerUpdate,
-    onRoleUpdate,
-    onBoardUpdate,
-    onTurnUpdate,
-    onArtifactUpdate,
-    onDecisionUpdate,
-    onOutcomeUpdate,
-    onCountdown,
-    onStoryOverlay,
-    onSignalReceived,
-    onTimeBankChanged,
-    onPuzzleUpdate,
-  ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- callbacks accessed via stable refs
+  }, []);
   
   // Timer tick effect (recalculate display)
   useEffect(() => {

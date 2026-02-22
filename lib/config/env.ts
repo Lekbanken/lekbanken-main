@@ -119,8 +119,8 @@ export const env = {
     directorModeDrawer: process.env.FEATURE_DIRECTOR_MODE_DRAWER === 'true' || (process.env.NODE_ENV === 'development'),
     /** Leader Script: Host-only instructions per step. */
     leaderScript: process.env.FEATURE_LEADER_SCRIPT === 'true' || (process.env.NODE_ENV === 'development'),
-    /** Event logging and live event feed. */
-    eventLogging: process.env.FEATURE_EVENT_LOGGING === 'true' || (process.env.NODE_ENV === 'development'),
+    /** Realtime session events: live event feed + signal visibility in Director. */
+    realtimeSessionEvents: process.env.FEATURE_REALTIME_SESSION_EVENTS === 'true' || (process.env.NODE_ENV === 'development'),
     /** Trigger kill switch: Emergency disable all triggers. */
     triggerKillSwitch: process.env.FEATURE_TRIGGER_KILL_SWITCH === 'true' || (process.env.NODE_ENV === 'development'),
   },

@@ -155,12 +155,12 @@ export function ParticipantOverlayStack({
 }: ParticipantOverlayStackProps) {
   const t = useTranslations('play.participantView');
 
-  // Drawer title — used by DrawerOverlay standard header
+  // Drawer title — must match pill label (pill===drawer-title contract)
   const drawerTitle = useMemo(() => {
     if (!activeDrawer) return undefined;
     const titles: Record<string, string> = {
-      artifacts: t('artifactsDrawer.title'),
-      decisions: t('decisionsDrawer.title'),
+      artifacts: t('header.artifacts'),
+      decisions: t('header.decisions'),
       role: t('header.role'),
     };
     return titles[activeDrawer];

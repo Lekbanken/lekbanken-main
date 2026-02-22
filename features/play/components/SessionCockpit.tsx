@@ -1487,7 +1487,7 @@ export function SessionCockpit({
   } = sessionState;
 
   const showSignals = isFeatureEnabled('signals');
-  const showEvents = isFeatureEnabled('eventLogging');
+  const showEvents = isFeatureEnabled('realtimeSessionEvents');
 
   const {
     capabilities,

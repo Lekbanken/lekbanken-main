@@ -48,7 +48,6 @@ export interface DecisionActions {
 export interface ParticipantDecisionDrawerProps {
   state: DecisionState;
   actions: DecisionActions;
-  onClose: () => void;
 }
 
 export interface ParticipantDecisionModalProps {
@@ -64,23 +63,16 @@ export interface ParticipantDecisionModalProps {
 export function ParticipantDecisionDrawer({
   state,
   actions,
-  onClose,
 }: ParticipantDecisionDrawerProps) {
   const t = useTranslations('play.participantView');
   const { decisions, decisionsError, selectedOptionByDecisionId, voteSendingByDecisionId, voteMessageByDecisionId, resultsByDecisionId } = state;
 
   return (
     <Card className="p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-foreground">{t('decisionsDrawer.title')}</p>
-        <div className="flex gap-1">
-          <Button type="button" size="sm" variant="ghost" onClick={actions.onRefresh} className="h-7 w-7 p-0" aria-label="Refresh">
-            ↻
-          </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={onClose} className="h-7 w-7 p-0" aria-label="Close">
-            ✕
-          </Button>
-        </div>
+      <div className="flex items-end justify-end">
+        <Button type="button" size="sm" variant="ghost" onClick={actions.onRefresh} className="h-7 w-7 p-0" aria-label="Refresh">
+          ↻
+        </Button>
       </div>
 
       {decisionsError && <p className="text-sm text-destructive">{decisionsError}</p>}

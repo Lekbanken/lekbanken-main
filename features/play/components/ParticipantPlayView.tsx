@@ -688,7 +688,6 @@ export function ParticipantPlayView({
               artifactsError={artifactsError}
               isOpen={activeDrawer === 'artifacts'}
               onRefresh={() => void loadArtifacts()}
-              onClose={() => setActiveDrawer(null)}
               keypadCodes={keypadCodes}
               keypadSubmitting={keypadSubmitting}
               keypadMessages={keypadMessages}
@@ -707,7 +706,6 @@ export function ParticipantPlayView({
           <ParticipantDecisionDrawer
             state={decisionState}
             actions={decisionActions}
-            onClose={() => setActiveDrawer(null)}
           />
         )}
         renderRoleSection={() =>

@@ -3121,4 +3121,41 @@ describe('SSoT Guardrails', () => {
     // (PlaySurface is the sole border owner)
     expect(dirPanel).not.toMatch(/lg:border(?!-b)/);
   });
+
+  // 39l. DrawerOverlay invocations in play must always pass a title prop
+  // ---------------------------------------------------------------------------
+  it('Every DrawerOverlay usage in play components passes a title prop', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+    const playDir = 'features/play/components';
+
+    // Collect all .tsx files that use DrawerOverlay
+    const files = fs.readdirSync(playDir, { recursive: true }) as string[];
+    const tsxFiles = files
+      .filter((f: string) => f.endsWith('.tsx'))
+      .map((f: string) => path.join(playDir, f));
+
+    for (const file of tsxFiles) {
+      const src = fs.readFileSync(file, 'utf-8');
+      // Find every <DrawerOverlay and extract until the matching closing >
+      // by counting angle brackets (handles arrow fns like () =>)
+      const tag = '<DrawerOverlay';
+      let idx = src.indexOf(tag);
+      while (idx !== -1) {
+        // Extract enough context (up to 500 chars) to find the closing >
+        const snippet = src.slice(idx, idx + 500);
+        // Find closing > that isn't inside {…} by tracking brace depth
+        let depth = 0;
+        let end = -1;
+        for (let i = tag.length; i < snippet.length; i++) {
+          if (snippet[i] === '{') depth++;
+          else if (snippet[i] === '}') depth--;
+          else if (snippet[i] === '>' && depth === 0) { end = i; break; }
+        }
+        const fullTag = end > 0 ? snippet.slice(0, end + 1) : snippet;
+        expect(fullTag).toMatch(/\btitle[={]/);
+        idx = src.indexOf(tag, idx + 1);
+      }
+    }
+  });
 });

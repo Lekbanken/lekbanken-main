@@ -66,7 +66,6 @@ export interface ParticipantArtifactDrawerProps {
   variantsByArtifactId: Map<string, ParticipantSessionArtifactVariant[]>;
   artifactsError: string | null;
   onRefresh: () => void;
-  onClose: () => void;
   /** When true, drawer just opened — triggers autoscroll to first highlighted */
   isOpen?: boolean;
   /** Keypad state (lifted from parent) */
@@ -201,7 +200,6 @@ export function ParticipantArtifactDrawer({
   variantsByArtifactId,
   artifactsError,
   onRefresh,
-  onClose: _onClose,
   isOpen = false,
   keypadCodes,
   keypadSubmitting,

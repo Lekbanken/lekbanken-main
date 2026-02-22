@@ -12369,6 +12369,13 @@
           "ready": "Redo",
           "found": "Hittat",
           "sos": "SOS"
+        },
+        "direction": {
+          "incoming": "{channel} från {sender}",
+          "incomingUnknown": "{channel} från deltagare",
+          "outgoing": "Du skickade {channel}",
+          "outgoingCount": "Du skickade {channel} → {count} deltagare",
+          "system": "{channel} (system)"
         }
       }
     },

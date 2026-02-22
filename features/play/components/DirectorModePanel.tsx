@@ -41,6 +41,8 @@ import {
   LightBulbIcon,
   UserGroupIcon,
   CheckCircleIcon,
+  ArrowUpRightIcon,
+  ArrowDownLeftIcon,
 } from '@heroicons/react/24/outline';
 import { StopIcon } from '@heroicons/react/24/solid';
 import type {
@@ -64,6 +66,7 @@ import {
   countUnhandledSignals,
   extractSignalMeta,
   getSignalChannelLabel,
+  getSignalDirectionLabel,
 } from '@/features/play/utils/signalHelpers';
 
 // =============================================================================
@@ -179,29 +182,51 @@ function SignalStrip({
   const latestSignal = selectLatestUnhandledSignal(events, handledSignalIds);
   if (!latestSignal) return null;
 
-  const { channel, sender } = extractSignalMeta(latestSignal);
+  const { channel, sender, direction } = extractSignalMeta(latestSignal);
   const channelLabel = getSignalChannelLabel(channel, (k) => t(`signalInbox.${k}`));
+  const directionLabel = getSignalDirectionLabel(
+    channelLabel,
+    direction,
+    sender,
+    (k, v) => t(`signalInbox.${k}`, v),
+  );
   const timestamp = new Date(latestSignal.timestamp);
   const timeStr = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // Severity-based border colour
+  const isUrgent = direction === 'incoming';
 
   return (
     <button
       type="button"
       onClick={() => onOpenSignals(latestSignal.id)}
-      className="mx-5 mb-1 flex items-center gap-2 rounded-lg border border-orange-200/50 bg-orange-50/50 px-3 py-2 text-left transition-colors hover:bg-orange-50 active:scale-[0.99] dark:border-orange-800/30 dark:bg-orange-950/10 dark:hover:bg-orange-950/20 animate-in fade-in slide-in-from-bottom-1 duration-200"
+      className={cn(
+        'mx-5 mb-1 flex items-center gap-2 rounded-lg border px-3 py-2 text-left transition-colors active:scale-[0.99] animate-in fade-in slide-in-from-bottom-1 duration-200',
+        isUrgent
+          ? 'border-orange-200/50 bg-orange-50/50 hover:bg-orange-50 dark:border-orange-800/30 dark:bg-orange-950/10 dark:hover:bg-orange-950/20'
+          : 'border-blue-200/50 bg-blue-50/50 hover:bg-blue-50 dark:border-blue-800/30 dark:bg-blue-950/10 dark:hover:bg-blue-950/20',
+      )}
     >
       <span className="flex h-2 w-2 shrink-0">
-        <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-orange-400 opacity-75" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500" />
+        <span className={cn(
+          'animate-ping absolute inline-flex h-2 w-2 rounded-full opacity-75',
+          isUrgent ? 'bg-orange-400' : 'bg-blue-400',
+        )} />
+        <span className={cn(
+          'relative inline-flex h-2 w-2 rounded-full',
+          isUrgent ? 'bg-orange-500' : 'bg-blue-500',
+        )} />
       </span>
       <div className="min-w-0 flex-1">
-        <span className="text-xs font-medium text-foreground">
-          {channelLabel}
-          {sender && <span className="text-muted-foreground ml-1">— {sender}</span>}
+        <span className="text-xs font-medium text-foreground truncate">
+          {directionLabel}
         </span>
       </div>
       <span className="text-[10px] text-muted-foreground/70 font-mono shrink-0">{timeStr}</span>
-      <span className="text-[10px] font-medium text-orange-600 dark:text-orange-400 shrink-0">
+      <span className={cn(
+        'text-[10px] font-medium shrink-0',
+        isUrgent ? 'text-orange-600 dark:text-orange-400' : 'text-blue-600 dark:text-blue-400',
+      )}>
         {t('stage.openSignal')}
       </span>
     </button>
@@ -632,11 +657,13 @@ function SignalInbox({
   handledSignalIds,
   onMarkHandled,
   t,
+  participantCount,
 }: {
   events: SessionEvent[];
   handledSignalIds: Set<string>;
   onMarkHandled: (signalId: string) => void;
   t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
+  participantCount?: number;
 }) {
   const locale = useLocale();
   // Deterministic sort — newest first, stable across reconnects
@@ -657,9 +684,19 @@ function SignalInbox({
       </div>
       <div className="space-y-1 max-h-[240px] overflow-y-auto">
         {signalEvents.map((evt) => {
-          const { channel, sender, message } = extractSignalMeta(evt);
+          const { channel, sender, message, direction, severity } = extractSignalMeta(evt);
           const channelLabel = getSignalChannelLabel(channel, (k) => t(`signalInbox.${k}`));
+          const directionLabel = getSignalDirectionLabel(
+            channelLabel,
+            direction,
+            sender,
+            (k, v) => t(`signalInbox.${k}`, v),
+            direction === 'outgoing' ? participantCount : undefined,
+          );
           const isHandled = handledSignalIds.has(evt.id);
+          const isIncoming = direction === 'incoming';
+          const isUrgent = severity === 'urgent';
+
           return (
             <div
               key={evt.id}
@@ -667,19 +704,27 @@ function SignalInbox({
                 'flex items-center justify-between gap-2 p-2 rounded-lg border transition-colors',
                 isHandled
                   ? 'bg-muted/30 border-border/30 opacity-60'
-                  : 'bg-orange-50/50 border-orange-200/30 dark:bg-orange-950/10 dark:border-orange-800/30',
+                  : isIncoming
+                    ? isUrgent
+                      ? 'bg-red-50/50 border-red-200/30 dark:bg-red-950/10 dark:border-red-800/30'
+                      : 'bg-orange-50/50 border-orange-200/30 dark:bg-orange-950/10 dark:border-orange-800/30'
+                    : 'bg-blue-50/50 border-blue-200/30 dark:bg-blue-950/10 dark:border-blue-800/30',
               )}
             >
               <div className="flex items-center gap-2 min-w-0">
                 {isHandled ? (
                   <CheckCircleIcon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+                ) : isIncoming ? (
+                  <ArrowDownLeftIcon className={cn(
+                    'h-3.5 w-3.5 shrink-0',
+                    isUrgent ? 'text-red-500' : 'text-orange-500',
+                  )} />
                 ) : (
-                  <span className="inline-block h-2 w-2 rounded-full bg-orange-500 shrink-0" />
+                  <ArrowUpRightIcon className="h-3.5 w-3.5 text-blue-500 shrink-0" />
                 )}
                 <div className="min-w-0">
                   <div className="text-xs font-medium text-foreground truncate">
-                    {channelLabel}
-                    {sender && <span className="text-muted-foreground ml-1">— {sender}</span>}
+                    {directionLabel}
                   </div>
                   {message && (
                     <div className="text-[10px] text-muted-foreground truncate">{message}</div>
@@ -694,7 +739,14 @@ function SignalInbox({
                   <button
                     type="button"
                     onClick={() => onMarkHandled(evt.id)}
-                    className="text-[10px] font-medium text-orange-600 dark:text-orange-400 hover:underline"
+                    className={cn(
+                      'text-[10px] font-medium hover:underline',
+                      isIncoming
+                        ? isUrgent
+                          ? 'text-red-600 dark:text-red-400'
+                          : 'text-orange-600 dark:text-orange-400'
+                        : 'text-blue-600 dark:text-blue-400',
+                    )}
                   >
                     {t('signalInbox.markHandled')}
                   </button>
@@ -1054,7 +1106,7 @@ export function DirectorModePanel({
         )}
         {activeDrawer === 'signals' && !isPreview && (
           <div className="space-y-6">
-            <SignalInbox events={events} handledSignalIds={handledSignalIds} onMarkHandled={markSignalHandled} t={t} />
+            <SignalInbox events={events} handledSignalIds={handledSignalIds} onMarkHandled={markSignalHandled} t={t} participantCount={participantCount} />
             <SignalQuickPanel
               recentSignals={recentSignals}
               presets={signalPresets}

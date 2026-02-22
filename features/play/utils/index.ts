@@ -11,8 +11,25 @@ export {
   selectLatestUnhandledSignal,
   countUnhandledSignals,
   extractSignalMeta,
+  getSignalChannelLabel,
+  getSignalDirectionLabel,
 } from './signalHelpers';
 export type { SignalEventLike } from './signalHelpers';
+
+// Signal catalog — SSoT for signal type metadata
+export {
+  SIGNAL_CATALOG,
+  lookupSignal,
+  getSignalSeverity,
+  resolveSignalDirection,
+} from './signalCatalog';
+export type {
+  SignalCatalogEntry,
+  SignalSeverity,
+  SignalOrigin,
+  SignalDirection,
+  SignalPresentation,
+} from './signalCatalog';
 
 // Role state helpers
 export {

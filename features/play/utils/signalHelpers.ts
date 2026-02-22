@@ -11,15 +11,26 @@
  * - handledSignalIds is a Set<string> of event IDs (not signal IDs)
  */
 
+import { type SignalDirection, type SignalSeverity, resolveSignalDirection, getSignalSeverity } from './signalCatalog';
+
 /**
  * Minimal signal event shape — works with both SessionEvent from
  * session-cockpit.ts and test fixtures.
+ *
+ * `actorType` / `actorId` / `actorName` are optional so test fixtures
+ * and legacy events still match.
  */
 export interface SignalEventLike {
   id: string;
   type: string;
   timestamp: string;
   payload?: Record<string, unknown>;
+  /** Who emitted this event (host | participant | system | trigger) */
+  actorType?: string;
+  /** User-id or participant-id of the actor */
+  actorId?: string;
+  /** Display name of the actor (e.g. "Erik") */
+  actorName?: string;
 }
 
 /**
@@ -60,19 +71,40 @@ export function countUnhandledSignals<T extends SignalEventLike>(
  * 1. payload.channel (server audit events & fixed client emitter)
  * 2. payload.targetName (legacy client events via SessionCockpit mapping)
  * 3. evt.type (absolute fallback)
+ *
+ * Direction is resolved from actorType on the event (host → outgoing,
+ * participant → incoming, trigger/system → system).  Falls back to the
+ * signal catalog's `origin` hint when actorType is unavailable.
+ *
+ * Sender name resolution chain:
+ * 1. evt.actorName (V2 session_events row)
+ * 2. payload.participant_name (broadcast payload)
+ * 3. payload.sender (legacy mapping)
+ * 4. undefined (consumer should fall back to i18n generic label)
  */
 export function extractSignalMeta(evt: SignalEventLike): {
   channel: string;
   sender: string | undefined;
   message: string | undefined;
+  direction: SignalDirection;
+  severity: SignalSeverity;
+  actorType: string | undefined;
 } {
+  const channel =
+    (evt.payload?.channel as string) ??
+    (evt.payload?.targetName as string) ??
+    evt.type;
+
   return {
-    channel:
-      (evt.payload?.channel as string) ??
-      (evt.payload?.targetName as string) ??
-      evt.type,
-    sender: (evt.payload?.participant_name as string) ?? (evt.payload?.sender as string),
+    channel,
+    sender:
+      evt.actorName ??
+      (evt.payload?.participant_name as string) ??
+      (evt.payload?.sender as string),
     message: evt.payload?.message as string | undefined,
+    direction: resolveSignalDirection(channel, evt.actorType),
+    severity: getSignalSeverity(channel),
+    actorType: evt.actorType,
   };
 }
 
@@ -116,4 +148,45 @@ export function getSignalChannelLabel(
   }
   // Fallback: capitalise first letter, rest lower-case
   return channel.charAt(0).toUpperCase() + channel.slice(1).toLowerCase();
+}
+
+// ---------------------------------------------------------------------------
+// Direction-aware label (for SignalInbox / SignalStrip)
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a direction-aware display string for a signal event.
+ *
+ * Examples:
+ *  - incoming  → "SOS från Erik"  /  "SOS från deltagare"
+ *  - outgoing  → "Du skickade Paus"
+ *  - system    → "Paus (system)"
+ *
+ * @param channelLabel  Already-translated channel label (e.g. "Paus")
+ * @param direction     resolved direction from extractSignalMeta
+ * @param sender        actor display name (may be undefined)
+ * @param tInbox        Translation fn scoped to signalInbox
+ * @param participantCount  Optional — if present and direction=outgoing, shows "→ N deltagare"
+ */
+export function getSignalDirectionLabel(
+  channelLabel: string,
+  direction: SignalDirection,
+  sender: string | undefined,
+  tInbox: (key: string, values?: Record<string, string | number>) => string,
+  participantCount?: number,
+): string {
+  switch (direction) {
+    case 'incoming':
+      return sender
+        ? tInbox('direction.incoming', { channel: channelLabel, sender })
+        : tInbox('direction.incomingUnknown', { channel: channelLabel });
+    case 'outgoing':
+      if (participantCount != null && participantCount > 0) {
+        return tInbox('direction.outgoingCount', { channel: channelLabel, count: participantCount });
+      }
+      return tInbox('direction.outgoing', { channel: channelLabel });
+    case 'system':
+    default:
+      return tInbox('direction.system', { channel: channelLabel });
+  }
 }

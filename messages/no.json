@@ -11868,6 +11868,13 @@
           "ready": "Klar",
           "found": "Funnet",
           "sos": "SOS"
+        },
+        "direction": {
+          "incoming": "{channel} fra {sender}",
+          "incomingUnknown": "{channel} fra deltaker",
+          "outgoing": "Du sendte {channel}",
+          "outgoingCount": "Du sendte {channel} → {count} deltakere",
+          "system": "{channel} (system)"
         }
       }
     },

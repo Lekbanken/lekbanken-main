@@ -11540,6 +11540,13 @@
           "ready": "Ready",
           "found": "Found",
           "sos": "SOS"
+        },
+        "direction": {
+          "incoming": "{channel} from {sender}",
+          "incomingUnknown": "{channel} from participant",
+          "outgoing": "You sent {channel}",
+          "outgoingCount": "You sent {channel} → {count} participants",
+          "system": "{channel} (system)"
         }
       }
     },

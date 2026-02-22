@@ -62,9 +62,7 @@ export interface DirectorStagePanelProps {
   swipeRef?: React.RefObject<HTMLDivElement | null>;
 
   /** i18n accessor from parent */
-  t: {
-    (key: string, values?: Record<string, unknown>): string;
-  };
+  t: (key: string, values?: Record<string, string | number | Date>) => string;
 }
 
 // =============================================================================

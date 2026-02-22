@@ -36,6 +36,7 @@ import type {
 } from '@/types/session-cockpit';
 import { StoryViewModal } from './StoryViewModal';
 import { DirectorModePanel } from './DirectorModePanel';
+import { PlaySurface } from './shared/PlaySurface';
 import { useDirectorChips } from './DirectorChipLane';
 import type { DirectorChipType } from './DirectorChipLane';
 
@@ -426,14 +427,8 @@ export function DirectorModeDrawer({
         {/* Desktop backdrop */}
         <div className="hidden lg:block absolute inset-0 bg-black/40" onClick={handleClose} />
 
-        {/* Fullscreen shell */}
-        <div
-          className={cn(
-            'relative flex h-full w-full flex-col overflow-hidden',
-            'lg:mx-auto lg:my-8 lg:max-h-[calc(100vh-4rem)] lg:max-w-5xl lg:rounded-2xl lg:shadow-xl',
-            className,
-          )}
-        >
+        {/* PlaySurface owns the single border — parity with ParticipantFullscreenShell */}
+        <PlaySurface className={cn('lg:shadow-xl', className)}>
           <DirectorModePanel
           title={sessionName}
           status={status}
@@ -471,7 +466,7 @@ export function DirectorModeDrawer({
           directorChips={directorChips}
           directorChipLabels={directorChipLabels}
         />
-        </div>
+        </PlaySurface>
       </div>
 
       {/* Story View Modal */}

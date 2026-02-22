@@ -3095,4 +3095,30 @@ describe('SSoT Guardrails', () => {
     expect(dirSrc).toContain('PlayTopArea');
     expect(partSrc).toContain('PlayTopArea');
   });
+
+  // 39j. PlayHeader must NOT contain lg:border (border-policy contract)
+  // ---------------------------------------------------------------------------
+  it('PlayHeader never applies lg:border (surface owns the border)', async () => {
+    const fs = await import('fs');
+    const src = fs.readFileSync('features/play/components/shared/PlayHeader.tsx', 'utf-8');
+    // PlayHeader may only use border-b (separator) — never lg:border (outer boundary)
+    expect(src).not.toMatch(/lg:border(?!-b)/);
+  });
+
+  // 39k. Director and Participant shells use PlaySurface — Stage has no lg:border
+  // ---------------------------------------------------------------------------
+  it('Both shells use PlaySurface and Stage has no lg:border', async () => {
+    const fs = await import('fs');
+    const dirDrawer = fs.readFileSync('features/play/components/DirectorModeDrawer.tsx', 'utf-8');
+    const partShell = fs.readFileSync('features/play/components/ParticipantFullscreenShell.tsx', 'utf-8');
+    const dirPanel = fs.readFileSync('features/play/components/DirectorModePanel.tsx', 'utf-8');
+
+    // Both shells must import and use PlaySurface
+    expect(dirDrawer).toContain('PlaySurface');
+    expect(partShell).toContain('PlaySurface');
+
+    // DirectorModePanel (stage owner) must NOT have lg:border on any element
+    // (PlaySurface is the sole border owner)
+    expect(dirPanel).not.toMatch(/lg:border(?!-b)/);
+  });
 });

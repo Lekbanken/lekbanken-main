@@ -372,6 +372,14 @@ export function ParticipantPlayView({
       setLastRealtimeEvent('signal_received');
       handleSignalToast(payload);
     },
+    onReconnect: () => {
+      // Re-fetch all mutable data that could have changed while disconnected.
+      // Step/phase state will arrive with the next broadcast, but artifacts
+      // and decisions need an explicit fetch since their updates are
+      // event-triggered (not polled).
+      void loadArtifacts();
+      void loadDecisions();
+    },
   });
 
   // --------------------------------------------------------------------------

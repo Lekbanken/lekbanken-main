@@ -6,15 +6,42 @@
  * `seq` field so that the client-side sequence guard in `useLiveSession` can
  * reject duplicates and stale events.
  *
- * `seq` is derived from `Date.now()` — monotonic within a single server
- * process and good-enough for ordering.  If two broadcasts from different
- * request handlers happen in the same millisecond they get the same `seq`,
- * which is harmless (the guard is `<=`, so the second is dropped as a dupe).
+ * `seq` is obtained via an atomic `broadcast_seq = broadcast_seq + 1` update
+ * on the `participant_sessions` row (Postgres function `increment_broadcast_seq`).
+ * This guarantees strict monotonicity per session regardless of which server
+ * instance handles the request (serverless/edge/multi-region all get a
+ * consistent ordering from Postgres).
+ *
+ * If the DB increment fails (e.g. migration not yet applied, session row
+ * missing), we fall back to `Date.now()` so the broadcast still goes out.
  *
  * @module lib/realtime/play-broadcast-server
  */
 
 import { createServiceRoleClient } from '@/lib/supabase/server';
+
+/**
+ * Atomically increment `broadcast_seq` on the session row and return the new
+ * value.  Falls back to `Date.now()` if the RPC call fails for any reason.
+ */
+async function nextSeq(sessionId: string): Promise<number> {
+  try {
+    const supabase = await createServiceRoleClient();
+    const { data, error } = await supabase.rpc('increment_broadcast_seq', {
+      p_session_id: sessionId,
+    });
+    if (!error && typeof data === 'number') {
+      return data;
+    }
+    if (error) {
+      // Expected when migration hasn't been applied yet — warn once
+      console.warn('[broadcastPlayEvent] increment_broadcast_seq RPC failed, falling back to Date.now():', error.message);
+    }
+  } catch {
+    // swallow — fall through to Date.now()
+  }
+  return Date.now();
+}
 
 /**
  * Broadcast a play event to all subscribers on the `play:{sessionId}` channel.
@@ -27,6 +54,7 @@ export async function broadcastPlayEvent(
   event: Record<string, unknown>
 ): Promise<void> {
   try {
+    const seq = await nextSeq(sessionId);
     const supabase = await createServiceRoleClient();
     const channel = supabase.channel(`play:${sessionId}`);
     await channel.send({
@@ -34,7 +62,7 @@ export async function broadcastPlayEvent(
       event: 'play_event',
       payload: {
         ...event,
-        seq: Date.now(),
+        seq,
       },
     });
   } catch (error) {

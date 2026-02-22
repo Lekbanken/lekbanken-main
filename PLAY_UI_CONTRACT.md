@@ -56,8 +56,8 @@ This file defines layout ownership boundaries. It is not descriptive documentati
 | # | Constraint | Guardrail |
 |---|-----------|-----------|
 | 13 | **Subscription effects must not depend on consumer callbacks.** All `on*` callback props in realtime hooks must be stored via `useLatestRef` and accessed through `ref.current` inside handlers. The handler's `useCallback` dependency array must be empty (or contain only primitive identifiers like `artifactId`). The channel subscription `useEffect` must only re-run when `sessionId`, `enabled`, or the Supabase client changes. | structural |
-| 14 | **Sequence guard.** `useLiveSession` rejects events whose `seq` field ≤ the last processed sequence number. Duplicate and out-of-order deliveries are silently dropped (logged in dev). | structural |
-| 15 | **Reconnect recovery.** A 60 s recovery poll in `ParticipantPlayMode` re-fetches authoritative state from the server. This ensures self-healing if a broadcast is lost for any reason. | structural |
+| 14 | **Sequence guard (DB-seq, hybrid).** `useLiveSession` rejects events whose `seq` field ≤ the last processed sequence number. `seq` is a monotonic DB counter (`increment_broadcast_seq` on `participant_sessions.broadcast_seq`). Falls back to `Date.now()` if the RPC is unavailable. **Type-aware override:** `state_change` events that represent forward progress (higher step/phase index) are always applied even if their seq is stale — this prevents clock-skew from locking a participant on an old step. | structural |
+| 15 | **Reconnect recovery.** A 60 s recovery poll in `ParticipantPlayMode` re-fetches authoritative state from the server. Additionally, `useLiveSession` exposes an `onReconnect` callback (debounced 500 ms) that fires when the channel recovers from `CHANNEL_ERROR`/`TIMED_OUT`. `ParticipantPlayView` wires `onReconnect` to re-fetch artifacts and decisions immediately. | structural |
 
 ---
 
@@ -75,7 +75,7 @@ This file defines layout ownership boundaries. It is not descriptive documentati
 | # | Constraint |
 |---|-----------|
 | 16 | **`createBrowserClient()` is a module-level singleton** (see `lib/supabase/client.ts`). Wrapping it in `useMemo` is harmless but not required. Hooks may accept it as a prop or call it directly — both yield the same instance. |
-| 17 | **Server-side broadcasts must use `broadcastPlayEvent`** from `lib/realtime/play-broadcast-server.ts`. Direct `channel.send()` in API routes is prohibited — it bypasses the `seq` stamp and centralised error handling. |
+| 17 | **Server-side broadcasts must use `broadcastPlayEvent`** from `lib/realtime/play-broadcast-server.ts`. Direct `channel.send()` in API routes is prohibited — it bypasses the DB `seq` stamp and centralised error handling. All callsites must `await broadcastPlayEvent(...)` (no fire-and-forget) so the event is confirmed sent before the response returns. |
 
 ---
 

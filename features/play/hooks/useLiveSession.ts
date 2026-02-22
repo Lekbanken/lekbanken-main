@@ -182,18 +182,63 @@ export function useLiveSession({
   // when the channel recovers to SUBSCRIBED.
   const wasDisconnectedRef = useRef(false);
   
+  // Debounce timer for onReconnect — prevents multiple rapid reconnect events
+  // from triggering multiple fetches.
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // Refs that track the latest step/phase for the type-aware seq guard.
+  // These are updated in the state_change handler *after* setState so the
+  // guard can peek at the current values without triggering re-renders.
+  const currentStepRef = useRef(currentStepIndex);
+  const currentPhaseRef = useRef(currentPhaseIndex);
+  
   // Sequence guard — reject duplicate/stale events (server-attached seq)
   const lastSeqRef = useRef(0);
   
   // Handle incoming broadcast event — stable identity (no callback deps)
   const handleBroadcastEvent = useCallback((event: PlayBroadcastEvent) => {
-    // Sequence guard: skip events we've already processed
+    // ---------------------------------------------------------------------------
+    // Sequence guard (hybrid / type-aware)
+    //
+    // The seq field is a monotonic DB counter (increment_broadcast_seq).
+    // We reject events with seq <= lastSeq *unless* the event represents
+    // forward progress that the participant must not miss.
+    //
+    // Why hybrid?  If the DB-seq RPC falls back to Date.now() (migration not
+    // yet applied, or RPC error) the timestamp is NOT monotonic across server
+    // instances.  A legitimate step-forward event could arrive with a lower seq
+    // than a previous timer tick from a different instance.  Dropping that
+    // event would lock the participant on a stale step.
+    //
+    // "Forward progress" = state_change with a higher step or phase index.
+    // For all other event types the strict seq guard is safe because missing
+    // a duplicate timer/board/artifact event is recoverable via the 60s poll
+    // or onReconnect.
+    // ---------------------------------------------------------------------------
     if (typeof event.seq === 'number') {
       if (event.seq <= lastSeqRef.current) {
-        if (process.env.NODE_ENV === 'development') {
-          console.debug('[useLiveSession] Skipping duplicate/stale event seq=%d (last=%d)', event.seq, lastSeqRef.current);
+        // Check for forward-progress override before dropping
+        const isForwardProgress = event.type === 'state_change' && (() => {
+          const p = (event as StateChangeBroadcast).payload;
+          // We read the *current* React state via the updater form of setState.
+          // Since we can't call setState inside a predicate, we peek at the
+          // "latest known" values stored as refs below.
+          const newStep = p.current_step_index;
+          const newPhase = p.current_phase_index;
+          if (typeof newStep === 'number' && newStep > currentStepRef.current) return true;
+          if (typeof newPhase === 'number' && newPhase > currentPhaseRef.current) return true;
+          return false;
+        })();
+
+        if (!isForwardProgress) {
+          if (process.env.NODE_ENV === 'development') {
+            console.debug('[useLiveSession] Skipping duplicate/stale event seq=%d (last=%d) type=%s', event.seq, lastSeqRef.current, event.type);
+          }
+          return;
         }
-        return;
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[useLiveSession] Forward-progress override: accepting state_change despite seq=%d <= last=%d', event.seq, lastSeqRef.current);
+        }
       }
       lastSeqRef.current = event.seq;
     }
@@ -206,9 +251,11 @@ export function useLiveSession({
         
         if (payload.current_step_index !== undefined) {
           setCurrentStepIndex(payload.current_step_index);
+          currentStepRef.current = payload.current_step_index;
         }
         if (payload.current_phase_index !== undefined) {
           setCurrentPhaseIndex(payload.current_phase_index);
+          currentPhaseRef.current = payload.current_phase_index;
         }
         if (payload.status !== undefined) {
           setStatus(payload.status as SessionRuntimeState['status']);
@@ -346,12 +393,17 @@ export function useLiveSession({
             setReconnecting(false);
             // If we recovered from an error/timeout, fire onReconnect so the
             // consumer can re-fetch authoritative state for any missed events.
+            // Debounced (500ms) to coalesce rapid reconnect cycles.
             if (wasDisconnectedRef.current) {
               wasDisconnectedRef.current = false;
-              if (process.env.NODE_ENV === 'development') {
-                console.debug('[useLiveSession] Channel recovered — firing onReconnect');
-              }
-              onReconnectRef.current?.();
+              if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+              reconnectTimerRef.current = setTimeout(() => {
+                if (process.env.NODE_ENV === 'development') {
+                  console.debug('[useLiveSession] Channel recovered — firing onReconnect');
+                }
+                onReconnectRef.current?.();
+                reconnectTimerRef.current = null;
+              }, 500);
             }
             break;
           case 'CHANNEL_ERROR':
@@ -376,6 +428,11 @@ export function useLiveSession({
       channel.unsubscribe();
       channelRef.current = null;
       setConnected(false);
+      // Clear any pending reconnect debounce
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
     };
   }, [sessionId, enabled, handleBroadcastEvent, supabase]);
   

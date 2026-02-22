@@ -3158,4 +3158,33 @@ describe('SSoT Guardrails', () => {
       }
     }
   });
+
+  // 39m. Banned flag name: eventLogging / FEATURE_EVENT_LOGGING must not exist
+  // ---------------------------------------------------------------------------
+  it('Banned flag name "eventLogging" does not appear in source', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+
+    const banned = /\beventLogging\b|FEATURE_EVENT_LOGGING/;
+    // Allowlist: contract doc mentions the old name as a negative example,
+    // and this test file itself contains the banned pattern in its regex.
+    const allowlist = new Set(['PLAY_UI_CONTRACT.md', 'interaction-lock.test.ts']);
+
+    const scan = (dir: string) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (entry.name === 'node_modules' || entry.name === '.next' || entry.name === '.git') continue;
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) { scan(full); continue; }
+        if (!/\.(ts|tsx|js|json|md)$/.test(entry.name)) continue;
+        if (allowlist.has(entry.name)) continue;
+        // Skip generated lint artifacts
+        if (entry.name.startsWith('play-lint')) continue;
+        const src = fs.readFileSync(full, 'utf-8');
+        if (banned.test(src)) {
+          throw new Error(`Banned flag name found in ${full}. Rename to realtimeSessionEvents / FEATURE_REALTIME_SESSION_EVENTS.`);
+        }
+      }
+    };
+    scan('.');
+  });
 });

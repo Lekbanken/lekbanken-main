@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { resolveSessionViewer } from '@/lib/api/play-auth';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 import type { Json } from '@/types/supabase';
 
 // =============================================================================
@@ -94,20 +95,6 @@ function sanitizeMetadataForParticipant(
 
   // For other artifact types, return null (or could return safe subset)
   return null;
-}
-
-async function broadcastPlayEvent(sessionId: string, event: unknown) {
-  try {
-    const supabase = await createServiceRoleClient();
-    const channel = supabase.channel(`play:${sessionId}`);
-    await channel.send({
-      type: 'broadcast',
-      event: 'play_event',
-      payload: event,
-    });
-  } catch (error) {
-    console.warn('[play/sessions/[id]/artifacts] Failed to broadcast play event:', error);
-  }
 }
 
 // =============================================================================

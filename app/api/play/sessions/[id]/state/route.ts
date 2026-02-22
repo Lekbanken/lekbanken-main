@@ -7,9 +7,9 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import type { ParticipantSessionWithRuntime } from '@/types/participant-session-extended';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
 interface StateUpdateRequest {
   action: 'set_step' | 'set_phase' | 'timer_start' | 'timer_pause' | 'timer_resume' | 'timer_reset' | 'set_board_message';
@@ -18,21 +18,6 @@ interface StateUpdateRequest {
   duration_seconds?: number;
   message?: string | null;
   overrides?: Record<string, boolean>;
-}
-
-async function broadcastPlayEvent(sessionId: string, event: unknown) {
-  try {
-    const supabase = await createServiceRoleClient();
-    const channel = supabase.channel(`play:${sessionId}`);
-    await channel.send({
-      type: 'broadcast',
-      event: 'play_event',
-      payload: event,
-    });
-  } catch (error) {
-    // Best-effort: do not fail the request if realtime broadcast fails.
-    console.warn('[play/sessions/[id]/state] Failed to broadcast play event:', error);
-  }
 }
 
 export async function PATCH(

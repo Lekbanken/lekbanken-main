@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { resolveSessionViewer } from '@/lib/api/play-auth';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
@@ -26,20 +27,6 @@ function isUnlockedForPosition(
   if (current.currentStep < itemStep) return false;
   if (typeof itemPhase !== 'number') return true;
   return current.currentPhase >= itemPhase;
-}
-
-async function broadcastPlayEvent(sessionId: string, event: unknown) {
-  try {
-    const supabase = await createServiceRoleClient();
-    const channel = supabase.channel(`play:${sessionId}`);
-    await channel.send({
-      type: 'broadcast',
-      event: 'play_event',
-      payload: event,
-    });
-  } catch (error) {
-    console.warn('[play/sessions/[id]/outcome] Failed to broadcast play event:', error);
-  }
 }
 
 type OutcomeBody =

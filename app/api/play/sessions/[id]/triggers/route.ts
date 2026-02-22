@@ -17,22 +17,10 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
-}
-
-async function broadcastPlayEvent(sessionId: string, event: unknown) {
-  try {
-    const supabase = createServiceRoleClient();
-    await supabase.channel(`play:${sessionId}`).send({
-      type: 'broadcast',
-      event: 'play_event',
-      payload: event,
-    });
-  } catch (err) {
-    console.error('[broadcastPlayEvent] Failed:', err);
-  }
 }
 
 // Types for V2

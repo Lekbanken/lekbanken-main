@@ -8,9 +8,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
-import { createServiceRoleClient } from '@/lib/supabase/server';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
 type SecretsAction = 'unlock' | 'relock';
 
@@ -38,20 +38,6 @@ async function getSecretsStats(sessionId: string) {
     assigned_count: assignedCount ?? 0,
     revealed_count: revealedCount ?? 0,
   };
-}
-
-async function broadcastPlayEvent(sessionId: string, event: unknown) {
-  try {
-    const supabase = await createServiceRoleClient();
-    const channel = supabase.channel(`play:${sessionId}`);
-    await channel.send({
-      type: 'broadcast',
-      event: 'play_event',
-      payload: event,
-    });
-  } catch (error) {
-    console.warn('[secrets] Failed to broadcast play event:', error);
-  }
 }
 
 export async function GET(

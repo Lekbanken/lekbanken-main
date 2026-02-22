@@ -1,22 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import type { PlayBroadcastEvent } from '@/types/play-runtime';
+import { createServerRlsClient } from '@/lib/supabase/server';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
 type ParticipantAction = 'kick' | 'block' | 'approve' | 'setNextStarter' | 'setPosition';
-
-async function broadcastPlayEvent(sessionId: string, event: PlayBroadcastEvent) {
-  try {
-    const realtime = await createServiceRoleClient();
-    const channel = realtime.channel(`play:${sessionId}`);
-    await channel.send({
-      type: 'broadcast',
-      event: 'play_event',
-      payload: event,
-    });
-  } catch (err) {
-    console.warn('[participants action] broadcast failed (best-effort):', err);
-  }
-}
 
 export async function PATCH(
   request: Request,

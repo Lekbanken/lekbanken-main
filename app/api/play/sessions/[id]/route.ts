@@ -1,24 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { createServiceRoleClient } from '@/lib/supabase/server';
 import { logGamificationEventV1 } from '@/lib/services/gamification-events.server';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
 type SessionStatus = 'draft' | 'lobby' | 'active' | 'paused' | 'locked' | 'ended' | 'archived' | 'cancelled';
-
-async function broadcastPlayEvent(sessionId: string, event: unknown) {
-  try {
-    const supabase = await createServiceRoleClient();
-    const channel = supabase.channel(`play:${sessionId}`);
-    await channel.send({
-      type: 'broadcast',
-      event: 'play_event',
-      payload: event,
-    });
-  } catch (error) {
-    // Best-effort: do not fail the request if realtime broadcast fails.
-    console.warn('[play/sessions/[id]] Failed to broadcast play event:', error);
-  }
-}
 
 export async function GET(
   _request: Request,

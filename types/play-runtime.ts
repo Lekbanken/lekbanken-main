@@ -189,6 +189,9 @@ export interface PlayBroadcastEvent {
     | 'puzzle_update';
   payload: unknown;
   timestamp: string;
+  /** Server-monotonic sequence number (Date.now()). Used by clients to reject
+   *  duplicate / stale events. Attached by `broadcastPlayEvent` server helper. */
+  seq?: number;
 }
 
 export interface SignalReceivedBroadcast extends PlayBroadcastEvent {

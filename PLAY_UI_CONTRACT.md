@@ -70,6 +70,28 @@ This file defines layout ownership boundaries. It is not descriptive documentati
 
 ---
 
+## 7. Supabase Client Policy
+
+| # | Constraint |
+|---|-----------|
+| 16 | **`createBrowserClient()` is a module-level singleton** (see `lib/supabase/client.ts`). Wrapping it in `useMemo` is harmless but not required. Hooks may accept it as a prop or call it directly — both yield the same instance. |
+| 17 | **Server-side broadcasts must use `broadcastPlayEvent`** from `lib/realtime/play-broadcast-server.ts`. Direct `channel.send()` in API routes is prohibited — it bypasses the `seq` stamp and centralised error handling. |
+
+---
+
+## PR Checklist — Realtime Changes
+
+Before merging any PR that touches realtime hooks or broadcast logic:
+
+- [ ] All `on*` callbacks in realtime hooks are stored via `useLatestRef`
+- [ ] Subscription `useEffect` deps: only `sessionId` / `enabled` / supabase client
+- [ ] Handler `useCallback` deps: `[]` (reads only refs + setState)
+- [ ] Payload events include `seq` and the client-side guard exists
+- [ ] Join/mount sync fetch exists (recovery poll or initial load)
+- [ ] No direct `channel.send()` in API routes — use `broadcastPlayEvent`
+
+---
+
 ## How to extend
 
 1. Add the rule to this file with a clear "Guardrail" reference.

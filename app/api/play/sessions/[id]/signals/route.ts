@@ -3,25 +3,13 @@ import { z } from 'zod';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { resolveSessionViewer } from '@/lib/api/play-auth';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseAny = any;
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
-}
-
-async function broadcastPlayEvent(sessionId: string, event: unknown) {
-  try {
-    const supabase = await createServiceRoleClient();
-    await supabase.channel(`play:${sessionId}`).send({
-      type: 'broadcast',
-      event: 'play_event',
-      payload: event,
-    });
-  } catch (err) {
-    console.error('[broadcastPlayEvent] Failed:', err);
-  }
 }
 
 const SendSignalSchema = z

@@ -75,6 +75,10 @@ export interface UseLiveSessionOptions {
   onTimeBankChanged?: (payload: TimeBankChangedBroadcast['payload']) => void;
   /** Called when puzzle state changes */
   onPuzzleUpdate?: (payload: PuzzleBroadcast['payload']) => void;
+  /** Called after the channel recovers from CHANNEL_ERROR / TIMED_OUT.
+   *  Use this to re-fetch authoritative state from the server so any
+   *  broadcasts missed during the outage window are reconciled. */
+  onReconnect?: () => void;
   /** Whether subscription is enabled */
   enabled?: boolean;
   /** Timer tick interval in ms (default: 1000) */
@@ -124,6 +128,7 @@ export function useLiveSession({
   onSignalReceived,
   onTimeBankChanged,
   onPuzzleUpdate,
+  onReconnect,
   enabled = true,
   timerTickInterval = 1000,
 }: UseLiveSessionOptions): UseLiveSessionResult {
@@ -171,22 +176,26 @@ export function useLiveSession({
   const onSignalReceivedRef = useLatestRef(onSignalReceived);
   const onTimeBankChangedRef = useLatestRef(onTimeBankChanged);
   const onPuzzleUpdateRef = useLatestRef(onPuzzleUpdate);
+  const onReconnectRef = useLatestRef(onReconnect);
   
-  // Sequence guard — reject duplicate/stale state_change events
+  // Track whether we've been in an error state so we can fire onReconnect
+  // when the channel recovers to SUBSCRIBED.
+  const wasDisconnectedRef = useRef(false);
+  
+  // Sequence guard — reject duplicate/stale events (server-attached seq)
   const lastSeqRef = useRef(0);
   
   // Handle incoming broadcast event — stable identity (no callback deps)
   const handleBroadcastEvent = useCallback((event: PlayBroadcastEvent) => {
     // Sequence guard: skip events we've already processed
-    if (typeof (event as { seq?: number }).seq === 'number') {
-      const seq = (event as { seq: number }).seq;
-      if (seq <= lastSeqRef.current) {
+    if (typeof event.seq === 'number') {
+      if (event.seq <= lastSeqRef.current) {
         if (process.env.NODE_ENV === 'development') {
-          console.debug('[useLiveSession] Skipping duplicate/stale event seq=%d (last=%d)', seq, lastSeqRef.current);
+          console.debug('[useLiveSession] Skipping duplicate/stale event seq=%d (last=%d)', event.seq, lastSeqRef.current);
         }
         return;
       }
-      lastSeqRef.current = seq;
+      lastSeqRef.current = event.seq;
     }
 
     setLastEventAt(event.timestamp);
@@ -335,11 +344,21 @@ export function useLiveSession({
           case 'SUBSCRIBED':
             setConnected(true);
             setReconnecting(false);
+            // If we recovered from an error/timeout, fire onReconnect so the
+            // consumer can re-fetch authoritative state for any missed events.
+            if (wasDisconnectedRef.current) {
+              wasDisconnectedRef.current = false;
+              if (process.env.NODE_ENV === 'development') {
+                console.debug('[useLiveSession] Channel recovered — firing onReconnect');
+              }
+              onReconnectRef.current?.();
+            }
             break;
           case 'CHANNEL_ERROR':
           case 'TIMED_OUT':
             setConnected(false);
             setReconnecting(true);
+            wasDisconnectedRef.current = true;
             break;
           case 'CLOSED':
             setConnected(false);

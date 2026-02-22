@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
 // =============================================================================
 // Artifacts V2: State management using session_*_state tables
@@ -31,20 +32,6 @@ function isArtifactStateRequest(value: unknown): value is ArtifactStateRequest {
     return typeof rec.variantId === 'string' && typeof rec.participantId === 'string';
   }
   return false;
-}
-
-async function broadcastPlayEvent(sessionId: string, event: unknown) {
-  try {
-    const supabase = await createServiceRoleClient();
-    const channel = supabase.channel(`play:${sessionId}`);
-    await channel.send({
-      type: 'broadcast',
-      event: 'play_event',
-      payload: event,
-    });
-  } catch (error) {
-    console.warn('[play/sessions/[id]/artifacts/state] Failed to broadcast play event:', error);
-  }
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {

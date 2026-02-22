@@ -582,7 +582,7 @@ const FEATURE_FLAGS = {
   LEADER_SCRIPT: false,
   
   // Observability
-  EVENT_LOGGING: false,
+  REALTIME_SESSION_EVENTS: false,
   LIVE_EVENT_FEED: false,
   
   // Safety

@@ -14,6 +14,7 @@
 
 import { useCallback, useEffect, useState, useRef, useMemo } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { useLatestRef } from '@/hooks/useLatestRef';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { getPlayChannelName, PLAY_BROADCAST_EVENTS, createPuzzleBroadcast } from '@/lib/realtime/play-broadcast';
 import type { PuzzleBroadcast, PlayBroadcastEvent } from '@/types/play-runtime';
@@ -103,6 +104,13 @@ export function usePuzzleRealtime({
   
   // Supabase client
   const supabase = useMemo(() => createBrowserClient(), []);
+
+  // Callback refs — stable identity, prevents channel churn
+  const onStateChangeRef = useLatestRef(onStateChange);
+  const onSolvedRef = useLatestRef(onSolved);
+  const onLockedRef = useLatestRef(onLocked);
+  const onUnlockedRef = useLatestRef(onUnlocked);
+  const onHintRevealedRef = useLatestRef(onHintRevealed);
   
   // Handle incoming puzzle broadcast
   const handlePuzzleBroadcast = useCallback((payload: PuzzleBroadcast['payload']) => {
@@ -118,11 +126,11 @@ export function usePuzzleRealtime({
         if (payload.state) {
           setState(prev => {
             const newState = { ...prev, ...payload.state };
-            onStateChange?.(newState);
+            onStateChangeRef.current?.(newState);
             
             // Check if puzzle was just solved
             if (!prev.solved && newState.solved) {
-              onSolved?.();
+              onSolvedRef.current?.();
             }
             
             return newState;
@@ -134,8 +142,8 @@ export function usePuzzleRealtime({
       case 'locked': {
         setState(prev => {
           const newState = { ...prev, locked: true };
-          onStateChange?.(newState);
-          onLocked?.();
+          onStateChangeRef.current?.(newState);
+          onLockedRef.current?.();
           return newState;
         });
         break;
@@ -144,8 +152,8 @@ export function usePuzzleRealtime({
       case 'unlocked': {
         setState(prev => {
           const newState = { ...prev, locked: false };
-          onStateChange?.(newState);
-          onUnlocked?.();
+          onStateChangeRef.current?.(newState);
+          onUnlockedRef.current?.();
           return newState;
         });
         break;
@@ -160,8 +168,8 @@ export function usePuzzleRealtime({
             hints: [...hints, hint],
             showHint: true,
           };
-          onStateChange?.(newState);
-          onHintRevealed?.(hint);
+          onStateChangeRef.current?.(newState);
+          onHintRevealedRef.current?.(hint);
           return newState;
         });
         break;
@@ -170,13 +178,14 @@ export function usePuzzleRealtime({
       case 'reset': {
         setState(_ => {
           const newState: PuzzleStateData = { solved: false, locked: false };
-          onStateChange?.(newState);
+          onStateChangeRef.current?.(newState);
           return newState;
         });
         break;
       }
     }
-  }, [artifactId, participantId, teamId, onStateChange, onSolved, onLocked, onUnlocked, onHintRevealed]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- callbacks via stable refs
+  }, [artifactId, participantId, teamId]);
   
   // Handle broadcast event
   const handleBroadcastEvent = useCallback((event: PlayBroadcastEvent) => {
@@ -223,10 +232,11 @@ export function usePuzzleRealtime({
   const updateState = useCallback((updates: Partial<PuzzleStateData>) => {
     setState(prev => {
       const newState = { ...prev, ...updates };
-      onStateChange?.(newState);
+      onStateChangeRef.current?.(newState);
       return newState;
     });
-  }, [onStateChange]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- callback via stable ref
+  }, []);
   
   // Broadcast state change
   const broadcastStateChange = useCallback(async (updates: Partial<PuzzleStateData>) => {

@@ -13,8 +13,9 @@
 
 'use client';
 
-import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
+import { useEffect, useCallback, useState, useMemo } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { useLatestRef } from '@/hooks/useLatestRef';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { getPlayChannelName, PLAY_BROADCAST_EVENTS } from '@/lib/realtime/play-broadcast';
 import { calculateTimerDisplay } from '@/lib/utils/timer-utils';
@@ -157,37 +158,37 @@ export function useLiveSession({
   // Without this, every render creates new inline callbacks → handleBroadcastEvent
   // changes → channel unsubscribes/resubscribes → broadcasts lost in the gap.
   // ---------------------------------------------------------------------------
-  const onStateChangeRef = useRef(onStateChange);
-  const onTimerUpdateRef = useRef(onTimerUpdate);
-  const onRoleUpdateRef = useRef(onRoleUpdate);
-  const onBoardUpdateRef = useRef(onBoardUpdate);
-  const onTurnUpdateRef = useRef(onTurnUpdate);
-  const onArtifactUpdateRef = useRef(onArtifactUpdate);
-  const onDecisionUpdateRef = useRef(onDecisionUpdate);
-  const onOutcomeUpdateRef = useRef(onOutcomeUpdate);
-  const onCountdownRef = useRef(onCountdown);
-  const onStoryOverlayRef = useRef(onStoryOverlay);
-  const onSignalReceivedRef = useRef(onSignalReceived);
-  const onTimeBankChangedRef = useRef(onTimeBankChanged);
-  const onPuzzleUpdateRef = useRef(onPuzzleUpdate);
-
-  // Sync refs on every render (cheap — just pointer assignments)
-  onStateChangeRef.current = onStateChange;
-  onTimerUpdateRef.current = onTimerUpdate;
-  onRoleUpdateRef.current = onRoleUpdate;
-  onBoardUpdateRef.current = onBoardUpdate;
-  onTurnUpdateRef.current = onTurnUpdate;
-  onArtifactUpdateRef.current = onArtifactUpdate;
-  onDecisionUpdateRef.current = onDecisionUpdate;
-  onOutcomeUpdateRef.current = onOutcomeUpdate;
-  onCountdownRef.current = onCountdown;
-  onStoryOverlayRef.current = onStoryOverlay;
-  onSignalReceivedRef.current = onSignalReceived;
-  onTimeBankChangedRef.current = onTimeBankChanged;
-  onPuzzleUpdateRef.current = onPuzzleUpdate;
+  const onStateChangeRef = useLatestRef(onStateChange);
+  const onTimerUpdateRef = useLatestRef(onTimerUpdate);
+  const onRoleUpdateRef = useLatestRef(onRoleUpdate);
+  const onBoardUpdateRef = useLatestRef(onBoardUpdate);
+  const onTurnUpdateRef = useLatestRef(onTurnUpdate);
+  const onArtifactUpdateRef = useLatestRef(onArtifactUpdate);
+  const onDecisionUpdateRef = useLatestRef(onDecisionUpdate);
+  const onOutcomeUpdateRef = useLatestRef(onOutcomeUpdate);
+  const onCountdownRef = useLatestRef(onCountdown);
+  const onStoryOverlayRef = useLatestRef(onStoryOverlay);
+  const onSignalReceivedRef = useLatestRef(onSignalReceived);
+  const onTimeBankChangedRef = useLatestRef(onTimeBankChanged);
+  const onPuzzleUpdateRef = useLatestRef(onPuzzleUpdate);
+  
+  // Sequence guard — reject duplicate/stale state_change events
+  const lastSeqRef = useRef(0);
   
   // Handle incoming broadcast event — stable identity (no callback deps)
   const handleBroadcastEvent = useCallback((event: PlayBroadcastEvent) => {
+    // Sequence guard: skip events we've already processed
+    if (typeof (event as { seq?: number }).seq === 'number') {
+      const seq = (event as { seq: number }).seq;
+      if (seq <= lastSeqRef.current) {
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[useLiveSession] Skipping duplicate/stale event seq=%d (last=%d)', seq, lastSeqRef.current);
+        }
+        return;
+      }
+      lastSeqRef.current = seq;
+    }
+
     setLastEventAt(event.timestamp);
     
     switch (event.type) {
@@ -310,6 +311,11 @@ export function useLiveSession({
     if (!enabled || !sessionId) return;
     
     const channelName = getPlayChannelName(sessionId);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('[useLiveSession] Subscribing to channel %s', channelName);
+    }
+
     const channel = supabase.channel(channelName, {
       config: {
         broadcast: { self: false },
@@ -322,6 +328,9 @@ export function useLiveSession({
         handleBroadcastEvent(event);
       })
       .subscribe((status) => {
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[useLiveSession] Channel %s status: %s', channelName, status);
+        }
         switch (status) {
           case 'SUBSCRIBED':
             setConnected(true);
@@ -342,6 +351,9 @@ export function useLiveSession({
     channelRef.current = channel;
     
     return () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[useLiveSession] Unsubscribing from channel %s', channelName);
+      }
       channel.unsubscribe();
       channelRef.current = null;
       setConnected(false);

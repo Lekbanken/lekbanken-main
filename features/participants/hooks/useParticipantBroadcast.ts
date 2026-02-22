@@ -7,8 +7,9 @@
 
 'use client';
 
-import { useEffect, useCallback, useState, useRef } from 'react';
+import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { useLatestRef } from '@/hooks/useLatestRef';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface BroadcastEvent {
@@ -30,7 +31,10 @@ export function useParticipantBroadcast({
 }: UseParticipantBroadcastOptions) {
   const channelRef = useRef<RealtimeChannel | null>(null);
   const [connected, setConnected] = useState(false);
-  const supabase = createBrowserClient();
+  const supabase = useMemo(() => createBrowserClient(), []);
+
+  // Callback ref — stable identity prevents channel churn
+  const onEventRef = useLatestRef(onEvent);
   
   // Broadcast an event to all participants
   const broadcast = useCallback(async (event: Omit<BroadcastEvent, 'timestamp'>) => {
@@ -67,10 +71,7 @@ export function useParticipantBroadcast({
     broadcastChannel
       .on('broadcast', { event: 'participant_event' }, (payload) => {
         const event = payload.payload as BroadcastEvent;
-        
-        if (onEvent) {
-          onEvent(event);
-        }
+        onEventRef.current?.(event);
       })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -87,7 +88,8 @@ export function useParticipantBroadcast({
       channelRef.current = null;
       setConnected(false);
     };
-  }, [sessionId, enabled, onEvent, supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- onEvent via stable ref
+  }, [sessionId, enabled, supabase]);
   
   return {
     broadcast,

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { useLatestRef } from '@/hooks/useLatestRef';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 type TableName =
@@ -72,6 +73,12 @@ export function useRealtimeTable<T extends Record<string, unknown>>({
   const channelRef = useRef<RealtimeChannel | null>(null);
   const supabase = useMemo(() => createBrowserClient(), []);
 
+  // Callback refs — stable identity prevents channel churn
+  const onEventRef = useLatestRef(onEvent);
+  const onInsertRef = useLatestRef(onInsert);
+  const onUpdateRef = useLatestRef(onUpdate);
+  const onDeleteRef = useLatestRef(onDelete);
+
   const handleChange = useCallback(
     (payload: RealtimePostgresChangesPayload<T>) => {
       const event: RealtimeEvent<T> = {
@@ -81,28 +88,29 @@ export function useRealtimeTable<T extends Record<string, unknown>>({
       };
 
       // Call generic event handler
-      onEvent?.(event);
+      onEventRef.current?.(event);
 
       // Call specific handlers
       switch (payload.eventType) {
         case 'INSERT':
-          if (payload.new && onInsert) {
-            onInsert(payload.new as T);
+          if (payload.new && onInsertRef.current) {
+            onInsertRef.current(payload.new as T);
           }
           break;
         case 'UPDATE':
-          if (payload.old && payload.new && onUpdate) {
-            onUpdate(payload.old as T, payload.new as T);
+          if (payload.old && payload.new && onUpdateRef.current) {
+            onUpdateRef.current(payload.old as T, payload.new as T);
           }
           break;
         case 'DELETE':
-          if (payload.old && onDelete) {
-            onDelete(payload.old as T);
+          if (payload.old && onDeleteRef.current) {
+            onDeleteRef.current(payload.old as T);
           }
           break;
       }
     },
-    [onEvent, onInsert, onUpdate, onDelete]
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- callbacks via stable refs
+    []
   );
 
   useEffect(() => {
@@ -212,33 +220,35 @@ export function useRealtimePresence({
   const channelRef = useRef<RealtimeChannel | null>(null);
   const supabase = useMemo(() => createBrowserClient(), []);
 
+  // Callback refs — stable identity prevents channel churn
+  const onSyncRef = useLatestRef(onSync);
+  const onJoinRef = useLatestRef(onJoin);
+  const onLeaveRef = useLatestRef(onLeave);
+
+  // Stabilise userState so object literal identity doesn't cause churn
+  const userStateJson = useMemo(() => (userState ? JSON.stringify(userState) : null), [userState]);
+
   useEffect(() => {
     if (!enabled) return;
 
     const channel = supabase.channel(channelName);
 
-    if (onSync) {
-      channel.on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        onSync(state);
-      });
-    }
+    channel.on('presence', { event: 'sync' }, () => {
+      const state = channel.presenceState();
+      onSyncRef.current?.(state);
+    });
 
-    if (onJoin) {
-      channel.on('presence', { event: 'join' }, ({ key, currentPresences, newPresences }: { key: string; currentPresences: unknown[]; newPresences: unknown[] }) => {
-        onJoin(key, currentPresences, newPresences);
-      });
-    }
+    channel.on('presence', { event: 'join' }, ({ key, currentPresences, newPresences }: { key: string; currentPresences: unknown[]; newPresences: unknown[] }) => {
+      onJoinRef.current?.(key, currentPresences, newPresences);
+    });
 
-    if (onLeave) {
-      channel.on('presence', { event: 'leave' }, ({ key, currentPresences, leftPresences }: { key: string; currentPresences: unknown[]; leftPresences: unknown[] }) => {
-        onLeave(key, currentPresences, leftPresences);
-      });
-    }
+    channel.on('presence', { event: 'leave' }, ({ key, currentPresences, leftPresences }: { key: string; currentPresences: unknown[]; leftPresences: unknown[] }) => {
+      onLeaveRef.current?.(key, currentPresences, leftPresences);
+    });
 
     channel.subscribe(async (status: string) => {
-      if (status === 'SUBSCRIBED' && userState) {
-        await channel.track(userState);
+      if (status === 'SUBSCRIBED' && userStateJson) {
+        await channel.track(JSON.parse(userStateJson));
       }
     });
 
@@ -250,7 +260,8 @@ export function useRealtimePresence({
         channelRef.current = null;
       }
     };
-  }, [supabase, channelName, userState, onSync, onJoin, onLeave, enabled]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- callbacks via stable refs
+  }, [supabase, channelName, userStateJson, enabled]);
 
   return { channelRef };
 }

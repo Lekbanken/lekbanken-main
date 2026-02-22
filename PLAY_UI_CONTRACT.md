@@ -51,7 +51,17 @@ This file defines layout ownership boundaries. It is not descriptive documentati
 
 ---
 
-## 5. Parity Invariants
+## 5. Realtime Channel Stability
+
+| # | Constraint | Guardrail |
+|---|-----------|-----------|
+| 13 | **Subscription effects must not depend on consumer callbacks.** All `on*` callback props in realtime hooks must be stored via `useLatestRef` and accessed through `ref.current` inside handlers. The handler's `useCallback` dependency array must be empty (or contain only primitive identifiers like `artifactId`). The channel subscription `useEffect` must only re-run when `sessionId`, `enabled`, or the Supabase client changes. | structural |
+| 14 | **Sequence guard.** `useLiveSession` rejects events whose `seq` field ≤ the last processed sequence number. Duplicate and out-of-order deliveries are silently dropped (logged in dev). | structural |
+| 15 | **Reconnect recovery.** A 60 s recovery poll in `ParticipantPlayMode` re-fetches authoritative state from the server. This ensures self-healing if a broadcast is lost for any reason. | structural |
+
+---
+
+## 6. Parity Invariants
 
 | # | Constraint |
 |---|-----------|

@@ -841,13 +841,14 @@ export function DirectorModePanel({
   const unhandledSignalCount = countUnhandledSignals(events, handledSignalIds);
 
   // Drawer pills — replaces old tab bar
-  const drawerPills: Array<{ id: DirectorDrawerType; icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; label: string; badge?: number; hideInPreview?: boolean }> = [
+  const allDrawerPills: Array<{ id: DirectorDrawerType; icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; label: string; badge?: number; hideInPreview?: boolean }> = [
     { id: 'time', icon: ClockIcon, label: t('tabs.time') },
     { id: 'artifacts', icon: ArchiveBoxIcon, label: t('tabs.artifacts'), badge: artifacts.length || undefined },
     { id: 'triggers', icon: BoltIcon, label: t('tabs.triggers'), badge: armedCount || undefined },
     { id: 'signals', icon: SignalIcon, label: t('tabs.signals'), badge: unhandledSignalCount || undefined, hideInPreview: true },
     { id: 'events', icon: Cog6ToothIcon, label: t('tabs.events'), badge: events.length || undefined, hideInPreview: true },
-  ].filter(pill => !isPreview || !pill.hideInPreview);
+  ];
+  const drawerPills = allDrawerPills.filter(pill => !isPreview || !pill.hideInPreview);
 
   return (
     <div className={cn('flex flex-col h-full bg-background relative', className)}>

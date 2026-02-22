@@ -201,43 +201,48 @@ export function useLiveSession({
     // Sequence guard (hybrid / type-aware)
     //
     // The seq field is a monotonic DB counter (increment_broadcast_seq).
-    // We reject events with seq <= lastSeq *unless* the event represents
-    // forward progress that the participant must not miss.
+    // We reject events with seq <= lastSeq *unless* the event is "must-deliver":
     //
-    // Why hybrid?  If the DB-seq RPC falls back to Date.now() (migration not
-    // yet applied, or RPC error) the timestamp is NOT monotonic across server
-    // instances.  A legitimate step-forward event could arrive with a lower seq
-    // than a previous timer tick from a different instance.  Dropping that
-    // event would lock the participant on a stale step.
+    //   - state_change with a higher step/phase (forward progress)
+    //   - signal_received  (fire-and-forget, no poll fallback)
+    //   - time_bank_changed (non-recoverable via poll)
     //
-    // "Forward progress" = state_change with a higher step or phase index.
+    // Events with seq <= 0 (server fallback when DB-seq fails) skip the guard
+    // entirely so they never poison lastSeqRef with a stale/bogus value.
+    //
     // For all other event types the strict seq guard is safe because missing
     // a duplicate timer/board/artifact event is recoverable via the 60s poll
     // or onReconnect.
     // ---------------------------------------------------------------------------
-    if (typeof event.seq === 'number') {
+    if (typeof event.seq === 'number' && event.seq > 0) {
       if (event.seq <= lastSeqRef.current) {
-        // Check for forward-progress override before dropping
-        const isForwardProgress = event.type === 'state_change' && (() => {
-          const p = (event as StateChangeBroadcast).payload;
-          // We read the *current* React state via the updater form of setState.
-          // Since we can't call setState inside a predicate, we peek at the
-          // "latest known" values stored as refs below.
-          const newStep = p.current_step_index;
-          const newPhase = p.current_phase_index;
-          if (typeof newStep === 'number' && newStep > currentStepRef.current) return true;
-          if (typeof newPhase === 'number' && newPhase > currentPhaseRef.current) return true;
+        // Check for forward-progress / must-deliver override before dropping
+        const isMustDeliver = (() => {
+          // state_change with a higher step/phase must never be dropped
+          if (event.type === 'state_change') {
+            const p = (event as StateChangeBroadcast).payload;
+            const newStep = p.current_step_index;
+            const newPhase = p.current_phase_index;
+            if (typeof newStep === 'number' && newStep > currentStepRef.current) return true;
+            if (typeof newPhase === 'number' && newPhase > currentPhaseRef.current) return true;
+          }
+          // signal_received is fire-and-forget — dropping means the participant
+          // never sees the toast and the director never sees the inbox entry.
+          // Unlike timer/board events there is no 60s poll fallback.
+          if (event.type === 'signal_received') return true;
+          // time_bank_changed is also non-recoverable via poll
+          if (event.type === 'time_bank_changed') return true;
           return false;
         })();
 
-        if (!isForwardProgress) {
+        if (!isMustDeliver) {
           if (process.env.NODE_ENV === 'development') {
             console.debug('[useLiveSession] Skipping duplicate/stale event seq=%d (last=%d) type=%s', event.seq, lastSeqRef.current, event.type);
           }
           return;
         }
         if (process.env.NODE_ENV === 'development') {
-          console.debug('[useLiveSession] Forward-progress override: accepting state_change despite seq=%d <= last=%d', event.seq, lastSeqRef.current);
+          console.debug('[useLiveSession] Must-deliver override: accepting %s despite seq=%d <= last=%d', event.type, event.seq, lastSeqRef.current);
         }
       }
       lastSeqRef.current = event.seq;

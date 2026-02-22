@@ -13,7 +13,9 @@
  * consistent ordering from Postgres).
  *
  * If the DB increment fails (e.g. migration not yet applied, session row
- * missing), we fall back to `Date.now()` so the broadcast still goes out.
+ * missing), we fall back to `-1` so the broadcast still goes out but the
+ * client-side seq guard ignores the non-positive value instead of being
+ * poisoned by a trillion-scale `Date.now()` high-water mark.
  *
  * @module lib/realtime/play-broadcast-server
  */
@@ -36,7 +38,9 @@ async function nextSeq(sessionId: string): Promise<number> {
       // Other errors (e.g. RPC doesn't exist yet) are expected pre-migration.
       const level = error.code === 'P0002' ? 'error' : 'warn';
       console[level]('[broadcastPlayEvent] increment_broadcast_seq failed for session %s: %s (code=%s)', sessionId, error.message, error.code);
-      return Date.now();
+      // Return -1 so the event still goes out but never poisons the
+      // client-side seq guard with a trillion-scale Date.now() value.
+      return -1;
     }
     if (typeof data === 'number') {
       return data;
@@ -44,9 +48,9 @@ async function nextSeq(sessionId: string): Promise<number> {
     // Unexpected: RPC returned non-number without error (should not happen)
     console.warn('[broadcastPlayEvent] increment_broadcast_seq returned non-number:', data);
   } catch {
-    // swallow — fall through to Date.now()
+    // swallow — fall through to -1
   }
-  return Date.now();
+  return -1;
 }
 
 /**

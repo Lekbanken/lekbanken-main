@@ -917,14 +917,18 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       });
       
       if (!res.ok) throw new Error('Failed to send signal');
+
+      // Use the real signal from API response (has correct id + created_at)
+      const json = await res.json();
+      const inserted = json.signal;
       
       const signal: Signal = {
-        id: crypto.randomUUID(),
+        id: inserted?.id ?? crypto.randomUUID(),
         sessionId,
-        channel,
-        payload,
+        channel: inserted?.channel ?? channel,
+        payload: inserted?.payload ?? payload,
         senderType: 'host',
-        createdAt: new Date().toISOString(),
+        createdAt: inserted?.created_at ?? new Date().toISOString(),
       };
       
       setState((prev) => ({

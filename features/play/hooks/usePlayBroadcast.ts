@@ -9,7 +9,7 @@
 
 import { useEffect, useCallback, useState, useRef } from 'react';
 import { PlayBroadcaster } from '@/lib/realtime/play-broadcast';
-import type { TimerState, BoardState } from '@/types/play-runtime';
+import type { TimerState, BoardState, SignalReceivedBroadcast } from '@/types/play-runtime';
 
 // =============================================================================
 // Types
@@ -73,6 +73,8 @@ export interface UsePlayBroadcastResult {
     allowParticipantSkip?: boolean;
     allowClose?: boolean;
   }) => Promise<boolean>;
+  /** Broadcast signal received (client-side dual delivery) */
+  broadcastSignalReceived: (payload: SignalReceivedBroadcast['payload']) => Promise<boolean>;
 }
 
 // =============================================================================
@@ -204,6 +206,15 @@ export function usePlayBroadcast({
     },
     []
   );
+
+  // Broadcast signal received (client-side dual delivery)
+  const broadcastSignalReceived = useCallback(
+    async (payload: SignalReceivedBroadcast['payload']): Promise<boolean> => {
+      if (!broadcasterRef.current) return false;
+      return broadcasterRef.current.sendSignalReceived(payload);
+    },
+    []
+  );
   
   return {
     connected,
@@ -215,5 +226,6 @@ export function usePlayBroadcast({
     broadcastBoardUpdate,
     broadcastCountdown,
     broadcastStoryOverlay,
+    broadcastSignalReceived,
   };
 }

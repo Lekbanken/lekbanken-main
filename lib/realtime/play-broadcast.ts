@@ -15,6 +15,7 @@ import type {
   BoardBroadcast,
   CountdownBroadcast,
   StoryOverlayBroadcast,
+  SignalReceivedBroadcast,
   PuzzleBroadcast,
   TimerState,
   BoardState,
@@ -173,6 +174,21 @@ export function createPuzzleBroadcast(
 ): PuzzleBroadcast {
   return {
     type: 'puzzle_update',
+    payload,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+/**
+ * Create a signal-received broadcast event.
+ * Used for client-side dual delivery so signals reach participants even if
+ * the server-side broadcastPlayEvent fails.
+ */
+export function createSignalReceivedBroadcast(
+  payload: SignalReceivedBroadcast['payload']
+): SignalReceivedBroadcast {
+  return {
+    type: 'signal_received',
     payload,
     timestamp: new Date().toISOString(),
   };
@@ -348,6 +364,17 @@ export class PlayBroadcaster {
     payload: PuzzleBroadcast['payload']
   ): Promise<boolean> {
     return this.send(createPuzzleBroadcast(payload));
+  }
+
+  /**
+   * Send a signal-received broadcast (client-side dual delivery).
+   * Called by the facilitator after the signal API returns, so the
+   * participant gets the signal even if the server broadcast path fails.
+   */
+  async sendSignalReceived(
+    payload: SignalReceivedBroadcast['payload']
+  ): Promise<boolean> {
+    return this.send(createSignalReceivedBroadcast(payload));
   }
 }
 

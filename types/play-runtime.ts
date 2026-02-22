@@ -189,8 +189,9 @@ export interface PlayBroadcastEvent {
     | 'puzzle_update';
   payload: unknown;
   timestamp: string;
-  /** Server-monotonic sequence number (Date.now()). Used by clients to reject
-   *  duplicate / stale events. Attached by `broadcastPlayEvent` server helper. */
+  /** Server-monotonic sequence number from `increment_broadcast_seq`.
+   *  Used by clients to reject duplicate / stale events.  Values <= 0 indicate
+   *  a server fallback (DB-seq unavailable) and are ignored by the guard. */
   seq?: number;
 }
 

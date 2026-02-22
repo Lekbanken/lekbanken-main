@@ -59,7 +59,7 @@ export async function PATCH(
     const body: StateUpdateRequest = await request.json();
 
     // Track which broadcast to emit (best-effort)
-    let broadcastEvent: unknown | null = null;
+    let broadcastEvent: Record<string, unknown> | null = null;
     
     switch (body.action) {
       case 'set_step':

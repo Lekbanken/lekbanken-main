@@ -148,7 +148,10 @@ export function SessionChatModal({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="max-w-lg h-[80vh] max-h-[600px] flex flex-col p-0 gap-0">
+      <DialogContent
+        className="max-w-lg h-[80vh] max-h-[600px] flex flex-col p-0 gap-0 !z-[75]"
+        overlayClassName="!z-[75]"
+      >
         <DialogHeader className="px-4 py-3 border-b border-border/50 shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <ChatBubbleLeftRightIcon className="h-5 w-5" />

@@ -55,8 +55,11 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 export const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    /** Extra className applied to the backdrop overlay (e.g. z-index override). */
+    overlayClassName?: string
+  }
+>(({ className, children, overlayClassName, ...props }, ref) => {
   const tActions = useTranslations('common.actions')
   const hasDescription = hasDialogDescription(children)
   const shouldUnsetDescribedBy =
@@ -64,7 +67,7 @@ export const DialogContent = React.forwardRef<
 
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         ref={ref}
         className={cn(

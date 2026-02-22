@@ -11,6 +11,12 @@ import type { SessionRuntimeState, SessionRole } from '@/types/play-runtime';
 import type { BoardTheme } from '@/types/games';
 import type { PlayMode } from '@/features/admin/games/v2/types';
 import type { GameSnapshotData } from '@/types/game-snapshot';
+import {
+  validateParticipantPayload,
+  ParticipantGameResponseSchema,
+  ParticipantRoleResponseSchema,
+} from '@/features/play/contracts/participantCockpit.schema';
+import { trackRequest } from '@/features/play/contracts/requestRateMonitor';
 
 // Local step/phase types for API responses
 // Must match StepPhaseNavigation.StepInfo and ParticipantPlayView.StepData
@@ -387,7 +393,9 @@ export async function getParticipantPlaySession(
 ): Promise<ParticipantPlayData | null> {
   try {
     // Fetch participant info with session
-    const meRes = await fetch(`/api/play/me?session_code=${sessionCode}`, {
+    const meUrl = `/api/play/me?session_code=${sessionCode}`;
+    trackRequest(meUrl);
+    const meRes = await fetch(meUrl, {
       headers: {
         'x-participant-token': participantToken,
       },
@@ -418,7 +426,9 @@ export async function getParticipantPlaySession(
       // Note: This needs a public game endpoint
       // For now we just use the session's display name
       try {
-        const gameRes = await fetch(`/api/play/sessions/${session.id}/game`, {
+        const gameUrl = `/api/play/sessions/${session.id}/game`;
+        trackRequest(gameUrl);
+        const gameRes = await fetch(gameUrl, {
           headers: {
             'x-participant-token': participantToken,
           },
@@ -427,6 +437,14 @@ export async function getParticipantPlaySession(
         
         if (gameRes.ok) {
           const gameData = await gameRes.json();
+
+          // Dev-only contract validation — logs [CONTRACT] if host-only fields leak
+          validateParticipantPayload(
+            ParticipantGameResponseSchema,
+            gameData,
+            'getParticipantPlaySession → /game',
+          );
+
           gameTitle = gameData.title || gameTitle;
           playMode = gameData.playMode || 'basic';
           steps = gameData.steps || [];
@@ -443,7 +461,9 @@ export async function getParticipantPlaySession(
     let assignedRole: SessionRole | null = null;
     let secretRoleRevealedAt: string | null = null;
     try {
-      const roleRes = await fetch(`/api/play/me/role?session_code=${sessionCode}`, {
+      const roleUrl = `/api/play/me/role?session_code=${sessionCode}`;
+      trackRequest(roleUrl);
+      const roleRes = await fetch(roleUrl, {
         headers: {
           'x-participant-token': participantToken,
         },
@@ -452,6 +472,14 @@ export async function getParticipantPlaySession(
       
       if (roleRes.ok) {
         const roleData = await roleRes.json();
+
+        // Dev-only contract validation — logs [CONTRACT] if design-meta fields leak
+        validateParticipantPayload(
+          ParticipantRoleResponseSchema,
+          roleData,
+          'getParticipantPlaySession → /me/role',
+        );
+
         assignedRole = roleData.role || null;
         secretRoleRevealedAt = roleData.secretRevealedAt || null;
       }

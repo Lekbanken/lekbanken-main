@@ -28,6 +28,24 @@ export type { RoleAssignerContainerProps } from './RoleAssignerContainer';
 export { ParticipantPlayView } from './ParticipantPlayView';
 export type { ParticipantPlayViewProps, StepData } from './ParticipantPlayView';
 
+export { ParticipantFullscreenShell } from './ParticipantFullscreenShell';
+export type { ParticipantFullscreenShellProps } from './ParticipantFullscreenShell';
+
+export { ParticipantStepStage } from './ParticipantStepStage';
+export type { ParticipantStepStageProps } from './ParticipantStepStage';
+
+export { ParticipantOverlayStack } from './ParticipantOverlayStack';
+export type { ParticipantOverlayStackProps, ActiveDrawer, OverlayState } from './ParticipantOverlayStack';
+
+export { ParticipantArtifactDrawer } from './ParticipantArtifactDrawer';
+export type { ParticipantArtifactDrawerProps } from './ParticipantArtifactDrawer';
+
+export { ParticipantDecisionDrawer, ParticipantDecisionModal } from './ParticipantDecisionOverlay';
+export type { ParticipantDecisionDrawerProps, ParticipantDecisionModalProps, DecisionState, DecisionActions } from './ParticipantDecisionOverlay';
+
+export { ParticipantRoleSection } from './ParticipantRoleSection';
+export type { ParticipantRoleSectionProps } from './ParticipantRoleSection';
+
 export { RoleCard } from './RoleCard';
 export type { RoleCardProps, RoleCardData } from './RoleCard';
 

@@ -4,6 +4,13 @@
  * Client-side helpers for artifacts + decisions/voting.
  */
 
+import {
+  validateParticipantPayload,
+  ParticipantArtifactsResponseSchema,
+  ParticipantDecisionsResponseSchema,
+} from '@/features/play/contracts/participantCockpit.schema';
+import { trackRequest } from '@/features/play/contracts/requestRateMonitor';
+
 /** Keypad state returned from server (correctCode is NEVER included) */
 export interface KeypadState {
   isUnlocked: boolean;
@@ -46,6 +53,8 @@ export interface ParticipantSessionArtifactVariant {
   visible_to_session_role_id?: string | null;
   revealed_at?: string | null;
   highlighted_at?: string | null;
+  /** v1.1: canonical "used" timestamp. Optional until DB migration lands. */
+  used_at?: string | null;
 }
 
 export interface ParticipantArtifactsResponse {
@@ -106,7 +115,9 @@ export async function getParticipantArtifacts(
   options: { participantToken?: string }
 ): Promise<ParticipantArtifactsResponse> {
   const token = requireToken(options.participantToken);
-  const res = await fetch(`/api/play/sessions/${sessionId}/artifacts`, {
+  const url = `/api/play/sessions/${sessionId}/artifacts`;
+  trackRequest(url);
+  const res = await fetch(url, {
     method: 'GET',
     headers: { 'x-participant-token': token },
     cache: 'no-store',
@@ -119,6 +130,14 @@ export async function getParticipantArtifacts(
   }
 
   const data = (await res.json()) as Partial<ParticipantArtifactsResponse>;
+
+  // Dev-only contract validation
+  validateParticipantPayload(
+    ParticipantArtifactsResponseSchema,
+    data,
+    'getParticipantArtifacts',
+  );
+
   return {
     artifacts: data.artifacts ?? [],
     variants: data.variants ?? [],
@@ -130,7 +149,9 @@ export async function getParticipantDecisions(
   options: { participantToken?: string }
 ): Promise<ParticipantDecision[]> {
   const token = requireToken(options.participantToken);
-  const res = await fetch(`/api/play/sessions/${sessionId}/decisions`, {
+  const url = `/api/play/sessions/${sessionId}/decisions`;
+  trackRequest(url);
+  const res = await fetch(url, {
     method: 'GET',
     headers: { 'x-participant-token': token },
     cache: 'no-store',
@@ -143,6 +164,14 @@ export async function getParticipantDecisions(
   }
 
   const data = (await res.json()) as Partial<ParticipantDecisionsResponse>;
+
+  // Dev-only contract validation
+  validateParticipantPayload(
+    ParticipantDecisionsResponseSchema,
+    { decisions: data.decisions ?? [] },
+    'getParticipantDecisions',
+  );
+
   return data.decisions ?? [];
 }
 

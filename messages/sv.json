@@ -11253,6 +11253,25 @@
       "activeTriggers": "aktiva triggers",
       "ofTotal": "{count} av {total}"
     },
+    "shared": {
+      "status": {
+        "draft": "Utkast",
+        "lobby": "Lobby",
+        "active": "Live",
+        "paused": "Pausad",
+        "locked": "Låst",
+        "ended": "Avslutad"
+      },
+      "connection": {
+        "degraded": "Instabilt",
+        "offline": "Återansluter…"
+      },
+      "header": {
+        "backToLobby": "Till lobbyn",
+        "fullscreen": "Helskärm",
+        "preview": "Förhandsvisning"
+      }
+    },
     "killSwitch": {
       "emergencyStopActive": "Nödstopp aktivt",
       "triggersActive": "Triggers aktiva",
@@ -12233,7 +12252,8 @@
         "pause": "Pausa",
         "resume": "Fortsätt",
         "fullscreen": "Helskärm",
-        "preview": "FÖRHANDSVISNING"
+        "preview": "FÖRHANDSVISNING",
+        "backToLobby": "Till lobbyn"
       },
       "leaderScript": {
         "title": "LEADER SCRIPT"
@@ -12313,6 +12333,34 @@
         "hidden": "Hemliga",
         "available": "Tillgängliga",
         "shown": "Visade"
+      },
+      "connection": {
+        "live": "Live",
+        "degraded": "Instabilt",
+        "offline": "Återansluter…"
+      },
+      "stage": {
+        "participantView": "DELTAGARVY",
+        "phaseOf": "Fas {current} av {total}",
+        "mediaAttached": "Bild bifogad",
+        "boardText": "TAVLA / MEDDELANDE",
+        "leaderScript": "LEADER SCRIPT",
+        "openSignal": "Öppna"
+      },
+      "nowRow": {
+        "step": "Steg",
+        "live": "live",
+        "paused": "pausad"
+      },
+      "chips": {
+        "signalReceived": "Signal",
+        "participantJoined": "Ansluten",
+        "triggerFired": "Trigger avfyrad"
+      },
+      "signalInbox": {
+        "title": "SIGNAL INKORG",
+        "empty": "Inga signaler mottagna ännu",
+        "markHandled": "Klar"
       }
     },
     "eventFeed": {
@@ -13801,6 +13849,10 @@
         "continueActive": "Lämna – sessionen fortsätter som AKTIV",
         "pauseSession": "Lämna – sessionen PAUSAS",
         "endSession": "Lämna – sessionen AVSLUTAS"
+      },
+      "connection": {
+        "degraded": "Instabilt",
+        "offline": "Återansluter…"
       }
     },
     "participant": {
@@ -13860,12 +13912,14 @@
         "play": "Spela",
         "playingAs": "Du spelar som {name}",
         "artifacts": "Artefakter",
-        "decisions": "Beslut"
+        "decisions": "Beslut",
+        "role": "Roll"
       },
       "timer": {
         "paused": "Timer pausad",
         "timeUp": "Tiden är slut!",
-        "timeRemaining": "Tid kvar"
+        "timeRemaining": "Tid kvar",
+        "almostDone": "Snart slut…"
       },
       "status": {
         "active": "Aktiv",
@@ -14015,7 +14069,11 @@
       },
       "artifactsDrawer": {
         "title": "Mina artefakter",
-        "noArtifacts": "Inga artefakter just nu."
+        "noArtifacts": "Inga artefakter just nu.",
+        "summaryNew": "nya",
+        "summaryAvailable": "tillgängliga",
+        "summaryDone": "klara",
+        "showLatest": "Visa senaste"
       },
       "decisionsDrawer": {
         "title": "Beslut",
@@ -14049,8 +14107,52 @@
       "safety": {
         "title": "Säkerhet"
       },
+      "nowRow": {
+        "step": "Steg",
+        "paused": "pausad"
+      },
+      "stepStage": {
+        "stepOf": "Steg {current} av {total}",
+        "materials": "Material",
+        "newArtifactTitle": "Ny artefakt tillgänglig",
+        "newArtifactHint": "Tryck för att öppna",
+        "state": {
+          "pausedTitle": "Pausad",
+          "pausedSub": "Lekledaren har pausat spelet. Vi fortsätter snart.",
+          "endedTitle": "Klart!",
+          "endedSub": "Tack för att du deltog."
+        }
+      },
+      "artifactStates": {
+        "artifact": "Artefakt",
+        "card": "Kort",
+        "public": "Offentlig",
+        "private": "Privat",
+        "rolePrivate": "Roll",
+        "highlighted": "Markerad",
+        "locked": "Låst",
+        "unlocked": "Upplåst",
+        "used": "Använd"
+      },
+      "decision": {
+        "voteSubmitted": "Röst skickad!",
+        "thankYou": "Tack för din röst",
+        "waitingForResults": "Inväntar resultat...",
+        "confirmTitle": "Bekräfta röst",
+        "confirmDescription": "Du röstar på: {option}. Vill du skicka?",
+        "confirmSubmit": "Ja, skicka röst",
+        "back": "Tillbaka"
+      },
       "secretsLocked": {
         "message": "Hemliga instruktioner är låsta tills lekledaren låser upp dem."
+      },
+      "triggerLane": {
+        "newArtifacts": "Ny artefakt",
+        "decisionOpen": "Nytt val",
+        "countdownStarted": "Nedräkning",
+        "storyShown": "Berättelse",
+        "boardUpdated": "Ny info från ledaren",
+        "reconnected": "Återansluten"
       }
     },
     "puzzleProgress": {
@@ -14302,6 +14404,7 @@
       "title": "Signaler",
       "queueCount": "{count} i kö",
       "autoSendHint": "Skickas automatiskt när du är online.",
+      "cooldownHint": "Vänta…",
       "buttons": {
         "ready": "REDO",
         "sos": "SOS",

@@ -10769,6 +10769,25 @@
       "activeTriggers": "aktive triggere",
       "ofTotal": "{count} av {total}"
     },
+    "shared": {
+      "status": {
+        "draft": "Utkast",
+        "lobby": "Lobby",
+        "active": "Live",
+        "paused": "Pauset",
+        "locked": "Låst",
+        "ended": "Avsluttet"
+      },
+      "connection": {
+        "degraded": "Ustabilt",
+        "offline": "Kobler til på nytt…"
+      },
+      "header": {
+        "backToLobby": "Tilbake til lobbyen",
+        "fullscreen": "Fullskjerm",
+        "preview": "Forhåndsvisning"
+      }
+    },
     "joinPage": {
       "title": "Bli med i økten",
       "description": "Skriv inn koden som vises på skjermen og velg et visningsnavn for å delta.",
@@ -11764,7 +11783,8 @@
         "statusPaused": "PAUSET",
         "statusEnded": "AVSLUTTET",
         "pause": "Pause",
-        "resume": "Fortsett"
+        "resume": "Fortsett",
+        "backToLobby": "Til lobbyen"
       },
       "steps": {
         "noSteps": "Ingen trinn tilgjengelig ennå",
@@ -11812,6 +11832,34 @@
       },
       "footer": {
         "backToLobby": "Tilbake til Lobby"
+      },
+      "connection": {
+        "live": "Live",
+        "degraded": "Ustabilt",
+        "offline": "Kobler til\u2026"
+      },
+      "stage": {
+        "participantView": "DELTAKERVISING",
+        "phaseOf": "Fase {current} av {total}",
+        "mediaAttached": "Bilde vedlagt",
+        "boardText": "TAVLE / MELDING",
+        "leaderScript": "LEADER SCRIPT",
+        "openSignal": "Åpne"
+      },
+      "nowRow": {
+        "step": "Steg",
+        "live": "live",
+        "paused": "pauset"
+      },
+      "chips": {
+        "signalReceived": "Signal",
+        "participantJoined": "Ble med",
+        "triggerFired": "Trigger avfyrt"
+      },
+      "signalInbox": {
+        "title": "SIGNAL INNBOKS",
+        "empty": "Ingen signaler mottatt enn\u00e5",
+        "markHandled": "Ferdig"
       }
     },
     "eventFeed": {
@@ -13196,6 +13244,10 @@
         "continueActive": "Forlat – sesjonen fortsetter som AKTIV",
         "pauseSession": "Forlat – sesjonen PAUSES",
         "endSession": "Forlat – sesjonen AVSLUTTES"
+      },
+      "connection": {
+        "degraded": "Ustabilt",
+        "offline": "Kobler til…"
       }
     },
     "participant": {
@@ -13259,6 +13311,8 @@
         "play": "Spill",
         "playingAs": "Du spiller som {name}",
         "artifacts": "Artefakter",
+        "decisions": "Beslutninger",
+        "role": "Rolle",
         "notConfigured": "Hotspot-bilde ikke konfigurert",
         "complete": "✓ Alle funnet!"
       },
@@ -13266,7 +13320,8 @@
         "title": "Puslespill",
         "missingConfig": "Puslespill ikke konfigurert",
         "timeUp": "Tiden er ute!",
-        "timeRemaining": "Tid igjen"
+        "timeRemaining": "Tid igjen",
+        "almostDone": "Nesten ferdig…"
       },
       "status": {
         "active": "Aktiv",
@@ -13342,7 +13397,11 @@
       },
       "artifactsDrawer": {
         "title": "Mine artefakter",
-        "noArtifacts": "Ingen artefakter for øyeblikket."
+        "noArtifacts": "Ingen artefakter for øyeblikket.",
+        "summaryNew": "nye",
+        "summaryAvailable": "tilgjengelige",
+        "summaryDone": "ferdige",
+        "showLatest": "Vis siste"
       },
       "decisionsDrawer": {
         "title": "Beslutninger",
@@ -13376,8 +13435,52 @@
       "safety": {
         "title": "Sikkerhet"
       },
+      "nowRow": {
+        "step": "Steg",
+        "paused": "pauset"
+      },
+      "stepStage": {
+        "stepOf": "Steg {current} av {total}",
+        "materials": "Materialer",
+        "newArtifactTitle": "Ny artefakt tilgjengelig",
+        "newArtifactHint": "Trykk for å åpne",
+        "state": {
+          "pausedTitle": "Pauset",
+          "pausedSub": "Spillederen har pauset spillet. Vi fortsetter snart.",
+          "endedTitle": "Ferdig!",
+          "endedSub": "Takk for at du deltok."
+        }
+      },
+      "artifactStates": {
+        "artifact": "Artefakt",
+        "card": "Kort",
+        "public": "Offentlig",
+        "private": "Privat",
+        "rolePrivate": "Rolle",
+        "highlighted": "Markert",
+        "locked": "Låst",
+        "unlocked": "Opplåst",
+        "used": "Brukt"
+      },
+      "decision": {
+        "voteSubmitted": "Stemme sendt!",
+        "thankYou": "Takk for din stemme",
+        "waitingForResults": "Venter på resultater...",
+        "confirmTitle": "Bekreft stemme",
+        "confirmDescription": "Du stemmer på: {option}. Vil du sende?",
+        "confirmSubmit": "Ja, send stemme",
+        "back": "Tilbake"
+      },
       "secretsLocked": {
         "message": "Hemmelige instruksjoner er låst til spillederen låser dem opp."
+      },
+      "triggerLane": {
+        "newArtifacts": "Ny artefakt",
+        "decisionOpen": "Nytt valg",
+        "countdownStarted": "Nedtelling",
+        "storyShown": "Fortelling",
+        "boardUpdated": "Ny info fra lederen",
+        "reconnected": "Tilkoblet igjen"
       }
     },
     "puzzleProgress": {
@@ -13629,6 +13732,7 @@
       "title": "Signaler",
       "queueCount": "{count} i kø",
       "autoSendHint": "Sendes automatisk når du er online.",
+      "cooldownHint": "Vent…",
       "buttons": {
         "ready": "KLAR",
         "sos": "SOS",

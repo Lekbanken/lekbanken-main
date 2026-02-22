@@ -2,14 +2,20 @@
 
 import { useEffect, useRef } from 'react';
 import { useAchievementAutoAward } from '@/features/gamification/hooks/useAchievementAutoAward';
+import type { SessionStatus } from '@/features/play/components/shared/play-types';
 
-type SessionStatus = 'active' | 'paused' | 'ended' | 'cancelled' | string;
+/**
+ * Raw DB status may include values normalised away before UI
+ * (e.g. 'cancelled', 'archived' → mapped to 'ended' by useSessionState).
+ * This hook sees them before that mapping, so accept the canonical type + extras.
+ */
+type RawSessionStatus = SessionStatus | 'cancelled' | 'archived';
 
 interface UseSessionAchievementsOptions {
   /** Session ID */
   sessionId: string;
-  /** Current session status */
-  status: SessionStatus;
+  /** Current session status (raw DB value, may include 'cancelled') */
+  status: RawSessionStatus;
   /** User ID (for authenticated users, null for guests) */
   userId?: string | null;
   /** Tenant ID */
@@ -49,7 +55,7 @@ export function useSessionAchievements({
   context,
 }: UseSessionAchievementsOptions) {
   // Track previous status to detect transition to 'ended'
-  const prevStatusRef = useRef<SessionStatus | null>(null);
+  const prevStatusRef = useRef<RawSessionStatus | null>(null);
   const hasTriggeredRef = useRef(false);
 
   const { checkAchievements, current, dismiss, pendingCount } = useAchievementAutoAward({

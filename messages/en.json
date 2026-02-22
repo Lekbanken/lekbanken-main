@@ -10420,6 +10420,25 @@
       "activeTriggers": "active triggers",
       "ofTotal": "{count} of {total}"
     },
+    "shared": {
+      "status": {
+        "draft": "Draft",
+        "lobby": "Lobby",
+        "active": "Live",
+        "paused": "Paused",
+        "locked": "Locked",
+        "ended": "Ended"
+      },
+      "connection": {
+        "degraded": "Unstable",
+        "offline": "Reconnecting…"
+      },
+      "header": {
+        "backToLobby": "Back to lobby",
+        "fullscreen": "Fullscreen",
+        "preview": "Preview"
+      }
+    },
     "killSwitch": {
       "emergencyStopActive": "Emergency stop active",
       "triggersActive": "Triggers active",
@@ -11404,7 +11423,8 @@
         "pause": "Pause",
         "resume": "Resume",
         "fullscreen": "Fullscreen",
-        "preview": "PREVIEW"
+        "preview": "PREVIEW",
+        "backToLobby": "To lobby"
       },
       "leaderScript": {
         "title": "LEADER SCRIPT"
@@ -11484,6 +11504,34 @@
         "hidden": "Hidden",
         "available": "Available",
         "shown": "Shown"
+      },
+      "connection": {
+        "live": "Live",
+        "degraded": "Unstable",
+        "offline": "Reconnecting\u2026"
+      },
+      "stage": {
+        "participantView": "PARTICIPANT VIEW",
+        "phaseOf": "Phase {current} of {total}",
+        "mediaAttached": "Image attached",
+        "boardText": "BOARD / MESSAGE",
+        "leaderScript": "LEADER SCRIPT",
+        "openSignal": "Open"
+      },
+      "nowRow": {
+        "step": "Step",
+        "live": "live",
+        "paused": "paused"
+      },
+      "chips": {
+        "signalReceived": "Signal",
+        "participantJoined": "Joined",
+        "triggerFired": "Trigger fired"
+      },
+      "signalInbox": {
+        "title": "SIGNAL INBOX",
+        "empty": "No signals received yet",
+        "markHandled": "Done"
       }
     },
     "eventFeed": {
@@ -12969,6 +13017,10 @@
         "continueActive": "Leave – session remains ACTIVE",
         "pauseSession": "Leave – session is PAUSED",
         "endSession": "Leave – session is ENDED"
+      },
+      "connection": {
+        "degraded": "Unstable",
+        "offline": "Reconnecting…"
       }
     },
     "participant": {
@@ -13028,12 +13080,14 @@
         "play": "Play",
         "playingAs": "You are playing as {name}",
         "artifacts": "Artifacts",
-        "decisions": "Decisions"
+        "decisions": "Decisions",
+        "role": "Role"
       },
       "timer": {
         "paused": "Timer paused",
         "timeUp": "Time's up!",
-        "timeRemaining": "Time remaining"
+        "timeRemaining": "Time remaining",
+        "almostDone": "Almost done…"
       },
       "status": {
         "active": "Active",
@@ -13137,7 +13191,11 @@
       },
       "artifactsDrawer": {
         "title": "My artifacts",
-        "noArtifacts": "No artifacts at the moment."
+        "noArtifacts": "No artifacts at the moment.",
+        "summaryNew": "new",
+        "summaryAvailable": "available",
+        "summaryDone": "done",
+        "showLatest": "Show latest"
       },
       "decisionsDrawer": {
         "title": "Decisions",
@@ -13171,8 +13229,52 @@
       "safety": {
         "title": "Safety"
       },
+      "nowRow": {
+        "step": "Step",
+        "paused": "paused"
+      },
+      "stepStage": {
+        "stepOf": "Step {current} of {total}",
+        "materials": "Materials",
+        "newArtifactTitle": "New artifact available",
+        "newArtifactHint": "Tap to open",
+        "state": {
+          "pausedTitle": "Paused",
+          "pausedSub": "The game leader has paused the game. We'll continue shortly.",
+          "endedTitle": "Done!",
+          "endedSub": "Thanks for participating."
+        }
+      },
+      "artifactStates": {
+        "artifact": "Artifact",
+        "card": "Card",
+        "public": "Public",
+        "private": "Private",
+        "rolePrivate": "Role",
+        "highlighted": "Highlighted",
+        "locked": "Locked",
+        "unlocked": "Unlocked",
+        "used": "Used"
+      },
+      "decision": {
+        "voteSubmitted": "Vote submitted!",
+        "thankYou": "Thank you for voting",
+        "waitingForResults": "Waiting for results...",
+        "confirmTitle": "Confirm vote",
+        "confirmDescription": "You are voting for: {option}. Do you want to submit?",
+        "confirmSubmit": "Yes, submit vote",
+        "back": "Back"
+      },
       "secretsLocked": {
         "message": "Secret instructions are locked until the host unlocks them."
+      },
+      "triggerLane": {
+        "newArtifacts": "New artifact",
+        "decisionOpen": "New decision",
+        "countdownStarted": "Countdown",
+        "storyShown": "Story",
+        "boardUpdated": "New info from leader",
+        "reconnected": "Reconnected"
       }
     },
     "puzzleProgress": {
@@ -13424,6 +13526,7 @@
       "title": "Signals",
       "queueCount": "{count} queued",
       "autoSendHint": "Will be sent automatically when you are online.",
+      "cooldownHint": "Wait…",
       "buttons": {
         "ready": "READY",
         "sos": "SOS",

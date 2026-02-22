@@ -55,14 +55,23 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Token expired' }, { status: 401 });
     }
 
-    // Note: keep '*' so it compiles even if generated Supabase types lag behind migrations.
+    // SECURITY: Select only participant-safe role fields.
+    // Never expose assignment_strategy, scaling_rules, conflicts_with,
+    // min_count, max_count, or other game-design metadata to participants.
     const { data: assignment } = await supabase
       .from('participant_role_assignments')
       .select(
         `
-        *,
+        revealed_at,
+        secret_instructions_revealed_at,
         session_role:session_roles(
-          *
+          id,
+          name,
+          icon,
+          color,
+          public_description,
+          private_instructions,
+          private_hints
         )
       `
       )
@@ -72,6 +81,24 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     const role = (assignment as unknown as { session_role: unknown } | null)?.session_role ?? null;
+
+    // SECURITY TRIPWIRE: hard-strip + log in ALL environments.
+    // Even if the SELECT above changes, participants never see design-meta.
+    if (role && typeof role === 'object') {
+      const FORBIDDEN_ROLE_KEYS = [
+        'assignment_strategy', 'scaling_rules', 'conflicts_with',
+        'min_count', 'max_count', 'preferred_count',
+        'source_game_role_id', 'created_at', 'updated_at',
+      ];
+      for (const field of FORBIDDEN_ROLE_KEYS) {
+        if (field in (role as Record<string, unknown>)) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.error(`[SECURITY] Role response contains forbidden field — stripping: ${field}`);
+          }
+          delete (role as Record<string, unknown>)[field];
+        }
+      }
+    }
 
     return NextResponse.json({
       role,

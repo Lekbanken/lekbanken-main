@@ -69,8 +69,12 @@ export function ParticipantPlayMode({
   useEffect(() => {
     void loadData();
     
-    // Refresh every 30 seconds to get updated state
-    const interval = setInterval(() => void loadData(), 30000);
+    // Recovery-only poll: 60s interval as a stale-state safety net.
+    // Realtime (useLiveSession) is the primary data source for step/timer/
+    // artifact/decision changes. This poll only exists to recover from
+    // missed realtime events (e.g. after a reconnect). Previous 30s interval
+    // was redundant network load on mobile.
+    const interval = setInterval(() => void loadData(), 60000);
     return () => clearInterval(interval);
   }, [loadData]);
 

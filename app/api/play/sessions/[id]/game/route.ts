@@ -191,9 +191,14 @@ export async function GET(
     }
 
     // ------------------------------------------------------------
-    // Authorization
+    // Authorization — track caller type for field filtering
     // ------------------------------------------------------------
     let authorized = false;
+    // RULE: `x-participant-token` forces participant response shape (sanitized),
+    // regardless of host auth. This is intentional — a host testing their own
+    // game as a participant must see exactly what participants see.
+    // Do NOT gate this behind `!authorized`. See auth-overlap regression test.
+    const isParticipant = Boolean(participantToken);
 
     // 1) Host auth via request-scoped RLS client
     const supabaseRls = await createServerRlsClient();
@@ -216,8 +221,14 @@ export async function GET(
       }
     }
 
-    // 2) Participant auth via token
-    if (!authorized && participantToken) {
+    // 2) Participant auth via token (also needed when host is testing their own game)
+    if (isParticipant && authorized && process.env.NODE_ENV !== 'production') {
+      console.info(
+        '[SECURITY] dual-auth request; forcing participant response shape',
+        { sessionId, userId: user?.id },
+      );
+    }
+    if (participantToken) {
       const { data: participant } = await supabaseAdmin
         .from('participants')
         .select('id, status, token_expires_at')
@@ -235,6 +246,7 @@ export async function GET(
         }
 
         authorized = true;
+        // isParticipant already true from above
       }
     }
 
@@ -418,21 +430,76 @@ export async function GET(
     const mergedStepsWithOverrides = applyStepOverrides(steps, adminOverrides.steps);
     const mergedPhasesWithOverrides = applyPhaseOverrides(phases, adminOverrides.phases);
 
+    // ------------------------------------------------------------------
+    // SECURITY: Strip host-only fields from participant responses.
+    // This is the server-side trust boundary — client filtering is NOT
+    // sufficient because participants can read the raw JSON in DevTools.
+    // ------------------------------------------------------------------
+    const responseSteps = isParticipant
+      ? mergedStepsWithOverrides.map(({ leaderScript: _ls, boardText: _bt, phaseId: _pid, ...safe }) => safe)
+      : mergedStepsWithOverrides;
+
+    const responseSafety = isParticipant
+      ? {
+          safetyNotes: adminOverrides.safety?.safetyNotes ?? materialsRow?.safety_notes ?? undefined,
+          accessibilityNotes: adminOverrides.safety?.accessibilityNotes,
+          spaceRequirements: adminOverrides.safety?.spaceRequirements,
+          // leaderTips intentionally omitted for participants
+        }
+      : {
+          safetyNotes: adminOverrides.safety?.safetyNotes ?? materialsRow?.safety_notes ?? undefined,
+          accessibilityNotes: adminOverrides.safety?.accessibilityNotes,
+          spaceRequirements: adminOverrides.safety?.spaceRequirements,
+          leaderTips: adminOverrides.safety?.leaderTips,
+        };
+
+    // ------------------------------------------------------------------
+    // SECURITY TRIPWIRE: hard-strip + log in ALL environments.
+    // Even if upstream code changes, participants never see these fields.
+    // The destructuring strip above is the primary defence; this is the
+    // belt to that suspender.
+    // ------------------------------------------------------------------
+    if (isParticipant) {
+      const FORBIDDEN_STEP_KEYS = ['leaderScript', 'boardText', 'leaderTips'];
+      const FORBIDDEN_SAFETY_KEYS = ['leaderTips'];
+
+      for (const s of responseSteps) {
+        for (const key of FORBIDDEN_STEP_KEYS) {
+          if (key in s) {
+            if (process.env.NODE_ENV !== 'production') {
+              console.error(
+                '[SECURITY] Participant step response contains forbidden field — stripping',
+                { stepId: (s as Record<string, unknown>).id, field: key },
+              );
+            }
+            delete (s as Record<string, unknown>)[key];
+          }
+        }
+      }
+
+      for (const key of FORBIDDEN_SAFETY_KEYS) {
+        if (key in responseSafety) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.error(
+              '[SECURITY] Participant safety response contains forbidden field — stripping',
+              { field: key },
+            );
+          }
+          delete (responseSafety as Record<string, unknown>)[key];
+        }
+      }
+    }
+
     return NextResponse.json({
       title: game?.name || session.display_name,
       playMode: (game?.play_mode as 'basic' | 'facilitated' | 'participants' | null) ?? 'basic',
       board: {
         theme: (boardConfig?.theme as BoardTheme | null) ?? 'neutral',
       },
-      steps: mergedStepsWithOverrides,
+      steps: responseSteps,
       phases: mergedPhasesWithOverrides,
       tools: (tools ?? []) as ToolInfo[],
-      safety: {
-        safetyNotes: adminOverrides.safety?.safetyNotes ?? materialsRow?.safety_notes ?? undefined,
-        accessibilityNotes: adminOverrides.safety?.accessibilityNotes,
-        spaceRequirements: adminOverrides.safety?.spaceRequirements,
-        leaderTips: adminOverrides.safety?.leaderTips,
-      },
+      safety: responseSafety,
     });
   } catch (error) {
     console.error('Error fetching session game content:', error);

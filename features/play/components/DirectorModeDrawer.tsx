@@ -1,11 +1,13 @@
 ﻿/**
- * DirectorModeDrawer Component
+ * DirectorModeDrawer → DirectorFullscreenShell
  *
- * Full-screen overlay (drawer) for Director Mode during active sessions.
- * This is a thin shell that adds:
- *   - Backdrop + slide-in animation
+ * Full-screen overlay for Director Mode during active sessions.
+ * Now a proper fullscreen shell (parity with ParticipantFullscreenShell):
+ *   - Fullscreen viewport (mobile) / centred modal (desktop)
+ *   - Safe area insets for notch + bottom bar
+ *   - Backdrop + fade-in animation (no slide-in-right)
  *   - Fullscreen API management
- *   - Keyboard shortcuts (â†/â†’, 1-6, Space, Escape)
+ *   - Keyboard shortcuts (←/→, Space, Escape)
  *   - Swipe gestures for mobile step navigation
  *   - Haptic feedback on trigger fire
  *   - Scroll lock when open
@@ -21,6 +23,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { hapticTap } from '../haptics';
 import type {
   CockpitStep,
   CockpitPhase,
@@ -33,6 +36,8 @@ import type {
 } from '@/types/session-cockpit';
 import { StoryViewModal } from './StoryViewModal';
 import { DirectorModePanel } from './DirectorModePanel';
+import { useDirectorChips } from './DirectorChipLane';
+import type { DirectorChipType } from './DirectorChipLane';
 
 // =============================================================================
 // Types
@@ -150,20 +155,6 @@ function isFullscreenActive(): boolean {
 }
 
 // =============================================================================
-// Haptic feedback helper
-// =============================================================================
-
-function triggerHaptic(pattern: number[] = [50, 30, 100]) {
-  try {
-    if ('vibrate' in navigator) {
-      navigator.vibrate(pattern);
-    }
-  } catch {
-    // Silent - not supported
-  }
-}
-
-// =============================================================================
 // Swipe hook for mobile step navigation
 // =============================================================================
 
@@ -253,6 +244,39 @@ export function DirectorModeDrawer({
   // Track when each step started (client-side) for per-step timer
   const [stepStartTimes, setStepStartTimes] = useState<Map<number, number>>(() => new Map());
 
+  // Director chip lane — host-side system cues
+  const { chips: directorChips, pushChip: pushDirectorChip } = useDirectorChips();
+  const prevEventsLenRef = useRef(events.length);
+
+  // Watch for new events → push chips (single source of truth — events array)
+  // NOTE: recentSignals watcher removed to prevent duplicate SIGNAL_RECEIVED chips.
+  // Signal events already appear in the events array via realtime broadcast.
+  useEffect(() => {
+    if (!open) return;
+    const prevLen = prevEventsLenRef.current;
+    if (events.length > prevLen) {
+      // Check latest events for chip-worthy types
+      const newEvents = events.slice(0, events.length - prevLen);
+      for (const evt of newEvents) {
+        if (evt.type.includes('signal')) {
+          pushDirectorChip('SIGNAL_RECEIVED', evt.payload?.channel as string | undefined);
+        } else if (evt.type.includes('trigger') && evt.type.includes('fire')) {
+          pushDirectorChip('TRIGGER_FIRED');
+        } else if (evt.type.includes('participant') && evt.type.includes('join')) {
+          pushDirectorChip('PARTICIPANT_JOINED');
+        }
+      }
+    }
+    prevEventsLenRef.current = events.length;
+  }, [open, events.length, events, pushDirectorChip]);
+
+  // Director chip labels (i18n)
+  const directorChipLabels: Record<DirectorChipType, string> = {
+    SIGNAL_RECEIVED: t('chips.signalReceived'),
+    PARTICIPANT_JOINED: t('chips.participantJoined'),
+    TRIGGER_FIRED: t('chips.triggerFired'),
+  };
+
   // Record step start time when step changes
   useEffect(() => {
     if (open && currentStepIndex >= 0) {
@@ -340,7 +364,7 @@ export function DirectorModeDrawer({
   // Haptic-enhanced trigger fire
   const handleFireTrigger = useCallback(async (triggerId: string) => {
     await onFireTrigger(triggerId);
-    triggerHaptic([50, 30, 100]);
+    hapticTap(50);
   }, [onFireTrigger]);
 
   // Keyboard shortcuts: Escape, â†/â†’ step nav, 1-6 tabs, Space for hint
@@ -392,24 +416,25 @@ export function DirectorModeDrawer({
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop — desktop only overlay dim */}
       <div
         className={cn(
-          'fixed inset-0 bg-black/60 z-50 transition-opacity duration-300',
+          'fixed inset-0 z-50 transition-opacity duration-300',
           open ? 'opacity-100' : 'opacity-0 pointer-events-none'
         )}
-        onClick={handleClose}
-      />
-
-      {/* Full-screen drawer */}
-      <div
-        className={cn(
-          'fixed inset-0 z-50 transition-transform duration-300 ease-out',
-          open ? 'translate-x-0' : 'translate-x-full',
-          className
-        )}
       >
-        <DirectorModePanel
+        {/* Desktop backdrop */}
+        <div className="hidden lg:block absolute inset-0 bg-black/40" onClick={handleClose} />
+
+        {/* Fullscreen shell */}
+        <div
+          className={cn(
+            'relative flex h-full w-full flex-col overflow-hidden',
+            'lg:mx-auto lg:my-8 lg:max-h-[calc(100vh-4rem)] lg:max-w-5xl lg:rounded-2xl lg:shadow-xl',
+            className,
+          )}
+        >
+          <DirectorModePanel
           title={sessionName}
           status={status}
           isPreview={false}
@@ -443,7 +468,10 @@ export function DirectorModeDrawer({
           swipeRef={swipeRef}
           resetConfirmPending={resetConfirmPending}
           onResetClick={handleResetClick}
+          directorChips={directorChips}
+          directorChipLabels={directorChipLabels}
         />
+        </div>
       </div>
 
       {/* Story View Modal */}

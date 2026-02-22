@@ -113,3 +113,7 @@ export type {
   CurrentContent,
   UseMultiLanguageScriptReturn,
 } from './useMultiLanguageScript';
+
+// Drawer discipline (ESC, scroll lock, focus)
+export { useDrawerDiscipline } from './useDrawerDiscipline';
+export type { UseDrawerDisciplineOptions } from './useDrawerDiscipline';

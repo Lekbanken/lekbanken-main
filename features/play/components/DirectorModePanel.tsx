@@ -29,14 +29,10 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
-  ArrowLeftIcon,
   PlayIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   BoltIcon,
   ClockIcon,
   SignalIcon,
-  DocumentTextIcon,
   BookOpenIcon,
   Cog6ToothIcon,
   ArchiveBoxIcon,
@@ -44,7 +40,7 @@ import {
   ArrowPathIcon,
   LightBulbIcon,
   UserGroupIcon,
-  ArrowsPointingOutIcon,
+  CheckCircleIcon,
 } from '@heroicons/react/24/outline';
 import { StopIcon } from '@heroicons/react/24/solid';
 import type {
@@ -57,12 +53,24 @@ import type {
   Signal,
   SessionCockpitStatus,
 } from '@/types/session-cockpit';
+import { DirectorChipLane } from './DirectorChipLane';
+import type { DirectorChip, DirectorChipType } from './DirectorChipLane';
+import { DirectorStagePanel } from './DirectorStagePanel';
+import { DrawerOverlay, PlayHeader, PlayTopArea, getSessionStatusConfig } from '@/features/play/components/shared';
+import { NowSummaryRow } from '@/features/play/components/shared';
+import {
+  sortedSignalEvents,
+  selectLatestUnhandledSignal,
+  countUnhandledSignals,
+  extractSignalMeta,
+} from '@/features/play/utils/signalHelpers';
 
 // =============================================================================
 // Types
 // =============================================================================
 
 export type DirectorTab = 'play' | 'time' | 'artifacts' | 'triggers' | 'signals' | 'events';
+export type DirectorDrawerType = 'time' | 'artifacts' | 'triggers' | 'signals' | 'events';
 
 export interface DirectorModePanelProps {
   /** Title shown in header */
@@ -127,6 +135,12 @@ export interface DirectorModePanelProps {
   showFullscreenButton?: boolean;
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
+  /** Connection quality (derived from realtime status) */
+  connectionState?: 'connected' | 'degraded' | 'offline';
+  /** Director chip lane — host-side system cues */
+  directorChips?: DirectorChip[];
+  directorChipLabels?: Record<DirectorChipType, string>;
+  onDirectorChipClick?: (chip: DirectorChip) => void;
   /** Step start times for per-step timer */
   stepStartTimes?: Map<number, number>;
   /** Swipe ref for mobile gestures */
@@ -139,162 +153,56 @@ export interface DirectorModePanelProps {
 }
 
 // =============================================================================
-// Status config
+// Status config — delegates to shared SSoT
 // =============================================================================
-
-function useStatusConfig(status: SessionCockpitStatus) {
-  const t = useTranslations('play.directorDrawer');
-  switch (status) {
-    case 'draft':
-      return {
-        label: t('header.statusDraft'),
-        bgClass: 'bg-slate-500/5',
-        textClass: 'text-slate-500 dark:text-slate-400',
-        dotClass: 'bg-slate-400',
-        animate: false,
-      };
-    case 'lobby':
-      return {
-        label: t('header.statusLobby'),
-        bgClass: 'bg-blue-500/5',
-        textClass: 'text-blue-600 dark:text-blue-400',
-        dotClass: 'bg-blue-500',
-        animate: false,
-      };
-    case 'active':
-      return {
-        label: t('header.statusLive'),
-        bgClass: 'bg-green-500/10',
-        textClass: 'text-green-600 dark:text-green-400',
-        dotClass: 'bg-green-500',
-        animate: true,
-      };
-    case 'paused':
-      return {
-        label: t('header.statusPaused'),
-        bgClass: 'bg-amber-500/10',
-        textClass: 'text-amber-600 dark:text-amber-400',
-        dotClass: 'bg-amber-500',
-        animate: false,
-      };
-    case 'locked':
-      return {
-        label: t('header.statusLocked'),
-        bgClass: 'bg-red-500/5',
-        textClass: 'text-red-500 dark:text-red-400',
-        dotClass: 'bg-red-500',
-        animate: false,
-      };
-    case 'ended':
-      return {
-        label: t('header.statusEnded'),
-        bgClass: 'bg-gray-500/10',
-        textClass: 'text-gray-500 dark:text-gray-400',
-        dotClass: 'bg-gray-500',
-        animate: false,
-      };
-  }
-}
 
 // =============================================================================
 // Sub-components
 // =============================================================================
 
-function StepNavigation({
-  steps,
-  currentIndex,
-  onNext,
-  onPrevious,
+// StepNavigation + LeaderScriptPanel extracted into DirectorStagePanel.tsx
+
+/** Signal Strip — compact "latest signal" bar for the stage surface */
+function SignalStrip({
+  events,
+  handledSignalIds,
+  onOpenSignals,
   t,
-  swipeRef,
-  disabled,
 }: {
-  steps: CockpitStep[];
-  currentIndex: number;
-  onNext?: () => void;
-  onPrevious?: () => void;
+  events: SessionEvent[];
+  handledSignalIds: Set<string>;
+  onOpenSignals: (signalId: string) => void;
   t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
-  swipeRef?: React.RefObject<HTMLDivElement | null>;
-  disabled?: boolean;
 }) {
-  if (steps.length === 0) {
-    return (
-      <div className="text-base text-muted-foreground text-center py-8">
-        {t('steps.noSteps')}
-      </div>
-    );
-  }
+  // Deterministic: sort signals by timestamp desc, pick first unhandled
+  const latestSignal = selectLatestUnhandledSignal(events, handledSignalIds);
+  if (!latestSignal) return null;
 
-  const currentStep = steps[currentIndex];
-  const isFirst = currentIndex <= 0;
-  const isLast = currentIndex >= steps.length - 1;
+  const { channel, sender } = extractSignalMeta(latestSignal);
+  const timestamp = new Date(latestSignal.timestamp);
+  const timeStr = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div ref={swipeRef} className="space-y-4 touch-pan-y">
-      {/* Step counter */}
-      <div className="text-center">
-        <div className="text-sm text-muted-foreground mb-1">
-          {t('steps.stepOf', { current: currentIndex + 1, total: steps.length })}
-        </div>
-        <div className="text-xl font-semibold text-foreground">
-          {currentStep?.title ?? t('steps.notStarted')}
-        </div>
+    <button
+      type="button"
+      onClick={() => onOpenSignals(latestSignal.id)}
+      className="mx-5 mb-1 flex items-center gap-2 rounded-lg border border-orange-200/50 bg-orange-50/50 px-3 py-2 text-left transition-colors hover:bg-orange-50 active:scale-[0.99] dark:border-orange-800/30 dark:bg-orange-950/10 dark:hover:bg-orange-950/20 animate-in fade-in slide-in-from-bottom-1 duration-200"
+    >
+      <span className="flex h-2 w-2 shrink-0">
+        <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-orange-400 opacity-75" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <span className="text-xs font-medium text-foreground">
+          {channel.toUpperCase()}
+          {sender && <span className="text-muted-foreground ml-1">— {sender}</span>}
+        </span>
       </div>
-
-      {/* Navigation buttons - large and clear */}
-      <div className="flex items-center gap-3">
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={onPrevious}
-          disabled={isFirst || disabled || !onPrevious}
-          className="flex-1 h-14 text-base"
-        >
-          <ChevronLeftIcon className="h-5 w-5 mr-2" />
-          {t('steps.previous')}
-        </Button>
-
-        <Button
-          variant="default"
-          size="lg"
-          onClick={onNext}
-          disabled={isLast || disabled || !onNext}
-          className="flex-1 h-14 text-base"
-        >
-          {t('steps.next')}
-          <ChevronRightIcon className="h-5 w-5 ml-2" />
-        </Button>
-      </div>
-
-      {/* Progress bar */}
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
-        <div
-          className="h-full bg-primary transition-all duration-300"
-          style={{ width: `${((currentIndex + 1) / steps.length) * 100}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function LeaderScriptPanel({ script }: { script?: string }) {
-  const t = useTranslations('play.directorDrawer');
-  if (!script) return null;
-
-  return (
-    <Card className="p-5 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800">
-      <div className="flex items-start gap-3">
-        <DocumentTextIcon className="h-6 w-6 text-amber-600 shrink-0 mt-0.5" />
-        <div>
-          <div className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-2">
-            {t('leaderScript.title')}
-          </div>
-          <div className="text-base text-amber-900 dark:text-amber-100 whitespace-pre-wrap leading-relaxed">
-            {script}
-          </div>
-        </div>
-      </div>
-    </Card>
+      <span className="text-[10px] text-muted-foreground/70 font-mono shrink-0">{timeStr}</span>
+      <span className="text-[10px] font-medium text-orange-600 dark:text-orange-400 shrink-0">
+        {t('stage.openSignal')}
+      </span>
+    </button>
   );
 }
 
@@ -717,6 +625,86 @@ function EventFeed({ events, t }: { events: SessionEvent[]; t: ReturnType<typeof
   );
 }
 
+function SignalInbox({
+  events,
+  handledSignalIds,
+  onMarkHandled,
+  t,
+}: {
+  events: SessionEvent[];
+  handledSignalIds: Set<string>;
+  onMarkHandled: (signalId: string) => void;
+  t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
+}) {
+  const locale = useLocale();
+  // Deterministic sort — newest first, stable across reconnects
+  const signalEvents = sortedSignalEvents(events).slice(0, 20);
+
+  if (signalEvents.length === 0) {
+    return (
+      <div className="text-center py-3">
+        <div className="text-xs text-muted-foreground">{t('signalInbox.empty')}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+        {t('signalInbox.title')}
+      </div>
+      <div className="space-y-1 max-h-[240px] overflow-y-auto">
+        {signalEvents.map((evt) => {
+          const { channel, sender, message } = extractSignalMeta(evt);
+          const isHandled = handledSignalIds.has(evt.id);
+          return (
+            <div
+              key={evt.id}
+              className={cn(
+                'flex items-center justify-between gap-2 p-2 rounded-lg border transition-colors',
+                isHandled
+                  ? 'bg-muted/30 border-border/30 opacity-60'
+                  : 'bg-orange-50/50 border-orange-200/30 dark:bg-orange-950/10 dark:border-orange-800/30',
+              )}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                {isHandled ? (
+                  <CheckCircleIcon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+                ) : (
+                  <span className="inline-block h-2 w-2 rounded-full bg-orange-500 shrink-0" />
+                )}
+                <div className="min-w-0">
+                  <div className="text-xs font-medium text-foreground truncate">
+                    {channel.toUpperCase()}
+                    {sender && <span className="text-muted-foreground ml-1">— {sender}</span>}
+                  </div>
+                  {message && (
+                    <div className="text-[10px] text-muted-foreground truncate">{message}</div>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="text-[10px] text-muted-foreground/60 font-mono">
+                  {new Date(evt.timestamp).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </span>
+                {!isHandled && (
+                  <button
+                    type="button"
+                    onClick={() => onMarkHandled(evt.id)}
+                    className="text-[10px] font-medium text-orange-600 dark:text-orange-400 hover:underline"
+                  >
+                    {t('signalInbox.markHandled')}
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ArtifactsTab({
   artifacts,
   artifactStates,
@@ -797,8 +785,8 @@ export function DirectorModePanel({
   isPreview = false,
   steps,
   currentStepIndex,
-  phases: _phases,
-  currentPhaseIndex: _currentPhaseIndex,
+  phases,
+  currentPhaseIndex,
   triggers,
   recentSignals,
   signalPresets,
@@ -821,6 +809,10 @@ export function DirectorModePanel({
   showFullscreenButton = false,
   isFullscreen = false,
   onToggleFullscreen,
+  connectionState = 'connected',
+  directorChips = [],
+  directorChipLabels,
+  onDirectorChipClick,
   stepStartTimes = new Map(),
   swipeRef,
   resetConfirmPending = false,
@@ -828,150 +820,236 @@ export function DirectorModePanel({
   className,
 }: DirectorModePanelProps) {
   const t = useTranslations('play.directorDrawer');
-  const [activeTab, setActiveTab] = useState<DirectorTab>('play');
+  const tShared = useTranslations('play.shared');
+  const [activeDrawer, setActiveDrawer] = useState<DirectorDrawerType | null>(null);
+  const [handledSignalIds, setHandledSignalIds] = useState<Set<string>>(new Set());
+  const toggleDrawer = (d: DirectorDrawerType) => setActiveDrawer(prev => prev === d ? null : d);
+  const markSignalHandled = (signalId: string) => {
+    setHandledSignalIds((prev) => new Set(prev).add(signalId));
+  };
+  const handleOpenSignal = (signalId: string) => {
+    markSignalHandled(signalId);
+    setActiveDrawer('signals');
+  };
 
   const currentStep = steps[currentStepIndex];
-  const statusConfig = useStatusConfig(status);
+  const statusConfig = getSessionStatusConfig(status);
   const armedCount = triggers.filter((tr) => tr.status === 'armed').length;
+  const unhandledSignalCount = countUnhandledSignals(events, handledSignalIds);
 
-  // Which tabs to show — preview hides signals/events (no session = no data)
-  const allTabs: Array<{ id: DirectorTab; icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; badge?: number; title: string; hideInPreview?: boolean }> = [
-    { id: 'play', icon: PlayIcon, title: t('tabs.play') },
-    { id: 'time', icon: ClockIcon, title: t('tabs.time') },
-    { id: 'artifacts', icon: ArchiveBoxIcon, title: t('tabs.artifacts'), badge: artifacts.length || undefined },
-    { id: 'triggers', icon: BoltIcon, title: t('tabs.triggers'), badge: armedCount || undefined },
-    { id: 'signals', icon: SignalIcon, title: t('tabs.signals'), hideInPreview: true },
-    { id: 'events', icon: Cog6ToothIcon, title: t('tabs.events'), badge: events.length || undefined, hideInPreview: true },
-  ];
-
-  const tabs = isPreview ? allTabs.filter((tab) => !tab.hideInPreview) : allTabs;
+  // Drawer pills — replaces old tab bar
+  const drawerPills: Array<{ id: DirectorDrawerType; icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; label: string; badge?: number; hideInPreview?: boolean }> = [
+    { id: 'time', icon: ClockIcon, label: t('tabs.time') },
+    { id: 'artifacts', icon: ArchiveBoxIcon, label: t('tabs.artifacts'), badge: artifacts.length || undefined },
+    { id: 'triggers', icon: BoltIcon, label: t('tabs.triggers'), badge: armedCount || undefined },
+    { id: 'signals', icon: SignalIcon, label: t('tabs.signals'), badge: unhandledSignalCount || undefined, hideInPreview: true },
+    { id: 'events', icon: Cog6ToothIcon, label: t('tabs.events'), badge: events.length || undefined, hideInPreview: true },
+  ].filter(pill => !isPreview || !pill.hideInPreview);
 
   return (
-    <div className={cn('flex flex-col h-full bg-background', className)}>
+    <div className={cn('flex flex-col h-full bg-background relative', className)}>
       {/* ================================================================= */}
-      {/* HEADER                                                            */}
+      {/* TOP AREA — header + NowSummaryRow + ChipLane (SSoT ordering)     */}
+      {/* ================================================================= */}
+      <PlayTopArea
+        header={
+          <PlayHeader
+            title={title}
+            onBack={onClose}
+            backLabel={tShared('header.backToLobby')}
+            connectionState={(connectionState || 'connected') as 'connected' | 'degraded' | 'offline'}
+            sessionStatus={status}
+            statusLabels={{
+              live: tShared('status.active'),
+              paused: tShared('status.paused'),
+              statusLabel: tShared(`status.${status}` as 'status.draft' | 'status.lobby' | 'status.active' | 'status.paused' | 'status.locked' | 'status.ended'),
+              degraded: tShared('connection.degraded'),
+              offline: tShared('connection.offline'),
+            }}
+            bgTintClass={statusConfig.bgTintClass}
+            isFullscreen={isFullscreen}
+            showFullscreenButton={showFullscreenButton}
+            onToggleFullscreen={onToggleFullscreen}
+            rightSlot={
+              <>
+                {!isPreview && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <UserGroupIcon className="h-3.5 w-3.5" />
+                    <span className="font-medium">{participantCount}</span>
+                  </div>
+                )}
+                {isPreview && (
+                  <Badge variant="secondary" size="sm" className="uppercase tracking-wider text-[10px]">
+                    {tShared('header.preview')}
+                  </Badge>
+                )}
+              </>
+            }
+          />
+        }
+      >
+        {/* NowSummaryRow — glanceable session status */}
+        {!isPreview && (
+          <NowSummaryRow
+            stepNumber={currentStepIndex + 1}
+            totalSteps={steps.length}
+            stepTitle={currentStep?.title ?? ''}
+            plannedMinutes={currentStep?.durationMinutes ?? undefined}
+            stepStartedAt={stepStartTimes.get(currentStepIndex)}
+            timerPaused={timeBankPaused}
+            unhandledSignals={unhandledSignalCount}
+            labels={{
+              step: t('nowRow.step'),
+              live: t('nowRow.live'),
+              paused: t('nowRow.paused'),
+            }}
+          />
+        )}
+
+        {/* DirectorChipLane — host-side system cues */}
+        {directorChipLabels && (
+          <DirectorChipLane
+            chips={directorChips}
+            labels={directorChipLabels}
+            onChipClick={(chip) => {
+              onDirectorChipClick?.(chip);
+              if (chip.type === 'SIGNAL_RECEIVED') {
+                setActiveDrawer('signals');
+              }
+            }}
+          />
+        )}
+      </PlayTopArea>
+
+      {/* ================================================================= */}
+      {/* STAGE — always-visible primary surface                            */}
       {/* ================================================================= */}
       <div className={cn(
-        'flex items-center justify-between px-5 py-4 border-b transition-colors',
-        statusConfig.bgClass
+        'flex-1 overflow-y-auto p-5 transition-opacity duration-200',
+        activeDrawer && 'opacity-30 pointer-events-none',
       )}>
-        <div className="flex items-center gap-4 min-w-0">
-          <Button variant="ghost" size="sm" onClick={onClose} className="h-10 w-10 p-0 shrink-0">
-            <ArrowLeftIcon className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-bold text-foreground truncate">{title}</h1>
+        <DirectorStagePanel
+          steps={steps}
+          currentStepIndex={currentStepIndex}
+          phases={phases}
+          currentPhaseIndex={currentPhaseIndex}
+          onNextStep={onNextStep}
+          onPreviousStep={onPreviousStep}
+          disabled={isPreview}
+          swipeRef={swipeRef}
+          t={t}
+        />
+
+        {/* Signal strip — latest signal at-a-glance (inside stage scroll) */}
+        {!isPreview && !activeDrawer && (
+          <SignalStrip
+            events={events}
+            handledSignalIds={handledSignalIds}
+            onOpenSignals={handleOpenSignal}
+            t={t}
+          />
+        )}
+      </div>
+
+      {/* ================================================================= */}
+      {/* ACTION STRIP — drawer pills + quick actions                       */}
+      {/* ================================================================= */}
+      <div
+        className="shrink-0 border-t bg-muted/30 px-4 py-3"
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+      >
+        {/* Drawer pills */}
+        <div className="flex gap-1.5 justify-center max-w-xl mx-auto mb-2 overflow-x-auto">
+          {drawerPills.map((pill) => (
+            <button
+              key={pill.id}
+              onClick={() => toggleDrawer(pill.id)}
+              className={cn(
+                'flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border whitespace-nowrap',
+                activeDrawer === pill.id
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-muted-foreground border-border/50 hover:bg-muted',
+              )}
+            >
+              <pill.icon className="h-3.5 w-3.5" />
+              {pill.label}
+              {pill.badge !== undefined && pill.badge > 0 && (
+                <span className="ml-0.5 inline-flex min-w-4 items-center justify-center rounded-full bg-primary/20 text-primary text-[9px] font-bold px-1">
+                  {pill.badge}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
 
-        <div className="flex items-center gap-4 shrink-0">
-          {/* Participant count (hidden in preview) */}
-          {!isPreview && (
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <UserGroupIcon className="h-4 w-4" />
-              <span className="font-medium">{t('header.participants', { count: participantCount })}</span>
-            </div>
-          )}
-          {/* Fullscreen toggle */}
-          {showFullscreenButton && !isFullscreen && onToggleFullscreen && (
-            <Button variant="ghost" size="sm" onClick={onToggleFullscreen}
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-              title={t('header.fullscreen')}>
-              <ArrowsPointingOutIcon className="h-4 w-4" />
+        {/* Quick actions */}
+        {!isPreview && (
+          <div className="flex items-center justify-center gap-2 max-w-xl mx-auto">
+            <Button variant="outline" size="sm" className="flex-1 h-10 text-xs gap-1.5"
+              onClick={() => onSendSignal?.('hint', { message: t('quickActions.giveHint') })}>
+              <LightBulbIcon className="h-4 w-4" />
+              {t('quickActions.giveHint')}
             </Button>
-          )}
-          {/* Preview badge */}
-          {isPreview && (
-            <Badge variant="secondary" size="sm" className="uppercase tracking-wider">
-              {t('header.preview')}
-            </Badge>
-          )}
-          {/* Status indicator */}
-          <div className={cn('flex items-center gap-2 text-sm font-bold uppercase tracking-wider', statusConfig.textClass)}>
-            <span className={cn('h-2.5 w-2.5 rounded-full shrink-0', statusConfig.dotClass, statusConfig.animate && 'animate-pulse')} />
-            {statusConfig.label}
+            <Button variant="outline" size="sm" className="flex-1 h-10 text-xs gap-1.5"
+              onClick={onOpenChat}>
+              <BookOpenIcon className="h-4 w-4" />
+              {t('quickActions.story')}
+            </Button>
+            <Button variant={resetConfirmPending ? 'destructive' : 'outline'} size="sm"
+              className="flex-1 h-10 text-xs gap-1.5" onClick={onResetClick}>
+              <ArrowPathIcon className="h-4 w-4" />
+              {resetConfirmPending ? t('quickActions.confirmReset') : t('quickActions.reset')}
+            </Button>
+            <Button variant="outline" size="sm" className="flex-1 h-10 text-xs gap-1.5 relative"
+              onClick={onOpenChat}>
+              <ChatBubbleLeftRightIcon className="h-4 w-4" />
+              {t('quickActions.message')}
+              {chatUnreadCount > 0 && (
+                <Badge variant="destructive" size="sm"
+                  className="absolute -top-2 -right-1 min-w-[18px] h-[18px] text-[10px]">
+                  {chatUnreadCount}
+                </Badge>
+              )}
+            </Button>
           </div>
-        </div>
+        )}
       </div>
 
       {/* ================================================================= */}
-      {/* TABS                                                              */}
+      {/* DRAWER OVERLAY — responsive: sheet on mobile, modal on desktop    */}
       {/* ================================================================= */}
-      <div className="flex border-b">
-        {tabs.map((tab, index) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            title={`${tab.title} (${index + 1})`}
-            className={cn(
-              'flex-1 flex items-center justify-center gap-1 py-3.5 transition-colors relative',
-              activeTab === tab.id
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            <tab.icon className="h-5 w-5" />
-            {tab.badge !== undefined && tab.badge > 0 && (
-              <Badge variant="default" size="sm" className="absolute -top-0.5 right-1/4 min-w-[18px] h-[18px] text-[10px]">
-                {tab.badge}
-              </Badge>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* ================================================================= */}
-      {/* CONTENT                                                           */}
-      {/* ================================================================= */}
-      <div className="flex-1 overflow-y-auto p-5">
-        {activeTab === 'play' && (
-          <div className="space-y-6 max-w-xl mx-auto">
-            <StepNavigation
-              steps={steps}
-              currentIndex={currentStepIndex}
-              onNext={onNextStep}
-              onPrevious={onPreviousStep}
-              t={t}
-              swipeRef={swipeRef}
-              disabled={isPreview}
-            />
-            <LeaderScriptPanel script={currentStep?.leaderScript} />
-          </div>
+      <DrawerOverlay
+        open={activeDrawer != null}
+        onClose={() => setActiveDrawer(null)}
+        size="lg"
+      >
+        {activeDrawer === 'time' && (
+          <TimeBankTab
+            balance={timeBankBalance}
+            paused={timeBankPaused}
+            onDelta={onTimeBankDelta}
+            steps={steps}
+            currentStepIndex={currentStepIndex}
+            stepStartTimes={stepStartTimes}
+            t={t}
+            disabled={isPreview}
+          />
         )}
-
-        {activeTab === 'time' && (
-          <div className="max-w-xl mx-auto">
-            <TimeBankTab
-              balance={timeBankBalance}
-              paused={timeBankPaused}
-              onDelta={onTimeBankDelta}
-              steps={steps}
-              currentStepIndex={currentStepIndex}
-              stepStartTimes={stepStartTimes}
-              t={t}
-              disabled={isPreview}
-            />
-          </div>
+        {activeDrawer === 'artifacts' && (
+          <ArtifactsTab artifacts={artifacts} artifactStates={artifactStates} t={t} />
         )}
-
-        {activeTab === 'artifacts' && (
-          <div className="max-w-xl mx-auto">
-            <ArtifactsTab artifacts={artifacts} artifactStates={artifactStates} t={t} />
-          </div>
+        {activeDrawer === 'triggers' && (
+          <TriggerPanel
+            triggers={triggers}
+            onFire={onFireTrigger}
+            onDisableAll={onDisableAllTriggers}
+            t={t}
+            disabled={isPreview}
+          />
         )}
-
-        {activeTab === 'triggers' && (
-          <div className="max-w-xl mx-auto">
-            <TriggerPanel
-              triggers={triggers}
-              onFire={onFireTrigger}
-              onDisableAll={onDisableAllTriggers}
-              t={t}
-              disabled={isPreview}
-            />
-          </div>
-        )}
-
-        {!isPreview && activeTab === 'signals' && (
-          <div className="max-w-xl mx-auto">
+        {activeDrawer === 'signals' && !isPreview && (
+          <div className="space-y-6">
+            <SignalInbox events={events} handledSignalIds={handledSignalIds} onMarkHandled={markSignalHandled} t={t} />
             <SignalQuickPanel
               recentSignals={recentSignals}
               presets={signalPresets}
@@ -981,49 +1059,10 @@ export function DirectorModePanel({
             />
           </div>
         )}
-
-        {!isPreview && activeTab === 'events' && (
-          <div className="max-w-xl mx-auto">
-            <EventFeed events={events} t={t} />
-          </div>
+        {activeDrawer === 'events' && !isPreview && (
+          <EventFeed events={events} t={t} />
         )}
-      </div>
-
-      {/* ================================================================= */}
-      {/* FOOTER — hidden in preview, shown in live session                 */}
-      {/* ================================================================= */}
-      {!isPreview && (
-        <div className="border-t bg-muted/30 px-5 py-4">
-          <div className="flex items-center justify-center gap-3 max-w-xl mx-auto">
-            <Button variant="outline" size="lg" className="flex-1 h-12 text-sm gap-2"
-              onClick={() => onSendSignal?.('hint', { message: t('quickActions.giveHint') })}>
-              <LightBulbIcon className="h-5 w-5" />
-              {t('quickActions.giveHint')}
-            </Button>
-            <Button variant="outline" size="lg" className="flex-1 h-12 text-sm gap-2"
-              onClick={onOpenChat}>
-              <BookOpenIcon className="h-5 w-5" />
-              {t('quickActions.story')}
-            </Button>
-            <Button variant={resetConfirmPending ? 'destructive' : 'outline'} size="lg"
-              className="flex-1 h-12 text-sm gap-2" onClick={onResetClick}>
-              <ArrowPathIcon className="h-5 w-5" />
-              {resetConfirmPending ? t('quickActions.confirmReset') : t('quickActions.reset')}
-            </Button>
-            <Button variant="outline" size="lg" className="flex-1 h-12 text-sm gap-2 relative"
-              onClick={onOpenChat}>
-              <ChatBubbleLeftRightIcon className="h-5 w-5" />
-              {t('quickActions.message')}
-              {chatUnreadCount > 0 && (
-                <Badge variant="destructive" size="sm"
-                  className="absolute -top-2 -right-1 min-w-[20px] h-[20px] text-[10px]">
-                  {chatUnreadCount}
-                </Badge>
-              )}
-            </Button>
-          </div>
-        </div>
-      )}
+      </DrawerOverlay>
     </div>
   );
 }

@@ -66,6 +66,13 @@ export function ParticipantSignalMicroUI({
   const t = useTranslations('play.participantSignalMicroUI');
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  // Tracks which channel just sent (for brief flash effect)
+  const [lastSentChannel, setLastSentChannel] = useState<string | null>(null);
+  const sentTimerRef = useRef<number | null>(null);
+  // Per-channel cooldown to prevent mash-tapping (800–1200ms jitter)
+  const cooldownUntilRef = useRef<Record<string, number>>({});
+  // Render-safe cooldown state: tracks which channels are currently cooling down
+  const [cooldownChannels, setCooldownChannels] = useState<Set<string>>(new Set());
 
   const queueKey = useMemo(() => makeQueueKey(sessionId, participantToken), [sessionId, participantToken]);
   const [queue, setQueue] = useState<QueuedSignal[]>(() => {
@@ -128,6 +135,27 @@ export function ParticipantSignalMicroUI({
   const handleTap = useCallback(async (channel: string) => {
     if (disabled || sending) return;
 
+    // Per-channel cooldown: 800–1200ms jitter to prevent mash-tapping
+    const now = Date.now();
+    const cooldownEnd = cooldownUntilRef.current[channel] ?? 0;
+    if (now < cooldownEnd) return; // still in cooldown — no send
+    const jitter = 800 + Math.floor(Math.random() * 400); // 800–1200ms
+    cooldownUntilRef.current[channel] = now + jitter;
+    // Set render-safe cooldown state + schedule clear
+    setCooldownChannels((prev) => new Set([...prev, channel]));
+    setTimeout(() => {
+      setCooldownChannels((prev) => {
+        const next = new Set(prev);
+        next.delete(channel);
+        return next;
+      });
+    }, jitter);
+
+    // Haptic feedback — gentle 50ms vibration on supported devices
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try { navigator.vibrate(50); } catch { /* best-effort */ }
+    }
+
     const item: QueuedSignal = {
       id: (typeof crypto !== 'undefined' && 'randomUUID' in crypto) ? crypto.randomUUID() : String(Date.now()),
       channel,
@@ -139,6 +167,11 @@ export function ParticipantSignalMicroUI({
     if (!ok) {
       enqueue(item);
       setError(null);
+    } else {
+      // Brief "sent" flash for immediate local feedback
+      setLastSentChannel(channel);
+      if (sentTimerRef.current) window.clearTimeout(sentTimerRef.current);
+      sentTimerRef.current = window.setTimeout(() => setLastSentChannel(null), 800);
     }
   }, [disabled, sending, sendNow, enqueue]);
 
@@ -196,16 +229,30 @@ export function ParticipantSignalMicroUI({
       {error && <div className="mt-2 text-sm text-destructive">{error}</div>}
 
       <div className="mt-3 grid grid-cols-3 gap-2">
-        {buttons.map((b) => (
-          <Button
-            key={b.channel}
-            type="button"
-            onClick={() => void handleTap(b.channel)}
-            disabled={disabled || sending}
-          >
-            {t(`buttons.${b.labelKey}` as Parameters<typeof t>[0])}
-          </Button>
-        ))}
+        {buttons.map((b) => {
+          const isSent = lastSentChannel === b.channel;
+          const isQueued = queue.some((q) => q.channel === b.channel);
+          const isCooling = cooldownChannels.has(b.channel) && !isSent;
+          return (
+            <Button
+              key={b.channel}
+              type="button"
+              onClick={() => void handleTap(b.channel)}
+              disabled={disabled || sending || isCooling}
+              variant={isSent ? 'default' : 'outline'}
+              className={`relative transition-all duration-200 ${isSent ? 'scale-95' : ''}`}
+              title={isCooling ? t('cooldownHint') : undefined}
+            >
+              {isSent ? '✓' : isCooling ? '…' : t(`buttons.${b.labelKey}` as Parameters<typeof t>[0])}
+              {isQueued && !isSent && !isCooling && (
+                <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500" />
+                </span>
+              )}
+            </Button>
+          );
+        })}
       </div>
 
       {queue.length > 0 && (

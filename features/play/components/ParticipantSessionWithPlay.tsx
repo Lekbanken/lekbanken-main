@@ -28,9 +28,10 @@ import {
 } from '@/components/play';
 import { ParticipantPlayMode } from './ParticipantPlayMode';
 import { ParticipantLobby } from './ParticipantLobby';
-import { ActiveSessionShell } from './ActiveSessionShell';
+import { ParticipantFullscreenShell } from './ParticipantFullscreenShell';
 import { SessionChatModal } from '@/features/play/components/SessionChatModal';
 import { useSessionChat } from '@/features/play/hooks/useSessionChat';
+import type { ConnectionState } from '@/features/play/components/shared/play-types';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -62,7 +63,6 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   // 3-state connection model: connected / degraded / offline
-  type ConnectionState = 'connected' | 'degraded' | 'offline';
   type DegradedReason = 'auth' | 'not-found' | 'temporary' | null;
   const [connectionState, setConnectionState] = useState<ConnectionState>('connected');
   const [degradedReason, setDegradedReason] = useState<DegradedReason>(null);
@@ -286,7 +286,6 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
   // -----------------------------------------------------------------------
   useEffect(() => {
     mountedRef.current = true;
-    let heartbeatTimer: ReturnType<typeof setInterval>;
     let stopped = false;
 
     const clearPollTimer = () => {
@@ -317,7 +316,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       if (!stopped) schedulePoll();
     });
 
-    heartbeatTimer = setInterval(() => void sendHeartbeat(), HEARTBEAT_INTERVAL);
+    const heartbeatTimer = setInterval(() => void sendHeartbeat(), HEARTBEAT_INTERVAL);
 
     // Pause polling when tab is hidden, resume immediately when visible.
     // Guard: only resume if no timer is already pending and no request in-flight.
@@ -791,13 +790,27 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       )}
 
       {shouldRenderActiveSessionShell && token && (
-        <ActiveSessionShell
-          role="participant"
+        <ParticipantFullscreenShell
           open
           title={session?.displayName ?? t('activeSession')}
           onRequestClose={() => setActiveSessionOpen(false)}
+          connectionState={connectionState}
+          sessionStatus={(session?.status as 'active' | 'paused' | 'locked' | 'ended') ?? 'active'}
           chatUnreadCount={chat.unreadCount}
           onOpenChat={() => setChatOpen(true)}
+          overlaySlot={
+            chatOpen ? (
+              <SessionChatModal
+                open={chatOpen}
+                onClose={() => setChatOpen(false)}
+                role="participant"
+                messages={chat.messages}
+                error={chat.error}
+                sending={chat.sending}
+                onSend={chat.send}
+              />
+            ) : null
+          }
         >
           <ReconnectingBanner
             isReconnecting={isReconnecting}
@@ -811,17 +824,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
             participantToken={token}
             showRole={true}
           />
-
-          <SessionChatModal
-            open={chatOpen}
-            onClose={() => setChatOpen(false)}
-            role="participant"
-            messages={chat.messages}
-            error={chat.error}
-            sending={chat.sending}
-            onSend={chat.send}
-          />
-        </ActiveSessionShell>
+        </ParticipantFullscreenShell>
       )}
     </div>
   );

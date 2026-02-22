@@ -42,7 +42,7 @@
  * 38. SSoT Header — StatusPill + PlayHeader + LeaderScriptSections
  * 39. SSoT Guardrails — canonical types, no duplicate mapping, role-assignment boundary
  *
- * Contract: PLAY_UI_CONTRACT.md (rules 1–12, enforced by tests 39j–39p)
+ * Contract: PLAY_UI_CONTRACT.md (rules 1–12, enforced by tests 39j–39q)
  *
  * Run: npx vitest run tests/play/interaction-lock.test.ts
  */
@@ -3231,5 +3231,27 @@ describe('SSoT Guardrails', () => {
     // Ban old padding patterns in those same files' stage containers
     // (px-4 py-4 or sm:px-6 were the old Participant values)
     expect(partSrc).not.toMatch(/overflow-y-auto[\s\S]{0,40}(?:px-4|py-4|sm:px-6)/);
+  });
+
+  // 39q. Separator policy: chrome files must not use divide-y or lg:border (only border-b)
+  // ---------------------------------------------------------------------------
+  it('Chrome files use border-b only — no divide-y or lg:border in separators', async () => {
+    const fs = await import('fs');
+    const chromeFiles = [
+      'features/play/components/shared/PlayTopArea.tsx',
+      'features/play/components/shared/PlayHeader.tsx',
+      'features/play/components/shared/NowSummaryRow.tsx',
+      'features/play/components/ParticipantFullscreenShell.tsx',
+    ];
+    for (const file of chromeFiles) {
+      if (!fs.existsSync(file)) continue;
+      const src = fs.readFileSync(file, 'utf-8');
+      // Strip comment lines to avoid false positives from docs/deprecation notes
+      const code = src.split('\n').filter(l => !l.trimStart().startsWith('//')).join('\n');
+      // Ban divide-y (alternative separator system)
+      expect(code).not.toMatch(/\bdivide-y\b/);
+      // Ban lg:border that isn't lg:border-b (outer boundary in separator context)
+      expect(code).not.toMatch(/lg:border(?!-b)/);
+    }
   });
 });

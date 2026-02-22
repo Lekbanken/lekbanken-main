@@ -20,7 +20,7 @@ This file defines layout ownership boundaries. It is not descriptive documentati
 | 1 | **PlaySurface is the only desktop border owner.** Only `PlaySurface` may apply `lg:border`, `lg:rounded-2xl`, or `lg:bg-background` within `features/play/`. | 39k |
 | 2 | **PlayHeader must never define an outer boundary.** It may use `border-b` (separator) but must never use `lg:border`. | 39j |
 | 3 | Both Director and Participant shells must render `<PlaySurface className="lg:shadow-xl">`. | 39k |
-| 4 | **Separator policy:** Inside `PlaySurface`, stacking separators must use `border-b` only. No `border`, `lg:border`, `divide-y`, or mixed boundary patterns in Header/TopArea sections. | convention |
+| 4 | **Separator policy:** Inside `PlaySurface`, stacking separators must use `border-b` only. No `border`, `lg:border`, `divide-y`, or mixed boundary patterns in Header/TopArea sections. | 39q |
 
 ---
 
@@ -29,7 +29,7 @@ This file defines layout ownership boundaries. It is not descriptive documentati
 | # | Constraint | Guardrail |
 |---|-----------|-----------|
 | 5 | **DrawerOverlay owns drawer chrome.** Title row and close button must be rendered by `DrawerOverlay`. Drawer children render content only (may include refresh buttons). | 39l, 39o |
-| 6 | **Pill label === drawer title.** The `DrawerOverlay.title` must reuse the same i18n key/label as the activating pill. Separate "drawer-only" title keys are forbidden. | 39l, 39n |
+| 6 | **Pill label === drawer title.** The `DrawerOverlay.title` must reuse the same i18n key/label as the activating pill. Separate "drawer-only" title keys are forbidden. No runtime string composition (e.g. `My ${label}`) — must be a direct `t('header.*')` result. | 39l, 39n |
 
 ---
 
@@ -65,3 +65,11 @@ This file defines layout ownership boundaries. It is not descriptive documentati
 1. Add the rule to this file with a clear "Guardrail" reference.
 2. Add a matching `it(...)` in `tests/play/interaction-lock.test.ts` under "SSoT Guardrails".
 3. Run `npx vitest run tests/play/interaction-lock.test.ts` to verify.
+
+---
+
+## Scope
+
+- Applies to code under `features/play/` and shared chrome in `features/play/components/shared/`.
+- Legacy host paths outside `features/play/` may violate until migration completes.
+- External systems (Vercel env vars, CI secrets) must be updated manually when flag names change.

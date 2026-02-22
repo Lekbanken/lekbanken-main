@@ -8,7 +8,7 @@ Violations must either:
 
 This file defines layout ownership boundaries. It is not descriptive documentation.
 
-> Enforced by tests **39j – 39p** in `tests/play/interaction-lock.test.ts`.
+> Enforced by tests **39j – 39q** in `tests/play/interaction-lock.test.ts`.
 > Adding a new guardrail requires updating this document.
 
 ---

@@ -27,7 +27,8 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 async function nextSeq(sessionId: string): Promise<number> {
   try {
     const supabase = await createServiceRoleClient();
-    const { data, error } = await supabase.rpc('increment_broadcast_seq', {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- RPC added by migration, not yet in generated types
+    const { data, error } = await supabase.rpc('increment_broadcast_seq' as any, {
       p_session_id: sessionId,
     });
     if (error) {

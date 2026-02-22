@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useEffect, useCallback, useState, useMemo } from 'react';
+import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useLatestRef } from '@/hooks/useLatestRef';
 import type { RealtimeChannel } from '@supabase/supabase-js';

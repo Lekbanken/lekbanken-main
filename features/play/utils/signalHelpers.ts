@@ -70,7 +70,12 @@ export function countUnhandledSignals<T extends SignalEventLike>(
  * Fallback chain for channel:
  * 1. payload.channel (server audit events & fixed client emitter)
  * 2. payload.targetName (legacy client events via SessionCockpit mapping)
- * 3. evt.type (absolute fallback)
+ * 3. payload.signal_channel (defensive: inner broadcast field)
+ * 4. evt.type stripped of event-type prefix ("signal_sent" → "signal_sent")
+ *
+ * If all fallbacks resolve to a raw event type (contains underscore + known
+ * prefix), return 'unknown' so the UI never renders raw event names
+ * (Hard Rule 1 from SIGNALS_SPEC.md).
  *
  * Direction is resolved from actorType on the event (host → outgoing,
  * participant → incoming, trigger/system → system).  Falls back to the
@@ -90,10 +95,23 @@ export function extractSignalMeta(evt: SignalEventLike): {
   severity: SignalSeverity;
   actorType: string | undefined;
 } {
-  const channel =
+  const rawChannel =
     (evt.payload?.channel as string) ??
     (evt.payload?.targetName as string) ??
+    (evt.payload?.signal_channel as string) ??
     evt.type;
+
+  // Hard Rule 1: never expose raw event type strings in the UI.
+  // If the channel resolved to a raw event type, map to 'unknown'.
+  const fellBackToUnknown = /^signal_(sent|received)$/i.test(rawChannel);
+  if (fellBackToUnknown && process.env.NODE_ENV === 'development') {
+    console.debug('[signals] Channel missing, fell back to unknown', {
+      evtType: evt.type,
+      rawChannel,
+      payloadKeys: evt.payload ? Object.keys(evt.payload) : [],
+    });
+  }
+  const channel = fellBackToUnknown ? 'unknown' : rawChannel;
 
   return {
     channel,
@@ -102,7 +120,7 @@ export function extractSignalMeta(evt: SignalEventLike): {
       (evt.payload?.participant_name as string) ??
       (evt.payload?.sender as string),
     message: evt.payload?.message as string | undefined,
-    direction: resolveSignalDirection(channel, evt.actorType),
+    direction: resolveSignalDirection(channel, evt.actorType, evt.payload),
     severity: getSignalSeverity(channel),
     actorType: evt.actorType,
   };
@@ -128,6 +146,7 @@ const CHANNEL_KEY_MAP: Record<string, string> = {
   ready: 'ready',
   found: 'found',
   sos: 'sos',
+  unknown: 'unknown',
 };
 
 /**

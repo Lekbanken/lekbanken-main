@@ -128,18 +128,23 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return jsonError('Failed to send signal', 500);
   }
 
-  // Audit: insert session_events row (best-effort)
+  // Audit: insert session_events row (best-effort, V2 schema)
   try {
     await service.from('session_events').insert({
       session_id: sessionId,
       event_type: 'signal_sent',
-      event_data: {
+      event_category: 'signal',
+      actor_type: sender.type === 'host' ? 'host' : 'participant',
+      actor_id: sender.type === 'host' ? sender.userId : sender.participantId,
+      target_type: 'signal',
+      target_id: inserted.id,
+      target_name: inserted.channel,
+      payload: {
         signal_id: inserted.id,
         channel: inserted.channel,
         payload: inserted.payload,
       },
-      actor_user_id: sender.type === 'host' ? sender.userId : null,
-      actor_participant_id: sender.type === 'participant' ? sender.participantId : null,
+      severity: 'info',
     });
   } catch (e) {
     console.warn('[signals] session_events insert failed', e);

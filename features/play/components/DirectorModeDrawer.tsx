@@ -39,7 +39,7 @@ import { DirectorModePanel } from './DirectorModePanel';
 import { PlaySurface } from './shared/PlaySurface';
 import { useDirectorChips } from './DirectorChipLane';
 import type { DirectorChipType } from './DirectorChipLane';
-import { getSignalChannelLabel } from '@/features/play/utils/signalHelpers';
+import { extractSignalMeta, getSignalChannelLabel, type SignalEventLike } from '@/features/play/utils/signalHelpers';
 
 // =============================================================================
 // Types
@@ -250,6 +250,14 @@ export function DirectorModeDrawer({
   const { chips: directorChips, pushChip: pushDirectorChip } = useDirectorChips();
   const prevEventsLenRef = useRef(events.length);
 
+  // Wrap onSendSignal to push an immediate confirmation chip for the director.
+  // The audit event chip (from the events-watcher below) is deduped by useDirectorChips.
+  const handleSendSignal = useCallback((channel: string, payload: unknown) => {
+    const label = getSignalChannelLabel(channel, (k) => t(`signalInbox.${k}`));
+    pushDirectorChip('SIGNAL_RECEIVED', label);
+    onSendSignal(channel, payload);
+  }, [onSendSignal, pushDirectorChip, t]);
+
   // Watch for new events → push chips (single source of truth — events array)
   // NOTE: recentSignals watcher removed to prevent duplicate SIGNAL_RECEIVED chips.
   // Signal events already appear in the events array via realtime broadcast.
@@ -261,8 +269,8 @@ export function DirectorModeDrawer({
       const newEvents = events.slice(0, events.length - prevLen);
       for (const evt of newEvents) {
         if (evt.type.includes('signal')) {
-          const raw = (evt.payload?.channel as string) ?? evt.type;
-          const label = getSignalChannelLabel(raw, (k) => t(`signalInbox.${k}`));
+          const { channel } = extractSignalMeta(evt as SignalEventLike);
+          const label = getSignalChannelLabel(channel, (k) => t(`signalInbox.${k}`));
           pushDirectorChip('SIGNAL_RECEIVED', label);
         } else if (evt.type.includes('trigger') && evt.type.includes('fire')) {
           pushDirectorChip('TRIGGER_FIRED');
@@ -453,7 +461,7 @@ export function DirectorModeDrawer({
           onPreviousStep={onPreviousStep}
           onFireTrigger={handleFireTrigger}
           onDisableAllTriggers={onDisableAllTriggers}
-          onSendSignal={onSendSignal}
+          onSendSignal={handleSendSignal}
           onExecuteSignal={onExecuteSignal}
           onTimeBankDelta={onTimeBankDelta}
           onOpenChat={onOpenChat}

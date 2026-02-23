@@ -11539,7 +11539,8 @@
           "flash": "Flash",
           "ready": "Ready",
           "found": "Found",
-          "sos": "SOS"
+          "sos": "SOS",
+          "unknown": "Signal"
         },
         "direction": {
           "incoming": "{channel} from {sender}",
@@ -11547,6 +11548,22 @@
           "outgoing": "You sent {channel}",
           "outgoingCount": "You sent {channel} → {count} participants",
           "system": "{channel} (system)"
+        },
+        "timeGroup": {
+          "recent": "Last 5 min",
+          "today": "Today",
+          "earlier": "Earlier"
+        },
+        "filter": {
+          "incoming": "Incoming",
+          "outgoing": "Outgoing",
+          "urgent": "Urgent"
+        },
+        "filterEmpty": {
+          "incoming": "No incoming signals",
+          "outgoing": "No outgoing signals",
+          "urgent": "No urgent signals",
+          "combo": "No signals match filter"
         }
       }
     },

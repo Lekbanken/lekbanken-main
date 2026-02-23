@@ -194,6 +194,12 @@ export function useLiveSession({
   
   // Sequence guard — reject duplicate/stale events (server-attached seq)
   const lastSeqRef = useRef(0);
+
+  // Signal dedupe — LRU set of recently seen signal IDs.
+  // Protects against duplicate toasts on reconnect/resubscribe where the
+  // same signal_received broadcast may be replayed.  Capped at 50 entries.
+  const SIGNAL_DEDUPE_LIMIT = 50;
+  const seenSignalIdsRef = useRef<Set<string>>(new Set());
   
   // Handle incoming broadcast event — stable identity (no callback deps)
   const handleBroadcastEvent = useCallback((event: PlayBroadcastEvent) => {
@@ -334,6 +340,30 @@ export function useLiveSession({
 
       case 'signal_received': {
         const payload = (event as SignalReceivedBroadcast).payload;
+        // Dedupe key: `payload.id` is the DB-backed session_signals UUID —
+        // stable and unique.  For future client-only broadcasts that may lack
+        // a DB id, fall back to inner-payload fields before giving up.
+        const innerPayload = payload.payload as Record<string, unknown> | undefined;
+        const rawKey =
+          payload.id ??
+          (innerPayload?.client_event_id as string | undefined);
+        // Guard: only use the key if it's a non-empty string
+        const dedupeKey = typeof rawKey === 'string' && rawKey.length > 0 ? rawKey : undefined;
+        // LRU dedupe — drop if we've already seen this key
+        if (dedupeKey && seenSignalIdsRef.current.has(dedupeKey)) {
+          if (process.env.NODE_ENV === 'development') {
+            console.debug('[useLiveSession] Dropping duplicate signal_received key=%s', dedupeKey);
+          }
+          break;
+        }
+        if (dedupeKey) {
+          seenSignalIdsRef.current.add(dedupeKey);
+          // Evict oldest entries when exceeding limit
+          if (seenSignalIdsRef.current.size > SIGNAL_DEDUPE_LIMIT) {
+            const first = seenSignalIdsRef.current.values().next().value;
+            if (first) seenSignalIdsRef.current.delete(first);
+          }
+        }
         onSignalReceivedRef.current?.(payload);
         break;
       }

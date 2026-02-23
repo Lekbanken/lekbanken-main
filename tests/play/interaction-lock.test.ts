@@ -2582,11 +2582,12 @@ describe('Shared Utils — signalHelpers', () => {
     expect(meta.message).toBe('Help!');
   });
 
-  it('extractSignalMeta falls back to type when no channel', async () => {
+  it('extractSignalMeta falls back to unknown when no channel (Hard Rule 1)', async () => {
     const { extractSignalMeta } = await import('@/features/play/utils/signalHelpers');
     const evt = { id: 'e1', type: 'signal_sent', timestamp: '2026-01-10T12:00:00Z', payload: {} as Record<string, unknown> };
     const meta = extractSignalMeta(evt);
-    expect(meta.channel).toBe('signal_sent');
+    // Hard Rule 1: raw event types like signal_sent / signal_received must never leak to UI
+    expect(meta.channel).toBe('unknown');
     expect(meta.sender).toBeUndefined();
     expect(meta.message).toBeUndefined();
   });

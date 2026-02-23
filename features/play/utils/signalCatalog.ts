@@ -141,21 +141,28 @@ export function getSignalSeverity(channel: string): SignalSeverity {
 /**
  * Determine signal direction from the perspective of the Director.
  *
- * - actor is 'host'        → outgoing (Director sent it)
- * - actor is 'participant'  → incoming (Participant sent it)
- * - actor is 'trigger'/'system' → system
- *
- * Falls back to the catalog's `origin` hint when actorType is unavailable.
+ * Resolution priority (avoids false attribution for trigger/system signals):
+ *   1. actorType on the event (host / participant / trigger / system)
+ *   2. payload sender fields (sender_user_id → host, sender_participant_id → participant)
+ *   3. catalog origin hint (last resort)
  */
 export function resolveSignalDirection(
   channel: string,
   actorType?: string,
+  payload?: Record<string, unknown>,
 ): SignalDirection {
+  // Priority 1: explicit actorType
   if (actorType === 'host') return 'outgoing';
   if (actorType === 'participant') return 'incoming';
   if (actorType === 'trigger' || actorType === 'system') return 'system';
 
-  // Fallback: use catalog origin
+  // Priority 2: payload sender fields (from broadcast / DB row)
+  if (payload) {
+    if (payload.sender_user_id) return 'outgoing';
+    if (payload.sender_participant_id) return 'incoming';
+  }
+
+  // Priority 3: catalog origin (may mis-attribute trigger-generated signals)
   const entry = lookupSignal(channel);
   if (entry) {
     if (entry.origin === 'director') return 'outgoing';

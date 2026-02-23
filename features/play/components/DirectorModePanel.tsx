@@ -22,7 +22,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -652,6 +652,39 @@ function EventFeed({ events, t }: { events: SessionEvent[]; t: ReturnType<typeof
   );
 }
 
+/** Bucket signals into time groups for the inbox.
+ *  `now` should be a stable timestamp (via useMemo) to avoid groups
+ *  shuffling when a minute-boundary passes during a single render. */
+function groupSignalsByTime(
+  signals: SessionEvent[],
+  labels: { recent: string; today: string; earlier: string },
+  now: number,
+): Array<{ label: string; events: SessionEvent[] }> {
+  const fiveMinAgo = now - 5 * 60 * 1000;
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+  const todayMs = startOfToday.getTime();
+
+  const recent: SessionEvent[] = [];
+  const today: SessionEvent[] = [];
+  const earlier: SessionEvent[] = [];
+
+  for (const evt of signals) {
+    const ts = new Date(evt.timestamp).getTime();
+    // Guard against invalid / unparseable timestamps
+    if (Number.isNaN(ts)) { earlier.push(evt); continue; }
+    if (ts >= fiveMinAgo) recent.push(evt);
+    else if (ts >= todayMs) today.push(evt);
+    else earlier.push(evt);
+  }
+
+  const groups: Array<{ label: string; events: SessionEvent[] }> = [];
+  if (recent.length) groups.push({ label: labels.recent, events: recent });
+  if (today.length) groups.push({ label: labels.today, events: today });
+  if (earlier.length) groups.push({ label: labels.earlier, events: earlier });
+  return groups;
+}
+
 function SignalInbox({
   events,
   handledSignalIds,
@@ -669,6 +702,16 @@ function SignalInbox({
   // Deterministic sort — newest first, stable across reconnects
   const signalEvents = sortedSignalEvents(events).slice(0, 20);
 
+  // Stable `now` — only refreshes when the event list changes, prevents
+  // groups from shuffling when a minute-boundary passes mid-render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const stableNow = useMemo(() => Date.now(), [signalEvents.length]);
+
+  // Filter pills — local toggle state (all active by default)
+  const [showIncoming, setShowIncoming] = useState(true);
+  const [showOutgoing, setShowOutgoing] = useState(true);
+  const [showUrgent, setShowUrgent] = useState(false);
+
   if (signalEvents.length === 0) {
     return (
       <div className="text-center py-3">
@@ -677,13 +720,98 @@ function SignalInbox({
     );
   }
 
+  const timeGroups = groupSignalsByTime(signalEvents, {
+    recent: t('signalInbox.timeGroup.recent'),
+    today: t('signalInbox.timeGroup.today'),
+    earlier: t('signalInbox.timeGroup.earlier'),
+  }, stableNow);
+
+  // Apply direction / urgency filter after time grouping.
+  // Urgent is a *modifier*: it narrows the currently-visible directions
+  // to only urgent items.  Direction pills control which directions show.
+  const filteredGroups = timeGroups.map((group) => {
+    const filtered = group.events.filter((evt) => {
+      const { direction, severity } = extractSignalMeta(evt);
+      if (direction === 'incoming' && !showIncoming) return false;
+      if (direction === 'outgoing' && !showOutgoing) return false;
+      if (showUrgent && severity !== 'urgent') return false;
+      return true;
+    });
+    return { ...group, events: filtered };
+  }).filter((g) => g.events.length > 0);
+
+  // Determine which filter-specific empty message to show (if any)
+  const isFiltered = !showIncoming || !showOutgoing || showUrgent;
+  const filterEmptyKey: string | null = filteredGroups.length === 0 && isFiltered
+    ? showUrgent
+      ? 'signalInbox.filterEmpty.urgent'
+      : !showIncoming && showOutgoing
+        ? 'signalInbox.filterEmpty.incoming'
+        : showIncoming && !showOutgoing
+          ? 'signalInbox.filterEmpty.outgoing'
+          : 'signalInbox.filterEmpty.combo'
+    : null;
+
   return (
     <div className="space-y-2">
-      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-        {t('signalInbox.title')}
+      <div className="flex items-center justify-between">
+        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+          {t('signalInbox.title')}
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setShowIncoming((p) => !p)}
+            className={cn(
+              'text-[10px] px-1.5 py-0.5 rounded-full border transition-colors font-medium',
+              showIncoming
+                ? 'bg-orange-100 border-orange-300 text-orange-700 dark:bg-orange-950/40 dark:border-orange-700 dark:text-orange-300'
+                : 'bg-muted/40 border-border/50 text-muted-foreground hover:bg-muted/60',
+            )}
+          >
+            {t('signalInbox.filter.incoming')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowOutgoing((p) => !p)}
+            className={cn(
+              'text-[10px] px-1.5 py-0.5 rounded-full border transition-colors font-medium',
+              showOutgoing
+                ? 'bg-blue-100 border-blue-300 text-blue-700 dark:bg-blue-950/40 dark:border-blue-700 dark:text-blue-300'
+                : 'bg-muted/40 border-border/50 text-muted-foreground hover:bg-muted/60',
+            )}
+          >
+            {t('signalInbox.filter.outgoing')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowUrgent((p) => !p)}
+            className={cn(
+              'text-[10px] px-1.5 py-0.5 rounded-full border transition-colors font-medium',
+              showUrgent
+                ? 'bg-red-100 border-red-300 text-red-700 dark:bg-red-950/40 dark:border-red-700 dark:text-red-300'
+                : 'bg-muted/40 border-border/50 text-muted-foreground hover:bg-muted/60',
+            )}
+          >
+            {t('signalInbox.filter.urgent')}
+          </button>
+        </div>
       </div>
       <div className="space-y-1 max-h-[240px] overflow-y-auto">
-        {signalEvents.map((evt) => {
+        {filterEmptyKey && (
+          <div className="text-center py-3">
+            <div className="text-[10px] text-muted-foreground">{t(filterEmptyKey)}</div>
+          </div>
+        )}
+        {filteredGroups.map((group) => (
+          <div key={group.label}>
+            {/* Show section header only when there are multiple groups */}
+            {timeGroups.length > 1 && (
+              <div className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider px-2 pt-2 pb-0.5">
+                {group.label}
+              </div>
+            )}
+            {group.events.map((evt) => {
           const { channel, sender, message, direction, severity } = extractSignalMeta(evt);
           const channelLabel = getSignalChannelLabel(channel, (k) => t(`signalInbox.${k}`));
           const directionLabel = getSignalDirectionLabel(
@@ -755,6 +883,8 @@ function SignalInbox({
             </div>
           );
         })}
+          </div>
+        ))}
       </div>
     </div>
   );

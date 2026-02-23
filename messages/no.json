@@ -11867,7 +11867,8 @@
           "flash": "Blink",
           "ready": "Klar",
           "found": "Funnet",
-          "sos": "SOS"
+          "sos": "SOS",
+          "unknown": "Signal"
         },
         "direction": {
           "incoming": "{channel} fra {sender}",
@@ -11875,6 +11876,22 @@
           "outgoing": "Du sendte {channel}",
           "outgoingCount": "Du sendte {channel} → {count} deltakere",
           "system": "{channel} (system)"
+        },
+        "timeGroup": {
+          "recent": "Siste 5 min",
+          "today": "I dag",
+          "earlier": "Tidligere"
+        },
+        "filter": {
+          "incoming": "Innkommende",
+          "outgoing": "Utg\u00e5ende",
+          "urgent": "Haster"
+        },
+        "filterEmpty": {
+          "incoming": "Ingen innkommende signaler",
+          "outgoing": "Ingen utg\u00e5ende signaler",
+          "urgent": "Ingen hastesignaler",
+          "combo": "Ingen signaler matcher filteret"
         }
       }
     },

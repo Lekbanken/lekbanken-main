@@ -122,18 +122,35 @@ function rowToEvent(row: SessionEventRow): SessionEvent {
       ? (row.event_category as EventCategory)
       : inferCategory(row.event_type);
 
+    // When the row was inserted with legacy columns only (event_data +
+    // actor_user_id), the V2 `payload` column will be null even though
+    // the column exists.  Fall back to event_data in that case, and
+    // infer actorType from the legacy actor_*_id fields.
+    const resolvedPayload: Record<string, unknown> =
+      row.payload && Object.keys(row.payload).length > 0
+        ? row.payload
+        : ((row as SessionEventRowV2 & { event_data?: Record<string, unknown> | null }).event_data ?? {});
+    const resolvedActorType: string =
+      row.actor_type ?? (
+        (row as SessionEventRowV2 & { actor_participant_id?: string | null }).actor_participant_id
+          ? 'participant'
+          : (row as SessionEventRowV2 & { actor_user_id?: string | null }).actor_user_id
+            ? 'host'
+            : 'system'
+      );
+
     return {
       id: row.id,
       sessionId: row.session_id,
       eventType: row.event_type as SessionEvent['eventType'],
       eventCategory,
-      actorType: row.actor_type as SessionEvent['actorType'],
+      actorType: resolvedActorType as SessionEvent['actorType'],
       actorId: row.actor_id ?? undefined,
       actorName: row.actor_name ?? undefined,
       targetType: row.target_type as SessionEvent['targetType'],
       targetId: row.target_id ?? undefined,
       targetName: row.target_name ?? undefined,
-      payload: row.payload ?? {},
+      payload: resolvedPayload,
       correlationId: row.correlation_id ?? undefined,
       parentEventId: row.parent_event_id ?? undefined,
       createdAt: new Date(row.created_at),

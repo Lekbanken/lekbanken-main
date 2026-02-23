@@ -12368,7 +12368,8 @@
           "flash": "Blink",
           "ready": "Redo",
           "found": "Hittat",
-          "sos": "SOS"
+          "sos": "SOS",
+          "unknown": "Signal"
         },
         "direction": {
           "incoming": "{channel} från {sender}",
@@ -12376,6 +12377,22 @@
           "outgoing": "Du skickade {channel}",
           "outgoingCount": "Du skickade {channel} → {count} deltagare",
           "system": "{channel} (system)"
+        },
+        "timeGroup": {
+          "recent": "Senaste 5 min",
+          "today": "Idag",
+          "earlier": "Tidigare"
+        },
+        "filter": {
+          "incoming": "Inkommande",
+          "outgoing": "Utgående",
+          "urgent": "Brådskande"
+        },
+        "filterEmpty": {
+          "incoming": "Inga inkommande signaler",
+          "outgoing": "Inga utgående signaler",
+          "urgent": "Inga brådskande signaler",
+          "combo": "Inga signaler matchar filtret"
         }
       }
     },

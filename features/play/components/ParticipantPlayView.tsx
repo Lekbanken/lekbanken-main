@@ -284,6 +284,7 @@ export function ParticipantPlayView({
     boardState,
     nextStarterParticipantId,
     connected,
+    resyncRuntimeState,
   } = useLiveSession({
     sessionId,
     initialState,
@@ -373,14 +374,69 @@ export function ParticipantPlayView({
       handleSignalToast(payload);
     },
     onReconnect: () => {
-      // Re-fetch all mutable data that could have changed while disconnected.
-      // Step/phase state will arrive with the next broadcast, but artifacts
-      // and decisions need an explicit fetch since their updates are
-      // event-triggered (not polled).
+      // Re-fetch ALL mutable data that could have changed while disconnected.
+      void resyncRuntimeState(); // step/phase/status/timer/board
       void loadArtifacts();
       void loadDecisions();
     },
   });
+
+  // --------------------------------------------------------------------------
+  // Runtime state polling fallback — 30s safety net for missed broadcasts
+  // (step, phase, status, timer, board). Lightweight GET; no-op if already in sync.
+  // Skips when tab is hidden or device is offline to reduce background churn.
+  // Random jitter (0-4s) on start so 500 participants don't all poll in lockstep.
+  // --------------------------------------------------------------------------
+  useEffect(() => {
+    if (status === 'ended') return;
+    let id: ReturnType<typeof setInterval>;
+    const jitterTimeout = setTimeout(() => {
+      id = setInterval(() => {
+        if (document.visibilityState === 'hidden') return;
+        if (!navigator.onLine) return;
+        void resyncRuntimeState();
+      }, 30_000);
+    }, Math.random() * 4_000);
+    return () => { clearTimeout(jitterTimeout); clearInterval(id); };
+  }, [resyncRuntimeState, status]);
+
+  // --------------------------------------------------------------------------
+  // Artifact polling fallback — 30s safety net for missed artifact_update
+  // broadcasts. Staggered by ~15s from runtime poll to spread load.
+  // Skips when tab is hidden or device is offline.
+  // Random jitter (0-4s) added to the 15s stagger for production de-sync.
+  // --------------------------------------------------------------------------
+  useEffect(() => {
+    if (!participantToken || status === 'ended') return;
+    let intervalId: ReturnType<typeof setInterval>;
+    // Stagger: 15s + jitter before first tick so it doesn't overlap runtime poll
+    const staggerTimeout = setTimeout(() => {
+      if (document.visibilityState !== 'hidden' && navigator.onLine) {
+        void loadArtifacts();
+      }
+      intervalId = setInterval(() => {
+        if (document.visibilityState === 'hidden') return;
+        if (!navigator.onLine) return;
+        void loadArtifacts();
+      }, 30_000);
+    }, 15_000 + Math.random() * 4_000);
+    return () => { clearTimeout(staggerTimeout); clearInterval(intervalId); };
+  }, [loadArtifacts, participantToken, status]);
+
+  // --------------------------------------------------------------------------
+  // Visibility-change catch-up — resync immediately when tab becomes active
+  // so participants don't wait up to 30s after switching back.
+  // --------------------------------------------------------------------------
+  useEffect(() => {
+    const onVisChange = () => {
+      if (document.visibilityState === 'visible' && navigator.onLine) {
+        void resyncRuntimeState();
+        void loadArtifacts();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisChange);
+    return () => document.removeEventListener('visibilitychange', onVisChange);
+  }, [resyncRuntimeState, loadArtifacts]);
 
   // --------------------------------------------------------------------------
   // Step-start time tracker — records epoch when step changes

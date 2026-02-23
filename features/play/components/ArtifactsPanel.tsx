@@ -57,7 +57,7 @@ type KeypadAttemptResponse = {
   };
 };
 
-export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
+export function ArtifactsPanel({ sessionId, refreshKey }: { sessionId: string; refreshKey?: number }) {
   const t = useTranslations('play.artifactsPanel');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,6 +88,14 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Re-fetch when parent signals a mutation (reveal/hide/reset/trigger)
+  useEffect(() => {
+    if (refreshKey != null && refreshKey > 0) {
+      void load();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshKey]);
 
   const variantsByArtifact = useMemo(() => {
     const map = new Map<string, SessionArtifactVariant[]>();

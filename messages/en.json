@@ -5093,6 +5093,11 @@
           "errors": {
             "loadConversationDecks": "Could not load conversation decks."
           },
+          "visibleFromStart": {
+            "label": "Visible from start",
+            "help": "The artifact is shown to participants immediately without the director needing to reveal it.",
+            "badge": "Visible"
+          },
           "visibility": {
             "public": "Public",
             "leaderOnly": "Leader only",
@@ -11441,7 +11446,124 @@
         "errorLabel": "❌ ERROR ({count})",
         "firedLabel": "✅ FIRED ({count})",
         "disableAll": "Disable all",
-        "noTriggers": "No triggers in this session"
+        "noTriggers": "No triggers in this session",
+        "noMatchingTriggers": "No triggers match the current filter",
+        "filterAll": "All",
+        "filterArmed": "Armed",
+        "filterFired": "Fired",
+        "filterError": "Error",
+        "filterDisabled": "Disabled",
+        "overrideMode": "Director override",
+        "overrideModeDesc": "Allow firing non-manual triggers. Use with caution.",
+        "overrideConfirmTitle": "Override fire?",
+        "overrideConfirmDesc": "Fire \"{name}\" manually? This bypasses the normal trigger condition.",
+        "overrideConfirmButton": "Fire anyway",
+        "pendingTimeout": "{action} on \"{name}\" took longer than expected — waiting for sync",
+        "pendingTimeoutTitle": "Sync delayed",
+        "requestFailed": "Could not reach server for \"{name}\". Check your connection and try again.",
+        "requestFailedTitle": "Request failed",
+        "actionFailed": "Action on \"{name}\" failed ({errorCode}). Try again or check trigger config.",
+        "actionFailedTitle": "Trigger action failed"
+      },
+      "triggerCard": {
+        "whenLabel": "WHEN",
+        "thenLabel": "THEN",
+        "noActions": "No actions defined",
+        "status": {
+          "armed": "Armed",
+          "fired": "Fired",
+          "disabled": "Off",
+          "error": "Error"
+        },
+        "conditionTypes": {
+          "phaseStarted": "Phase start",
+          "phaseCompleted": "Phase end",
+          "stepStarted": "Step start",
+          "stepCompleted": "Step end",
+          "keypadCorrect": "Keypad solved",
+          "keypadFailed": "Keypad failed",
+          "riddleCorrect": "Riddle solved",
+          "counterReached": "Counter",
+          "manual": "Manual",
+          "signalReceived": "Signal",
+          "timerEnded": "Timer",
+          "artifactUnlocked": "Artifact",
+          "decisionResolved": "Decision",
+          "audioAcknowledged": "Audio",
+          "multiAnswerComplete": "Multi-answer",
+          "scanVerified": "Scan",
+          "hintRequested": "Hint",
+          "hotspotFound": "Hotspot",
+          "hotspotHuntComplete": "Hunt done",
+          "tilePuzzleComplete": "Tile puzzle",
+          "cipherDecoded": "Cipher",
+          "propConfirmed": "Prop OK",
+          "propRejected": "Prop rejected",
+          "locationVerified": "Location",
+          "logicGridSolved": "Logic grid",
+          "soundLevelTriggered": "Sound level",
+          "timeBankExpired": "Time bank",
+          "signalGeneratorTriggered": "Signal gen.",
+          "replayMarkerAdded": "Marker",
+          "unknown": "Unknown"
+        },
+        "actionTypes": {
+          "send_message": "Message",
+          "reveal_artifact": "Reveal",
+          "hide_artifact": "Hide",
+          "advance_step": "Next step",
+          "advance_phase": "Next phase",
+          "play_sound": "Sound",
+          "start_timer": "Timer",
+          "show_countdown": "Countdown",
+          "send_signal": "Signal",
+          "increment_counter": "Counter +",
+          "reset_counter": "Reset counter",
+          "send_hint": "Hint",
+          "show_leader_script": "Script",
+          "time_bank_apply_delta": "Time ±",
+          "time_bank_pause": "Time pause",
+          "trigger_signal": "Trigger signal",
+          "reset_keypad": "Reset keypad",
+          "reset_riddle": "Reset riddle",
+          "unlock_decision": "Unlock vote",
+          "lock_decision": "Lock vote",
+          "add_replay_marker": "Marker",
+          "reset_scan_gate": "Reset scan",
+          "reset_hotspot_hunt": "Reset hunt",
+          "reset_tile_puzzle": "Reset puzzle",
+          "reset_cipher": "Reset cipher",
+          "reset_prop": "Reset prop",
+          "reset_location": "Reset location",
+          "reset_logic_grid": "Reset grid",
+          "reset_sound_meter": "Reset meter"
+        },
+        "meta": {
+          "manual": "Manual trigger",
+          "once": "Once only",
+          "delay": "{seconds}s delay",
+          "firedCount": "Fired {count}×",
+          "lastFired": "Last: {time}",
+          "copyDebug": "Copy debug info",
+          "copied": "Copied!"
+        },
+        "actions": {
+          "fire": "Fire now",
+          "fireOverride": "Override fire",
+          "rearm": "Rearm",
+          "rearmHint": "Re-arms trigger (history is preserved)",
+          "disable": "Disable"
+        },
+        "gating": {
+          "notArmed": "Trigger is not armed",
+          "alreadyFiredOnce": "Already fired (execute-once)",
+          "alreadyArmed": "Trigger is already armed",
+          "alreadyDisabled": "Trigger is already disabled",
+          "overrideRequired": "Enable Director Override to fire non-manual triggers"
+        },
+        "pending": {
+          "timedOut": "Took longer than expected"
+        }
       },
       "signals": {
         "deviceSignals": "Device signals",
@@ -11503,7 +11625,10 @@
         "noArtifacts": "No artifacts in this session",
         "hidden": "Hidden",
         "available": "Available",
-        "shown": "Shown"
+        "shown": "Shown",
+        "reveal": "Reveal",
+        "hide": "Hide",
+        "reset": "Reset"
       },
       "connection": {
         "live": "Live",

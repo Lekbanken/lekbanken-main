@@ -106,6 +106,8 @@ export interface UseLiveSessionResult {
   reconnecting: boolean;
   /** Last event timestamp */
   lastEventAt: string | null;
+  /** Fetch authoritative runtime state from server (step, phase, status, timer, board). Call on reconnect or as polling fallback. */
+  resyncRuntimeState: () => Promise<void>;
 }
 
 // =============================================================================
@@ -470,6 +472,42 @@ export function useLiveSession({
       }
     };
   }, [sessionId, enabled, handleBroadcastEvent, supabase]);
+
+  // Imperative resync: fetch authoritative runtime state from server
+  const resyncRuntimeState = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/play/sessions/${sessionId}/state`, { cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const s = data.session as Record<string, unknown> | undefined;
+      if (!s) return;
+
+      const step = s.current_step_index as number | undefined;
+      const phase = s.current_phase_index as number | undefined;
+      const serverStatus = s.status as SessionRuntimeState['status'] | undefined;
+      const timer = s.timer_state as TimerState | null | undefined;
+      const board = s.board_state as BoardState | null | undefined;
+
+      if (typeof step === 'number' && step !== currentStepRef.current) {
+        setCurrentStepIndex(step);
+        currentStepRef.current = step;
+      }
+      if (typeof phase === 'number' && phase !== currentPhaseRef.current) {
+        setCurrentPhaseIndex(phase);
+        currentPhaseRef.current = phase;
+      }
+      if (serverStatus) setStatus(serverStatus);
+      if (timer !== undefined) {
+        setTimerState(timer);
+        setTimerDisplay(calculateTimerDisplay(timer));
+      }
+      if (board !== undefined) setBoardState(board);
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[useLiveSession] resyncRuntimeState failed:', err);
+      }
+    }
+  }, [sessionId]);
   
   return {
     currentStepIndex,
@@ -482,6 +520,7 @@ export function useLiveSession({
     connected,
     reconnecting,
     lastEventAt,
+    resyncRuntimeState,
   };
 }
 

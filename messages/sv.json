@@ -5152,6 +5152,11 @@
           "errors": {
             "loadConversationDecks": "Kunde inte ladda samtalskortlekar."
           },
+          "visibleFromStart": {
+            "label": "Synlig från start",
+            "help": "Artefakten visas direkt för deltagare utan att spelledaren behöver avslöja den.",
+            "badge": "Synlig"
+          },
           "visibility": {
             "public": "Publik",
             "leaderOnly": "Endast ledare",
@@ -12270,7 +12275,124 @@
         "errorLabel": "❌ ERROR ({count})",
         "firedLabel": "✅ FIRED ({count})",
         "disableAll": "Inaktivera alla",
-        "noTriggers": "Inga triggers i denna session"
+        "noTriggers": "Inga triggers i denna session",
+        "noMatchingTriggers": "Inga triggers matchar det valda filtret",
+        "filterAll": "Alla",
+        "filterArmed": "Aktiva",
+        "filterFired": "Avfyrade",
+        "filterError": "Fel",
+        "filterDisabled": "Inaktiva",
+        "overrideMode": "Spelledar-override",
+        "overrideModeDesc": "Tillåt manuell triggning av icke-manuella triggers. Använd med försiktighet.",
+        "overrideConfirmTitle": "Tvinga trigga?",
+        "overrideConfirmDesc": "Trigga \"{name}\" manuellt? Detta kringgår det normala trigger-villkoret.",
+        "overrideConfirmButton": "Trigga ändå",
+        "pendingTimeout": "{action} på \"{name}\" tog längre än förväntat — väntar på synk",
+        "pendingTimeoutTitle": "Synk fördröjd",
+        "requestFailed": "Kunde inte nå servern för \"{name}\". Kontrollera anslutningen och försök igen.",
+        "requestFailedTitle": "Begäran misslyckades",
+        "actionFailed": "Åtgärd på \"{name}\" misslyckades ({errorCode}). Försök igen eller kontrollera triggerkonfigurationen.",
+        "actionFailedTitle": "Triggeråtgärd misslyckades"
+      },
+      "triggerCard": {
+        "whenLabel": "NÄR",
+        "thenLabel": "GÖR",
+        "noActions": "Inga åtgärder definierade",
+        "status": {
+          "armed": "Aktiv",
+          "fired": "Avfyrad",
+          "disabled": "Av",
+          "error": "Fel"
+        },
+        "conditionTypes": {
+          "phaseStarted": "Fas startar",
+          "phaseCompleted": "Fas slutar",
+          "stepStarted": "Steg startar",
+          "stepCompleted": "Steg slutar",
+          "keypadCorrect": "Kod rätt",
+          "keypadFailed": "Kod fel",
+          "riddleCorrect": "Gåta löst",
+          "counterReached": "Räknare",
+          "manual": "Manuell",
+          "signalReceived": "Signal",
+          "timerEnded": "Timer",
+          "artifactUnlocked": "Artefakt",
+          "decisionResolved": "Beslut",
+          "audioAcknowledged": "Ljud",
+          "multiAnswerComplete": "Flersvar",
+          "scanVerified": "Skanning",
+          "hintRequested": "Ledtråd",
+          "hotspotFound": "Hotspot",
+          "hotspotHuntComplete": "Jakt klar",
+          "tilePuzzleComplete": "Pussel",
+          "cipherDecoded": "Chiffer",
+          "propConfirmed": "Rekvisita OK",
+          "propRejected": "Rekvisita nekad",
+          "locationVerified": "Plats",
+          "logicGridSolved": "Logikrutnät",
+          "soundLevelTriggered": "Ljudnivå",
+          "timeBankExpired": "Tidsbank",
+          "signalGeneratorTriggered": "Signalgen.",
+          "replayMarkerAdded": "Markör",
+          "unknown": "Okänd"
+        },
+        "actionTypes": {
+          "send_message": "Meddelande",
+          "reveal_artifact": "Visa",
+          "hide_artifact": "Dölj",
+          "advance_step": "Nästa steg",
+          "advance_phase": "Nästa fas",
+          "play_sound": "Ljud",
+          "start_timer": "Timer",
+          "show_countdown": "Nedräkning",
+          "send_signal": "Signal",
+          "increment_counter": "Räknare +",
+          "reset_counter": "Nollställ räknare",
+          "send_hint": "Ledtråd",
+          "show_leader_script": "Manus",
+          "time_bank_apply_delta": "Tid ±",
+          "time_bank_pause": "Tid paus",
+          "trigger_signal": "Trigga signal",
+          "reset_keypad": "Nollställ kod",
+          "reset_riddle": "Nollställ gåta",
+          "unlock_decision": "Lås upp röstning",
+          "lock_decision": "Lås röstning",
+          "add_replay_marker": "Markör",
+          "reset_scan_gate": "Nollställ skanning",
+          "reset_hotspot_hunt": "Nollställ jakt",
+          "reset_tile_puzzle": "Nollställ pussel",
+          "reset_cipher": "Nollställ chiffer",
+          "reset_prop": "Nollställ rekvisita",
+          "reset_location": "Nollställ plats",
+          "reset_logic_grid": "Nollställ rutnät",
+          "reset_sound_meter": "Nollställ ljudmätare"
+        },
+        "meta": {
+          "manual": "Manuell trigger",
+          "once": "Bara en gång",
+          "delay": "{seconds}s fördröjning",
+          "firedCount": "Avfyrad {count}×",
+          "lastFired": "Senast: {time}",
+          "copyDebug": "Kopiera debug-info",
+          "copied": "Kopierat!"
+        },
+        "actions": {
+          "fire": "Trigga nu",
+          "fireOverride": "Tvinga trigga",
+          "rearm": "Återaktivera",
+          "rearmHint": "Återaktiverar triggern (historik bevaras)",
+          "disable": "Inaktivera"
+        },
+        "gating": {
+          "notArmed": "Triggern är inte aktiv",
+          "alreadyFiredOnce": "Redan avfyrad (kör-en-gång)",
+          "alreadyArmed": "Triggern är redan aktiv",
+          "alreadyDisabled": "Triggern är redan inaktiverad",
+          "overrideRequired": "Aktivera Spelledar-override för att trigga icke-manuella triggers"
+        },
+        "pending": {
+          "timedOut": "Tog längre än förväntat"
+        }
       },
       "signals": {
         "deviceSignals": "Enhetssignaler",
@@ -12332,7 +12454,10 @@
         "noArtifacts": "Inga artefakter i denna session",
         "hidden": "Hemliga",
         "available": "Tillgängliga",
-        "shown": "Visade"
+        "shown": "Visade",
+        "reveal": "Visa",
+        "hide": "Dölj",
+        "reset": "Återställ"
       },
       "connection": {
         "live": "Live",

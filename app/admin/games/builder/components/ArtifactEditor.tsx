@@ -316,6 +316,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       {artifact.tags.slice(0, 2).join(', ')}{artifact.tags.length > 2 ? '...' : ''}
                     </span>
                   )}
+                  {(artifact.metadata as Record<string, unknown> | null)?.visibleFromStart === true && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/30 shrink-0">
+                      👁 {t('artifact.visibleFromStart.badge')}
+                    </span>
+                  )}
                 </div>
                 {artifact.description && !isExpanded && (
                   <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{artifact.description}</p>
@@ -1313,6 +1318,25 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
               rows={3}
               placeholder={t('artifact.fields.descriptionPlaceholder')}
             />
+          </div>
+
+          {/* Visible from start toggle */}
+          <div className="rounded-lg border border-green-500/30 bg-green-500/5 p-3 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-foreground">{t('artifact.visibleFromStart.label')}</p>
+              <p className="text-xs text-muted-foreground">{t('artifact.visibleFromStart.help')}</p>
+            </div>
+            <label className="relative inline-flex cursor-pointer items-center shrink-0">
+              <input
+                type="checkbox"
+                className="peer sr-only"
+                checked={(artifact.metadata as Record<string, unknown> | null)?.visibleFromStart === true}
+                onChange={(e) => updateArtifact(idx, {
+                  metadata: { ...artifact.metadata, visibleFromStart: e.target.checked },
+                })}
+              />
+              <div className="h-6 w-11 rounded-full bg-gray-300 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:bg-green-500 peer-checked:after:translate-x-full peer-focus:ring-2 peer-focus:ring-green-400/50" />
+            </label>
           </div>
 
           <div className="space-y-3">

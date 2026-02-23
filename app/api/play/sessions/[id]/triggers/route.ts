@@ -19,8 +19,8 @@ import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/s
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
+function jsonError(message: string, status: number, errorCode?: string) {
+  return NextResponse.json({ ok: false, error: message, errorCode: errorCode ?? 'UNKNOWN_ERROR' }, { status });
 }
 
 // Types for V2
@@ -165,22 +165,22 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return jsonError('Unauthorized', 401);
+  if (!user) return jsonError('Unauthorized', 401, 'AUTH_REQUIRED');
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can update triggers', 403);
+  if (!session) return jsonError('Session not found', 404, 'SESSION_NOT_FOUND');
+  if (session.host_user_id !== user.id) return jsonError('Only host can update triggers', 403, 'RLS_DENIED');
 
   const body = await request.json().catch(() => ({}));
   const triggerId = body?.triggerId as string | undefined;
   const action = body?.action as 'fire' | 'disable' | 'arm' | undefined;
 
   if (!triggerId || !action) {
-    return jsonError('triggerId and action are required', 400);
+    return jsonError('triggerId and action are required', 400, 'INVALID_PAYLOAD');
   }
 
   if (!['fire', 'disable', 'arm'].includes(action)) {
-    return jsonError('Invalid action. Must be fire, disable, or arm', 400);
+    return jsonError('Invalid action. Must be fire, disable, or arm', 400, 'INVALID_ACTION');
   }
 
   // V2.1: For fire action, require idempotency key (C2.1)
@@ -203,7 +203,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     .eq('id', triggerId)
     .single();
 
-  if (gtErr || !gameTrigger) return jsonError('Trigger not found', 404);
+  if (gtErr || !gameTrigger) return jsonError('Trigger not found', 404, 'TRIGGER_NOT_FOUND');
 
   // Handle fire action via atomic RPC
   if (action === 'fire') {
@@ -220,7 +220,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
     if (rpcErr) {
       console.error('[PATCH triggers] RPC error:', rpcErr);
-      return jsonError('Failed to fire trigger', 500);
+      return jsonError('Failed to fire trigger', 500, 'RPC_ERROR');
     }
 
     // RPC returns array, get first row
@@ -228,8 +228,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
     if (!result || !result.ok) {
       return NextResponse.json(
-        { ok: false, error: result?.reason ?? 'TRIGGER_FIRE_FAILED' },
-        { status: 500 }
+        { ok: false, error: result?.reason ?? 'TRIGGER_FIRE_FAILED', errorCode: result?.reason ?? 'TRIGGER_FIRE_FAILED' },
+        { status: 422 }
       );
     }
 
@@ -303,7 +303,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       { onConflict: 'session_id,game_trigger_id' }
     );
 
-  if (updateErr) return jsonError('Failed to update trigger', 500);
+  if (updateErr) return jsonError('Failed to update trigger', 500, 'DB_UPDATE_FAILED');
 
   await broadcastPlayEvent(sessionId, {
     type: 'trigger_update',

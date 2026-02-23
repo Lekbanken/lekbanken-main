@@ -1287,6 +1287,11 @@
               "errors": {
                 "loadConversationDecks": "Kunne ikke laste samtalekortstokker."
               },
+              "visibleFromStart": {
+                "label": "Synlig fra start",
+                "help": "Artefakten vises direkte for deltakere uten at spillederen trenger å avsLøre den.",
+                "badge": "Synlig"
+              },
               "visibility": {
                 "public": "Offentlig",
                 "leaderOnly": "Kun leder",
@@ -11817,6 +11822,15 @@
       },
       "events": {
         "noEvents": "Ingen hendelser ennå"
+      },
+      "artifacts": {
+        "noArtifacts": "Ingen artefakter i denne sesjonen",
+        "hidden": "Skjulte",
+        "available": "Tilgjengelige",
+        "shown": "Viste",
+        "reveal": "Vis",
+        "hide": "Skjul",
+        "reset": "Tilbakestill"
       },
       "timeBank": {
         "title": "Tidsbank",

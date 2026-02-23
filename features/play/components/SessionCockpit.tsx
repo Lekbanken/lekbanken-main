@@ -1465,6 +1465,7 @@ export function SessionCockpit({
     preflightItems,
     canStartDirectorMode,
     artifactStates,
+    artifactVersion,
     // Actions
     enterDirectorMode,
     exitDirectorMode,
@@ -1480,9 +1481,14 @@ export function SessionCockpit({
     unassignRole,
     snapshotRoles,
     fireTrigger,
+    armTrigger,
+    disableTrigger,
     disableAllTriggers,
     sendSignal,
     applyTimeBankDelta,
+    revealArtifact,
+    hideArtifact,
+    resetArtifact,
     refresh,
   } = sessionState;
 
@@ -1970,7 +1976,7 @@ export function SessionCockpit({
           </TabPanel>
           
           <TabPanel id="artifacts" activeTab={activeTab}>
-            <ArtifactsPanel sessionId={sessionId} />
+            <ArtifactsPanel sessionId={sessionId} refreshKey={artifactVersion} />
           </TabPanel>
           
           <TabPanel id="triggers" activeTab={activeTab}>
@@ -2151,12 +2157,17 @@ export function SessionCockpit({
           onNextStep={nextStep}
           onPreviousStep={previousStep}
           onFireTrigger={fireTrigger}
+          onArmTrigger={armTrigger}
+          onDisableTrigger={disableTrigger}
           onDisableAllTriggers={disableAllTriggers}
           onSendSignal={sendSignal}
           onExecuteSignal={handleExecuteSignal}
           onTimeBankDelta={applyTimeBankDelta}
           onOpenChat={() => setChatOpen(true)}
           chatUnreadCount={chat.unreadCount}
+          onRevealArtifact={revealArtifact}
+          onHideArtifact={hideArtifact}
+          onResetArtifact={resetArtifact}
         />
 
         {/* Chat modal: only mount when open → on-demand chunk load */}

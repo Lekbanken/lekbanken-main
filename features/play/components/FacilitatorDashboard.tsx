@@ -289,6 +289,14 @@ export function FacilitatorDashboard({
           () => broadcastBoardUpdate(trimmed || undefined)
         );
       },
+      updateArtifactVisibility: async (artifactId: string, visible: boolean) => {
+        const action = visible ? 'reveal_artifact' : 'hide_artifact';
+        await fetch(`/api/play/sessions/${sessionId}/artifacts/state`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, artifactId }),
+        });
+      },
     };
 
     return withSignalAndTimeBank(base);

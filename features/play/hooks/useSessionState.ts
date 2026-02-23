@@ -19,6 +19,8 @@ import type {
   SessionEvent,
   Signal,
   SignalOutputType,
+  TriggerActionResult,
+  ArtifactState,
 } from '@/types/session-cockpit';
 import { getPollingConfig } from '@/lib/play/realtime-gate';
 import {
@@ -59,6 +61,7 @@ const DEFAULT_STATE: SessionCockpitState = {
   currentPhaseIndex: -1,
   artifacts: [],
   artifactStates: {},
+  artifactVersion: 0,
   triggers: [],
   signalCapabilities: DEFAULT_SIGNAL_CAPABILITIES,
   signalPresets: [],
@@ -115,6 +118,10 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
 
   // Refs for cleanup
   const pollRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Keep a ref to triggers to avoid stale closures in fireTrigger
+  const triggersRef = useRef(state.triggers);
+  useEffect(() => { triggersRef.current = state.triggers; }, [state.triggers]);
   // Note: supabase client for realtime will be added in future iteration
 
   // ==========================================================================
@@ -341,9 +348,54 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
         state: (artifact.state as Record<string, unknown> | null) ?? null,
       }));
 
+      // V2: Build artifactStates from variant reveal/highlight state
+      const variants = data.variants as Array<{
+        id: string;
+        session_artifact_id: string; // actually game_artifact_id in V2
+        revealed_at: string | null;
+        highlighted_at: string | null;
+        visibility: string;
+      }> | undefined;
+
+      const newArtifactStates: Record<string, ArtifactState> = {};
+      if (variants) {
+        // Group variants by artifact
+        const variantsByArtifact = new Map<string, typeof variants>();
+        for (const v of variants) {
+          const key = v.session_artifact_id; // game_artifact_id mapped as session_artifact_id
+          const list = variantsByArtifact.get(key) ?? [];
+          list.push(v);
+          variantsByArtifact.set(key, list);
+        }
+
+        for (const artifact of artifacts) {
+          const avs = variantsByArtifact.get(artifact.id) ?? [];
+          const anyRevealed = avs.some((v: { revealed_at: string | null }) => v.revealed_at != null);
+          const anyHighlighted = avs.some((v: { highlighted_at: string | null }) => v.highlighted_at != null);
+          // Check puzzle state from artifact.state
+          const artState = artifact.state as Record<string, unknown> | null;
+          const keypadUnlocked = Boolean((artState?.keypadState as Record<string, unknown> | undefined)?.isUnlocked);
+          const puzzleSolved = Boolean(artState?.solved);
+
+          let status: 'hidden' | 'revealed' | 'unlocked' | 'solved' | 'locked' | 'failed' = 'hidden';
+          if (puzzleSolved || keypadUnlocked) status = 'solved';
+          else if (anyRevealed) status = 'revealed';
+
+          newArtifactStates[artifact.id] = {
+            artifactId: artifact.id,
+            status,
+            isRevealed: anyRevealed,
+            isHighlighted: anyHighlighted,
+            isLocked: false,
+            isSolved: puzzleSolved || keypadUnlocked,
+          };
+        }
+      }
+
       setState((prev) => ({
         ...prev,
         artifacts,
+        artifactStates: newArtifactStates,
       }));
     } catch (err) {
       console.warn('Failed to load artifacts:', err);
@@ -436,6 +488,10 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
         firedCount: t.fired_count as number ?? 0,
         lastFiredAt: t.fired_at as string | undefined,
         lastError: t.last_error as string | undefined,
+        delaySeconds: t.delay_seconds as number | undefined,
+        conditionType: (t.condition as Record<string, unknown>)?.type as string ?? 'unknown',
+        condition: t.condition as Record<string, unknown> ?? {},
+        actions: t.actions as Array<Record<string, unknown>> ?? [],
         conditionSummary: formatCondition(t.condition as Record<string, unknown>),
         actionSummary: formatActions(t.actions as Record<string, unknown>[]),
       }));
@@ -744,11 +800,12 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       const res = await fetch(`/api/play/sessions/${sessionId}/artifacts/state`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'reveal', artifactId }),
+        body: JSON.stringify({ action: 'reveal_artifact', artifactId }),
       });
       
       if (!res.ok) throw new Error('Failed to reveal artifact');
       
+      // Optimistic update for immediate UI feedback
       setState((prev) => ({
         ...prev,
         artifactStates: {
@@ -757,23 +814,28 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
             ...prev.artifactStates[artifactId],
             artifactId,
             isRevealed: true,
+            isHighlighted: true, // reveal also highlights for participant pulse/spotlight
             status: 'revealed',
             isLocked: false,
             isSolved: false,
           },
         },
+        artifactVersion: prev.artifactVersion + 1,
       }));
+
+      // Server-confirmed refresh (ensures all views are consistent)
+      void loadArtifacts();
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to reveal artifact'));
     }
-  }, [sessionId, onError]);
+  }, [sessionId, onError, loadArtifacts]);
 
   const hideArtifact = useCallback(async (artifactId: string) => {
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/artifacts/state`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'hide', artifactId }),
+        body: JSON.stringify({ action: 'hide_artifact', artifactId }),
       });
       
       if (!res.ok) throw new Error('Failed to hide artifact');
@@ -786,23 +848,27 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
             ...prev.artifactStates[artifactId],
             artifactId,
             isRevealed: false,
+            isHighlighted: false,
             status: 'hidden',
             isLocked: false,
             isSolved: false,
           },
         },
+        artifactVersion: prev.artifactVersion + 1,
       }));
+
+      void loadArtifacts();
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to hide artifact'));
     }
-  }, [sessionId, onError]);
+  }, [sessionId, onError, loadArtifacts]);
 
   const resetArtifact = useCallback(async (artifactId: string) => {
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/artifacts/state`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'reset', artifactId }),
+        body: JSON.stringify({ action: 'reset_artifact', artifactId }),
       });
       
       if (!res.ok) throw new Error('Failed to reset artifact');
@@ -814,42 +880,118 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
           [artifactId]: {
             artifactId,
             isRevealed: true,
+            isHighlighted: false,
             status: 'revealed',
             isLocked: false,
             isSolved: false,
             attemptCount: 0,
           },
         },
+        artifactVersion: prev.artifactVersion + 1,
       }));
+
+      void loadArtifacts();
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to reset artifact'));
     }
-  }, [sessionId, onError]);
+  }, [sessionId, onError, loadArtifacts]);
 
-  const fireTrigger = useCallback(async (triggerId: string) => {
+  const fireTrigger = useCallback(async (triggerId: string): Promise<TriggerActionResult> => {
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': `${sessionId}:${triggerId}:${crypto.randomUUID()}`,
+        },
         body: JSON.stringify({ triggerId, action: 'fire' }),
       });
       
-      if (!res.ok) throw new Error('Failed to fire trigger');
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        const msg = json?.error ?? 'Failed to fire trigger';
+        const code = json?.errorCode ?? `HTTP_${res.status}`;
+        if (process.env.NODE_ENV === 'development') console.warn('[useSessionState] fire failed:', code, msg);
+        onError?.(new Error(msg));
+        return { ok: false, action: 'fire', triggerId, kind: res.status >= 500 ? 'request_failed' : 'action_failed', httpStatus: res.status, errorCode: code, message: msg, details: json?.details };
+      }
       
+      // Optimistic state update
+      const serverTrigger = json?.trigger as { status?: string; firedCount?: number; firedAt?: string | null } | undefined;
       setState((prev) => ({
         ...prev,
         triggers: prev.triggers.map((t) =>
           t.id === triggerId
-            ? { ...t, status: 'fired' as const, firedCount: t.firedCount + 1, lastFiredAt: new Date().toISOString() }
+            ? {
+                ...t,
+                status: (serverTrigger?.status as CockpitTrigger['status']) ?? 'fired',
+                firedCount: serverTrigger?.firedCount ?? t.firedCount + 1,
+                lastFiredAt: serverTrigger?.firedAt ?? new Date().toISOString(),
+              }
             : t
         ),
       }));
-    } catch (err) {
-      onError?.(err instanceof Error ? err : new Error('Failed to fire trigger'));
-    }
-  }, [sessionId, onError]);
 
-  const disableTrigger = useCallback(async (triggerId: string) => {
+      // Execute trigger actions client-side (server only persists trigger state)
+      const trigger = triggersRef.current.find((t) => t.id === triggerId);
+      const executedActions: string[] = [];
+      const failedActions: Array<{ type: string; error: string }> = [];
+
+      if (trigger?.actions?.length) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[useSessionState] post-fire: executing ${trigger.actions.length} actions for "${trigger.name}"`);
+        }
+        for (const act of trigger.actions) {
+          const actionType = (act.type as string) ?? 'unknown';
+          try {
+            const artifactId = act.artifactId as string | undefined;
+            if (actionType === 'reveal_artifact' && artifactId) {
+              await revealArtifact(artifactId);
+              executedActions.push(`reveal_artifact(${artifactId.slice(0, 8)}…)`);
+            } else if (actionType === 'hide_artifact' && artifactId) {
+              await hideArtifact(artifactId);
+              executedActions.push(`hide_artifact(${artifactId.slice(0, 8)}…)`);
+            } else {
+              // Action type not handled in useSessionState (e.g. show_countdown, send_message)
+              executedActions.push(`${actionType}(skipped—not wired)`);
+            }
+          } catch (actionErr) {
+            const errMsg = actionErr instanceof Error ? actionErr.message : String(actionErr);
+            failedActions.push({ type: actionType, error: errMsg });
+            console.warn(`[useSessionState] trigger action failed: ${actionType}`, actionErr);
+          }
+        }
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[useSessionState] post-fire result: executed=[${executedActions.join(', ')}] failed=[${failedActions.map(f => f.type).join(', ')}]`);
+        }
+
+        // Final consolidated refresh to ensure all views are consistent
+        // (individual actions already refresh, but this catches edge cases)
+        if (executedActions.length > 0) {
+          void loadArtifacts();
+        }
+      }
+
+      return {
+        ok: true,
+        action: 'fire',
+        triggerId,
+        trigger: serverTrigger
+          ? { status: serverTrigger.status as CockpitTrigger['status'] ?? 'fired', firedCount: serverTrigger.firedCount ?? 0, firedAt: serverTrigger.firedAt ?? null }
+          : undefined,
+        ...(executedActions.length > 0 && { executedActions }),
+        ...(failedActions.length > 0 && { failedActions }),
+      };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to fire trigger';
+      if (process.env.NODE_ENV === 'development') console.warn('[useSessionState] fire network error:', msg);
+      onError?.(err instanceof Error ? err : new Error(msg));
+      return { ok: false, action: 'fire', triggerId, kind: 'request_failed', httpStatus: 0, errorCode: 'NETWORK_ERROR', message: msg };
+    }
+  }, [sessionId, onError, revealArtifact, hideArtifact]);
+
+  const disableTrigger = useCallback(async (triggerId: string): Promise<TriggerActionResult> => {
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
         method: 'PATCH',
@@ -857,7 +999,15 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
         body: JSON.stringify({ triggerId, action: 'disable' }),
       });
       
-      if (!res.ok) throw new Error('Failed to disable trigger');
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        const msg = json?.error ?? 'Failed to disable trigger';
+        const code = json?.errorCode ?? `HTTP_${res.status}`;
+        if (process.env.NODE_ENV === 'development') console.warn('[useSessionState] disable failed:', code, msg);
+        onError?.(new Error(msg));
+        return { ok: false, action: 'disable', triggerId, kind: res.status >= 500 ? 'request_failed' : 'action_failed', httpStatus: res.status, errorCode: code, message: msg, details: json?.details };
+      }
       
       setState((prev) => ({
         ...prev,
@@ -865,12 +1015,17 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
           t.id === triggerId ? { ...t, status: 'disabled' as const } : t
         ),
       }));
+
+      return { ok: true, action: 'disable', triggerId };
     } catch (err) {
-      onError?.(err instanceof Error ? err : new Error('Failed to disable trigger'));
+      const msg = err instanceof Error ? err.message : 'Failed to disable trigger';
+      if (process.env.NODE_ENV === 'development') console.warn('[useSessionState] disable network error:', msg);
+      onError?.(err instanceof Error ? err : new Error(msg));
+      return { ok: false, action: 'disable', triggerId, kind: 'request_failed', httpStatus: 0, errorCode: 'NETWORK_ERROR', message: msg };
     }
   }, [sessionId, onError]);
 
-  const armTrigger = useCallback(async (triggerId: string) => {
+  const armTrigger = useCallback(async (triggerId: string): Promise<TriggerActionResult> => {
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
         method: 'PATCH',
@@ -878,7 +1033,15 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
         body: JSON.stringify({ triggerId, action: 'arm' }),
       });
       
-      if (!res.ok) throw new Error('Failed to arm trigger');
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        const msg = json?.error ?? 'Failed to arm trigger';
+        const code = json?.errorCode ?? `HTTP_${res.status}`;
+        if (process.env.NODE_ENV === 'development') console.warn('[useSessionState] arm failed:', code, msg);
+        onError?.(new Error(msg));
+        return { ok: false, action: 'arm', triggerId, kind: res.status >= 500 ? 'request_failed' : 'action_failed', httpStatus: res.status, errorCode: code, message: msg, details: json?.details };
+      }
       
       setState((prev) => ({
         ...prev,
@@ -886,8 +1049,13 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
           t.id === triggerId ? { ...t, status: 'armed' as const } : t
         ),
       }));
+
+      return { ok: true, action: 'arm', triggerId };
     } catch (err) {
-      onError?.(err instanceof Error ? err : new Error('Failed to arm trigger'));
+      const msg = err instanceof Error ? err.message : 'Failed to arm trigger';
+      if (process.env.NODE_ENV === 'development') console.warn('[useSessionState] arm network error:', msg);
+      onError?.(err instanceof Error ? err : new Error(msg));
+      return { ok: false, action: 'arm', triggerId, kind: 'request_failed', httpStatus: 0, errorCode: 'NETWORK_ERROR', message: msg };
     }
   }, [sessionId, onError]);
 
@@ -1109,6 +1277,23 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       }
     };
   }, [enableRealtime, pollInterval, sessionId, loadParticipants, loadRuntimeState, state.status]);
+
+  // Artifact state polling — slower cadence (15s) to catch external changes
+  // (e.g. another host tab, trigger actions from FacilitatorDashboard)
+  const artifactPollRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    if (!enableRealtime) return;
+    // Only poll artifacts when session is active/paused (not draft/lobby/ended)
+    if (!['active', 'paused'].includes(state.status)) return;
+
+    artifactPollRef.current = setInterval(() => {
+      void loadArtifacts();
+    }, 15_000);
+
+    return () => {
+      if (artifactPollRef.current) clearInterval(artifactPollRef.current);
+    };
+  }, [enableRealtime, state.status, loadArtifacts]);
 
   // ==========================================================================
   // Return

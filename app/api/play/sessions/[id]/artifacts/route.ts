@@ -203,6 +203,51 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     });
   }
 
+  // ==========================================================================
+  // Lazy auto-reveal for "visibleFromStart" artifacts
+  // If an artifact has metadata.visibleFromStart === true and its public
+  // variants have no session_artifact_variant_state rows yet, auto-insert
+  // rows with revealed_at = now(). This makes the "visible from start"
+  // semantics work with the existing reveal/hide/reset machinery.
+  // ==========================================================================
+  const now = new Date().toISOString();
+  const autoRevealUpserts: Array<{
+    session_id: string;
+    game_artifact_variant_id: string;
+    revealed_at: string;
+    highlighted_at: string | null;
+  }> = [];
+
+  for (const a of gameArtifacts ?? []) {
+    const meta = (a.metadata && typeof a.metadata === 'object' && !Array.isArray(a.metadata))
+      ? a.metadata as Record<string, unknown>
+      : null;
+    if (meta?.visibleFromStart !== true) continue;
+
+    // Find public variants of this artifact that have NO state row yet
+    const publicVars = (gameVariants ?? []).filter(
+      (v) => (v.artifact_id as string) === (a.id as string) && (v.visibility as string) === 'public'
+    );
+    for (const v of publicVars) {
+      if (!variantStateMap.has(v.id as string)) {
+        autoRevealUpserts.push({
+          session_id: sessionId,
+          game_artifact_variant_id: v.id as string,
+          revealed_at: now,
+          highlighted_at: null, // no highlight on auto-reveal
+        });
+        // Update local map so subsequent code sees them
+        variantStateMap.set(v.id as string, { revealed_at: now, highlighted_at: null });
+      }
+    }
+  }
+
+  if (autoRevealUpserts.length > 0) {
+    await service
+      .from('session_artifact_variant_state')
+      .upsert(autoRevealUpserts, { onConflict: 'session_id,game_artifact_variant_id' });
+  }
+
   // Fetch assignments (V2)
   const { data: assignmentsV2 } = await service
     .from('session_artifact_variant_assignments_v2')
@@ -339,8 +384,19 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       };
     });
 
+  // Build set of artifact IDs that have at least one accessible variant.
+  // Artifacts with zero accessible variants are hidden from participants
+  // (keypads, puzzles, etc. that haven't been revealed yet).
+  const artifactIdsWithAccess = new Set<string>();
+  for (const v of filteredVariants) {
+    artifactIdsWithAccess.add(v.session_artifact_id as string);
+  }
+
   // Sanitize artifacts for participant (no correctCode, merge state)
-  const sanitizedArtifacts = (gameArtifacts ?? []).map((a) => ({
+  // Only include artifacts that have at least one accessible variant
+  const sanitizedArtifacts = (gameArtifacts ?? [])
+    .filter((a) => artifactIdsWithAccess.has(a.id as string))
+    .map((a) => ({
     id: a.id,
     title: a.title,
     description: a.description,

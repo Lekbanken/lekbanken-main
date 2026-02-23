@@ -33,6 +33,7 @@ import type {
   SessionEvent,
   Signal,
   SessionCockpitStatus,
+  TriggerActionResult,
 } from '@/types/session-cockpit';
 import { StoryViewModal } from './StoryViewModal';
 import { DirectorModePanel } from './DirectorModePanel';
@@ -104,7 +105,9 @@ export interface DirectorModeDrawerProps {
   onResume: () => Promise<void>;
   onNextStep: () => Promise<void>;
   onPreviousStep: () => Promise<void>;
-  onFireTrigger: (triggerId: string) => Promise<void>;
+  onFireTrigger: (triggerId: string) => Promise<TriggerActionResult>;
+  onArmTrigger?: (triggerId: string) => Promise<TriggerActionResult>;
+  onDisableTrigger?: (triggerId: string) => Promise<TriggerActionResult>;
   onDisableAllTriggers: () => Promise<void>;
   onSendSignal: (channel: string, payload: unknown) => Promise<void>;
   onExecuteSignal?: (type: string, config: Record<string, unknown>) => Promise<void>;
@@ -114,6 +117,11 @@ export interface DirectorModeDrawerProps {
   onOpenChat?: () => void;
   /** Unread message count for chat badge */
   chatUnreadCount?: number;
+  
+  /** Artifact actions */
+  onRevealArtifact?: (artifactId: string) => Promise<void>;
+  onHideArtifact?: (artifactId: string) => Promise<void>;
+  onResetArtifact?: (artifactId: string) => Promise<void>;
   
   /** Optional class name */
   className?: string;
@@ -228,12 +236,17 @@ export function DirectorModeDrawer({
   onNextStep,
   onPreviousStep,
   onFireTrigger,
+  onArmTrigger,
+  onDisableTrigger,
   onDisableAllTriggers,
   onSendSignal,
   onExecuteSignal,
   onTimeBankDelta,
   onOpenChat,
   chatUnreadCount = 0,
+  onRevealArtifact,
+  onHideArtifact,
+  onResetArtifact,
   className,
 }: DirectorModeDrawerProps) {
   const t = useTranslations('play.directorDrawer');
@@ -375,8 +388,9 @@ export function DirectorModeDrawer({
 
   // Haptic-enhanced trigger fire
   const handleFireTrigger = useCallback(async (triggerId: string) => {
-    await onFireTrigger(triggerId);
+    const result = await onFireTrigger(triggerId);
     hapticTap(50);
+    return result;
   }, [onFireTrigger]);
 
   // Keyboard shortcuts: Escape, â†/â†’ step nav, 1-6 tabs, Space for hint
@@ -460,6 +474,8 @@ export function DirectorModeDrawer({
           onNextStep={onNextStep}
           onPreviousStep={onPreviousStep}
           onFireTrigger={handleFireTrigger}
+          onArmTrigger={onArmTrigger}
+          onDisableTrigger={onDisableTrigger}
           onDisableAllTriggers={onDisableAllTriggers}
           onSendSignal={handleSendSignal}
           onExecuteSignal={onExecuteSignal}
@@ -467,6 +483,9 @@ export function DirectorModeDrawer({
           onOpenChat={onOpenChat}
           chatUnreadCount={chatUnreadCount}
           onClose={handleClose}
+          onRevealArtifact={onRevealArtifact}
+          onHideArtifact={onHideArtifact}
+          onResetArtifact={onResetArtifact}
           showFullscreenButton
           isFullscreen={isFullscreen}
           onToggleFullscreen={handleToggleFullscreen}

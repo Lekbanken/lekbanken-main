@@ -45,6 +45,8 @@ export interface SessionCockpitState {
   // Artifacts
   artifacts: CockpitArtifact[];
   artifactStates: Record<string, ArtifactState>;
+  /** Monotonic counter — incremented on every artifact mutation (reveal/hide/reset/trigger). Used as refreshKey for components with independent state. */
+  artifactVersion: number;
   
   // Triggers
   triggers: CockpitTrigger[];
@@ -158,6 +160,7 @@ export interface ArtifactState {
   artifactId: string;
   status: ArtifactStateStatus;
   isRevealed: boolean;
+  isHighlighted: boolean;
   isLocked: boolean;
   isSolved: boolean;
   
@@ -188,11 +191,54 @@ export interface CockpitTrigger {
   firedCount: number;
   lastFiredAt?: string;
   lastError?: string;
+  delaySeconds?: number;
+  
+  // Structured condition/action data for rich UI
+  conditionType: string;
+  condition: Record<string, unknown>;
+  actions: Array<Record<string, unknown>>;
   
   // Condition/action summaries for display
   conditionSummary: string;
   actionSummary: string;
 }
+
+/**
+ * Result from a trigger action (fire/arm/disable).
+ * Returned by useSessionState callbacks so the UI can clear pending on HTTP success
+ * and show actionable diagnostics on failure.
+ *
+ * `kind` classifies the failure so the UI can show the right copy:
+ *   - request_failed: network / HTTP transport error (offline, 5xx, timeout)
+ *   - action_failed:  server understood but refused/couldn't execute (RPC error, guard, missing ref)
+ */
+export type TriggerActionResult =
+  | {
+      ok: true;
+      action: 'fire' | 'arm' | 'disable';
+      triggerId: string;
+      /** Runtime state after the action */
+      trigger?: { status: TriggerStatus; firedCount: number; firedAt: string | null };
+      /** Actions executed client-side after fire (debug info) */
+      executedActions?: string[];
+      /** Actions that failed during post-fire execution */
+      failedActions?: Array<{ type: string; error: string }>;
+    }
+  | {
+      ok: false;
+      action: 'fire' | 'arm' | 'disable';
+      triggerId: string;
+      /** Classifies the failure for UI copy selection */
+      kind: 'request_failed' | 'action_failed';
+      /** HTTP status code (0 if no response) */
+      httpStatus: number;
+      /** Machine-readable error code from server */
+      errorCode: string;
+      /** User-safe message */
+      message: string;
+      /** Optional structured details (e.g. { artifactId } for missing artifacts) */
+      details?: Record<string, unknown>;
+    };
 
 // =============================================================================
 // Signal Types
@@ -441,9 +487,9 @@ export interface SessionCockpitActions {
   resetArtifact: (artifactId: string) => Promise<void>;
   
   // Triggers
-  fireTrigger: (triggerId: string) => Promise<void>;
-  disableTrigger: (triggerId: string) => Promise<void>;
-  armTrigger: (triggerId: string) => Promise<void>;
+  fireTrigger: (triggerId: string) => Promise<TriggerActionResult>;
+  disableTrigger: (triggerId: string) => Promise<TriggerActionResult>;
+  armTrigger: (triggerId: string) => Promise<TriggerActionResult>;
   disableAllTriggers: () => Promise<void>;
   
   // Signals

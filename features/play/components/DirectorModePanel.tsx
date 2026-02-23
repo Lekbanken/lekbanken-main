@@ -22,11 +22,14 @@
 
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { ConfirmDialog } from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 import {
   PlayIcon,
@@ -43,6 +46,8 @@ import {
   CheckCircleIcon,
   ArrowUpRightIcon,
   ArrowDownLeftIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from '@heroicons/react/24/outline';
 import { StopIcon } from '@heroicons/react/24/solid';
 import type {
@@ -54,10 +59,12 @@ import type {
   SessionEvent,
   Signal,
   SessionCockpitStatus,
+  TriggerActionResult,
 } from '@/types/session-cockpit';
 import { DirectorChipLane } from './DirectorChipLane';
 import type { DirectorChip, DirectorChipType } from './DirectorChipLane';
 import { DirectorStagePanel } from './DirectorStagePanel';
+import { DirectorTriggerCard, type PendingAction } from './DirectorTriggerCard';
 import { DrawerOverlay, PlayHeader, PlayTopArea, getSessionStatusConfig } from '@/features/play/components/shared';
 import { NowSummaryRow } from '@/features/play/components/shared';
 import {
@@ -125,13 +132,18 @@ export interface DirectorModePanelProps {
   // Actions — all optional so preview can omit them
   onNextStep?: () => void;
   onPreviousStep?: () => void;
-  onFireTrigger?: (triggerId: string) => void;
+  onFireTrigger?: (triggerId: string) => Promise<TriggerActionResult>;
+  onArmTrigger?: (triggerId: string) => Promise<TriggerActionResult>;
+  onDisableTrigger?: (triggerId: string) => Promise<TriggerActionResult>;
   onDisableAllTriggers?: () => void;
   onSendSignal?: (channel: string, payload: unknown) => void;
   onExecuteSignal?: (type: string, config: Record<string, unknown>) => Promise<void>;
   onTimeBankDelta?: (delta: number, reason: string) => void;
   onOpenChat?: () => void;
   chatUnreadCount?: number;
+  onRevealArtifact?: (artifactId: string) => Promise<void>;
+  onHideArtifact?: (artifactId: string) => Promise<void>;
+  onResetArtifact?: (artifactId: string) => Promise<void>;
 
   // Chrome
   onClose: () => void;
@@ -375,86 +387,263 @@ function TimeBankTab({
   );
 }
 
+type TriggerFilter = 'all' | 'armed' | 'fired' | 'error' | 'disabled';
+
+// ── Smart trigger ranking ──
+// Rank triggers by relevance to the director's current position in the game.
+function rankTrigger(
+  trigger: CockpitTrigger,
+  steps: CockpitStep[],
+  currentStepIndex: number,
+  currentPhaseIndex: number,
+): number {
+  const conditionType = trigger.conditionType || (trigger.condition?.type as string) || '';
+  const cond = trigger.condition ?? {};
+
+  // Manual triggers: always top priority
+  if (conditionType === 'manual') return 0;
+
+  // Extract phase/step references from condition JSONB
+  const condStepId = (cond.step_id ?? cond.stepId) as string | undefined;
+  const condStepIndex = (cond.step_index ?? cond.stepIndex) as number | undefined;
+  const condPhaseId = (cond.phase_id ?? cond.phaseId) as string | undefined;
+  const condPhaseIndex = (cond.phase_index ?? cond.phaseIndex) as number | undefined;
+
+  const currentStep = steps[currentStepIndex];
+  const currentPhaseId = currentStep?.phaseId;
+
+  // Check if trigger targets current step
+  if (condStepId && currentStep && condStepId === currentStep.id) return 1;
+  if (condStepIndex != null && condStepIndex === currentStepIndex) return 1;
+
+  // Check if trigger targets current phase
+  if (condPhaseId && currentPhaseId && condPhaseId === currentPhaseId) return 2;
+  if (condPhaseIndex != null && condPhaseIndex === currentPhaseIndex) return 2;
+
+  // Check if trigger targets next step (current + 1)
+  const nextStep = steps[currentStepIndex + 1];
+  if (condStepId && nextStep && condStepId === nextStep.id) return 3;
+  if (condStepIndex != null && condStepIndex === currentStepIndex + 1) return 3;
+
+  // Everything else
+  return 5;
+}
+
 function TriggerPanel({
   triggers,
+  steps,
+  currentStepIndex,
+  currentPhaseIndex,
   onFire,
+  onRearm,
+  onDisable,
   onDisableAll,
   t,
   disabled,
 }: {
   triggers: CockpitTrigger[];
-  onFire?: (id: string) => void;
+  steps: CockpitStep[];
+  currentStepIndex: number;
+  currentPhaseIndex: number;
+  onFire?: (id: string) => Promise<TriggerActionResult>;
+  onRearm?: (id: string) => Promise<TriggerActionResult>;
+  onDisable?: (id: string) => Promise<TriggerActionResult>;
   onDisableAll?: () => void;
   t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
   disabled?: boolean;
 }) {
-  const locale = useLocale();
-  const armedTriggers = triggers.filter((tr) => tr.status === 'armed');
-  const firedTriggers = triggers.filter((tr) => tr.status === 'fired');
-  const errorTriggers = triggers.filter((tr) => tr.status === 'error');
+  const toast = useToast();
+  const [filter, setFilter] = useState<TriggerFilter>('all');
+
+  // ── Sticky override per session (sessionStorage keyed on URL path) ──
+  const overrideStorageKey = typeof window !== 'undefined'
+    ? `lekbanken:directorOverride:${window.location.pathname}`
+    : '';
+  const [overrideEnabled, setOverrideEnabled] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try { return sessionStorage.getItem(overrideStorageKey) === '1'; } catch { return false; }
+  });
+  const handleOverrideChange = useCallback((checked: boolean) => {
+    setOverrideEnabled(checked);
+    try { sessionStorage.setItem(overrideStorageKey, checked ? '1' : '0'); } catch {}
+  }, [overrideStorageKey]);
+
+  const [confirmFireId, setConfirmFireId] = useState<string | null>(null);
+
+  const counts = useMemo(() => ({
+    all: triggers.length,
+    armed: triggers.filter((tr) => tr.status === 'armed').length,
+    fired: triggers.filter((tr) => tr.status === 'fired').length,
+    error: triggers.filter((tr) => tr.status === 'error').length,
+    disabled: triggers.filter((tr) => tr.status === 'disabled').length,
+  }), [triggers]);
+
+  const filteredTriggers = useMemo(() => {
+    const list = filter === 'all' ? [...triggers] : triggers.filter((tr) => tr.status === filter);
+
+    const STATUS_ORDER: Record<string, number> = { armed: 0, error: 1, fired: 2, disabled: 3 };
+    list.sort((a, b) => {
+      // Primary: relevance rank (manual/current-step/current-phase/next/rest)
+      const ra = rankTrigger(a, steps, currentStepIndex, currentPhaseIndex);
+      const rb = rankTrigger(b, steps, currentStepIndex, currentPhaseIndex);
+      if (ra !== rb) return ra - rb;
+      // Secondary: status order
+      const sa = STATUS_ORDER[a.status] ?? 9;
+      const sb = STATUS_ORDER[b.status] ?? 9;
+      if (sa !== sb) return sa - sb;
+      // Tertiary: alphabetical
+      return (a.name ?? '').localeCompare(b.name ?? '');
+    });
+
+    return list;
+  }, [triggers, filter, steps, currentStepIndex, currentPhaseIndex]);
+
+  const filters: Array<{ key: TriggerFilter; label: string; count: number }> = [
+    { key: 'all', label: t('triggers.filterAll'), count: counts.all },
+    { key: 'armed', label: t('triggers.filterArmed'), count: counts.armed },
+    { key: 'fired', label: t('triggers.filterFired'), count: counts.fired },
+    { key: 'error', label: t('triggers.filterError'), count: counts.error },
+    { key: 'disabled', label: t('triggers.filterDisabled'), count: counts.disabled },
+  ];
+
+  // ── Override fire: non-manual triggers need confirm dialog ──
+  const handleFireWithOverrideCheck = useCallback(async (triggerId: string): Promise<TriggerActionResult> => {
+    const trigger = triggers.find((tr) => tr.id === triggerId);
+    if (!trigger) return { ok: false, action: 'fire', triggerId, kind: 'action_failed', httpStatus: 0, errorCode: 'TRIGGER_NOT_FOUND', message: 'Trigger not found' };
+    const isManual = (trigger.conditionType || (trigger.condition?.type as string)) === 'manual';
+    if (isManual) {
+      return await onFire?.(triggerId) ?? { ok: false, action: 'fire', triggerId, kind: 'action_failed', httpStatus: 0, errorCode: 'NO_HANDLER', message: 'No fire handler' };
+    } else {
+      // Non-manual: require confirm (result returned from handleConfirmOverrideFire)
+      setConfirmFireId(triggerId);
+      // For non-manual, the actual fire happens in handleConfirmOverrideFire
+      // Return a synthetic success since the confirm dialog takes over
+      return { ok: true, action: 'fire', triggerId };
+    }
+  }, [triggers, onFire]);
+
+  const handleConfirmOverrideFire = useCallback(async () => {
+    if (confirmFireId) {
+      await onFire?.(confirmFireId);
+      setConfirmFireId(null);
+    }
+  }, [confirmFireId, onFire]);
+
+  // ── Pending timeout handler → toast ──
+  const handlePendingTimeout = useCallback((triggerId: string, action: PendingAction) => {
+    const trigger = triggers.find((tr) => tr.id === triggerId);
+    const name = trigger?.name ?? triggerId;
+    toast.warning(
+      t('triggers.pendingTimeout', { name, action: action ?? 'unknown' }),
+      t('triggers.pendingTimeoutTitle'),
+    );
+  }, [triggers, toast, t]);
+
+  // ── Request error handler → diagnostic toast (uses `kind` for classification) ──
+  const handleRequestError = useCallback((triggerId: string, action: PendingAction, result: Extract<TriggerActionResult, { ok: false }>) => {
+    const trigger = triggers.find((tr) => tr.id === triggerId);
+    const name = trigger?.name ?? triggerId;
+    if (result.kind === 'request_failed') {
+      toast.error(
+        t('triggers.requestFailed', { name }),
+        t('triggers.requestFailedTitle'),
+      );
+    } else {
+      toast.error(
+        t('triggers.actionFailed', { name, errorCode: result.errorCode }),
+        t('triggers.actionFailedTitle'),
+      );
+    }
+    if (typeof window !== 'undefined') {
+      try { if (localStorage.getItem('trigger:debug') === '1') console.debug('[TriggerPanel] request:error', { triggerId, action, kind: result.kind, httpStatus: result.httpStatus, errorCode: result.errorCode, message: result.message }); } catch {}
+    }
+  }, [triggers, toast, t]);
+
+  const confirmTrigger = confirmFireId ? triggers.find((tr) => tr.id === confirmFireId) : null;
 
   return (
     <div className="space-y-4">
-      {armedTriggers.length > 0 && (
-        <div className="flex justify-end">
-          <Button variant="destructive" size="sm" onClick={onDisableAll} disabled={disabled || !onDisableAll}>
-            <StopIcon className="h-4 w-4 mr-1" />
+      {/* Filter toggles + Override toggle */}
+      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+        {filters.map((f) => (
+          f.count > 0 || f.key === 'all' ? (
+            <button
+              key={f.key}
+              type="button"
+              onClick={() => setFilter(f.key)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap',
+                filter === f.key
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted',
+              )}
+            >
+              {f.label}
+              {f.count > 0 && (
+                <span className={cn(
+                  'text-[10px] rounded-full min-w-[18px] px-1 py-0.5 text-center',
+                  filter === f.key ? 'bg-primary-foreground/20' : 'bg-muted-foreground/20',
+                )}>
+                  {f.count}
+                </span>
+              )}
+            </button>
+          ) : null
+        ))}
+
+        {/* Disable All — push to the right */}
+        {counts.armed > 0 && onDisableAll && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={onDisableAll}
+            disabled={disabled}
+            className="ml-auto shrink-0"
+          >
+            <StopIcon className="h-3.5 w-3.5 mr-1" />
             {t('triggers.disableAll')}
           </Button>
+        )}
+      </div>
+
+      {/* Director Override Mode toggle */}
+      {!disabled && (
+        <div className="flex items-center justify-between rounded-lg border border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-950/10 px-3 py-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-amber-600 dark:text-amber-400 text-sm">⚡</span>
+            <div className="min-w-0">
+              <span className="text-xs font-medium text-foreground">{t('triggers.overrideMode')}</span>
+              <p className="text-[10px] text-muted-foreground">{t('triggers.overrideModeDesc')}</p>
+            </div>
+          </div>
+          <Switch
+            checked={overrideEnabled}
+            onCheckedChange={handleOverrideChange}
+            aria-label={t('triggers.overrideMode')}
+          />
         </div>
       )}
 
-      {armedTriggers.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-xs font-medium text-muted-foreground">
-            {t('triggers.armedLabel', { count: armedTriggers.length })}
-          </div>
-          {armedTriggers.map((trigger) => (
-            <div key={trigger.id}
-              className="flex items-center justify-between p-3 rounded-lg border bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
-              <div className="min-w-0 flex-1">
-                <div className="font-medium text-sm truncate">{trigger.name}</div>
-                <div className="text-xs text-muted-foreground truncate">
-                  {trigger.conditionSummary} → {trigger.actionSummary}
-                </div>
-              </div>
-              <Button size="sm" variant="outline" onClick={() => onFire?.(trigger.id)} disabled={disabled || !onFire}>
-                <BoltIcon className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Trigger cards */}
+      <div className="space-y-3">
+        {filteredTriggers.map((trigger) => (
+          <DirectorTriggerCard
+            key={trigger.id}
+            trigger={trigger}
+            onFire={handleFireWithOverrideCheck}
+            onRearm={onRearm}
+            onDisable={onDisable}
+            overrideEnabled={overrideEnabled}
+            onPendingTimeout={handlePendingTimeout}
+            onRequestError={handleRequestError}
+            disabled={disabled}
+          />
+        ))}
+      </div>
 
-      {errorTriggers.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-xs font-medium text-destructive">
-            {t('triggers.errorLabel', { count: errorTriggers.length })}
-          </div>
-          {errorTriggers.map((trigger) => (
-            <div key={trigger.id} className="p-3 rounded-lg border bg-destructive/10 border-destructive/30">
-              <div className="font-medium text-sm">{trigger.name}</div>
-              <div className="text-xs text-destructive">{trigger.lastError}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {firedTriggers.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-xs font-medium text-muted-foreground">
-            {t('triggers.firedLabel', { count: firedTriggers.length })}
-          </div>
-          {firedTriggers.slice(0, 5).map((trigger) => (
-            <div key={trigger.id} className="p-3 rounded-lg border bg-muted/50">
-              <div className="font-medium text-sm text-muted-foreground">{trigger.name}</div>
-              <div className="text-xs text-muted-foreground">
-                {trigger.lastFiredAt
-                  ? new Date(trigger.lastFiredAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-                  : t('common.dash')}
-              </div>
-            </div>
-          ))}
+      {filteredTriggers.length === 0 && triggers.length > 0 && (
+        <div className="text-sm text-muted-foreground text-center py-6">
+          {t('triggers.noMatchingTriggers')}
         </div>
       )}
 
@@ -463,6 +652,17 @@ function TriggerPanel({
           {t('triggers.noTriggers')}
         </div>
       )}
+
+      {/* Override fire confirm dialog */}
+      <ConfirmDialog
+        open={confirmFireId !== null}
+        onClose={() => setConfirmFireId(null)}
+        onConfirm={handleConfirmOverrideFire}
+        title={t('triggers.overrideConfirmTitle')}
+        description={t('triggers.overrideConfirmDesc', { name: confirmTrigger?.name ?? '' })}
+        confirmLabel={t('triggers.overrideConfirmButton')}
+        variant="warning"
+      />
     </div>
   );
 }
@@ -894,10 +1094,16 @@ function ArtifactsTab({
   artifacts,
   artifactStates,
   t,
+  onRevealArtifact,
+  onHideArtifact,
+  onResetArtifact,
 }: {
   artifacts: CockpitArtifact[];
   artifactStates: Record<string, ArtifactState>;
   t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
+  onRevealArtifact?: (artifactId: string) => Promise<void>;
+  onHideArtifact?: (artifactId: string) => Promise<void>;
+  onResetArtifact?: (artifactId: string) => Promise<void>;
 }) {
   const hiddenCount = artifacts.filter(a => { const s = artifactStates[a.id]; return !s || s.status === 'hidden'; }).length;
   const availableCount = artifacts.filter(a => { const s = artifactStates[a.id]; return s && (s.status === 'revealed' || s.status === 'unlocked'); }).length;
@@ -952,6 +1158,31 @@ function ArtifactsTab({
                 </div>
                 <ArchiveBoxIcon className="h-5 w-5 text-muted-foreground shrink-0" />
               </div>
+              {/* Action buttons */}
+              {(onRevealArtifact || onHideArtifact) && (
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                  {statusLabel === 'hidden' && onRevealArtifact && (
+                    <Button size="sm" variant="default" className="h-7 text-xs"
+                      onClick={() => onRevealArtifact(artifact.id)}>
+                      <EyeIcon className="h-3.5 w-3.5 mr-1" />
+                      {t('artifacts.reveal')}
+                    </Button>
+                  )}
+                  {(statusLabel === 'revealed' || statusLabel === 'unlocked') && onHideArtifact && (
+                    <Button size="sm" variant="outline" className="h-7 text-xs"
+                      onClick={() => onHideArtifact(artifact.id)}>
+                      <EyeSlashIcon className="h-3.5 w-3.5 mr-1" />
+                      {t('artifacts.hide')}
+                    </Button>
+                  )}
+                  {statusLabel !== 'hidden' && onResetArtifact && (
+                    <Button size="sm" variant="ghost" className="h-7 text-xs text-muted-foreground"
+                      onClick={() => onResetArtifact(artifact.id)}>
+                      {t('artifacts.reset')}
+                    </Button>
+                  )}
+                </div>
+              )}
             </Card>
           );
         })}
@@ -984,6 +1215,8 @@ export function DirectorModePanel({
   onNextStep,
   onPreviousStep,
   onFireTrigger,
+  onArmTrigger,
+  onDisableTrigger,
   onDisableAllTriggers,
   onSendSignal,
   onExecuteSignal,
@@ -991,6 +1224,9 @@ export function DirectorModePanel({
   onOpenChat,
   chatUnreadCount = 0,
   onClose,
+  onRevealArtifact,
+  onHideArtifact,
+  onResetArtifact,
   showFullscreenButton = false,
   isFullscreen = false,
   onToggleFullscreen,
@@ -1223,12 +1459,21 @@ export function DirectorModePanel({
           />
         )}
         {activeDrawer === 'artifacts' && (
-          <ArtifactsTab artifacts={artifacts} artifactStates={artifactStates} t={t} />
+          <ArtifactsTab artifacts={artifacts} artifactStates={artifactStates} t={t}
+            onRevealArtifact={onRevealArtifact}
+            onHideArtifact={onHideArtifact}
+            onResetArtifact={onResetArtifact}
+          />
         )}
         {activeDrawer === 'triggers' && (
           <TriggerPanel
             triggers={triggers}
+            steps={steps}
+            currentStepIndex={currentStepIndex}
+            currentPhaseIndex={currentPhaseIndex}
             onFire={onFireTrigger}
+            onRearm={onArmTrigger}
+            onDisable={onDisableTrigger}
             onDisableAll={onDisableAllTriggers}
             t={t}
             disabled={isPreview}

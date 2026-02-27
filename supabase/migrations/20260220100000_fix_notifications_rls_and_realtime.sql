@@ -18,6 +18,9 @@
 -- already covers that. Split into INSERT/UPDATE/DELETE only.
 
 DROP POLICY IF EXISTS "user_preferences_admin_all" ON public.user_preferences;
+DROP POLICY IF EXISTS "user_preferences_admin_insert" ON public.user_preferences;
+DROP POLICY IF EXISTS "user_preferences_admin_update" ON public.user_preferences;
+DROP POLICY IF EXISTS "user_preferences_admin_delete" ON public.user_preferences;
 
 CREATE POLICY "user_preferences_admin_insert"
   ON public.user_preferences

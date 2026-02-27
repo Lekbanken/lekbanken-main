@@ -78,6 +78,7 @@ DROP POLICY IF EXISTS "Users can view their notifications" ON public.notificatio
 -- =============================================================================
 
 -- 4a. get_user_notifications
+DROP FUNCTION IF EXISTS public.get_user_notifications(INTEGER);
 CREATE OR REPLACE FUNCTION public.get_user_notifications(p_limit INTEGER DEFAULT 20)
 RETURNS TABLE (
   id UUID,
@@ -119,6 +120,7 @@ $$;
 GRANT EXECUTE ON FUNCTION public.get_user_notifications TO authenticated;
 
 -- 4b. get_unread_notification_count
+DROP FUNCTION IF EXISTS public.get_unread_notification_count();
 CREATE OR REPLACE FUNCTION public.get_unread_notification_count()
 RETURNS INTEGER
 LANGUAGE sql
@@ -135,6 +137,7 @@ $$;
 GRANT EXECUTE ON FUNCTION public.get_unread_notification_count TO authenticated;
 
 -- 4c. mark_notification_read
+DROP FUNCTION IF EXISTS public.mark_notification_read(UUID);
 CREATE OR REPLACE FUNCTION public.mark_notification_read(p_delivery_id UUID)
 RETURNS BOOLEAN
 LANGUAGE plpgsql
@@ -154,6 +157,7 @@ $$;
 GRANT EXECUTE ON FUNCTION public.mark_notification_read TO authenticated;
 
 -- 4d. mark_all_notifications_read
+DROP FUNCTION IF EXISTS public.mark_all_notifications_read();
 CREATE OR REPLACE FUNCTION public.mark_all_notifications_read()
 RETURNS INTEGER
 LANGUAGE plpgsql
@@ -175,6 +179,7 @@ $$;
 GRANT EXECUTE ON FUNCTION public.mark_all_notifications_read TO authenticated;
 
 -- 4e. dismiss_notification
+DROP FUNCTION IF EXISTS public.dismiss_notification(UUID);
 CREATE OR REPLACE FUNCTION public.dismiss_notification(p_delivery_id UUID)
 RETURNS BOOLEAN
 LANGUAGE plpgsql

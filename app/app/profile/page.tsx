@@ -20,7 +20,6 @@ import {
   ExclamationTriangleIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/outline';
-import { isPrivateTenant } from '@/lib/tenant/helpers';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
 import { profileCacheKeys } from '@/lib/profile/cacheKeys';
 

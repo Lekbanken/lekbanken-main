@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { Card, CardContent, CardHeader, CardTitle, Button, Badge, Input, Select } from '@/components/ui';
@@ -46,6 +47,7 @@ interface FormData {
 }
 
 export default function MarketplaceAdminPage() {
+  const t = useTranslations('admin.marketplace.legacy');
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
@@ -528,7 +530,7 @@ export default function MarketplaceAdminPage() {
                         }
                       />
                       <div className="col-span-2 -mt-2 text-sm text-muted-foreground">
-                        Visas som: {formatDurationSeconds(formData.powerup_duration_seconds ?? null)}
+                        {t('displayedAs', { value: formatDurationSeconds(formData.powerup_duration_seconds ?? null) })}
                       </div>
                     </div>
                   )}

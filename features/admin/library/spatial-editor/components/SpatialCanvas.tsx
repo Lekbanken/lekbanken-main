@@ -11,6 +11,7 @@
 // =============================================================================
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useSpatialEditorStore, getActiveContentBox, clampToBox } from '../store/spatial-editor-store';
 import {
   screenToWorld,
@@ -847,6 +848,7 @@ type DragState =
   | null;
 
 export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_props, ref) {
+  const t = useTranslations('admin.library.spatialEditor.canvas');
   const svgRef = useRef<SVGSVGElement>(null);
   useImperativeHandle(ref, () => svgRef.current!, []);
   const [isPanning, setIsPanning] = useState(false);
@@ -1795,7 +1797,7 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
           fillOpacity={0.7}
           data-selection-ring
         >
-          Klicka för att placera
+          {t('clickToPlace')}
         </text>
       )}
 
@@ -1820,7 +1822,7 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
                 fill={polyColor}
                 fillOpacity={0.8}
               >
-                Klicka för att sätta hörn
+                {t('clickToSetCorner')}
               </text>
             </g>
           );
@@ -1936,7 +1938,7 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
                 fill={pathColor}
                 fillOpacity={0.8}
               >
-                Klicka för att sätta punkt
+                {t('clickToSetPoint')}
               </text>
             </g>
           );
@@ -2034,7 +2036,7 @@ export const SpatialCanvas = forwardRef<SVGSVGElement>(function SpatialCanvas(_p
                 fill={acColor}
                 fillOpacity={0.8}
               >
-                Klicka för att sätta punkt
+                {t('clickToSetPoint')}
               </text>
             </g>
           );

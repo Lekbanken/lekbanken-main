@@ -196,7 +196,8 @@
         "uploadToStart": "Upload an image to get started.",
         "clear": "Clear",
         "noHotspotsYet": "No hotspots yet.",
-        "selectHotspotToEdit": "Select a hotspot in the image to edit."
+        "selectHotspotToEdit": "Select a hotspot in the image to edit.",
+        "requiredForCompletion": "Required for completion"
       },
       "emptyState": {
         "noItemsYet": "You have no {itemName} yet.",
@@ -432,8 +433,19 @@
       "noAchievementsYet": "No achievements yet",
       "viewAll": "View all",
       "unlockedCount": "{unlocked} of {total} unlocked",
-      "clickBadgeHint": "Click a badge to see details"
+      "clickBadgeHint": "Click a badge to see details",
+      "retry": "Try again"
     }
+  },
+  "playground": {
+    "subtitle": "Lekbanken · UI Playground",
+    "title": "Design playground",
+    "description": "Paste TailwindPLUS components here, adjust colors and layout, then move finished components to components/ui.",
+    "sandbox1Title": "Sandbox 1 – paste component here",
+    "sandbox1Description": "Replace this box with a component from TailwindPLUS. Test spacing, colors, responsiveness etc.",
+    "sandbox1Placeholder": "Placeholder for first component.",
+    "sandbox2Title": "Sandbox 2 – alternative layout",
+    "sandbox2Description": "Use this section to test variants of the same component or entirely different component types."
   },
   "planner": {
     "myPlans": "My plans",
@@ -1383,7 +1395,11 @@
         "unknownOrg": "Unknown org",
         "plan": "Annual",
         "seatsLabel": "Plan: {plan} • Seats: {used}/{total}",
-        "validLabel": "Valid: {start} – {end}"
+        "validLabel": "Valid: {start} – {end}",
+        "loginToSee": "Log in to see licenses.",
+        "errorOccurred": "An error occurred",
+        "planSeats": "Plan: {plan} • Seats: {used}/{total}",
+        "validPeriod": "Valid: {start} – {end}"
       }
     },
     "leaderboard": {
@@ -7768,9 +7784,11 @@
         "openSvg": "Open SVG",
         "createNew": "Create new",
         "creating": "Creating…",
-        "newDiagram": "New diagram"
+        "newDiagram": "New diagram",
+        "pattern": "Pattern"
       },
       "spatialEditor": {
+        "loadingEditor": "Loading editor...",
         "toolbar": {
           "save": "Save",
           "load": "Load",
@@ -7872,6 +7890,61 @@
           "useAsBackground": "Use as background",
           "tips": "Drag the map to pan. Scroll to zoom. Map data: OpenStreetMap.",
           "placeholder": "Press \"Capture map image\" to see the preview here. You can then use it as background in the editor."
+        },
+        "palette": {
+          "selectMove": "Select / Move (V)",
+          "draw": "Draw",
+          "arrow": "Arrow",
+          "zoneRect": "Zone (rect)",
+          "zonePolygon": "Zone (polygon)",
+          "waterPolygon": "Water (polygon)",
+          "pathChain": "Path (chain)",
+          "hintFinishArrow": "Click canvas to set end point",
+          "hintSetCorner": "Click to set corner, double-click to finish",
+          "hintPolygon": "Click to set corners",
+          "hintPath": "Click to set points, double-click to finish",
+          "snapToGrid": "Snap to grid",
+          "constrainToArea": "Keep within area",
+          "showTrail": "Show trail",
+          "lockBackground": "Lock background",
+          "shortcutMove": "← → ↑ ↓ = Move (Shift = 5×)",
+          "shortcutDuplicate": "Ctrl+D = Duplicate",
+          "shortcutDelete": "Del = Delete",
+          "shortcutCancel": "Esc = Cancel"
+        },
+        "canvasToolbar": {
+          "customColor": "Custom color",
+          "pattern": "Pattern",
+          "noMarker": "No marker",
+          "selectMoveTool": "Select / Move (V)",
+          "deleteTool": "Delete (Del)"
+        },
+        "inspector": {
+          "color": "Color",
+          "from": "From",
+          "to": "To",
+          "dragEndpointsHint": "Drag the endpoints on the canvas to adjust",
+          "water": "Water",
+          "zone": "Zone",
+          "fillOpacity": "Fill ({percent}%)",
+          "exerciseDescriptionPlaceholder": "Exercise description…",
+          "marker": "Marker",
+          "borderColor": "Border color",
+          "selectObjectToEdit": "Select an object to edit",
+          "multiSelectHint": "Del = delete all • Drag = move all",
+          "pattern": "Pattern",
+          "corners": "corners",
+          "height": "Height"
+        },
+        "canvas": {
+          "clickToPlace": "Click to place",
+          "clickToSetCorner": "Click to set corner",
+          "clickToSetPoint": "Click to set point"
+        },
+        "stationList": {
+          "noStationsYet": "No stations yet. Place checkpoints via the palette.",
+          "autoNumberTitle": "Number by position (top-down, left-right)",
+          "renumberTitle": "Renumber 1..N (keep order)"
         }
       },
       "badges": {
@@ -7917,6 +7990,16 @@
       "security": "Security",
       "integrations": "Integrations",
       "advanced": "Advanced"
+    },
+    "legal": {
+      "formattingGuide": "Formatting guide",
+      "markdownSectionsHint": "Use ## for main sections",
+      "markdownSectionsDesc": "(these become accordions)"
+    },
+    "marketplace": {
+      "legacy": {
+        "displayedAs": "Displayed as: {value}"
+      }
     },
     "translations": {
       "title": "Translations",
@@ -8498,7 +8581,80 @@
           "searching": "Searching...",
           "results": "Results",
           "noUserFound": "No user found with that email address",
-          "addFriend": "Add"
+          "addFriend": "Add",
+          "connectionTimeout": "Connection timed out",
+          "loadError": "Could not load data",
+          "unexpectedError": "An unexpected error occurred.",
+          "retry": "Try again",
+          "partialFailure": "Partial error",
+          "partialFailureDesc": "Some data could not be loaded. The information below may be incomplete."
+        },
+        "activity": {
+          "title": "Activity",
+          "description": "View your recent activity and login history",
+          "activeSessions": "Active sessions",
+          "activeSessionsDesc": "Devices currently logged in to your account.",
+          "noSessions": "No active sessions found.",
+          "currentDevice": "This device",
+          "unknownDevice": "Unknown device",
+          "unknownIp": "Unknown IP",
+          "lastActive": "Last active {time}",
+          "revokeSession": "Revoke",
+          "revoking": "Revoking...",
+          "recentActivity": "Recent activity",
+          "recentActivityDesc": "The most recent activities on your account.",
+          "noActivity": "No activity yet",
+          "noFilteredActivity": "No activity to show for this filter.",
+          "viewAll": "View all",
+          "filters": {
+            "all": "All",
+            "security": "Security",
+            "profile": "Profile",
+            "achievements": "Achievements"
+          },
+          "types": {
+            "login": "Login",
+            "logout": "Logout",
+            "password_change": "Password changed",
+            "email_change": "Email changed",
+            "profile_update": "Profile updated",
+            "mfa_enabled": "MFA enabled",
+            "mfa_disabled": "MFA disabled",
+            "settings_change": "Settings changed",
+            "achievement_unlocked": "Achievement unlocked",
+            "gdpr_request": "GDPR request",
+            "session_revoked": "Session revoked"
+          },
+          "exportLog": "Export activity log",
+          "exportDesc": "Download your activity history as a file.",
+          "exportJson": "Export as JSON",
+          "exportCsv": "Export as CSV",
+          "loadMore": "Load more activities",
+          "revokeAllOther": "Revoke all other sessions",
+          "relativeTime": {
+            "now": "Just now",
+            "minutesAgo": "{minutes} min ago",
+            "hoursAgo": "{hours} hours ago",
+            "daysAgo": "{days} days ago"
+          },
+          "csvHeaders": {
+            "date": "Date",
+            "activity": "Activity",
+            "details": "Details",
+            "ip": "IP address"
+          },
+          "loadError": "Could not load activity",
+          "initError": "Could not initialize database connection.",
+          "unexpectedError": "An unexpected error occurred.",
+          "loadingTakingLong": "This is taking longer than expected. Check Console/Network to see which request is stuck and try reloading the page.",
+          "retry": "Try again",
+          "reload": "Reload",
+          "connectionTimeout": "Connection timed out",
+          "loadError": "Could not load data",
+          "unexpectedError": "An unexpected error occurred.",
+          "retry": "Try again",
+          "partialFailure": "Partial error",
+          "partialFailureDesc": "Some data could not be loaded. The information below may be incomplete."
         }
       },
       "achievementsShowcase": {
@@ -8514,6 +8670,11 @@
         "primary": "Primary",
         "currentlyActive": "Currently active",
         "switchSuccess": "Switched to {name}"
+      },
+      "errorBoundary": {
+        "title": "Something went wrong",
+        "description": "We could not load your profile page. Try again or contact support if the problem persists.",
+        "retry": "Try again"
       }
     },
     "settings": {
@@ -9335,7 +9496,8 @@
         "trustedDevicesDescription": "Devices that don't require MFA verification",
         "noTrustedDevices": "No trusted devices yet",
         "unknownDevice": "Unknown device",
-        "on": "on"
+        "on": "on",
+        "retry": "Try again"
       }
     }
   },

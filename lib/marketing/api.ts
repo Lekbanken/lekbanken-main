@@ -10,7 +10,7 @@
 
 import 'server-only';
 
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { unstable_cache } from 'next/cache';
 import { transformFeatureRow, transformUpdateRow, transformFeatureInput, transformUpdateInput } from './transformers';
 import type {

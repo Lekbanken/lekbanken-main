@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import {
   AcademicCapIcon,
-  UserGroupIcon,
   SparklesIcon,
   HeartIcon,
   TrophyIcon,
@@ -15,17 +14,13 @@ import {
   BriefcaseIcon,
   ComputerDesktopIcon,
   UsersIcon,
-  CakeIcon,
   CalendarDaysIcon,
   GiftIcon,
-  BookOpenIcon,
 } from "@heroicons/react/24/outline";
 
 // =============================================================================
 // Translation Helper Types
 // =============================================================================
-
-type TranslateFunction = ReturnType<typeof useTranslations<"marketing.pricing">>;
 
 // =============================================================================
 // Types

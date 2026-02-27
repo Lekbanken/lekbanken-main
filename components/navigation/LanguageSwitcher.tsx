@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSyncExternalStore } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,8 +30,8 @@ export function LanguageSwitcher({ className, align = "end" }: LanguageSwitcherP
   const active = LANG_OPTIONS.find((option) => option.code === language);
   
   // Prevent hydration mismatch from Radix UI generating different IDs on server vs client
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const emptySubscribe = () => () => {};
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const handleLanguageChange = (option: typeof LANG_OPTIONS[number]) => {
     // Update both PreferencesContext (for legacy support) and next-intl locale

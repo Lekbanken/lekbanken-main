@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { CheckIcon, ChevronDownIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { cn } from '@/lib/utils';
 import { PageTitleHeader } from '@/components/app/PageTitleHeader';

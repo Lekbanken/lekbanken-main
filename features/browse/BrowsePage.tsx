@@ -113,8 +113,8 @@ export function BrowsePage() {
     options: filterOptions,
     visibleGroups,
     hasSuperFilters,
-    isLoading: isLoadingFilters,
-    error: filterError,
+    isLoading: _isLoadingFilters,
+    error: _filterError,
   } = useBrowseFilters(tenantId, userPlayModes);
 
   // Reset filters when tenant changes to avoid stale, disallowed selections

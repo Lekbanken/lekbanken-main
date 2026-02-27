@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { EyeIcon } from '@heroicons/react/24/outline'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Input, Textarea, Select, Switch } from '@/components/ui'
 import { AdminConfirmDialog } from '@/components/admin/shared'
@@ -80,6 +81,7 @@ export function LegalDocEditorClient({
   initialSnapshot: LegalEditorSnapshot
   initialOrgAcceptance?: Record<string, OrgLegalAcceptanceRow>
 }) {
+  const t = useTranslations('admin.legal')
   const [locale, setLocale] = useState<LegalLocale>(() => {
     const map = buildLocaleMap(initialSnapshot.drafts)
     if (map.sv) return 'sv'
@@ -325,10 +327,10 @@ export function LegalDocEditorClient({
                 <label className="block text-sm font-medium text-foreground">Content (Markdown)</label>
                 <details className="text-xs">
                   <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                    Formatting guide
+                    {t('formattingGuide')}
                   </summary>
                   <div className="mt-2 p-3 rounded-lg bg-muted/50 text-muted-foreground space-y-1.5 max-w-md">
-                    <p><strong>Use ## for main sections</strong> (these become accordions):</p>
+                    <p><strong>{t('markdownSectionsHint')}</strong>{' '}{t('markdownSectionsDesc')}:</p>
                     <pre className="text-[11px] bg-background/50 p-2 rounded overflow-x-auto">
 {`## 1. Introduktion
 Text for this section...

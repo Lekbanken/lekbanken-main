@@ -185,7 +185,8 @@
         "uploadToStart": "Ladda upp en bild för att börja.",
         "clear": "Rensa",
         "noHotspotsYet": "Inga hotspots ännu.",
-        "selectHotspotToEdit": "Välj en hotspot i bilden för att redigera."
+        "selectHotspotToEdit": "Välj en hotspot i bilden för att redigera.",
+        "requiredForCompletion": "Krävs för completion"
       },
       "emptyState": {
         "noItemsYet": "Du har inga {itemName} ännu.",
@@ -421,8 +422,19 @@
       "noAchievementsYet": "Inga prestationer ännu",
       "viewAll": "Visa alla",
       "unlockedCount": "{unlocked} av {total} upplåsta",
-      "clickBadgeHint": "Klicka på en badge för att se detaljer"
+      "clickBadgeHint": "Klicka på en badge för att se detaljer",
+      "retry": "Försök igen"
     }
+  },
+  "playground": {
+    "subtitle": "Lekbanken · UI Playground",
+    "title": "Design playground",
+    "description": "Här kan du klistra in TailwindPLUS-komponenter, justera färger och layout, och sedan flytta färdiga komponenter till components/ui.",
+    "sandbox1Title": "Sandlåda 1 – klistra in komponent här",
+    "sandbox1Description": "Byt ut denna box mot en komponent från TailwindPLUS. Testa spacing, färger, responsivitet mm.",
+    "sandbox1Placeholder": "Placeholder för första komponenten.",
+    "sandbox2Title": "Sandlåda 2 – alternativ layout",
+    "sandbox2Description": "Använd den här sektionen för att testa varianter av samma komponent eller helt andra komponenttyper."
   },
   "planner": {
     "myPlans": "Mina planer",
@@ -1483,7 +1495,17 @@
           "invalidEmail": "Ange en giltig e-postadress"
         }
       },
-      "loadError": "Kunde inte ladda licenser"
+      "loadError": "Kunde inte ladda licenser",
+      "legacy": {
+        "notLoggedIn": "Du är inte inloggad",
+        "loginToSee": "Logga in för att se licenser.",
+        "pageDescription": "Översikt över kunders licenser, status och användning.",
+        "errorOccurred": "Ett fel inträffade",
+        "stats": { "expired": "Utgångna" },
+        "searchPlaceholder": "Sök organisation eller produkt",
+        "planSeats": "Plan: {plan} • Seats: {used}/{total}",
+        "validPeriod": "Gäller: {start} – {end}"
+      }
     },
     "leaderboard": {
       "legacy": {
@@ -8127,9 +8149,11 @@
         "openSvg": "Öppna SVG",
         "createNew": "Skapa nytt",
         "creating": "Skapar…",
-        "newDiagram": "Nytt diagram"
+        "newDiagram": "Nytt diagram",
+        "pattern": "Mönster"
       },
       "spatialEditor": {
+        "loadingEditor": "Laddar editor…",
         "toolbar": {
           "save": "Spara",
           "load": "Ladda",
@@ -8231,6 +8255,61 @@
           "useAsBackground": "Använd som bakgrund",
           "tips": "Dra i kartan för att panorera. Scrolla för att zooma. Kartdata: OpenStreetMap.",
           "placeholder": "Tryck på \"Fånga kartbild\" så visas förhandsgranskningen här. Du kan sedan använda den som bakgrund i editorn."
+        },
+        "palette": {
+          "selectMove": "Välj / Flytta (V)",
+          "draw": "Rita",
+          "arrow": "Pil",
+          "zoneRect": "Zon (rekt)",
+          "zonePolygon": "Zon (polygon)",
+          "waterPolygon": "Vatten (polygon)",
+          "pathChain": "Stig (kedja)",
+          "hintFinishArrow": "Klicka på canvasen för att sätta slutpunkt",
+          "hintSetCorner": "Klicka för att sätta hörn, dubbelklicka för att avsluta",
+          "hintPolygon": "Klicka för att sätta hörn",
+          "hintPath": "Klicka för att sätta punkter, dubbelklicka för att avsluta",
+          "snapToGrid": "Snap till rutnät",
+          "constrainToArea": "Håll innanför yta",
+          "showTrail": "Visa rutt",
+          "lockBackground": "Lås bakgrund",
+          "shortcutMove": "← → ↑ ↓ = Flytta (Shift = 5×)",
+          "shortcutDuplicate": "Ctrl+D = Duplicera",
+          "shortcutDelete": "Del = Ta bort",
+          "shortcutCancel": "Esc = Avbryt"
+        },
+        "canvasToolbar": {
+          "customColor": "Anpassad färg",
+          "pattern": "Mönster",
+          "noMarker": "Ingen markör",
+          "selectMoveTool": "Välj / Flytta (V)",
+          "deleteTool": "Ta bort (Del)"
+        },
+        "inspector": {
+          "color": "Färg",
+          "from": "Från",
+          "to": "Till",
+          "dragEndpointsHint": "Dra ändpunkterna i canvasen för att justera",
+          "water": "Vatten",
+          "zone": "Zon",
+          "fillOpacity": "Fyllning ({percent}%)",
+          "exerciseDescriptionPlaceholder": "Övningsbeskrivning…",
+          "marker": "Markör",
+          "borderColor": "Borderfärg",
+          "selectObjectToEdit": "Välj ett objekt för att redigera",
+          "multiSelectHint": "Del = ta bort alla • Dra = flytta alla",
+          "pattern": "Mönster",
+          "corners": "hörn",
+          "height": "Höjd"
+        },
+        "canvas": {
+          "clickToPlace": "Klicka för att placera",
+          "clickToSetCorner": "Klicka för att sätta hörn",
+          "clickToSetPoint": "Klicka för att sätta punkt"
+        },
+        "stationList": {
+          "noStationsYet": "Inga stationer än. Placera checkpoints via paletten.",
+          "autoNumberTitle": "Numrera efter position (uppifrån-ner, vänster-höger)",
+          "renumberTitle": "Omnumrera 1..N (behåll ordning)"
         }
       },
       "badges": {
@@ -8276,6 +8355,16 @@
       "security": "Säkerhet",
       "integrations": "Integrationer",
       "advanced": "Avancerat"
+    },
+    "legal": {
+      "formattingGuide": "Formateringsguide",
+      "markdownSectionsHint": "Använd ## för huvudsektioner",
+      "markdownSectionsDesc": "(dessa blir dragspel)"
+    },
+    "marketplace": {
+      "legacy": {
+        "displayedAs": "Visas som: {value}"
+      }
     },
     "translations": {
       "title": "Översättningar",
@@ -9091,7 +9180,13 @@
             "activity": "Aktivitet",
             "details": "Detaljer",
             "ip": "IP-adress"
-          }
+          },
+          "loadError": "Kunde inte ladda aktivitet",
+          "initError": "Det gick inte att initiera anslutningen till databasen.",
+          "unexpectedError": "Ett oväntat fel inträffade.",
+          "loadingTakingLong": "Det här tar ovanligt lång tid. Kolla Console/Network för vilken request som fastnat och prova att ladda om sidan.",
+          "retry": "Försök igen",
+          "reload": "Ladda om"
         },
         "achievements": {
           "title": "Dina prestationer",
@@ -9156,7 +9251,13 @@
           "searching": "Söker...",
           "results": "Resultat",
           "noUserFound": "Ingen användare hittades med den e-postadressen",
-          "addFriend": "Lägg till"
+          "addFriend": "Lägg till",
+          "connectionTimeout": "Anslutningen tog för lång tid",
+          "loadError": "Kunde inte ladda data",
+          "unexpectedError": "Ett oväntat fel uppstod.",
+          "retry": "Försök igen",
+          "partialFailure": "Delvis fel",
+          "partialFailureDesc": "Vissa data kunde inte laddas. Informationen nedan kan vara ofullständig."
         }
       },
       "achievementsShowcase": {
@@ -9181,6 +9282,11 @@
         "primary": "Primär",
         "currentlyActive": "Aktiv nu",
         "switchSuccess": "Bytte till {name}"
+      },
+      "errorBoundary": {
+        "title": "Något gick fel",
+        "description": "Vi kunde inte ladda din profilsida. Försök igen eller kontakta support om problemet kvarstår.",
+        "retry": "Försök igen"
       }
     },
     "settings": {
@@ -10046,7 +10152,8 @@
           "codesRegenerated": "Nya återställningskoder har genererats",
           "deviceRevoked": "Enheten har tagits bort",
           "allDevicesRevoked": "Alla enheter har tagits bort"
-        }
+        },
+        "retry": "Försök igen"
       }
     },
     "errors": {

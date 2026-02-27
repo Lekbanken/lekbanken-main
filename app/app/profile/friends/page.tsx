@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
@@ -217,11 +217,11 @@ export default function FriendsPage() {
 
       {/* Query error/timeout */}
       {(status === 'error' || status === 'timeout') && (
-        <Alert variant="error" title={status === 'timeout' ? 'Anslutningen tog för lång tid' : 'Kunde inte ladda data'}>
+        <Alert variant="error" title={status === 'timeout' ? t('sections.friends.connectionTimeout') : t('sections.friends.loadError')}>
           <div className="space-y-3">
-            <p>{queryError || 'Ett oväntat fel uppstod.'}</p>
+            <p>{queryError || t('sections.friends.unexpectedError')}</p>
             <Button onClick={retry} variant="outline" size="sm">
-              Försök igen
+              {t('sections.friends.retry')}
             </Button>
           </div>
         </Alert>
@@ -229,8 +229,8 @@ export default function FriendsPage() {
 
       {/* Partial failure warning */}
       {friendsData?.partialFailure && (
-        <Alert variant="warning" title="Delvis fel">
-          <p>Vissa data kunde inte laddas. Informationen nedan kan vara ofullständig.</p>
+        <Alert variant="warning" title={t('sections.friends.partialFailure')}>
+          <p>{t('sections.friends.partialFailureDesc')}</p>
         </Alert>
       )}
 

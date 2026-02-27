@@ -84,9 +84,11 @@ export function NotificationBell({ className }: NotificationBellProps) {
 
   // Reset image error flag when switching between active/rest bell
   const isActive = unreadCount > 0;
-  useEffect(() => {
+  const [prevIsActive, setPrevIsActive] = useState(isActive);
+  if (prevIsActive !== isActive) {
+    setPrevIsActive(isActive);
     setImgError(false);
-  }, [isActive]);
+  }
 
   // Close on click outside
   useEffect(() => {

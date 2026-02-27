@@ -5,6 +5,7 @@
 // =============================================================================
 
 import { useSpatialEditorStore } from '../store/spatial-editor-store';
+import { useTranslations } from 'next-intl';
 import type { SpatialObjectBase } from '../lib/types';
 import type { CheckpointKind } from '../lib/types';
 import { ALL_PLAYER_MARKERS, ALL_BALL_MARKERS } from '../lib/types';
@@ -30,11 +31,12 @@ const PRESET_COLORS = [
 // ---------------------------------------------------------------------------
 
 function ColorPicker({ obj }: { obj: SpatialObjectBase }) {
+  const t = useTranslations('admin.library.spatialEditor.inspector');
   const updateObjectProps = useSpatialEditorStore((s) => s.updateObjectProps);
   const current = (obj.props.color as string) ?? '#3b82f6';
   return (
     <div className="flex flex-col gap-1 text-xs">
-      <span className="text-gray-500 dark:text-gray-400">Färg</span>
+      <span className="text-gray-500 dark:text-gray-400">{t('color')}</span>
       <div className="flex flex-wrap gap-1">
         {PRESET_COLORS.map((c) => (
           <button
@@ -115,6 +117,7 @@ function RotationControls({ obj }: { obj: SpatialObjectBase }) {
 // ---------------------------------------------------------------------------
 
 function ArrowInspector({ obj }: { obj: SpatialObjectBase }) {
+  const t = useTranslations('admin.library.spatialEditor.inspector');
   const updateObjectProps = useSpatialEditorStore((s) => s.updateObjectProps);
   const pattern = (obj.props.pattern as string) ?? 'solid';
   const hasArrowhead = obj.props.arrowhead !== false;
@@ -126,21 +129,21 @@ function ArrowInspector({ obj }: { obj: SpatialObjectBase }) {
         <div className="text-xs text-gray-500 dark:text-gray-400">
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <span className="font-medium">Från:</span>{' '}
+              <span className="font-medium">{t('from')}:</span>{' '}
               <span className="font-mono">{(obj.from.x * 100).toFixed(0)}%, {(obj.from.y * 100).toFixed(0)}%</span>
             </div>
             <div>
-              <span className="font-medium">Till:</span>{' '}
+              <span className="font-medium">{t('to')}:</span>{' '}
               <span className="font-mono">{(obj.to.x * 100).toFixed(0)}%, {(obj.to.y * 100).toFixed(0)}%</span>
             </div>
           </div>
-          <p className="mt-0.5 text-[10px] text-gray-400">Dra ändpunkterna i canvasen för att justera</p>
+          <p className="mt-0.5 text-[10px] text-gray-400">{t('dragEndpointsHint')}</p>
         </div>
       )}
 
       {/* Pattern selector */}
       <div className="flex flex-col gap-1 text-xs">
-        <span className="text-gray-500 dark:text-gray-400">Mönster</span>
+        <span className="text-gray-500 dark:text-gray-400">{t('pattern')}</span>
         <div className="flex gap-1">
           {(['solid', 'dashed'] as const).map((p) => (
             <button
@@ -181,6 +184,7 @@ function ArrowInspector({ obj }: { obj: SpatialObjectBase }) {
 // ---------------------------------------------------------------------------
 
 function ZoneInspector({ obj }: { obj: SpatialObjectBase }) {
+  const t = useTranslations('admin.library.spatialEditor.inspector');
   const updateObjectProps = useSpatialEditorStore((s) => s.updateObjectProps);
   const fillOpacity = (obj.props.fillOpacity as number) ?? 0.2;
   const polyPoints = obj.props.points as { x: number; y: number }[] | undefined;
@@ -192,8 +196,8 @@ function ZoneInspector({ obj }: { obj: SpatialObjectBase }) {
       {/* Polygon info */}
       {isPolygon && (
         <div className="text-xs text-gray-500 dark:text-gray-400">
-          <span className="font-medium">{variant === 'water' ? 'Vatten' : 'Zon'}</span>
-          <span className="ml-1">({polyPoints.length} hörn)</span>
+          <span className="font-medium">{variant === 'water' ? t('water') : t('zone')}</span>
+          <span className="ml-1">({polyPoints.length} {t('corners')})</span>
         </div>
       )}
 
@@ -205,7 +209,7 @@ function ZoneInspector({ obj }: { obj: SpatialObjectBase }) {
             <span className="ml-1 font-mono">{((obj.props.width as number ?? 0.1) * 100).toFixed(0)}%</span>
           </div>
           <div>
-            <span className="text-gray-500 dark:text-gray-400">Höjd</span>
+            <span className="text-gray-500 dark:text-gray-400">{t('height')}</span>
             <span className="ml-1 font-mono">{((obj.props.height as number ?? 0.07) * 100).toFixed(0)}%</span>
           </div>
         </div>
@@ -213,7 +217,7 @@ function ZoneInspector({ obj }: { obj: SpatialObjectBase }) {
 
       {/* Fill opacity slider */}
       <div className="flex flex-col gap-1 text-xs">
-        <span className="text-gray-500 dark:text-gray-400">Fyllning ({(fillOpacity * 100).toFixed(0)}%)</span>
+        <span className="text-gray-500 dark:text-gray-400">{t('fillOpacity', { percent: (fillOpacity * 100).toFixed(0) })}</span>
         <input
           type="range"
           min={0.05}
@@ -243,6 +247,7 @@ const CHECKPOINT_KINDS: { value: CheckpointKind; label: string; emoji: string }[
 ];
 
 function CheckpointInspector({ obj }: { obj: SpatialObjectBase }) {
+  const t = useTranslations('admin.library.spatialEditor.inspector');
   const updateObjectProps = useSpatialEditorStore((s) => s.updateObjectProps);
   const cpLabel = (obj.props.label as string) ?? '';
   const order = (obj.props.order as number) ?? 1;
@@ -304,7 +309,7 @@ function CheckpointInspector({ obj }: { obj: SpatialObjectBase }) {
           onChange={(e) => updateObjectProps(obj.id, { notes: e.target.value })}
           rows={2}
           className="rounded border border-gray-300 bg-white px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-          placeholder="Övningsbeskrivning…"
+          placeholder={t('exerciseDescriptionPlaceholder')}
         />
       </label>
 
@@ -319,6 +324,7 @@ function CheckpointInspector({ obj }: { obj: SpatialObjectBase }) {
 // ---------------------------------------------------------------------------
 
 function ObjectInspector({ obj }: { obj: SpatialObjectBase }) {
+  const t = useTranslations('admin.library.spatialEditor.inspector');
   const updateObjectProps = useSpatialEditorStore((s) => s.updateObjectProps);
   const updateObjectTransform = useSpatialEditorStore((s) => s.updateObjectTransform);
   const deleteSelected = useSpatialEditorStore((s) => s.deleteSelected);
@@ -466,7 +472,7 @@ function ObjectInspector({ obj }: { obj: SpatialObjectBase }) {
       {/* Marker image selector for player */}
       {obj.type === 'player' && (
         <div className="flex flex-col gap-1 text-xs">
-          <span className="text-gray-500 dark:text-gray-400">Markör</span>
+          <span className="text-gray-500 dark:text-gray-400">{t('marker')}</span>
           <div className="flex flex-wrap gap-1.5">
             {/* No-image option */}
             <button
@@ -495,7 +501,7 @@ function ObjectInspector({ obj }: { obj: SpatialObjectBase }) {
       {/* Marker image selector for ball */}
       {obj.type === 'ball' && (
         <div className="flex flex-col gap-1 text-xs">
-          <span className="text-gray-500 dark:text-gray-400">Markör</span>
+          <span className="text-gray-500 dark:text-gray-400">{t('marker')}</span>
           <div className="flex flex-wrap gap-1.5">
             {/* No-image option */}
             <button
@@ -545,7 +551,7 @@ function ObjectInspector({ obj }: { obj: SpatialObjectBase }) {
       {/* Border color for label */}
       {obj.type === 'label' && (
         <label className="flex flex-col gap-1 text-xs">
-          <span className="text-gray-500 dark:text-gray-400">Borderfärg</span>
+          <span className="text-gray-500 dark:text-gray-400">{t('borderColor')}</span>
           <input
             type="color"
             value={(obj.props.borderColor as string) ?? '#ffffff'}
@@ -578,6 +584,7 @@ function ObjectInspector({ obj }: { obj: SpatialObjectBase }) {
 }
 
 export function InspectorPanel() {
+  const t = useTranslations('admin.library.spatialEditor.inspector');
   const selectedIds = useSpatialEditorStore((s) => s.selectedIds);
   const doc = useSpatialEditorStore((s) => s.doc);
 
@@ -591,7 +598,7 @@ export function InspectorPanel() {
   if (selectedObjects.length === 0) {
     return (
       <div className="text-xs text-gray-400 dark:text-gray-500 italic">
-        Välj ett objekt för att redigera
+        {t('selectObjectToEdit')}
       </div>
     );
   }
@@ -601,7 +608,7 @@ export function InspectorPanel() {
       <div className="text-xs text-gray-500 dark:text-gray-400">
         <p className="font-medium">{selectedObjects.length} objekt valda</p>
         <p className="mt-1 text-gray-400 dark:text-gray-500">
-          Del = ta bort alla • Dra = flytta alla
+          {t('multiSelectHint')}
         </p>
       </div>
     );

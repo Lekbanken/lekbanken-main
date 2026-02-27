@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils'
 import { SandboxShell } from '../components/shell/SandboxShellV2'
 import { BadgePreviewEnhanced } from '@/features/admin/achievements/editor/components/BadgePreviewEnhanced'
 import { mockAchievements, themes } from '@/features/admin/achievements/data'
-import type { AchievementIconConfig, AchievementAssetType } from '@/features/admin/achievements/types'
 
 // =============================================================================
 // Lekbanken Assets
@@ -128,7 +127,7 @@ function paletteAnimatedBg(mode: ColorMode, accent: string, angle = 124): Record
 
 // Flowing border glow — returns style props for a container that shifts colors
 // Use on box-shadow and border via CSS custom properties
-function paletteFlowingStyle(mode: ColorMode, accent: string, angle = 124): Record<string, string> {
+function _paletteFlowingStyle(mode: ColorMode, accent: string, angle = 124): Record<string, string> {
   if (mode === 'accent') return {}
   const colors = getColorPalette(mode, accent)
   const doubled = [...colors, ...colors.slice(0, Math.min(3, colors.length))]
@@ -279,7 +278,7 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${f(0)}${f(8)}${f(4)}`
 }
 
-function lightenColor(hex: string, amount: number): string {
+function _lightenColor(hex: string, amount: number): string {
   const hsl = hexToHSL(hex)
   // Move lightness towards white
   const newL = hsl.l + (100 - hsl.l) * amount
@@ -1921,7 +1920,7 @@ interface SkillNode {
 type NonNullFactionId = Exclude<FactionId, null>
 
 // Dice images per faction
-const FACTION_DICE: Record<NonNullFactionId, string> = {
+const _FACTION_DICE: Record<NonNullFactionId, string> = {
   forest: '/achievements/utmarkelser/lg/ic_dice.png',
   sea: '/achievements/utmarkelser/lg/ic_dice.png',
   sky: '/achievements/utmarkelser/lg/ic_dice.png',
@@ -1985,7 +1984,7 @@ const THEME_SKILL_TREES: Record<NonNullFactionId, ThemeTreeDef> = {
 }
 
 // Category icons for cosmetic node types
-const COSMETIC_CATEGORY_ICONS: Record<string, string> = {
+const _COSMETIC_CATEGORY_ICONS: Record<string, string> = {
   root: '⭐',
   bg: '🌌',
   avatar: '✨',
@@ -3735,7 +3734,7 @@ function BackgroundEffectsLayer({
             const x = ((i * 23 + 11) % 95) + 2
             const duration = 8 + (i % 6) * 3
             const delay = (i * 1.3) % 12
-            const wobbleDir = (i % 3) - 1
+            const _wobbleDir = (i % 3) - 1
             return (
               <div key={`bubble-${i}`} className="absolute rounded-full"
                 style={{
@@ -5104,7 +5103,7 @@ function SkillTreeInline({
   onFactionChange,
   completedPerFaction,
   isDarkMode,
-  accentColor,
+  accentColor: _accentColor,
   onCosmeticApply,
   onResetDesign,
   designSettings,

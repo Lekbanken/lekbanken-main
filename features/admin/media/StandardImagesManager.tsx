@@ -185,12 +185,12 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
   // Check if we can still create templates for this combo
   const canCreate = useMemo(() => {
     if (!selectedMainPurpose) return true
-    const product = products.find(p => p.id === selectedProduct)
+    const _product = products.find(p => p.id === selectedProduct)
     const purpose = purposes.find(p => p.id === selectedMainPurpose)
     if (!purpose) return true
     
     return canCreateTemplate(comboTemplates.length)
-  }, [comboTemplates.length])
+  }, [comboTemplates.length, products, purposes, selectedMainPurpose, selectedProduct])
 
   const handleCreateTemplate = async () => {
     if (!selectedMediaId || !selectedMainPurpose || !templateKey || !templateName) return
@@ -362,7 +362,7 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
   // Filter to only main purposes (no parent_id) for dropdowns
   const mainPurposes = useMemo(() => purposes.filter((p) => p.parent_id === null), [purposes])
   // Sub purposes for delsyfte dropdown (kept for display of existing templates)
-  const subPurposes = useMemo(() => purposes.filter((p) => p.parent_id !== null), [purposes])
+  const _subPurposes = useMemo(() => purposes.filter((p) => p.parent_id !== null), [purposes])
 
   // G1: Coverage matrix visible by default
   const [showCoverageMatrix, setShowCoverageMatrix] = useState(true)

@@ -19,12 +19,11 @@ import { isSystemAdmin, assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth
 import { parseCsvGames } from '@/features/admin/games/utils/csv-parser';
 import { parseGamesFromJsonPayload } from '@/features/admin/games/utils/json-game-import';
 import { validateGames } from '@/features/admin/games/utils/game-validator';
-import { actionOrderAliasesToIds, conditionOrderAliasesToIds } from '@/lib/games/trigger-order-alias';
 import { normalizeAndValidate } from '@/lib/import/metadataSchemas';
 import { rewriteAllTriggerRefs, type TriggerIdMap, type TriggerPayload } from '@/lib/import/triggerRefRewrite';
 import { assignCoverFromTemplates, type AssignCoverResult } from '@/lib/import/assignCoverFromTemplates';
-import { runPreflightValidation, type PreflightResult } from '@/lib/import/preflight-validation';
-import type { ParsedGame, DryRunResult, DryRunGamePreview, ImportError } from '@/types/csv-import';
+import { runPreflightValidation } from '@/lib/import/preflight-validation';
+import type { ParsedGame, DryRunResult, DryRunGamePreview, ImportError, ParsedTrigger } from '@/types/csv-import';
 import type { Json } from '@/types/supabase';
 
 /**
@@ -722,7 +721,7 @@ async function importRelatedData(
     artifactIdByOrder: Map<number, string>;
     roleIdByOrder: Map<number, string>;
     roleIdByName: Map<string, string>;
-    normalizedTriggers: import('@/types/csv-import').ParsedTrigger[];
+    normalizedTriggers: ParsedTrigger[];
   }
 ): Promise<AssignCoverResult> {
   // ==========================================================================

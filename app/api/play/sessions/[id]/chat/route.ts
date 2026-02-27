@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { resolveSessionViewer, type Viewer } from '@/lib/api/play-auth';
+import { resolveSessionViewer } from '@/lib/api/play-auth';
 
 type Visibility = 'public' | 'host';
 

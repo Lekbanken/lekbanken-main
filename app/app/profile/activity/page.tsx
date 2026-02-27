@@ -4,7 +4,6 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { ProfileService, type ActivityLogEntry, type UserSession } from '@/lib/profile';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -78,7 +77,6 @@ const getActivityFilters = (t: (key: string) => string) => [
 
 export default function ActivityPage() {
   const t = useTranslations('app.profile');
-  const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
   const { supabase, error: supabaseError, isInitializing } = useBrowserSupabase();
   const activityFilters = useMemo(() => getActivityFilters(t), [t]);
@@ -144,7 +142,7 @@ export default function ActivityPage() {
     } finally {
       setIsRevokingSession(null);
     }
-  }, [user?.id, supabase]);
+  }, [user?.id, profileService]);
 
   const filteredActivities = activities.filter((activity) => {
     if (activeFilter === 'all') return true;
@@ -197,8 +195,8 @@ export default function ActivityPage() {
   if (!authLoading && supabaseError) {
     return (
       <div className="p-6 lg:p-8 space-y-4">
-        <Alert variant="error" title="Kunde inte ladda aktivitet">
-          <p>Det gick inte att initiera anslutningen till databasen.</p>
+        <Alert variant="error" title={t('sections.activity.loadError')}>
+          <p>{t('sections.activity.initError')}</p>
           {process.env.NODE_ENV !== 'production' && (
             <pre className="mt-2 whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs text-foreground">
               {supabaseError.message}
@@ -206,7 +204,7 @@ export default function ActivityPage() {
           )}
         </Alert>
         <Button onClick={() => window.location.reload()} variant="outline">
-          Ladda om
+          {t('sections.activity.reload')}
         </Button>
       </div>
     );
@@ -227,14 +225,14 @@ export default function ActivityPage() {
         {isTimeout && (
           <div className="mt-6 space-y-3">
             <p className="text-xs text-muted-foreground">
-              Det här tar ovanligt lång tid. Kolla Console/Network för vilken request som fastnat och prova att ladda om sidan.
+              {t('sections.activity.loadingTakingLong')}
             </p>
             <div className="flex gap-2">
               <Button onClick={retry} variant="outline" size="sm">
-                Försök igen
+                {t('sections.activity.retry')}
               </Button>
               <Button onClick={() => window.location.reload()} variant="ghost" size="sm">
-                Ladda om
+                {t('sections.activity.reload')}
               </Button>
             </div>
           </div>
@@ -246,15 +244,15 @@ export default function ActivityPage() {
   if (status === 'error' || status === 'timeout') {
     return (
       <div className="p-6 lg:p-8 space-y-4">
-        <Alert variant="error" title="Kunde inte ladda aktivitet">
-          <p>{loadError || 'Ett oväntat fel inträffade.'}</p>
+        <Alert variant="error" title={t('sections.activity.loadError')}>
+          <p>{loadError || t('sections.activity.unexpectedError')}</p>
         </Alert>
         <div className="flex gap-2">
           <Button onClick={retry} variant="outline">
-            Försök igen
+            {t('sections.activity.retry')}
           </Button>
           <Button onClick={() => window.location.reload()} variant="ghost">
-            Ladda om
+            {t('sections.activity.reload')}
           </Button>
         </div>
       </div>

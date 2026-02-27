@@ -11,7 +11,6 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
-import type { Database } from '@/types/supabase';
 
 interface RejoinRequest {
   participantToken: string;

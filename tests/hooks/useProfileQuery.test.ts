@@ -9,7 +9,7 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useProfileQuery } from '../../hooks/useProfileQuery';
 

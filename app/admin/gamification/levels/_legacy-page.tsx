@@ -121,7 +121,7 @@ export default function GamificationLevelsAdminPage() {
           <div className="space-y-2">
             <textarea
               className="h-80 w-full rounded-md border border-border bg-background p-3 font-mono text-sm"
-              placeholder='[{ "level": 1, "name": "Nybörjare", "nextLevelXp": 1000 }]'
+              placeholder='[{ "level": 1, "name": "Beginner", "nextLevelXp": 1000 }]'
               value={rawJson}
               onChange={(e) => setRawJson(e.target.value)}
               disabled={loading || !tenantId}

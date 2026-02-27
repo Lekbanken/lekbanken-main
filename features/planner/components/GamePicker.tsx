@@ -89,7 +89,7 @@ export function GamePicker({
   const [hasMore, setHasMore] = React.useState(false);
   
   // Get filter options and coverage from useBrowseFilters hook
-  const { options, coverage, visibleGroups, hasSuperFilters } = useBrowseFilters(
+  const { options, coverage: _coverage, visibleGroups, hasSuperFilters } = useBrowseFilters(
     tenantId,
     userPlayModes
   );

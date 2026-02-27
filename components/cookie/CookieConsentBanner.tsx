@@ -22,7 +22,6 @@ import {
   CogIcon, 
   ChartBarIcon, 
   MegaphoneIcon,
-  XMarkIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'

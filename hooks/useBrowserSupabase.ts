@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 import { createBrowserClient } from '@/lib/supabase/client'
@@ -10,17 +10,30 @@ function toError(err: unknown): Error {
   return new Error(typeof err === 'string' ? err : JSON.stringify(err))
 }
 
-export function useBrowserSupabase() {
-  const [supabase, setSupabase] = useState<SupabaseClient<Database> | null>(null)
-  const [error, setError] = useState<Error | null>(null)
+interface BrowserSupabaseState {
+  supabase: SupabaseClient<Database> | null
+  error: Error | null
+}
 
-  useEffect(() => {
-    try {
-      setSupabase(createBrowserClient())
-    } catch (err) {
-      setError(toError(err))
+/**
+ * Lazy-initialise the Supabase browser client.
+ *
+ * Uses a `useState` initialiser so the client is created synchronously on the
+ * first client render (no flash of `null`).  The `typeof window` guard keeps
+ * the server-side render safe — during SSR the hook returns `null` and
+ * `isInitializing: true`.
+ */
+export function useBrowserSupabase() {
+  const [{ supabase, error }] = useState<BrowserSupabaseState>(() => {
+    if (typeof window === 'undefined') {
+      return { supabase: null, error: null }
     }
-  }, [])
+    try {
+      return { supabase: createBrowserClient(), error: null }
+    } catch (err) {
+      return { supabase: null, error: toError(err) }
+    }
+  })
 
   return {
     supabase,

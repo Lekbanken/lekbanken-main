@@ -186,16 +186,9 @@ export function useProfileQuery<T>(
     fetcherRef.current = fetcher
   }, [fetcher])
 
-  // Memoize depsKey to prevent recalculation on every render
-  // This is the key fix: depsKey only changes when primitive values change
-  const depsKey = useMemo(() => getDepsKey(deps), [
-    // We manually list primitives to avoid object identity issues
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.entries(deps)
-      .filter(([, v]) => isSerializablePrimitive(v))
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, v]) => v)
-  ])
+  // Compute depsKey from primitive values in deps
+  // getDepsKey is a cheap pure function (string concatenation)
+  const depsKey = getDepsKey(deps)
   
   // Memoize requestKey based on stable key + depsKey
   const requestKey = useMemo(() => `${key}::${depsKey}`, [key, depsKey])

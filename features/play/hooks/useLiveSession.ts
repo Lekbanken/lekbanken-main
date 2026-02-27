@@ -471,7 +471,7 @@ export function useLiveSession({
         reconnectTimerRef.current = null;
       }
     };
-  }, [sessionId, enabled, handleBroadcastEvent, supabase]);
+  }, [sessionId, enabled, handleBroadcastEvent, supabase, onReconnectRef]);
 
   // Imperative resync: fetch authoritative runtime state from server
   const resyncRuntimeState = useCallback(async () => {

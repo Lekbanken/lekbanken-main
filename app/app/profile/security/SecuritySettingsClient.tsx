@@ -58,7 +58,7 @@ export function SecuritySettingsClient({
   const {
     data: mfaData,
     error: mfaFetchError,
-    isLoading: isLoadingMfa,
+    isLoading: _isLoadingMfa,
     retry: retryMfa,
   } = useProfileQuery<{ status: MFAStatus; factorId?: string }>(
     statusFetchKey,
@@ -396,7 +396,7 @@ export function SecuritySettingsClient({
                 {devicesError}
               </div>
               <Button variant="outline" onClick={retryDevices}>
-                Försök igen
+                {t('retry')}
               </Button>
             </div>
           ) : trustedDevices.length === 0 ? (

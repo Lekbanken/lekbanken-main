@@ -369,7 +369,8 @@
         "uploadToStart": "Last opp et bilde for å starte.",
         "clear": "Tøm",
         "noHotspotsYet": "Ingen hotspots ennå.",
-        "selectHotspotToEdit": "Velg et hotspot i bildet for å redigere."
+        "selectHotspotToEdit": "Velg et hotspot i bildet for å redigere.",
+        "requiredForCompletion": "Kreves for fullføring"
       },
       "emptyState": {
         "noItemsYet": "Du har ingen {itemName} ennå.",
@@ -574,8 +575,19 @@
       "noAchievementsYet": "Ingen prestasjoner ennå",
       "viewAll": "Vis alle",
       "unlockedCount": "{unlocked} av {total} opplåst",
-      "clickBadgeHint": "Klikk på en badge for å se detaljer"
+      "clickBadgeHint": "Klikk på en badge for å se detaljer",
+      "retry": "Prøv igjen"
     }
+  },
+  "playground": {
+    "subtitle": "Lekbanken · UI Playground",
+    "title": "Design playground",
+    "description": "Lim inn TailwindPLUS-komponenter her, juster farger og layout, og flytt ferdige komponenter til components/ui.",
+    "sandbox1Title": "Sandkasse 1 – lim inn komponent her",
+    "sandbox1Description": "Bytt ut denne boksen med en komponent fra TailwindPLUS. Test spacing, farger, responsivitet osv.",
+    "sandbox1Placeholder": "Plassholder for første komponent.",
+    "sandbox2Title": "Sandkasse 2 – alternativ layout",
+    "sandbox2Description": "Bruk denne seksjonen for å teste varianter av samme komponent eller helt andre komponenttyper."
   },
   "planner": {
     "myPlans": "Mine planer",
@@ -1773,7 +1785,11 @@
         "unknownOrg": "Ukjent org",
         "plan": "Årlig",
         "seatsLabel": "Plan: {plan} • Seter: {used}/{total}",
-        "validLabel": "Gyldig: {start} – {end}"
+        "validLabel": "Gyldig: {start} – {end}",
+        "loginToSee": "Logg inn for å se lisenser.",
+        "errorOccurred": "En feil oppstod",
+        "planSeats": "Plan: {plan} • Seats: {used}/{total}",
+        "validPeriod": "Gjelder: {start} – {end}"
       }
     },
     "leaderboard": {
@@ -8058,9 +8074,11 @@
         "openSvg": "Åpne SVG",
         "createNew": "Opprett ny",
         "creating": "Oppretter…",
-        "newDiagram": "Nytt diagram"
+        "newDiagram": "Nytt diagram",
+        "pattern": "Mønster"
       },
       "spatialEditor": {
+        "loadingEditor": "Laster editor…",
         "toolbar": {
           "save": "Lagre",
           "load": "Last",
@@ -8162,6 +8180,61 @@
           "useAsBackground": "Bruk som bakgrunn",
           "tips": "Dra i kartet for å panorere. Scroll for å zoome. Kartdata: OpenStreetMap.",
           "placeholder": "Trykk på \"Fang kartbilde\" for å se forhåndsvisningen her. Du kan deretter bruke den som bakgrunn i editoren."
+        },
+        "palette": {
+          "selectMove": "Velg / Flytt (V)",
+          "draw": "Tegn",
+          "arrow": "Pil",
+          "zoneRect": "Sone (rekt)",
+          "zonePolygon": "Sone (polygon)",
+          "waterPolygon": "Vann (polygon)",
+          "pathChain": "Sti (kjede)",
+          "hintFinishArrow": "Klikk på lerretet for å sette sluttpunkt",
+          "hintSetCorner": "Klikk for å sette hjørne, dobbeltklikk for å fullføre",
+          "hintPolygon": "Klikk for å sette hjørner",
+          "hintPath": "Klikk for å sette punkter, dobbeltklikk for å fullføre",
+          "snapToGrid": "Fest til rutenett",
+          "constrainToArea": "Hold innenfor område",
+          "showTrail": "Vis rute",
+          "lockBackground": "Lås bakgrunn",
+          "shortcutMove": "← → ↑ ↓ = Flytt (Shift = 5×)",
+          "shortcutDuplicate": "Ctrl+D = Dupliser",
+          "shortcutDelete": "Del = Slett",
+          "shortcutCancel": "Esc = Avbryt"
+        },
+        "canvasToolbar": {
+          "customColor": "Egendefinert farge",
+          "pattern": "Mønster",
+          "noMarker": "Ingen markør",
+          "selectMoveTool": "Velg / Flytt (V)",
+          "deleteTool": "Slett (Del)"
+        },
+        "inspector": {
+          "color": "Farge",
+          "from": "Fra",
+          "to": "Til",
+          "dragEndpointsHint": "Dra endepunktene på lerretet for å justere",
+          "water": "Vann",
+          "zone": "Sone",
+          "fillOpacity": "Fyll ({percent}%)",
+          "exerciseDescriptionPlaceholder": "Øvelsesbeskrivelse…",
+          "marker": "Markør",
+          "borderColor": "Kantfarge",
+          "selectObjectToEdit": "Velg et objekt for å redigere",
+          "multiSelectHint": "Del = slett alle • Dra = flytt alle",
+          "pattern": "Mønster",
+          "corners": "hjørner",
+          "height": "Høyde"
+        },
+        "canvas": {
+          "clickToPlace": "Klikk for å plassere",
+          "clickToSetCorner": "Klikk for å sette hjørne",
+          "clickToSetPoint": "Klikk for å sette punkt"
+        },
+        "stationList": {
+          "noStationsYet": "Ingen stasjoner ennå. Plasser sjekkpunkter via paletten.",
+          "autoNumberTitle": "Nummerer etter posisjon (ovenfra-ned, venstre-høyre)",
+          "renumberTitle": "Omnummerer 1..N (behold rekkefølge)"
         }
       },
       "badges": {
@@ -8207,6 +8280,16 @@
       "security": "Sikkerhet",
       "integrations": "Integrasjoner",
       "advanced": "Avansert"
+    },
+    "legal": {
+      "formattingGuide": "Formateringsguide",
+      "markdownSectionsHint": "Bruk ## for hovedseksjoner",
+      "markdownSectionsDesc": "(disse blir trekkspill)"
+    },
+    "marketplace": {
+      "legacy": {
+        "displayedAs": "Vises som: {value}"
+      }
     },
     "translations": {
       "title": "Oversettelser",
@@ -8838,7 +8921,74 @@
           "searching": "Søker...",
           "results": "Resultater",
           "noUserFound": "Ingen bruker funnet med den e-postadressen",
-          "addFriend": "Legg til"
+          "addFriend": "Legg til",
+          "connectionTimeout": "Tilkoblingen tok for lang tid",
+          "loadError": "Kunne ikke laste data",
+          "unexpectedError": "En uventet feil oppsto.",
+          "retry": "Prøv igjen",
+          "partialFailure": "Delvis feil",
+          "partialFailureDesc": "Noen data kunne ikke lastes. Informasjonen nedenfor kan være ufullstendig."
+        },
+        "activity": {
+          "title": "Aktivitet",
+          "description": "Se din nylige aktivitet og påloggingshistorikk",
+          "activeSessions": "Aktive økter",
+          "activeSessionsDesc": "Enheter som for øyeblikket er logget inn på kontoen din.",
+          "noSessions": "Ingen aktive økter funnet.",
+          "currentDevice": "Denne enheten",
+          "unknownDevice": "Ukjent enhet",
+          "unknownIp": "Ukjent IP",
+          "lastActive": "Sist aktiv {time}",
+          "revokeSession": "Opphev",
+          "revoking": "Opphever...",
+          "recentActivity": "Nylig aktivitet",
+          "recentActivityDesc": "De siste aktivitetene på kontoen din.",
+          "noActivity": "Ingen aktivitet ennå",
+          "noFilteredActivity": "Ingen aktivitet å vise for dette filteret.",
+          "viewAll": "Vis alle",
+          "filters": {
+            "all": "Alle",
+            "security": "Sikkerhet",
+            "profile": "Profil",
+            "achievements": "Utmerkelser"
+          },
+          "types": {
+            "login": "Pålogging",
+            "logout": "Utlogging",
+            "password_change": "Passord endret",
+            "email_change": "E-post endret",
+            "profile_update": "Profil oppdatert",
+            "mfa_enabled": "MFA aktivert",
+            "mfa_disabled": "MFA deaktivert",
+            "settings_change": "Innstillinger endret",
+            "achievement_unlocked": "Utmerkelse låst opp",
+            "gdpr_request": "GDPR-forespørsel",
+            "session_revoked": "Økt opphevet"
+          },
+          "exportLog": "Eksporter aktivitetslogg",
+          "exportDesc": "Last ned aktivitetshistorikken din som en fil.",
+          "exportJson": "Eksporter som JSON",
+          "exportCsv": "Eksporter som CSV",
+          "loadMore": "Last flere aktiviteter",
+          "revokeAllOther": "Opphev alle andre økter",
+          "relativeTime": {
+            "now": "Akkurat nå",
+            "minutesAgo": "{minutes} min siden",
+            "hoursAgo": "{hours} timer siden",
+            "daysAgo": "{days} dager siden"
+          },
+          "csvHeaders": {
+            "date": "Dato",
+            "activity": "Aktivitet",
+            "details": "Detaljer",
+            "ip": "IP-adresse"
+          },
+          "loadError": "Kunne ikke laste aktivitet",
+          "initError": "Kunne ikke initialisere databasetilkoblingen.",
+          "unexpectedError": "En uventet feil oppsto.",
+          "loadingTakingLong": "Dette tar uvanlig lang tid. Sjekk Console/Network for å se hvilken forespørsel som har hengt seg og prøv å laste siden på nytt.",
+          "retry": "Prøv igjen",
+          "reload": "Last på nytt"
         }
       },
       "achievementsShowcase": {
@@ -8863,6 +9013,11 @@
         "primary": "Primær",
         "currentlyActive": "Aktiv nå",
         "switchSuccess": "Byttet til {name}"
+      },
+      "errorBoundary": {
+        "title": "Noe gikk galt",
+        "description": "Vi kunne ikke laste profilsiden din. Prøv igjen eller kontakt support hvis problemet vedvarer.",
+        "retry": "Prøv igjen"
       }
     },
     "settings": {
@@ -9684,7 +9839,8 @@
         "trustedDevicesDescription": "Enheter som ikke krever MFA-verifisering",
         "noTrustedDevices": "Ingen betrodde enheter ennå",
         "unknownDevice": "Ukjent enhet",
-        "on": "på"
+        "on": "på",
+        "retry": "Prøv igjen"
       }
     }
   },

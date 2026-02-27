@@ -408,7 +408,7 @@ type LinkedGame = {
   updated_at: string;
 };
 
-function GamesTab({ product, onRefresh }: { product: ProductDetail; onRefresh: () => void }) {
+function GamesTab({ product, onRefresh: _onRefresh }: { product: ProductDetail; onRefresh: () => void }) {
   const t = useTranslations('admin.products.v2.detail');
   const router = useRouter();
   const { success, error: toastError } = useToast();
@@ -443,7 +443,7 @@ function GamesTab({ product, onRefresh }: { product: ProductDetail; onRefresh: (
       if (!res.ok) throw new Error('Failed to unlink game');
       success(t('games.unlinkSuccess', { name: game.name }));
       loadGames();
-    } catch (err) {
+    } catch {
       toastError(t('games.unlinkFailed'));
     } finally {
       setUnlinkingId(null);

@@ -28,7 +28,7 @@ describe('metadataSchemas contract tests', () => {
   describe('counter.target policy', () => {
     it('should return error when target is missing (POLICY: server/client mismatch)', () => {
       const raw = { step: 1, label: 'Test counter' };
-      const { canonical, warnings } = normalizeCounter(raw);
+      const { canonical, warnings: _warnings } = normalizeCounter(raw);
       const validation = validateCounter(canonical);
 
       expect(validation.ok).toBe(false);
@@ -48,7 +48,7 @@ describe('metadataSchemas contract tests', () => {
 
     it('should NOT set target during normalization (validation must catch it)', () => {
       const raw = { step: 1 };
-      const { canonical, warnings } = normalizeCounter(raw);
+      const { canonical, warnings: _warnings } = normalizeCounter(raw);
 
       // target behålls som undefined så validering kan avbryta
       expect(canonical.target).toBeUndefined();

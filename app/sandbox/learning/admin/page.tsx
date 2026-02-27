@@ -7,7 +7,6 @@ import {
   PencilIcon, 
   TrashIcon,
   MagnifyingGlassIcon,
-  FunnelIcon,
   CheckCircleIcon,
   ClockIcon,
   ArchiveBoxIcon

@@ -103,15 +103,6 @@ export function AppTopbar({ canGoBack = false, onBack, backLabel }: AppTopbarPro
  * ```
  */
 export function useAppNavigation() {
-  // Root routes where back should NOT be shown
-  const rootRoutes = [
-    '/app',
-    '/app/browse',
-    '/app/play',
-    '/app/planner',
-    '/app/profile',
-  ];
-  
   // This would need to be enhanced with actual pathname logic
   // For now, return false (root level)
   return {

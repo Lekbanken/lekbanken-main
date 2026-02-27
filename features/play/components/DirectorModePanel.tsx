@@ -32,7 +32,6 @@ import { ConfirmDialog } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 import {
-  PlayIcon,
   BoltIcon,
   ClockIcon,
   SignalIcon,

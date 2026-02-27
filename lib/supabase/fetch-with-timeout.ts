@@ -34,7 +34,6 @@ const defaultTimeouts: TimeoutConfig = {
 }
 
 function nowMs(): number {
-  // eslint-disable-next-line no-restricted-globals
   return typeof performance !== 'undefined' && typeof performance.now === 'function'
     ? performance.now()
     : Date.now()

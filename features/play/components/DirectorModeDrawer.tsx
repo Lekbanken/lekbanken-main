@@ -20,7 +20,7 @@
 
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useSyncExternalStore } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { hapticTap } from '../haptics';
@@ -261,7 +261,27 @@ export function DirectorModeDrawer({
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Track when each step started (client-side) for per-step timer
-  const [stepStartTimes, setStepStartTimes] = useState<Map<number, number>>(() => new Map());
+  // Uses useSyncExternalStore to bridge ref (effect-writable) with render (readable)
+  // without triggering set-state-in-effect or refs-during-render rules.
+  const stepTimesRef = useRef(new Map<number, number>());
+  const stepTimesListenersRef = useRef(new Set<() => void>());
+
+  const subscribeStepTimes = useCallback((cb: () => void) => {
+    stepTimesListenersRef.current.add(cb);
+    return () => { stepTimesListenersRef.current.delete(cb); };
+  }, []);
+  const getStepTimesSnapshot = useCallback(() => stepTimesRef.current, []);
+  const stepStartTimes = useSyncExternalStore(subscribeStepTimes, getStepTimesSnapshot);
+
+  // Record step start time on step change (effect — Date.now is impure)
+  useEffect(() => {
+    if (open && currentStepIndex >= 0 && !stepTimesRef.current.has(currentStepIndex)) {
+      const next = new Map(stepTimesRef.current);
+      next.set(currentStepIndex, Date.now());
+      stepTimesRef.current = next;
+      stepTimesListenersRef.current.forEach(l => l());
+    }
+  }, [open, currentStepIndex]);
 
   // Director chip lane — host-side system cues
   const { chips: directorChips, pushChip: pushDirectorChip } = useDirectorChips();
@@ -297,7 +317,7 @@ export function DirectorModeDrawer({
       }
     }
     prevEventsLenRef.current = events.length;
-  }, [open, events.length, events, pushDirectorChip]);
+  }, [open, events.length, events, pushDirectorChip, t]);
 
   // Director chip labels (i18n)
   const directorChipLabels: Record<DirectorChipType, string> = {
@@ -306,25 +326,22 @@ export function DirectorModeDrawer({
     TRIGGER_FIRED: t('chips.triggerFired'),
   };
 
-  // Record step start time when step changes
-  useEffect(() => {
-    if (open && currentStepIndex >= 0) {
-      setStepStartTimes((prev) => {
-        if (prev.has(currentStepIndex)) return prev;
-        const next = new Map(prev);
-        next.set(currentStepIndex, Date.now());
-        return next;
-      });
+  // --- Adjust state during render when `open` changes (avoids setState in effects) ---
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (prevOpen !== open) {
+    setPrevOpen(open);
+    if (!open) {
+      setIsFullscreen(false);
+      setResetConfirmPending(false);
     }
-  }, [open, currentStepIndex]);
+  }
 
-  // Fullscreen on open / exit on close
+  // Fullscreen on open / exit on close (DOM side-effect only)
   useEffect(() => {
     if (open) {
       requestFullscreen().then(setIsFullscreen);
     } else {
       exitFullscreen();
-      setIsFullscreen(false);
     }
   }, [open]);
 
@@ -343,7 +360,6 @@ export function DirectorModeDrawer({
   // Lock body scroll when open; clear reset timer on close
   useEffect(() => {
     if (!open) {
-      setResetConfirmPending(false);
       if (resetTimerRef.current) {
         clearTimeout(resetTimerRef.current);
         resetTimerRef.current = null;

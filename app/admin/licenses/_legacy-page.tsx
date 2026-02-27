@@ -159,8 +159,8 @@ export default function LicensesPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<KeyIcon className="h-6 w-6" />}
-          title="Du är inte inloggad"
-          description="Logga in för att se licenser."
+          title={t('notLoggedIn')}
+          description={t('loginToSee')}
         />
       </AdminPageLayout>
     );
@@ -170,13 +170,13 @@ export default function LicensesPage() {
     <AdminPageLayout>
       <AdminPageHeader
         title="Licenser"
-        description="Översikt över kunders licenser, status och användning."
+        description={t('pageDescription')}
         icon={<KeyIcon className="h-8 w-8 text-primary" />}
       />
 
       {error && (
         <AdminErrorState
-          title="Ett fel inträffade"
+          title={t('errorOccurred')}
           description={error}
           onRetry={() => {
             setError(null);
@@ -190,13 +190,13 @@ export default function LicensesPage() {
           <AdminStatCard label="Totalt" value={stats.total} />
           <AdminStatCard label="Aktiva" value={stats.active} />
           <AdminStatCard label="Testperiod" value={stats.trial} />
-          <AdminStatCard label="Utgångna" value={stats.expired} />
+          <AdminStatCard label={t('stats.expired')} value={stats.expired} />
         </AdminStatGrid>
       )}
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <Input
-          placeholder="Sök organisation eller produkt"
+          placeholder={t('searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full sm:w-80"
@@ -237,11 +237,10 @@ export default function LicensesPage() {
                     <Badge variant={statusCfg.variant}>{t(statusCfg.labelKey)}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Plan: {license.plan} • Seats: {license.usedSeats}/{license.seats}
+                    {t('planSeats', { plan: license.plan, used: license.usedSeats, total: license.seats })}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Gäller: {new Date(license.startDate).toLocaleDateString('sv-SE')} –{" "}
-                    {new Date(license.endDate).toLocaleDateString('sv-SE')}
+                    {t('validPeriod', { start: new Date(license.startDate).toLocaleDateString('sv-SE'), end: new Date(license.endDate).toLocaleDateString('sv-SE') })}
                   </p>
                 </CardContent>
               </Card>

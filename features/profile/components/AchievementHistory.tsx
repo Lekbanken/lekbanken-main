@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import {
-  getUserAchievementProgress,
-  type AchievementProgress,
-} from '@/lib/services/achievementService';
+import type { AchievementProgress } from '@/types/achievement';
+import { getUserAchievementProgress } from '@/hooks/useAchievementProgress';
 import AchievementBadge from '@/components/AchievementBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { ClockIcon } from '@heroicons/react/24/outline';

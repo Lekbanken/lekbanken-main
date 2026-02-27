@@ -5,6 +5,7 @@
 // =============================================================================
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useSpatialEditorStore } from '../store/spatial-editor-store';
 import type { PointObjectType, EditorTool } from '../lib/types';
 import {
@@ -100,6 +101,7 @@ function ToolButton({
 }
 
 export function AssetPalette() {
+  const t = useTranslations('admin.library.spatialEditor.palette');
   const activePlaceType = useSpatialEditorStore((s) => s.activePlaceType);
   const setActivePlaceType = useSpatialEditorStore((s) => s.setActivePlaceType);
   const activeTool = useSpatialEditorStore((s) => s.activeTool);
@@ -120,7 +122,7 @@ export function AssetPalette() {
   return (
     <div className="flex flex-col gap-3">
       {/* Select tool */}
-      <ToolButton tool="select" icon="🖱" label="Välj / Flytta" activeTool={activeTool} onClick={() => setTool('select')} />
+      <ToolButton tool="select" icon="🖱" label={t('selectMove')} activeTool={activeTool} onClick={() => setTool('select')} />
 
       {/* Divider */}
       <div className="border-t border-gray-200 dark:border-gray-700" />
@@ -174,19 +176,19 @@ export function AssetPalette() {
 
       {/* Two-click creation modes */}
       <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-        Rita
+        {t('draw')}
       </p>
-      <ToolButton tool="arrow" icon="→" label="Pil" activeTool={activeTool} onClick={() => setTool('arrow')} />
-      <ToolButton tool="zone" icon="▭" label="Zon (rektangel)" activeTool={activeTool} onClick={() => setTool('zone')} />
-      <ToolButton tool="polygon" icon="⬡" label="Zon (polygon)" activeTool={activeTool} onClick={() => {
+      <ToolButton tool="arrow" icon="→" label={t('arrow')} activeTool={activeTool} onClick={() => setTool('arrow')} />
+      <ToolButton tool="zone" icon="▭" label={t('zoneRect')} activeTool={activeTool} onClick={() => setTool('zone')} />
+      <ToolButton tool="polygon" icon="⬡" label={t('zonePolygon')} activeTool={activeTool} onClick={() => {
         const store = useSpatialEditorStore.getState();
         store.startPolygon('zone');
       }} />
-      <ToolButton tool="polygon" icon="💧" label="Vatten (polygon)" activeTool={activeTool} onClick={() => {
+      <ToolButton tool="polygon" icon="💧" label={t('waterPolygon')} activeTool={activeTool} onClick={() => {
         const store = useSpatialEditorStore.getState();
         store.startPolygon('water');
       }} />
-      <ToolButton tool="path" icon="🛤" label="Stig (kedja)" activeTool={activeTool} onClick={() => {
+      <ToolButton tool="path" icon="🛤" label={t('pathChain')} activeTool={activeTool} onClick={() => {
         const store = useSpatialEditorStore.getState();
         store.startPath();
       }} />
@@ -194,17 +196,17 @@ export function AssetPalette() {
       {/* Pending indicator */}
       {pendingStart && (activeTool === 'arrow' || activeTool === 'zone') && (
         <p className="text-[10px] text-amber-600 dark:text-amber-400 italic">
-          Klicka på canvasen för att {activeTool === 'arrow' ? 'avsluta pilen' : 'sätta andra hörnet'}
+          {activeTool === 'arrow' ? t('hintFinishArrow') : t('hintSetCorner')}
         </p>
       )}
       {activeTool === 'polygon' && (
         <p className="text-[10px] text-amber-600 dark:text-amber-400 italic">
-          Klicka för att sätta hörn. Klicka nära startpunkten för att stänga polygonen. Enter = klar, Esc = avbryt.
+          {t('hintPolygon')}
         </p>
       )}
       {activeTool === 'path' && (
         <p className="text-[10px] text-amber-600 dark:text-amber-400 italic">
-          Klicka för att sätta stigpunkter. Enter = klar, Esc = avbryt.
+          {t('hintPath')}
         </p>
       )}
 
@@ -219,7 +221,7 @@ export function AssetPalette() {
           onChange={toggleSnap}
           className="rounded border-gray-300"
         />
-        <span className="text-gray-600 dark:text-gray-300 font-medium">Snap till rutnät</span>
+        <span className="text-gray-600 dark:text-gray-300 font-medium">{t('snapToGrid')}</span>
         <span className="text-[10px] text-gray-400 dark:text-gray-500">(Alt = av)</span>
       </label>
 
@@ -231,7 +233,7 @@ export function AssetPalette() {
           onChange={toggleConstrainToContentBox}
           className="rounded border-gray-300"
         />
-        <span className="text-gray-600 dark:text-gray-300 font-medium">Håll innanför yta</span>
+        <span className="text-gray-600 dark:text-gray-300 font-medium">{t('constrainToArea')}</span>
       </label>
 
       {/* Show trail */}
@@ -242,7 +244,7 @@ export function AssetPalette() {
           onChange={toggleShowTrail}
           className="rounded border-gray-300"
         />
-        <span className="text-gray-600 dark:text-gray-300 font-medium">Visa rutt</span>
+        <span className="text-gray-600 dark:text-gray-300 font-medium">{t('showTrail')}</span>
       </label>
 
       {/* Lock background */}
@@ -253,15 +255,15 @@ export function AssetPalette() {
           onChange={toggleBackgroundLocked}
           className="rounded border-gray-300"
         />
-        <span className="text-gray-600 dark:text-gray-300 font-medium">Lås bakgrund</span>
+        <span className="text-gray-600 dark:text-gray-300 font-medium">{t('lockBackground')}</span>
       </label>
 
       {/* Keyboard shortcuts hint */}
       <div className="text-[10px] text-gray-400 dark:text-gray-500 space-y-0.5">
-        <p>← → ↑ ↓ = Flytta (Shift = 5×)</p>
-        <p>Ctrl+D = Duplicera</p>
-        <p>Del = Ta bort</p>
-        <p>Esc = Avbryt</p>
+        <p>{t('shortcutMove')}</p>
+        <p>{t('shortcutDuplicate')}</p>
+        <p>{t('shortcutDelete')}</p>
+        <p>{t('shortcutCancel')}</p>
       </div>
     </div>
   );

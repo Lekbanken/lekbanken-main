@@ -3,10 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import {
-  getUserAchievementProgress,
-  type AchievementProgress,
-} from '@/lib/services/achievementService';
+import type { AchievementProgress } from '@/types/achievement';
+import { getUserAchievementProgress } from '@/hooks/useAchievementProgress';
 import { withTimeout } from '@/lib/utils/withTimeout';
 import AchievementBadge from '@/components/AchievementBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
@@ -124,7 +122,7 @@ export function ProfileAchievementsShowcase({
             onClick={() => setReloadCounter((n) => n + 1)}
             className="mt-3 inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium hover:bg-muted transition-colors"
           >
-            Försök igen
+            {t('achievements.retry')}
           </button>
         </CardContent>
       </Card>

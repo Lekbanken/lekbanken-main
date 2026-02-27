@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 /**
  * Returns a ref that always holds the latest value.
@@ -8,6 +8,9 @@ import { useRef } from 'react';
  * Useful for stabilising callbacks passed to subscription effects so that
  * the effect dependency array stays empty (or only contains stable values)
  * while the handler always sees the latest closure.
+ *
+ * The ref is updated in a passive effect (after paint), so by the time
+ * any other effect reads `ref.current`, it already reflects the latest render.
  *
  * @example
  * ```ts
@@ -21,8 +24,8 @@ import { useRef } from 'react';
  */
 export function useLatestRef<T>(value: T) {
   const ref = useRef(value);
-  // Intentionally synchronous — runs during render (before commit),
-  // so the ref is always up-to-date when any effect reads it.
-  ref.current = value;
+  useEffect(() => {
+    ref.current = value;
+  });
   return ref;
 }

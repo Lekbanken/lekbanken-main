@@ -44,10 +44,6 @@ interface DemoUser {
   id: string;
 }
 
-interface ActiveSession {
-  user_id: string;
-}
-
 Deno.serve(async (req: Request) => {
   // Verifiera API-nyckel för säkerhet
   const authHeader = req.headers.get('Authorization');

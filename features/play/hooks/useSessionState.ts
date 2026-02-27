@@ -1076,7 +1076,7 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       onError?.(err instanceof Error ? err : new Error(msg));
       return { ok: false, action: 'fire', triggerId, kind: 'request_failed', httpStatus: 0, errorCode: 'NETWORK_ERROR', message: msg };
     }
-  }, [sessionId, onError, revealArtifact, hideArtifact]);
+  }, [sessionId, onError, revealArtifact, hideArtifact, loadArtifacts]);
 
   const disableTrigger = useCallback(async (triggerId: string): Promise<TriggerActionResult> => {
     try {

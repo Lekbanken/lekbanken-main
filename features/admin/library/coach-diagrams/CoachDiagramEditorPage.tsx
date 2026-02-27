@@ -782,7 +782,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Mönster</label>
+                  <label className="text-sm font-medium">{t('pattern')}</label>
                   <Select
                     value={selectedArrow.style.pattern}
                     onChange={(e) => setArrowPattern(e.target.value as 'solid' | 'dashed')}
@@ -1158,7 +1158,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
 
           <div className="mt-3 text-xs text-muted-foreground">
             <Link className="underline" href={`/api/coach-diagrams/${doc.id}/svg`} target="_blank" rel="noreferrer">
-              Öppna SVG
+              {t('openSvg')}
             </Link>
           </div>
 

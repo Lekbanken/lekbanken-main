@@ -12,8 +12,10 @@
 
 import { useSpatialEditorStore } from '../store/spatial-editor-store';
 import type { SpatialObjectBase } from '../lib/types';
+import { useTranslations } from 'next-intl';
 
 export function StationListPanel() {
+  const t = useTranslations('admin.library.spatialEditor.stationList');
   const doc = useSpatialEditorStore((s) => s.doc);
   const selectedIds = useSpatialEditorStore((s) => s.selectedIds);
   const select = useSpatialEditorStore((s) => s.select);
@@ -41,7 +43,7 @@ export function StationListPanel() {
   if (checkpoints.length === 0) {
     return (
       <div className="text-xs text-gray-400 dark:text-gray-500 italic">
-        Inga stationer än. Placera checkpoints via paletten.
+        {t('noStationsYet')}
       </div>
     );
   }
@@ -126,7 +128,7 @@ export function StationListPanel() {
           type="button"
           onClick={autoNumberCheckpoints}
           className="rounded border border-gray-300 px-2 py-1 text-[11px] font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-          title="Numrera efter position (uppifrån-ner, vänster-höger)"
+          title={t('autoNumberTitle')}
         >
           🔢 Auto-nr
         </button>
@@ -134,7 +136,7 @@ export function StationListPanel() {
           type="button"
           onClick={renumberCheckpoints}
           className="rounded border border-gray-300 px-2 py-1 text-[11px] font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-          title="Omnumrera 1..N (behåll ordning)"
+          title={t('renumberTitle')}
         >
           ↕ Omnumrera
         </button>

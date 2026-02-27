@@ -371,7 +371,7 @@ export function InteractiveImageEditor({ value, tenantId, disabled = false, onCh
                     disabled={disabled}
                     onChange={(e) => updateZone(selectedZone.id, { required: e.currentTarget.checked })}
                   />
-                  <Label htmlFor="hotspot-required">Krävs för completion</Label>
+                  <Label htmlFor="hotspot-required">{t('requiredForCompletion')}</Label>
                 </div>
 
                 <div className="flex items-center justify-end">

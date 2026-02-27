@@ -212,7 +212,6 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
       schedule_at: scheduleAt?.toISOString() ?? null,
       sent_at: isScheduled ? null : new Date().toISOString(),
       created_by: user.id,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as Record<string, unknown>
     
     let sentCount = 0
@@ -223,9 +222,8 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
     switch (params.scope) {
       case 'global': {
         // Global broadcast: Create one notification with scope='all', tenant_id=NULL
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: notification, error: insertError } = await (supabase
-          .from('notifications') as any)
+          .from('notifications') as any) // eslint-disable-line @typescript-eslint/no-explicit-any
           .insert({
             ...notificationBase,
             tenant_id: null,
@@ -243,7 +241,7 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
           // Optionally exclude demo users (default: true)
           const excludeDemo = params.excludeDemoUsers !== false
           
-          let usersQuery = supabase.from('users').select('id, is_demo_user')
+          const usersQuery = supabase.from('users').select('id, is_demo_user')
           const { data: allUsers, error: usersError } = await usersQuery
           
           if (usersError) {
@@ -283,9 +281,8 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
       
       case 'tenant': {
         // Tenant broadcast: One notification for the tenant
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: notification, error: insertError } = await (supabase
-          .from('notifications') as any)
+          .from('notifications') as any) // eslint-disable-line @typescript-eslint/no-explicit-any
           .insert({
             ...notificationBase,
             tenant_id: params.tenantId!,
@@ -347,9 +344,8 @@ export async function sendAdminNotification(params: SendNotificationParams): Pro
       
       case 'users': {
         // Specific users: Create notification and deliveries only for selected users
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: notification, error: insertError } = await (supabase
-          .from('notifications') as any)
+          .from('notifications') as any) // eslint-disable-line @typescript-eslint/no-explicit-any
           .insert({
             ...notificationBase,
             tenant_id: params.tenantId!,

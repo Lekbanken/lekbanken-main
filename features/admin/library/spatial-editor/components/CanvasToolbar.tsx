@@ -20,6 +20,7 @@ import {
 } from '../lib/types';
 import type { SpatialObjectBase, CheckpointKind } from '../lib/types';
 import { useCallback, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 // ---------------------------------------------------------------------------
 // Preset colors for quick picker
@@ -80,6 +81,7 @@ const CHECKPOINT_KINDS: { value: CheckpointKind; label: string; emoji: string }[
 // ---------------------------------------------------------------------------
 
 function QuickColorPicker({ obj }: { obj: SpatialObjectBase }) {
+  const t = useTranslations('admin.library.spatialEditor.canvasToolbar');
   const updateObjectProps = useSpatialEditorStore((s) => s.updateObjectProps);
   const current = (obj.props.color as string) ?? '#3b82f6';
   const [showCustom, setShowCustom] = useState(false);
@@ -105,7 +107,7 @@ function QuickColorPicker({ obj }: { obj: SpatialObjectBase }) {
           type="button"
           onClick={() => setShowCustom(!showCustom)}
           className="h-5 w-5 rounded-full border-2 border-dashed border-gray-400 dark:border-gray-500 text-[10px] text-gray-400 hover:border-gray-500 flex items-center justify-center"
-          title="Anpassad färg"
+          title={t('customColor')}
         >
           +
         </button>
@@ -160,6 +162,7 @@ function QuickLabelEditor({ obj }: { obj: SpatialObjectBase }) {
 // ---------------------------------------------------------------------------
 
 export function CanvasToolbar() {
+  const t = useTranslations('admin.library.spatialEditor.canvasToolbar');
   const activeTool = useSpatialEditorStore((s) => s.activeTool);
   const setTool = useSpatialEditorStore((s) => s.setTool);
   const selectedIds = useSpatialEditorStore((s) => s.selectedIds);
@@ -246,7 +249,7 @@ export function CanvasToolbar() {
                       ? 'border-blue-400 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
                       : 'border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-400'
                   }`}
-                  title="Mönster"
+                  title={t('pattern')}
                 >
                   {pattern === 'solid' ? '── Heldragen' : '╌╌ Streckad'}
                 </button>
@@ -382,7 +385,7 @@ export function CanvasToolbar() {
                     ? 'border-blue-500 ring-1 ring-blue-200'
                     : 'border-gray-200 dark:border-gray-600'
                 }`}
-                title="Ingen markör"
+                title={t('noMarker')}
               >
                 <span className="text-[8px]">○</span>
               </button>
@@ -416,7 +419,7 @@ export function CanvasToolbar() {
                     ? 'border-blue-500 ring-1 ring-blue-200'
                     : 'border-gray-200 dark:border-gray-600'
                 }`}
-                title="Ingen markör"
+                title={t('noMarker')}
               >
                 <span className="text-[8px]">○</span>
               </button>
@@ -448,7 +451,7 @@ export function CanvasToolbar() {
           <ToolBtn
             active={activeTool === 'select'}
             onClick={() => setTool('select')}
-            title="Välj / Flytta (V)"
+            title={t('selectMoveTool')}
             label="🖱️"
           />
           <ToolBtn
@@ -503,7 +506,7 @@ export function CanvasToolbar() {
               />
               <ActionBtn
                 onClick={deleteSelected}
-                title="Ta bort (Del)"
+                title={t('deleteTool')}
                 label="🗑️"
               />
             </div>

@@ -35,7 +35,6 @@ import {
 import { cn } from '@/lib/utils';
 import { isFeatureEnabled } from '@/lib/config/env';
 import { resolveUiState } from '@/lib/play/ui-state';
-import { shouldEnableRealtime, getPollingConfig } from '@/lib/play/realtime-gate';
 import {
   PlayIcon,
   UserGroupIcon,
@@ -1778,27 +1777,11 @@ export function SessionCockpit({
     }));
   }, [sessionEvents, showEvents]);
 
-  // Enter director mode
-  // Director Mode is a pure view overlay — it MUST NOT trigger status
-  // transitions. Starting a session is an explicit host action in the
-  // lobby, never a side-effect of opening Director Mode.
-  const handleEnterDirectorMode = useCallback(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const rtEnabled = shouldEnableRealtime({ status, sessionId });
-      const polling = getPollingConfig({ status, sessionId });
-      // eslint-disable-next-line no-console
-      console.debug('[DirectorMode:open]', { status, sessionId, rtEnabled, polling });
-    }
-    enterDirectorMode();
-    setDirectorModeOpen(true);
-  }, [enterDirectorMode, status, sessionId]);
-
   // Start session AND open director mode — used by the explicit
   // "Starta session" button in the lobby. This is the ONLY place
   // where opening director mode is coupled with a status transition.
   const handleStartAndDirector = useCallback(async () => {
     if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
       console.debug('[DirectorMode:startAndOpen]', { status, sessionId });
     }
     if (status === 'lobby') {

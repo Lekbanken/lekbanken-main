@@ -122,6 +122,8 @@ export interface DirectorModeDrawerProps {
   onRevealArtifact?: (artifactId: string) => Promise<void>;
   onHideArtifact?: (artifactId: string) => Promise<void>;
   onResetArtifact?: (artifactId: string) => Promise<void>;
+  onHighlightArtifact?: (artifactId: string) => Promise<void>;
+  onUnhighlightArtifact?: (artifactId: string) => Promise<void>;
   
   /** Optional class name */
   className?: string;
@@ -247,6 +249,8 @@ export function DirectorModeDrawer({
   onRevealArtifact,
   onHideArtifact,
   onResetArtifact,
+  onHighlightArtifact,
+  onUnhighlightArtifact,
   className,
 }: DirectorModeDrawerProps) {
   const t = useTranslations('play.directorDrawer');
@@ -486,6 +490,8 @@ export function DirectorModeDrawer({
           onRevealArtifact={onRevealArtifact}
           onHideArtifact={onHideArtifact}
           onResetArtifact={onResetArtifact}
+          onHighlightArtifact={onHighlightArtifact}
+          onUnhighlightArtifact={onUnhighlightArtifact}
           showFullscreenButton
           isFullscreen={isFullscreen}
           onToggleFullscreen={handleToggleFullscreen}

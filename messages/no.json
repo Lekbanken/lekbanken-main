@@ -11830,7 +11830,23 @@
         "shown": "Viste",
         "reveal": "Vis",
         "hide": "Skjul",
-        "reset": "Tilbakestill"
+        "reset": "Tilbakestill",
+        "highlight": "Fremhev",
+        "unhighlight": "Fjern fremheving",
+        "showMore": "Mer info",
+        "showLess": "Mindre info",
+        "pin": "Fest",
+        "unpin": "Løsne",
+        "pinnedTitle": "Festede",
+        "pinnedVolatile": "Lagres ikke ved oppdatering",
+        "showLatest": "Vis siste",
+        "showLatestNone": "Ingen artefakter",
+        "showLatestHint": {
+          "highlighted": "Hopper til markert artefakt",
+          "event": "Hopper til artefakt med siste hendelse",
+          "fallback": "Hopper til f\u00f8rste tilgjengelige artefakt"
+        },
+        "new": "Ny"
       },
       "timeBank": {
         "title": "Tidsbank",
@@ -12894,6 +12910,54 @@
         "decoded": "Dekryptert!"
       }
     },
+    "artifactBadge": {
+      "used": "Brukt",
+      "highlighted": "Ny",
+      "visibility": {
+        "public": "Offentlig",
+        "leader_only": "Kun leder",
+        "role_private": "Rolle"
+      },
+      "state": {
+        "hidden": "Skjult",
+        "revealed": "Synlig",
+        "locked": "Låst",
+        "unlocked": "Opplåst",
+        "solved": "Løst",
+        "failed": "Mislykket"
+      }
+    },
+    "artifactInspector": {
+      "title": "Inspektør",
+      "close": "Lukk inspektør",
+      "noSelection": "Velg en artefakt å inspisere",
+      "quickActions": "Hurtighandlinger",
+      "details": "Detaljer",
+      "detailType": "Type",
+      "detailOrder": "Rekkefølge",
+      "detailAttempts": "Forsøk",
+      "detailProgress": "Fremgang",
+      "currentlyHighlighted": "Markert akkurat nå",
+      "metadata": "Metadata",
+      "variants": "Varianter",
+      "untitledVariant": "Variant",
+      "links": "Lenker",
+      "noLinks": "Ingen lenker",
+      "linkStep": "Steg {order}: {title}"
+    },
+    "artifactTimeline": {
+      "title": "Tidslinje",
+      "empty": "Ingen hendelser ennå",
+      "event": {
+        "revealed": "Vist",
+        "hidden": "Skjult",
+        "stateChanged": "Status endret",
+        "solved": "Løst",
+        "failed": "Mislykket",
+        "triggerFired": "Trigger utløst",
+        "unknown": "Hendelse"
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Noe gikk galt",
@@ -12914,7 +12978,8 @@
         "hide": "Skjul",
         "update": "Oppdater",
         "highlight": "Fremhev",
-        "unhighlight": "Fjern fremheving"
+        "unhighlight": "Fjern fremheving",
+        "reset": "Tilbakestill"
       },
       "loading": "Laster artefakter…",
       "title": "Artefakter",
@@ -13155,6 +13220,7 @@
       "failedAttempts": "{count} mislykkede forsøk",
       "viaManualCode": "(via manuell kode)",
       "defaultPrompt": "Skann QR-koden for å fortsette",
+      "scanning": "Skanner...",
       "devSimulateScan": "[DEV] Simuler vellykket skanning"
     },
     "triggerCard": {
@@ -13479,6 +13545,13 @@
         "keypadLocked": "Tastaturet er låst.",
         "attemptsRemaining": "{count} forsøk igjen"
       },
+      "keypadGrid": {
+        "ariaLabel": "Tastatur",
+        "submit": "Send",
+        "delete": "Slett",
+        "verifying": "Verifiserer…",
+        "correct": "Riktig!"
+      },
       "safety": {
         "title": "Sikkerhet"
       },
@@ -13508,6 +13581,13 @@
         "locked": "Låst",
         "unlocked": "Opplåst",
         "used": "Brukt"
+      },
+      "imageLightbox": {
+        "tapToView": "Trykk for å vise bilde",
+        "openFullscreen": "Åpne bilde i fullskjerm",
+        "close": "Lukk",
+        "zoomIn": "Zoom inn",
+        "zoomOut": "Zoom ut"
       },
       "decision": {
         "voteSubmitted": "Stemme sendt!",

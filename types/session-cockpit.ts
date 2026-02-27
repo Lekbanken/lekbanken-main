@@ -146,15 +146,29 @@ export interface CockpitArtifact {
   metadata: Record<string, unknown> | null;
   stepId?: string;
   phaseId?: string;
+  /**
+   * First playable/public variant for the artifact in play-context
+   * (variant_order ASC, fallback: array insertion order).
+   * Enables variant-level actions (e.g. highlight) without separate lookups.
+   * null when the artifact has no variants.
+   */
+  primaryVariantId: string | null;
 }
 
-export type ArtifactStateStatus = 
-  | 'hidden' 
-  | 'revealed' 
-  | 'locked' 
-  | 'unlocked' 
-  | 'solved' 
-  | 'failed';
+/**
+ * Artifact status values actually produced by loadArtifacts().
+ *
+ * Only values that loadArtifacts() actually assigns may exist here.
+ * Removed: 'unlocked' (maps to 'solved'), 'locked', 'failed' (never assigned).
+ * See ARTIFACT_COMPONENTS.md §9 for the canonical contract and change checklist.
+ */
+export const ARTIFACT_STATUSES = ['hidden', 'revealed', 'solved'] as const;
+export type ArtifactStateStatus = (typeof ARTIFACT_STATUSES)[number];
+
+/** Type guard — single place for the `as readonly string[]` cast. */
+export function isArtifactStateStatus(x: string): x is ArtifactStateStatus {
+  return (ARTIFACT_STATUSES as readonly string[]).includes(x);
+}
 
 export interface ArtifactState {
   artifactId: string;
@@ -485,6 +499,8 @@ export interface SessionCockpitActions {
   revealArtifact: (artifactId: string) => Promise<void>;
   hideArtifact: (artifactId: string) => Promise<void>;
   resetArtifact: (artifactId: string) => Promise<void>;
+  highlightArtifact: (artifactId: string) => Promise<void>;
+  unhighlightArtifact: (artifactId: string) => Promise<void>;
   
   // Triggers
   fireTrigger: (triggerId: string) => Promise<TriggerActionResult>;

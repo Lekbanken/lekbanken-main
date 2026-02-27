@@ -157,6 +157,24 @@ export type { TriggerTemplateLibraryProps } from './TriggerTemplateLibrary';
 export { BatchArtifactPanel } from './BatchArtifactPanel';
 export type { BatchArtifactPanelProps } from './BatchArtifactPanel';
 
+// Director artifact actions (extracted from ArtifactsPanel)
+export { DirectorArtifactActions } from './DirectorArtifactActions';
+export type { DirectorArtifactActionsProps } from './DirectorArtifactActions';
+
+// Artifact Inspector + Link Pills (PR #2)
+export { ArtifactInspector } from './artifacts/ArtifactInspector';
+export type { ArtifactInspectorProps, InspectorVariant } from './artifacts/ArtifactInspector';
+export { ArtifactLinkPills } from './artifacts/ArtifactLinkPills';
+export type { ArtifactLinkPillsProps } from './artifacts/ArtifactLinkPills';
+
+// Artifact Timeline — Per-artifact event history (PR #3)
+export { ArtifactTimeline } from './artifacts/ArtifactTimeline';
+export type { ArtifactTimelineProps } from './artifacts/ArtifactTimeline';
+
+// Pinned Artifact Bar — Quick-access strip (PR #4)
+export { PinnedArtifactBar } from './artifacts/PinnedArtifactBar';
+export type { PinnedArtifactBarProps, PinnedArtifactItem } from './artifacts/PinnedArtifactBar';
+
 // Session timeline
 export { SessionTimeline, CompactTimeline } from './SessionTimeline';
 export type { SessionTimelineProps, CompactTimelineProps } from './SessionTimeline';

@@ -7,6 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ConversationCardsCollectionArtifact } from '@/features/play/components/ConversationCardsCollectionArtifact';
+import { ArtifactTypeIcon } from '@/features/play/components/shared/ArtifactTypeIcon';
+import { ArtifactBadge } from '@/features/play/components/shared/ArtifactBadge';
+import { DirectorArtifactActions } from '@/features/play/components/DirectorArtifactActions';
+import type { ArtifactType } from '@/types/games';
 
 /**
  * Sanitized keypad metadata (from server - correctCode is NEVER included)
@@ -381,9 +385,18 @@ export function ArtifactsPanel({ sessionId, refreshKey }: { sessionId: string; r
           return (
             <Card key={a.id} className="p-6 space-y-3">
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="font-medium">{a.title}</h3>
-                  {a.description && <p className="text-sm text-muted-foreground">{a.description}</p>}
+                <div className="flex items-center gap-2">
+                  {a.artifact_type && (
+                    <ArtifactTypeIcon
+                      type={a.artifact_type as ArtifactType}
+                      size="md"
+                      className="text-muted-foreground"
+                    />
+                  )}
+                  <div>
+                    <h3 className="font-medium">{a.title}</h3>
+                    {a.description && <p className="text-sm text-muted-foreground">{a.description}</p>}
+                  </div>
                 </div>
                 <Badge variant="secondary">{t('variants', { count: vs.length })}</Badge>
               </div>
@@ -400,33 +413,37 @@ export function ArtifactsPanel({ sessionId, refreshKey }: { sessionId: string; r
                           <p className="text-sm font-medium truncate">
                             {v.title || t('variant')}
                           </p>
-                          <p className="text-xs text-muted-foreground">
-                            {t(`visibility.${v.visibility}` as Parameters<typeof t>[0])}
-                            {v.visibility === 'role_private' && v.visible_to_session_role_id ? ` ${t('rolePrivate')}` : ''}
-                          </p>
+                          <ArtifactBadge
+                            state={revealed ? 'revealed' : 'hidden'}
+                            visibility={v.visibility}
+                            compact
+                          />
                         </div>
-                        <div className="flex items-center gap-2">
-                          {revealable && (
-                            <Button
-                              size="sm"
-                              variant={revealed ? 'outline' : 'primary'}
-                              onClick={() =>
-                                updateVariant({ action: 'reveal_variant', variantId: v.id, revealed: !revealed })
-                              }
-                            >
-                              {revealed ? t('actions.hide') : t('actions.reveal')}
-                            </Button>
-                          )}
-                          <Button
-                            size="sm"
-                            variant={highlighted ? 'outline' : 'ghost'}
-                            onClick={() =>
-                              updateVariant({ action: 'highlight_variant', variantId: v.id, highlighted: !highlighted })
-                            }
-                          >
-                            {highlighted ? t('actions.unhighlight') : t('actions.highlight')}
-                          </Button>
-                        </div>
+                        <DirectorArtifactActions
+                          state={revealed ? 'revealed' : 'hidden'}
+                          isHighlighted={highlighted}
+                          onReveal={
+                            revealable && !revealed
+                              ? () => updateVariant({ action: 'reveal_variant', variantId: v.id, revealed: true })
+                              : undefined
+                          }
+                          onHide={
+                            revealable && revealed
+                              ? () => updateVariant({ action: 'reveal_variant', variantId: v.id, revealed: false })
+                              : undefined
+                          }
+                          onHighlight={
+                            !highlighted
+                              ? () => updateVariant({ action: 'highlight_variant', variantId: v.id, highlighted: true })
+                              : undefined
+                          }
+                          onUnhighlight={
+                            highlighted
+                              ? () => updateVariant({ action: 'highlight_variant', variantId: v.id, highlighted: false })
+                              : undefined
+                          }
+                          compact
+                        />
                       </div>
                       {v.body && <p className="mt-2 text-sm whitespace-pre-wrap">{v.body}</p>}
                     </div>

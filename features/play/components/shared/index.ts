@@ -73,3 +73,15 @@ export type { PlaySurfaceProps } from './PlaySurface';
 // LeaderScriptSections — structured renderer for leader scripts
 export { LeaderScriptSections, parseLeaderScript } from './LeaderScriptSections';
 export type { LeaderScriptSectionsProps, ScriptSection, SectionLabel } from './LeaderScriptSections';
+
+// ArtifactTypeIcon — SSoT icon per artifact type
+export { ArtifactTypeIcon, getArtifactTypeIcon } from './ArtifactTypeIcon';
+export type { ArtifactTypeIconProps } from './ArtifactTypeIcon';
+
+// ArtifactBadge — state + visibility badge
+export { ArtifactBadge } from './ArtifactBadge';
+export type { ArtifactBadgeProps, ParticipantArtifactState } from './ArtifactBadge';
+
+// ArtifactCard — shared card container
+export { ArtifactCard } from './ArtifactCard';
+export type { ArtifactCardProps, ArtifactCardState } from './ArtifactCard';

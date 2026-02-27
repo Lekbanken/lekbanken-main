@@ -15,6 +15,84 @@ import {
 import type { ScanGateConfig, ScanGateState } from '@/types/puzzle-modules';
 
 // =============================================================================
+// QR Decode abstraction — native BarcodeDetector → ZXing fallback
+// =============================================================================
+
+/** Minimal decode result */
+interface DecodeResult {
+  rawValue: string;
+}
+
+/**
+ * Creates a decode function that works across browsers.
+ *  1. Try native BarcodeDetector (Chrome / Edge / Android WebView)
+ *  2. Fall back to @zxing/library (Safari / Firefox / older)
+ *
+ * Returns `null` while the decoder is being initialised.
+ */
+async function createDecoder(): Promise<
+  (source: HTMLVideoElement | HTMLCanvasElement | ImageBitmap) => Promise<DecodeResult[]>
+> {
+  // --- Native path ---
+  if (
+    typeof globalThis !== 'undefined' &&
+    'BarcodeDetector' in globalThis
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const BD = (globalThis as any).BarcodeDetector;
+    // Feature-detect supported formats before creating detector
+    let supported: string[] = [];
+    try {
+      if (typeof BD.getSupportedFormats === 'function') {
+        supported = await BD.getSupportedFormats();
+      }
+    } catch {
+      // getSupportedFormats() threw — treat as "unknown, try anyway"
+    }
+    if (supported.length === 0 || supported.includes('qr_code')) {
+      const detector = new BD({ formats: ['qr_code'] });
+      return async (source) => {
+        const barcodes = await detector.detect(source);
+        return barcodes.map((b: { rawValue: string }) => ({
+          rawValue: b.rawValue,
+        }));
+      };
+    }
+    // qr_code not in supported formats — fall through to ZXing
+  }
+
+  // --- ZXing fallback (lazy import so we don't ship the library when native exists) ---
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+  let readerPromise: Promise<import('@zxing/library').BrowserQRCodeReader> | null =
+    null;
+
+  return async (source) => {
+    if (!readerPromise) {
+      readerPromise = import('@zxing/library').then(
+        (mod) => new mod.BrowserQRCodeReader()
+      );
+    }
+    const reader = await readerPromise;
+
+    // ZXing decode() accepts HTMLVideoElement and HTMLImageElement
+    if (
+      source instanceof HTMLVideoElement ||
+      source instanceof HTMLImageElement
+    ) {
+      try {
+        const result = reader.decode(source);
+        return result ? [{ rawValue: result.getText() }] : [];
+      } catch {
+        // NotFoundException → no QR found in this frame
+        return [];
+      }
+    }
+
+    return [];
+  };
+}
+
+// =============================================================================
 // QR Scanner Component
 // =============================================================================
 
@@ -54,8 +132,16 @@ export function QRScanner({
 }: QRScannerProps) {
   const t = useTranslations('play.qrScanner');
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const scanningRef = useRef(false);
+  const rafIdRef = useRef<number | null>(null);
+  const decoderRef = useRef<(
+    source: HTMLVideoElement | HTMLCanvasElement | ImageBitmap
+  ) => Promise<DecodeResult[]>>(null);
+  /** Dedupe: last decoded value + timestamp to avoid spamming same wrong code */
+  const lastDecodedRef = useRef<{ value: string; at: number } | null>(null);
+  /** Gate: true while a validate cycle is in-flight */
+  const isVerifyingRef = useRef(false);
 
   // Internal state
   const [internalState, setInternalState] = useState<ScanGateState>({
@@ -80,9 +166,14 @@ export function QRScanner({
     onChange?.(newState);
   }, [state, externalState, onChange]);
 
-  // Cleanup camera on unmount
+  // Cleanup camera + scan loop on unmount
   useEffect(() => {
     return () => {
+      scanningRef.current = false;
+      if (rafIdRef.current != null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
@@ -102,6 +193,13 @@ export function QRScanner({
   }, [config.allowedValues, config.fallbackCode]);
 
   const handleSuccess = useCallback((value: string, usedFallback: boolean) => {
+    // Stop scan loop immediately
+    scanningRef.current = false;
+    if (rafIdRef.current != null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+
     updateState({
       isVerified: true,
       scannedValue: value,
@@ -118,6 +216,81 @@ export function QRScanner({
     
     onSuccess?.(value, usedFallback);
   }, [updateState, onSuccess]);
+
+  // ===========================================================================
+  // QR decode scan loop — runs frame-by-frame while camera is active
+  // ===========================================================================
+  const SCAN_INTERVAL_MS = 250;   // decode every 250 ms to save CPU
+  const DEDUPE_WINDOW_MS = 2000;  // ignore same wrong code within 2 s
+
+  const startScanLoop = useCallback(async () => {
+    if (!decoderRef.current) {
+      decoderRef.current = await createDecoder();
+    }
+    const decode = decoderRef.current;
+    scanningRef.current = true;
+
+    let lastScanTime = 0;
+
+    const loop = (timestamp: number) => {
+      if (!scanningRef.current) return;
+
+      if (timestamp - lastScanTime >= SCAN_INTERVAL_MS) {
+        lastScanTime = timestamp;
+
+        // Skip if a previous validate is still in-flight
+        if (isVerifyingRef.current) {
+          rafIdRef.current = requestAnimationFrame(loop);
+          return;
+        }
+
+        const video = videoRef.current;
+        if (video && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          decode(video)
+            .then((results) => {
+              if (!scanningRef.current) return;
+              if (results.length === 0) return; // no QR found — silent retry
+
+              const scannedValue = results[0].rawValue;
+
+              // --- Dedupe: same wrong code within window → skip ---
+              const now = Date.now();
+              const last = lastDecodedRef.current;
+              if (
+                last &&
+                last.value === scannedValue &&
+                now - last.at < DEDUPE_WINDOW_MS
+              ) {
+                return; // same code recently tried, don't spam
+              }
+
+              isVerifyingRef.current = true;
+              const isValid = validateValue(scannedValue);
+
+              if (isValid) {
+                scanningRef.current = false;
+                handleSuccess(scannedValue, false);
+              } else {
+                // Record this code so we don't re-report it every 250 ms
+                lastDecodedRef.current = { value: scannedValue, at: now };
+                setError(t('qrNotValid'));
+                updateState({ scanAttempts: state.scanAttempts + 1 });
+                onScanFail?.(t('qrNotValid'));
+              }
+              isVerifyingRef.current = false;
+            })
+            .catch(() => {
+              // decode failure (blurry frame, etc.) — silently retry
+              isVerifyingRef.current = false;
+            });
+        }
+      }
+
+      rafIdRef.current = requestAnimationFrame(loop);
+    };
+
+    rafIdRef.current = requestAnimationFrame(loop);
+  }, [validateValue, handleSuccess, updateState, state.scanAttempts, onScanFail, t]);
 
   const startCamera = useCallback(async () => {
     setError(null);
@@ -136,6 +309,9 @@ export function QRScanner({
       }
       
       setShowCamera(true);
+
+      // Start frame-by-frame QR decode loop
+      await startScanLoop();
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : t('cameraError');
       setCameraError(errorMsg);
@@ -146,9 +322,14 @@ export function QRScanner({
         setShowFallback(true);
       }
     }
-  }, [config.allowManualFallback, onScanFail, t]);
+  }, [config.allowManualFallback, onScanFail, t, startScanLoop]);
 
   const stopCamera = useCallback(() => {
+    scanningRef.current = false;
+    if (rafIdRef.current != null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
@@ -169,8 +350,7 @@ export function QRScanner({
     }
   }, [fallbackCode, validateValue, handleSuccess, updateState, state.scanAttempts, t]);
 
-  // Note: Real QR scanning requires a library like @zxing/library
-  // This is a placeholder that shows the UI structure
+  // Dev-only simulated scan (still useful for testing without camera)
   const handleSimulatedScan = useCallback((simulatedValue: string) => {
     const isValid = validateValue(simulatedValue);
     
@@ -224,11 +404,13 @@ export function QRScanner({
             playsInline
             muted
           />
-          <canvas ref={canvasRef} className="hidden" />
           
           {/* Scan overlay */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <div className="w-48 h-48 border-2 border-white/50 rounded-lg" />
+            <p className="mt-2 text-xs text-white/70 animate-pulse">
+              {t('scanning')}
+            </p>
           </div>
           
           {/* Close button */}

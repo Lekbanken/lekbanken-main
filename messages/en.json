@@ -11628,7 +11628,23 @@
         "shown": "Shown",
         "reveal": "Reveal",
         "hide": "Hide",
-        "reset": "Reset"
+        "reset": "Reset",
+        "highlight": "Highlight",
+        "unhighlight": "Remove highlight",
+        "showMore": "More info",
+        "showLess": "Less info",
+        "pin": "Pin",
+        "unpin": "Unpin",
+        "pinnedTitle": "Pinned",
+        "pinnedVolatile": "Not saved after refresh",
+        "showLatest": "Show latest",
+        "showLatestNone": "No artifacts",
+        "showLatestHint": {
+          "highlighted": "Jumping to highlighted artifact",
+          "event": "Jumping to artifact with latest event",
+          "fallback": "Jumping to first available artifact"
+        },
+        "new": "New"
       },
       "connection": {
         "live": "Live",
@@ -12677,6 +12693,54 @@
         "decoded": "Decoded!"
       }
     },
+    "artifactBadge": {
+      "used": "Used",
+      "highlighted": "New",
+      "visibility": {
+        "public": "Public",
+        "leader_only": "Leader only",
+        "role_private": "Role"
+      },
+      "state": {
+        "hidden": "Hidden",
+        "revealed": "Visible",
+        "locked": "Locked",
+        "unlocked": "Unlocked",
+        "solved": "Solved",
+        "failed": "Failed"
+      }
+    },
+    "artifactInspector": {
+      "title": "Inspector",
+      "close": "Close inspector",
+      "noSelection": "Select an artifact to inspect",
+      "quickActions": "Quick actions",
+      "details": "Details",
+      "detailType": "Type",
+      "detailOrder": "Order",
+      "detailAttempts": "Attempts",
+      "detailProgress": "Progress",
+      "currentlyHighlighted": "Currently highlighted",
+      "metadata": "Metadata",
+      "variants": "Variants",
+      "untitledVariant": "Variant",
+      "links": "Links",
+      "noLinks": "No links",
+      "linkStep": "Step {order}: {title}"
+    },
+    "artifactTimeline": {
+      "title": "Timeline",
+      "empty": "No events yet",
+      "event": {
+        "revealed": "Revealed",
+        "hidden": "Hidden",
+        "stateChanged": "State changed",
+        "solved": "Solved",
+        "failed": "Failed",
+        "triggerFired": "Trigger fired",
+        "unknown": "Event"
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Something went wrong",
@@ -12697,7 +12761,8 @@
         "hide": "Hide",
         "update": "Update",
         "highlight": "Highlight",
-        "unhighlight": "Unhighlight"
+        "unhighlight": "Unhighlight",
+        "reset": "Reset"
       },
       "loading": "Loading artifacts…",
       "title": "Artifacts",
@@ -12938,6 +13003,7 @@
       "failedAttempts": "{count} failed attempts",
       "viaManualCode": "(via manual code)",
       "defaultPrompt": "Scan the QR code to continue",
+      "scanning": "Scanning...",
       "devSimulateScan": "[DEV] Simulate successful scan"
     },
     "triggerCard": {
@@ -13384,6 +13450,13 @@
         "keypadLocked": "Keypad is locked.",
         "attemptsRemaining": "{count} attempts remaining"
       },
+      "keypadGrid": {
+        "ariaLabel": "Keypad",
+        "submit": "Submit",
+        "delete": "Delete",
+        "verifying": "Verifying…",
+        "correct": "Correct!"
+      },
       "safety": {
         "title": "Safety"
       },
@@ -13413,6 +13486,13 @@
         "locked": "Locked",
         "unlocked": "Unlocked",
         "used": "Used"
+      },
+      "imageLightbox": {
+        "tapToView": "Tap to view image",
+        "openFullscreen": "Open image fullscreen",
+        "close": "Close",
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out"
       },
       "decision": {
         "voteSubmitted": "Vote submitted!",

@@ -1489,6 +1489,8 @@ export function SessionCockpit({
     revealArtifact,
     hideArtifact,
     resetArtifact,
+    highlightArtifact,
+    unhighlightArtifact,
     refresh,
   } = sessionState;
 
@@ -2168,6 +2170,8 @@ export function SessionCockpit({
           onRevealArtifact={revealArtifact}
           onHideArtifact={hideArtifact}
           onResetArtifact={resetArtifact}
+          onHighlightArtifact={highlightArtifact}
+          onUnhighlightArtifact={unhighlightArtifact}
         />
 
         {/* Chat modal: only mount when open → on-demand chunk load */}

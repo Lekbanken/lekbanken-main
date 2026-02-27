@@ -73,6 +73,7 @@ export function mapGameArtifactsToCockpit(
       artifactType: (a.type as CockpitArtifact['artifactType']) ?? 'document',
       artifactOrder: i,
       metadata: {},
+      primaryVariantId: null, // No variant data in preview context
     });
     states[id] = {
       artifactId: id,

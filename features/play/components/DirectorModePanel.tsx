@@ -22,7 +22,7 @@
 
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -48,6 +48,10 @@ import {
   ArrowDownLeftIcon,
   EyeIcon,
   EyeSlashIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  SparklesIcon,
+  MapPinIcon,
 } from '@heroicons/react/24/outline';
 import { StopIcon } from '@heroicons/react/24/solid';
 import type {
@@ -56,6 +60,7 @@ import type {
   CockpitTrigger,
   CockpitArtifact,
   ArtifactState,
+  ArtifactStateStatus,
   SessionEvent,
   Signal,
   SessionCockpitStatus,
@@ -65,6 +70,13 @@ import { DirectorChipLane } from './DirectorChipLane';
 import type { DirectorChip, DirectorChipType } from './DirectorChipLane';
 import { DirectorStagePanel } from './DirectorStagePanel';
 import { DirectorTriggerCard, type PendingAction } from './DirectorTriggerCard';
+import { ArtifactLinkPills } from './artifacts/ArtifactLinkPills';
+import { ArtifactTimeline } from './artifacts/ArtifactTimeline';
+import { PinnedArtifactBar } from './artifacts/PinnedArtifactBar';
+import type { PinnedArtifactItem } from './artifacts/PinnedArtifactBar';
+import { ArtifactTypeIcon } from './shared/ArtifactTypeIcon';
+import { ArtifactBadge } from './shared/ArtifactBadge';
+import type { ArtifactType } from '@/types/games';
 import { DrawerOverlay, PlayHeader, PlayTopArea, getSessionStatusConfig } from '@/features/play/components/shared';
 import { NowSummaryRow } from '@/features/play/components/shared';
 import {
@@ -144,6 +156,8 @@ export interface DirectorModePanelProps {
   onRevealArtifact?: (artifactId: string) => Promise<void>;
   onHideArtifact?: (artifactId: string) => Promise<void>;
   onResetArtifact?: (artifactId: string) => Promise<void>;
+  onHighlightArtifact?: (artifactId: string) => Promise<void>;
+  onUnhighlightArtifact?: (artifactId: string) => Promise<void>;
 
   // Chrome
   onClose: () => void;
@@ -1097,6 +1111,12 @@ function ArtifactsTab({
   onRevealArtifact,
   onHideArtifact,
   onResetArtifact,
+  onHighlightArtifact,
+  onUnhighlightArtifact,
+  steps,
+  phases,
+  triggers,
+  events,
 }: {
   artifacts: CockpitArtifact[];
   artifactStates: Record<string, ArtifactState>;
@@ -1104,10 +1124,145 @@ function ArtifactsTab({
   onRevealArtifact?: (artifactId: string) => Promise<void>;
   onHideArtifact?: (artifactId: string) => Promise<void>;
   onResetArtifact?: (artifactId: string) => Promise<void>;
+  onHighlightArtifact?: (artifactId: string) => Promise<void>;
+  onUnhighlightArtifact?: (artifactId: string) => Promise<void>;
+  steps?: CockpitStep[];
+  phases?: CockpitPhase[];
+  triggers?: CockpitTrigger[];
+  events?: SessionEvent[];
 }) {
   const hiddenCount = artifacts.filter(a => { const s = artifactStates[a.id]; return !s || s.status === 'hidden'; }).length;
-  const availableCount = artifacts.filter(a => { const s = artifactStates[a.id]; return s && (s.status === 'revealed' || s.status === 'unlocked'); }).length;
+  const availableCount = artifacts.filter(a => { const s = artifactStates[a.id]; return s && s.status === 'revealed'; }).length;
   const shownCount = artifacts.filter(a => { const s = artifactStates[a.id]; return s && (s.status === 'solved' || s.isRevealed); }).length;
+  const tInspector = useTranslations('play.artifactInspector');
+  const tTimeline = useTranslations('play.artifactTimeline');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+  const [pendingHighlightId, setPendingHighlightId] = useState<string | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Pin / unpin helpers (UI-only — no backend persistence)
+  const togglePin = useCallback((artifactId: string) => {
+    setPinnedIds((prev) =>
+      prev.includes(artifactId)
+        ? prev.filter((id) => id !== artifactId)
+        : [...prev, artifactId],
+    );
+  }, []);
+
+  const unpinArtifact = useCallback((artifactId: string) => {
+    setPinnedIds((prev) => prev.filter((id) => id !== artifactId));
+  }, []);
+
+  // Scroll to expanded card with a small delay for DOM update
+  const expandAndScroll = useCallback((artifactId: string | null) => {
+    setExpandedId(artifactId);
+    if (artifactId) {
+      requestAnimationFrame(() => {
+        const el = document.getElementById(`artifact-card-${artifactId}`);
+        el?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      });
+    }
+  }, []);
+
+  // "Show latest" — 3-tier target selection + reason for tooltip:
+  //   1. Highlighted artifact (pinned highlighted first, then any highlighted)
+  //   2. Artifact with most recent timeline event
+  //   3. First non-hidden artifact (fallback)
+  type LatestReason = 'highlighted' | 'event' | 'revealed' | 'first' | 'none';
+  const { latestTargetId, latestTargetReason } = useMemo((): { latestTargetId: string | null; latestTargetReason: LatestReason } => {
+    // Tier 1: highlighted (prefer pinned highlighted)
+    const pinnedHighlighted = pinnedIds.find((id) => artifactStates[id]?.isHighlighted);
+    if (pinnedHighlighted) return { latestTargetId: pinnedHighlighted, latestTargetReason: 'highlighted' };
+    const anyHighlighted = artifacts.find((a) => artifactStates[a.id]?.isHighlighted);
+    if (anyHighlighted) return { latestTargetId: anyHighlighted.id, latestTargetReason: 'highlighted' };
+
+    // Tier 2: most recent event with artifactId
+    if (events && events.length > 0) {
+      const sorted = [...events]
+        .filter((e) => e.artifactId || (e.payload && typeof (e.payload as Record<string, unknown>).artifactId === 'string'))
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      const top = sorted[0];
+      if (top) {
+        const id = top.artifactId ?? (top.payload as Record<string, unknown>).artifactId as string;
+        return { latestTargetId: id, latestTargetReason: 'event' };
+      }
+    }
+
+    // Tier 3: first non-hidden artifact
+    const revealed = artifacts.find((a) => {
+      const s = artifactStates[a.id];
+      return s && s.status !== 'hidden';
+    });
+    if (revealed) return { latestTargetId: revealed.id, latestTargetReason: 'revealed' };
+
+    // Absolute fallback: first artifact or nothing
+    const firstId = artifacts[0]?.id ?? null;
+    return { latestTargetId: firstId, latestTargetReason: firstId ? 'first' : 'none' };
+  }, [artifacts, artifactStates, events, pinnedIds]);
+
+  // Brief flash on the target card so the eye catches it (PR #6)
+  const flashTargetCard = useCallback((artifactId: string) => {
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`artifact-card-${artifactId}`);
+      if (!el) return;
+      el.classList.add('ring-2', 'ring-primary', 'animate-pulse');
+      setTimeout(() => {
+        el.classList.remove('ring-2', 'ring-primary', 'animate-pulse');
+      }, 600);
+    });
+  }, []);
+
+  const handleShowLatest = useCallback(() => {
+    if (latestTargetId) {
+      expandAndScroll(latestTargetId);
+      // Flash after scroll + expand settle (rAF inside expandAndScroll + extra 100ms)
+      setTimeout(() => flashTargetCard(latestTargetId), 150);
+    }
+  }, [latestTargetId, expandAndScroll, flashTargetCard]);
+
+  // Build pinned items for the bar
+  const pinnedItems: PinnedArtifactItem[] = useMemo(() => {
+    return pinnedIds
+      .map((id) => {
+        const artifact = artifacts.find((a) => a.id === id);
+        if (!artifact) return null;
+        const state = artifactStates[id];
+        return {
+          id: artifact.id,
+          title: artifact.title,
+          type: artifact.artifactType as ArtifactType,
+          status: (state?.status ?? 'hidden') as ArtifactStateStatus,
+          isHighlighted: state?.isHighlighted ?? false,
+        };
+      })
+      .filter((item): item is PinnedArtifactItem => item !== null);
+  }, [pinnedIds, artifacts, artifactStates]);
+
+  // Derive linked step/phase/triggers for expanded card
+  const findLinkedStep = (stepId?: string) => {
+    if (!stepId || !steps) return undefined;
+    const step = steps.find(s => s.id === stepId);
+    if (!step) return undefined;
+    return { id: step.id, title: step.title, stepOrder: step.stepOrder };
+  };
+  const findLinkedPhase = (phaseId?: string) => {
+    if (!phaseId || !phases) return undefined;
+    const phase = phases.find(p => p.id === phaseId);
+    if (!phase) return undefined;
+    return { id: phase.id, name: phase.name, phaseOrder: phase.phaseOrder };
+  };
+  const findLinkedTriggers = (artifactId: string) => {
+    if (!triggers) return [];
+    return triggers.filter((trigger) => {
+      const condStr = JSON.stringify(trigger.condition ?? {});
+      if (condStr.includes(artifactId)) return true;
+      for (const action of trigger.actions ?? []) {
+        if (JSON.stringify(action).includes(artifactId)) return true;
+      }
+      return false;
+    }).map(tr => ({ id: tr.id, name: tr.name }));
+  };
 
   if (artifacts.length === 0) {
     return (
@@ -1134,30 +1289,92 @@ function ArtifactsTab({
         </Card>
       </div>
 
-      <div className="space-y-3">
+      {/* Show latest control (PR #5 + PR #6 polish) */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className={cn(
+            'text-xs inline-flex items-center gap-1 transition-colors',
+            latestTargetId
+              ? 'text-muted-foreground hover:text-foreground'
+              : 'text-muted-foreground/40 cursor-not-allowed',
+          )}
+          onClick={handleShowLatest}
+          disabled={!latestTargetId}
+          title={
+            latestTargetReason === 'none'
+              ? t('artifacts.showLatestNone')
+              : latestTargetReason === 'highlighted'
+                ? t('artifacts.showLatestHint.highlighted')
+                : latestTargetReason === 'event'
+                  ? t('artifacts.showLatestHint.event')
+                  : t('artifacts.showLatestHint.fallback')
+          }
+        >
+          <SparklesIcon className="h-3.5 w-3.5" />
+          {latestTargetId ? t('artifacts.showLatest') : t('artifacts.showLatestNone')}
+        </button>
+      </div>
+
+      {/* Pinned artifacts bar (PR #4 — UI-only pins) */}
+      <PinnedArtifactBar
+        items={pinnedItems}
+        onSelect={expandAndScroll}
+        onUnpin={unpinArtifact}
+      />
+
+      <div ref={scrollContainerRef} className="space-y-3">
         {artifacts.map((artifact) => {
           const state = artifactStates[artifact.id];
-          const statusLabel = state?.status ?? 'hidden';
+          const statusLabel: ArtifactStateStatus = state?.status ?? 'hidden';
+          const isExpanded = expandedId === artifact.id;
+          const isHighlighted = state?.isHighlighted ?? false;
+          const isPinned = pinnedIds.includes(artifact.id);
           return (
-            <Card key={artifact.id} className={cn('p-4 transition-colors',
+            <Card key={artifact.id} id={`artifact-card-${artifact.id}`} className={cn('p-4 transition-colors',
               statusLabel === 'hidden' && 'opacity-60',
               statusLabel === 'revealed' && 'border-primary/40',
-              statusLabel === 'solved' && 'border-green-400/40 bg-green-50/50 dark:bg-green-950/10')}>
+              statusLabel === 'solved' && 'border-green-400/40 bg-green-50/50 dark:bg-green-950/10',
+              isExpanded && 'ring-2 ring-primary/50',
+            )}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-foreground">{artifact.title}</div>
+                  <div className="flex items-center gap-2">
+                    <ArtifactTypeIcon
+                      type={artifact.artifactType as ArtifactType}
+                      size="sm"
+                      className="text-muted-foreground shrink-0"
+                    />
+                    <div className="font-medium text-foreground">{artifact.title}</div>
+                  </div>
                   {artifact.description && <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{artifact.description}</div>}
                   <div className="flex items-center gap-2 mt-2">
-                    <Badge variant={
-                      statusLabel === 'revealed' || statusLabel === 'unlocked' ? 'default' :
-                      statusLabel === 'solved' ? 'success' :
-                      statusLabel === 'failed' ? 'destructive' : 'secondary'
-                    } size="sm">{statusLabel}</Badge>
-                    <span className="text-xs text-muted-foreground">{artifact.artifactType}</span>
+                    <ArtifactBadge state={statusLabel} compact />
+                    {isHighlighted && (
+                      <span className="inline-flex items-center gap-0.5 text-xs text-primary font-medium">
+                        <SparklesIcon className="h-3 w-3" />
+                        {tInspector('currentlyHighlighted')}
+                      </span>
+                    )}
                   </div>
                 </div>
-                <ArchiveBoxIcon className="h-5 w-5 text-muted-foreground shrink-0" />
+                {/* Pin toggle */}
+                <button
+                  type="button"
+                  className={cn(
+                    'shrink-0 p-1 rounded transition-colors',
+                    isPinned
+                      ? 'text-primary hover:text-primary/80'
+                      : 'text-muted-foreground hover:text-foreground',
+                  )}
+                  onClick={(e) => { e.stopPropagation(); togglePin(artifact.id); }}
+                  aria-label={isPinned ? t('artifacts.unpin') : t('artifacts.pin')}
+                  title={isPinned ? t('artifacts.unpin') : t('artifacts.pin')}
+                >
+                  <MapPinIcon className={cn('h-4 w-4', isPinned && 'fill-current')} />
+                </button>
               </div>
+
               {/* Action buttons */}
               {(onRevealArtifact || onHideArtifact) && (
                 <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
@@ -1168,7 +1385,7 @@ function ArtifactsTab({
                       {t('artifacts.reveal')}
                     </Button>
                   )}
-                  {(statusLabel === 'revealed' || statusLabel === 'unlocked') && onHideArtifact && (
+                  {statusLabel === 'revealed' && onHideArtifact && (
                     <Button size="sm" variant="outline" className="h-7 text-xs"
                       onClick={() => onHideArtifact(artifact.id)}>
                       <EyeSlashIcon className="h-3.5 w-3.5 mr-1" />
@@ -1180,6 +1397,120 @@ function ArtifactsTab({
                       onClick={() => onResetArtifact(artifact.id)}>
                       {t('artifacts.reset')}
                     </Button>
+                  )}
+                  {/* Highlight / Unhighlight toggle — revealed only (unlocked is never set by loadArtifacts) */}
+                  {statusLabel === 'revealed' && artifact.primaryVariantId && (
+                    isHighlighted ? (
+                      onUnhighlightArtifact && (
+                        <Button size="sm" variant="outline" className="h-7 text-xs"
+                          disabled={pendingHighlightId != null}
+                          onClick={async () => {
+                            setPendingHighlightId(artifact.id);
+                            try { await onUnhighlightArtifact(artifact.id); } finally { setPendingHighlightId(null); }
+                          }}>
+                          <SparklesIcon className="h-3.5 w-3.5 mr-1" />
+                          {pendingHighlightId === artifact.id ? '…' : t('artifacts.unhighlight')}
+                        </Button>
+                      )
+                    ) : (
+                      onHighlightArtifact && (
+                        <Button size="sm" variant="ghost" className="h-7 text-xs"
+                          disabled={pendingHighlightId != null}
+                          onClick={async () => {
+                            setPendingHighlightId(artifact.id);
+                            try { await onHighlightArtifact(artifact.id); } finally { setPendingHighlightId(null); }
+                          }}>
+                          <SparklesIcon className="h-3.5 w-3.5 mr-1" />
+                          {pendingHighlightId === artifact.id ? '…' : t('artifacts.highlight')}
+                        </Button>
+                      )
+                    )
+                  )}
+
+                  {/* Show more / Show less toggle — link style, secondary action */}
+                  <button
+                    type="button"
+                    className="h-7 text-xs text-muted-foreground hover:text-foreground ml-auto inline-flex items-center gap-1 transition-colors"
+                    onClick={() => expandAndScroll(isExpanded ? null : artifact.id)}
+                    aria-expanded={isExpanded}
+                    aria-controls={`artifact-details-${artifact.id}`}
+                  >
+                    {isExpanded ? (
+                      <><ChevronUpIcon className="h-3.5 w-3.5" />{t('artifacts.showLess')}</>
+                    ) : (
+                      <><ChevronDownIcon className="h-3.5 w-3.5" />{t('artifacts.showMore')}</>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* ── Expanded detail section ── */}
+              {isExpanded && (
+                <div id={`artifact-details-${artifact.id}`} className="mt-3 pt-3 border-t border-border/50 space-y-3">
+                  {/* Details grid */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-muted-foreground">{tInspector('detailType')}</span>
+                      <div className="font-medium">{artifact.artifactType}</div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">{tInspector('detailOrder')}</span>
+                      <div className="font-medium">{artifact.artifactOrder}</div>
+                    </div>
+                    {state?.attemptCount != null && (
+                      <div>
+                        <span className="text-muted-foreground">{tInspector('detailAttempts')}</span>
+                        <div className="font-medium">
+                          {state.attemptCount}
+                          {state.maxAttempts != null && ` / ${state.maxAttempts}`}
+                        </div>
+                      </div>
+                    )}
+                    {state?.progress != null && (
+                      <div>
+                        <span className="text-muted-foreground">{tInspector('detailProgress')}</span>
+                        <div className="font-medium">{state.progress}%</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Links (step/phase/trigger pills) */}
+                  <div className="space-y-1">
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                      {tInspector('links')}
+                    </div>
+                    <ArtifactLinkPills
+                      step={findLinkedStep(artifact.stepId)}
+                      phase={findLinkedPhase(artifact.phaseId)}
+                      triggers={findLinkedTriggers(artifact.id)}
+                      compact
+                    />
+                  </div>
+
+                  {/* Metadata (collapsed by default) */}
+                  {artifact.metadata && Object.keys(artifact.metadata).length > 0 && (
+                    <details className="text-xs">
+                      <summary className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                        {tInspector('metadata')}
+                      </summary>
+                      <pre className="mt-1 p-2 rounded bg-muted/50 text-[10px] text-muted-foreground overflow-x-auto max-h-32">
+                        {JSON.stringify(artifact.metadata, null, 2)}
+                      </pre>
+                    </details>
+                  )}
+
+                  {/* Per-artifact timeline (PR #3) */}
+                  {events && events.length > 0 && (
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                        {tTimeline('title')}
+                      </div>
+                      <ArtifactTimeline
+                        events={events}
+                        artifactId={artifact.id}
+                        compact
+                      />
+                    </div>
                   )}
                 </div>
               )}
@@ -1227,6 +1558,8 @@ export function DirectorModePanel({
   onRevealArtifact,
   onHideArtifact,
   onResetArtifact,
+  onHighlightArtifact,
+  onUnhighlightArtifact,
   showFullscreenButton = false,
   isFullscreen = false,
   onToggleFullscreen,
@@ -1463,6 +1796,12 @@ export function DirectorModePanel({
             onRevealArtifact={onRevealArtifact}
             onHideArtifact={onHideArtifact}
             onResetArtifact={onResetArtifact}
+            onHighlightArtifact={onHighlightArtifact}
+            onUnhighlightArtifact={onUnhighlightArtifact}
+            steps={steps}
+            phases={phases}
+            triggers={triggers}
+            events={events}
           />
         )}
         {activeDrawer === 'triggers' && (

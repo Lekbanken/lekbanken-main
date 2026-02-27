@@ -45,24 +45,16 @@ import {
   EyeIcon,
   EyeSlashIcon,
   LockClosedIcon,
-  LockOpenIcon,
   ArrowPathIcon,
   CheckCircleIcon,
   ChevronDownIcon,
-  PuzzlePieceIcon,
-  DocumentTextIcon,
-  KeyIcon,
-  QuestionMarkCircleIcon,
-  PhotoIcon,
-  SpeakerWaveIcon,
-  Squares2X2Icon,
-  CircleStackIcon,
-  CursorArrowRaysIcon,
   CheckIcon,
   MinusIcon,
   StopIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
+import { ArtifactTypeIcon } from '@/features/play/components/shared/ArtifactTypeIcon';
+import type { ArtifactType } from '@/types/games';
 import type {
   ArtifactInfo,
   BatchOperation,
@@ -91,20 +83,6 @@ export interface BatchArtifactPanelProps {
 // Constants
 // =============================================================================
 
-const ARTIFACT_TYPE_ICONS: Record<string, React.ReactNode> = {
-  keypad: <KeyIcon className="h-4 w-4" />,
-  riddle: <QuestionMarkCircleIcon className="h-4 w-4" />,
-  cipher: <CircleStackIcon className="h-4 w-4" />,
-  tile_puzzle: <Squares2X2Icon className="h-4 w-4" />,
-  logic_grid: <Squares2X2Icon className="h-4 w-4" />,
-  hotspot: <CursorArrowRaysIcon className="h-4 w-4" />,
-  card: <DocumentTextIcon className="h-4 w-4" />,
-  document: <DocumentTextIcon className="h-4 w-4" />,
-  image: <PhotoIcon className="h-4 w-4" />,
-  audio: <SpeakerWaveIcon className="h-4 w-4" />,
-  default: <PuzzlePieceIcon className="h-4 w-4" />,
-};
-
 const ARTIFACT_TYPE_KEYS: Record<string, string> = {
   keypad: 'keypad',
   riddle: 'riddle',
@@ -127,8 +105,7 @@ const OPERATION_CONFIGS: Array<{
   { operation: 'reveal', icon: <EyeIcon className="h-4 w-4" />, variant: 'default' },
   { operation: 'hide', icon: <EyeSlashIcon className="h-4 w-4" />, variant: 'outline' },
   { operation: 'reset', icon: <ArrowPathIcon className="h-4 w-4" />, variant: 'outline', confirmRequired: true },
-  { operation: 'unlock', icon: <LockOpenIcon className="h-4 w-4" />, variant: 'outline' },
-  { operation: 'lock', icon: <LockClosedIcon className="h-4 w-4" />, variant: 'outline' },
+  // lock/unlock removed — no backend support (PR #3)
   { operation: 'solve', icon: <CheckCircleIcon className="h-4 w-4" />, variant: 'default', confirmRequired: true },
 ];
 
@@ -144,7 +121,6 @@ interface ArtifactRowProps {
 
 function ArtifactRow({ artifact, isSelected, onToggle }: ArtifactRowProps) {
   const t = useTranslations('play.batchArtifactPanel');
-  const icon = ARTIFACT_TYPE_ICONS[artifact.type] || ARTIFACT_TYPE_ICONS.default;
   const typeKey = ARTIFACT_TYPE_KEYS[artifact.type] ?? 'unknown';
   const typeLabel = t(`types.${typeKey}` as Parameters<typeof t>[0], { type: artifact.type });
 
@@ -157,7 +133,9 @@ function ArtifactRow({ artifact, isSelected, onToggle }: ArtifactRowProps) {
       onClick={onToggle}
     >
       <Checkbox checked={isSelected} onChange={onToggle} />
-      <div className="text-muted-foreground">{icon}</div>
+      <div className="text-muted-foreground">
+        <ArtifactTypeIcon type={artifact.type as ArtifactType} size="md" />
+      </div>
       <div className="flex-1 min-w-0">
         <div className="font-medium text-sm truncate">{artifact.name}</div>
         <div className="text-xs text-muted-foreground">{typeLabel}</div>

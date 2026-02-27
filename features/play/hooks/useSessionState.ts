@@ -21,11 +21,14 @@ import type {
   SignalOutputType,
   TriggerActionResult,
   ArtifactState,
+  ArtifactStateStatus,
 } from '@/types/session-cockpit';
 import { getPollingConfig } from '@/lib/play/realtime-gate';
 import {
   DEFAULT_SIGNAL_CAPABILITIES,
   DEFAULT_TIMEBANK_RULES,
+  ARTIFACT_STATUSES,
+  isArtifactStateStatus,
 } from '@/types/session-cockpit';
 import type { SessionRole } from '@/types/play-runtime';
 import {
@@ -336,50 +339,71 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       if (!res.ok) return;
 
       const data = await res.json();
-      
-      const artifacts = (data.artifacts ?? []).map((artifact: Record<string, unknown>) => ({
-        id: artifact.id as string,
-        title: artifact.title as string,
-        description: (artifact.description as string | undefined) ?? undefined,
-        artifactType: (artifact.artifact_type as string | undefined) ?? 'unknown',
-        artifactOrder: (artifact.artifact_order as number | undefined) ?? 0,
-        metadata: (artifact.metadata as Record<string, unknown> | null) ?? null,
-        // V2: Include state if present
-        state: (artifact.state as Record<string, unknown> | null) ?? null,
-      }));
 
-      // V2: Build artifactStates from variant reveal/highlight state
-      const variants = data.variants as Array<{
+      // Group variants by artifact for primaryVariantId lookup
+      const rawVariants = (data.variants ?? []) as Array<{
         id: string;
-        session_artifact_id: string; // actually game_artifact_id in V2
+        session_artifact_id: string;
+        variant_order?: number;
         revealed_at: string | null;
         highlighted_at: string | null;
         visibility: string;
-      }> | undefined;
-
-      const newArtifactStates: Record<string, ArtifactState> = {};
-      if (variants) {
-        // Group variants by artifact
-        const variantsByArtifact = new Map<string, typeof variants>();
-        for (const v of variants) {
-          const key = v.session_artifact_id; // game_artifact_id mapped as session_artifact_id
-          const list = variantsByArtifact.get(key) ?? [];
-          list.push(v);
-          variantsByArtifact.set(key, list);
+      }>;
+      const variantsByArtifactMap = new Map<string, typeof rawVariants>();
+      for (const v of rawVariants) {
+        const key = v.session_artifact_id;
+        const list = variantsByArtifactMap.get(key) ?? [];
+        list.push(v);
+        variantsByArtifactMap.set(key, list);
+      }
+      
+      const artifacts = (data.artifacts ?? []).map((artifact: Record<string, unknown>) => {
+        const id = artifact.id as string;
+        // primaryVariantId: first playable/public variant for the artifact
+        // in play-context (variant_order ASC). Defensive local sort so the
+        // contract holds even if the API response order changes in the future.
+        const avs = variantsByArtifactMap.get(id);
+        let primaryVariantId: string | null = null;
+        if (avs && avs.length > 0) {
+          const sorted = [...avs].sort((a, b) => (a.variant_order ?? Infinity) - (b.variant_order ?? Infinity));
+          primaryVariantId = sorted[0].id;
         }
 
+        return {
+          id,
+          title: artifact.title as string,
+          description: (artifact.description as string | undefined) ?? undefined,
+          artifactType: (artifact.artifact_type as string | undefined) ?? 'unknown',
+          artifactOrder: (artifact.artifact_order as number | undefined) ?? 0,
+          metadata: (artifact.metadata as Record<string, unknown> | null) ?? null,
+          primaryVariantId,
+          // V2: Include state if present
+          state: (artifact.state as Record<string, unknown> | null) ?? null,
+        };
+      });
+
+      // V2: Build artifactStates from variant reveal/highlight state
+      const newArtifactStates: Record<string, ArtifactState> = {};
+      if (rawVariants.length > 0) {
         for (const artifact of artifacts) {
-          const avs = variantsByArtifact.get(artifact.id) ?? [];
-          const anyRevealed = avs.some((v: { revealed_at: string | null }) => v.revealed_at != null);
-          const anyHighlighted = avs.some((v: { highlighted_at: string | null }) => v.highlighted_at != null);
+          const avs = variantsByArtifactMap.get(artifact.id) ?? [];
+          const anyRevealed = avs.some((v) => v.revealed_at != null);
+          const anyHighlighted = avs.some((v) => v.highlighted_at != null);
           // Check puzzle state from artifact.state
           const artState = artifact.state as Record<string, unknown> | null;
           const keypadUnlocked = Boolean((artState?.keypadState as Record<string, unknown> | undefined)?.isUnlocked);
           const puzzleSolved = Boolean(artState?.solved);
 
-          let status: 'hidden' | 'revealed' | 'unlocked' | 'solved' | 'locked' | 'failed' = 'hidden';
+          let status: ArtifactStateStatus = 'hidden';
           if (puzzleSolved || keypadUnlocked) status = 'solved';
           else if (anyRevealed) status = 'revealed';
+
+          // Dev-only tripwire: catch status values not in ARTIFACT_STATUSES
+          if (process.env.NODE_ENV !== 'production') {
+            if (!isArtifactStateStatus(status)) {
+              throw new Error(`Invalid ArtifactStateStatus: "${status}". Allowed: [${ARTIFACT_STATUSES.join(', ')}]. Update ARTIFACT_STATUSES in types/session-cockpit.ts. See ARTIFACT_COMPONENTS.md §9.`);
+            }
+          }
 
           newArtifactStates[artifact.id] = {
             artifactId: artifact.id,
@@ -896,6 +920,69 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
     }
   }, [sessionId, onError, loadArtifacts]);
 
+  const highlightArtifact = useCallback(async (artifactId: string) => {
+    // Resolve primaryVariantId from the cockpit artifact
+    const artifact = state.artifacts.find((a) => a.id === artifactId);
+    const variantId = artifact?.primaryVariantId;
+    if (!variantId) return;
+
+    try {
+      const res = await fetch(`/api/play/sessions/${sessionId}/artifacts/state`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'highlight_variant', variantId, highlighted: true }),
+      });
+
+      if (!res.ok) throw new Error('Failed to highlight artifact');
+
+      // Optimistic: clear all highlights, set this one
+      setState((prev) => {
+        const next = { ...prev.artifactStates };
+        for (const [id, s] of Object.entries(next)) {
+          if (s.isHighlighted) next[id] = { ...s, isHighlighted: false };
+        }
+        next[artifactId] = { ...next[artifactId], isHighlighted: true };
+        return { ...prev, artifactStates: next, artifactVersion: prev.artifactVersion + 1 };
+      });
+
+      void loadArtifacts();
+    } catch (err) {
+      onError?.(err instanceof Error ? err : new Error('Failed to highlight artifact'));
+    }
+  }, [sessionId, state.artifacts, onError, loadArtifacts]);
+
+  const unhighlightArtifact = useCallback(async (artifactId: string) => {
+    const artifact = state.artifacts.find((a) => a.id === artifactId);
+    const variantId = artifact?.primaryVariantId;
+    if (!variantId) return;
+
+    try {
+      const res = await fetch(`/api/play/sessions/${sessionId}/artifacts/state`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'highlight_variant', variantId, highlighted: false }),
+      });
+
+      if (!res.ok) throw new Error('Failed to unhighlight artifact');
+
+      setState((prev) => ({
+        ...prev,
+        artifactStates: {
+          ...prev.artifactStates,
+          [artifactId]: {
+            ...prev.artifactStates[artifactId],
+            isHighlighted: false,
+          },
+        },
+        artifactVersion: prev.artifactVersion + 1,
+      }));
+
+      void loadArtifacts();
+    } catch (err) {
+      onError?.(err instanceof Error ? err : new Error('Failed to unhighlight artifact'));
+    }
+  }, [sessionId, state.artifacts, onError, loadArtifacts]);
+
   const fireTrigger = useCallback(async (triggerId: string): Promise<TriggerActionResult> => {
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
@@ -1321,6 +1408,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
     revealArtifact,
     hideArtifact,
     resetArtifact,
+    highlightArtifact,
+    unhighlightArtifact,
     fireTrigger,
     disableTrigger,
     armTrigger,

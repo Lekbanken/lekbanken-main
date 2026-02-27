@@ -23,13 +23,18 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { hapticTap, HAPTIC_LIGHT } from '../haptics';
+import { hapticTap, HAPTIC_LIGHT, HAPTIC_MEDIUM } from '../haptics';
 import { playSfx, SFX_TAP } from '../sound';
 import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ArtifactCard } from '@/features/play/components/shared/ArtifactCard';
+import { ArtifactBadge } from '@/features/play/components/shared/ArtifactBadge';
+import { ImageLightbox, extractImageUrl } from '@/features/play/components/shared/ImageLightbox';
+import { KeypadGrid } from '@/features/play/components/shared/KeypadGrid';
+import type { KeypadGridStatus } from '@/features/play/components/shared/KeypadGrid';
+import type { ArtifactType } from '@/types/games';
 import type {
   ParticipantSessionArtifact,
   ParticipantSessionArtifactVariant,
@@ -215,6 +220,8 @@ export function ParticipantArtifactDrawer({
   const didAutoScrollRef = useRef(false);
   // Track which variant cards are expanded (card→expand pattern)
   const [expandedVariants, setExpandedVariants] = useState<Set<string>>(new Set());
+  // Image lightbox state — { src, alt, caption } when open, null when closed
+  const [lightboxData, setLightboxData] = useState<{ src: string; alt: string; caption?: string | null } | null>(null);
 
   const toggleExpand = useCallback((variantId: string) => {
     hapticTap(HAPTIC_LIGHT);
@@ -386,7 +393,6 @@ export function ParticipantArtifactDrawer({
                   <div className="space-y-2">
                     {vars.map((v) => {
                       const visibility = v.visibility ?? 'public';
-                      const isPublicRevealed = visibility === 'public' && Boolean(v.revealed_at);
                       const isHighlighted = Boolean(v.highlighted_at);
 
                       // 3-state: used → highlighted → available
@@ -394,59 +400,85 @@ export function ParticipantArtifactDrawer({
                       // receives a variant, they have access. Period.
                       const isUsed = isVariantUsed(v.metadata, v.used_at);
 
-                      const stateClasses = isUsed
-                        ? 'bg-muted/20 border border-border opacity-70'
+                      const cardState = isUsed
+                        ? 'used' as const
                         : isHighlighted
-                          ? 'bg-primary/5 border-2 border-primary/30 shadow-sm'
-                          : 'bg-muted/30';
+                          ? 'highlighted' as const
+                          : 'available' as const;
 
                       const isExpanded = expandedVariants.has(v.id);
                       const hasBody = Boolean(v.body);
 
+                      // Image artifacts: extract URL for thumbnail + lightbox
+                      const isImageType = a.artifact_type === 'image';
+                      const imageUrl = isImageType
+                        ? extractImageUrl(v.metadata, v.body)
+                        : null;
+
+                      // For image variants with a URL, body is the image — don't show as text
+                      const showBodyAsText = hasBody && !imageUrl;
+
                       return (
-                        <button
-                          type="button"
+                        <ArtifactCard
                           key={v.id}
-                          data-highlighted={isHighlighted && !isUsed ? 'true' : undefined}
-                          onClick={() => hasBody && toggleExpand(v.id)}
-                          className={`w-full rounded-lg p-2.5 text-left transition-colors select-none ${hasBody ? 'active:scale-[0.98] cursor-pointer' : ''} ${stateClasses}`}
+                          id={v.id}
+                          title={v.title ?? t('artifactStates.card')}
+                          artifactType={a.artifact_type as ArtifactType | undefined}
+                          state={cardState}
+                          density="comfortable"
+                          isExpanded={isExpanded}
+                          onToggleExpand={(showBodyAsText || imageUrl) ? () => toggleExpand(v.id) : undefined}
+                          dataHighlighted={isHighlighted && !isUsed}
+                          badge={
+                            <ArtifactBadge
+                              participantState={cardState}
+                              visibility={visibility}
+                              compact
+                            />
+                          }
+                          excerpt={imageUrl ? t('imageLightbox.tapToView') : v.body}
                         >
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className={`text-sm font-medium ${isUsed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                              {v.title ?? t('artifactStates.card')}
-                            </p>
-                            {isUsed ? (
-                              <Badge variant="secondary" className="text-[10px]">✓ {t('artifactStates.used')}</Badge>
-                            ) : isPublicRevealed ? (
-                              <Badge variant="secondary" className="text-[10px]">{t('artifactStates.public')}</Badge>
-                            ) : visibility === 'role_private' ? (
-                              <Badge variant="secondary" className="text-[10px]">{t('artifactStates.rolePrivate')}</Badge>
-                            ) : (
-                              <Badge variant="secondary" className="text-[10px]">{t('artifactStates.private')}</Badge>
-                            )}
-                            {isHighlighted && !isUsed && (
-                              <Badge variant="default" className="text-[10px] animate-pulse">{t('artifactStates.highlighted')}</Badge>
-                            )}
-                            {/* Expand chevron when body exists */}
-                            {hasBody && (
-                              <span className={`ml-auto text-xs text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
-                                ▾
+                          {/* Image thumbnail — tap to open lightbox */}
+                          {imageUrl ? (
+                            <button
+                              type="button"
+                              className="group relative mt-1 w-full overflow-hidden rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                hapticTap(HAPTIC_LIGHT);
+                                setLightboxData({
+                                  src: imageUrl,
+                                  alt: v.title ?? a.title ?? '',
+                                  caption: v.title ?? a.title ?? null,
+                                });
+                              }}
+                              aria-label={t('imageLightbox.openFullscreen')}
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={imageUrl}
+                                alt={v.title ?? a.title ?? ''}
+                                className={`w-full rounded-md object-cover transition-transform group-hover:scale-[1.02] ${
+                                  isUsed ? 'opacity-50 grayscale' : ''
+                                }`}
+                                style={{ maxHeight: '200px' }}
+                                loading="lazy"
+                                draggable={false}
+                              />
+                              <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/10">
+                                <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                  {t('imageLightbox.tapToView')}
+                                </span>
                               </span>
-                            )}
-                          </div>
-                          {/* Body — card→expand: collapsed by default, revealed on tap */}
-                          {hasBody && isExpanded && (
-                            <p className={`mt-1.5 text-sm leading-relaxed animate-in fade-in slide-in-from-top-1 duration-200 ${isUsed ? 'text-muted-foreground/60' : 'text-muted-foreground'}`}>
+                            </button>
+                          ) : null}
+                          {/* Text body (non-image or caption text) */}
+                          {showBodyAsText ? (
+                            <p className={isUsed ? 'text-muted-foreground/60' : 'text-muted-foreground'}>
                               {v.body}
                             </p>
-                          )}
-                          {/* One-line excerpt when collapsed + has body */}
-                          {hasBody && !isExpanded && (
-                            <p className="mt-1 text-xs text-muted-foreground/50 truncate">
-                              {v.body}
-                            </p>
-                          )}
-                        </button>
+                          ) : null}
+                        </ArtifactCard>
                       );
                     })}
                   </div>
@@ -455,6 +487,20 @@ export function ParticipantArtifactDrawer({
             })}
         </div>
       )}
+
+      {/* Image lightbox overlay */}
+      <ImageLightbox
+        src={lightboxData?.src ?? ''}
+        alt={lightboxData?.alt}
+        open={lightboxData !== null}
+        onClose={() => setLightboxData(null)}
+        caption={lightboxData?.caption}
+        labels={{
+          close: t('imageLightbox.close'),
+          zoomIn: t('imageLightbox.zoomIn'),
+          zoomOut: t('imageLightbox.zoomOut'),
+        }}
+      />
     </Card>
   );
 }
@@ -538,52 +584,34 @@ function KeypadArtifact({
         </div>
       ) : (
         <div className="space-y-2">
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={codeLength}
-              placeholder={'•'.repeat(codeLength)}
-              value={enteredCode}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, '').slice(0, codeLength);
-                onCodeChange(val);
-                if (message?.type === 'error') {
-                  onClearMessage();
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && enteredCode.length === codeLength && !isSubmitting) {
-                  onSubmit(enteredCode);
-                }
-              }}
-              disabled={isSubmitting}
-              className={`text-center text-lg tracking-[0.3em] font-mono h-9 ${
-                message?.type === 'error' ? 'animate-shake border-destructive' : ''
-              }`}
-            />
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => onSubmit(enteredCode)}
-              disabled={enteredCode.length !== codeLength || isSubmitting}
-            >
-              {isSubmitting ? '...' : '→'}
-            </Button>
-          </div>
+          <KeypadGrid
+            value={enteredCode}
+            onChange={(next) => {
+              onCodeChange(next);
+              if (message?.type === 'error') onClearMessage();
+            }}
+            onSubmit={() => onSubmit(enteredCode)}
+            maxLength={codeLength}
+            status={
+              (isSubmitting
+                ? 'submitting'
+                : message?.type === 'error'
+                  ? 'error'
+                  : 'idle') as KeypadGridStatus
+            }
+            errorMessage={message?.type === 'error' ? message.text : null}
+            ariaLabel={t('keypadGrid.ariaLabel')}
+            submitLabel={t('keypadGrid.submit')}
+            backspaceLabel={t('keypadGrid.delete')}
+            submittingLabel={t('keypadGrid.verifying')}
+            successLabel={t('keypadGrid.correct')}
+            onHaptic={(kind) => {
+              hapticTap(kind === 'tap' ? HAPTIC_LIGHT : HAPTIC_MEDIUM);
+            }}
+          />
           {attemptsRemaining !== null && (
             <p className="text-xs text-muted-foreground text-center">
               {t('keypadArtifact.attemptsRemaining', { count: attemptsRemaining })}
-            </p>
-          )}
-          {message && (
-            <p
-              className={`text-xs text-center ${
-                message.type === 'success' ? 'text-green-600' : 'text-destructive'
-              }`}
-            >
-              {message.text}
             </p>
           )}
         </div>

@@ -12457,7 +12457,23 @@
         "shown": "Visade",
         "reveal": "Visa",
         "hide": "Dölj",
-        "reset": "Återställ"
+        "reset": "Återställ",
+        "highlight": "Highlighta",
+        "unhighlight": "Ta bort highlight",
+        "showMore": "Mer info",
+        "showLess": "Mindre info",
+        "pin": "Fäst",
+        "unpin": "Lossa",
+        "pinnedTitle": "Fästa",
+        "pinnedVolatile": "Sparas inte vid omladdning",
+        "showLatest": "Visa senaste",
+        "showLatestNone": "Inga artefakter",
+        "showLatestHint": {
+          "highlighted": "Hoppar till markerad artefakt",
+          "event": "Hoppar till artefakt med senaste händelse",
+          "fallback": "Hoppar till första tillgängliga artefakt"
+        },
+        "new": "Ny"
       },
       "connection": {
         "live": "Live",
@@ -13507,6 +13523,54 @@
         "decoded": "Dekrypterat!"
       }
     },
+    "artifactBadge": {
+      "used": "Använd",
+      "highlighted": "Ny",
+      "visibility": {
+        "public": "Publik",
+        "leader_only": "Endast lekledare",
+        "role_private": "Roll"
+      },
+      "state": {
+        "hidden": "Dold",
+        "revealed": "Synlig",
+        "locked": "Låst",
+        "unlocked": "Upplåst",
+        "solved": "Löst",
+        "failed": "Misslyckad"
+      }
+    },
+    "artifactInspector": {
+      "title": "Inspektör",
+      "close": "Stäng inspektör",
+      "noSelection": "Välj en artefakt att inspektera",
+      "quickActions": "Snabbåtgärder",
+      "details": "Detaljer",
+      "detailType": "Typ",
+      "detailOrder": "Ordning",
+      "detailAttempts": "Försök",
+      "detailProgress": "Framsteg",
+      "currentlyHighlighted": "Markerad just nu",
+      "metadata": "Metadata",
+      "variants": "Varianter",
+      "untitledVariant": "Variant",
+      "links": "Länkar",
+      "noLinks": "Inga länkar",
+      "linkStep": "Steg {order}: {title}"
+    },
+    "artifactTimeline": {
+      "title": "Tidslinje",
+      "empty": "Inga händelser ännu",
+      "event": {
+        "revealed": "Visad",
+        "hidden": "Dold",
+        "stateChanged": "Status ändrad",
+        "solved": "Löst",
+        "failed": "Misslyckad",
+        "triggerFired": "Trigger utlöst",
+        "unknown": "Händelse"
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Något gick fel",
@@ -13527,7 +13591,8 @@
         "hide": "Dölj",
         "update": "Uppdatera",
         "highlight": "Highlight",
-        "unhighlight": "Avmarkera"
+        "unhighlight": "Avmarkera",
+        "reset": "Återställ"
       },
       "loading": "Laddar artefakter…",
       "title": "Artefakter",
@@ -13770,6 +13835,7 @@
       "failedAttempts": "{count} misslyckade försök",
       "viaManualCode": "(via manuell kod)",
       "defaultPrompt": "Skanna QR-koden för att fortsätta",
+      "scanning": "Skannar...",
       "devSimulateScan": "[DEV] Simulera lyckad skanning"
     },
     "triggerCard": {
@@ -14262,6 +14328,13 @@
         "keypadLocked": "Keypaden är låst.",
         "attemptsRemaining": "{count} försök kvar"
       },
+      "keypadGrid": {
+        "ariaLabel": "Knappsats",
+        "submit": "Skicka",
+        "delete": "Radera",
+        "verifying": "Verifierar…",
+        "correct": "Rätt!"
+      },
       "safety": {
         "title": "Säkerhet"
       },
@@ -14291,6 +14364,13 @@
         "locked": "Låst",
         "unlocked": "Upplåst",
         "used": "Använd"
+      },
+      "imageLightbox": {
+        "tapToView": "Tryck för att visa bild",
+        "openFullscreen": "Öppna bild i helskärm",
+        "close": "Stäng",
+        "zoomIn": "Zooma in",
+        "zoomOut": "Zooma ut"
       },
       "decision": {
         "voteSubmitted": "Röst skickad!",

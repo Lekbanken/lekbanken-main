@@ -62,7 +62,7 @@ export async function PATCH(
     updates.capabilities = Array.isArray(body.capabilities) ? body.capabilities : []
   }
   if (body.product_key !== undefined) {
-    updates.product_key = body.product_key?.trim() || null
+    updates.product_key = body.product_key?.trim() || undefined
   }
 
   const { data, error } = await supabase

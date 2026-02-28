@@ -7,7 +7,7 @@ type ProductRow = {
   id: string
   name: string
   description: string | null
-  product_key: string | null
+  product_key: string
   product_type: string | null
   category: string | null
   status: string
@@ -18,7 +18,7 @@ type PricingProduct = {
   id: string
   name: string
   description?: string | null
-  product_key?: string | null
+  product_key: string
   product_type?: string | null
   category?: string | null
   image_url?: string | null
@@ -87,7 +87,7 @@ export async function GET(request: Request) {
     id: p.id,
     name: p.name,
     description: p.description ?? null,
-    product_key: p.product_key ?? null,
+    product_key: p.product_key,
     product_type: p.product_type ?? null,
     category: p.category ?? null,
     image_url: p.image_url ?? null,

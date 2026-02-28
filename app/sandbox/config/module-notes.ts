@@ -231,17 +231,16 @@ const scale = generateSpacingScale(4);
 
   pricing: {
     notes: `
-- Three pricing tiers: Free, Pro, Team
-- Monthly/yearly toggle with discount display
-- Highlighted "popular" tier
-- Feature comparison list per tier
+- Minimal CTA band linking to /pricing
+- Category-driven product catalog (replaced old tiers)
     `.trim(),
     changelog: [
       { date: '2025-12-01', note: 'Initial pricing component' },
+      { date: '2026-02-28', note: 'Replaced tiers with category CTA' },
     ],
-    codeSnippet: `import { PricingSection } from '@/components/marketing/pricing';
+    codeSnippet: `import { PricingCta } from '@/components/marketing/pricing-cta';
 
-<PricingSection showYearlyDiscount />`,
+<PricingCta />`,
   },
 
   testimonials: {

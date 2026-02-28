@@ -3,11 +3,11 @@
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ActivityFeed } from "@/components/marketing/activity-feed";
+import { CategoryHubLoader } from "@/components/marketing/category-hub-loader";
 import { FeatureGrid } from "@/components/marketing/feature-grid";
 import { Hero } from "@/components/marketing/hero";
 import { LoginCta } from "@/components/marketing/login-cta";
-import { PricingSection } from "@/components/marketing/pricing-section";
-import { StepsSpotlight } from "@/components/marketing/steps-spotlight";
+import { PricingCta } from "@/components/marketing/pricing-cta";
 import { StepsTimeline } from "@/components/marketing/steps-timeline";
 import { Testimonials } from "@/components/marketing/testimonials";
 import { useAuth } from "@/lib/supabase/auth";
@@ -42,10 +42,10 @@ function MarketingContent() {
       <Hero />
       <FeatureGrid />
       <StepsTimeline />
-      <StepsSpotlight />
+      <CategoryHubLoader />
       <Testimonials />
       <ActivityFeed />
-      <PricingSection />
+      <PricingCta />
       <LoginCta />
     </>
   );

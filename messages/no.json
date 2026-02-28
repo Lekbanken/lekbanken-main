@@ -773,6 +773,7 @@
         "organisations": "Organisasjoner",
         "users": "Brukere",
         "products": "Produkter",
+        "categories": "Kategorier",
         "games": "Spillhåndtering",
         "planner": "Planlegger",
         "badges": "Badges",
@@ -6465,11 +6466,52 @@
         "selectOrCreateDescription": "Velg et merke fra biblioteket over eller opprett et nytt for å begynne å bygge lagene, fargene og metadataene."
       }
     },
+    "categories": {
+      "title": "Kategorier",
+      "description": "Administrer produktkategorier – sortering, ikoner, synlighet og bundles.",
+      "loadError": "Kunne ikke laste kategorier",
+      "tableTitle": "Alle kategorier",
+      "noCategories": "Ingen kategorier",
+      "noCategoriesDescription": "Det finnes ingen kategorier ennå.",
+      "colSlug": "Slug",
+      "colName": "Navn",
+      "colDescription": "Beskrivelse",
+      "colIcon": "Ikon",
+      "colOrder": "Rekkefølge",
+      "colPublic": "Synlig",
+      "colProducts": "Produkter",
+      "colBundle": "Bundle-produkt",
+      "colActions": "Handlinger",
+      "visible": "Synlig",
+      "hidden": "Skjult",
+      "edit": "Rediger",
+      "syncBundle": "Synk bundle",
+      "saved": "Lagret",
+      "savedDescription": "Kategorien er oppdatert.",
+      "saveError": "Kunne ikke lagre",
+      "syncSuccess": "Bundle synkronisert",
+      "syncDescription": "Lagt til: {added}, fjernet: {removed}, totalt: {total}",
+      "syncError": "Kunne ikke synkronisere bundle",
+      "statTotal": "Totalt",
+      "statPublic": "Offentlige",
+      "statHidden": "Skjulte",
+      "statProducts": "Produkter",
+      "createButton": "Opprett kategori",
+      "createTitle": "Opprett ny kategori",
+      "createDescription": "Fyll inn detaljene nedenfor. Slug genereres automatisk fra navnet hvis du ikke angir en.",
+      "createNamePlaceholder": "F.eks. Samarbeidsleker",
+      "createSlugPlaceholder": "auto-generert",
+      "createSlugPreview": "Slug blir",
+      "createDescPlaceholder": "Kort beskrivelse (valgfritt)",
+      "createPublicLabel": "Synlig på nettstedet",
+      "createCancel": "Avbryt",
+      "createSubmit": "Opprett",
+      "createSubmitting": "Oppretter…",
+      "createSuccess": "Kategori opprettet",
+      "createSuccessDescription": "Den nye kategorien er lagt til.",
+      "createError": "Kunne ikke opprette kategori"
+    },
     "products": {
-      "title": "Produkter",
-      "accessDenied": "Tilgang nektet",
-      "noPermissionProducts": "Du har ikke tillatelse til å se produkter.",
-      "goToDashboard": "Gå til dashboard",
       "description": "Administrer produkter, lisenser og formål – alt som selges og kategoriseres i Lekbanken.",
       "productsAndContent": "Produkter & Innhold",
       "createProduct": "Opprett produkt",
@@ -10207,6 +10249,27 @@
       "tagline": "Hva andre sier",
       "title": "Elsket av aktivitetsledere"
     },
+    "categoryHub": {
+      "tagline": "Våre kategorier",
+      "title": "Finn riktig innhold for din virksomhet",
+      "subtitle": "Bla gjennom kategoriene våre og finn aktiviteter og leker som passer for deg.",
+      "comingSoon": "Kommer snart",
+      "cta": {
+        "view": "Se innhold",
+        "buyBundle": "Kjøp lisenspakke",
+        "viewAll": "Se alle lisenser og priser"
+      },
+      "meta": {
+        "products": "lisenser",
+        "games": "leker",
+        "perYear": "/år"
+      }
+    },
+    "pricingCta": {
+      "title": "Finn riktig lisens",
+      "description": "Utforsk alle våre lisenser og pakker. Betal per år — ingen bindingstid.",
+      "cta": "Se alle lisenser"
+    },
     "pricing": {
       "tagline": "Priser",
       "badge": "Priser",
@@ -10217,6 +10280,16 @@
       "allCategories": "Alle",
       "noProducts": "Ingen produkter funnet",
       "noProductsDescription": "Det er ingen produkter tilgjengelig for øyeblikket.",
+      "categoryPage": {
+        "products": "produkter",
+        "games": "leker",
+        "gamesComingSoon": "Leker kommer snart",
+        "bundleLabel": "Lisenspakke",
+        "perYear": "/år",
+        "bundleIncludes": "Inkluderer alle {count} produkter",
+        "buyBundle": "Kjøp hele pakken",
+        "backToAll": "Alle kategorier"
+      },
       "products": {
         "autismnpf": { "name": "Autisme & NPF", "description": "Aktiviteter tilpasset autisme og NPF" },
         "rarelsehinder": { "name": "Bevegelseshemming", "description": "Tilpasset for personer med bevegelseshemming" },

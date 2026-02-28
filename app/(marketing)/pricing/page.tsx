@@ -1,39 +1,24 @@
-"use client";
-
-import { useEffect, useMemo, useState, useRef, useCallback } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { useTranslations } from "next-intl";
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
-import {
-  AcademicCapIcon,
-  SparklesIcon,
-  HeartIcon,
-  TrophyIcon,
-  HomeIcon,
-  BriefcaseIcon,
-  ComputerDesktopIcon,
-  UsersIcon,
-  CalendarDaysIcon,
-  GiftIcon,
-} from "@heroicons/react/24/outline";
+import { getTranslations } from "next-intl/server";
+import { permanentRedirect } from "next/navigation";
+import { createServerRlsClient } from "@/lib/supabase/server";
+import PricingCatalogClient from "./pricing-catalog-client";
+import type { ProductCard, CategoryGroup } from "./pricing-components";
 
 // =============================================================================
-// Translation Helper Types
+// Types for API/DB data
 // =============================================================================
 
-// =============================================================================
-// Types
-// =============================================================================
-
-type PricingApiProduct = {
+type PricingProduct = {
   id: string;
   name: string;
   description: string | null;
-  product_key: string | null;
+  product_key: string;
   product_type: string | null;
   category: string | null;
+  category_slug: string | null;
   image_url: string | null;
+  is_marketing_visible: boolean;
+  is_bundle: boolean;
   prices: Array<{
     id: string;
     amount: number;
@@ -44,407 +29,293 @@ type PricingApiProduct = {
   }>;
 };
 
-type PricingApiResponse = {
-  currency: string;
-  products: PricingApiProduct[];
-};
-
-type ProductCard = {
-  id: string;
+type CategoryRow = {
   slug: string;
   name: string;
-  price: string;
-  description: string;
-  category: string;
-  categoryKey: string; // Original category key for icon lookup
-  imageUrl: string | null;
-};
-
-type CategoryGroup = {
-  name: string;
-  categoryKey: string; // Original category key
-  products: ProductCard[];
+  description_short: string | null;
+  icon_key: string | null;
+  sort_order: number;
+  bundle_product_id: string | null;
 };
 
 // =============================================================================
-// Category Icons & Colors (keyed by original database category)
+// Data fetching (server-side) — with pre-migration fallbacks
 // =============================================================================
 
-const CATEGORY_CONFIG: Record<string, { icon: typeof AcademicCapIcon; gradient: string }> = {
-  // Actual database category values from seed-product-taxonomy.ts
-  "specialpedagog": { icon: HeartIcon, gradient: "from-purple-400 to-violet-500" },
-  "arbetsplatsen": { icon: BriefcaseIcon, gradient: "from-slate-400 to-gray-600" },
-  "digitala aktiviteter": { icon: ComputerDesktopIcon, gradient: "from-cyan-400 to-blue-500" },
-  "ungdomsverksamhet": { icon: UsersIcon, gradient: "from-orange-400 to-red-500" },
-  "föräldrar": { icon: HomeIcon, gradient: "from-green-400 to-emerald-500" },
-  "event & högtider": { icon: CalendarDaysIcon, gradient: "from-indigo-400 to-purple-500" },
-  "festligheter": { icon: GiftIcon, gradient: "from-pink-400 to-rose-500" },
-  "pedagoger": { icon: AcademicCapIcon, gradient: "from-blue-400 to-indigo-500" },
-  "tränare": { icon: TrophyIcon, gradient: "from-amber-400 to-orange-500" },
-  // Familie shown on screenshot (Norwegian for Family)
-  "familie": { icon: HomeIcon, gradient: "from-green-400 to-emerald-500" },
-  // Legacy categories from initial_schema.sql seed data
-  "sports": { icon: TrophyIcon, gradient: "from-amber-400 to-orange-500" },
-  "education": { icon: AcademicCapIcon, gradient: "from-blue-400 to-indigo-500" },
-  "family": { icon: HomeIcon, gradient: "from-green-400 to-emerald-500" },
-  // Fallback
-  "other": { icon: SparklesIcon, gradient: "from-primary to-[#00c7b0]" },
-  "default": { icon: SparklesIcon, gradient: "from-primary to-[#00c7b0]" },
+// Legacy fallback: synthesize CategoryRow from product.category text
+const LEGACY_CATEGORY_META: Record<string, { slug: string; iconKey: string; sortOrder: number }> = {
+  "specialpedagog": { slug: "specialpedagog", iconKey: "HeartIcon", sortOrder: 1 },
+  "arbetsplatsen": { slug: "arbetsplatsen", iconKey: "BriefcaseIcon", sortOrder: 2 },
+  "digitala aktiviteter": { slug: "digitala-aktiviteter", iconKey: "ComputerDesktopIcon", sortOrder: 3 },
+  "ungdomsverksamhet": { slug: "ungdomsverksamhet", iconKey: "UsersIcon", sortOrder: 4 },
+  "föräldrar": { slug: "foraldrar", iconKey: "HomeIcon", sortOrder: 5 },
+  "event & högtider": { slug: "event-och-hogtider", iconKey: "CalendarDaysIcon", sortOrder: 6 },
+  "festligheter": { slug: "festligheter", iconKey: "GiftIcon", sortOrder: 7 },
+  "pedagoger": { slug: "pedagoger", iconKey: "AcademicCapIcon", sortOrder: 8 },
+  "tränare": { slug: "tranare", iconKey: "TrophyIcon", sortOrder: 9 },
 };
 
-function getCategoryConfig(categoryKey: string) {
-  const key = categoryKey.toLowerCase();
-  return CATEGORY_CONFIG[key] ?? CATEGORY_CONFIG["default"];
+// Hidden legacy categories
+const LEGACY_HIDDEN = new Set(["sports", "education", "family", "familie"]);
+
+async function fetchCategories(): Promise<CategoryRow[]> {
+  const supabase = await createServerRlsClient();
+  const { data, error } = await supabase
+    .from("categories")
+    .select("slug,name,description_short,icon_key,sort_order,bundle_product_id")
+    .eq("is_public", true)
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+
+  if (!error && data && data.length > 0) {
+    return data as CategoryRow[];
+  }
+
+  // Pre-migration fallback: return empty (products will be grouped by legacy path)
+  if (error) {
+    console.warn("[pricing] categories table not available yet, using legacy fallback");
+  }
+  return [];
 }
 
-// =============================================================================
-// Product Card Component
-// =============================================================================
+async function fetchProducts(currency: string) {
+  const supabase = await createServerRlsClient();
 
-function ProductCard({ product }: { product: ProductCard }) {
-  const config = getCategoryConfig(product.categoryKey);
-  const Icon = config.icon;
+  // Try new columns first; fall back to old query if they don't exist
+  let { data: products, error: prodError } = await supabase
+    .from("products")
+    .select(
+      "id,name,description,product_key,product_type,category,category_slug,image_url,is_marketing_visible,is_bundle,status"
+    )
+    .eq("status", "active")
+    .eq("is_marketing_visible", true)
+    .eq("is_bundle", false)
+    .order("name", { ascending: true });
 
-  return (
-    <Link
-      href={`/pricing/${product.slug}`}
-      className="group relative flex h-80 w-56 flex-shrink-0 flex-col overflow-hidden rounded-2xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl xl:w-auto"
-    >
-      {/* Background - Image or Gradient */}
-      <span aria-hidden="true" className="absolute inset-0">
-        {product.imageUrl ? (
-          <Image
-            src={product.imageUrl}
-            alt={product.name}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            sizes="(max-width: 768px) 224px, 280px"
-          />
-        ) : (
-          <div className={`h-full w-full bg-gradient-to-br ${config.gradient}`}>
-            <div className="flex h-full items-center justify-center">
-              <Icon className="h-20 w-20 text-white/30" />
-            </div>
-          </div>
-        )}
-      </span>
+  // If the query failed (new columns don't exist yet), fall back to old query
+  if (prodError) {
+    console.warn("[pricing] new columns not available, using legacy product query");
+    const legacy = await supabase
+      .from("products")
+      .select("id,name,description,product_key,product_type,category,image_url,is_bundle,status")
+      .eq("status", "active")
+      .eq("is_bundle", false)
+      .order("name", { ascending: true });
 
-      {/* Gradient overlay for text readability */}
-      <span
-        aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-gray-900/80 via-gray-900/40 to-transparent"
-      />
+    prodError = legacy.error;
+    // Add missing fields with defaults
+    products = (legacy.data ?? []).map((p: Record<string, unknown>) => ({
+      ...p,
+      category_slug: null,
+      is_marketing_visible: true,
+    }));
+  }
 
-      {/* Price badge */}
-      {product.price && (
-        <span className="absolute right-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-900 shadow-sm backdrop-blur-sm">
-          {product.price}
-        </span>
-      )}
+  if (prodError) {
+    console.error("[pricing] products query error", prodError);
+    return [];
+  }
 
-      {/* Content */}
-      <span className="relative mt-auto flex flex-col p-5">
-        <span className="text-lg font-bold text-white drop-shadow-sm">
-          {product.name}
-        </span>
-        {product.description && (
-          <span className="mt-1 line-clamp-2 text-sm text-white/80">
-            {product.description}
-          </span>
-        )}
-      </span>
-    </Link>
-  );
-}
+  const productIds = (products ?? []).map((p) => p.id);
 
-// =============================================================================
-// Category Section Component
-// =============================================================================
+  if (productIds.length === 0) return [];
 
-function CategorySection({
-  category,
-  categoryKey,
-  products,
-  t,
-}: {
-  category: string;
-  categoryKey: string;
-  products: ProductCard[];
-  t: ReturnType<typeof useTranslations<"marketing.pricing">>;
-}) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const config = getCategoryConfig(categoryKey);
-  const Icon = config.icon;
+  const { data: prices, error: priceError } = await supabase
+    .from("product_prices")
+    .select("id,product_id,amount,currency,interval,interval_count,active,is_default")
+    .eq("active", true)
+    .eq("currency", currency)
+    .in("product_id", productIds);
 
-  return (
-    <section className="py-8">
-      {/* Section Header */}
-      <div className="flex items-center justify-between px-4 sm:px-6 lg:px-0">
-        <div className="flex items-center gap-3">
-          <span className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${config.gradient}`}>
-            <Icon className="h-5 w-5 text-white" />
-          </span>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">
-            {category}
-          </h2>
-          <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-            {products.length}
-          </span>
-        </div>
-        <Link
-          href={`#${category.toLowerCase().replace(/\s+/g, "-")}`}
-          className="hidden text-sm font-semibold text-primary hover:text-primary/80 sm:flex sm:items-center"
-        >
-          {t("viewAll")}
-          <ArrowRightIcon className="ml-1 h-4 w-4" />
-        </Link>
-      </div>
+  if (priceError) {
+    console.error("[pricing] prices query error", priceError);
+  }
 
-      {/* Horizontal Scroll Container */}
-      <div className="mt-4 flow-root">
-        <div className="-my-2">
-          <div
-            ref={scrollRef}
-            className="box-content overflow-x-auto py-2 xl:overflow-visible"
-          >
-            {/* Mobile: horizontal scroll, Desktop: grid that wraps */}
-            <div className="flex space-x-4 px-4 sm:px-6 lg:px-0 xl:grid xl:grid-cols-5 xl:gap-4 xl:space-x-0">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile "View All" link */}
-      <div className="mt-4 px-4 sm:hidden">
-        <Link
-          href={`#${category.toLowerCase().replace(/\s+/g, "-")}`}
-          className="flex items-center text-sm font-semibold text-primary hover:text-primary/80"
-        >
-          {t("viewAll")}
-          <ArrowRightIcon className="ml-1 h-4 w-4" />
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-// =============================================================================
-// Category Filter Tabs (Mobile)
-// =============================================================================
-
-function CategoryTabs({
-  categories,
-  activeCategory,
-  onSelect,
-}: {
-  categories: Array<{ name: string; categoryKey: string }>;
-  activeCategory: string | null;
-  onSelect: (category: string | null) => void;
-}) {
-  const t = useTranslations("marketing.pricing");
-
-  return (
-    <div className="sticky top-0 z-10 -mx-4 bg-background/95 px-4 py-3 backdrop-blur-sm sm:-mx-6 sm:px-6 lg:hidden">
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-        <button
-          onClick={() => onSelect(null)}
-          className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-            activeCategory === null
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:bg-muted/80"
-          }`}
-        >
-          {t("allCategories")}
-        </button>
-        {categories.map((cat) => {
-          const config = getCategoryConfig(cat.categoryKey);
-          const Icon = config.icon;
-          return (
-            <button
-              key={cat.name}
-              onClick={() => onSelect(cat.name)}
-              className={`flex flex-shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                activeCategory === cat.name
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              {cat.name}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// =============================================================================
-// Loading Skeleton
-// =============================================================================
-
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-12">
-      {[1, 2, 3].map((section) => (
-        <div key={section} className="animate-pulse">
-          <div className="flex items-center gap-3 px-4 sm:px-6 lg:px-0">
-            <div className="h-10 w-10 rounded-xl bg-muted" />
-            <div className="h-6 w-32 rounded bg-muted" />
-          </div>
-          <div className="mt-4 flex gap-4 overflow-hidden px-4 sm:px-6 lg:px-0">
-            {[1, 2, 3, 4, 5].map((card) => (
-              <div
-                key={card}
-                className="h-80 w-56 flex-shrink-0 rounded-2xl bg-muted xl:w-auto xl:flex-1"
-              />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// =============================================================================
-// Main Page Component
-// =============================================================================
-
-export default function PricingPage() {
-  const t = useTranslations("marketing.pricing");
-  const [pricing, setPricing] = useState<PricingApiResponse | null>(null);
-  const [pricingError, setPricingError] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      try {
-        setIsLoading(true);
-        const res = await fetch("/api/public/pricing?currency=SEK", {
-          headers: { accept: "application/json" },
-        });
-        if (!res.ok) throw new Error(`pricing api failed: ${res.status}`);
-        const json = (await res.json()) as PricingApiResponse;
-        if (!active) return;
-        setPricing(json);
-      } catch (err) {
-        if (!active) return;
-        setPricingError(err instanceof Error ? err.message : "Failed to load pricing");
-        setPricing(null);
-      } finally {
-        if (active) setIsLoading(false);
-      }
-    };
-    void load();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  // Translation helper functions
-  const getTranslatedProductName = useCallback((productKey: string | null, fallbackName: string): string => {
-    if (!productKey) return fallbackName;
-    try {
-      // Try to get translated name, fall back to database name
-      const translatedName = t(`products.${productKey}.name` as Parameters<typeof t>[0]);
-      // next-intl returns the key path if translation not found
-      if (translatedName.includes(`products.${productKey}`)) {
-        return fallbackName;
-      }
-      return translatedName;
-    } catch {
-      return fallbackName;
-    }
-  }, [t]);
-
-  const getTranslatedProductDescription = useCallback((productKey: string | null, fallbackDesc: string | null): string => {
-    if (!productKey || !fallbackDesc) return fallbackDesc ?? "";
-    try {
-      const translatedDesc = t(`products.${productKey}.description` as Parameters<typeof t>[0]);
-      if (translatedDesc.includes(`products.${productKey}`)) {
-        return fallbackDesc;
-      }
-      return translatedDesc;
-    } catch {
-      return fallbackDesc;
-    }
-  }, [t]);
-
-  const getTranslatedCategory = useCallback((category: string): string => {
-    try {
-      const translatedCategory = t(`categories.${category}` as Parameters<typeof t>[0]);
-      // next-intl returns the key path if translation not found
-      if (translatedCategory.includes(`categories.${category}`)) {
-        return category;
-      }
-      return translatedCategory;
-    } catch {
-      return category;
-    }
-  }, [t]);
-
-  // Transform products into cards and group by category
-  const { categories, groupedProducts } = useMemo(() => {
-    const products = pricing?.products ?? [];
-    if (products.length === 0) return { categories: [], groupedProducts: [] };
-
-    // Transform to ProductCard format with translations
-    const cards: ProductCard[] = products.map((p) => {
-      const defaultPrice = p.prices.find((pr) => pr.is_default) ?? p.prices[0] ?? null;
-      const priceLabel = defaultPrice
-        ? `${Math.round(defaultPrice.amount / 100)} ${defaultPrice.currency}` +
-          (defaultPrice.interval ? `/${defaultPrice.interval}` : "")
-        : "";
-      const slug = p.product_key ?? p.name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
-
-      // Use translated name/description if available, otherwise use database value
-      const translatedName = getTranslatedProductName(p.product_key, p.name);
-      const translatedDescription = getTranslatedProductDescription(p.product_key, p.description);
-      const rawCategory = p.category ?? "other";
-      const translatedCategory = getTranslatedCategory(rawCategory);
-
-      return {
-        id: p.id,
-        slug,
-        name: translatedName,
-        price: priceLabel,
-        description: translatedDescription,
-        category: translatedCategory,
-        categoryKey: rawCategory, // Keep original key for icon lookup
-        imageUrl: p.image_url,
-      };
+  // Map prices to products
+  const pricesByProduct = new Map<string, PricingProduct["prices"]>();
+  for (const pr of prices ?? []) {
+    if (!pricesByProduct.has(pr.product_id)) pricesByProduct.set(pr.product_id, []);
+    pricesByProduct.get(pr.product_id)!.push({
+      id: pr.id,
+      amount: pr.amount,
+      currency: pr.currency,
+      interval: pr.interval,
+      interval_count: pr.interval_count,
+      is_default: Boolean(pr.is_default),
     });
+  }
 
-    // Group by translated category name, keep track of original key
-    const groupMap = new Map<string, { categoryKey: string; products: ProductCard[] }>();
-    for (const card of cards) {
-      if (!groupMap.has(card.category)) {
-        groupMap.set(card.category, { categoryKey: card.categoryKey, products: [] });
+  // Sort: default first, then cheapest
+  for (const list of pricesByProduct.values()) {
+    list.sort((a, b) => {
+      if (a.is_default !== b.is_default) return a.is_default ? -1 : 1;
+      return a.amount - b.amount;
+    });
+  }
+
+  return (products ?? []).map((p) => ({
+    ...p,
+    prices: pricesByProduct.get(p.id) ?? [],
+  })) as PricingProduct[];
+}
+
+// =============================================================================
+// Translation helpers
+// =============================================================================
+
+function translateProductName(
+  t: Awaited<ReturnType<typeof getTranslations<"marketing.pricing">>>,
+  productKey: string | null,
+  fallback: string
+): string {
+  if (!productKey) return fallback;
+  try {
+    const translated = t(`products.${productKey}.name` as Parameters<typeof t>[0]);
+    if (translated.includes(`products.${productKey}`)) return fallback;
+    return translated;
+  } catch {
+    return fallback;
+  }
+}
+
+function translateProductDescription(
+  t: Awaited<ReturnType<typeof getTranslations<"marketing.pricing">>>,
+  productKey: string | null,
+  fallback: string | null
+): string {
+  if (!productKey || !fallback) return fallback ?? "";
+  try {
+    const translated = t(`products.${productKey}.description` as Parameters<typeof t>[0]);
+    if (translated.includes(`products.${productKey}`)) return fallback;
+    return translated;
+  } catch {
+    return fallback;
+  }
+}
+
+// =============================================================================
+// Server Component
+// =============================================================================
+
+export default async function PricingPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // ── SEO canonical redirect: /pricing?category=<slug> → /pricing/<slug> ──
+  const params = await searchParams;
+  const categoryParam = typeof params.category === "string" ? params.category.trim() : null;
+  if (categoryParam) {
+    const supabase = await createServerRlsClient();
+    const { data: match } = await supabase
+      .from("categories")
+      .select("slug")
+      .eq("slug", categoryParam)
+      .eq("is_public", true)
+      .maybeSingle();
+    if (match) {
+      permanentRedirect(`/pricing/${match.slug}`);
+    }
+  }
+
+  const currency = "SEK";
+  const t = await getTranslations("marketing.pricing");
+
+  const [categories, products] = await Promise.all([
+    fetchCategories(),
+    fetchProducts(currency),
+  ]);
+
+  const useLegacyGrouping = categories.length === 0;
+
+  // Build a slug → category map from DB categories
+  const categoryBySlug = new Map(categories.map((c) => [c.slug, c]));
+
+  // Group products by category
+  const groupMap = new Map<string, { category: CategoryRow; products: ProductCard[] }>();
+
+  // Helper: translate category text to display name via i18n
+  function translateCategory(categoryText: string): string {
+    try {
+      const translated = t(`categories.${categoryText}` as Parameters<typeof t>[0]);
+      if (translated.includes(`categories.${categoryText}`)) return categoryText;
+      return translated;
+    } catch {
+      return categoryText;
+    }
+  }
+
+  for (const p of products) {
+    let cat: CategoryRow | undefined;
+    let groupKey: string;
+
+    if (!useLegacyGrouping && p.category_slug) {
+      // Post-migration: use category_slug FK
+      cat = categoryBySlug.get(p.category_slug);
+      if (!cat) continue;
+      groupKey = cat.slug;
+    } else if (useLegacyGrouping && p.category) {
+      // Pre-migration fallback: synthesize category from product.category text
+      const rawCat = p.category as string;
+      const key = rawCat.toLowerCase();
+
+      // Skip hidden legacy categories
+      if (LEGACY_HIDDEN.has(key)) continue;
+
+      const meta = LEGACY_CATEGORY_META[key];
+      groupKey = meta?.slug ?? key.replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+
+      if (!groupMap.has(groupKey)) {
+        cat = {
+          slug: groupKey,
+          name: translateCategory(rawCat),
+          description_short: null,
+          icon_key: meta?.iconKey ?? null,
+          sort_order: meta?.sortOrder ?? 99,
+          bundle_product_id: null,
+        };
+      } else {
+        cat = groupMap.get(groupKey)!.category;
       }
-      groupMap.get(card.category)!.products.push(card);
+    } else {
+      continue; // No category info at all
     }
 
-    // Convert to array and sort by category name
-    const grouped: CategoryGroup[] = Array.from(groupMap.entries())
-      .map(([name, data]) => ({ name, categoryKey: data.categoryKey, products: data.products }))
-      .sort((a, b) => a.name.localeCompare(b.name, "sv"));
+    if (!groupMap.has(groupKey!)) {
+      groupMap.set(groupKey!, { category: cat!, products: [] });
+    }
 
-    return {
-      categories: grouped.map((g) => ({ name: g.name, categoryKey: g.categoryKey })),
-      groupedProducts: grouped,
-    };
-  }, [pricing, getTranslatedProductName, getTranslatedProductDescription, getTranslatedCategory]);
+    const defaultPrice = p.prices.find((pr) => pr.is_default) ?? p.prices[0] ?? null;
+    const priceLabel = defaultPrice
+      ? `${Math.round(defaultPrice.amount / 100)} ${defaultPrice.currency}` +
+        (defaultPrice.interval ? `/${defaultPrice.interval}` : "")
+      : "";
 
-  // Filter by active category on mobile
-  const visibleGroups = useMemo(() => {
-    if (activeCategory === null) return groupedProducts;
-    return groupedProducts.filter((g) => g.name === activeCategory);
-  }, [groupedProducts, activeCategory]);
+    const productSlug = p.product_key;
+
+    groupMap.get(groupKey!)!.products.push({
+      id: p.id,
+      slug: productSlug,
+      name: translateProductName(t, p.product_key, p.name),
+      price: priceLabel,
+      description: translateProductDescription(t, p.product_key, p.description),
+      category: cat!.name,
+      categorySlug: groupKey!,
+      imageUrl: p.image_url,
+    });
+  }
+
+  // Convert to sorted array, ordered by category sort_order
+  const groups: CategoryGroup[] = Array.from(groupMap.values())
+    .sort((a, b) => a.category.sort_order - b.category.sort_order)
+    .map(({ category, products: prods }) => ({
+      name: category.name,
+      slug: category.slug,
+      iconKey: category.icon_key,
+      productCount: prods.length,
+      gameCount: 0, // Will be populated when games exist
+      products: prods,
+    }));
 
   return (
     <div className="bg-background">
@@ -460,50 +331,18 @@ export default function PricingPage() {
           <p className="max-w-2xl text-base text-muted-foreground">
             {t("description")}
           </p>
-          {pricingError && (
-            <p className="text-sm text-destructive">{pricingError}</p>
-          )}
         </header>
 
-        {/* Category Filter (Mobile) */}
-        {!isLoading && categories.length > 0 && (
-          <div className="mt-6">
-            <CategoryTabs
-              categories={categories}
-              activeCategory={activeCategory}
-              onSelect={setActiveCategory}
-            />
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="mt-8">
-          {isLoading ? (
-            <LoadingSkeleton />
-          ) : visibleGroups.length > 0 ? (
-            <div className="divide-y divide-border">
-              {visibleGroups.map((group) => (
-                <CategorySection
-                  key={group.name}
-                  category={group.name}
-                  categoryKey={group.categoryKey}
-                  products={group.products}
-                  t={t}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <SparklesIcon className="h-12 w-12 text-muted-foreground/50" />
-              <h3 className="mt-4 text-lg font-semibold text-foreground">
-                {t("noProducts")}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {t("noProductsDescription")}
-              </p>
-            </div>
-          )}
-        </div>
+        {/* Client-side interactive catalog */}
+        <PricingCatalogClient
+          groups={groups}
+          labels={{
+            allCategories: t("allCategories"),
+            viewAll: t("viewAll"),
+            noProducts: t("noProducts"),
+            noProductsDescription: t("noProductsDescription"),
+          }}
+        />
       </div>
     </div>
   );

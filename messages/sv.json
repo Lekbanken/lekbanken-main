@@ -782,6 +782,7 @@
         "organisations": "Organisationer",
         "users": "Användare",
         "products": "Produkter",
+        "categories": "Kategorier",
         "games": "Lekhanteraren",
         "planner": "Planläggaren",
         "badges": "Badges",
@@ -6530,6 +6531,51 @@
         }
       }
     },
+    "categories": {
+      "title": "Kategorier",
+      "description": "Hantera produktkategorier – sortering, ikoner, synlighet och bundles.",
+      "loadError": "Kunde inte ladda kategorier",
+      "tableTitle": "Alla kategorier",
+      "noCategories": "Inga kategorier",
+      "noCategoriesDescription": "Det finns inga kategorier ännu.",
+      "colSlug": "Slug",
+      "colName": "Namn",
+      "colDescription": "Beskrivning",
+      "colIcon": "Ikon",
+      "colOrder": "Ordning",
+      "colPublic": "Synlig",
+      "colProducts": "Produkter",
+      "colBundle": "Bundle-produkt",
+      "colActions": "Åtgärder",
+      "visible": "Synlig",
+      "hidden": "Dold",
+      "edit": "Redigera",
+      "syncBundle": "Synk bundle",
+      "saved": "Sparat",
+      "savedDescription": "Kategorin har uppdaterats.",
+      "saveError": "Kunde inte spara",
+      "syncSuccess": "Bundle synkad",
+      "syncDescription": "Tillagda: {added}, borttagna: {removed}, totalt: {total}",
+      "syncError": "Kunde inte synka bundle",
+      "statTotal": "Totalt",
+      "statPublic": "Publika",
+      "statHidden": "Dolda",
+      "statProducts": "Produkter",
+      "createButton": "Skapa kategori",
+      "createTitle": "Skapa ny kategori",
+      "createDescription": "Fyll i uppgifterna nedan. Slug genereras automatiskt från namnet om du inte anger en.",
+      "createNamePlaceholder": "T.ex. Samarbetslekar",
+      "createSlugPlaceholder": "auto-genererad",
+      "createSlugPreview": "Slug blir",
+      "createDescPlaceholder": "Kort beskrivning (valfritt)",
+      "createPublicLabel": "Synlig på webbplatsen",
+      "createCancel": "Avbryt",
+      "createSubmit": "Skapa",
+      "createSubmitting": "Skapar…",
+      "createSuccess": "Kategori skapad",
+      "createSuccessDescription": "Den nya kategorin har lagts till.",
+      "createError": "Kunde inte skapa kategori"
+    },
     "products": {
       "title": "Produkter",
       "accessDenied": "Åtkomst nekad",
@@ -10558,6 +10604,27 @@
       "description": "Lekbanken är byggd av och för aktivitetsledare. Vi förstår dina utmaningar.",
       "imagePlaceholder": "Produktbild"
     },
+    "categoryHub": {
+      "tagline": "Våra kategorier",
+      "title": "Hitta rätt innehåll för din verksamhet",
+      "subtitle": "Bläddra bland våra kategorier och hitta aktiviteter och lekar som passar just dig.",
+      "comingSoon": "Kommer snart",
+      "cta": {
+        "view": "Se innehåll",
+        "buyBundle": "Köp licenspaket",
+        "viewAll": "Se alla licenser och priser"
+      },
+      "meta": {
+        "products": "licenser",
+        "games": "lekar",
+        "perYear": "/år"
+      }
+    },
+    "pricingCta": {
+      "title": "Hitta rätt licens",
+      "description": "Utforska alla våra licenser och paket. Betala per år — ingen bindningstid.",
+      "cta": "Se alla licenser"
+    },
     "testimonials": {
       "tagline": "Vad våra användare säger",
       "title": "Älskad av tusentals ledare"
@@ -10572,6 +10639,16 @@
       "allCategories": "Alla",
       "noProducts": "Inga produkter hittades",
       "noProductsDescription": "Det finns inga produkter tillgängliga just nu.",
+      "categoryPage": {
+        "products": "produkter",
+        "games": "lekar",
+        "gamesComingSoon": "Lekar kommer snart",
+        "bundleLabel": "Licenspaket",
+        "perYear": "/år",
+        "bundleIncludes": "Inkluderar alla {count} produkter",
+        "buyBundle": "Köp hela paketet",
+        "backToAll": "Alla kategorier"
+      },
       "products": {
         "autismnpf": {
           "name": "Autism & NPF",
@@ -10737,85 +10814,6 @@
         "Family": "Familj",
         "other": "Övrigt"
       },
-      "frequencyLabel": "Välj betalningsfrekvens",
-      "save15": "Spara 15%",
-      "frequencies": {
-        "monthly": {
-          "label": "Månadsvis",
-          "suffix": "/mån"
-        },
-        "annually": {
-          "label": "Årsvis",
-          "suffix": "/år"
-        }
-      },
-      "tiers": {
-        "free": {
-          "name": "Gratis",
-          "description": "Perfekt för att testa och komma igång.",
-          "price": {
-            "monthly": "0 kr",
-            "annually": "0 kr"
-          },
-          "cta": "Kom igång gratis",
-          "features": [
-            "Upp till 10 aktiviteter",
-            "1 pass per vecka",
-            "Grundläggande filter",
-            "E-postsupport"
-          ]
-        },
-        "pro": {
-          "name": "Pro",
-          "description": "För dig som vill ha mer kraft och flexibilitet.",
-          "price": {
-            "monthly": "99 kr",
-            "annually": "999 kr"
-          },
-          "cta": "Prova Pro gratis",
-          "features": [
-            "Obegränsade aktiviteter",
-            "Obegränsade pass",
-            "Avancerade filter",
-            "PDF-export",
-            "Delade mappar",
-            "Prioriterad support"
-          ]
-        },
-        "team": {
-          "name": "Team",
-          "description": "För organisationer med flera användare.",
-          "price": "Kontakta oss",
-          "cta": "Kontakta sälj",
-          "features": [
-            "Allt i Pro",
-            "Teamhantering",
-            "SSO-inloggning",
-            "Anpassad onboarding",
-            "Dedikerad support",
-            "SLA-garanti"
-          ]
-        },
-        "marketing": {
-          "name": "Marknadsföring",
-          "highlight": "Grundläggande",
-          "price": "Gratis",
-          "description": "Utforska våra aktiviteter och lekar utan kostnad."
-        },
-        "app": {
-          "name": "App",
-          "highlight": "Populär",
-          "price": "99 kr/mån",
-          "description": "Full tillgång till alla funktioner i appen."
-        },
-        "admin": {
-          "name": "Admin",
-          "highlight": "Avancerad",
-          "price": "Kontakta oss",
-          "description": "Anpassade lösningar för organisationer."
-        }
-      },
-      "mostPopular": "Mest populär",
       "detail": {
         "notFound": "Produkten hittades inte",
         "notFoundDescription": "Den begärda produkten finns inte eller är inte tillgänglig.",

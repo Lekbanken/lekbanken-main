@@ -231,6 +231,12 @@ export const navIcons = {
       <circle cx="13" cy="17" r="1" fill="currentColor" />
     </svg>
   ),
+  categories: (
+    <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" />
+      <circle cx="17" cy="17" r="3" />
+    </svg>
+  ),
 };
 
 export const adminNavConfig: AdminNavConfig = [
@@ -258,6 +264,7 @@ export const adminNavConfig: AdminNavConfig = [
     titleKey: 'admin.nav.groups.productsContent',
     items: [
       { id: 'products', href: '/admin/products', labelKey: 'admin.nav.items.products', icon: navIcons.products, permission: 'admin.products.list', systemAdminOnly: true },
+      { id: 'categories', href: '/admin/categories', labelKey: 'admin.nav.items.categories', icon: navIcons.categories, permission: 'admin.products.list', systemAdminOnly: true },
       { id: 'games', href: '/admin/games', labelKey: 'admin.nav.items.games', icon: navIcons.games, permission: 'admin.games.list', systemAdminOnly: true },
       { id: 'planner', href: '/admin/planner', labelKey: 'admin.nav.items.planner', icon: navIcons.content, permission: 'admin.planner.list' },
     ],

@@ -1,17 +1,17 @@
 'use client'
 
-import { PricingSection } from '@/components/marketing/pricing-section'
+import { PricingCta } from '@/components/marketing/pricing-cta'
 import { SimpleModulePage } from '../components/shell/SimpleModulePage'
 
 export default function PricingSandbox() {
   return (
     <SimpleModulePage
       moduleId="pricing"
-      title="Pricing Section"
-      description="Three-tier pricing with monthly/yearly toggle."
+      title="Pricing CTA"
+      description="Minimal CTA band linking to the category-driven pricing page."
     >
       <div className="-m-6">
-        <PricingSection />
+        <PricingCta />
       </div>
     </SimpleModulePage>
   )

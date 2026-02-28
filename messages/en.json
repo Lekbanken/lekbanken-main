@@ -791,6 +791,7 @@
         "organisations": "Organisations",
         "users": "Users",
         "products": "Products",
+        "categories": "Categories",
         "games": "Game Manager",
         "planner": "Planner",
         "badges": "Badges",
@@ -6169,6 +6170,51 @@
         "selectOrCreateDescription": "Choose a badge from the library above or create a new one to start building its layers, colors, and metadata."
       }
     },
+    "categories": {
+      "title": "Categories",
+      "description": "Manage product categories – sorting, icons, visibility and bundles.",
+      "loadError": "Failed to load categories",
+      "tableTitle": "All categories",
+      "noCategories": "No categories",
+      "noCategoriesDescription": "There are no categories yet.",
+      "colSlug": "Slug",
+      "colName": "Name",
+      "colDescription": "Description",
+      "colIcon": "Icon",
+      "colOrder": "Order",
+      "colPublic": "Visible",
+      "colProducts": "Products",
+      "colBundle": "Bundle product",
+      "colActions": "Actions",
+      "visible": "Visible",
+      "hidden": "Hidden",
+      "edit": "Edit",
+      "syncBundle": "Sync bundle",
+      "saved": "Saved",
+      "savedDescription": "Category has been updated.",
+      "saveError": "Failed to save",
+      "syncSuccess": "Bundle synced",
+      "syncDescription": "Added: {added}, removed: {removed}, total: {total}",
+      "syncError": "Failed to sync bundle",
+      "statTotal": "Total",
+      "statPublic": "Public",
+      "statHidden": "Hidden",
+      "statProducts": "Products",
+      "createButton": "Create category",
+      "createTitle": "Create new category",
+      "createDescription": "Fill in the details below. The slug is automatically generated from the name if you don't provide one.",
+      "createNamePlaceholder": "e.g. Collaboration games",
+      "createSlugPlaceholder": "auto-generated",
+      "createSlugPreview": "Slug will be",
+      "createDescPlaceholder": "Short description (optional)",
+      "createPublicLabel": "Visible on website",
+      "createCancel": "Cancel",
+      "createSubmit": "Create",
+      "createSubmitting": "Creating…",
+      "createSuccess": "Category created",
+      "createSuccessDescription": "The new category has been added.",
+      "createError": "Failed to create category"
+    },
     "products": {
       "title": "Products",
       "accessDenied": "Access denied",
@@ -9864,6 +9910,27 @@
       "tagline": "What others say",
       "title": "Loved by activity leaders"
     },
+    "categoryHub": {
+      "tagline": "Our categories",
+      "title": "Find the right content for your organization",
+      "subtitle": "Browse our categories and find activities and games that suit you.",
+      "comingSoon": "Coming soon",
+      "cta": {
+        "view": "View content",
+        "buyBundle": "Buy license bundle",
+        "viewAll": "See all licenses and prices"
+      },
+      "meta": {
+        "products": "licenses",
+        "games": "games",
+        "perYear": "/year"
+      }
+    },
+    "pricingCta": {
+      "title": "Find the right license",
+      "description": "Explore all our licenses and bundles. Pay yearly — no lock-in.",
+      "cta": "See all licenses"
+    },
     "pricing": {
       "tagline": "Pricing",
       "badge": "Pricing",
@@ -9874,6 +9941,16 @@
       "allCategories": "All",
       "noProducts": "No products found",
       "noProductsDescription": "There are no products available at the moment.",
+      "categoryPage": {
+        "products": "products",
+        "games": "games",
+        "gamesComingSoon": "Games coming soon",
+        "bundleLabel": "License bundle",
+        "perYear": "/year",
+        "bundleIncludes": "Includes all {count} products",
+        "buyBundle": "Buy the full bundle",
+        "backToAll": "All categories"
+      },
       "products": {
         "autismnpf": { "name": "Autism & NPF", "description": "Activities adapted for autism and NPF" },
         "rarelsehinder": { "name": "Mobility Impairment", "description": "Adapted for people with mobility impairments" },

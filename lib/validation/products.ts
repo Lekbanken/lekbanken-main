@@ -23,6 +23,7 @@ export function validateProductPayload(
 
   if (mode === 'create') {
     pushIf(errors, !payload.name || payload.name.trim().length === 0, 'name is required')
+    pushIf(errors, !payload.product_key || payload.product_key.trim().length === 0, 'product_key is required')
     pushIf(errors, !payload.category || payload.category.trim().length === 0, 'category is required')
   } else {
     if (payload.name !== undefined && payload.name.trim().length === 0) {
@@ -43,7 +44,7 @@ export function validateProductPayload(
 
   if (payload.product_key !== undefined && payload.product_key !== null) {
     if (payload.product_key.trim().length === 0) {
-      errors.push('product_key cannot be empty when provided')
+      errors.push('product_key cannot be empty')
     }
   }
 

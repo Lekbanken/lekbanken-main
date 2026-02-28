@@ -145,4 +145,5 @@ export const adminLabelMap: Record<string, string> = {
   marketplace: 'Butik',
   personalization: 'Personalisering',
   leaderboard: 'Leaderboard',
+  categories: 'Kategorier',
 };

@@ -544,9 +544,9 @@ export const sandboxCategories: SandboxCategory[] = [
         id: 'pricing', 
         label: 'Pricing', 
         href: '/sandbox/pricing', 
-        description: 'Tre tiers med toggle', 
+        description: 'Kategori-CTA band', 
         status: 'done',
-        components: ['@/components/marketing/PricingSection', '@/components/marketing/PricingCard'],
+        components: ['@/components/marketing/PricingCta'],
         routes: ['/', '/pricing'],
       },
       { 

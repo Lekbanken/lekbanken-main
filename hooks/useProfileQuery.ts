@@ -40,6 +40,27 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { TimeoutError, withTimeout } from '@/lib/utils/withTimeout'
 
 // =============================================================================
+// HELPERS
+// =============================================================================
+
+/**
+ * Create a promise that rejects when the given AbortSignal fires.
+ * Used to let a reuser bail out of its await without creating a second
+ * timeout timer (the owner's timer is the single source of truth).
+ */
+function raceAbort<T>(signal: AbortSignal): Promise<T> {
+  return new Promise<T>((_, reject) => {
+    if (signal.aborted) {
+      reject(signal.reason ?? new DOMException('Aborted', 'AbortError'))
+      return
+    }
+    signal.addEventListener('abort', () => {
+      reject(signal.reason ?? new DOMException('Aborted', 'AbortError'))
+    }, { once: true })
+  })
+}
+
+// =============================================================================
 // TYPES
 // =============================================================================
 
@@ -179,6 +200,10 @@ export function useProfileQuery<T>(
   // Track request generation to ignore stale responses
   const requestGeneration = useRef(0)
   const abortControllerRef = useRef<AbortController | null>(null)
+  // Track which requestKey the current own request was registered under,
+  // so cleanup always targets the correct inFlightRequests entry even if
+  // requestKey derivation changes between renders (e.g. userId changes).
+  const activeRequestKeyRef = useRef<string | null>(null)
   const fetcherRef = useRef(fetcher)
 
   // Keep fetcher ref updated without triggering re-renders
@@ -197,10 +222,17 @@ export function useProfileQuery<T>(
     // Increment generation to invalidate previous requests
     const generation = ++requestGeneration.current
 
-    // Abort any previous in-flight request for this component
+    // Abort any previous in-flight request owned by THIS component instance
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
+
+    // Create new AbortController for THIS execution immediately.
+    // This ensures cleanup can always cancel the current await — whether
+    // we're in the reuse path or the fresh-fetch path.
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+    activeRequestKeyRef.current = requestKey
 
     // Check if there's already a global in-flight request for this key+deps
     const existing = inFlightRequests.get(requestKey)
@@ -210,21 +242,33 @@ export function useProfileQuery<T>(
       if (existing.abortController.signal.aborted || isStale) {
         // Clean up the stale entry
         inFlightRequests.delete(requestKey)
+        if (process.env.NODE_ENV !== 'production') {
+          console.debug(`[useProfileQuery] ${key}: cleaned stale entry (aborted=${existing.abortController.signal.aborted}, stale=${isStale})`)
+        }
       } else {
-        // Reuse the existing promise (single-flight)
+        // Reuse the existing promise (single-flight dedup)
+        if (process.env.NODE_ENV !== 'production') {
+          console.debug(`[useProfileQuery] ${key}: reusing existing in-flight request`)
+        }
         try {
           setStatus('loading')
-          const result = await withTimeout(
+          // NO second withTimeout here — the owner's promise already has
+          // its own timeout timer. We only race against our own abort
+          // signal so we can bail out immediately if we unmount.
+          const result = await Promise.race([
             existing.promise as Promise<T>,
-            timeout,
-            `useProfileQuery(${key})`
-          )
+            raceAbort<T>(abortController.signal),
+          ])
           // Only update if this is still the current generation
           if (requestGeneration.current === generation) {
             setData(result as T)
             setStatus('success')
             setError(null)
+            if (process.env.NODE_ENV !== 'production') {
+              console.debug(`[useProfileQuery] ${key}: reused request → success`)
+            }
           }
+          return // Reuse succeeded — done
         } catch (err) {
           if (requestGeneration.current === generation) {
             if (err instanceof TimeoutError) {
@@ -235,32 +279,66 @@ export function useProfileQuery<T>(
               return
             }
             if (err instanceof Error && err.name === 'AbortError') {
+              // GUARDRAIL A: AbortError during reuse. Two possible causes:
+              // a) OUR cleanup aborted our signal → generation will mismatch
+              //    on next check, but we're still here, so check explicitly.
+              // b) The ORIGINAL owner's cleanup aborted the reused promise.
+              // In both cases, clean up and fall through to start fresh
+              // (unless our own generation is stale).
+              if (abortController.signal.aborted) {
+                // Our own cleanup fired — component unmounting. Just return.
+                return
+              }
               inFlightRequests.delete(requestKey)
+              if (process.env.NODE_ENV !== 'production') {
+                console.debug(`[useProfileQuery] ${key}: reused request aborted → starting fresh request`)
+              }
+              // fall through to create a new request below
+            } else {
+              setError(err instanceof Error ? err.message : 'Unknown error')
+              setStatus('error')
               return
             }
-            setError(err instanceof Error ? err.message : 'Unknown error')
-            setStatus('error')
+          } else {
+            return
           }
         }
-        return
       }
     }
 
-    // Create new AbortController
-    const abortController = new AbortController()
-    abortControllerRef.current = abortController
-
-    // Create the promise and register it
+    // Create the promise and register it.
+    // The promise is wrapped with a self-cleaning .finally() so the
+    // inFlightRequests entry is removed as soon as the underlying fetch
+    // settles — regardless of which component instance created it or
+    // whether that instance is still mounted. This prevents zombie
+    // entries that could cause stale data reuse across user/tenant changes.
     const fetchPromise = fetcherRef.current(abortController.signal)
-    const promise = withTimeout(fetchPromise, timeout, `useProfileQuery(${key})`).catch((err) => {
+    const rawPromise = withTimeout(
+      fetchPromise,
+      timeout,
+      `useProfileQuery(${key})`,
+      { signal: abortController.signal }
+    ).catch((err) => {
       if (err instanceof TimeoutError) {
         abortController.abort()
       }
       throw err
     })
+    const selfCleaningPromise = rawPromise.finally(() => {
+      if (inFlightRequests.get(requestKey)?.promise === selfCleaningPromise) {
+        inFlightRequests.delete(requestKey)
+      }
+      // Clear active key if this instance's request just settled
+      if (activeRequestKeyRef.current === requestKey) {
+        activeRequestKeyRef.current = null
+      }
+      if (process.env.NODE_ENV === 'development') {
+        console.info('[useProfileQuery] inFlight size', inFlightRequests.size)
+      }
+    })
 
     inFlightRequests.set(requestKey, { 
-      promise: promise as Promise<unknown>, 
+      promise: selfCleaningPromise as Promise<unknown>, 
       abortController,
       timestamp: Date.now()
     })
@@ -269,7 +347,7 @@ export function useProfileQuery<T>(
     setError(null)
 
     try {
-      const result = await promise
+      const result = await selfCleaningPromise
 
       if (requestGeneration.current === generation) {
         setData(result)
@@ -282,36 +360,28 @@ export function useProfileQuery<T>(
           setError(err.message)
           setStatus('timeout')
         } else if (err instanceof Error && err.name === 'AbortError') {
-          // Silently ignore aborted requests
+          // OWN request was aborted (user navigated away, new query started).
+          // Silently ignore — no fallthrough needed since this was our own fetch.
         } else {
           setError(err instanceof Error ? err.message : 'Unknown error')
           setStatus('error')
         }
       }
-    } finally {
-      if (inFlightRequests.get(requestKey)?.promise === promise) {
-        inFlightRequests.delete(requestKey)
-      }
     }
+    // NOTE: No manual finally{} cleanup needed here — selfCleaningPromise
+    // handles it via its own .finally() callback above.
   }, [key, requestKey, timeout])
 
   const retry = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
+    activeRequestKeyRef.current = null
     inFlightRequests.delete(requestKey)
     void executeQuery()
   }, [requestKey, executeQuery])
 
-  // Track cleanup timeout for StrictMode handling
-  const cleanupTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
   useEffect(() => {
-    if (cleanupTimeoutRef.current) {
-      clearTimeout(cleanupTimeoutRef.current)
-      cleanupTimeoutRef.current = null
-    }
-
     if (skip) {
       setStatus('idle')
       return
@@ -320,17 +390,41 @@ export function useProfileQuery<T>(
     void executeQuery()
 
     return () => {
-      const controllerToAbort = abortControllerRef.current
-      if (controllerToAbort) {
+      // GUARDRAIL B: Abort immediately (no 100ms delay) and clean up
+      // the inFlightRequests entry IF this instance owns it.
+      //
+      // The old 100ms-delayed abort was a StrictMode workaround that
+      // caused a race condition: the new mount's executeQuery() would
+      // find a not-yet-aborted entry, reuse it, then get AbortError
+      // 100ms later → stuck in 'loading'.
+      //
+      // Aborting immediately is safe:
+      // - StrictMode: React unmounts and remounts. The immediate abort
+      //   means the remount finds the entry already aborted → deletes
+      //   it → starts a fresh request. Correct.
+      // - Real unmount: the request is cancelled. Correct.
+      // - Another instance reusing: if two instances share a requestKey,
+      //   we only delete if WE own the AbortController.
+      const ownController = abortControllerRef.current
+      const ownKey = activeRequestKeyRef.current
+      if (ownController) {
         abortControllerRef.current = null
-        cleanupTimeoutRef.current = setTimeout(() => {
-          if (!controllerToAbort.signal.aborted) {
-            controllerToAbort.abort()
+        activeRequestKeyRef.current = null
+        ownController.abort()
+
+        // Only remove the inFlightRequests entry if it belongs to
+        // this component instance (same AbortController reference).
+        // Use activeRequestKeyRef (not closure requestKey) to ensure
+        // we target the correct entry even if deps changed mid-render.
+        if (ownKey) {
+          const entry = inFlightRequests.get(ownKey)
+          if (entry && entry.abortController === ownController) {
+            inFlightRequests.delete(ownKey)
           }
-        }, 100)
+        }
       }
     }
-  }, [skip, executeQuery])
+  }, [skip, executeQuery, requestKey])
 
   return {
     data,

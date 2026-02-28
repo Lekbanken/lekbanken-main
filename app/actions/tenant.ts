@@ -24,25 +24,45 @@ export async function resolveCurrentTenant() {
 
   const { data: memberships } = await supabase
     .from('user_tenant_memberships')
-    .select('tenant_id, role, is_primary, tenant:tenants(*)')
+    .select('tenant_id, role, is_primary, status, tenant:tenants(*)')
     .eq('user_id', user.id)
+    .or('status.eq.active,status.is.null')
 
   const validMemberships =
     memberships?.filter((m): m is typeof m & { tenant: NonNullable<typeof m['tenant']> } => !!m.tenant) ?? []
 
   const chooseTenant = () => {
+    // 1. Cookie match (user's explicit previous choice)
     if (tenantIdFromCookie) {
       const match = validMemberships.find((m) => m.tenant_id === tenantIdFromCookie)
       if (match) return match
     }
-    return (
-      validMemberships.find((m) => m.is_primary) ||
-      validMemberships[0] ||
-      null
-    )
+    // 2. Deterministic fallback: is_primary first, then stable tenant_id sort
+    const sorted = [...validMemberships].sort((a, b) => {
+      if (a.is_primary && !b.is_primary) return -1
+      if (!a.is_primary && b.is_primary) return 1
+      const aId = a.tenant_id ?? ''
+      const bId = b.tenant_id ?? ''
+      return aId < bId ? -1 : aId > bId ? 1 : 0
+    })
+    return sorted[0] ?? null
   }
 
   const selected = chooseTenant()
+
+  // Dev-only: log resolution source for tenant debugging
+  if (process.env.NODE_ENV === 'development') {
+    const source = selected
+      ? selected.tenant_id === tenantIdFromCookie ? 'cookie' : selected.is_primary ? 'primary' : 'fallback'
+      : 'none'
+    console.debug('[resolveCurrentTenant]', {
+      source,
+      tenantId: selected?.tenant_id ?? null,
+      cookieHad: tenantIdFromCookie ?? null,
+      totalMemberships: validMemberships.length,
+    })
+  }
+
   if (selected?.tenant_id) {
     await setTenantCookie(cookieStore, selected.tenant_id)
   } else {

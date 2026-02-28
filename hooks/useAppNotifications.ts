@@ -4,12 +4,17 @@
  * useAppNotifications Hook
  *
  * Fetches and manages notifications for the current user.
- * Reads from notification_deliveries table via RPC.
+ * Reads from notification_deliveries table via RPC with direct-query fallback.
  *
  * Features:
- * - Supabase Realtime subscription for instant updates
- * - 30 s fallback polling
- * - Per-instance state (safe when multiple components use the hook)
+ * - **Single-flight dedup** — module-level Map keyed by userId; superset-aware
+ *   (a limit=100 fetch satisfies a limit=20 consumer via `.slice()`)
+ * - **Per-user RPC cooldown** — on RPC timeout, skips RPC for 60→120→300s
+ *   and goes straight to direct query. Auth/permission errors don't trigger cooldown.
+ * - **Supabase Realtime** subscription for instant updates (debounced 300ms)
+ * - **30s fallback polling** with exponential backoff + circuit breaker
+ * - **Visibility + online gating** — no fetches when tab hidden or offline
+ * - **Focus refetch** — replaces per-pathname refetch (notifications are ambient)
  *
  * @example
  * ```tsx
@@ -18,9 +23,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { usePathname } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { withTimeout } from '@/lib/utils/withTimeout';
+import { TimeoutError } from '@/lib/utils/withTimeout';
 import { parseDbTimestamp } from '@/lib/utils/parseDbTimestamp';
 
 // =============================================================================
@@ -72,7 +77,7 @@ export interface UseAppNotificationsResult {
 }
 
 // =============================================================================
-// HOOK
+// CONSTANTS
 // =============================================================================
 
 /** RPC response row type */
@@ -95,13 +100,8 @@ interface NotificationRow {
 type AnyRpc = any;
 
 /**
- * Timeout for the main notifications fetch.
- *
- * This is a SAFETY NET above the per-endpoint timeouts in fetch-with-timeout.
- * The Supabase client may resolve the auth session (including Web Lock
- * acquisition + JWT refresh at ~5 s) BEFORE making the actual HTTP request
- * (REST timeout ~8 s). The outer timeout must exceed auth + fetch combined
- * so that it never fires before the real timeout.
+ * Timeout for the main notifications fetch (RPC or direct query).
+ * Covers auth session resolution (~5s) + HTTP request (~8s) with margin.
  */
 const FETCH_TIMEOUT_MS = 20_000;
 /** Timeout for user-initiated actions (mark read, dismiss) */
@@ -114,6 +114,125 @@ const MAX_BACKOFF_MS = 120_000;
 const BACKOFF_THRESHOLD = 2;
 /** Stop polling entirely after this many consecutive failures */
 const MAX_CONSECUTIVE_FAILURES = 6;
+/** Max age of an in-flight entry before it's considered stale (ms) */
+const MAX_INFLIGHT_AGE_MS = 60_000;
+/** Max RPC cooldown duration (ms) */
+const MAX_RPC_COOLDOWN_MS = 300_000;
+/** Base RPC cooldown duration on first timeout (ms) */
+const BASE_RPC_COOLDOWN_MS = 60_000;
+/** Debounce delay for Realtime-triggered refetch (ms) */
+const REALTIME_DEBOUNCE_MS = 300;
+
+// =============================================================================
+// MODULE-LEVEL SHARED STATE
+// =============================================================================
+
+/**
+ * Single-flight dedup map — keyed by userId.
+ * Superset-aware: a limit=100 fetch can satisfy a limit=20 consumer.
+ */
+interface InFlightEntry {
+  limit: number;
+  promise: Promise<AppNotification[]>;
+  abortController: AbortController;
+  startedAt: number;
+}
+const inFlightRequests = new Map<string, InFlightEntry>();
+
+/**
+ * Per-user RPC cooldown state.
+ * When RPC times out, we skip RPC and go straight to direct query
+ * for a period. Auth/permission errors don't trigger cooldown.
+ */
+interface RpcCooldownState {
+  cooldownUntil: number;
+  consecutiveTimeouts: number;
+}
+const rpcStateByUser = new Map<string, RpcCooldownState>();
+
+/** Check if RPC is available (not in cooldown) for a user */
+function isRpcAvailable(userId: string): boolean {
+  const state = rpcStateByUser.get(userId);
+  if (!state) return true;
+  if (Date.now() >= state.cooldownUntil) {
+    // Cooldown expired — reset
+    rpcStateByUser.delete(userId);
+    return true;
+  }
+  return false;
+}
+
+/** Record an RPC timeout for a user — activates/extends cooldown */
+function recordRpcTimeout(userId: string): void {
+  const state = rpcStateByUser.get(userId) ?? { cooldownUntil: 0, consecutiveTimeouts: 0 };
+  state.consecutiveTimeouts += 1;
+  const cooldownMs = Math.min(
+    BASE_RPC_COOLDOWN_MS * Math.pow(2, state.consecutiveTimeouts - 1),
+    MAX_RPC_COOLDOWN_MS
+  );
+  state.cooldownUntil = Date.now() + cooldownMs;
+  rpcStateByUser.set(userId, state);
+
+  if (process.env.NODE_ENV === 'development') {
+    console.info('[useAppNotifications] RPC cooldown activated', {
+      userId: userId.slice(0, 8),
+      cooldownMs,
+      consecutiveTimeouts: state.consecutiveTimeouts,
+    });
+  }
+}
+
+/** Record an RPC success for a user — resets cooldown */
+function recordRpcSuccess(userId: string): void {
+  if (rpcStateByUser.has(userId)) {
+    rpcStateByUser.delete(userId);
+  }
+}
+
+/**
+ * Clean up all module-level state for a user.
+ * Called when the last instance for a user unmounts, or on user switch.
+ */
+function cleanupUser(userId: string): void {
+  const entry = inFlightRequests.get(userId);
+  if (entry) {
+    entry.abortController.abort();
+    inFlightRequests.delete(userId);
+  }
+  rpcStateByUser.delete(userId);
+}
+
+/**
+ * Refcount per userId — prevents one instance's unmount from cleaning up
+ * shared module-level state while other instances (e.g. bell + page) are
+ * still mounted. cleanupUser only runs when the LAST instance releases.
+ */
+const userRefCounts = new Map<string, number>();
+
+function retainUser(userId: string): void {
+  userRefCounts.set(userId, (userRefCounts.get(userId) ?? 0) + 1);
+}
+
+function releaseUser(userId: string): void {
+  const next = (userRefCounts.get(userId) ?? 0) - 1;
+  if (next <= 0) {
+    userRefCounts.delete(userId);
+    cleanupUser(userId);
+  } else {
+    userRefCounts.set(userId, next);
+  }
+}
+
+/**
+ * Minimum interval between trigger-initiated refetches (ms).
+ * Prevents double-fire when Chrome sends both visibilitychange + focus
+ * back-to-back (common on alt-tab).
+ */
+const TRIGGER_COOLDOWN_MS = 2_000;
+
+// =============================================================================
+// MAP HELPERS
+// =============================================================================
 
 /** Map RPC rows → AppNotification[] */
 function mapRows(rows: NotificationRow[]): AppNotification[] {
@@ -165,15 +284,19 @@ function mapDirectRows(rows: DirectQueryRow[]): AppNotification[] {
   }));
 }
 
+// =============================================================================
+// HOOK
+// =============================================================================
+
 export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Per-instance refs — no shared module-level state
+  // Per-instance refs
   const hasLoadedOnce = useRef(false);
-  const mountedRef = useRef(true);
+  const mountedRef = useRef(false);
 
   // AbortController for the current in-flight fetch.
   // New fetches abort the previous one so that timed-out HTTP requests
@@ -182,6 +305,15 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
 
   // Consecutive failure counter for exponential backoff on polling
   const consecutiveFailures = useRef(0);
+
+  // Cached userId so we can key the dedup map without re-fetching session.
+  // On userId change (logout / account switch), we release the old user's
+  // refcount and retain the new one.
+  const userIdRef = useRef<string | null>(null);
+
+  // Per-instance trigger cooldown (not module-level — avoids one instance
+  // throttling another when both react to focus/visibility events).
+  const lastTriggerFetchRef = useRef(0);
 
   // Client components can still render on the server in Next.js; avoid
   // calling `createBrowserClient()` when `window` is not available.
@@ -210,11 +342,120 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   };
 
   // =========================================================================
-  // Fetch — cancels previous in-flight request, uses AbortController to
-  // properly terminate stale HTTP connections.
-  // Two strategies: RPC first, direct PostgREST query as fallback.
-  // Each strategy gets its own child AbortController so that a timed-out
-  // strategy can be cancelled without aborting the fallback attempt.
+  // Core fetch — the actual RPC + direct-query logic.
+  // Called by fetchNotifications (which handles dedup) and always gets
+  // a fresh AbortController + the limit to use.
+  // =========================================================================
+  const executeFetch = useCallback(async (
+    ac: AbortController,
+    fetchLimit: number,
+    userId: string,
+  ): Promise<AppNotification[] | null> => {
+    if (!supabase) return null;
+
+    let mapped: AppNotification[] | null = null;
+
+    // --- Strategy 1: RPC (fast, SECURITY DEFINER — bypasses RLS) ---
+    // Skip if RPC is in cooldown for this user (recent timeouts).
+    const rpcOk = isRpcAvailable(userId);
+
+    if (rpcOk && !ac.signal.aborted) {
+      const rpcAc = childAbort(ac);
+
+      try {
+        const rpc = (supabase.rpc as AnyRpc)(
+          'get_user_notifications',
+          { p_limit: fetchLimit }
+        );
+        attachSignal(rpc, rpcAc.signal);
+
+        const { data, error: fetchError } = await withTimeout(
+          rpc as Promise<{ data: NotificationRow[] | null; error: Error | null }>,
+          FETCH_TIMEOUT_MS,
+          'rpc:get_user_notifications',
+          { signal: ac.signal }
+        );
+
+        if (ac.signal.aborted) return null;
+
+        if (fetchError) {
+          // RPC returned an error (not a timeout) — don't cooldown, just fallback
+          console.warn('[useAppNotifications] RPC error, trying direct query:', fetchError.message);
+        } else {
+          recordRpcSuccess(userId);
+          mapped = mapRows(data || []);
+        }
+      } catch (rpcErr) {
+        // Abort the RPC HTTP request to free the connection
+        rpcAc.abort();
+
+        if (ac.signal.aborted) return null;
+
+        // Distinguish timeout from other errors for cooldown
+        if (rpcErr instanceof TimeoutError) {
+          recordRpcTimeout(userId);
+        }
+        // Auth/permission errors → no cooldown (logic error, not capacity)
+
+        console.warn(
+          '[useAppNotifications] RPC failed/timed-out, trying direct query:',
+          rpcErr instanceof Error ? rpcErr.message : rpcErr
+        );
+      }
+    }
+
+    // --- Strategy 2: Direct PostgREST query (goes through RLS) ---
+    if (!mapped && !ac.signal.aborted) {
+      const directAc = childAbort(ac);
+
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const query = (supabase as any)
+          .from('notification_deliveries')
+          .select(
+            `id, notification_id, delivered_at, read_at, dismissed_at,
+             notifications!inner ( title, message, type, category, action_url, action_label )`
+          )
+          .is('dismissed_at', null)
+          .order('delivered_at', { ascending: false })
+          .limit(fetchLimit);
+        attachSignal(query, directAc.signal);
+
+        const { data: directData, error: directError } = await withTimeout(
+          query as Promise<{ data: DirectQueryRow[] | null; error: Error | null }>,
+          FETCH_TIMEOUT_MS,
+          'direct:notification_deliveries',
+          { signal: ac.signal }
+        );
+
+        if (ac.signal.aborted) return null;
+
+        if (directError) {
+          throw new Error(directError.message);
+        }
+
+        mapped = mapDirectRows(directData || []);
+      } catch (directErr) {
+        directAc.abort(); // Free the HTTP connection
+
+        if (ac.signal.aborted) return null;
+        console.warn(
+          '[useAppNotifications] Direct query also failed:',
+          directErr instanceof Error ? directErr.message : directErr
+        );
+      }
+    }
+
+    return mapped;
+  }, [supabase]);
+
+  // =========================================================================
+  // Fetch — single-flight dedup with superset-aware reuse.
+  //
+  // Dedup key: userId. If an in-flight entry exists with limit >= ours,
+  // we reuse it and slice. If our limit is larger, we abort the old entry
+  // and start a fresh fetch with our limit (the old reusers get our result
+  // through the promise chain).
   // =========================================================================
   const fetchNotifications = useCallback(async () => {
     if (!supabase) return;
@@ -232,9 +473,6 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     }
 
     // ---- Session pre-check (reads localStorage, no network call) ----
-    // If there's no session, the Supabase client will try to refresh the token
-    // (acquiring a Web Lock → hitting /auth/v1/token), which can block for
-    // seconds before the actual REST call even starts.
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -243,113 +481,130 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         }
         return;
       }
+      const newUserId = session.user.id;
+      // If userId changed (account switch), release old user + retain new
+      if (userIdRef.current && userIdRef.current !== newUserId) {
+        releaseUser(userIdRef.current);
+        retainUser(newUserId);
+      } else if (!userIdRef.current) {
+        // First time seeing this user — retain
+        retainUser(newUserId);
+      }
+      userIdRef.current = newUserId;
     } catch {
-      // getSession failed — skip this cycle
       return;
     }
 
-    // Cancel any previous in-flight request (frees browser connections)
+    const userId = userIdRef.current!;
+
+    // ---- Single-flight dedup (superset-aware) ----
+    const existing = inFlightRequests.get(userId);
+    if (existing) {
+      const isStale = Date.now() - existing.startedAt > MAX_INFLIGHT_AGE_MS;
+      const isAborted = existing.abortController.signal.aborted;
+
+      if (!isStale && !isAborted && existing.limit >= limit) {
+        // Reuse: existing fetch has enough data for us
+        if (process.env.NODE_ENV === 'development') {
+          console.debug(`[useAppNotifications] Reusing in-flight (limit=${existing.limit} >= ${limit})`);
+        }
+        try {
+          const result = await existing.promise;
+          if (!mountedRef.current) return;
+          const sliced = existing.limit > limit ? result.slice(0, limit) : result;
+          consecutiveFailures.current = 0;
+          setNotifications(sliced);
+          setUnreadCount(sliced.filter((n) => !n.readAt).length);
+          setError(null);
+          hasLoadedOnce.current = true;
+          return;
+        } catch {
+          // Existing fetch failed — fall through to start our own
+          if (!mountedRef.current) return;
+        } finally {
+          // Only clear loading if we actually set it (SWR: first load only)
+          if (mountedRef.current && !hasLoadedOnce.current) {
+            setIsLoading(false);
+          }
+        }
+      } else if (!isStale && !isAborted) {
+        // Existing has smaller limit — abort it and take over.
+        // The old entry's reusers will get our (larger) result via the
+        // promise chain since we replace the Map entry.
+        existing.abortController.abort();
+        inFlightRequests.delete(userId);
+      } else {
+        // Stale or aborted — clean up
+        inFlightRequests.delete(userId);
+      }
+    }
+
+    // ---- Start our own fetch ----
+    // Cancel any previous per-instance in-flight request
     abortRef.current?.abort();
     const ac = new AbortController();
     abortRef.current = ac;
 
-    try {
-      setError(null);
-
-      let mapped: AppNotification[] | null = null;
-
-      // --- Strategy 1: RPC (fast, SECURITY DEFINER — bypasses RLS) ---
+    // Master timeout: abort the entire fetch cycle (RPC + fallback combined)
+    // after the computed timeout. This prevents the 40s worst-case where RPC
+    // times out and direct query gets another full timeout independently.
+    // Dynamic: bell (limit ≤ 20) gets 12s, page (limit > 20) gets 20s.
+    const masterTimeoutMs = limit > 20 ? FETCH_TIMEOUT_MS : 12_000;
+    const masterTimer = setTimeout(() => {
       if (!ac.signal.aborted) {
-        const rpcAc = childAbort(ac);
-
-        try {
-          const rpc = (supabase.rpc as AnyRpc)(
-            'get_user_notifications',
-            { p_limit: limit }
-          );
-          attachSignal(rpc, rpcAc.signal);
-
-          const { data, error: fetchError } = await withTimeout(
-            rpc as Promise<{ data: NotificationRow[] | null; error: Error | null }>,
-            FETCH_TIMEOUT_MS,
-            'rpc:get_user_notifications'
-          );
-
-          if (ac.signal.aborted || !mountedRef.current) return;
-
-          if (fetchError) {
-            console.warn('[useAppNotifications] RPC error, trying direct query:', fetchError.message);
-          } else {
-            mapped = mapRows(data || []);
-          }
-        } catch (rpcErr) {
-          // Abort the RPC HTTP request to free the connection
-          rpcAc.abort();
-
-          if (ac.signal.aborted || !mountedRef.current) return;
-          console.warn(
-            '[useAppNotifications] RPC failed/timed-out, trying direct query:',
-            rpcErr instanceof Error ? rpcErr.message : rpcErr
-          );
-        }
+        ac.abort();
       }
+    }, masterTimeoutMs);
 
-      // --- Strategy 2: Direct PostgREST query (goes through RLS) ---
-      if (!mapped && !ac.signal.aborted) {
-        const directAc = childAbort(ac);
+    // Stale-while-revalidate: only show loading spinner on first load.
+    // After that, keep showing stale data while fetching fresh data.
+    if (!hasLoadedOnce.current) {
+      setIsLoading(true);
+    }
+    setError(null);
 
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const query = (supabase as any)
-            .from('notification_deliveries')
-            .select(
-              `id, notification_id, delivered_at, read_at, dismissed_at,
-               notifications!inner ( title, message, type, category, action_url, action_label )`
-            )
-            .is('dismissed_at', null)
-            .order('delivered_at', { ascending: false })
-            .limit(limit);
-          attachSignal(query, directAc.signal);
+    // Create the deduped promise
+    const fetchPromise = executeFetch(ac, limit, userId).then((mapped) => {
+      if (mapped) return mapped;
+      throw new Error('All strategies failed');
+    });
 
-          const { data: directData, error: directError } = await withTimeout(
-            query as Promise<{ data: DirectQueryRow[] | null; error: Error | null }>,
-            FETCH_TIMEOUT_MS,
-            'direct:notification_deliveries'
-          );
-
-          if (ac.signal.aborted || !mountedRef.current) return;
-
-          if (directError) {
-            throw new Error(directError.message);
-          }
-
-          mapped = mapDirectRows(directData || []);
-        } catch (directErr) {
-          directAc.abort(); // Free the HTTP connection
-
-          if (ac.signal.aborted || !mountedRef.current) return;
-          console.warn(
-            '[useAppNotifications] Direct query also failed:',
-            directErr instanceof Error ? directErr.message : directErr
-          );
-        }
+    // Self-cleaning wrapper
+    const selfCleaningPromise = fetchPromise.finally(() => {
+      clearTimeout(masterTimer);
+      const entry = inFlightRequests.get(userId);
+      if (entry?.promise === selfCleaningPromise) {
+        inFlightRequests.delete(userId);
       }
+      if (process.env.NODE_ENV === 'development') {
+        console.info('[useAppNotifications] inFlight size', inFlightRequests.size);
+      }
+    });
 
-      // --- Apply result ---
-      if (!ac.signal.aborted && mountedRef.current) {
-        if (mapped) {
-          consecutiveFailures.current = 0; // Reset backoff on success
-          setNotifications(mapped);
-          setUnreadCount(mapped.filter((n) => !n.readAt).length);
-          hasLoadedOnce.current = true;
-        } else {
-          consecutiveFailures.current += 1;
-          if (!hasLoadedOnce.current) {
-            setNotifications([]);
-            setUnreadCount(0);
-            setError('Kunde inte hämta notifikationer');
-          }
-        }
+    inFlightRequests.set(userId, {
+      limit,
+      promise: selfCleaningPromise,
+      abortController: ac,
+      startedAt: Date.now(),
+    });
+
+    try {
+      const result = await selfCleaningPromise;
+
+      if (!mountedRef.current || ac.signal.aborted) return;
+
+      consecutiveFailures.current = 0;
+      setNotifications(result);
+      setUnreadCount(result.filter((n) => !n.readAt).length);
+      hasLoadedOnce.current = true;
+    } catch {
+      if (!mountedRef.current || ac.signal.aborted) return;
+
+      consecutiveFailures.current += 1;
+      if (!hasLoadedOnce.current) {
+        setNotifications([]);
+        setUnreadCount(0);
+        setError('Kunde inte hämta notifikationer');
       }
     } finally {
       if (abortRef.current === ac) {
@@ -359,10 +614,10 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         setIsLoading(false);
       }
     }
-  }, [supabase, limit]);
+  }, [supabase, limit, executeFetch]);
 
   // =========================================================================
-  // Lifecycle: mount/unmount tracking + abort cleanup
+  // Lifecycle: mount/unmount tracking + abort cleanup + user refcount
   // =========================================================================
   useEffect(() => {
     mountedRef.current = true;
@@ -370,6 +625,11 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       mountedRef.current = false;
       // Cancel any in-flight HTTP requests on unmount
       abortRef.current?.abort();
+      // Release refcount — only cleans up module-level Maps when the
+      // LAST instance for this user unmounts.
+      if (userIdRef.current) {
+        releaseUser(userIdRef.current);
+      }
     };
   }, []);
 
@@ -380,57 +640,83 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     fetchNotifications();
   }, [fetchNotifications]);
 
-  // =========================================================================
-  // Refetch on client-side navigation (admin → app, etc.)
-  // Next.js client navigation keeps the singleton Supabase client alive but
-  // a new layout tree mounts. Pathname change = reliable navigation signal.
-  // =========================================================================
-  const pathname = usePathname();
-  useEffect(() => {
-    // Skip the very first render (covered by initial fetch above)
-    if (!hasLoadedOnce.current) return;
-    fetchNotifications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
-
   // Ref so the visibility handler can restart polling after circuit breaker
   const restartPollingRef = useRef<(() => void) | null>(null);
 
   // =========================================================================
-  // Refetch when tab becomes visible (user switches back to this tab)
+  // Refetch on visibility change (tab becomes visible) and window focus.
+  // Replaces per-pathname refetch — notifications are ambient data and
+  // don't need to refetch on every sub-page navigation.
   // Also resets backoff + circuit breaker since the user is actively looking.
   // =========================================================================
   useEffect(() => {
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') {
-        const wasCircuitOpen = consecutiveFailures.current >= MAX_CONSECUTIVE_FAILURES;
-        consecutiveFailures.current = 0; // Reset backoff + circuit breaker
-        setError(null);
-        fetchNotifications();
-        // If polling had stopped (circuit breaker), restart it
-        if (wasCircuitOpen && restartPollingRef.current) {
-          restartPollingRef.current();
-        }
+    // Per-instance trigger with cooldown — prevents double-fire when Chrome
+    // sends both visibilitychange + focus back-to-back on alt-tab.
+    const triggerFetch = () => {
+      const now = Date.now();
+      if (now - lastTriggerFetchRef.current < TRIGGER_COOLDOWN_MS) return;
+      lastTriggerFetchRef.current = now;
+
+      const wasCircuitOpen = consecutiveFailures.current >= MAX_CONSECUTIVE_FAILURES;
+      consecutiveFailures.current = 0;
+      setError(null);
+      fetchNotifications();
+      if (wasCircuitOpen && restartPollingRef.current) {
+        restartPollingRef.current();
       }
     };
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        triggerFetch();
+      }
+    };
+
+    const onFocus = () => {
+      // Only refetch on focus if the tab is already visible (avoids
+      // double-fetch when switching tabs, since visibilitychange fires first).
+      // The TRIGGER_COOLDOWN_MS guard prevents the double-fire scenario.
+      if (document.visibilityState === 'visible') {
+        triggerFetch();
+      }
+    };
+
+    const onOnline = () => {
+      // Coming back online — reset failures and fetch immediately
+      consecutiveFailures.current = 0;
+      setError(null);
+      lastTriggerFetchRef.current = Date.now();
+      fetchNotifications();
+    };
+
     document.addEventListener('visibilitychange', onVisible);
-    return () => document.removeEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('online', onOnline);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('online', onOnline);
+    };
   }, [fetchNotifications]);
 
   // =========================================================================
-  // Realtime subscription — instant bell updates when deliveries change
+  // Realtime subscription — instant bell updates when deliveries change.
+  // Debounced: multiple rapid changes (e.g. bulk delivery) collapse into
+  // one fetch after 300ms of quiet.
   // =========================================================================
   useEffect(() => {
     if (!supabase) return;
 
     let channel: ReturnType<typeof supabase.channel> | null = null;
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
     const setup = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user?.id || !mountedRef.current) return;
 
       channel = supabase
-        .channel(`notif_deliveries_${user.id}_${limit}`)
+        .channel(`notif_deliveries_${user.id}`)
         .on(
           'postgres_changes',
           {
@@ -440,7 +726,11 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
             filter: `user_id=eq.${user.id}`,
           },
           () => {
-            fetchNotifications();
+            // Debounce: collapse rapid-fire changes into one fetch
+            if (debounceTimer) clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+              fetchNotifications();
+            }, REALTIME_DEBOUNCE_MS);
           }
         )
         .subscribe();
@@ -449,16 +739,17 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     setup();
 
     return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
       if (channel) {
         supabase.removeChannel(channel);
       }
     };
-  }, [supabase, fetchNotifications, limit]);
+  }, [supabase, fetchNotifications]);
 
   // =========================================================================
   // Fallback polling — keeps bell correct even if realtime misses.
-  // Visibility-gated: skips fetch when tab is hidden to avoid wasting
-  // connections. Uses exponential backoff on consecutive failures.
+  // Gated by visibility + online status.
+  // Uses exponential backoff on consecutive failures.
   // =========================================================================
   useEffect(() => {
     if (!supabase) return;
@@ -466,6 +757,10 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     let timerId: ReturnType<typeof setTimeout> | null = null;
 
     const schedulePoll = () => {
+      // Clear any existing timer to prevent duplicate poll loops
+      // (can happen when visibility handler restarts polling via restartPollingRef)
+      if (timerId) clearTimeout(timerId);
+
       // Exponential backoff: double interval for each failure past threshold
       const failCount = consecutiveFailures.current;
       const delay =
@@ -477,8 +772,8 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
             );
 
       timerId = setTimeout(async () => {
-        // Skip fetch when tab is hidden — visibility handler will catch up
-        if (document.visibilityState === 'visible') {
+        // Skip fetch when tab is hidden or offline
+        if (document.visibilityState === 'visible' && navigator.onLine) {
           await fetchNotifications();
         }
         // Circuit breaker: stop polling entirely if too many failures

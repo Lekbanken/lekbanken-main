@@ -7162,6 +7162,7 @@
     },
     "participants": {
       "title": "Deltagare",
+      "pageTitle": "Deltagare",
       "noAccess": "Ingen åtkomst",
       "noPermissionParticipants": "Du behöver behörighet för att se deltagare.",
       "notFound": "Deltagaren hittades inte",
@@ -7199,18 +7200,28 @@
       "riskFilter": {
         "all": "Alla risknivåer",
         "low": "Låg risk",
-        "high": "Hög risk"
+        "high": "Hög risk",
+        "placeholder": "Filtrera risknivå"
       },
       "emptyState": {
         "title": "Inga deltagare",
-        "description": "Justera filter eller försök igen senare."
+        "description": "Justera filter eller försök igen senare.",
+        "noParticipants": "Inga deltagare",
+        "noParticipantsDescription": "Justera filter eller försök igen senare.",
+        "noAccess": "Ingen åtkomst",
+        "noAccessDescription": "Du behöver behörighet för att se deltagare."
       },
       "columns": {
         "name": "Namn",
         "email": "E-post",
         "tenant": "Tenant",
         "risk": "Risk",
-        "lastActive": "Senast aktiv"
+        "lastActive": "Senast aktiv",
+        "missing": "Saknas",
+        "global": "Global"
+      },
+      "errorState": {
+        "title": "Något gick fel"
       },
       "riskLabels": {
         "high": "Hög",
@@ -8454,6 +8465,12 @@
     }
   },
   "app": {
+    "errorBoundary": {
+      "title": "Något gick fel",
+      "description": "Ett oväntat fel inträffade. Försök igen, eller ladda om sidan.",
+      "retry": "Försök igen",
+      "reload": "Ladda om sidan"
+    },
     "invoices": {
       "title": "Mina fakturor",
       "description": "Visa och ladda ner dina fakturor.",

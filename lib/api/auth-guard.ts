@@ -28,6 +28,9 @@ export async function requireSystemAdmin() {
 }
 
 export async function requireTenantRole(roles: TenantRole[], tenantId?: string | null) {
+  // TODO: consolidate tenant-resolution priority with resolveCurrentTenant
+  // (app/actions/tenant.ts) to ensure identical rules. Currently this function
+  // has its own fallback chain: param → header → ctx.activeTenant → first membership.
   const ctx = await requireAuth()
   const headerStore = await headers()
   const headerTenantId = headerStore.get('x-tenant-id')

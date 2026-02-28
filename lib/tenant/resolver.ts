@@ -1,4 +1,3 @@
-import type { NextRequest } from 'next/server'
 import type { TenantMembership, TenantResolution, TenantRole, TenantWithMembership } from '@/types/tenant'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 
@@ -120,12 +119,4 @@ export async function resolveTenant(
     tenant,
     tenantRole,
   }
-}
-
-export function resolveTenantForMiddleware(request: NextRequest, memberships: TenantMembership[]) {
-  return resolveTenant({
-    pathname: request.nextUrl.pathname,
-    cookieStore: request.cookies,
-    memberships,
-  })
 }

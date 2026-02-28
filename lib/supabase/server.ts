@@ -6,6 +6,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import type { Database } from '@/types/supabase'
 import { env } from '@/lib/config/env'
+import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 import { enhanceCookieOptions } from '@/lib/supabase/cookie-domain'
 import { createFetchWithTimeout } from '@/lib/supabase/fetch-with-timeout'
 
@@ -117,7 +118,13 @@ export const supabaseAdmin = new Proxy({} as ReturnType<typeof createServiceRole
   },
 })
 
-export async function getRequestTenantId() {
+export async function getRequestTenantId(): Promise<string | null> {
+  // 1. Header set by middleware (available for /app paths)
   const headerStore = await headers()
-  return headerStore.get('x-tenant-id')
+  const headerTenantId = headerStore.get('x-tenant-id')
+  if (headerTenantId) return headerTenantId
+
+  // 2. Signed cookie fallback (always available, even without middleware)
+  const cookieStore = await cookies()
+  return readTenantIdFromCookies(cookieStore)
 }

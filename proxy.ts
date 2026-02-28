@@ -2,8 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/supabase'
 import { env } from '@/lib/config/env'
-import { deriveEffectiveGlobalRoleFromClaims, resolveTenantForMiddlewareRequest } from '@/lib/auth/middleware-helpers'
-import { setTenantCookie, clearTenantCookie } from '@/lib/utils/tenantCookie'
+import { deriveEffectiveGlobalRoleFromClaims } from '@/lib/auth/middleware-helpers'
+import { readTenantIdFromCookies, setTenantCookie } from '@/lib/utils/tenantCookie'
 import { defaultLocale, LOCALE_COOKIE, isValidLocale, type Locale } from '@/lib/i18n/config'
 import { checkMFAStatus, MFA_TRUST_COOKIE, buildMFAChallengeUrl, buildMFAEnrollUrl, extractDeviceFingerprint } from '@/lib/auth/mfa-aal'
 import { enhanceCookieOptions } from '@/lib/supabase/cookie-domain'
@@ -728,57 +728,62 @@ export default async function proxy(request: NextRequest) {
 
   // ============================================
   // TENANT RESOLUTION FOR /app PATHS
-  // Priority when user is logged in:
-  //   1. Path override (/app/t/[tenantId]) - extracted directly, no membership check
+  //
+  // POLICY (do not change without team consensus):
+  //   - Middleware ONLY selects a tenant candidate (path/host/cookie)
+  //     and forwards it via x-tenant-id header.
+  //   - Middleware NEVER clears lb_tenant cookie — not on signature
+  //     mismatch, not on missing memberships, never.
+  //   - Middleware NEVER redirects based on membership/access checks
+  //     (it has no membership data and must not query DB for it).
+  //   - Validation and self-healing (cookie rewrite, fallback tenant)
+  //     is the responsibility of server actions (resolveCurrentTenant)
+  //     and DB/RLS policies.
+  //
+  // Priority:
+  //   1. Path override (/app/t/[tenantId])
   //   2. Hostname resolution (custom domain or subdomain)
-  //   3. Cookie / membership fallback via resolver
+  //   3. Signed cookie (lb_tenant)
   // ============================================
   
   if (pathname.startsWith('/app') && user && !isBudgetExhausted()) {
-    // Extract path override directly (not via resolver, to avoid membership dependency)
-    // Validate that it's a proper UUID to prevent garbage values
+    // Extract path override directly — validate UUID to prevent garbage
     const pathTenantIdRaw = extractPathTenantId(pathname)
     const pathTenantId = pathTenantIdRaw && isUuid(pathTenantIdRaw) ? pathTenantIdRaw : null
-    
-    // Run resolver for redirects and cookie/membership fallback
-    const { resolution } = await resolveTenantForMiddlewareRequest(request, [])
 
-    if (resolution.redirect) {
-      try {
-        const redirectResponse = NextResponse.redirect(new URL(resolution.redirect, request.url))
-        redirectResponse.headers.set('x-request-id', requestId)
-        return redirectResponse
-      } catch {
-        console.warn(`[proxy:${requestId}] malformed tenant redirect: ${resolution.redirect}`)
-      }
-    }
+    // Read signed cookie directly — returns null if missing or signature invalid
+    const cookieTenantId = await readTenantIdFromCookies(request.cookies)
 
-    if (resolution.clearCookie) {
-      clearTenantCookie(response.cookies)
-    }
-
-    // Determine final tenant ID with correct priority:
-    // 1. Path override (extracted directly, always wins for logged-in user)
-    // 2. Hostname-resolved tenant
-    // 3. Cookie/membership-resolved tenant from resolver
+    // Determine final tenant ID with strict priority + track source
     let finalTenantId: string | null = null
+    let source: 'path' | 'host' | 'cookie' | 'none' = 'none'
     
     if (pathTenantId) {
-      // Path override has highest priority - no membership check in middleware
-      // RLS and API layer will enforce access control
+      // Path override has highest priority — RLS enforces access
       finalTenantId = pathTenantId
+      source = 'path'
     } else if (hostTenantId) {
       // Hostname resolution is second priority
       finalTenantId = hostTenantId
-    } else if (resolution.tenantId) {
-      // Cookie/membership fallback
-      finalTenantId = resolution.tenantId
+      source = 'host'
+    } else if (cookieTenantId) {
+      // Signed cookie fallback — no membership validation here
+      finalTenantId = cookieTenantId
+      source = 'cookie'
     }
 
-    // Set header and cookie exactly once based on final tenant
+    // Always set header so downstream server code sees the tenant
     if (finalTenantId) {
       response.headers.set('x-tenant-id', finalTenantId)
-      await setTenantCookie(response.cookies, finalTenantId, { hostname })
+
+      // Persist cookie only when appropriate:
+      //   - Path override is "imperative context" and must NOT be persisted
+      //     (avoids deep-links / QA links silently changing user's default tenant)
+      //   - Host/cookie sources may persist, but only if the value actually changed
+      //     (avoids Set-Cookie churn on every _rsc / HMR request)
+      if (source !== 'path' && finalTenantId !== cookieTenantId) {
+        await setTenantCookie(response.cookies, finalTenantId, { hostname })
+      }
     }
   }
 

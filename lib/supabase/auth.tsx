@@ -157,6 +157,7 @@ export function AuthProvider({
       .from('user_tenant_memberships')
       .select('*, tenant:tenants(*)')
       .eq('user_id', currentUser.id)
+      .or('status.eq.active,status.is.null')
 
     if (error) {
       console.warn('[auth] fetchMemberships error:', error)
@@ -314,9 +315,22 @@ export function AuthProvider({
           router.refresh()
         }
       } else {
-        // TOKEN_REFRESHED and other events: just update user object
+        // TOKEN_REFRESHED and other events: update user object only if the
+        // payload actually changed. A full JSON comparison avoids creating a
+        // new object reference (and triggering a React re-render cascade) on
+        // the frequent token refreshes (~60 min / tab focus). This covers
+        // all fields including user_metadata, app_metadata, aud, and role.
+        // The comparison runs at most once per hour — negligible cost.
         if (isMountedRef.current) {
-          setUser(authUser)
+          setUser((prev) => {
+            if (!prev) return authUser
+            try {
+              return JSON.stringify(prev) === JSON.stringify(authUser) ? prev : authUser
+            } catch {
+              // Safety fallback: if serialization fails, always update
+              return authUser
+            }
+          })
         }
       }
     })

@@ -104,11 +104,11 @@ async function fetchProducts(currency: string) {
 
     prodError = legacy.error;
     // Add missing fields with defaults
-    products = (legacy.data ?? []).map((p: Record<string, unknown>) => ({
+    products = (legacy.data ?? []).map((p) => ({
       ...p,
-      category_slug: null,
+      category_slug: null as string | null,
       is_marketing_visible: true,
-    }));
+    })) as typeof products;
   }
 
   if (prodError) {

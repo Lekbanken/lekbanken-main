@@ -155,7 +155,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ dia
     const host = _req.headers.get('host') ?? 'localhost:3000';
     const baseUrl = `${proto}://${host}`;
 
-    svg = renderSpatialSvg(artifact.document as SpatialDocumentV1, {
+    svg = renderSpatialSvg(artifact.document as unknown as SpatialDocumentV1, {
       baseUrl,
       includeGrid: false,
     });

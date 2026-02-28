@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     description: body.description?.trim() || null,
     status: body.status || 'active',
     capabilities: Array.isArray(body.capabilities) ? body.capabilities : [],
-    product_key: body.product_key!.trim(),
+    product_key: body.product_key!.trim().toLowerCase(),
   } as const
 
   const { data, error } = await supabase

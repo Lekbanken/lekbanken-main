@@ -4,14 +4,13 @@ type ProductInsert = Database['public']['Tables']['products']['Insert']
 type ValidationResult = { ok: true } | { ok: false; errors: string[] }
 type ValidateMode = 'create' | 'update'
 
+/** Matches lowercase alphanumeric slug: "teambuilding", "autism-npf" */
+export const PRODUCT_KEY_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
 const allowedStatuses = ['active', 'inactive']
 
-function pushIf(errors: string[], condition: boolean, message: string) {
-  if (condition) errors.push(message)
-}
-
-function isArray(value: unknown): value is unknown[] {
-  return Array.isArray(value)
+function isStr(v: unknown): v is string {
+  return typeof v === 'string'
 }
 
 export function validateProductPayload(
@@ -21,30 +20,53 @@ export function validateProductPayload(
   const mode = options.mode || 'create'
   const errors: string[] = []
 
+  // ── required fields (create only) ────────────────────────────
   if (mode === 'create') {
-    pushIf(errors, !payload.name || payload.name.trim().length === 0, 'name is required')
-    pushIf(errors, !payload.product_key || payload.product_key.trim().length === 0, 'product_key is required')
-    pushIf(errors, !payload.category || payload.category.trim().length === 0, 'category is required')
+    if (!isStr(payload.name) || payload.name.trim().length === 0) {
+      errors.push('name is required')
+    }
+    if (!isStr(payload.product_key) || payload.product_key.trim().length === 0) {
+      errors.push('product_key is required')
+    }
+    if (!isStr(payload.category) || payload.category.trim().length === 0) {
+      errors.push('category is required')
+    }
   } else {
-    if (payload.name !== undefined && payload.name.trim().length === 0) {
-      errors.push('name cannot be empty')
+    // update: reject empty strings if the field is present
+    if (payload.name !== undefined) {
+      if (!isStr(payload.name) || payload.name.trim().length === 0) {
+        errors.push('name cannot be empty')
+      }
     }
-    if (payload.category !== undefined && payload.category.trim().length === 0) {
-      errors.push('category cannot be empty')
+    if (payload.category !== undefined) {
+      if (!isStr(payload.category) || payload.category.trim().length === 0) {
+        errors.push('category cannot be empty')
+      }
     }
   }
 
-  if (payload.status && !allowedStatuses.includes(payload.status)) {
-    errors.push(`status must be one of: ${allowedStatuses.join(', ')}`)
-  }
-
-  if (payload.capabilities !== undefined && !isArray(payload.capabilities)) {
-    errors.push('capabilities must be an array')
-  }
-
+  // ── product_key format (both create + update) ────────────────
   if (payload.product_key !== undefined) {
-    if (payload.product_key === null || payload.product_key.trim().length === 0) {
+    if (!isStr(payload.product_key) || payload.product_key.trim().length === 0) {
       errors.push('product_key cannot be empty')
+    } else if (!PRODUCT_KEY_RE.test(payload.product_key.trim().toLowerCase())) {
+      errors.push('product_key must be a lowercase slug (a-z, 0-9, hyphens)')
+    }
+  }
+
+  // ── status ───────────────────────────────────────────────────
+  if (payload.status !== undefined) {
+    if (!isStr(payload.status) || !allowedStatuses.includes(payload.status)) {
+      errors.push(`status must be one of: ${allowedStatuses.join(', ')}`)
+    }
+  }
+
+  // ── capabilities ─────────────────────────────────────────────
+  if (payload.capabilities !== undefined) {
+    if (!Array.isArray(payload.capabilities)) {
+      errors.push('capabilities must be an array')
+    } else if (!payload.capabilities.every((x) => typeof x === 'string')) {
+      errors.push('capabilities must be string[]')
     }
   }
 

@@ -4,6 +4,7 @@ import { createServerRlsClient } from "@/lib/supabase/server";
 import { PricingProductCard } from "../pricing-components";
 import { getCategoryVisuals } from "../pricing-shared";
 import type { ProductCard } from "../pricing-shared";
+import StickyMobileCTA from "./sticky-mobile-cta";
 import {
   ChevronRightIcon,
   ArrowLeftIcon,
@@ -397,12 +398,14 @@ export default async function CategoryDetail({
                 </ul>
 
                 {/* Primary CTA */}
-                <Link
-                  href={`/checkout/start?product=${category.bundle_product_id}`}
-                  className={`mt-5 flex w-full items-center justify-center rounded-xl bg-gradient-to-r ${gradient} px-5 py-3 text-base font-bold text-white shadow-md transition-all hover:shadow-lg hover:scale-[1.02]`}
-                >
-                  {t("categoryPage.buyBundle")}
-                </Link>
+                <div id="sticky-sentinel">
+                  <Link
+                    href={`/checkout/start?product=${category.bundle_product_id}`}
+                    className={`mt-5 flex w-full items-center justify-center rounded-xl bg-gradient-to-r ${gradient} px-5 py-3 text-base font-bold text-white shadow-md transition-all hover:shadow-lg hover:scale-[1.02]`}
+                  >
+                    {t("categoryPage.buyBundle")}
+                  </Link>
+                </div>
 
                 {/* Secondary CTA — scroll to grid */}
                 <a
@@ -423,7 +426,7 @@ export default async function CategoryDetail({
         className="mx-auto max-w-7xl scroll-mt-8 px-4 pb-16 sm:px-6 lg:px-8"
       >
         {products.length > 0 ? (
-          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="mt-8 grid grid-cols-1 gap-5 pb-20 lg:pb-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {products.map((product) => (
               <PricingProductCard key={product.id} product={product} />
             ))}
@@ -451,6 +454,19 @@ export default async function CategoryDetail({
           </Link>
         </div>
       </div>
+
+      {/* Sticky mobile CTA (bundle only) */}
+      {category.bundle_product_id && bundlePrice && (
+        <StickyMobileCTA
+          priceLabel={formatPrice(bundlePrice.amount, bundlePrice.currency)}
+          savingsPercent={savingsPct}
+          ctaLabel={t("categoryPage.buyBundle")}
+          ctaHref={`/checkout/start?product=${category.bundle_product_id}`}
+          secondaryLabel={t("categoryPage.seeLicenses")}
+          secondaryHref="#licenses"
+          gradient={gradient}
+        />
+      )}
     </div>
   );
 }

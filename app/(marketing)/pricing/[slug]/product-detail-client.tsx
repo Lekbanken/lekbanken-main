@@ -20,6 +20,7 @@ import { StarIcon } from '@heroicons/react/20/solid'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import StickyMobileCTA from './sticky-mobile-cta'
 
 // -----------------------------------------------------------------------------
 // Types
@@ -327,7 +328,7 @@ export default function ProductDetailClient({
           </section>
 
           {/* CTA Buttons */}
-          <div className="mt-10 space-y-4">
+          <div id="sticky-sentinel" className="mt-10 space-y-4">
             <Button
               onClick={handleBuyClick}
               className="w-full bg-indigo-600 py-6 text-lg font-medium hover:bg-indigo-700"
@@ -539,7 +540,7 @@ export default function ProductDetailClient({
 
       {/* Back to all products */}
       <section className="border-t border-slate-100 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-12 pb-28 text-center sm:px-6 lg:px-8 lg:pb-12">
           <Link
             href="/pricing"
             className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500"
@@ -548,6 +549,23 @@ export default function ProductDetailClient({
           </Link>
         </div>
       </section>
+
+      {/* Sticky mobile CTA */}
+      {defaultPrice && (
+        <StickyMobileCTA
+          priceLabel={formatPrice(defaultPrice.amount, defaultPrice.currency, defaultPrice.interval)}
+          ctaLabel={t('buyNow')}
+          ctaHref={`/checkout/start?product=${product.id}&price=${defaultPrice.id}`}
+          secondaryLabel={
+            crossSell
+              ? t('crossSell.partOf', { category: crossSell.categoryName })
+              : undefined
+          }
+          secondaryHref={
+            crossSell ? `/pricing/${crossSell.categorySlug}` : undefined
+          }
+        />
+      )}
     </div>
   )
 }

@@ -10288,6 +10288,12 @@
         "perYear": "/år",
         "bundleIncludes": "Inkluderer alle {count} produkter",
         "buyBundle": "Kjøp hele pakken",
+        "saveBadge": "Spar {percent}%",
+        "individualTotal": "kjøpt individuelt",
+        "gamesIncluded": "{count} leker inkludert",
+        "singleLicense": "Én lisens – alt inkludert",
+        "licensesIncluded": "{count} lisenser inkludert",
+        "seeLicenses": "Se alle lisenser",
         "backToAll": "Alle kategorier"
       },
       "products": {

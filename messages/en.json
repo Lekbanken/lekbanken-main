@@ -9949,6 +9949,12 @@
         "perYear": "/year",
         "bundleIncludes": "Includes all {count} products",
         "buyBundle": "Buy the full bundle",
+        "saveBadge": "Save {percent}%",
+        "individualTotal": "bought individually",
+        "gamesIncluded": "{count} games included",
+        "singleLicense": "One license – everything included",
+        "licensesIncluded": "{count} licenses included",
+        "seeLicenses": "See all licenses",
         "backToAll": "All categories"
       },
       "products": {

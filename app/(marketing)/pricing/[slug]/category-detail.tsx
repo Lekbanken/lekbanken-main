@@ -7,6 +7,7 @@ import type { ProductCard } from "../pricing-shared";
 import {
   ChevronRightIcon,
   ArrowLeftIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 
 // Cache category pages for 5 minutes (same as /api/public/categories)
@@ -141,6 +142,51 @@ async function fetchGameCount(categorySlug: string): Promise<number> {
   return games?.length ?? 0;
 }
 
+async function fetchIndividualYearlySum(
+  categorySlug: string,
+  currency: string
+): Promise<{ sum: number; pricedCount: number }> {
+  const supabase = await createServerRlsClient();
+
+  const { data: products } = await supabase
+    .from("products")
+    .select("id")
+    .eq("category_slug", categorySlug)
+    .eq("status", "active")
+    .eq("is_marketing_visible", true)
+    .eq("is_bundle", false);
+
+  if (!products || products.length === 0) return { sum: 0, pricedCount: 0 };
+
+  const { data: prices } = await supabase
+    .from("product_prices")
+    .select("product_id,amount")
+    .eq("active", true)
+    .eq("currency", currency)
+    .eq("interval", "year")
+    .in(
+      "product_id",
+      products.map((p) => p.id)
+    )
+    .order("is_default", { ascending: false })
+    .order("amount", { ascending: true });
+
+  if (!prices || prices.length === 0) return { sum: 0, pricedCount: 0 };
+
+  // Best yearly price per product (first hit = default-preferred, cheapest)
+  const bestYearly = new Map<string, number>();
+  for (const pr of prices) {
+    if (!bestYearly.has(pr.product_id)) {
+      bestYearly.set(pr.product_id, pr.amount);
+    }
+  }
+
+  let sum = 0;
+  for (const amount of bestYearly.values()) sum += amount;
+
+  return { sum, pricedCount: bestYearly.size };
+}
+
 // =============================================================================
 // Price formatter
 // =============================================================================
@@ -166,13 +212,27 @@ export default async function CategoryDetail({
   const currency = "SEK";
   const t = await getTranslations("marketing.pricing");
 
-  const [products, bundlePrice, gameCount] = await Promise.all([
+  const [products, bundlePrice, gameCount, individualSum] = await Promise.all([
     fetchCategoryProducts(category.slug, currency),
     category.bundle_product_id
       ? fetchBundlePrice(category.bundle_product_id, currency)
       : Promise.resolve(null),
     fetchGameCount(category.slug),
+    category.bundle_product_id
+      ? fetchIndividualYearlySum(category.slug, currency)
+      : Promise.resolve({ sum: 0, pricedCount: 0 }),
   ]);
+
+  // Calculate savings percentage
+  // Only show when ALL products have yearly prices (prevents misleading partial data)
+  const allProductsPriced = individualSum.pricedCount === products.length;
+  const savingsPct =
+    bundlePrice &&
+    allProductsPriced &&
+    individualSum.sum > 0 &&
+    bundlePrice.amount < individualSum.sum
+      ? Math.round((1 - bundlePrice.amount / individualSum.sum) * 100)
+      : null;
 
   const { Icon, gradient } = getCategoryVisuals(category.icon_key);
 
@@ -199,72 +259,169 @@ export default async function CategoryDetail({
         </ol>
       </nav>
 
-      {/* Category Hero */}
-      <header className="mx-auto max-w-7xl px-4 pt-8 pb-6 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-start gap-4">
-            <div
-              className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${gradient} shadow-lg`}
-            >
-              <Icon className="h-7 w-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                {category.name}
-              </h1>
-              {category.description_short && (
-                <p className="mt-2 max-w-2xl text-base text-muted-foreground">
-                  {category.description_short}
-                </p>
-              )}
-              <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="font-medium">
-                  {products.length} {t("categoryPage.products")}
-                </span>
-                <span className="text-border">·</span>
-                {gameCount > 0 ? (
-                  <span className="font-medium">
-                    {gameCount} {t("categoryPage.games")}
-                  </span>
-                ) : (
-                  <span className="italic text-muted-foreground/60">
-                    {t("categoryPage.gamesComingSoon")}
-                  </span>
+      {/* Category Sales Hero */}
+      <header className="mx-auto max-w-7xl px-4 pt-8 pb-10 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+          {/* Left: Category info + stat chips */}
+          <div className="flex-1">
+            <div className="flex items-start gap-4">
+              <div
+                className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${gradient} shadow-lg`}
+              >
+                <Icon className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                  {category.name}
+                </h1>
+                {category.description_short && (
+                  <p className="mt-2 max-w-xl text-lg leading-relaxed text-muted-foreground">
+                    {category.description_short}
+                  </p>
                 )}
               </div>
             </div>
+
+            {/* Stat chips */}
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3.5 py-1.5 text-sm font-medium text-foreground">
+                {products.length} {t("categoryPage.products")}
+              </span>
+              {gameCount > 0 ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3.5 py-1.5 text-sm font-medium text-foreground">
+                  {gameCount} {t("categoryPage.games")}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted/60 px-3.5 py-1.5 text-sm italic text-muted-foreground">
+                  {t("categoryPage.gamesComingSoon")}
+                </span>
+              )}
+            </div>
+
+            {/* Feature list (when bundle exists) */}
+            {category.bundle_product_id && bundlePrice && (
+              <ul className="mt-6 space-y-2">
+                <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <CheckCircleIcon className="h-5 w-5 flex-shrink-0 text-primary" />
+                  {t("categoryPage.bundleIncludes", {
+                    count: products.length,
+                  })}
+                </li>
+                {gameCount > 0 && (
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircleIcon className="h-5 w-5 flex-shrink-0 text-primary" />
+                    {t("categoryPage.gamesIncluded", { count: gameCount })}
+                  </li>
+                )}
+                <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <CheckCircleIcon className="h-5 w-5 flex-shrink-0 text-primary" />
+                  {t("categoryPage.singleLicense")}
+                </li>
+              </ul>
+            )}
           </div>
 
-          {/* Bundle CTA */}
+          {/* Right: Bundle Sales Card */}
           {category.bundle_product_id && bundlePrice && (
-            <div className="flex-shrink-0 rounded-2xl border border-border bg-card p-5 shadow-sm sm:min-w-[280px]">
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("categoryPage.bundleLabel")}
-              </p>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-foreground">
-                  {formatPrice(bundlePrice.amount, bundlePrice.currency)}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  {t("categoryPage.perYear")}
-                </span>
+            <div className="flex-shrink-0 overflow-hidden rounded-2xl border-2 border-primary/20 bg-card shadow-lg sm:min-w-[320px] lg:max-w-[380px]">
+              {/* Savings badge banner */}
+              {savingsPct != null && savingsPct > 0 && (
+                <div
+                  className={`bg-gradient-to-r ${gradient} px-5 py-2.5 text-center`}
+                >
+                  <span className="text-sm font-bold tracking-wide text-white">
+                    {t("categoryPage.saveBadge", { percent: savingsPct })}
+                  </span>
+                </div>
+              )}
+
+              <div className="p-6">
+                <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t("categoryPage.bundleLabel")}
+                </p>
+
+                {/* Price display */}
+                <div className="mt-3">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-extrabold text-foreground">
+                      {formatPrice(
+                        bundlePrice.amount,
+                        bundlePrice.currency
+                      )}
+                    </span>
+                    <span className="text-base text-muted-foreground">
+                      {t("categoryPage.perYear")}
+                    </span>
+                  </div>
+
+                  {/* Strikethrough individual sum — only when all products have prices */}
+                  {allProductsPriced &&
+                    individualSum.sum > 0 &&
+                    individualSum.sum > bundlePrice.amount && (
+                      <p className="mt-1.5 text-sm text-muted-foreground">
+                        <span className="line-through decoration-muted-foreground/50">
+                          {formatPrice(
+                            individualSum.sum,
+                            bundlePrice.currency
+                          )}
+                        </span>{" "}
+                        {t("categoryPage.individualTotal")}
+                      </p>
+                    )}
+                </div>
+
+                {/* Value snapshot */}
+                <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <CheckCircleIcon className="h-4 w-4 flex-shrink-0 text-primary" />
+                    {t("categoryPage.licensesIncluded", {
+                      count: products.length,
+                    })}
+                  </li>
+                  {gameCount > 0 && (
+                    <li className="flex items-center gap-2">
+                      <CheckCircleIcon className="h-4 w-4 flex-shrink-0 text-primary" />
+                      {t("categoryPage.gamesIncluded", {
+                        count: gameCount,
+                      })}
+                    </li>
+                  )}
+                  {savingsPct != null && savingsPct > 0 && (
+                    <li className="flex items-center gap-2">
+                      <CheckCircleIcon className="h-4 w-4 flex-shrink-0 text-primary" />
+                      {t("categoryPage.saveBadge", {
+                        percent: savingsPct,
+                      })}
+                    </li>
+                  )}
+                </ul>
+
+                {/* Primary CTA */}
+                <Link
+                  href={`/checkout/start?product=${category.bundle_product_id}`}
+                  className={`mt-5 flex w-full items-center justify-center rounded-xl bg-gradient-to-r ${gradient} px-5 py-3 text-base font-bold text-white shadow-md transition-all hover:shadow-lg hover:scale-[1.02]`}
+                >
+                  {t("categoryPage.buyBundle")}
+                </Link>
+
+                {/* Secondary CTA — scroll to grid */}
+                <a
+                  href="#licenses"
+                  className="mt-2.5 flex w-full items-center justify-center rounded-xl border border-border px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+                >
+                  {t("categoryPage.seeLicenses")}
+                </a>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {t("categoryPage.bundleIncludes", { count: products.length })}
-              </p>
-              <Link
-                href={`/checkout/start?product=${category.bundle_product_id}`}
-                className={`mt-4 flex w-full items-center justify-center rounded-lg bg-gradient-to-r ${gradient} px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md`}
-              >
-                {t("categoryPage.buyBundle")}
-              </Link>
             </div>
           )}
         </div>
       </header>
 
       {/* Product Grid */}
-      <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+      <div
+        id="licenses"
+        className="mx-auto max-w-7xl scroll-mt-8 px-4 pb-16 sm:px-6 lg:px-8"
+      >
         {products.length > 0 ? (
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {products.map((product) => (

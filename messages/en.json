@@ -6185,6 +6185,7 @@
       "colPublic": "Visible",
       "colProducts": "Products",
       "colBundle": "Bundle product",
+      "bundleNone": "No bundle",
       "colActions": "Actions",
       "visible": "Visible",
       "hidden": "Hidden",

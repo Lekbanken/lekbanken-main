@@ -11,8 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
   Input,
+  Select,
   useToast,
 } from '@/components/ui';
+import type { SelectOption } from '@/components/ui/select';
 import type { CreateCategoryInput } from './types';
 
 // ---------------------------------------------------------------------------
@@ -44,13 +46,14 @@ type CategoryCreateDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  bundleOptions?: SelectOption[];
 };
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export function CategoryCreateDialog({ open, onOpenChange, onSuccess }: CategoryCreateDialogProps) {
+export function CategoryCreateDialog({ open, onOpenChange, onSuccess, bundleOptions = [] }: CategoryCreateDialogProps) {
   const t = useTranslations('admin.categories');
   const toast = useToast();
 
@@ -224,13 +227,23 @@ export function CategoryCreateDialog({ open, onOpenChange, onSuccess }: Category
             <label htmlFor="cat-bundle" className="text-sm font-medium">
               {t('colBundle')}
             </label>
-            <Input
-              id="cat-bundle"
-              value={bundleProductId}
-              onChange={(e) => setBundleProductId(e.target.value)}
-              placeholder="UUID"
-              className="font-mono text-sm"
-            />
+            {bundleOptions.length > 0 ? (
+              <Select
+                options={bundleOptions}
+                value={bundleProductId}
+                onChange={(e) => setBundleProductId(e.target.value)}
+                placeholder={t('bundleNone')}
+                className="text-sm"
+              />
+            ) : (
+              <Input
+                id="cat-bundle"
+                value={bundleProductId}
+                onChange={(e) => setBundleProductId(e.target.value)}
+                placeholder="UUID"
+                className="font-mono text-sm"
+              />
+            )}
           </div>
         </div>
 

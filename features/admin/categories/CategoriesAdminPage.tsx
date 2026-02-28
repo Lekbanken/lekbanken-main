@@ -29,8 +29,10 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  Select,
   useToast,
 } from '@/components/ui';
+import type { SelectOption } from '@/components/ui/select';
 import type { CategoryAdminRow, SyncBundleResult } from './types';
 import { CategoryCreateDialog } from './CategoryCreateDialog';
 
@@ -48,11 +50,13 @@ function CategoryEditRow({
   onSave,
   onCancel,
   t,
+  bundleOptions,
 }: {
   category: CategoryAdminRow;
   onSave: (id: string, updates: Partial<EditableFields>) => Promise<void>;
   onCancel: () => void;
   t: ReturnType<typeof useTranslations>;
+  bundleOptions: SelectOption[];
 }) {
   const [fields, setFields] = useState<EditableFields>({
     name: category.name,
@@ -128,13 +132,17 @@ function CategoryEditRow({
       </td>
       <td className="px-4 py-2 text-sm text-muted-foreground">{category.product_count}</td>
       <td className="px-4 py-2">
-        <Input
+        <Select
+          options={bundleOptions}
           value={fields.bundle_product_id ?? ''}
           onChange={(e) =>
-            setFields((f) => ({ ...f, bundle_product_id: e.target.value || null }))
+            setFields((f) => ({
+              ...f,
+              bundle_product_id: e.target.value || null,
+            }))
           }
-          className="h-8 text-sm w-36 font-mono"
-          placeholder="—"
+          placeholder={t('bundleNone')}
+          className="h-8 text-sm w-48"
         />
       </td>
       <td className="px-4 py-2">
@@ -165,6 +173,35 @@ export function CategoriesAdminPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [syncingSlug, setSyncingSlug] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [bundleOptions, setBundleOptions] = useState<SelectOption[]>([]);
+
+  // ── Fetch bundle options (once) ─────────────────────────────────────────────
+  useEffect(() => {
+    async function loadBundles() {
+      try {
+        const res = await fetch('/api/admin/products/bundles');
+        if (!res.ok) return;
+        const json = await res.json();
+        const options: SelectOption[] = [
+          { value: '', label: t('bundleNone') },
+          ...((json.bundles ?? []) as Array<{
+            id: string;
+            name: string;
+            yearlyPriceFormatted: string | null;
+          }>).map((b) => ({
+            value: b.id,
+            label: b.yearlyPriceFormatted
+              ? `${b.name} (${b.yearlyPriceFormatted})`
+              : b.name,
+          })),
+        ];
+        setBundleOptions(options);
+      } catch {
+        // Silently fail — fallback to empty dropdown
+      }
+    }
+    void loadBundles();
+  }, [t]);
 
   // ── Fetch categories ──────────────────────────────────────────────────────
   const fetchCategories = useCallback(async () => {
@@ -337,6 +374,7 @@ export function CategoriesAdminPage() {
                         onSave={handleSave}
                         onCancel={() => setEditingId(null)}
                         t={t}
+                        bundleOptions={bundleOptions}
                       />
                     ) : (
                       <tr key={cat.id} className="hover:bg-muted/30 transition-colors">
@@ -361,9 +399,10 @@ export function CategoriesAdminPage() {
                         <td className="px-4 py-3">
                           <Badge variant="outline">{cat.product_count}</Badge>
                         </td>
-                        <td className="px-4 py-3 text-xs font-mono text-muted-foreground max-w-[120px] truncate">
+                        <td className="px-4 py-3 text-sm text-muted-foreground max-w-[180px] truncate">
                           {cat.bundle_product_id
-                            ? cat.bundle_product_id.slice(0, 8) + '…'
+                            ? bundleOptions.find((o) => o.value === cat.bundle_product_id)?.label ??
+                              cat.bundle_product_id.slice(0, 8) + '…'
                             : '—'}
                         </td>
                         <td className="px-4 py-3">
@@ -405,6 +444,7 @@ export function CategoriesAdminPage() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         onSuccess={fetchCategories}
+        bundleOptions={bundleOptions}
       />
     </AdminPageLayout>
   );

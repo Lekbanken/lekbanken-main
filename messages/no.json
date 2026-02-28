@@ -6481,6 +6481,7 @@
       "colPublic": "Synlig",
       "colProducts": "Produkter",
       "colBundle": "Bundle-produkt",
+      "bundleNone": "Ingen bundle",
       "colActions": "Handlinger",
       "visible": "Synlig",
       "hidden": "Skjult",

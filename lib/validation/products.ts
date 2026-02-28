@@ -42,8 +42,8 @@ export function validateProductPayload(
     errors.push('capabilities must be an array')
   }
 
-  if (payload.product_key !== undefined && payload.product_key !== null) {
-    if (payload.product_key.trim().length === 0) {
+  if (payload.product_key !== undefined) {
+    if (payload.product_key === null || payload.product_key.trim().length === 0) {
       errors.push('product_key cannot be empty')
     }
   }

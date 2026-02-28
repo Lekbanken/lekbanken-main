@@ -62,7 +62,7 @@ export async function PATCH(
     updates.capabilities = Array.isArray(body.capabilities) ? body.capabilities : []
   }
   if (body.product_key !== undefined) {
-    updates.product_key = body.product_key?.trim() || undefined
+    updates.product_key = body.product_key!.trim()
   }
 
   const { data, error } = await supabase
@@ -73,6 +73,13 @@ export async function PATCH(
     .single()
 
   if (error) {
+    // 23505 = unique_violation (product_key already exists)
+    if (error.code === '23505') {
+      return NextResponse.json(
+        { error: `product_key "${updates.product_key}" already exists` },
+        { status: 409 },
+      )
+    }
     console.error('[api/products/:id] update error', error)
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })
   }

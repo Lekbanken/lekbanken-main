@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     description: body.description?.trim() || null,
     status: body.status || 'active',
     capabilities: Array.isArray(body.capabilities) ? body.capabilities : [],
-    product_key: body.product_key?.trim() || '',
+    product_key: body.product_key!.trim(),
   } as const
 
   const { data, error } = await supabase
@@ -65,6 +65,13 @@ export async function POST(request: Request) {
     .single()
 
   if (error) {
+    // 23505 = unique_violation (product_key already exists)
+    if (error.code === '23505') {
+      return NextResponse.json(
+        { error: `product_key "${payload.product_key}" already exists` },
+        { status: 409 },
+      )
+    }
     console.error('[api/products] insert error', error)
     return NextResponse.json({ error: 'Failed to create product' }, { status: 500 })
   }

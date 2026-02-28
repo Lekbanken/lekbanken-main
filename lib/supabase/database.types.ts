@@ -8941,7 +8941,7 @@ export type Database = {
           max_seats: number | null
           min_seats: number | null
           name: string
-          product_key: string | null
+          product_key: string
           product_type: string | null
           statement_descriptor: string | null
           status: string
@@ -8968,7 +8968,7 @@ export type Database = {
           max_seats?: number | null
           min_seats?: number | null
           name: string
-          product_key?: string | null
+          product_key: string
           product_type?: string | null
           statement_descriptor?: string | null
           status?: string
@@ -8995,7 +8995,7 @@ export type Database = {
           max_seats?: number | null
           min_seats?: number | null
           name?: string
-          product_key?: string | null
+          product_key?: string
           product_type?: string | null
           statement_descriptor?: string | null
           status?: string

@@ -190,7 +190,7 @@ export type AuditEventType =
 export type ProductAdminRow = {
   // Core identifiers
   id: string;
-  product_key: string | null;
+  product_key: string;
   name: string;
   internal_description: string | null;
   customer_description: string | null;

@@ -13,7 +13,7 @@ type TenantRole = Database["public"]["Tables"]["user_tenant_memberships"]["Inser
 export type ProductRow = {
   id: string;
   name: string | null;
-  product_key: string | null;
+  product_key: string;
 };
 
 export type EntitlementRow = {

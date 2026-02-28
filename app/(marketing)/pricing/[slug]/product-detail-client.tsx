@@ -14,6 +14,7 @@ import {
   ShieldCheckIcon,
   AcademicCapIcon,
   HeartIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/outline'
 import { StarIcon } from '@heroicons/react/20/solid'
 
@@ -23,6 +24,14 @@ import { Badge } from '@/components/ui/badge'
 // -----------------------------------------------------------------------------
 // Types
 // -----------------------------------------------------------------------------
+
+export type CrossSellData = {
+  categoryName: string
+  categorySlug: string
+  savingsPercent: number | null
+  bundlePriceFormatted: string
+  productCount: number
+}
 
 type PricingApiProduct = {
   id: string
@@ -151,7 +160,13 @@ function getCategoryIcon(category: string | null) {
 // Component
 // -----------------------------------------------------------------------------
 
-export default function ProductDetailClient({ slug }: { slug: string }) {
+export default function ProductDetailClient({
+  slug,
+  crossSell,
+}: {
+  slug: string
+  crossSell?: CrossSellData | null
+}) {
   const router = useRouter()
   const t = useTranslations('marketing.pricing.detail')
 
@@ -332,6 +347,34 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
               <span>{t('guarantee')}</span>
             </div>
           </div>
+
+          {/* Cross-sell block */}
+          {crossSell && (
+            <div className="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5">
+              <p className="text-sm font-semibold text-slate-900">
+                {t('crossSell.partOf', { category: crossSell.categoryName })}
+              </p>
+              <p className="mt-1.5 text-sm text-slate-600">
+                {crossSell.savingsPercent != null && crossSell.savingsPercent > 0
+                  ? t('crossSell.savePercent', {
+                      percent: crossSell.savingsPercent,
+                      price: crossSell.bundlePriceFormatted,
+                      count: crossSell.productCount,
+                    })
+                  : t('crossSell.bundleAvailable', {
+                      price: crossSell.bundlePriceFormatted,
+                      count: crossSell.productCount,
+                    })}
+              </p>
+              <Link
+                href={`/pricing/${crossSell.categorySlug}`}
+                className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
+              >
+                {t('crossSell.viewBundle')}
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Product image / preview (right column) */}

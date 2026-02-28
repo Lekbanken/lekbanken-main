@@ -10837,6 +10837,12 @@
         "guarantee": "30 dagars nöjdhetsgaranti",
         "contactUs": "Kontakta oss",
         "activityPreview": "Förhandsvisning av aktiviteter",
+        "crossSell": {
+          "partOf": "Ingår i {category}",
+          "savePercent": "Köp hela paketet ({count} licenser) för {price} och spara {percent}%.",
+          "bundleAvailable": "Finns som paket ({count} licenser) för {price}.",
+          "viewBundle": "Se hela paketet"
+        },
         "viewAllProducts": "Visa alla produkter",
         "benefits": {
           "title": "Fördelar",

@@ -10034,6 +10034,12 @@
         "guarantee": "30-day satisfaction guarantee",
         "contactUs": "Contact us",
         "activityPreview": "Activity preview",
+        "crossSell": {
+          "partOf": "Part of {category}",
+          "savePercent": "Buy the full bundle ({count} licenses) for {price} and save {percent}%.",
+          "bundleAvailable": "Available as a bundle ({count} licenses) for {price}.",
+          "viewBundle": "See the full bundle"
+        },
         "viewAllProducts": "View all products",
         "benefits": {
           "title": "Benefits",

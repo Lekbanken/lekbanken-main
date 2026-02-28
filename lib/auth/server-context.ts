@@ -73,7 +73,11 @@ const getServerUserDataCached = cache(async (): Promise<ServerUserData> => {
 
   const [profileResult, membershipsResult] = await Promise.all([
     supabase.from('users').select('*').eq('id', user.id).maybeSingle(),
-    supabase.from('user_tenant_memberships').select('*, tenant:tenants(*)').eq('user_id', user.id),
+    supabase
+      .from('user_tenant_memberships')
+      .select('*, tenant:tenants(*)')
+      .eq('user_id', user.id)
+      .or('status.eq.active,status.is.null'),
   ])
 
   // Build profile from DB or fallback to auth user metadata

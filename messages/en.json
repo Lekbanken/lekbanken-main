@@ -6804,6 +6804,7 @@
     },
     "participants": {
       "title": "Participants",
+      "pageTitle": "Participants",
       "noAccess": "No access",
       "noPermissionParticipants": "You need permission to view participants.",
       "notFound": "Participant not found",
@@ -6841,18 +6842,28 @@
       "riskFilter": {
         "all": "All risk levels",
         "low": "Low risk",
-        "high": "High risk"
+        "high": "High risk",
+        "placeholder": "Filter risk level"
       },
       "emptyState": {
         "title": "No participants",
-        "description": "Adjust filters or try again later."
+        "description": "Adjust filters or try again later.",
+        "noParticipants": "No participants",
+        "noParticipantsDescription": "Adjust filters or try again later.",
+        "noAccess": "No access",
+        "noAccessDescription": "You need permission to view participants."
       },
       "columns": {
         "name": "Name",
         "email": "Email",
         "tenant": "Tenant",
         "risk": "Risk",
-        "lastActive": "Last active"
+        "lastActive": "Last active",
+        "missing": "Missing",
+        "global": "Global"
+      },
+      "errorState": {
+        "title": "Something went wrong"
       },
       "riskLabels": {
         "high": "High",
@@ -8089,6 +8100,12 @@
     }
   },
   "app": {
+    "errorBoundary": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again, or reload the page.",
+      "retry": "Try again",
+      "reload": "Reload page"
+    },
     "invoices": {
       "title": "My Invoices",
       "description": "View and download your invoices.",

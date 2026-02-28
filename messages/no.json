@@ -7096,6 +7096,7 @@
     },
     "participants": {
       "title": "Deltakere",
+      "pageTitle": "Deltakere",
       "noAccess": "Ingen tilgang",
       "noPermissionParticipants": "Du trenger tillatelse for å se deltakere.",
       "notFound": "Deltakeren ble ikke funnet",
@@ -7133,18 +7134,28 @@
       "riskFilter": {
         "all": "Alle risikonivåer",
         "low": "Lav risiko",
-        "high": "Høy risiko"
+        "high": "Høy risiko",
+        "placeholder": "Filtrer risikonivå"
       },
       "emptyState": {
         "title": "Ingen deltakere",
-        "description": "Juster filtre eller prøv igjen senere."
+        "description": "Juster filtre eller prøv igjen senere.",
+        "noParticipants": "Ingen deltakere",
+        "noParticipantsDescription": "Juster filtre eller prøv igjen senere.",
+        "noAccess": "Ingen tilgang",
+        "noAccessDescription": "Du trenger tillatelse for å se deltakere."
       },
       "columns": {
         "name": "Navn",
         "email": "E-post",
         "tenant": "Tenant",
         "risk": "Risiko",
-        "lastActive": "Sist aktiv"
+        "lastActive": "Sist aktiv",
+        "missing": "Mangler",
+        "global": "Global"
+      },
+      "errorState": {
+        "title": "Noe gikk galt"
       },
       "riskLabels": {
         "high": "Høy",
@@ -8379,6 +8390,12 @@
     }
   },
   "app": {
+    "errorBoundary": {
+      "title": "Noe gikk galt",
+      "description": "En uventet feil oppstod. Prøv igjen, eller last inn siden på nytt.",
+      "retry": "Prøv igjen",
+      "reload": "Last inn siden på nytt"
+    },
     "invoices": {
       "title": "Mine fakturaer",
       "description": "Se og last ned fakturaene dine.",

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useSyncExternalStore } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 import { createBrowserClient } from '@/lib/supabase/client'
@@ -15,30 +15,45 @@ interface BrowserSupabaseState {
   error: Error | null
 }
 
+// Module-level singleton state — determined once, never changes
+let clientState: BrowserSupabaseState | null = null
+
+function getClientState(): BrowserSupabaseState {
+  if (clientState) return clientState
+  try {
+    clientState = { supabase: createBrowserClient(), error: null }
+  } catch (err) {
+    clientState = { supabase: null, error: toError(err) }
+  }
+  return clientState
+}
+
+// Server snapshot: always null (matches SSR output)
+const serverSnapshot: BrowserSupabaseState = { supabase: null, error: null }
+
+// No-op subscribe: the state never changes after initial creation
+const noop = () => () => {}
+
 /**
- * Lazy-initialise the Supabase browser client.
+ * Access the Supabase browser client.
  *
- * Uses a `useState` initialiser so the client is created synchronously on the
- * first client render (no flash of `null`).  The `typeof window` guard keeps
- * the server-side render safe — during SSR the hook returns `null` and
- * `isInitializing: true`.
+ * Uses `useSyncExternalStore` to safely provide different values during SSR
+ * (null) vs client (singleton instance) without hydration mismatch warnings.
+ * The client is available immediately on the first client render — no
+ * useEffect delay.
  */
 export function useBrowserSupabase() {
-  const [{ supabase, error }] = useState<BrowserSupabaseState>(() => {
-    if (typeof window === 'undefined') {
-      return { supabase: null, error: null }
-    }
-    try {
-      return { supabase: createBrowserClient(), error: null }
-    } catch (err) {
-      return { supabase: null, error: toError(err) }
-    }
-  })
+  const { supabase, error } = useSyncExternalStore(
+    noop,
+    getClientState,
+    () => serverSnapshot
+  )
 
-  return {
+  // Memoize return object to give consumers stable reference
+  return useMemo(() => ({
     supabase,
     error,
     isInitializing: supabase === null && error === null,
-  }
+  }), [supabase, error])
 }
 

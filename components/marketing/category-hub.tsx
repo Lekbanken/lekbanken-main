@@ -70,8 +70,62 @@ const GRADIENT_MAP: Record<string, string> = {
   SparklesIcon: "from-primary to-[#00c7b0]",
 };
 
+/** Subtle border-top / accent color per icon */
+const ACCENT_BORDER_MAP: Record<string, string> = {
+  HeartIcon: "border-t-purple-400",
+  BriefcaseIcon: "border-t-slate-400",
+  ComputerDesktopIcon: "border-t-cyan-400",
+  UsersIcon: "border-t-orange-400",
+  HomeIcon: "border-t-green-400",
+  CalendarDaysIcon: "border-t-indigo-400",
+  GiftIcon: "border-t-pink-400",
+  AcademicCapIcon: "border-t-blue-400",
+  TrophyIcon: "border-t-amber-400",
+  SparklesIcon: "border-t-primary",
+};
+
+/** Icon text color (for icon rendered on light background) */
+const ICON_COLOR_MAP: Record<string, string> = {
+  HeartIcon: "text-purple-500",
+  BriefcaseIcon: "text-slate-500",
+  ComputerDesktopIcon: "text-cyan-500",
+  UsersIcon: "text-orange-500",
+  HomeIcon: "text-green-500",
+  CalendarDaysIcon: "text-indigo-500",
+  GiftIcon: "text-pink-500",
+  AcademicCapIcon: "text-blue-500",
+  TrophyIcon: "text-amber-500",
+  SparklesIcon: "text-primary",
+};
+
+/** Soft tinted icon box background */
+const ICON_BG_MAP: Record<string, string> = {
+  HeartIcon: "bg-purple-100 dark:bg-purple-500/20",
+  BriefcaseIcon: "bg-slate-100 dark:bg-slate-500/20",
+  ComputerDesktopIcon: "bg-cyan-100 dark:bg-cyan-500/20",
+  UsersIcon: "bg-orange-100 dark:bg-orange-500/20",
+  HomeIcon: "bg-green-100 dark:bg-green-500/20",
+  CalendarDaysIcon: "bg-indigo-100 dark:bg-indigo-500/20",
+  GiftIcon: "bg-pink-100 dark:bg-pink-500/20",
+  AcademicCapIcon: "bg-blue-100 dark:bg-blue-500/20",
+  TrophyIcon: "bg-amber-100 dark:bg-amber-500/20",
+  SparklesIcon: "bg-primary/10",
+};
+
 function getGradient(iconKey: string | null): string {
   return (iconKey && GRADIENT_MAP[iconKey]) || "from-primary to-[#00c7b0]";
+}
+
+function getAccentBorder(iconKey: string | null): string {
+  return (iconKey && ACCENT_BORDER_MAP[iconKey]) || "border-t-primary";
+}
+
+function getIconColor(iconKey: string | null): string {
+  return (iconKey && ICON_COLOR_MAP[iconKey]) || "text-primary";
+}
+
+function getIconBg(iconKey: string | null): string {
+  return (iconKey && ICON_BG_MAP[iconKey]) || "bg-primary/10";
 }
 
 // =============================================================================
@@ -108,20 +162,21 @@ function CategoryCard({
   const iconKey = category.icon_key;
   const IconComponent = (iconKey && ICON_MAP[iconKey]) || SparklesIcon;
   const gradient = getGradient(category.icon_key);
+  const accentBorder = getAccentBorder(category.icon_key);
+  const iconColor = getIconColor(category.icon_key);
+  const iconBg = getIconBg(category.icon_key);
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-      {/* Icon + gradient header */}
-      <div
-        className={`flex items-center gap-4 bg-gradient-to-r ${gradient} p-5 text-white`}
-      >
-        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-          <IconComponent className="h-6 w-6" />
+    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border border-t-[3px] ${accentBorder} bg-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg`}>
+      {/* Header — white bg, colored icon box */}
+      <div className="flex items-center gap-4 p-5">
+        <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
+          <IconComponent className={`h-6 w-6 ${iconColor}`} />
         </div>
         <div className="min-w-0">
-          <h3 className="truncate text-lg font-semibold">{category.name}</h3>
+          <h3 className="truncate text-lg font-semibold text-foreground">{category.name}</h3>
           {category.description_short && (
-            <p className="mt-0.5 line-clamp-1 text-sm text-white/80">
+            <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
               {category.description_short}
             </p>
           )}
@@ -129,27 +184,10 @@ function CategoryCard({
       </div>
 
       {/* Body */}
-      <div className="flex flex-1 flex-col p-5">
-        {/* Meta counts */}
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span className="font-medium">
-            {category.product_count} {labels.products}
-          </span>
-          <span className="text-border">·</span>
-          {category.game_count > 0 ? (
-            <span className="font-medium">
-              {category.game_count} {labels.games}
-            </span>
-          ) : (
-            <span className="italic text-muted-foreground/60">
-              {labels.comingSoon}
-            </span>
-          )}
-        </div>
-
+      <div className="flex flex-1 flex-col px-5 pb-5">
         {/* Bundle price */}
         {category.bundle_price_yearly && (
-          <div className="mt-3 text-sm">
+          <div className="text-sm">
             <span className="text-2xl font-bold text-foreground">
               {formatPrice(
                 category.bundle_price_yearly.amount,
@@ -163,24 +201,39 @@ function CategoryCard({
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* CTAs */}
-        <div className="mt-5 flex flex-col gap-2">
+        {/* Game count + View CTA on same row */}
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <span className="text-sm text-muted-foreground">
+            {category.game_count > 0 ? (
+              <span className="font-medium">
+                {category.game_count} {labels.games}
+              </span>
+            ) : (
+              <span className="italic text-muted-foreground/60">
+                {labels.comingSoon}
+              </span>
+            )}
+          </span>
           <Link
             href={`/pricing/${category.slug}`}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
             {labels.view}
-            <ArrowRightIcon className="h-4 w-4" />
+            <ArrowRightIcon className="h-3.5 w-3.5" />
           </Link>
-          {category.bundle_product_id && category.bundle_price_yearly && (
+        </div>
+
+        {/* Buy bundle CTA */}
+        {category.bundle_product_id && category.bundle_price_yearly && (
+          <div className="mt-2">
             <Link
               href={`/checkout/start?product=${category.bundle_product_id}`}
-              className={`inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r ${gradient} px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md`}
+              className={`inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r ${gradient} px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md`}
             >
               {labels.buyBundle}
             </Link>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

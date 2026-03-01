@@ -1,8 +1,13 @@
 "use client";
 
+import { useRef, useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/24/outline";
 import { getCategoryVisuals, ACCENT_BORDER_MAP } from "./pricing-shared";
 import type { ProductCard, CategoryGroup } from "./pricing-shared";
 
@@ -19,14 +24,14 @@ function getAccentBorder(iconKey: string | null): string {
 }
 
 // =============================================================================
-// Mini Product Card (compact, for embedding inside category cards)
+// Product Card (larger, for embedding inside category cards)
 // =============================================================================
 
-function MiniProductCard({ product }: { product: ProductCard }) {
+function SwipeProductCard({ product }: { product: ProductCard }) {
   const { Icon, gradient } = getCategoryVisuals(null, product.categorySlug);
 
   return (
-    <div className="relative flex h-36 w-28 flex-shrink-0 overflow-hidden rounded-xl shadow-sm">
+    <div className="relative flex h-44 w-36 flex-shrink-0 overflow-hidden rounded-xl shadow-sm sm:h-48 sm:w-40">
       {/* Background — image or gradient */}
       <span aria-hidden="true" className="absolute inset-0">
         {product.imageUrl ? (
@@ -35,12 +40,12 @@ function MiniProductCard({ product }: { product: ProductCard }) {
             alt={product.name}
             fill
             className="object-cover"
-            sizes="112px"
+            sizes="160px"
           />
         ) : (
           <div className={`h-full w-full bg-gradient-to-br ${gradient}`}>
             <div className="flex h-full items-center justify-center">
-              <Icon className="h-10 w-10 text-white/30" />
+              <Icon className="h-12 w-12 text-white/30" />
             </div>
           </div>
         )}
@@ -53,8 +58,8 @@ function MiniProductCard({ product }: { product: ProductCard }) {
       />
 
       {/* Product name */}
-      <span className="relative mt-auto p-2">
-        <span className="line-clamp-2 text-xs font-semibold leading-tight text-white drop-shadow-sm">
+      <span className="relative mt-auto p-3">
+        <span className="line-clamp-2 text-sm font-semibold leading-tight text-white drop-shadow-sm">
           {product.name}
         </span>
       </span>
@@ -63,7 +68,109 @@ function MiniProductCard({ product }: { product: ProductCard }) {
 }
 
 // =============================================================================
-// Category Card (hub-style card with embedded product swipe)
+// Product Carousel (arrow nav + page dots)
+// =============================================================================
+
+function ProductCarousel({ products }: { products: ProductCard[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [maxIndex, setMaxIndex] = useState(0);
+
+  const updatePagination = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Each card is ~144px (w-36) or ~160px (sm:w-40) + 12px gap
+    const cardWidth = el.querySelector<HTMLElement>(":scope > *")?.offsetWidth ?? 144;
+    const gap = 12;
+    const step = cardWidth + gap;
+    const currentIndex = Math.round(el.scrollLeft / step);
+    const visibleCards = Math.floor(el.clientWidth / step) || 1;
+    const total = products.length;
+    setActiveIndex(currentIndex);
+    setMaxIndex(Math.max(0, total - visibleCards));
+  }, [products.length]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updatePagination();
+    el.addEventListener("scroll", updatePagination, { passive: true });
+    const ro = new ResizeObserver(updatePagination);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", updatePagination);
+      ro.disconnect();
+    };
+  }, [updatePagination]);
+
+  const scrollTo = useCallback((direction: "prev" | "next") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.querySelector<HTMLElement>(":scope > *")?.offsetWidth ?? 144;
+    const gap = 12;
+    const step = cardWidth + gap;
+    el.scrollBy({ left: direction === "next" ? step : -step, behavior: "smooth" });
+  }, []);
+
+  const canPrev = activeIndex > 0;
+  const canNext = activeIndex < maxIndex;
+  const totalDots = maxIndex + 1;
+
+  return (
+    <div className="relative">
+      {/* Scroll container */}
+      <div
+        ref={scrollRef}
+        className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth scrollbar-hide"
+      >
+        {products.map((product) => (
+          <div key={product.id} className="snap-start">
+            <SwipeProductCard product={product} />
+          </div>
+        ))}
+      </div>
+
+      {/* Navigation: arrows + dots */}
+      {totalDots > 1 && (
+        <div className="mt-3 flex items-center justify-center gap-3">
+          <button
+            onClick={() => scrollTo("prev")}
+            disabled={!canPrev}
+            aria-label="Previous"
+            className="flex h-7 w-7 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30 disabled:hover:bg-background"
+          >
+            <ChevronLeftIcon className="h-3.5 w-3.5" />
+          </button>
+
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: totalDots }).map((_, i) => (
+              <span
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-200 ${
+                  i === activeIndex
+                    ? "w-4 bg-foreground"
+                    : "w-1.5 bg-muted-foreground/30"
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={() => scrollTo("next")}
+            disabled={!canNext}
+            aria-label="Next"
+            className="flex h-7 w-7 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30 disabled:hover:bg-background"
+          >
+            <ChevronRightIcon className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =============================================================================
+// Category Card (hub-style card with embedded product carousel)
 // =============================================================================
 
 export function PricingCategoryCard({
@@ -103,14 +210,10 @@ export function PricingCategoryCard({
         </div>
       </div>
 
-      {/* Product Swipe */}
+      {/* Product Carousel */}
       {group.products.length > 0 && (
         <div className="px-5 py-2">
-          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
-            {group.products.map((product) => (
-              <MiniProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <ProductCarousel products={group.products} />
         </div>
       )}
 

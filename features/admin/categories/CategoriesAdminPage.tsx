@@ -333,34 +333,28 @@ export function CategoriesAdminPage() {
             <AdminEmptyState title={t('noCategories')} description={t('noCategoriesDescription')} />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm" style={{ minWidth: '700px' }}>
                 <thead>
                   <tr className="border-b bg-muted/50">
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      {t('colSlug')}
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">
                       {t('colName')}
                     </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      {t('colDescription')}
+                    <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">
+                      {t('colSlug')}
                     </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      {t('colIcon')}
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      {t('colOrder')}
-                    </th>
-                    <th className="px-4 py-3 text-center font-medium text-muted-foreground">
+                    <th className="px-3 py-3 text-center font-medium text-muted-foreground whitespace-nowrap w-16">
                       {t('colPublic')}
                     </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                    <th className="px-3 py-3 text-center font-medium text-muted-foreground whitespace-nowrap w-12">
                       {t('colProducts')}
                     </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                    <th className="px-3 py-3 text-center font-medium text-muted-foreground whitespace-nowrap w-12">
+                      {t('colOrder')}
+                    </th>
+                    <th className="px-3 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">
                       {t('colBundle')}
                     </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                    <th className="sticky right-0 bg-card px-3 py-3 text-right font-medium text-muted-foreground whitespace-nowrap shadow-[-8px_0_12px_-6px_rgba(0,0,0,0.08)]">
                       {t('colActions')}
                     </th>
                   </tr>
@@ -377,36 +371,39 @@ export function CategoriesAdminPage() {
                         bundleOptions={bundleOptions}
                       />
                     ) : (
-                      <tr key={cat.id} className="hover:bg-muted/30 transition-colors">
-                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                      <tr key={cat.id} className="hover:bg-muted/30 transition-colors group">
+                        <td className="px-4 py-3">
+                          <div className="font-medium">{cat.name}</div>
+                          {cat.description_short && (
+                            <div className="mt-0.5 text-xs text-muted-foreground line-clamp-1 max-w-[260px]">
+                              {cat.description_short}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-3 py-3 font-mono text-xs text-muted-foreground whitespace-nowrap">
                           {cat.slug}
                         </td>
-                        <td className="px-4 py-3 font-medium">{cat.name}</td>
-                        <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">
-                          {cat.description_short ?? '—'}
-                        </td>
-                        <td className="px-4 py-3 text-xs font-mono text-muted-foreground">
-                          {cat.icon_key ?? '—'}
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">{cat.sort_order}</td>
-                        <td className="px-4 py-3 text-center">
+                        <td className="px-3 py-3 text-center">
                           {cat.is_public ? (
                             <Badge variant="success">{t('visible')}</Badge>
                           ) : (
                             <Badge variant="secondary">{t('hidden')}</Badge>
                           )}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-3 text-center">
                           <Badge variant="outline">{cat.product_count}</Badge>
                         </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground max-w-[180px] truncate">
+                        <td className="px-3 py-3 text-center text-muted-foreground">
+                          {cat.sort_order}
+                        </td>
+                        <td className="px-3 py-3 text-sm text-muted-foreground max-w-[160px] truncate">
                           {cat.bundle_product_id
                             ? bundleOptions.find((o) => o.value === cat.bundle_product_id)?.label ??
                               cat.bundle_product_id.slice(0, 8) + '…'
                             : '—'}
                         </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1">
+                        <td className="sticky right-0 bg-card px-3 py-3 shadow-[-8px_0_12px_-6px_rgba(0,0,0,0.08)]">
+                          <div className="flex items-center justify-end gap-1">
                             <Button
                               size="sm"
                               variant="ghost"

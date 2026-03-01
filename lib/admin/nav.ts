@@ -91,6 +91,7 @@ const systemAdminCategories: AdminNavCategory[] = [
     icon: 'products',
     items: [
       { id: 'product-list', labelKey: 'allProducts', href: '/admin/products', icon: 'products', permission: 'admin.products.list' },
+      { id: 'categories', labelKey: 'categories', href: '/admin/categories', icon: 'content', permission: 'admin.products.list' },
       { id: 'default-images', labelKey: 'defaultImages', href: '/admin/media', icon: 'content', permission: 'admin.products.list' },
     ],
   },

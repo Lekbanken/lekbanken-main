@@ -865,6 +865,7 @@
       "plannerTool": "Planner",
       "products": "Products",
       "allProducts": "All Products",
+      "categories": "Categories",
       "defaultImages": "Default images",
       "purposes": "Purposes",
       "badges": "Badges",
@@ -9991,7 +9992,10 @@
         "singleLicense": "One license – everything included",
         "licensesIncluded": "{count} licenses included",
         "seeLicenses": "See all licenses",
-        "backToAll": "All categories"
+        "backToAll": "All categories",
+        "includedProductsTitle": "Included products",
+        "includedProductsSubtitle": "Can also be purchased individually",
+        "viewProduct": "View details"
       },
       "bundlePage": {
         "licenses": "licenses",

@@ -68,6 +68,32 @@ export const GRADIENT_MAP: Record<string, string> = {
   SparklesIcon: "from-primary to-[#00c7b0]",
 };
 
+export const ICON_COLOR_MAP: Record<string, string> = {
+  HeartIcon: "text-purple-500",
+  BriefcaseIcon: "text-slate-500",
+  ComputerDesktopIcon: "text-cyan-500",
+  UsersIcon: "text-orange-500",
+  HomeIcon: "text-green-500",
+  CalendarDaysIcon: "text-indigo-500",
+  GiftIcon: "text-pink-500",
+  AcademicCapIcon: "text-blue-500",
+  TrophyIcon: "text-amber-500",
+  SparklesIcon: "text-primary",
+};
+
+export const ICON_BG_MAP: Record<string, string> = {
+  HeartIcon: "bg-purple-100 dark:bg-purple-500/20",
+  BriefcaseIcon: "bg-slate-100 dark:bg-slate-500/20",
+  ComputerDesktopIcon: "bg-cyan-100 dark:bg-cyan-500/20",
+  UsersIcon: "bg-orange-100 dark:bg-orange-500/20",
+  HomeIcon: "bg-green-100 dark:bg-green-500/20",
+  CalendarDaysIcon: "bg-indigo-100 dark:bg-indigo-500/20",
+  GiftIcon: "bg-pink-100 dark:bg-pink-500/20",
+  AcademicCapIcon: "bg-blue-100 dark:bg-blue-500/20",
+  TrophyIcon: "bg-amber-100 dark:bg-amber-500/20",
+  SparklesIcon: "bg-primary/10",
+};
+
 // Legacy mapping: database category text → icon + gradient (fallback during migration)
 const LEGACY_CATEGORY_CONFIG: Record<string, { iconKey: string; gradient: string }> = {
   specialpedagog: { iconKey: "HeartIcon", gradient: "from-purple-400 to-violet-500" },
@@ -87,6 +113,8 @@ export function getCategoryVisuals(iconKey: string | null, categoryTextFallback?
     return {
       Icon: ICON_MAP[iconKey],
       gradient: GRADIENT_MAP[iconKey] ?? GRADIENT_MAP.SparklesIcon,
+      iconColor: ICON_COLOR_MAP[iconKey] ?? ICON_COLOR_MAP.SparklesIcon,
+      iconBg: ICON_BG_MAP[iconKey] ?? ICON_BG_MAP.SparklesIcon,
     };
   }
   // Fallback: match legacy category text
@@ -96,9 +124,16 @@ export function getCategoryVisuals(iconKey: string | null, categoryTextFallback?
       return {
         Icon: ICON_MAP[legacy.iconKey] ?? SparklesIcon,
         gradient: legacy.gradient,
+        iconColor: ICON_COLOR_MAP[legacy.iconKey] ?? ICON_COLOR_MAP.SparklesIcon,
+        iconBg: ICON_BG_MAP[legacy.iconKey] ?? ICON_BG_MAP.SparklesIcon,
       };
     }
   }
   // Default
-  return { Icon: SparklesIcon, gradient: GRADIENT_MAP.SparklesIcon };
+  return {
+    Icon: SparklesIcon,
+    gradient: GRADIENT_MAP.SparklesIcon,
+    iconColor: ICON_COLOR_MAP.SparklesIcon,
+    iconBg: ICON_BG_MAP.SparklesIcon,
+  };
 }

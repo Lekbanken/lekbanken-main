@@ -847,6 +847,7 @@
       "plannerTool": "Planlegger",
       "products": "Produkter",
       "allProducts": "Alle produkter",
+      "categories": "Kategorier",
       "defaultImages": "Standardbilder",
       "purposes": "Formål",
       "badges": "Badges",
@@ -10324,7 +10325,10 @@
         "singleLicense": "Én lisens – alt inkludert",
         "licensesIncluded": "{count} lisenser inkludert",
         "seeLicenses": "Se alle lisenser",
-        "backToAll": "Alle kategorier"
+        "backToAll": "Alle kategorier",
+        "includedProductsTitle": "Inkluderte produkter",
+        "includedProductsSubtitle": "Kan også kjøpes enkeltvis",
+        "viewProduct": "Se detaljer"
       },
       "bundlePage": {
         "licenses": "lisenser",

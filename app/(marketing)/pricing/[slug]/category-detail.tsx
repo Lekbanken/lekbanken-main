@@ -1,7 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { createServerRlsClient } from "@/lib/supabase/server";
-import { PricingProductCard } from "../pricing-components";
 import { fetchBundleSlug } from "../pricing-server";
 import { getCategoryVisuals } from "../pricing-shared";
 import type { ProductCard } from "../pricing-shared";
@@ -9,6 +9,7 @@ import StickyMobileCTA from "./sticky-mobile-cta";
 import {
   ChevronRightIcon,
   ArrowLeftIcon,
+  ArrowRightIcon,
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 
@@ -250,7 +251,7 @@ export default async function CategoryDetail({
       ? individualSum.sum - bundlePrice!.amount
       : null;
 
-  const { Icon, gradient } = getCategoryVisuals(category.icon_key);
+  const { Icon, gradient, iconColor, iconBg } = getCategoryVisuals(category.icon_key);
 
   return (
     <div className="bg-background">
@@ -282,9 +283,9 @@ export default async function CategoryDetail({
           <div className="flex-1">
             <div className="flex items-start gap-4">
               <div
-                className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${gradient} shadow-lg`}
+                className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl ${iconBg}`}
               >
-                <Icon className="h-7 w-7 text-white" />
+                <Icon className={`h-7 w-7 ${iconColor}`} />
               </div>
               <div>
                 <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -461,11 +462,75 @@ export default async function CategoryDetail({
         className="mx-auto max-w-7xl scroll-mt-24 px-4 pb-16 sm:px-6 lg:px-8"
       >
         {products.length > 0 ? (
-          <div className="mt-8 grid grid-cols-1 gap-5 pb-20 lg:pb-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {products.map((product) => (
-              <PricingProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <>
+            {/* Section heading */}
+            <div className="mt-8 mb-6">
+              <h2 className="text-xl font-bold text-foreground">
+                {t("categoryPage.includedProductsTitle")}
+              </h2>
+              {category.bundle_product_id && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {t("categoryPage.includedProductsSubtitle")}
+                </p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 pb-20 lg:pb-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {products.map((product) => (
+                <Link
+                  key={product.id}
+                  href={`/pricing/${product.slug}`}
+                  className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  {/* Image or icon placeholder */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted/30">
+                    {product.imageUrl ? (
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <Icon className="h-12 w-12 text-muted-foreground/20" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex flex-1 flex-col p-4">
+                    <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+                      {product.name}
+                    </h3>
+                    {product.description && (
+                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                        {product.description}
+                      </p>
+                    )}
+
+                    <div className="flex-1" />
+
+                    {/* Price + CTA row */}
+                    <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-3">
+                      {product.price ? (
+                        <span className="text-sm font-bold text-foreground">
+                          {product.price}
+                        </span>
+                      ) : (
+                        <span />
+                      )}
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors group-hover:text-primary/80">
+                        {t("categoryPage.viewProduct")}
+                        <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="mt-16 flex flex-col items-center justify-center py-20 text-center">
             <Icon className="h-12 w-12 text-muted-foreground/50" />

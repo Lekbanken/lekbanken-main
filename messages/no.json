@@ -10364,7 +10364,7 @@
         "buyBundle": "Se pakken",
         "buyBundleSubtitle": "se hva som er inkludert",
         "saveBadge": "Spar {percent}%",
-        "saveAbsolute": "Spar {amount}/år",
+        "saveAbsolute": "Spar {amount}{period}",
         "individualTotal": "kjøpt individuelt",
         "gamesIncluded": "{count} leker inkludert",
         "singleLicense": "Én lisens – alt inkludert",
@@ -10377,6 +10377,7 @@
         "includedInBundle": "Inkludert i pakken",
         "noPrice": "Pris mangler",
         "orMonthly": "eller {price}/mnd",
+        "orYearly": "eller {price}/år",
         "perMonth": "/mnd"
       },
       "bundlePage": {

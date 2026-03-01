@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { createServerRlsClient } from "@/lib/supabase/server";
-import { fetchBundleSlug } from "../pricing-server";
+import { fetchBundleSlug, detectCurrency } from "../pricing-server";
 import { getCategoryVisuals } from "../pricing-shared";
 import type { ProductCard } from "../pricing-shared";
 import StickyMobileCTA from "./sticky-mobile-cta";
@@ -101,10 +101,15 @@ async function fetchCategoryProducts(
   });
 }
 
-async function fetchBundlePrice(
+/**
+ * Fetch bundle price — tries yearly first, falls back to monthly.
+ * Returns both the "primary" (display) price and an optional secondary
+ * (the other interval) so we can show "or X/mån".
+ */
+async function fetchBundlePrices(
   bundleProductId: string,
   currency: string
-): Promise<BundlePrice | null> {
+): Promise<{ primary: BundlePrice | null; secondary: BundlePrice | null }> {
   const supabase = await createServerRlsClient();
   const { data } = await supabase
     .from("product_prices")
@@ -112,35 +117,20 @@ async function fetchBundlePrice(
     .eq("product_id", bundleProductId)
     .eq("active", true)
     .eq("currency", currency)
-    .eq("interval", "year")
+    .in("interval", ["year", "month"])
     .order("is_default", { ascending: false })
-    .order("amount", { ascending: true })
-    .limit(1)
-    .single();
+    .order("amount", { ascending: true });
 
-  if (!data) return null;
-  return data as BundlePrice;
-}
+  if (!data || data.length === 0) return { primary: null, secondary: null };
 
-async function fetchMonthlyBundlePrice(
-  bundleProductId: string,
-  currency: string
-): Promise<BundlePrice | null> {
-  const supabase = await createServerRlsClient();
-  const { data } = await supabase
-    .from("product_prices")
-    .select("id,amount,currency,interval")
-    .eq("product_id", bundleProductId)
-    .eq("active", true)
-    .eq("currency", currency)
-    .eq("interval", "month")
-    .order("is_default", { ascending: false })
-    .order("amount", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+  const yearly = data.find((p) => p.interval === "year") ?? null;
+  const monthly = data.find((p) => p.interval === "month") ?? null;
 
-  if (!data) return null;
-  return data as BundlePrice;
+  // Prefer yearly as primary (better for savings calc), fall back to monthly
+  return {
+    primary: (yearly ?? monthly) as BundlePrice | null,
+    secondary: yearly ? (monthly as BundlePrice | null) : null,
+  };
 }
 
 async function fetchGameCount(categorySlug: string): Promise<number> {
@@ -166,10 +156,15 @@ async function fetchGameCount(categorySlug: string): Promise<number> {
   return games?.length ?? 0;
 }
 
-async function fetchIndividualYearlySum(
+/**
+ * Sum of individual prices for the same interval as the bundle's primary price.
+ * Falls back across year → month if needed.
+ */
+async function fetchIndividualSum(
   categorySlug: string,
-  currency: string
-): Promise<{ sum: number; pricedCount: number }> {
+  currency: string,
+  preferredInterval: string
+): Promise<{ sum: number; pricedCount: number; interval: string }> {
   const supabase = await createServerRlsClient();
 
   const { data: products } = await supabase
@@ -180,35 +175,35 @@ async function fetchIndividualYearlySum(
     .eq("is_marketing_visible", true)
     .eq("is_bundle", false);
 
-  if (!products || products.length === 0) return { sum: 0, pricedCount: 0 };
+  if (!products || products.length === 0)
+    return { sum: 0, pricedCount: 0, interval: preferredInterval };
 
-  const { data: prices } = await supabase
-    .from("product_prices")
-    .select("product_id,amount")
-    .eq("active", true)
-    .eq("currency", currency)
-    .eq("interval", "year")
-    .in(
-      "product_id",
-      products.map((p) => p.id)
-    )
-    .order("is_default", { ascending: false })
-    .order("amount", { ascending: true });
+  const productIds = products.map((p) => p.id);
 
-  if (!prices || prices.length === 0) return { sum: 0, pricedCount: 0 };
+  // Try preferred interval first
+  for (const interval of [preferredInterval, preferredInterval === "year" ? "month" : "year"]) {
+    const { data: prices } = await supabase
+      .from("product_prices")
+      .select("product_id,amount")
+      .eq("active", true)
+      .eq("currency", currency)
+      .eq("interval", interval)
+      .in("product_id", productIds)
+      .order("is_default", { ascending: false })
+      .order("amount", { ascending: true });
 
-  // Best yearly price per product (first hit = default-preferred, cheapest)
-  const bestYearly = new Map<string, number>();
-  for (const pr of prices) {
-    if (!bestYearly.has(pr.product_id)) {
-      bestYearly.set(pr.product_id, pr.amount);
+    if (prices && prices.length > 0) {
+      const best = new Map<string, number>();
+      for (const pr of prices) {
+        if (!best.has(pr.product_id)) best.set(pr.product_id, pr.amount);
+      }
+      let sum = 0;
+      for (const amount of best.values()) sum += amount;
+      return { sum, pricedCount: best.size, interval };
     }
   }
 
-  let sum = 0;
-  for (const amount of bestYearly.values()) sum += amount;
-
-  return { sum, pricedCount: bestYearly.size };
+  return { sum: 0, pricedCount: 0, interval: preferredInterval };
 }
 
 // =============================================================================
@@ -233,25 +228,35 @@ export default async function CategoryDetail({
 }: {
   category: CategoryRow;
 }) {
-  const currency = "SEK";
   const t = await getTranslations("marketing.pricing");
 
-  const [products, bundlePrice, monthlyPrice, gameCount, individualSum, bundleSlug] = await Promise.all([
+  // Auto-detect currency from available prices (SEK > NOK > EUR)
+  const currency = await detectCurrency(category.bundle_product_id);
+
+  // Fetch all data in parallel
+  const [products, bundlePrices, gameCount, bundleSlug] = await Promise.all([
     fetchCategoryProducts(category.slug, currency),
     category.bundle_product_id
-      ? fetchBundlePrice(category.bundle_product_id, currency)
-      : Promise.resolve(null),
-    category.bundle_product_id
-      ? fetchMonthlyBundlePrice(category.bundle_product_id, currency)
-      : Promise.resolve(null),
+      ? fetchBundlePrices(category.bundle_product_id, currency)
+      : Promise.resolve({ primary: null, secondary: null }),
     fetchGameCount(category.slug),
-    category.bundle_product_id
-      ? fetchIndividualYearlySum(category.slug, currency)
-      : Promise.resolve({ sum: 0, pricedCount: 0 }),
     category.bundle_product_id
       ? fetchBundleSlug(category.bundle_product_id)
       : Promise.resolve(null),
   ]);
+
+  const bundlePrice = bundlePrices.primary;
+  const secondaryPrice = bundlePrices.secondary;
+
+  // Fetch individual sum for the same interval as bundle price
+  const primaryInterval = bundlePrice?.interval ?? "year";
+  const individualSum = category.bundle_product_id
+    ? await fetchIndividualSum(category.slug, currency, primaryInterval)
+    : { sum: 0, pricedCount: 0, interval: primaryInterval };
+
+  // Interval label helper
+  const intervalLabel = (interval: string) =>
+    interval === "year" ? t("categoryPage.perYear") : t("categoryPage.perMonth");
 
   // Bundle detail page URL (persuasion step before checkout)
   const bundleHref = bundleSlug
@@ -259,11 +264,13 @@ export default async function CategoryDetail({
     : `/checkout/start?product=${category.bundle_product_id}`;
 
   // Calculate savings percentage
-  // Only show when ALL products have yearly prices (prevents misleading partial data)
+  // Only show when ALL products have prices AND same interval as bundle
   const allProductsPriced = individualSum.pricedCount === products.length;
+  const sameInterval = individualSum.interval === primaryInterval;
   const savingsPct =
     bundlePrice &&
     allProductsPriced &&
+    sameInterval &&
     individualSum.sum > 0 &&
     bundlePrice.amount < individualSum.sum
       ? Math.round((1 - bundlePrice.amount / individualSum.sum) * 100)
@@ -340,7 +347,7 @@ export default async function CategoryDetail({
             </div>
 
             {/* Feature list (when bundle exists) */}
-            {category.bundle_product_id && bundlePrice && (
+            {category.bundle_product_id && (
               <ul className="mt-6 space-y-2">
                 <li className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircleIcon className="h-5 w-5 flex-shrink-0 text-primary" />
@@ -373,6 +380,7 @@ export default async function CategoryDetail({
                   <span className="text-sm font-bold tracking-wide text-white">
                     {t("categoryPage.saveAbsolute", {
                       amount: formatPrice(savingsAmount, bundlePrice!.currency),
+                      period: intervalLabel(bundlePrice!.interval),
                     })}
                   </span>
                 </div>
@@ -393,21 +401,26 @@ export default async function CategoryDetail({
                       )}
                     </span>
                     <span className="text-base text-muted-foreground">
-                      {t("categoryPage.perYear")}
+                      {intervalLabel(bundlePrice.interval)}
                     </span>
                   </div>
 
-                  {/* Monthly price alternative */}
-                  {monthlyPrice && (
+                  {/* Secondary price (other interval) */}
+                  {secondaryPrice && (
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {t("categoryPage.orMonthly", {
-                        price: formatPrice(monthlyPrice.amount, monthlyPrice.currency),
-                      })}
+                      {bundlePrice.interval === "year"
+                        ? t("categoryPage.orMonthly", {
+                            price: formatPrice(secondaryPrice.amount, secondaryPrice.currency),
+                          })
+                        : t("categoryPage.orYearly", {
+                            price: formatPrice(secondaryPrice.amount, secondaryPrice.currency),
+                          })}
                     </p>
                   )}
 
                   {/* Strikethrough individual sum — only when all products have prices */}
                   {allProductsPriced &&
+                    sameInterval &&
                     individualSum.sum > 0 &&
                     individualSum.sum > bundlePrice.amount && (
                       <div className="mt-1.5">
@@ -424,6 +437,7 @@ export default async function CategoryDetail({
                           <p className="mt-1 text-sm font-semibold text-green-600">
                             {t("categoryPage.saveAbsolute", {
                               amount: formatPrice(savingsAmount, bundlePrice.currency),
+                              period: intervalLabel(bundlePrice.interval),
                             })}
                             {" "}
                             <span className="font-normal text-muted-foreground">
@@ -456,6 +470,7 @@ export default async function CategoryDetail({
                       <CheckCircleIcon className="h-4 w-4 flex-shrink-0 text-primary" />
                       {t("categoryPage.saveAbsolute", {
                         amount: formatPrice(savingsAmount, bundlePrice.currency),
+                        period: intervalLabel(bundlePrice.interval),
                       })}
                     </li>
                   )}
@@ -598,14 +613,15 @@ export default async function CategoryDetail({
       </div>
 
       {/* Sticky mobile CTA (bundle only) */}
-      {category.bundle_product_id && bundlePrice && (
+      {bundlePrice && (
         <StickyMobileCTA
-          priceLabel={formatPrice(bundlePrice.amount, bundlePrice.currency)}
+          priceLabel={`${formatPrice(bundlePrice.amount, bundlePrice.currency)}${intervalLabel(bundlePrice.interval)}`}
           savingsPercent={savingsPct}
           savingsLabel={
             savingsAmount != null
               ? t("categoryPage.saveAbsolute", {
                   amount: formatPrice(savingsAmount, bundlePrice.currency),
+                  period: intervalLabel(bundlePrice.interval),
                 })
               : undefined
           }

@@ -10031,7 +10031,7 @@
         "buyBundle": "See the bundle",
         "buyBundleSubtitle": "see what's included",
         "saveBadge": "Save {percent}%",
-        "saveAbsolute": "Save {amount}/year",
+        "saveAbsolute": "Save {amount}{period}",
         "individualTotal": "bought individually",
         "gamesIncluded": "{count} games included",
         "singleLicense": "One license – everything included",
@@ -10044,6 +10044,7 @@
         "includedInBundle": "Included in bundle",
         "noPrice": "Price not available",
         "orMonthly": "or {price}/mo",
+        "orYearly": "or {price}/yr",
         "perMonth": "/mo"
       },
       "bundlePage": {

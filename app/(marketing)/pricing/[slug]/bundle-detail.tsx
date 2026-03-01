@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { createServerRlsClient } from "@/lib/supabase/server";
+import { detectCurrency } from "../pricing-server";
 import { PricingProductCard } from "../pricing-components";
 import { getCategoryVisuals } from "../pricing-shared";
 import type { ProductCard } from "../pricing-shared";
@@ -222,7 +223,7 @@ export default async function BundleDetail({
   bundle,
   category,
 }: BundlePageProps) {
-  const currency = "SEK";
+  const currency = await detectCurrency(bundle.id);
   const t = await getTranslations("marketing.pricing");
 
   const [products, bundlePrice, individualSum, gameCount] = await Promise.all([
@@ -360,6 +361,7 @@ export default async function BundleDetail({
                     {savingsAmount != null && (
                       <> &bull; {t("categoryPage.saveAbsolute", {
                         amount: formatPrice(savingsAmount, bundlePrice.currency),
+                        period: t("categoryPage.perYear"),
                       })}</>
                     )}
                   </p>
@@ -384,6 +386,7 @@ export default async function BundleDetail({
                                 savingsAmount,
                                 bundlePrice.currency
                               ),
+                              period: t("categoryPage.perYear"),
                             })}
                             {" "}
                             <span className="font-normal text-muted-foreground">
@@ -618,6 +621,7 @@ export default async function BundleDetail({
             <p className="mt-2 text-lg text-green-600 font-semibold">
               {t("categoryPage.saveAbsolute", {
                 amount: formatPrice(savingsAmount, bundlePrice.currency),
+                period: t("categoryPage.perYear"),
               })}
             </p>
           )}
@@ -652,6 +656,7 @@ export default async function BundleDetail({
             savingsAmount != null
               ? t("categoryPage.saveAbsolute", {
                   amount: formatPrice(savingsAmount, bundlePrice.currency),
+                  period: t("categoryPage.perYear"),
                 })
               : undefined
           }

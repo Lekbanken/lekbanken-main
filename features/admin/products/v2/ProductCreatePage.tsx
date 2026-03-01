@@ -79,11 +79,13 @@ export function ProductCreatePage() {
   const [checkingKey, setCheckingKey] = useState(false);
 
   // Auto-generate product_key from name if user hasn't manually edited it
+  // Append -bundle suffix when Type=Bundle to prevent key collisions
   useEffect(() => {
     if (!productKeyTouched && name.trim()) {
-      setProductKey(previewSlug(name));
+      const base = previewSlug(name);
+      setProductKey(category === 'bundle' ? `${base}-bundle` : base);
     }
-  }, [name, productKeyTouched]);
+  }, [name, productKeyTouched, category]);
 
   // Preflight: check product_key availability (debounced)
   useEffect(() => {

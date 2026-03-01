@@ -1,0 +1,17 @@
+﻿supabase : Initialising login role...
+At line:1 char:1
++ supabase db dump --linked 2>&1 | Out-File -FilePath schema_dump.txt - 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Initialising login role... 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Dumping schemas from remote database...
+failed to inspect docker image: error during connect: in the default dae
+mon configuration on Windows, the docker client must be run with elevate
+d privileges to connect: Get "http://%2F%2F.%2Fpipe%2Fdocker_engine/v1.5
+1/images/public.ecr.aws/supabase/postgres:17.6.1.054/json": open //./pip
+e/docker_engine: The system cannot find the file specified.
+Docker Desktop is a prerequisite for local development. Follow the offic
+ial docs to install: https://docs.docker.com/desktop

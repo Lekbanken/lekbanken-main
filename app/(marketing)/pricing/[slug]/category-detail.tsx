@@ -306,7 +306,7 @@ export default async function CategoryDetail({
       {/* Category Sales Hero */}
       <header className="mx-auto max-w-7xl px-4 pt-8 pb-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
-          {/* Left: Category info + stat chips */}
+          {/* Left: Category info */}
           <div className="flex-1">
             <div className="flex items-start gap-4">
               <div
@@ -325,63 +325,11 @@ export default async function CategoryDetail({
                 )}
               </div>
             </div>
-
-            {/* Stat chips */}
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3.5 py-1.5 text-sm font-medium text-foreground">
-                {products.length} {t("categoryPage.products")}
-              </span>
-              {gameCount > 0 ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3.5 py-1.5 text-sm font-medium text-foreground">
-                  {gameCount} {t("categoryPage.games")}
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted/60 px-3.5 py-1.5 text-sm italic text-muted-foreground">
-                  {t("categoryPage.gamesComingSoon")}
-                </span>
-              )}
-            </div>
-
-            {/* Feature list (when bundle exists) */}
-            {category.bundle_product_id && (
-              <ul className="mt-6 space-y-2">
-                <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircleIcon className="h-5 w-5 flex-shrink-0 text-primary" />
-                  {t("categoryPage.bundleIncludes", {
-                    count: products.length,
-                  })}
-                </li>
-                {gameCount > 0 && (
-                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCircleIcon className="h-5 w-5 flex-shrink-0 text-primary" />
-                    {t("categoryPage.gamesIncluded", { count: gameCount })}
-                  </li>
-                )}
-                <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircleIcon className="h-5 w-5 flex-shrink-0 text-primary" />
-                  {t("categoryPage.singleLicense")}
-                </li>
-              </ul>
-            )}
           </div>
 
           {/* Right: Bundle Sales Card */}
           {category.bundle_product_id && bundlePrice && (
-            <div className="flex-shrink-0 overflow-hidden rounded-2xl border-2 border-primary/20 bg-card shadow-lg sm:min-w-[320px] lg:max-w-[380px]">
-              {/* Savings badge banner */}
-              {savingsPct != null && savingsPct > 0 && savingsAmount != null && (
-                <div
-                  className={`bg-gradient-to-r ${gradient} px-5 py-2.5 text-center`}
-                >
-                  <span className="text-sm font-bold tracking-wide text-white">
-                    {t("categoryPage.saveAbsolute", {
-                      amount: formatPrice(savingsAmount, bundlePrice!.currency),
-                      period: intervalLabel(bundlePrice!.interval),
-                    })}
-                  </span>
-                </div>
-              )}
-
+            <div className="flex-shrink-0 overflow-hidden rounded-2xl border border-border bg-card shadow-sm sm:min-w-[320px] lg:max-w-[380px]">
               <div className="p-6">
                 <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                   {t("categoryPage.bundleLabel")}
@@ -390,7 +338,7 @@ export default async function CategoryDetail({
                 {/* Price display */}
                 <div className="mt-3">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-extrabold text-foreground">
+                    <span className="text-3xl font-bold text-foreground">
                       {formatPrice(
                         bundlePrice.amount,
                         bundlePrice.currency
@@ -419,29 +367,15 @@ export default async function CategoryDetail({
                     sameInterval &&
                     individualSum.sum > 0 &&
                     individualSum.sum > bundlePrice.amount && (
-                      <div className="mt-1.5">
-                        <p className="text-sm text-muted-foreground">
-                          <span className="line-through decoration-muted-foreground/50">
-                            {formatPrice(
-                              individualSum.sum,
-                              bundlePrice.currency
-                            )}
-                          </span>{" "}
-                          {t("categoryPage.individualTotal")}
-                        </p>
-                        {savingsAmount != null && (
-                          <p className="mt-1 text-sm font-semibold text-green-600">
-                            {t("categoryPage.saveAbsolute", {
-                              amount: formatPrice(savingsAmount, bundlePrice.currency),
-                              period: intervalLabel(bundlePrice.interval),
-                            })}
-                            {" "}
-                            <span className="font-normal text-muted-foreground">
-                              ({savingsPct}%)
-                            </span>
-                          </p>
-                        )}
-                      </div>
+                      <p className="mt-1.5 text-sm text-muted-foreground">
+                        <span className="line-through decoration-muted-foreground/50">
+                          {formatPrice(
+                            individualSum.sum,
+                            bundlePrice.currency
+                          )}
+                        </span>{" "}
+                        {t("categoryPage.individualTotal")}
+                      </p>
                     )}
                 </div>
 
@@ -462,12 +396,16 @@ export default async function CategoryDetail({
                     </li>
                   )}
                   {savingsPct != null && savingsPct > 0 && savingsAmount != null && (
-                    <li className="flex items-center gap-2">
-                      <CheckCircleIcon className="h-4 w-4 flex-shrink-0 text-primary" />
+                    <li className="flex items-center gap-2 text-green-600 font-medium">
+                      <CheckCircleIcon className="h-4 w-4 flex-shrink-0" />
                       {t("categoryPage.saveAbsolute", {
                         amount: formatPrice(savingsAmount, bundlePrice.currency),
                         period: intervalLabel(bundlePrice.interval),
                       })}
+                      {" "}
+                      <span className="font-normal text-muted-foreground">
+                        ({savingsPct}%)
+                      </span>
                     </li>
                   )}
                 </ul>
@@ -476,9 +414,9 @@ export default async function CategoryDetail({
                 <div id="sticky-sentinel">
                   <Link
                     href={bundleHref}
-                    className={`mt-5 flex w-full flex-col items-center justify-center rounded-xl bg-gradient-to-r ${gradient} px-5 py-3 text-white shadow-md transition-all hover:shadow-lg hover:scale-[1.02]`}
+                    className="mt-5 flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md"
                   >
-                    <span className="text-base font-bold">{t("categoryPage.buyBundle")}</span>
+                    {t("categoryPage.buyBundle")}
                   </Link>
                 </div>
 

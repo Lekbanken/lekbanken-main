@@ -10028,7 +10028,7 @@
         "bundleLabel": "License bundle",
         "perYear": "/year",
         "bundleIncludes": "Includes all {count} products",
-        "buyBundle": "See the bundle",
+        "buyBundle": "Buy bundle",
         "buyBundleSubtitle": "see what's included",
         "saveBadge": "Save {percent}%",
         "saveAbsolute": "Save {amount}{period}",

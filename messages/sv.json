@@ -10714,7 +10714,7 @@
         "bundleLabel": "Licenspaket",
         "perYear": "/år",
         "bundleIncludes": "Inkluderar alla {count} produkter",
-        "buyBundle": "Se paketet",
+        "buyBundle": "Köp paketet",
         "buyBundleSubtitle": "se vad som ingår",
         "saveBadge": "Spara {percent}%",
         "saveAbsolute": "Spara {amount}{period}",

@@ -33,6 +33,7 @@ export type CategoryGroup = {
   name: string;
   slug: string;
   iconKey: string | null;
+  descriptionShort: string | null;
   productCount: number;
   gameCount: number;
   products: ProductCard[];
@@ -81,6 +82,19 @@ export const ICON_COLOR_MAP: Record<string, string> = {
   AcademicCapIcon: "text-blue-500",
   TrophyIcon: "text-amber-500",
   SparklesIcon: "text-primary",
+};
+
+export const ACCENT_BORDER_MAP: Record<string, string> = {
+  HeartIcon: "border-t-purple-400",
+  BriefcaseIcon: "border-t-slate-400",
+  ComputerDesktopIcon: "border-t-cyan-400",
+  UsersIcon: "border-t-orange-400",
+  HomeIcon: "border-t-green-400",
+  CalendarDaysIcon: "border-t-indigo-400",
+  GiftIcon: "border-t-pink-400",
+  AcademicCapIcon: "border-t-blue-400",
+  TrophyIcon: "border-t-amber-400",
+  SparklesIcon: "border-t-primary",
 };
 
 export const ICON_BG_MAP: Record<string, string> = {

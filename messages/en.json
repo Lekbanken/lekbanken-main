@@ -10021,6 +10021,8 @@
       "allCategories": "All",
       "noProducts": "No products found",
       "noProductsDescription": "There are no products available at the moment.",
+      "viewContent": "View content",
+      "comingSoon": "Coming soon",
       "categoryPage": {
         "products": "products",
         "games": "games",

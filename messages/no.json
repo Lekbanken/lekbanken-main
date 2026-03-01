@@ -10354,6 +10354,8 @@
       "allCategories": "Alle",
       "noProducts": "Ingen produkter funnet",
       "noProductsDescription": "Det er ingen produkter tilgjengelig for øyeblikket.",
+      "viewContent": "Se innhold",
+      "comingSoon": "Kommer snart",
       "categoryPage": {
         "products": "produkter",
         "games": "leker",

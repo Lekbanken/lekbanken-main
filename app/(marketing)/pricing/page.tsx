@@ -159,6 +159,42 @@ async function fetchProducts(currency: string) {
   })) as PricingProduct[];
 }
 
+async function fetchGameCounts(categorySlugs: string[]): Promise<Map<string, number>> {
+  if (categorySlugs.length === 0) return new Map();
+  const supabase = await createServerRlsClient();
+
+  // Get product IDs per category
+  const { data: catProducts, error: cpErr } = await supabase
+    .from("products")
+    .select("id,category_slug")
+    .in("category_slug", categorySlugs)
+    .eq("status", "active")
+    .eq("is_marketing_visible", true)
+    .eq("is_bundle", false);
+
+  if (cpErr || !catProducts || catProducts.length === 0) return new Map();
+
+  const productIds = catProducts.map((p) => p.id);
+  const { data: games, error: gErr } = await supabase
+    .from("games")
+    .select("product_id")
+    .in("product_id", productIds)
+    .eq("status", "published");
+
+  if (gErr || !games) return new Map();
+
+  const productToSlug = new Map(catProducts.map((p) => [p.id, p.category_slug]));
+  const countMap = new Map<string, number>();
+  for (const g of games) {
+    if (!g.product_id) continue;
+    const slug = productToSlug.get(g.product_id);
+    if (slug) {
+      countMap.set(slug, (countMap.get(slug) ?? 0) + 1);
+    }
+  }
+  return countMap;
+}
+
 // =============================================================================
 // Translation helpers
 // =============================================================================
@@ -234,6 +270,13 @@ export default async function PricingPage({
   // Group products by category
   const groupMap = new Map<string, { category: CategoryRow; products: ProductCard[] }>();
 
+  // Pre-populate with all DB categories so empty ones appear too (matching hub design)
+  if (!useLegacyGrouping) {
+    for (const cat of categories) {
+      groupMap.set(cat.slug, { category: cat, products: [] });
+    }
+  }
+
   // Helper: translate category text to display name via i18n
   function translateCategory(categoryText: string): string {
     try {
@@ -306,6 +349,10 @@ export default async function PricingPage({
     });
   }
 
+  // Fetch game counts for all category slugs
+  const allSlugs = Array.from(groupMap.keys());
+  const gameCountMap = await fetchGameCounts(allSlugs);
+
   // Convert to sorted array, ordered by category sort_order
   const groups: CategoryGroup[] = Array.from(groupMap.values())
     .sort((a, b) => a.category.sort_order - b.category.sort_order)
@@ -313,8 +360,9 @@ export default async function PricingPage({
       name: category.name,
       slug: category.slug,
       iconKey: category.icon_key,
+      descriptionShort: category.description_short,
       productCount: prods.length,
-      gameCount: 0, // Will be populated when games exist
+      gameCount: gameCountMap.get(category.slug) ?? 0,
       products: prods,
     }));
 
@@ -334,14 +382,15 @@ export default async function PricingPage({
           </p>
         </header>
 
-        {/* Client-side interactive catalog */}
+        {/* Category card grid */}
         <PricingCatalogClient
           groups={groups}
           labels={{
-            allCategories: t("allCategories"),
-            viewAll: t("viewAll"),
             noProducts: t("noProducts"),
             noProductsDescription: t("noProductsDescription"),
+            viewContent: t("viewContent"),
+            comingSoon: t("comingSoon"),
+            games: t("categoryPage.games"),
           }}
         />
       </div>

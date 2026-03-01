@@ -10707,6 +10707,8 @@
       "allCategories": "Alla",
       "noProducts": "Inga produkter hittades",
       "noProductsDescription": "Det finns inga produkter tillgängliga just nu.",
+      "viewContent": "Se innehåll",
+      "comingSoon": "Kommer snart",
       "categoryPage": {
         "products": "produkter",
         "games": "lekar",

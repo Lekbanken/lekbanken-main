@@ -122,6 +122,27 @@ async function fetchBundlePrice(
   return data as BundlePrice;
 }
 
+async function fetchMonthlyBundlePrice(
+  bundleProductId: string,
+  currency: string
+): Promise<BundlePrice | null> {
+  const supabase = await createServerRlsClient();
+  const { data } = await supabase
+    .from("product_prices")
+    .select("id,amount,currency,interval")
+    .eq("product_id", bundleProductId)
+    .eq("active", true)
+    .eq("currency", currency)
+    .eq("interval", "month")
+    .order("is_default", { ascending: false })
+    .order("amount", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (!data) return null;
+  return data as BundlePrice;
+}
+
 async function fetchGameCount(categorySlug: string): Promise<number> {
   const supabase = await createServerRlsClient();
 
@@ -215,10 +236,13 @@ export default async function CategoryDetail({
   const currency = "SEK";
   const t = await getTranslations("marketing.pricing");
 
-  const [products, bundlePrice, gameCount, individualSum, bundleSlug] = await Promise.all([
+  const [products, bundlePrice, monthlyPrice, gameCount, individualSum, bundleSlug] = await Promise.all([
     fetchCategoryProducts(category.slug, currency),
     category.bundle_product_id
       ? fetchBundlePrice(category.bundle_product_id, currency)
+      : Promise.resolve(null),
+    category.bundle_product_id
+      ? fetchMonthlyBundlePrice(category.bundle_product_id, currency)
       : Promise.resolve(null),
     fetchGameCount(category.slug),
     category.bundle_product_id
@@ -373,6 +397,15 @@ export default async function CategoryDetail({
                     </span>
                   </div>
 
+                  {/* Monthly price alternative */}
+                  {monthlyPrice && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {t("categoryPage.orMonthly", {
+                        price: formatPrice(monthlyPrice.amount, monthlyPrice.currency),
+                      })}
+                    </p>
+                  )}
+
                   {/* Strikethrough individual sum — only when all products have prices */}
                   {allProductsPriced &&
                     individualSum.sum > 0 &&
@@ -497,6 +530,13 @@ export default async function CategoryDetail({
                         <Icon className="h-12 w-12 text-muted-foreground/20" />
                       </div>
                     )}
+
+                    {/* "Included in bundle" badge */}
+                    {category.bundle_product_id && (
+                      <span className="absolute left-2 top-2 z-10 rounded-full bg-primary/90 px-2.5 py-0.5 text-[11px] font-medium text-white shadow-sm">
+                        {t("categoryPage.includedInBundle")}
+                      </span>
+                    )}
                   </div>
 
                   {/* Content */}
@@ -519,7 +559,9 @@ export default async function CategoryDetail({
                           {product.price}
                         </span>
                       ) : (
-                        <span />
+                        <span className="text-xs italic text-muted-foreground">
+                          {t("categoryPage.noPrice")}
+                        </span>
                       )}
                       <span className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors group-hover:text-primary/80">
                         {t("categoryPage.viewProduct")}

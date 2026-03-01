@@ -10373,7 +10373,11 @@
         "backToAll": "Alle kategorier",
         "includedProductsTitle": "Inkluderte produkter",
         "includedProductsSubtitle": "Kan også kjøpes enkeltvis",
-        "viewProduct": "Se detaljer"
+        "viewProduct": "Se detaljer",
+        "includedInBundle": "Inkludert i pakken",
+        "noPrice": "Pris mangler",
+        "orMonthly": "eller {price}/mnd",
+        "perMonth": "/mnd"
       },
       "bundlePage": {
         "licenses": "lisenser",

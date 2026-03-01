@@ -10040,7 +10040,11 @@
         "backToAll": "All categories",
         "includedProductsTitle": "Included products",
         "includedProductsSubtitle": "Can also be purchased individually",
-        "viewProduct": "View details"
+        "viewProduct": "View details",
+        "includedInBundle": "Included in bundle",
+        "noPrice": "Price not available",
+        "orMonthly": "or {price}/mo",
+        "perMonth": "/mo"
       },
       "bundlePage": {
         "licenses": "licenses",

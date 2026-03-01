@@ -10726,7 +10726,11 @@
         "backToAll": "Alla kategorier",
         "includedProductsTitle": "Ingående produkter",
         "includedProductsSubtitle": "Kan också köpas enskilt",
-        "viewProduct": "Se detaljer"
+        "viewProduct": "Se detaljer",
+        "includedInBundle": "Ingår i paketet",
+        "noPrice": "Pris saknas",
+        "orMonthly": "eller {price}/mån",
+        "perMonth": "/mån"
       },
       "bundlePage": {
         "licenses": "licenser",

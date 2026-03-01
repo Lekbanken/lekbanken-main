@@ -63,7 +63,6 @@ export function ProductCreatePage() {
   const [category, setCategory] = useState('platform');
   const [categorySlug, setCategorySlug] = useState('');
   const [status, setStatus] = useState('active');
-  const [isBundle, setIsBundle] = useState(false);
 
   // Category options from API
   const [categoryOptions, setCategoryOptions] = useState<SelectOption[]>([]);
@@ -109,7 +108,7 @@ export function ProductCreatePage() {
         category: category.trim() || 'platform',
         description: description.trim() || null,
         status,
-        is_bundle: isBundle,
+        is_bundle: category === 'bundle',
         capabilities: [],
       };
       if (categorySlug) {
@@ -137,7 +136,7 @@ export function ProductCreatePage() {
     } finally {
       setSubmitting(false);
     }
-  }, [name, productKey, category, categorySlug, description, status, isBundle, router, toast, t]);
+  }, [name, productKey, category, categorySlug, description, status, router, toast, t]);
 
   return (
     <AdminPageLayout>
@@ -257,22 +256,13 @@ export function ProductCreatePage() {
                 </div>
               )}
 
-              {/* Bundle toggle */}
-              <div className="flex items-center gap-3 rounded-lg border border-border p-4">
-                <input
-                  id="is-bundle"
-                  type="checkbox"
-                  checked={isBundle}
-                  onChange={(e) => setIsBundle(e.target.checked)}
-                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                />
-                <div>
-                  <label htmlFor="is-bundle" className="text-sm font-medium cursor-pointer">
-                    {t('bundleLabel')}
-                  </label>
-                  <p className="text-xs text-muted-foreground">{t('bundleHelp')}</p>
+              {/* Bundle info note */}
+              {category === 'bundle' && (
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-muted-foreground">
+                  <p className="font-medium text-foreground">{t('bundleLabel')}</p>
+                  <p className="mt-0.5 text-xs">{t('bundleHelp')}</p>
                 </div>
-              </div>
+              )}
 
               {/* Description */}
               <div className="grid gap-1.5">

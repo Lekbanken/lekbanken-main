@@ -30,6 +30,7 @@ export type CrossSellData = {
   categoryName: string
   categorySlug: string
   savingsPercent: number | null
+  savingsAmountFormatted: string | null
   bundlePriceFormatted: string
   productCount: number
 }
@@ -356,8 +357,9 @@ export default function ProductDetailClient({
                 {t('crossSell.partOf', { category: crossSell.categoryName })}
               </p>
               <p className="mt-1.5 text-sm text-slate-600">
-                {crossSell.savingsPercent != null && crossSell.savingsPercent > 0
-                  ? t('crossSell.savePercent', {
+                {crossSell.savingsPercent != null && crossSell.savingsPercent > 0 && crossSell.savingsAmountFormatted
+                  ? t('crossSell.saveAbsolute', {
+                      amount: crossSell.savingsAmountFormatted,
                       percent: crossSell.savingsPercent,
                       price: crossSell.bundlePriceFormatted,
                       count: crossSell.productCount,

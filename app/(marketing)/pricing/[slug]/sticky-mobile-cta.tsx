@@ -16,6 +16,8 @@ type StickyCTAProps = {
   priceLabel: string;
   /** Optional savings percentage (e.g. 33). Only shown when > 0 */
   savingsPercent?: number | null;
+  /** Optional formatted savings label, e.g. "Spara 2 000 kr/år" */
+  savingsLabel?: string;
   /** Primary CTA label */
   ctaLabel: string;
   /** Primary CTA href (Link destination) */
@@ -31,6 +33,7 @@ type StickyCTAProps = {
 export default function StickyMobileCTA({
   priceLabel,
   savingsPercent,
+  savingsLabel,
   ctaLabel,
   ctaHref,
   secondaryLabel,
@@ -72,11 +75,15 @@ export default function StickyMobileCTA({
             <span className="text-lg font-bold text-foreground truncate">
               {priceLabel}
             </span>
-            {savingsPercent != null && savingsPercent > 0 && (
+            {savingsLabel ? (
+              <span className="flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700">
+                {savingsLabel}
+              </span>
+            ) : savingsPercent != null && savingsPercent > 0 ? (
               <span className="flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700">
                 -{savingsPercent}%
               </span>
-            )}
+            ) : null}
           </div>
           {secondaryLabel && secondaryHref && (
             <a

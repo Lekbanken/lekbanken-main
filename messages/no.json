@@ -10302,6 +10302,7 @@
         "bundleIncludes": "Inkluderer alle {count} produkter",
         "buyBundle": "Kjøp hele pakken",
         "saveBadge": "Spar {percent}%",
+        "saveAbsolute": "Spar {amount}/år",
         "individualTotal": "kjøpt individuelt",
         "gamesIncluded": "{count} leker inkludert",
         "singleLicense": "Én lisens – alt inkludert",
@@ -10389,6 +10390,7 @@
         "crossSell": {
           "partOf": "Inngår i {category}",
           "savePercent": "Kjøp hele pakken ({count} lisenser) for {price} og spar {percent}%.",
+          "saveAbsolute": "Kjøp hele pakken ({count} lisenser) for {price} – spar {amount} ({percent}%).",
           "bundleAvailable": "Tilgjengelig som pakke ({count} lisenser) for {price}.",
           "viewBundle": "Se hele pakken"
         },

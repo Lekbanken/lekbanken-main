@@ -9963,6 +9963,7 @@
         "bundleIncludes": "Includes all {count} products",
         "buyBundle": "Buy the full bundle",
         "saveBadge": "Save {percent}%",
+        "saveAbsolute": "Save {amount}/year",
         "individualTotal": "bought individually",
         "gamesIncluded": "{count} games included",
         "singleLicense": "One license – everything included",
@@ -10050,6 +10051,7 @@
         "crossSell": {
           "partOf": "Part of {category}",
           "savePercent": "Buy the full bundle ({count} licenses) for {price} and save {percent}%.",
+          "saveAbsolute": "Get the full bundle ({count} licenses) for {price} – save {amount} ({percent}%).",
           "bundleAvailable": "Available as a bundle ({count} licenses) for {price}.",
           "viewBundle": "See the full bundle"
         },

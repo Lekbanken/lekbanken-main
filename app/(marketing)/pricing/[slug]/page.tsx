@@ -102,6 +102,9 @@ async function resolveCrossSell(
       ? Math.round((1 - bundlePrice.amount / sum) * 100)
       : null;
 
+  const savingsAmount =
+    savingsPercent != null && savingsPercent > 0 ? sum - bundlePrice.amount : null;
+
   const formatted = new Intl.NumberFormat("sv-SE", {
     style: "currency",
     currency: bundlePrice.currency,
@@ -109,10 +112,20 @@ async function resolveCrossSell(
     maximumFractionDigits: 0,
   }).format(bundlePrice.amount / 100);
 
+  const savingsFormatted = savingsAmount != null
+    ? new Intl.NumberFormat("sv-SE", {
+        style: "currency",
+        currency: bundlePrice.currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(savingsAmount / 100)
+    : null;
+
   return {
     categoryName: category.name,
     categorySlug: category.slug,
     savingsPercent,
+    savingsAmountFormatted: savingsFormatted ? `${savingsFormatted}/år` : null,
     bundlePriceFormatted: `${formatted}/år`,
     productCount: catProducts.length,
   };

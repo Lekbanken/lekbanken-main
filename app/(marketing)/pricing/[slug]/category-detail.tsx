@@ -235,6 +235,12 @@ export default async function CategoryDetail({
       ? Math.round((1 - bundlePrice.amount / individualSum.sum) * 100)
       : null;
 
+  // Absolute savings in the same currency (amount in cents)
+  const savingsAmount =
+    savingsPct != null && savingsPct > 0
+      ? individualSum.sum - bundlePrice!.amount
+      : null;
+
   const { Icon, gradient } = getCategoryVisuals(category.icon_key);
 
   return (
@@ -326,12 +332,14 @@ export default async function CategoryDetail({
           {category.bundle_product_id && bundlePrice && (
             <div className="flex-shrink-0 overflow-hidden rounded-2xl border-2 border-primary/20 bg-card shadow-lg sm:min-w-[320px] lg:max-w-[380px]">
               {/* Savings badge banner */}
-              {savingsPct != null && savingsPct > 0 && (
+              {savingsPct != null && savingsPct > 0 && savingsAmount != null && (
                 <div
                   className={`bg-gradient-to-r ${gradient} px-5 py-2.5 text-center`}
                 >
                   <span className="text-sm font-bold tracking-wide text-white">
-                    {t("categoryPage.saveBadge", { percent: savingsPct })}
+                    {t("categoryPage.saveAbsolute", {
+                      amount: formatPrice(savingsAmount, bundlePrice!.currency),
+                    })}
                   </span>
                 </div>
               )}
@@ -359,15 +367,28 @@ export default async function CategoryDetail({
                   {allProductsPriced &&
                     individualSum.sum > 0 &&
                     individualSum.sum > bundlePrice.amount && (
-                      <p className="mt-1.5 text-sm text-muted-foreground">
-                        <span className="line-through decoration-muted-foreground/50">
-                          {formatPrice(
-                            individualSum.sum,
-                            bundlePrice.currency
-                          )}
-                        </span>{" "}
-                        {t("categoryPage.individualTotal")}
-                      </p>
+                      <div className="mt-1.5">
+                        <p className="text-sm text-muted-foreground">
+                          <span className="line-through decoration-muted-foreground/50">
+                            {formatPrice(
+                              individualSum.sum,
+                              bundlePrice.currency
+                            )}
+                          </span>{" "}
+                          {t("categoryPage.individualTotal")}
+                        </p>
+                        {savingsAmount != null && (
+                          <p className="mt-1 text-sm font-semibold text-green-600">
+                            {t("categoryPage.saveAbsolute", {
+                              amount: formatPrice(savingsAmount, bundlePrice.currency),
+                            })}
+                            {" "}
+                            <span className="font-normal text-muted-foreground">
+                              ({savingsPct}%)
+                            </span>
+                          </p>
+                        )}
+                      </div>
                     )}
                 </div>
 
@@ -387,11 +408,11 @@ export default async function CategoryDetail({
                       })}
                     </li>
                   )}
-                  {savingsPct != null && savingsPct > 0 && (
+                  {savingsPct != null && savingsPct > 0 && savingsAmount != null && (
                     <li className="flex items-center gap-2">
                       <CheckCircleIcon className="h-4 w-4 flex-shrink-0 text-primary" />
-                      {t("categoryPage.saveBadge", {
-                        percent: savingsPct,
+                      {t("categoryPage.saveAbsolute", {
+                        amount: formatPrice(savingsAmount, bundlePrice.currency),
                       })}
                     </li>
                   )}
@@ -460,6 +481,13 @@ export default async function CategoryDetail({
         <StickyMobileCTA
           priceLabel={formatPrice(bundlePrice.amount, bundlePrice.currency)}
           savingsPercent={savingsPct}
+          savingsLabel={
+            savingsAmount != null
+              ? t("categoryPage.saveAbsolute", {
+                  amount: formatPrice(savingsAmount, bundlePrice.currency),
+                })
+              : undefined
+          }
           ctaLabel={t("categoryPage.buyBundle")}
           ctaHref={`/checkout/start?product=${category.bundle_product_id}`}
           secondaryLabel={t("categoryPage.seeLicenses")}

@@ -5,7 +5,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { isSystemAdmin } from '@/lib/utils/tenantAuth';
 import { slugify } from '@/lib/media/templateKey';
 
@@ -179,9 +179,10 @@ export async function POST(request: Request) {
   }
   const bundle_product_id = bundleResult.id;
 
-  // ── Insert ────────────────────────────────────────────────────────────────
+  // ── Insert (use service role to bypass RLS) ───────────────────────────────
+  const adminClient = createServiceRoleClient();
   const now = new Date().toISOString();
-  const { data, error } = await supabase
+  const { data, error } = await adminClient
     .from('categories')
     .insert({
       slug,
@@ -280,7 +281,9 @@ export async function PATCH(request: Request) {
     updates.bundle_product_id = bundleResult.id;
   }
 
-  const { data, error } = await supabase
+  // Use service role to bypass RLS for admin writes
+  const adminClient = createServiceRoleClient();
+  const { data, error } = await adminClient
     .from('categories')
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq('id', id)

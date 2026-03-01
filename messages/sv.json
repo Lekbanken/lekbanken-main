@@ -10733,6 +10733,15 @@
         "orYearly": "eller {price}/år",
         "perMonth": "/mån"
       },
+      "productSheet": {
+        "noPrice": "Pris saknas",
+        "instantAccess": "Direkt tillgång efter köp",
+        "cancelAnytime": "Ingen bindningstid",
+        "teamAccess": "Dela med hela teamet",
+        "bundleHint": "Finns även i licenspaket",
+        "bundleHintDescription": "Spara pengar med paketet — alla licenser i kategorin ingår.",
+        "buyLicense": "Köp licens"
+      },
       "bundlePage": {
         "licenses": "licenser",
         "games": "lekar",

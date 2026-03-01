@@ -21,6 +21,8 @@ export type ProductCard = {
   slug: string;
   name: string;
   price: string;
+  /** Default price ID for checkout link (nullable when no price exists) */
+  priceId: string | null;
   description: string;
   category: string;
   categorySlug: string;

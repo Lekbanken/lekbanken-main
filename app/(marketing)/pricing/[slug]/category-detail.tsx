@@ -1,15 +1,14 @@
 import Link from "next/link";
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { createServerRlsClient } from "@/lib/supabase/server";
-import { fetchBundleSlug, detectCurrency } from "../pricing-server";
+import { detectCurrency } from "../pricing-server";
 import { getCategoryVisuals } from "../pricing-shared";
 import type { ProductCard } from "../pricing-shared";
 import StickyMobileCTA from "./sticky-mobile-cta";
+import ProductGrid from "./product-grid";
 import {
   ChevronRightIcon,
   ArrowLeftIcon,
-  ArrowRightIcon,
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 
@@ -67,11 +66,12 @@ async function fetchCategoryProducts(
     .in("product_id", productIds);
 
   // Best price per product
-  const bestPrice = new Map<string, { amount: number; currency: string; interval: string | null }>();
+  const bestPrice = new Map<string, { id: string; amount: number; currency: string; interval: string | null }>();
   for (const pr of prices ?? []) {
     const existing = bestPrice.get(pr.product_id);
     if (!existing || (pr.is_default && !existing) || pr.amount < existing.amount) {
       bestPrice.set(pr.product_id, {
+        id: pr.id,
         amount: pr.amount,
         currency: pr.currency,
         interval: pr.interval,
@@ -93,6 +93,7 @@ async function fetchCategoryProducts(
       slug: productSlug,
       name: p.name,
       price: priceLabel,
+      priceId: price?.id ?? null,
       description: p.description ?? "",
       category: categorySlug,
       categorySlug,
@@ -234,15 +235,12 @@ export default async function CategoryDetail({
   const currency = await detectCurrency(category.bundle_product_id);
 
   // Fetch all data in parallel
-  const [products, bundlePrices, gameCount, bundleSlug] = await Promise.all([
+  const [products, bundlePrices, gameCount] = await Promise.all([
     fetchCategoryProducts(category.slug, currency),
     category.bundle_product_id
       ? fetchBundlePrices(category.bundle_product_id, currency)
       : Promise.resolve({ primary: null, secondary: null }),
     fetchGameCount(category.slug),
-    category.bundle_product_id
-      ? fetchBundleSlug(category.bundle_product_id)
-      : Promise.resolve(null),
   ]);
 
   const bundlePrice = bundlePrices.primary;
@@ -258,10 +256,8 @@ export default async function CategoryDetail({
   const intervalLabel = (interval: string) =>
     interval === "year" ? t("categoryPage.perYear") : t("categoryPage.perMonth");
 
-  // Bundle detail page URL (persuasion step before checkout)
-  const bundleHref = bundleSlug
-    ? `/pricing/${bundleSlug}`
-    : `/checkout/start?product=${category.bundle_product_id}`;
+  // Bundle checkout URL — go directly to checkout wizard (no separate bundle page)
+  const bundleHref = `/checkout/start?product=${category.bundle_product_id}`;
 
   // Calculate savings percentage
   // Only show when ALL products have prices AND same interval as bundle
@@ -483,11 +479,6 @@ export default async function CategoryDetail({
                     className={`mt-5 flex w-full flex-col items-center justify-center rounded-xl bg-gradient-to-r ${gradient} px-5 py-3 text-white shadow-md transition-all hover:shadow-lg hover:scale-[1.02]`}
                   >
                     <span className="text-base font-bold">{t("categoryPage.buyBundle")}</span>
-                    {bundleSlug && (
-                      <span className="text-xs font-normal text-white/80">
-                        {t("categoryPage.buyBundleSubtitle")}
-                      </span>
-                    )}
                   </Link>
                 </div>
 
@@ -523,70 +514,13 @@ export default async function CategoryDetail({
               )}
             </div>
 
-            <div className="grid grid-cols-1 gap-5 pb-20 lg:pb-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {products.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/pricing/${product.slug}`}
-                  className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  {/* Image or icon placeholder */}
-                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted/30">
-                    {product.imageUrl ? (
-                      <Image
-                        src={product.imageUrl}
-                        alt={product.name}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center">
-                        <Icon className="h-12 w-12 text-muted-foreground/20" />
-                      </div>
-                    )}
-
-                    {/* "Included in bundle" badge */}
-                    {category.bundle_product_id && (
-                      <span className="absolute left-2 top-2 z-10 rounded-full bg-primary/90 px-2.5 py-0.5 text-[11px] font-medium text-white shadow-sm">
-                        {t("categoryPage.includedInBundle")}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex flex-1 flex-col p-4">
-                    <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {product.name}
-                    </h3>
-                    {product.description && (
-                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                        {product.description}
-                      </p>
-                    )}
-
-                    <div className="flex-1" />
-
-                    {/* Price + CTA row */}
-                    <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-3">
-                      {product.price ? (
-                        <span className="text-sm font-bold text-foreground">
-                          {product.price}
-                        </span>
-                      ) : (
-                        <span className="text-xs italic text-muted-foreground">
-                          {t("categoryPage.noPrice")}
-                        </span>
-                      )}
-                      <span className="inline-flex items-center gap-1 text-xs font-medium text-primary transition-colors group-hover:text-primary/80">
-                        {t("categoryPage.viewProduct")}
-                        <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <ProductGrid
+              products={products}
+              hasBundleOption={!!category.bundle_product_id}
+              iconKey={category.icon_key}
+              gradient={gradient}
+              iconColor={iconColor}
+            />
           </>
         ) : (
           <div className="mt-16 flex flex-col items-center justify-center py-20 text-center">

@@ -10047,6 +10047,15 @@
         "orYearly": "or {price}/yr",
         "perMonth": "/mo"
       },
+      "productSheet": {
+        "noPrice": "Price not available",
+        "instantAccess": "Instant access after purchase",
+        "cancelAnytime": "No commitment",
+        "teamAccess": "Share with your whole team",
+        "bundleHint": "Also available in a license bundle",
+        "bundleHintDescription": "Save money with the bundle — all licenses in the category are included.",
+        "buyLicense": "Buy license"
+      },
       "bundlePage": {
         "licenses": "licenses",
         "games": "games",

@@ -298,6 +298,7 @@ export default async function PricingPage({
       slug: productSlug,
       name: translateProductName(t, p.product_key, p.name),
       price: priceLabel,
+      priceId: defaultPrice?.id ?? null,
       description: translateProductDescription(t, p.product_key, p.description),
       category: cat!.name,
       categorySlug: groupKey!,

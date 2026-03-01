@@ -72,6 +72,13 @@ export async function POST(request: Request) {
     query = query.in('status', filters.statuses);
   }
 
+  // Bundle filter (server-side — is_bundle boolean column)
+  if (filters.bundleFilter === 'bundles_only') {
+    query = query.eq('is_bundle', true);
+  } else if (filters.bundleFilter === 'products_only') {
+    query = query.eq('is_bundle', false);
+  }
+
   // Sorting
   const sortAsc = filters.sortOrder === 'asc';
   const columnMap: Record<string, string> = {
@@ -299,6 +306,11 @@ export async function POST(request: Request) {
     .select('id', { count: 'exact', head: true })
     .is('stripe_product_id', null);
 
+  const { count: bundleCount } = await supabase
+    .from('products')
+    .select('id', { count: 'exact', head: true })
+    .eq('is_bundle', true);
+
   const response: ProductListResponse = {
     products: filteredProducts,
     total: count || 0,
@@ -309,6 +321,7 @@ export async function POST(request: Request) {
       active: activeCount || 0,
       draft: draftCount || 0,
       missingStripe: missingStripeCount || 0,
+      bundles: bundleCount || 0,
     },
   };
 

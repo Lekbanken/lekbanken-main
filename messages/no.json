@@ -6642,10 +6642,14 @@
           "total": "Totalt",
           "active": "Aktive",
           "draft": "Utkast",
+          "bundles": "Bundles",
           "missingStripe": "Mangler Stripe"
         },
         "filters": {
           "searchPlaceholder": "Søk produkter...",
+          "bundleAll": "Alle",
+          "productsOnly": "Enkeltprodukter",
+          "bundlesOnly": "Bundles",
           "active": "Aktive",
           "draft": "Utkast",
           "missingStripe": "Mangler Stripe",
@@ -6723,7 +6727,14 @@
           "creating": "Oppretter...",
           "success": "Produkt opprettet",
           "successDescription": "Produktet er opprettet. Du kan n\u00e5 konfigurere priser og Stripe-kobling.",
-          "error": "Kunne ikke opprette produkt"
+          "error": "Kunne ikke opprette produkt",
+          "keyChecking": "Sjekker tilgjengelighet...",
+          "keyExists": "Denne produktnøkkelen finnes allerede",
+          "keyExistsDetail": "{name} ({type}, {status})",
+          "keyExistsProduct": "Produkt",
+          "keyExistsOpen": "Åpne eksisterende",
+          "keyExistsSuggest": "Bruk {key}",
+          "keyAvailable": "✓ Nøkkelen er tilgjengelig"
         },
         "status": {
           "active": "Aktiv",

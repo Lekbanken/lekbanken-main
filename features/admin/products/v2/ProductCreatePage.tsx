@@ -68,12 +68,48 @@ export function ProductCreatePage() {
   const [categoryOptions, setCategoryOptions] = useState<SelectOption[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
+  // Product key collision state
+  const [existingProduct, setExistingProduct] = useState<{
+    id: string;
+    name: string;
+    product_key: string;
+    is_bundle: boolean;
+    status: string;
+  } | null>(null);
+  const [checkingKey, setCheckingKey] = useState(false);
+
   // Auto-generate product_key from name if user hasn't manually edited it
   useEffect(() => {
     if (!productKeyTouched && name.trim()) {
       setProductKey(previewSlug(name));
     }
   }, [name, productKeyTouched]);
+
+  // Preflight: check product_key availability (debounced)
+  useEffect(() => {
+    const trimmedKey = productKey.trim().toLowerCase();
+    if (!trimmedKey || trimmedKey.length < 2) {
+      setExistingProduct(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setCheckingKey(true);
+      try {
+        const res = await fetch(`/api/admin/products/exists?product_key=${encodeURIComponent(trimmedKey)}`);
+        if (res.ok) {
+          const json = await res.json();
+          setExistingProduct(json.exists ? json.product : null);
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        setCheckingKey(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [productKey]);
 
   // Fetch categories
   useEffect(() => {
@@ -201,10 +237,51 @@ export function ProductCreatePage() {
                     setProductKey(e.target.value);
                   }}
                   placeholder={t('keyPlaceholder')}
-                  className="font-mono text-sm"
+                  className={`font-mono text-sm ${existingProduct ? 'border-destructive' : ''}`}
                   required
                 />
-                <p className="text-xs text-muted-foreground">{t('keyHelp')}</p>
+                {checkingKey && (
+                  <p className="text-xs text-muted-foreground">{t('keyChecking')}</p>
+                )}
+                {existingProduct && !checkingKey && (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 space-y-2">
+                    <p className="text-sm font-medium text-destructive">{t('keyExists')}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('keyExistsDetail', {
+                        name: existingProduct.name,
+                        type: existingProduct.is_bundle ? 'Bundle' : t('keyExistsProduct'),
+                        status: existingProduct.status,
+                      })}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => router.push(`/admin/products/${existingProduct.id}`)}
+                      >
+                        {t('keyExistsOpen')}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setProductKeyTouched(true);
+                          setProductKey(`${productKey.trim()}-bundle`);
+                        }}
+                      >
+                        {t('keyExistsSuggest', { key: `${productKey.trim()}-bundle` })}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                {!existingProduct && !checkingKey && productKey.trim().length >= 2 && (
+                  <p className="text-xs text-emerald-600">{t('keyAvailable')}</p>
+                )}
+                {!existingProduct && !checkingKey && productKey.trim().length < 2 && (
+                  <p className="text-xs text-muted-foreground">{t('keyHelp')}</p>
+                )}
               </div>
 
               {/* Type + Status row */}
@@ -287,7 +364,7 @@ export function ProductCreatePage() {
                 >
                   {t('cancel')}
                 </Button>
-                <Button type="submit" disabled={submitting || !name.trim() || !productKey.trim()}>
+                <Button type="submit" disabled={submitting || !name.trim() || !productKey.trim() || !!existingProduct}>
                   {submitting ? t('creating') : t('submit')}
                 </Button>
               </div>

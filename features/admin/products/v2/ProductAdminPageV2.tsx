@@ -121,6 +121,13 @@ type FilterBarProps = {
 function FilterBar({ filters, onChange }: FilterBarProps) {
   const t = useTranslations('admin.products.v2');
   
+  // Bundle type pills
+  const bundleOptions: Array<{ key: 'all' | 'products_only' | 'bundles_only'; label: string }> = useMemo(() => [
+    { key: 'all', label: t('filters.bundleAll') },
+    { key: 'products_only', label: t('filters.productsOnly') },
+    { key: 'bundles_only', label: t('filters.bundlesOnly') },
+  ], [t]);
+
   const quickFilters: Array<{ key: string; label: string; filter: Partial<ProductFilters> }> = useMemo(() => [
     { key: 'active', label: t('filters.active'), filter: { statuses: ['active'] } },
     { key: 'draft', label: t('filters.draft'), filter: { statuses: ['draft'] } },
@@ -183,6 +190,23 @@ function FilterBar({ filters, onChange }: FilterBarProps) {
           onChange={(e) => onChange({ ...filters, search: e.target.value, page: 1 })}
           className="pl-9"
         />
+      </div>
+
+      {/* Bundle type pills */}
+      <div className="flex rounded-lg border border-border overflow-hidden">
+        {bundleOptions.map((opt) => (
+          <button
+            key={opt.key}
+            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              (filters.bundleFilter || 'all') === opt.key
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-background hover:bg-muted text-muted-foreground'
+            } border-r border-border last:border-r-0`}
+            onClick={() => onChange({ ...filters, bundleFilter: opt.key, page: 1 })}
+          >
+            {opt.label}
+          </button>
+        ))}
       </div>
 
       {/* Quick Filters */}
@@ -406,9 +430,18 @@ function ProductRow({
 
       {/* Type */}
       <td className="px-3 py-3 hidden md:table-cell">
-        <Badge variant="outline" className="text-xs">
-          {labels.typeLabels[product.product_type] || product.product_type}
-        </Badge>
+        <div className="flex items-center gap-1">
+          <Badge variant="outline" className="text-xs">
+            {product.is_bundle
+              ? 'Bundle'
+              : labels.typeLabels[product.product_type] || product.product_type}
+          </Badge>
+          {product.is_bundle && (
+            <Badge variant="secondary" className="text-[10px] px-1">
+              📦
+            </Badge>
+          )}
+        </div>
       </td>
 
       {/* Status */}
@@ -584,7 +617,7 @@ export function ProductAdminPageV2() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState({ total: 0, active: 0, draft: 0, missingStripe: 0 });
+  const [stats, setStats] = useState({ total: 0, active: 0, draft: 0, missingStripe: 0, bundles: 0 });
 
   // Filter state
   const [filters, setFilters] = useState<ProductFilters>({
@@ -721,6 +754,7 @@ export function ProductAdminPageV2() {
         <AdminStatCard label={t('stats.total')} value={stats.total} />
         <AdminStatCard label={t('stats.active')} value={stats.active} />
         <AdminStatCard label={t('stats.draft')} value={stats.draft} />
+        <AdminStatCard label={t('stats.bundles')} value={stats.bundles} />
         <AdminStatCard label={t('stats.missingStripe')} value={stats.missingStripe} />
       </AdminStatGrid>
 

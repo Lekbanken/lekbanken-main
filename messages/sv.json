@@ -6715,10 +6715,14 @@
           "total": "Totalt",
           "active": "Aktiva",
           "draft": "Utkast",
+          "bundles": "Bundles",
           "missingStripe": "Saknar Stripe"
         },
         "filters": {
           "searchPlaceholder": "Sök produkter...",
+          "bundleAll": "Alla",
+          "productsOnly": "Enkelprodukter",
+          "bundlesOnly": "Bundles",
           "active": "Aktiva",
           "draft": "Utkast",
           "missingStripe": "Saknar Stripe",
@@ -6796,7 +6800,14 @@
           "creating": "Skapar...",
           "success": "Produkt skapad",
           "successDescription": "Produkten har skapats. Du kan nu konfigurera priser och Stripe-koppling.",
-          "error": "Kunde inte skapa produkt"
+          "error": "Kunde inte skapa produkt",
+          "keyChecking": "Kontrollerar tillgänglighet...",
+          "keyExists": "Den här produktnyckeln finns redan",
+          "keyExistsDetail": "{name} ({type}, {status})",
+          "keyExistsProduct": "Produkt",
+          "keyExistsOpen": "Öppna befintlig",
+          "keyExistsSuggest": "Använd {key}",
+          "keyAvailable": "✓ Nyckeln är tillgänglig"
         },
         "status": {
           "active": "Aktiv",

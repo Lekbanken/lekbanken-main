@@ -275,6 +275,7 @@ export type ProductFilters = {
   stripeLinkageStatuses?: StripeLinkageStatus[];
   healthStatuses?: HealthStatus[];
   availabilityScopes?: AvailabilityScope[];
+  bundleFilter?: 'all' | 'products_only' | 'bundles_only';
 };
 
 export type ProductListResponse = {
@@ -287,6 +288,7 @@ export type ProductListResponse = {
     active: number;
     draft: number;
     missingStripe: number;
+    bundles: number;
   };
 };
 

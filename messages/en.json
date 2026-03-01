@@ -6354,10 +6354,14 @@
           "total": "Total",
           "active": "Active",
           "draft": "Draft",
+          "bundles": "Bundles",
           "missingStripe": "Missing Stripe"
         },
         "filters": {
           "searchPlaceholder": "Search products...",
+          "bundleAll": "All",
+          "productsOnly": "Products only",
+          "bundlesOnly": "Bundles only",
           "active": "Active",
           "draft": "Draft",
           "missingStripe": "Missing Stripe",
@@ -6435,7 +6439,14 @@
           "creating": "Creating...",
           "success": "Product created",
           "successDescription": "The product has been created. You can now configure pricing and Stripe connection.",
-          "error": "Failed to create product"
+          "error": "Failed to create product",
+          "keyChecking": "Checking availability...",
+          "keyExists": "This product key already exists",
+          "keyExistsDetail": "{name} ({type}, {status})",
+          "keyExistsProduct": "Product",
+          "keyExistsOpen": "Open existing",
+          "keyExistsSuggest": "Use {key}",
+          "keyAvailable": "✓ Key is available"
         },
         "status": {
           "active": "Active",

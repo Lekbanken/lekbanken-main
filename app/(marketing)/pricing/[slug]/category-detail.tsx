@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { createServerRlsClient } from "@/lib/supabase/server";
 import { PricingProductCard } from "../pricing-components";
+import { fetchBundleSlug } from "../pricing-server";
 import { getCategoryVisuals } from "../pricing-shared";
 import type { ProductCard } from "../pricing-shared";
 import StickyMobileCTA from "./sticky-mobile-cta";
@@ -213,7 +214,7 @@ export default async function CategoryDetail({
   const currency = "SEK";
   const t = await getTranslations("marketing.pricing");
 
-  const [products, bundlePrice, gameCount, individualSum] = await Promise.all([
+  const [products, bundlePrice, gameCount, individualSum, bundleSlug] = await Promise.all([
     fetchCategoryProducts(category.slug, currency),
     category.bundle_product_id
       ? fetchBundlePrice(category.bundle_product_id, currency)
@@ -222,7 +223,15 @@ export default async function CategoryDetail({
     category.bundle_product_id
       ? fetchIndividualYearlySum(category.slug, currency)
       : Promise.resolve({ sum: 0, pricedCount: 0 }),
+    category.bundle_product_id
+      ? fetchBundleSlug(category.bundle_product_id)
+      : Promise.resolve(null),
   ]);
+
+  // Bundle detail page URL (persuasion step before checkout)
+  const bundleHref = bundleSlug
+    ? `/pricing/${bundleSlug}`
+    : `/checkout/start?product=${category.bundle_product_id}`;
 
   // Calculate savings percentage
   // Only show when ALL products have yearly prices (prevents misleading partial data)
@@ -421,10 +430,15 @@ export default async function CategoryDetail({
                 {/* Primary CTA */}
                 <div id="sticky-sentinel">
                   <Link
-                    href={`/checkout/start?product=${category.bundle_product_id}`}
-                    className={`mt-5 flex w-full items-center justify-center rounded-xl bg-gradient-to-r ${gradient} px-5 py-3 text-base font-bold text-white shadow-md transition-all hover:shadow-lg hover:scale-[1.02]`}
+                    href={bundleHref}
+                    className={`mt-5 flex w-full flex-col items-center justify-center rounded-xl bg-gradient-to-r ${gradient} px-5 py-3 text-white shadow-md transition-all hover:shadow-lg hover:scale-[1.02]`}
                   >
-                    {t("categoryPage.buyBundle")}
+                    <span className="text-base font-bold">{t("categoryPage.buyBundle")}</span>
+                    {bundleSlug && (
+                      <span className="text-xs font-normal text-white/80">
+                        {t("categoryPage.buyBundleSubtitle")}
+                      </span>
+                    )}
                   </Link>
                 </div>
 
@@ -444,7 +458,7 @@ export default async function CategoryDetail({
       {/* Product Grid */}
       <div
         id="licenses"
-        className="mx-auto max-w-7xl scroll-mt-8 px-4 pb-16 sm:px-6 lg:px-8"
+        className="mx-auto max-w-7xl scroll-mt-24 px-4 pb-16 sm:px-6 lg:px-8"
       >
         {products.length > 0 ? (
           <div className="mt-8 grid grid-cols-1 gap-5 pb-20 lg:pb-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -489,7 +503,7 @@ export default async function CategoryDetail({
               : undefined
           }
           ctaLabel={t("categoryPage.buyBundle")}
-          ctaHref={`/checkout/start?product=${category.bundle_product_id}`}
+          ctaHref={bundleHref}
           secondaryLabel={t("categoryPage.seeLicenses")}
           secondaryHref="#licenses"
           gradient={gradient}

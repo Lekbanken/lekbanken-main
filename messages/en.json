@@ -9650,21 +9650,35 @@
           "seats": {
             "label": "Number of seats"
           },
+          "orgMode": {
+            "label": "Organization type",
+            "existing": "Existing organization",
+            "new": "New organization"
+          },
+          "existingOrg": {
+            "label": "Select organization",
+            "hint": "The license will be added to the selected organization.",
+            "createNew": "Create new organization\u2026"
+          },
           "plan": {
             "label": "Plan",
             "loading": "Loading plans…"
           }
         },
         "noAccount": "Don’t have an account?",
+        "total": "Total",
+        "vatHint": "VAT calculated at checkout",
         "actions": {
           "createAccount": "Create account",
           "starting": "Starting…",
           "goToPayment": "Go to payment",
-          "backToPricing": "Back to pricing"
+          "backToPricing": "Back to pricing",
+          "changePlan": "Change"
         },
         "errors": {
           "pickProduct": "Choose a plan.",
           "enterOrgName": "Enter an organization name.",
+          "pickOrg": "Select an organization.",
           "startCheckoutFailed": "Could not start checkout.",
           "missingCheckoutUrl": "Missing checkout URL.",
           "generic": "Something went wrong. Please try again."
@@ -9681,6 +9695,7 @@
         "labels": {
           "status": "Status:",
           "loading": "Loading…",
+          "elapsed": "{seconds}s",
           "organization": "Organization:",
           "seats": "Seats:"
         },
@@ -9692,6 +9707,12 @@
           "missingIntentId": "Missing purchase_intent_id.",
           "readStatusFailed": "Could not read status.",
           "generic": "Something went wrong. Please try again."
+        },
+        "timeout": {
+          "title": "This is taking longer than expected",
+          "subtitle": "Your payment went through, but activation is delayed. This can happen during high load.",
+          "retry": "Try again",
+          "supportHint": "Still not working? Contact us at"
         }
       },
       "success": {
@@ -9961,7 +9982,8 @@
         "bundleLabel": "License bundle",
         "perYear": "/year",
         "bundleIncludes": "Includes all {count} products",
-        "buyBundle": "Buy the full bundle",
+        "buyBundle": "See the bundle",
+        "buyBundleSubtitle": "see what's included",
         "saveBadge": "Save {percent}%",
         "saveAbsolute": "Save {amount}/year",
         "individualTotal": "bought individually",
@@ -9970,6 +9992,37 @@
         "licensesIncluded": "{count} licenses included",
         "seeLicenses": "See all licenses",
         "backToAll": "All categories"
+      },
+      "bundlePage": {
+        "licenses": "licenses",
+        "games": "games",
+        "bundlePrice": "Bundle price",
+        "buyNow": "Buy the bundle",
+        "guarantee": "30-day satisfaction guarantee",
+        "noCommitment": "No commitment",
+        "cancelAnytime": "Cancel anytime",
+        "instantAccess": "Instant access for the whole team",
+        "pricingNote": "Price is per license per year. Choose the number of licenses at checkout.",
+        "ctaSubtext": "Instant access after purchase",
+        "seeContents": "See what's included",
+        "savingsBreakdownTitle": "Show price breakdown",
+        "individualPrice": "Individually ({count} licenses)",
+        "bundlePriceLabel": "Bundle price (everything included)",
+        "youSave": "You save",
+        "whatsIncluded": "What's included",
+        "whatsIncludedDescription": "All licenses in the {category} category – one subscription, full access.",
+        "valueProp1Title": "Everything in one place",
+        "valueProp1Description": "Access all {count} licenses with a single subscription.",
+        "valueProp2Title": "Your whole team",
+        "valueProp2Description": "Share with all colleagues – unlimited users.",
+        "valueProp3Title": "Always up to date",
+        "valueProp3Description": "New games and activities are added continuously at no extra cost.",
+        "proofLicenses": "Licenses included",
+        "proofGames": "Games & activities",
+        "proofSavings": "Savings/year",
+        "proofSubscription": "Subscription",
+        "bottomCtaTitle": "Ready to get started?",
+        "backToCategory": "Back to {category}"
       },
       "products": {
         "autismnpf": { "name": "Autism & NPF", "description": "Activities adapted for autism and NPF" },

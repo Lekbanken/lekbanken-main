@@ -30,6 +30,12 @@ type RouteParams = {
   params: Promise<{ productId: string }>;
 };
 
+/** Return the most recent of updated_at and stripe_last_synced_at */
+function effectiveUpdatedAt(updatedAt: string, syncedAt: string | null | undefined): string {
+  if (!syncedAt) return updatedAt;
+  return new Date(syncedAt) > new Date(updatedAt) ? syncedAt : updatedAt;
+}
+
 export async function GET(request: Request, { params }: RouteParams) {
   const { productId } = await params;
   const supabase = await createServerRlsClient();
@@ -183,7 +189,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     health_issues: healthIssues,
     metadata: null,
     created_at: row.created_at,
-    updated_at: row.updated_at,
+    updated_at: effectiveUpdatedAt(row.updated_at, row.stripe_last_synced_at),
     created_by: null,
     prices: prices.map(p => ({
       id: p.id,

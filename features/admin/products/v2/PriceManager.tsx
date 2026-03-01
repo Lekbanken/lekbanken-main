@@ -389,33 +389,34 @@ function PriceRow({ price, onSetDefault, onDelete, isLoading }: PriceRowProps) {
   const isRecurring = price.interval !== 'one_time';
   
   return (
-    <div className="flex items-center justify-between py-3 px-4 bg-card hover:bg-muted/30 transition-colors">
-      <div className="flex items-center gap-4">
-        {/* Default Star */}
-        <button
-          onClick={onSetDefault}
-          disabled={isLoading || price.is_default}
-          className={`p-1 rounded hover:bg-muted ${price.is_default ? 'text-amber-500' : 'text-muted-foreground hover:text-amber-500'}`}
-          title={price.is_default ? t('tooltips.defaultPrice') : t('tooltips.makeDefault')}
-        >
-          <StarIcon className="h-4 w-4" />
-        </button>
-        
-        {/* Amount & Currency */}
-        <div>
-          <span className="font-semibold text-lg">{formatCurrency(price.amount, price.currency)}</span>
-          <span className="text-muted-foreground text-sm ml-2">/ {getIntervalLabel(price.interval)}</span>
-        </div>
-        
+    <div className="flex items-center gap-3 py-3 px-4 bg-card hover:bg-muted/30 transition-colors">
+      {/* Default Star — always visible */}
+      <button
+        onClick={onSetDefault}
+        disabled={isLoading || price.is_default}
+        className={`flex-shrink-0 p-1 rounded hover:bg-muted ${price.is_default ? 'text-amber-500' : 'text-muted-foreground hover:text-amber-500'}`}
+        title={price.is_default ? t('tooltips.defaultPrice') : t('tooltips.makeDefault')}
+      >
+        <StarIcon className="h-4 w-4" />
+      </button>
+
+      {/* Amount & Currency — always visible */}
+      <div className="flex-shrink-0">
+        <span className="font-semibold text-lg">{formatCurrency(price.amount, price.currency)}</span>
+        <span className="text-muted-foreground text-sm ml-1">/ {getIntervalLabel(price.interval)}</span>
+      </div>
+
+      {/* Badges — wrap when space is tight */}
+      <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1">
         {/* Nickname */}
         {price.nickname && (
           <span className="text-muted-foreground text-sm italic">({price.nickname})</span>
         )}
-        
+
         {/* Tax Behavior Badge with tooltip for synced prices */}
         <div className="relative group">
-          <Badge 
-            variant="outline" 
+          <Badge
+            variant="outline"
             className={`text-xs ${isSynced ? 'cursor-help' : ''}`}
           >
             {taxLabel}
@@ -431,23 +432,21 @@ function PriceRow({ price, onSetDefault, onDelete, isLoading }: PriceRowProps) {
             </div>
           )}
         </div>
-      </div>
-      
-      <div className="flex items-center gap-3">
-        {/* Lookup Key (read-only) */}
+
+        {/* Lookup Key (read-only) — truncated */}
         {price.lookup_key && (
-          <Badge variant="outline" className="text-xs font-mono text-muted-foreground" title={`Lookup Key: ${price.lookup_key}`}>
-            🔑 {price.lookup_key.length > 20 ? price.lookup_key.slice(0, 20) + '...' : price.lookup_key}
+          <Badge variant="outline" className="text-xs font-mono text-muted-foreground max-w-[10rem] truncate" title={`Lookup Key: ${price.lookup_key}`}>
+            🔑 {price.lookup_key}
           </Badge>
         )}
-        
+
         {/* Trial Period Badge - only for recurring */}
         {isRecurring && price.trial_period_days > 0 && (
           <Badge variant="secondary" className="text-xs" title={`${price.trial_period_days} dagars provperiod`}>
             🎁 {t('badges.trial', { days: price.trial_period_days })}
           </Badge>
         )}
-        
+
         {/* Stripe Sync Badge */}
         {isSynced ? (
           <Badge variant="outline" className="text-xs font-mono text-emerald-600" title={price.stripe_price_id || ''}>
@@ -458,18 +457,18 @@ function PriceRow({ price, onSetDefault, onDelete, isLoading }: PriceRowProps) {
             {t('badges.notSynced')}
           </Badge>
         )}
-        
-        {/* Delete Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onDelete}
-          disabled={isLoading}
-          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-        >
-          <TrashIcon className="h-4 w-4" />
-        </Button>
       </div>
+
+      {/* Delete Button — always visible, never pushed off-screen */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onDelete}
+        disabled={isLoading}
+        className="flex-shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+      >
+        <TrashIcon className="h-4 w-4" />
+      </Button>
     </div>
   );
 }

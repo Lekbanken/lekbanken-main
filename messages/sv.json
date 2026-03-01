@@ -10306,6 +10306,16 @@
           "seats": {
             "label": "Antal platser"
           },
+          "orgMode": {
+            "label": "Typ av organisation",
+            "existing": "Befintlig organisation",
+            "new": "Ny organisation"
+          },
+          "existingOrg": {
+            "label": "Välj organisation",
+            "hint": "Licensen läggs till på den valda organisationen.",
+            "createNew": "Skapa ny organisation…"
+          },
           "plan": {
             "label": "Plan",
             "loading": "Laddar planer…"
@@ -10317,15 +10327,19 @@
           "manageSubscription": "Hantera prenumeration"
         },
         "noAccount": "Har du inget konto?",
+        "total": "Totalt",
+        "vatHint": "Moms beräknas i kassan",
         "actions": {
           "createAccount": "Skapa konto",
           "starting": "Startar…",
           "goToPayment": "Gå till betalning",
-          "backToPricing": "Tillbaka till priser"
+          "backToPricing": "Tillbaka till priser",
+          "changePlan": "Ändra"
         },
         "errors": {
           "pickProduct": "Välj en plan.",
           "enterOrgName": "Ange organisationsnamn.",
+          "pickOrg": "Välj en organisation.",
           "startCheckoutFailed": "Kunde inte starta checkout.",
           "missingCheckoutUrl": "Saknar checkout-länk.",
           "generic": "Något gick fel. Försök igen."
@@ -10339,6 +10353,7 @@
         "labels": {
           "status": "Status:",
           "loading": "Laddar…",
+          "elapsed": "{seconds}s",
           "organization": "Organisation:",
           "seats": "Platser:"
         },
@@ -10350,6 +10365,12 @@
           "missingIntentId": "Saknar purchase_intent_id.",
           "readStatusFailed": "Kunde inte läsa status.",
           "generic": "Något gick fel. Försök igen."
+        },
+        "timeout": {
+          "title": "Det tar längre tid än väntat",
+          "subtitle": "Din betalning har gått igenom, men aktiveringen dröjer. Det kan bero på tillfällig belastning.",
+          "retry": "Försök igen",
+          "supportHint": "Fungerar det fortfarande inte? Kontakta oss på"
         },
         "personalSuccess": {
           "title": "Du har nu tillgång!",
@@ -10647,7 +10668,8 @@
         "bundleLabel": "Licenspaket",
         "perYear": "/år",
         "bundleIncludes": "Inkluderar alla {count} produkter",
-        "buyBundle": "Köp hela paketet",
+        "buyBundle": "Se paketet",
+        "buyBundleSubtitle": "se vad som ingår",
         "saveBadge": "Spara {percent}%",
         "saveAbsolute": "Spara {amount}/år",
         "individualTotal": "köpt individuellt",
@@ -10656,6 +10678,37 @@
         "licensesIncluded": "{count} licenser ingår",
         "seeLicenses": "Se alla licenser",
         "backToAll": "Alla kategorier"
+      },
+      "bundlePage": {
+        "licenses": "licenser",
+        "games": "lekar",
+        "bundlePrice": "Paketpris",
+        "buyNow": "Köp paketet",
+        "guarantee": "30 dagars nöjdhetsgaranti",
+        "noCommitment": "Ingen bindningstid",
+        "cancelAnytime": "Avsluta när du vill",
+        "instantAccess": "Direkt tillgång för hela teamet",
+        "pricingNote": "Priset gäller per licens och år. Antal licenser väljer du i kassan.",
+        "ctaSubtext": "Direkt tillgång efter köp",
+        "seeContents": "Se vad som ingår",
+        "savingsBreakdownTitle": "Visa prisuppdelning",
+        "individualPrice": "Individuellt ({count} licenser)",
+        "bundlePriceLabel": "Paketpris (allt inkluderat)",
+        "youSave": "Du sparar",
+        "whatsIncluded": "Det här ingår",
+        "whatsIncludedDescription": "Alla licenser i kategorin {category} – en prenumeration, full tillgång.",
+        "valueProp1Title": "Allt samlat",
+        "valueProp1Description": "Få tillgång till alla {count} licenser med en enda prenumeration.",
+        "valueProp2Title": "Hela teamet",
+        "valueProp2Description": "Dela med alla kollegor – obegränsat antal användare.",
+        "valueProp3Title": "Ständigt uppdaterat",
+        "valueProp3Description": "Nya lekar och aktiviteter läggs till löpande utan extra kostnad.",
+        "proofLicenses": "Licenser ingår",
+        "proofGames": "Lekar & aktiviteter",
+        "proofSavings": "Besparing/år",
+        "proofSubscription": "Prenumeration",
+        "bottomCtaTitle": "Redo att komma igång?",
+        "backToCategory": "Tillbaka till {category}"
       },
       "products": {
         "autismnpf": {

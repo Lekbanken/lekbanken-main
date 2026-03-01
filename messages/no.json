@@ -9982,6 +9982,16 @@
           "seats": {
             "label": "Antall plasser"
           },
+          "orgMode": {
+            "label": "Type organisasjon",
+            "existing": "Eksisterende organisasjon",
+            "new": "Ny organisasjon"
+          },
+          "existingOrg": {
+            "label": "Velg organisasjon",
+            "hint": "Lisensen legges til på den valgte organisasjonen.",
+            "createNew": "Opprett ny organisasjon…"
+          },
           "plan": {
             "label": "Plan",
             "loading": "Laster planer…"
@@ -9995,15 +10005,19 @@
           }
         },
         "noAccount": "Har du ikke en konto?",
+        "total": "Totalt",
+        "vatHint": "MVA beregnes i kassen",
         "actions": {
           "createAccount": "Opprett konto",
           "starting": "Starter…",
           "goToPayment": "Gå til betaling",
-          "backToPricing": "Tilbake til priser"
+          "backToPricing": "Tilbake til priser",
+          "changePlan": "Endre"
         },
         "errors": {
           "pickProduct": "Velg en plan.",
           "enterOrgName": "Skriv inn organisasjonsnavn.",
+          "pickOrg": "Velg en organisasjon.",
           "startCheckoutFailed": "Kunne ikke starte checkout.",
           "missingCheckoutUrl": "Mangler checkout-lenke.",
           "generic": "Noe gikk galt. Prøv igjen."
@@ -10020,6 +10034,7 @@
         "labels": {
           "status": "Status:",
           "loading": "Laster…",
+          "elapsed": "{seconds}s",
           "organization": "Organisasjon:",
           "seats": "Plasser:"
         },
@@ -10300,7 +10315,8 @@
         "bundleLabel": "Lisenspakke",
         "perYear": "/år",
         "bundleIncludes": "Inkluderer alle {count} produkter",
-        "buyBundle": "Kjøp hele pakken",
+        "buyBundle": "Se pakken",
+        "buyBundleSubtitle": "se hva som er inkludert",
         "saveBadge": "Spar {percent}%",
         "saveAbsolute": "Spar {amount}/år",
         "individualTotal": "kjøpt individuelt",
@@ -10309,6 +10325,37 @@
         "licensesIncluded": "{count} lisenser inkludert",
         "seeLicenses": "Se alle lisenser",
         "backToAll": "Alle kategorier"
+      },
+      "bundlePage": {
+        "licenses": "lisenser",
+        "games": "leker",
+        "bundlePrice": "Pakkepris",
+        "buyNow": "Kjøp pakken",
+        "guarantee": "30 dagers tilfredshetsgaranti",
+        "noCommitment": "Ingen bindingstid",
+        "cancelAnytime": "Avslutt når du vil",
+        "instantAccess": "Direkte tilgang for hele teamet",
+        "pricingNote": "Prisen gjelder per lisens og år. Antall lisenser velger du i kassen.",
+        "ctaSubtext": "Direkte tilgang etter kjøp",
+        "seeContents": "Se hva som er inkludert",
+        "savingsBreakdownTitle": "Vis prisfordeling",
+        "individualPrice": "Individuelt ({count} lisenser)",
+        "bundlePriceLabel": "Pakkepris (alt inkludert)",
+        "youSave": "Du sparer",
+        "whatsIncluded": "Dette er inkludert",
+        "whatsIncludedDescription": "Alle lisenser i kategorien {category} – ett abonnement, full tilgang.",
+        "valueProp1Title": "Alt samlet",
+        "valueProp1Description": "Få tilgang til alle {count} lisenser med ett enkelt abonnement.",
+        "valueProp2Title": "Hele teamet",
+        "valueProp2Description": "Del med alle kolleger – ubegrenset antall brukere.",
+        "valueProp3Title": "Alltid oppdatert",
+        "valueProp3Description": "Nye leker og aktiviteter legges til løpende uten ekstra kostnad.",
+        "proofLicenses": "Lisenser inkludert",
+        "proofGames": "Leker og aktiviteter",
+        "proofSavings": "Besparelse/år",
+        "proofSubscription": "Abonnement",
+        "bottomCtaTitle": "Klar til å komme i gang?",
+        "backToCategory": "Tilbake til {category}"
       },
       "products": {
         "autismnpf": { "name": "Autisme & NPF", "description": "Aktiviteter tilpasset autisme og NPF" },

@@ -280,6 +280,12 @@ export type ProductListResponse = {
   total: number;
   page: number;
   pageSize: number;
+  stats?: {
+    total: number;
+    active: number;
+    draft: number;
+    missingStripe: number;
+  };
 };
 
 // ============================================================================

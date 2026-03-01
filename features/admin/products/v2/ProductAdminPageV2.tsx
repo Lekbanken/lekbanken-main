@@ -584,6 +584,7 @@ export function ProductAdminPageV2() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState({ total: 0, active: 0, draft: 0, missingStripe: 0 });
 
   // Filter state
   const [filters, setFilters] = useState<ProductFilters>({
@@ -600,16 +601,6 @@ export function ProductAdminPageV2() {
   const canView = can('admin.products.list');
   const canEdit = can('admin.products.edit');
   const canCreate = can('admin.products.create');
-
-  // Stats
-  const stats = useMemo(() => {
-    return {
-      total: totalProducts,
-      active: products.filter((p) => p.status === 'active').length,
-      draft: products.filter((p) => p.status === 'draft').length,
-      missingStripe: products.filter((p) => p.stripe_linkage.status === 'missing').length,
-    };
-  }, [products, totalProducts]);
 
   // Load products
   const loadProducts = useCallback(async () => {
@@ -633,6 +624,7 @@ export function ProductAdminPageV2() {
       const data: ProductListResponse = await response.json();
       setProducts(data.products);
       setTotalProducts(data.total);
+      if (data.stats) setStats(data.stats);
     } catch (err) {
       console.error('[ProductAdminPageV2] Load error:', err);
       setError(err instanceof Error ? err.message : 'Failed to load products');

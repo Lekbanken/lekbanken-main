@@ -1,4 +1,5 @@
 import { createServerRlsClient } from "@/lib/supabase/server";
+import BundleDetail from "./bundle-detail";
 import CategoryDetail from "./category-detail";
 import ProductDetailClient from "./product-detail-client";
 import type { CrossSellData } from "./product-detail-client";
@@ -146,6 +147,40 @@ export default async function PricingSlugPage({ params }: PageProps) {
 
   if (category) {
     return <CategoryDetail category={category} />;
+  }
+
+  // Try to resolve as a bundle product (product with is_bundle = true)
+  const { data: bundleProduct } = await supabase
+    .from("products")
+    .select("id,name,description,customer_description,product_key,category_slug")
+    .eq("product_key", slug)
+    .eq("is_bundle", true)
+    .eq("status", "active")
+    .maybeSingle();
+
+  if (bundleProduct) {
+    if (!bundleProduct.category_slug) {
+      console.warn(
+        `[pricing] Bundle "${bundleProduct.product_key}" (${bundleProduct.id}) has no category_slug — falling through to product detail`
+      );
+    } else {
+      const { data: bundleCategory } = await supabase
+        .from("categories")
+        .select("slug,name,icon_key,bundle_product_id")
+        .eq("slug", bundleProduct.category_slug)
+        .eq("is_public", true)
+        .maybeSingle();
+
+      if (bundleCategory) {
+        return (
+          <BundleDetail bundle={bundleProduct} category={bundleCategory} />
+        );
+      }
+
+      console.warn(
+        `[pricing] Bundle "${bundleProduct.product_key}" links to category "${bundleProduct.category_slug}" which is not public — falling through to product detail`
+      );
+    }
   }
 
   // Fall through to product detail (client-side lookup)

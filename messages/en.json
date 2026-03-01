@@ -6551,6 +6551,7 @@
             "stripe": "Stripe",
             "settings": "Settings",
             "availability": "Availability",
+            "games": "Games",
             "entitlements": "Rules",
             "lifecycle": "Lifecycle"
           },
@@ -6614,6 +6615,17 @@
             "noDependencies": "No dependencies configured",
             "requires": "Requires",
             "excludes": "Excludes"
+          },
+          "games": {
+            "title": "Linked games",
+            "loading": "Loading games...",
+            "noGames": "No linked games",
+            "noGamesHelp": "Link games via the game builder's Settings section.",
+            "global": "Global",
+            "unlink": "Remove",
+            "unlinkSuccess": "\"{name}\" unlinked from the product",
+            "unlinkFailed": "Failed to unlink",
+            "helpText": "Games are linked to products via the game builder's Settings section."
           },
           "footer": {
             "tagline": "Activities, sessions, and sharing for coaches, teachers, and leaders.",

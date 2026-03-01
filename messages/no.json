@@ -6839,6 +6839,7 @@
             "stripe": "Stripe",
             "settings": "Innstillinger",
             "availability": "Tilgjengelighet",
+            "games": "Leker",
             "entitlements": "Regler",
             "lifecycle": "Livssyklus"
           },
@@ -6902,6 +6903,17 @@
             "noDependencies": "Ingen avhengigheter konfigurert",
             "requires": "Krever",
             "excludes": "Ekskluderer"
+          },
+          "games": {
+            "title": "Koblede leker",
+            "loading": "Laster leker...",
+            "noGames": "Ingen koblede leker",
+            "noGamesHelp": "Koble leker via lekbyggerens Innstillinger-seksjon.",
+            "global": "Global",
+            "unlink": "Fjern",
+            "unlinkSuccess": "\"{name}\" frakoblet fra produktet",
+            "unlinkFailed": "Kunne ikke fjerne kobling",
+            "helpText": "Leker kobles til produkter via lekbyggerens Innstillinger-seksjon."
           },
           "footer": {
             "tagline": "Aktiviteter, økter og deling for trenere, lærere og ledere.",

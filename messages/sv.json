@@ -6779,6 +6779,7 @@
           "keyLabel": "Produktnyckel (slug)",
           "keyPlaceholder": "t.ex. lekbanken-pro",
           "keyHelp": "Unik identifierare i URL:er. Genereras automatiskt från namnet.",
+          "typeLabel": "Typ",
           "categoryLabel": "Typ",
           "statusLabel": "Status",
           "statusActive": "Aktiv",

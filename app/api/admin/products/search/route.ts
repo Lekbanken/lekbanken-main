@@ -234,6 +234,8 @@ export async function POST(request: Request) {
       customer_description: row.customer_description ?? null,
       product_type: productType,
       category: row.category || 'general',
+      is_bundle: row.is_bundle ?? false,
+      category_slug: row.category_slug ?? null,
       tags: [],
       status,
       unit_label: (row.unit_label as UnitLabel) || 'seat',

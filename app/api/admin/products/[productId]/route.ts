@@ -135,8 +135,14 @@ export async function GET(request: Request, { params }: RouteParams) {
   }
   // Note: Would check stripe linkage here once column exists
 
-  // Infer product type from category
-  const productType: ProductType = row.category === 'subscription' ? 'subscription' : 'license';
+  // Derive product type from is_bundle + legacy category
+  const productType: ProductType = row.is_bundle
+    ? 'addon' // bundles display as add-on type in legacy enum; real truth is is_bundle
+    : row.category === 'subscription'
+      ? 'subscription'
+      : row.category === 'addon'
+        ? 'addon'
+        : 'license';
 
   const product: ProductDetail = {
     id: row.id,
@@ -146,6 +152,8 @@ export async function GET(request: Request, { params }: RouteParams) {
     customer_description: row.customer_description ?? null,
     product_type: productType,
     category: row.category || 'general',
+    is_bundle: row.is_bundle ?? false,
+    category_slug: row.category_slug ?? null,
     tags: [],
     status,
     // Critical Stripe fields (Step 1)
@@ -266,7 +274,14 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   // Original fields
   if (body.name !== undefined) trackChange('name', body.name);
   if (body.description !== undefined) trackChange('description', body.description);
-  if (body.category !== undefined) trackChange('category', body.category);
+  if (body.category !== undefined) {
+    trackChange('category', body.category);
+    // Keep is_bundle in sync with category (single source of truth)
+    const newIsBundle = body.category === 'bundle';
+    if (newIsBundle !== currentProduct.is_bundle) {
+      trackChange('is_bundle', newIsBundle);
+    }
+  }
   if (body.product_key !== undefined) trackChange('product_key', body.product_key);
   
   // Customer-facing description (syncs to Stripe)

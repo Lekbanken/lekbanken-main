@@ -49,6 +49,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
   }
 
+  // Normalise is_bundle: explicit boolean wins, fallback to legacy category signal
+  const is_bundle: boolean = typeof body.is_bundle === 'boolean'
+    ? body.is_bundle
+    : (body.category === 'bundle');
+
   const payload = {
     name: body.name?.trim() || '',
     category: body.category?.trim() || 'general',
@@ -56,7 +61,7 @@ export async function POST(request: Request) {
     status: body.status || 'active',
     capabilities: Array.isArray(body.capabilities) ? body.capabilities : [],
     product_key: body.product_key!.trim().toLowerCase(),
-    ...(typeof body.is_bundle === 'boolean' ? { is_bundle: body.is_bundle } : {}),
+    is_bundle,
     ...(typeof body.category_slug === 'string' ? { category_slug: body.category_slug || null } : {}),
   }
 

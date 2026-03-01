@@ -211,7 +211,7 @@ export function ProductCreatePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-1.5">
                   <label htmlFor="product-category" className="text-sm font-medium">
-                    {t('categoryLabel')}
+                    {t('typeLabel')}
                   </label>
                   <Select
                     id="product-category"

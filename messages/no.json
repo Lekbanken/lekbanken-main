@@ -6706,6 +6706,7 @@
           "keyLabel": "Produktnøkkel (slug)",
           "keyPlaceholder": "f.eks. lekbanken-pro",
           "keyHelp": "Unik identifikator i URL-er. Genereres automatisk fra navnet.",
+          "typeLabel": "Type",
           "categoryLabel": "Type",
           "statusLabel": "Status",
           "statusActive": "Aktiv",

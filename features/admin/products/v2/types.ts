@@ -198,6 +198,8 @@ export type ProductAdminRow = {
   // Classification
   product_type: ProductType;
   category: string;
+  is_bundle: boolean;
+  category_slug: string | null;
   tags: string[];
   status: ProductStatus;
   

@@ -275,9 +275,24 @@ function OverviewTab({ product, onRefresh: _onRefresh, onNavigateToTab }: {
               </code>
             </InfoRow>
             <InfoRow label={t('overview.type')}>
-              <Badge variant="outline">{typeMeta.label}</Badge>
+              <div className="flex items-center gap-1.5">
+                <Badge variant="outline">
+                  {product.is_bundle
+                    ? 'Bundle'
+                    : product.category === 'addon'
+                      ? 'Add-on'
+                      : product.category === 'platform'
+                        ? 'Platform'
+                        : typeMeta.label}
+                </Badge>
+                {product.is_bundle && (
+                  <Badge variant="secondary" className="text-[10px]">is_bundle</Badge>
+                )}
+              </div>
             </InfoRow>
-            <InfoRow label={t('overview.category')}>{product.category || '—'}</InfoRow>
+            {product.category_slug && (
+              <InfoRow label={t('overview.category')}>{product.category_slug}</InfoRow>
+            )}
             <InfoRow label={t('overview.status')}><StatusBadge status={product.status} /></InfoRow>
           </CardContent>
         </Card>

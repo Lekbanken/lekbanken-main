@@ -6418,6 +6418,7 @@
           "keyLabel": "Product key (slug)",
           "keyPlaceholder": "e.g., lekbanken-pro",
           "keyHelp": "Unique identifier used in URLs. Auto-generated from the name.",
+          "typeLabel": "Type",
           "categoryLabel": "Type",
           "statusLabel": "Status",
           "statusActive": "Active",

@@ -18,16 +18,12 @@ type ProductGridProps = {
   hasBundleOption: boolean;
   /** Category visuals for icon fallback */
   iconKey: string | null;
-  gradient: string;
-  iconColor: string;
 };
 
 export default function ProductGrid({
   products,
   hasBundleOption,
   iconKey,
-  gradient,
-  iconColor,
 }: ProductGridProps) {
   const t = useTranslations("marketing.pricing.categoryPage");
   const [selectedProduct, setSelectedProduct] = useState<ProductCard | null>(
@@ -117,8 +113,6 @@ export default function ProductGrid({
         product={selectedProduct}
         open={sheetOpen}
         onOpenChange={setSheetOpen}
-        gradient={gradient}
-        iconColor={iconColor}
         hasBundleOption={hasBundleOption}
       />
     </>

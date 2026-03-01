@@ -21,8 +21,6 @@ type ProductInfoSheetProps = {
   product: ProductCard | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  gradient: string;
-  iconColor: string;
   hasBundleOption: boolean;
 };
 
@@ -30,7 +28,6 @@ export default function ProductInfoSheet({
   product,
   open,
   onOpenChange,
-  gradient,
   hasBundleOption,
 }: ProductInfoSheetProps) {
   const t = useTranslations("marketing.pricing.productSheet");
@@ -116,7 +113,7 @@ export default function ProductInfoSheet({
         <SheetFooter className="mt-6 flex-col gap-2 sm:flex-col">
           <a
             href={checkoutHref}
-            className={`flex w-full items-center justify-center rounded-xl bg-gradient-to-r ${gradient} px-5 py-3 text-base font-bold text-white shadow-md transition-all hover:shadow-lg hover:scale-[1.02]`}
+            className="flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3 text-base font-bold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md"
           >
             {t("buyLicense")}
           </a>

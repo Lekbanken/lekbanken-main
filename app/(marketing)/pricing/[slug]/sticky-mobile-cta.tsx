@@ -26,8 +26,6 @@ type StickyCTAProps = {
   secondaryLabel?: string;
   /** Secondary action: href string for <a> or <Link> */
   secondaryHref?: string;
-  /** Gradient classes for CTA button, e.g. "from-purple-400 to-violet-500" */
-  gradient?: string;
 };
 
 export default function StickyMobileCTA({
@@ -38,7 +36,6 @@ export default function StickyMobileCTA({
   ctaHref,
   secondaryLabel,
   secondaryHref,
-  gradient,
 }: StickyCTAProps) {
   const [visible, setVisible] = useState(true);
 
@@ -61,10 +58,6 @@ export default function StickyMobileCTA({
   }, []);
 
   if (!visible) return null;
-
-  const btnGradient = gradient
-    ? `bg-gradient-to-r ${gradient}`
-    : "bg-indigo-600 hover:bg-indigo-700";
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)] lg:hidden">
@@ -98,7 +91,7 @@ export default function StickyMobileCTA({
         {/* CTA button */}
         <Link
           href={ctaHref}
-          className={`flex-shrink-0 rounded-xl ${btnGradient} px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all active:scale-95`}
+          className="flex-shrink-0 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-95"
         >
           {ctaLabel}
         </Link>

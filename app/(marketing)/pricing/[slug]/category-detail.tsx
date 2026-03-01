@@ -456,8 +456,6 @@ export default async function CategoryDetail({
               products={products}
               hasBundleOption={!!category.bundle_product_id}
               iconKey={category.icon_key}
-              gradient={gradient}
-              iconColor={iconColor}
             />
           </>
         ) : (
@@ -501,7 +499,6 @@ export default async function CategoryDetail({
           ctaHref={bundleHref}
           secondaryLabel={t("categoryPage.seeLicenses")}
           secondaryHref="#licenses"
-          gradient={gradient}
         />
       )}
     </div>

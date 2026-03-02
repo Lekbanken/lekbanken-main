@@ -54,6 +54,7 @@ const statusOrder: OrganisationListStatus[] = [
   "inactive",
   "suspended",
   "archived",
+  "anonymized",
 ];
 
 function slugify(value: string) {
@@ -212,10 +213,27 @@ export function OrganisationAdminPage({
 
   const handleRemove = async (orgId: string) => {
     try {
-      const { error: deleteError } = await supabase.from("tenants").delete().eq("id", orgId);
+      const { data, error: deleteError } = await supabase
+        .from("tenants")
+        .delete()
+        .eq("id", orgId)
+        .select("id")
+        .maybeSingle();
 
       if (deleteError) {
+        // Surface FK-violation errors with a user-friendly message
+        if (deleteError.code === "23503") {
+          throw new Error(
+            "Organisationen kan inte tas bort eftersom den har kopplad data (medlemmar, innehåll, etc). Arkivera den istället, eller ta bort kopplad data först."
+          );
+        }
         throw deleteError;
+      }
+
+      if (!data) {
+        throw new Error(
+          "Organisationen kunde inte tas bort. Kontrollera att du har rätt behörighet (system_admin)."
+        );
       }
 
       setOrganisations((prev) => prev.filter((org) => org.id !== orgId));
@@ -226,6 +244,7 @@ export function OrganisationAdminPage({
       const message = err instanceof Error ? err.message : "Kunde inte ta bort organisation.";
       setError(message);
       toastError(message);
+      throw err; // Re-throw so confirmation dialog stays open
     }
   };
 

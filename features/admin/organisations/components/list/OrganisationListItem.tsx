@@ -18,24 +18,23 @@ import {
   LinkIcon,
 } from "@heroicons/react/24/outline";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
   Badge,
   Button,
   Card,
   CardContent,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Input,
   useToast,
 } from "@/components/ui";
 import type { AdminOrganisationListItem, OrganisationListStatus } from "../../types";
@@ -50,12 +49,13 @@ type OrganisationListItemProps = {
   onRemove?: (organisationId: string) => Promise<void>;
 };
 
-const statusVariants: Record<OrganisationListStatus, "success" | "warning" | "error" | "secondary" | "accent"> = {
+const statusVariants: Record<OrganisationListStatus, "success" | "warning" | "error" | "secondary" | "accent" | "destructive"> = {
   active: "success",
   trial: "warning",
   demo: "accent",
   suspended: "error",
   archived: "secondary",
+  anonymized: "destructive",
   inactive: "secondary",
 };
 
@@ -105,7 +105,23 @@ export function OrganisationListItem({
   const router = useRouter();
   const { success, error } = useToast();
   const [removeOpen, setRemoveOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const isInactive = ["suspended", "archived", "inactive"].includes(organisation.status);
+
+  const handleConfirmedDelete = async () => {
+    if (deleteConfirmation.trim() !== 'DELETE=TRUE' || !onRemove) return;
+    setIsDeleting(true);
+    try {
+      await onRemove(organisation.id);
+      setRemoveOpen(false);
+      setDeleteConfirmation('');
+    } catch {
+      // Error handled by caller
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const handleRowClick = () => {
     router.push(`/admin/organisations/${organisation.id}`);
@@ -333,25 +349,49 @@ export function OrganisationListItem({
       </CardContent>
 
       {canDelete && onRemove && (
-        <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
-          <AlertDialogContent variant="destructive">
-            <AlertDialogHeader>
-              <AlertDialogTitle>{t('deleteOrgTitle')}</AlertDialogTitle>
-              <AlertDialogDescription>
+        <Dialog open={removeOpen} onOpenChange={(open) => { setRemoveOpen(open); if (!open) setDeleteConfirmation(''); }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-red-600">{t('deleteOrgTitle')}</DialogTitle>
+              <DialogDescription>
                 {t('deleteOrgWarning')}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-              <AlertDialogAction
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-2">
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900/50 dark:bg-red-900/20">
+                <p className="text-sm text-red-700 dark:text-red-400">
+                  {t('deleteConfirmHint')}
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium">
+                  {t('deleteConfirmLabel')}
+                </label>
+                <Input
+                  value={deleteConfirmation}
+                  onChange={(e) => setDeleteConfirmation(e.target.value)}
+                  placeholder="DELETE=TRUE"
+                  className="mt-2 font-mono"
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => { setRemoveOpen(false); setDeleteConfirmation(''); }}>
+                {t('cancel')}
+              </Button>
+              <Button
                 variant="destructive"
-                onClick={() => onRemove && void onRemove(organisation.id)}
+                onClick={handleConfirmedDelete}
+                disabled={isDeleting || deleteConfirmation.trim() !== 'DELETE=TRUE'}
               >
-                {t('delete')}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+                {isDeleting ? t('deleting') : t('delete')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </Card>
   );

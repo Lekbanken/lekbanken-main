@@ -206,24 +206,6 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
     }
   };
 
-  // Handle delete
-  const handleDelete = async () => {
-    try {
-      const { error: deleteError } = await supabase
-        .from("tenants")
-        .delete()
-        .eq("id", tenantId);
-      
-      if (deleteError) throw deleteError;
-      
-      success("Organisation raderad");
-      router.push("/admin/organisations");
-    } catch (err) {
-      toastError("Kunde inte radera organisation");
-      console.error(err);
-    }
-  };
-
   if (isLoading) {
     return (
       <AdminPageLayout>
@@ -405,7 +387,7 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
             onSuspend={() => handleStatusChange('suspended')}
             onReactivate={() => handleStatusChange('active')}
             onArchive={() => handleStatusChange('archived')}
-            onDelete={handleDelete}
+            onRefresh={loadOrganisation}
           />
         </TabPanel>
 

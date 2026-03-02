@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslations } from 'next-intl';
 import { formatDateLong } from '@/lib/i18n/format-utils';
 import {
@@ -15,6 +15,8 @@ import {
   XMarkIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
+  KeyIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button, Input } from "@/components/ui";
@@ -36,7 +38,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/toast";
-import { loadMembersData, searchUsers, addMemberToTenant, changeMemberRole, removeMember } from "../../organisationSections.server";
+import {
+  loadMembersData,
+  searchUsers,
+  addMemberToTenant,
+  changeMemberRole,
+  removeMember,
+  loadSeatData,
+  assignSeatToMember,
+  releaseSeatFromMember,
+} from "../../organisationSections.server";
+import type { SeatEntitlementRow, SeatAssignmentRow } from "../../organisationSections.server";
 import type { MemberSummary } from "../../types";
 
 type TenantRole = 'owner' | 'admin' | 'member';
@@ -400,6 +412,96 @@ function AddMemberDialog({
   );
 }
 
+// Assign Seat Dialog Component
+type AssignSeatDialogProps = {
+  entitlements: SeatEntitlementRow[];
+  usedSeatsByEntitlement: Map<string, number>;
+  existingEntitlementIds: string[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onAssign: (entitlementId: string) => void;
+  t: ReturnType<typeof useTranslations>;
+};
+
+function AssignSeatDialog({
+  entitlements,
+  usedSeatsByEntitlement,
+  existingEntitlementIds,
+  open,
+  onOpenChange,
+  onAssign,
+  t,
+}: AssignSeatDialogProps) {
+  const [selectedEntitlementId, setSelectedEntitlementId] = useState('');
+
+  // Reset when dialog closes
+  useEffect(() => {
+    if (!open) setSelectedEntitlementId('');
+  }, [open]);
+
+  // Filter to active entitlements that have available seats and aren't already assigned
+  const availableEntitlements = useMemo(() => {
+    return entitlements.filter((e) => {
+      if (e.status !== 'active') return false;
+      if (existingEntitlementIds.includes(e.id)) return false;
+      const used = usedSeatsByEntitlement.get(e.id) ?? 0;
+      return used < e.quantity_seats;
+    });
+  }, [entitlements, existingEntitlementIds, usedSeatsByEntitlement]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <KeyIcon className="h-5 w-5" />
+            {t('assignSeatTitle')}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          {availableEntitlements.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t('noActiveLicenses')}</p>
+          ) : (
+            <>
+              <Select
+                value={selectedEntitlementId}
+                onChange={(e) => setSelectedEntitlementId(e.target.value)}
+                placeholder={t('selectLicense')}
+                options={availableEntitlements.map((e) => {
+                  const label = e.product?.name ?? e.product?.product_key ?? e.id;
+                  const used = usedSeatsByEntitlement.get(e.id) ?? 0;
+                  return {
+                    value: e.id,
+                    label: `${label} (${t('seatsLabel', { used, max: e.quantity_seats })})`,
+                  };
+                })}
+              />
+            </>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t('cancel')}
+          </Button>
+          <Button
+            disabled={!selectedEntitlementId}
+            onClick={() => {
+              if (selectedEntitlementId) {
+                onAssign(selectedEntitlementId);
+                setSelectedEntitlementId('');
+                onOpenChange(false);
+              }
+            }}
+          >
+            <KeyIcon className="h-3.5 w-3.5 mr-1.5" />
+            {t('assign')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function OrganisationMembersList({
   tenantId,
   summary,
@@ -414,20 +516,28 @@ export function OrganisationMembersList({
   const [roleFilter, setRoleFilter] = useState<TenantRole | 'all'>('all');
   const [isUpdatingRole, setIsUpdatingRole] = useState<string | null>(null);
   const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
+
+  // Seat assignment state
+  const [entitlements, setEntitlements] = useState<SeatEntitlementRow[]>([]);
+  const [seatAssignments, setSeatAssignments] = useState<SeatAssignmentRow[]>([]);
+  const [assignSeatForUserId, setAssignSeatForUserId] = useState<string | null>(null);
   
   // Load members
   const loadMembers = useCallback(async () => {
     setIsLoading(true);
     try {
-      const result = await loadMembersData(tenantId);
+      const [membersResult, seatsResult] = await Promise.all([
+        loadMembersData(tenantId),
+        loadSeatData(tenantId),
+      ]);
 
-      if (result.error) {
+      if (membersResult.error) {
         toastError(t('loadFailed'));
-        console.error('[OrganisationMembersList] Server action error:', result.error);
+        console.error('[OrganisationMembersList] Server action error:', membersResult.error);
         return;
       }
 
-      const mappedMembers: Member[] = result.members.map((m) => ({
+      const mappedMembers: Member[] = membersResult.members.map((m) => ({
         id: m.id,
         userId: m.userId,
         email: m.email,
@@ -440,6 +550,13 @@ export function OrganisationMembersList({
       }));
 
       setMembers(mappedMembers);
+
+      if (seatsResult.error) {
+        console.error('[OrganisationMembersList] Seat data error:', seatsResult.error);
+      } else {
+        setEntitlements(seatsResult.entitlements);
+        setSeatAssignments(seatsResult.assignments);
+      }
     } catch (err) {
       console.error('Failed to load members:', err);
       toastError(t('loadFailed'));
@@ -451,6 +568,70 @@ export function OrganisationMembersList({
   useEffect(() => {
     loadMembers();
   }, [loadMembers]);
+
+  // Seat assignment lookup maps
+  const assignmentsByUser = useMemo(() => {
+    const map = new Map<string, SeatAssignmentRow[]>();
+    for (const a of seatAssignments) {
+      if (a.status !== 'active') continue;
+      const arr = map.get(a.user_id) ?? [];
+      arr.push(a);
+      map.set(a.user_id, arr);
+    }
+    return map;
+  }, [seatAssignments]);
+
+  const entitlementById = useMemo(() => {
+    const map = new Map<string, SeatEntitlementRow>();
+    for (const e of entitlements) map.set(e.id, e);
+    return map;
+  }, [entitlements]);
+
+  const usedSeatsByEntitlement = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const a of seatAssignments) {
+      if (a.status !== 'active') continue;
+      map.set(a.entitlement_id, (map.get(a.entitlement_id) ?? 0) + 1);
+    }
+    return map;
+  }, [seatAssignments]);
+
+  // Seat actions
+  const handleAssignSeat = async (userId: string, entitlementId: string) => {
+    try {
+      const result = await assignSeatToMember({
+        tenantId,
+        entitlementId,
+        userId,
+      });
+      if (result.error) {
+        toastError(t('seatAssignFailed'));
+        console.error('[handleAssignSeat] Error:', result.error);
+        return;
+      }
+      success(t('seatAssigned'));
+      await loadMembers();
+    } catch (err) {
+      console.error('Failed to assign seat:', err);
+      toastError(t('seatAssignFailed'));
+    }
+  };
+
+  const handleReleaseSeat = async (assignmentId: string) => {
+    try {
+      const result = await releaseSeatFromMember(assignmentId, tenantId);
+      if (result.error) {
+        toastError(t('seatReleaseFailed'));
+        console.error('[handleReleaseSeat] Error:', result.error);
+        return;
+      }
+      success(t('seatReleased'));
+      await loadMembers();
+    } catch (err) {
+      console.error('Failed to release seat:', err);
+      toastError(t('seatReleaseFailed'));
+    }
+  };
   
   // Filter members
   const filteredMembers = members.filter((member) => {
@@ -636,6 +817,9 @@ export function OrganisationMembersList({
                       {t('tableRole')}
                     </th>
                     <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">
+                      {t('tableLicenses')}
+                    </th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">
                       {t('tableMemberSince')}
                     </th>
                     <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">
@@ -647,6 +831,7 @@ export function OrganisationMembersList({
                   {filteredMembers.map((member) => {
                     const RoleIcon = roleIcons[member.role] ?? UserIcon;
                     const roleLabel = member.role === 'owner' ? t('roleOwner') : member.role === 'admin' ? t('roleAdmin') : t('roleMember');
+                    const userAssignments = assignmentsByUser.get(member.userId) ?? [];
                     return (
                       <tr key={member.id} className="hover:bg-muted/30 transition-colors">
                         <td className="px-4 py-3">
@@ -674,6 +859,45 @@ export function OrganisationMembersList({
                             <RoleIcon className="h-3.5 w-3.5" />
                             {roleLabel}
                           </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {userAssignments.length === 0 ? (
+                              <span className="text-xs text-muted-foreground italic">
+                                {t('noLicenseSeats')}
+                              </span>
+                            ) : (
+                              userAssignments.map((a) => {
+                                const ent = entitlementById.get(a.entitlement_id);
+                                const label = ent?.product?.name ?? ent?.product?.product_key ?? '?';
+                                return (
+                                  <span
+                                    key={a.id}
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400"
+                                  >
+                                    <KeyIcon className="h-3 w-3" />
+                                    {label}
+                                    <button
+                                      onClick={() => void handleReleaseSeat(a.id)}
+                                      className="ml-0.5 hover:text-destructive transition-colors"
+                                      title={t('releaseSeat')}
+                                    >
+                                      <XMarkIcon className="h-3 w-3" />
+                                    </button>
+                                  </span>
+                                );
+                              })
+                            )}
+                            {entitlements.length > 0 && (
+                              <button
+                                onClick={() => setAssignSeatForUserId(member.userId)}
+                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                                title={t('assignSeat')}
+                              >
+                                <PlusIcon className="h-3.5 w-3.5" />
+                              </button>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
                           {formatDate(member.createdAt)}
@@ -742,6 +966,25 @@ export function OrganisationMembersList({
           loadMembers();
           onRefresh();
         }}
+      />
+
+      {/* Assign Seat Dialog */}
+      <AssignSeatDialog
+        entitlements={entitlements}
+        usedSeatsByEntitlement={usedSeatsByEntitlement}
+        existingEntitlementIds={
+          assignSeatForUserId
+            ? (assignmentsByUser.get(assignSeatForUserId) ?? []).map((a) => a.entitlement_id)
+            : []
+        }
+        open={!!assignSeatForUserId}
+        onOpenChange={(open) => { if (!open) setAssignSeatForUserId(null); }}
+        onAssign={(entitlementId) => {
+          if (assignSeatForUserId) {
+            void handleAssignSeat(assignSeatForUserId, entitlementId);
+          }
+        }}
+        t={t}
       />
     </div>
   );

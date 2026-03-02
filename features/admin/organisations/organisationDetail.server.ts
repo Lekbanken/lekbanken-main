@@ -191,6 +191,8 @@ export async function getOrganisationDetail(tenantId: string): Promise<{
       mainLanguage: tenant.main_language,
       defaultTheme: tenant.default_theme,
       trialEndsAt: tenant.trial_ends_at,
+      anonymizedAt: tenant.anonymized_at ?? null,
+      purgeAfter: tenant.purge_after ?? null,
       brandingEnabled: tenant.tenant_branding_enabled ?? false,
       branding,
       domains,

@@ -57,7 +57,7 @@ export type OrganisationCreatePayload = {
 /**
  * Full tenant status values from database
  */
-export type TenantStatus = 'active' | 'trial' | 'suspended' | 'archived' | 'demo' | 'inactive';
+export type TenantStatus = 'active' | 'trial' | 'suspended' | 'archived' | 'anonymized' | 'demo' | 'inactive';
 
 /**
  * Tenant type classification
@@ -72,6 +72,7 @@ export const tenantStatusLabels: Record<TenantStatus, string> = {
   trial: "Provperiod",
   suspended: "Avstängd",
   archived: "Arkiverad",
+  anonymized: "Anonymiserad",
   demo: "Demo",
   inactive: "Inaktiv",
 };
@@ -79,11 +80,12 @@ export const tenantStatusLabels: Record<TenantStatus, string> = {
 /**
  * Status colors for badges
  */
-export const tenantStatusColors: Record<TenantStatus, "green" | "blue" | "amber" | "gray" | "purple"> = {
+export const tenantStatusColors: Record<TenantStatus, "green" | "blue" | "amber" | "gray" | "purple" | "red"> = {
   active: "green",
   trial: "blue",
   suspended: "amber",
   archived: "gray",
+  anonymized: "red",
   demo: "purple",
   inactive: "gray",
 };
@@ -254,6 +256,10 @@ export type OrganisationDetail = {
 
   // Trial
   trialEndsAt: string | null;
+
+  // Anonymization
+  anonymizedAt: string | null;
+  purgeAfter: string | null;
   
   // Branding feature toggle (system admin controlled)
   brandingEnabled: boolean;

@@ -94,6 +94,8 @@ export const env = {
     tenantCookieSecret: process.env.TENANT_COOKIE_SECRET || 'dev-secret-change-in-production',
     jwtSecret: process.env.JWT_SECRET,
     mfaEnforceSystemAdmin: process.env.MFA_ENFORCE_SYSTEM_ADMIN === 'true',
+    /** 64-char hex (32 bytes) key for AES-256-GCM vault encryption. Server-only. */
+    vaultEncryptionKey: process.env.VAULT_ENCRYPTION_KEY,
   },
   
   // Auth (Optional)

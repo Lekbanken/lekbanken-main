@@ -481,6 +481,177 @@ export async function changeMemberRole(input: {
 }
 
 // ============================================================================
+// Seats: load entitlements + seat assignments for a tenant
+// ============================================================================
+
+export type SeatEntitlementRow = {
+  id: string;
+  status: string;
+  quantity_seats: number;
+  product: { id: string; name: string | null; product_key: string } | null;
+};
+
+export type SeatAssignmentRow = {
+  id: string;
+  entitlement_id: string;
+  user_id: string;
+  status: string;
+  assigned_at: string;
+};
+
+export async function loadSeatData(tenantId: string): Promise<{
+  entitlements: SeatEntitlementRow[];
+  assignments: SeatAssignmentRow[];
+  error: string | null;
+}> {
+  try {
+    await requireSystemAdmin("/admin/organisations");
+  } catch {
+    return { entitlements: [], assignments: [], error: "Ingen behörighet" };
+  }
+
+  const supabase = await createServerRlsClient();
+
+  try {
+    const [entRes, asgRes] = await Promise.all([
+      supabase
+        .from("tenant_product_entitlements")
+        .select("id, status, quantity_seats, product:products(id, name, product_key)")
+        .eq("tenant_id", tenantId)
+        .eq("status", "active")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("tenant_entitlement_seat_assignments")
+        .select("id, entitlement_id, user_id, status, assigned_at")
+        .eq("tenant_id", tenantId)
+        .eq("status", "active")
+        .order("assigned_at", { ascending: false }),
+    ]);
+
+    if (entRes.error) {
+      console.error("[loadSeatData] Entitlements error:", entRes.error);
+      return { entitlements: [], assignments: [], error: entRes.error.message };
+    }
+    if (asgRes.error) {
+      console.error("[loadSeatData] Assignments error:", asgRes.error);
+      return { entitlements: [], assignments: [], error: asgRes.error.message };
+    }
+
+    const entitlements = ((entRes.data ?? []) as SeatEntitlementRow[]).filter(
+      (r) => typeof r?.id === "string"
+    );
+    const assignments = ((asgRes.data ?? []) as SeatAssignmentRow[]).filter(
+      (r) => typeof r?.id === "string"
+    );
+
+    return { entitlements, assignments, error: null };
+  } catch (err) {
+    console.error("[loadSeatData] Unexpected error:", err);
+    return {
+      entitlements: [],
+      assignments: [],
+      error: err instanceof Error ? err.message : "Okänt fel",
+    };
+  }
+}
+
+// ============================================================================
+// Seats: assign seat to member
+// ============================================================================
+
+export async function assignSeatToMember(input: {
+  tenantId: string;
+  entitlementId: string;
+  userId: string;
+}): Promise<{ error: string | null }> {
+  try {
+    await requireSystemAdmin("/admin/organisations");
+  } catch {
+    return { error: "Ingen behörighet" };
+  }
+
+  const supabase = await createServerRlsClient();
+
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { error: insertError } = await supabase
+      .from("tenant_entitlement_seat_assignments")
+      .insert({
+        tenant_id: input.tenantId,
+        entitlement_id: input.entitlementId,
+        user_id: input.userId,
+        assigned_by: user?.id ?? null,
+        status: "active",
+      });
+
+    if (insertError) {
+      console.error("[assignSeatToMember] Insert error:", insertError);
+      return { error: insertError.message };
+    }
+
+    // Log audit
+    await supabase.from("tenant_audit_logs").insert({
+      tenant_id: input.tenantId,
+      event_type: "seat_assigned",
+      payload: {
+        entitlementId: input.entitlementId,
+        userId: input.userId,
+        assignedBy: user?.id,
+      },
+    });
+
+    return { error: null };
+  } catch (err) {
+    console.error("[assignSeatToMember] Unexpected error:", err);
+    return { error: err instanceof Error ? err.message : "Okänt fel" };
+  }
+}
+
+// ============================================================================
+// Seats: release seat from member
+// ============================================================================
+
+export async function releaseSeatFromMember(
+  assignmentId: string,
+  tenantId: string
+): Promise<{ error: string | null }> {
+  try {
+    await requireSystemAdmin("/admin/organisations");
+  } catch {
+    return { error: "Ingen behörighet" };
+  }
+
+  const supabase = await createServerRlsClient();
+
+  try {
+    const { error: updateError } = await supabase
+      .from("tenant_entitlement_seat_assignments")
+      .update({ status: "released", released_at: new Date().toISOString() })
+      .eq("id", assignmentId);
+
+    if (updateError) {
+      console.error("[releaseSeatFromMember] Update error:", updateError);
+      return { error: updateError.message };
+    }
+
+    // Log audit
+    await supabase.from("tenant_audit_logs").insert({
+      tenant_id: tenantId,
+      event_type: "seat_released",
+      payload: { assignmentId },
+    });
+
+    return { error: null };
+  } catch (err) {
+    console.error("[releaseSeatFromMember] Unexpected error:", err);
+    return { error: err instanceof Error ? err.message : "Okänt fel" };
+  }
+}
+
+// ============================================================================
 // Members: remove member
 // ============================================================================
 

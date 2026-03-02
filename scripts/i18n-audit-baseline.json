@@ -1,0 +1,36 @@
+{
+  "createdAt": "2026-03-02T23:41:23.814Z",
+  "metrics": {
+    "keys": {
+      "sv": 11399,
+      "no": 10955,
+      "en": 10875
+    },
+    "missing": {
+      "no": 1419,
+      "en": 932
+    },
+    "extra": {
+      "no": 975,
+      "en": 408
+    },
+    "placeholder": 34,
+    "interpolationMismatch": 0,
+    "probablyUntranslated": 372,
+    "unused": 2279,
+    "hardcodedActionable": {
+      "total": 1799,
+      "byGroup": {
+        "marketing": 3,
+        "play": 63,
+        "ui": 18
+      }
+    },
+    "mojibake": {
+      "sv": 373,
+      "no": 168,
+      "en": 21
+    },
+    "scopePrefixes": []
+  }
+}

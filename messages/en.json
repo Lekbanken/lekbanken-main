@@ -9231,7 +9231,7 @@
     },
     "subscription": {
       "title": "Subscription",
-      "subtitle": "Manage your subscription and invoices",
+      "subtitle": "Manage the subscription and invoices for {tenantName}",
       "tabs": {
         "overview": "Overview",
         "plans": "Plans",

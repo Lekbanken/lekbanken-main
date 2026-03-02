@@ -9570,7 +9570,7 @@
     },
     "subscription": {
       "title": "Abonnement",
-      "subtitle": "Administrer abonnementet og fakturaene dine",
+      "subtitle": "Administrer abonnementet og fakturaene for {tenantName}",
       "tabs": {
         "overview": "Oversikt",
         "plans": "Planer",

@@ -1,0 +1,33 @@
+{
+  "allowIdentical": [],
+  "allowMissing": [],
+  "allowExtra": [],
+  "allowPlaceholder": [],
+  "hardcodedActionableEnforcement": {
+    "groups": [
+      {
+        "id": "marketing",
+        "includePrefixes": ["app/(marketing)/", "components/marketing/"]
+      },
+      {
+        "id": "play",
+        "includePrefixes": ["features/play/"]
+      },
+      {
+        "id": "ui",
+        "includePrefixes": ["components/ui/"]
+      }
+    ]
+  },
+  "examples": {
+    "allowIdentical": [
+      "common.actions.ok",
+      "common.actions.cancel",
+      "common.brand.*",
+      "common.units.*"
+    ],
+    "allowMissing": [
+      "admin.experimental.*"
+    ]
+  }
+}

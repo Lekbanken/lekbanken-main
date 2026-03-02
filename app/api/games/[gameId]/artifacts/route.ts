@@ -31,6 +31,7 @@ export async function GET(
         artifact_type: a.artifact_type,
         artifact_order: a.artifact_order,
         tags: a.tags,
+        metadata: a.metadata as Record<string, unknown> | null,
         variants: a.variants?.map((v) => ({
           id: v.id,
           title: v.title,

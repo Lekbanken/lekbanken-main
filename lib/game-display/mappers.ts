@@ -133,6 +133,7 @@ export interface DbGame {
     artifact_type?: string | null;
     artifact_order?: number | null;
     tags?: string[] | null;
+    metadata?: Record<string, unknown> | null;
     variants?: Array<{
       id?: string | null;
       title?: string | null;
@@ -668,6 +669,7 @@ export function mapArtifacts(artifacts?: DbGame['artifacts']): GameArtifact[] {
       description: a.description ?? undefined,
       type: a.artifact_type ?? undefined,
       tags: a.tags ?? undefined,
+      metadata: a.metadata ?? undefined,
       variants: a.variants
         ?.sort((v1, v2) => (v1.variant_order ?? 0) - (v2.variant_order ?? 0))
         .map((v): GameArtifactVariant => ({

@@ -60,6 +60,14 @@ const ConversationCardsCollectionArtifact = dynamic(
   { ssr: false, loading: () => <div className="rounded-md border border-border p-3 animate-pulse h-24" /> },
 );
 
+const SpatialMapArtifactRenderer = dynamic(
+  () =>
+    import('@/features/play/components/shared/SpatialMapArtifactRenderer').then((m) => ({
+      default: m.SpatialMapArtifactRenderer,
+    })),
+  { ssr: false, loading: () => <div className="rounded-md border border-border p-3 animate-pulse h-24" /> },
+);
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -114,6 +122,7 @@ const V1_KNOWN_TYPES: ReadonlySet<string> = new Set([
   ...V1_STANDARD_TYPES,
   'conversation_cards_collection',
   'keypad',
+  'spatial_map',
 ]);
 
 // =============================================================================
@@ -340,6 +349,34 @@ export function ParticipantArtifactDrawer({
                     artifactDescription={a.description ?? null}
                     metadata={(a.metadata ?? null) as Record<string, unknown> | null}
                   />
+                );
+              }
+
+              // Spatial map artifact
+              if (a.artifact_type === 'spatial_map') {
+                const meta = (a.metadata ?? {}) as Record<string, unknown>;
+                const spatialId = typeof meta.spatial_artifact_id === 'string' ? meta.spatial_artifact_id : null;
+                if (!spatialId) return null;
+                return (
+                  <div key={a.id} className="rounded-lg border border-border p-3 space-y-2">
+                    <p className="text-sm font-medium text-foreground">{a.title ?? t('artifactStates.artifact')}</p>
+                    {a.description && (
+                      <p className="text-xs text-muted-foreground">{a.description}</p>
+                    )}
+                    <SpatialMapArtifactRenderer
+                      spatialArtifactId={spatialId}
+                      title={typeof meta.title_override === 'string' ? meta.title_override : a.title}
+                      participantToken={participantToken}
+                      labels={{
+                        openFull: t('artifactsDrawer.openMap'),
+                        loadError: t('artifactsDrawer.mapLoadError'),
+                        noAccess: t('artifactsDrawer.mapNoAccess'),
+                        loading: t('artifactsDrawer.mapLoading'),
+                        retry: t('artifactsDrawer.mapRetry'),
+                        close: t('artifactsDrawer.mapClose'),
+                      }}
+                    />
+                  </div>
                 );
               }
 

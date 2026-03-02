@@ -1333,7 +1333,25 @@
                 "replayMarker": "Replay-markør",
                 "signalGenerator": "Signalgenerator",
                 "timeBankStep": "Tidsbank-steg",
-                "emptyArtifact": "Tom artefakt"
+                "emptyArtifact": "Tom artefakt",
+                "spatialMap": "Kart (Spatial)"
+              },
+              "spatialMap": {
+                "title": "Romlig kart",
+                "pickLabel": "Velg kart",
+                "pickPlaceholder": "— Velg et kart —",
+                "noMaps": "Ingen lagrede kart funnet",
+                "currentMap": "Valgt kart",
+                "titleOverrideLabel": "Overstyr tittel (valgfritt)",
+                "titleOverridePlaceholder": "F.eks. Kjeller, Inngang",
+                "helpText": "Kartet vises som en artefakt for ledere og/eller deltakere.",
+                "openFull": "Åpne kart",
+                "loadError": "Kunne ikke laste kartet",
+                "noAccess": "Ingen tilgang til kartet",
+                "loading": "Laster kart…",
+                "loadingMap": "Laster kart…",
+                "retry": "Prøv igjen",
+                "close": "Lukk"
               },
               "keypad": {
                 "title": "PIN-kode-innstillinger",
@@ -13961,7 +13979,13 @@
         "summaryNew": "nye",
         "summaryAvailable": "tilgjengelige",
         "summaryDone": "ferdige",
-        "showLatest": "Vis siste"
+        "showLatest": "Vis siste",
+        "openMap": "Åpne kart",
+        "mapLoadError": "Kunne ikke laste kartet",
+        "mapNoAccess": "Ingen tilgang til kartet",
+        "mapLoading": "Laster kart…",
+        "mapRetry": "Prøv igjen",
+        "mapClose": "Lukk"
       },
       "decisionsDrawer": {
         "title": "Beslutninger",

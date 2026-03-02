@@ -44,6 +44,8 @@ export type ArtifactType =
   | 'location_check'
   | 'sound_level'
   | 'replay_marker'
+  // Spatial / File artifacts
+  | 'spatial_map'
   // Session Cockpit artifacts (Task 2.1-2.3)
   | 'signal_generator'
   | 'time_bank_step'

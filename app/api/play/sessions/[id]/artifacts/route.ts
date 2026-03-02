@@ -93,6 +93,19 @@ function sanitizeMetadataForParticipant(
     return { conversation_card_collection_id: collectionId } as unknown as Json;
   }
 
+  // Spatial map: expose artifact ID + optional title (no secrets)
+  if (artifactType === 'spatial_map') {
+    const id = typeof config.spatial_artifact_id === 'string' ? config.spatial_artifact_id : null;
+    if (!id || id.length < 10) return null; // fail closed
+    const title = typeof config.title_override === 'string' && config.title_override.trim()
+      ? config.title_override.trim()
+      : undefined;
+    return {
+      spatial_artifact_id: id,
+      ...(title ? { title_override: title } : {}),
+    } as unknown as Json;
+  }
+
   // For other artifact types, return null (or could return safe subset)
   return null;
 }

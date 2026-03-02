@@ -32,6 +32,7 @@ import {
   ChatBubbleLeftRightIcon,
   CubeTransparentIcon,
   ListBulletIcon,
+  MapIcon,
 } from '@heroicons/react/24/outline';
 import type { ArtifactType } from '@/types/games';
 
@@ -82,6 +83,9 @@ const ICON_MAP: Record<ArtifactType, IconComponent> = {
   location_check: MapPinIcon,
   sound_level: MicrophoneIcon,
   replay_marker: BookmarkIcon,
+
+  // Spatial
+  spatial_map: MapIcon,
 
   // Session Cockpit artifacts
   signal_generator: MegaphoneIcon,

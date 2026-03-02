@@ -176,6 +176,9 @@ export interface GameDetailArtifactsProps extends GameDetailSectionProps {
     description?: string;
     variants?: string;
     use?: string;
+    openMap?: string;
+    mapLoadError?: string;
+    mapNoAccess?: string;
   };
 }
 

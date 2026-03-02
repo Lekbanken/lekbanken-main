@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { CubeTransparentIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import type { GameArtifact } from '@/lib/game-display';
 import type { GameDetailArtifactsProps } from './types';
+import { SpatialMapArtifactRenderer } from '@/features/play/components/shared/SpatialMapArtifactRenderer';
 
 /**
  * GameDetailArtifacts - Lazy-loaded artifacts/props for games
@@ -56,6 +57,7 @@ export function GameDetailArtifacts({
       prop: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
       document: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
       digital: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300',
+      spatial_map: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
     };
     return typeMap[type.toLowerCase()] ?? 'bg-muted text-muted-foreground';
   };
@@ -145,6 +147,25 @@ export function GameDetailArtifacts({
                       ))}
                     </div>
                   )}
+
+                  {/* Spatial map preview */}
+                  {artifact.type === 'spatial_map' &&
+                    typeof artifact.metadata?.spatial_artifact_id === 'string' && (
+                      <div className="mt-3">
+                        <SpatialMapArtifactRenderer
+                          spatialArtifactId={artifact.metadata.spatial_artifact_id as string}
+                          title={
+                            (artifact.metadata.title_override as string) ||
+                            artifact.title
+                          }
+                          labels={{
+                            openFull: labels.openMap ?? 'Öppna karta',
+                            loadError: labels.mapLoadError ?? 'Kunde inte ladda kartan',
+                            noAccess: labels.mapNoAccess ?? 'Ingen åtkomst till kartan',
+                          }}
+                        />
+                      </div>
+                    )}
 
                   {/* Variants */}
                   {artifact.variants && artifact.variants.length > 0 && (

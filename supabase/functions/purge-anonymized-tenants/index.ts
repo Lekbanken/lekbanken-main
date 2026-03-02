@@ -21,7 +21,7 @@ declare const Deno: {
   };
 };
 
-// @ts-ignore — Deno HTTP import, not resolvable by Node TS checker
+// @ts-expect-error — Deno HTTP import, not resolvable by Node TS checker
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const JOB_NAME = 'purge_anonymized_tenants';

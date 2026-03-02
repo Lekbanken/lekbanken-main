@@ -5256,7 +5256,25 @@
             "replayMarker": "Replay-markör",
             "signalGenerator": "Signalgenerator",
             "timeBankStep": "Tidsbank-steg",
-            "emptyArtifact": "Tom artefakt"
+            "emptyArtifact": "Tom artefakt",
+            "spatialMap": "Karta (Spatial)"
+          },
+          "spatialMap": {
+            "title": "Spatial-karta",
+            "pickLabel": "Välj karta",
+            "pickPlaceholder": "— Välj en karta —",
+            "noMaps": "Inga sparade kartor hittades",
+            "currentMap": "Vald karta",
+            "titleOverrideLabel": "Överskrid titel (valfritt)",
+            "titleOverridePlaceholder": "T.ex. Källarplan, Entré",
+            "helpText": "Kartan visas som artefakt för ledare och/eller deltagare.",
+            "openFull": "Öppna karta",
+            "loadError": "Kunde inte ladda kartan",
+            "noAccess": "Ingen åtkomst till kartan",
+            "loading": "Laddar kartor…",
+            "loadingMap": "Laddar karta…",
+            "retry": "Försök igen",
+            "close": "Stäng"
           },
           "keypad": {
             "title": "Pinkod-inställningar",
@@ -14614,7 +14632,13 @@
         "summaryNew": "nya",
         "summaryAvailable": "tillgängliga",
         "summaryDone": "klara",
-        "showLatest": "Visa senaste"
+        "showLatest": "Visa senaste",
+        "openMap": "Öppna karta",
+        "mapLoadError": "Kunde inte ladda kartan",
+        "mapNoAccess": "Ingen åtkomst till kartan",
+        "mapLoading": "Laddar karta…",
+        "mapRetry": "Försök igen",
+        "mapClose": "Stäng"
       },
       "decisionsDrawer": {
         "title": "Beslut",

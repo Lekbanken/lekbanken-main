@@ -174,6 +174,7 @@ export interface GameArtifact {
   use?: string;
   access?: string;
   tags?: string[];
+  metadata?: Record<string, unknown>;
   variants?: GameArtifactVariant[];
 }
 

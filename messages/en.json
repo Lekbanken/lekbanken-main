@@ -5205,7 +5205,25 @@
             "replayMarker": "Replay marker",
             "signalGenerator": "Signal generator",
             "timeBankStep": "Time bank step",
-            "emptyArtifact": "Empty artifact"
+            "emptyArtifact": "Empty artifact",
+            "spatialMap": "Map (Spatial)"
+          },
+          "spatialMap": {
+            "title": "Spatial map",
+            "pickLabel": "Choose map",
+            "pickPlaceholder": "— Select a map —",
+            "noMaps": "No saved maps found",
+            "currentMap": "Selected map",
+            "titleOverrideLabel": "Title override (optional)",
+            "titleOverridePlaceholder": "E.g. Basement, Main entrance",
+            "helpText": "The map will be shown as an artifact for leaders and/or participants.",
+            "openFull": "Open map",
+            "loadError": "Could not load map",
+            "noAccess": "No access to map",
+            "loading": "Loading maps…",
+            "loadingMap": "Loading map…",
+            "retry": "Try again",
+            "close": "Close"
           },
           "keypad": {
             "title": "Keypad settings",
@@ -13882,7 +13900,13 @@
         "summaryNew": "new",
         "summaryAvailable": "available",
         "summaryDone": "done",
-        "showLatest": "Show latest"
+        "showLatest": "Show latest",
+        "openMap": "Open map",
+        "mapLoadError": "Could not load map",
+        "mapNoAccess": "No access to map",
+        "mapLoading": "Loading map…",
+        "mapRetry": "Try again",
+        "mapClose": "Close"
       },
       "decisionsDrawer": {
         "title": "Decisions",

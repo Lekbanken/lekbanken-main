@@ -9,6 +9,7 @@ import type { RoleData } from './RoleEditor';
 import { ArtifactWizard } from './ArtifactWizard';
 import { AudioUploadEditor, type AudioUploadEditorValue } from '@/components/ui/audio-upload-editor';
 import { InteractiveImageEditor, type InteractiveImageEditorValue } from '@/components/ui/interactive-image-editor';
+import { SpatialMapConfigPanel } from './SpatialMapConfigPanel';
 
 type StorageRef = { bucket: string; path: string };
 
@@ -61,6 +62,7 @@ const ARTIFACT_STYLES: Record<string, ArtifactTypeStyle> = {
   signal_generator: { emoji: '📡', bg: 'bg-blue-500/10', border: 'border-blue-500/40', text: 'text-blue-600 dark:text-blue-400' },
   time_bank_step: { emoji: '⏱️', bg: 'bg-orange-500/10', border: 'border-orange-500/40', text: 'text-orange-600 dark:text-orange-400' },
   empty_artifact: { emoji: '📦', bg: 'bg-gray-500/10', border: 'border-gray-500/40', text: 'text-gray-600 dark:text-gray-400' },
+  spatial_map: { emoji: '🗺️', bg: 'bg-emerald-500/10', border: 'border-emerald-500/40', text: 'text-emerald-600 dark:text-emerald-400' },
 };
 const getStyle = (type: string): ArtifactTypeStyle => ARTIFACT_STYLES[type] ?? ARTIFACT_STYLES.card;
 
@@ -140,6 +142,8 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
     { value: 'location_check', label: t('artifact.types.locationCheck') },
     { value: 'sound_level', label: t('artifact.types.soundLevel') },
     { value: 'replay_marker', label: t('artifact.types.replayMarker') },
+    // Spatial / Filer
+    { value: 'spatial_map', label: t('artifact.types.spatialMap') },
     // Session Cockpit (Task 2.1-2.3)
     { value: 'signal_generator', label: t('artifact.types.signalGenerator') },
     { value: 'time_bank_step', label: t('artifact.types.timeBankStep') },
@@ -1308,6 +1312,15 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Spatial Map configuration */}
+          {artifact.artifact_type === 'spatial_map' && (
+            <SpatialMapConfigPanel
+              metadata={artifact.metadata}
+              onChange={(nextMeta) => updateArtifact(idx, { metadata: nextMeta })}
+              t={t}
+            />
           )}
 
           <div className="space-y-2">

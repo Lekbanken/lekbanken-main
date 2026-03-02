@@ -27,8 +27,8 @@ function getAccentBorder(iconKey: string | null): string {
 // Product Card (larger, for embedding inside category cards)
 // =============================================================================
 
-function SwipeProductCard({ product }: { product: ProductCard }) {
-  const { Icon, iconColor, borderColor, iconBg } = getCategoryVisuals(null, product.categorySlug);
+function SwipeProductCard({ product, iconKey }: { product: ProductCard; iconKey: string | null }) {
+  const { Icon, iconColor, borderColor, iconBg } = getCategoryVisuals(iconKey);
 
   return (
     <div className={`relative flex h-44 w-36 flex-shrink-0 flex-col overflow-hidden rounded-xl border ${borderColor} shadow-sm sm:h-48 sm:w-40`}>
@@ -75,7 +75,7 @@ function SwipeProductCard({ product }: { product: ProductCard }) {
 // Product Carousel (arrow nav + page dots)
 // =============================================================================
 
-function ProductCarousel({ products }: { products: ProductCard[] }) {
+function ProductCarousel({ products, iconKey }: { products: ProductCard[]; iconKey: string | null }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [maxIndex, setMaxIndex] = useState(0);
@@ -129,7 +129,7 @@ function ProductCarousel({ products }: { products: ProductCard[] }) {
       >
         {products.map((product) => (
           <div key={product.id} className="snap-start">
-            <SwipeProductCard product={product} />
+            <SwipeProductCard product={product} iconKey={iconKey} />
           </div>
         ))}
       </div>
@@ -217,7 +217,7 @@ export function PricingCategoryCard({
       {/* Product Carousel */}
       {group.products.length > 0 && (
         <div className="px-5 py-2">
-          <ProductCarousel products={group.products} />
+          <ProductCarousel products={group.products} iconKey={group.iconKey} />
         </div>
       )}
 

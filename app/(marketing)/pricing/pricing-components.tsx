@@ -28,10 +28,10 @@ function getAccentBorder(iconKey: string | null): string {
 // =============================================================================
 
 function SwipeProductCard({ product }: { product: ProductCard }) {
-  const { Icon, iconColor } = getCategoryVisuals(null, product.categorySlug);
+  const { Icon, iconColor, borderColor } = getCategoryVisuals(null, product.categorySlug);
 
   return (
-    <div className="relative flex h-44 w-36 flex-shrink-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm sm:h-48 sm:w-40">
+    <div className={`relative flex h-44 w-36 flex-shrink-0 flex-col overflow-hidden rounded-xl border ${borderColor} bg-card shadow-sm sm:h-48 sm:w-40`}>
       {product.imageUrl ? (
         <>
           {/* Image background */}

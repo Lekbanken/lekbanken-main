@@ -110,6 +110,19 @@ export const ICON_BG_MAP: Record<string, string> = {
   SparklesIcon: "bg-primary/10",
 };
 
+export const BORDER_COLOR_MAP: Record<string, string> = {
+  HeartIcon: "border-purple-300",
+  BriefcaseIcon: "border-slate-300",
+  ComputerDesktopIcon: "border-cyan-300",
+  UsersIcon: "border-orange-300",
+  HomeIcon: "border-green-300",
+  CalendarDaysIcon: "border-indigo-300",
+  GiftIcon: "border-pink-300",
+  AcademicCapIcon: "border-blue-300",
+  TrophyIcon: "border-amber-300",
+  SparklesIcon: "border-primary/40",
+};
+
 // Legacy mapping: database category text → icon + gradient (fallback during migration)
 const LEGACY_CATEGORY_CONFIG: Record<string, { iconKey: string; gradient: string }> = {
   specialpedagog: { iconKey: "HeartIcon", gradient: "from-purple-400 to-violet-500" },
@@ -131,6 +144,7 @@ export function getCategoryVisuals(iconKey: string | null, categoryTextFallback?
       gradient: GRADIENT_MAP[iconKey] ?? GRADIENT_MAP.SparklesIcon,
       iconColor: ICON_COLOR_MAP[iconKey] ?? ICON_COLOR_MAP.SparklesIcon,
       iconBg: ICON_BG_MAP[iconKey] ?? ICON_BG_MAP.SparklesIcon,
+      borderColor: BORDER_COLOR_MAP[iconKey] ?? BORDER_COLOR_MAP.SparklesIcon,
     };
   }
   // Fallback: match legacy category text
@@ -142,6 +156,7 @@ export function getCategoryVisuals(iconKey: string | null, categoryTextFallback?
         gradient: legacy.gradient,
         iconColor: ICON_COLOR_MAP[legacy.iconKey] ?? ICON_COLOR_MAP.SparklesIcon,
         iconBg: ICON_BG_MAP[legacy.iconKey] ?? ICON_BG_MAP.SparklesIcon,
+        borderColor: BORDER_COLOR_MAP[legacy.iconKey] ?? BORDER_COLOR_MAP.SparklesIcon,
       };
     }
   }
@@ -151,5 +166,6 @@ export function getCategoryVisuals(iconKey: string | null, categoryTextFallback?
     gradient: GRADIENT_MAP.SparklesIcon,
     iconColor: ICON_COLOR_MAP.SparklesIcon,
     iconBg: ICON_BG_MAP.SparklesIcon,
+    borderColor: BORDER_COLOR_MAP.SparklesIcon,
   };
 }

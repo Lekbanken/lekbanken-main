@@ -28,41 +28,45 @@ function getAccentBorder(iconKey: string | null): string {
 // =============================================================================
 
 function SwipeProductCard({ product }: { product: ProductCard }) {
-  const { Icon, gradient } = getCategoryVisuals(null, product.categorySlug);
+  const { Icon, iconColor } = getCategoryVisuals(null, product.categorySlug);
 
   return (
-    <div className="relative flex h-44 w-36 flex-shrink-0 overflow-hidden rounded-xl shadow-sm sm:h-48 sm:w-40">
-      {/* Background — image or gradient */}
-      <span aria-hidden="true" className="absolute inset-0">
-        {product.imageUrl ? (
-          <Image
-            src={product.imageUrl}
-            alt={product.name}
-            fill
-            className="object-cover"
-            sizes="160px"
+    <div className="relative flex h-44 w-36 flex-shrink-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm sm:h-48 sm:w-40">
+      {product.imageUrl ? (
+        <>
+          {/* Image background */}
+          <span aria-hidden="true" className="absolute inset-0">
+            <Image
+              src={product.imageUrl}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="160px"
+            />
+          </span>
+          <span
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-gray-900/80 to-transparent"
           />
-        ) : (
-          <div className={`h-full w-full bg-gradient-to-br ${gradient}`}>
-            <div className="flex h-full items-center justify-center">
-              <Icon className="h-12 w-12 text-white/30" />
-            </div>
+          <span className="relative mt-auto p-3">
+            <span className="line-clamp-2 text-sm font-semibold leading-tight text-white drop-shadow-sm">
+              {product.name}
+            </span>
+          </span>
+        </>
+      ) : (
+        <>
+          {/* Icon + name on light card */}
+          <div className="flex flex-1 items-center justify-center">
+            <Icon className={`h-12 w-12 ${iconColor} opacity-60`} />
           </div>
-        )}
-      </span>
-
-      {/* Dark gradient overlay for text */}
-      <span
-        aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-gray-900/80 to-transparent"
-      />
-
-      {/* Product name */}
-      <span className="relative mt-auto p-3">
-        <span className="line-clamp-2 text-sm font-semibold leading-tight text-white drop-shadow-sm">
-          {product.name}
-        </span>
-      </span>
+          <div className="border-t border-border px-3 py-2.5">
+            <span className="line-clamp-2 text-sm font-semibold leading-tight text-foreground">
+              {product.name}
+            </span>
+          </div>
+        </>
+      )}
     </div>
   );
 }

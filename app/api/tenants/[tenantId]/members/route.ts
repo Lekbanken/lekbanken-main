@@ -3,7 +3,7 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
 import { requireMfaIfEnabled } from '@/lib/utils/mfaGuard'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/supabase'
 
 type TenantRole = Database['public']['Enums']['tenant_role_enum']
 

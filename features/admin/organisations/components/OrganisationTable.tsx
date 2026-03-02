@@ -28,6 +28,7 @@ const statusStyles: Record<OrganisationListStatus, { dot: string; text: string }
   suspended: { dot: "bg-red-500", text: "text-red-600" },
   archived: { dot: "bg-gray-400", text: "text-gray-500" },
   demo: { dot: "bg-blue-500", text: "text-blue-600" },
+  anonymized: { dot: "bg-red-700", text: "text-red-700" },
 };
 
 // Plan badge styles by tier

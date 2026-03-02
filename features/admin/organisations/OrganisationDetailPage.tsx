@@ -89,6 +89,7 @@ function StatusBadge({ status }: { status: TenantStatus }) {
     amber: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
     gray: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400",
     purple: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+    red: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
   };
   
   return (

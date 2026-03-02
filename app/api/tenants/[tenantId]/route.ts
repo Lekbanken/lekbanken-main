@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
-import type { Json } from '@/lib/supabase/database.types'
+import type { Json } from '@/types/supabase'
 
 export async function GET(
   _request: Request,

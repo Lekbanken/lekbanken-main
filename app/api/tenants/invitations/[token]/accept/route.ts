@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
 import { isSystemAdmin } from '@/lib/utils/tenantAuth'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/supabase'
 
 type TenantRole = Database['public']['Enums']['tenant_role_enum']
 

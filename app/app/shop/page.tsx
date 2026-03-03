@@ -1,13 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import Image from 'next/image'
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 import { Button, Card, CardContent, Badge, Input, useToast } from '@/components/ui'
 import {
   ShoppingBagIcon,
   SparklesIcon,
-  CurrencyDollarIcon,
   TagIcon,
   MagnifyingGlassIcon,
   Squares2X2Icon,
@@ -15,6 +14,7 @@ import {
   GiftIcon,
   StarIcon,
   BoltIcon,
+  TrophyIcon,
 } from '@heroicons/react/24/outline'
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid'
 import { useTenant } from '@/lib/context/TenantContext'
@@ -48,7 +48,6 @@ type ShopOverviewPayload = {
   tenantId: string
   userLevel: number
   coinBalance: number
-  gemBalance: number
   ownedItemIds: string[]
   ownedQuantitiesByItemId?: Record<string, number>
   activeBoost?: { multiplier: number; expiresAt: string } | null
@@ -90,7 +89,6 @@ export default function ShopPage() {
   const [activeBoost, setActiveBoost] = useState<{ multiplier: number; expiresAt: string } | null>(null)
   const [nowMs, setNowMs] = useState(() => Date.now())
   const [coinBalance, setCoinBalance] = useState(0)
-  const [gemBalance, setGemBalance] = useState(0)
   const [userLevel, setUserLevel] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [isBuyingId, setIsBuyingId] = useState<string | null>(null)
@@ -108,7 +106,6 @@ export default function ShopPage() {
           setItems([])
           setOwnedItemIds([])
           setCoinBalance(0)
-          setGemBalance(0)
           setIsLoading(false)
         }
         return
@@ -125,7 +122,6 @@ export default function ShopPage() {
         setOwnedQuantitiesByItemId(payload.ownedQuantitiesByItemId ?? {})
         setActiveBoost(payload.activeBoost ?? null)
         setCoinBalance(payload.coinBalance ?? 0)
-        setGemBalance(payload.gemBalance ?? 0)
         setUserLevel(typeof payload.userLevel === 'number' && Number.isFinite(payload.userLevel) ? payload.userLevel : 1)
       } catch {
         if (!isMounted) return
@@ -134,7 +130,6 @@ export default function ShopPage() {
         setOwnedQuantitiesByItemId({})
         setActiveBoost(null)
         setCoinBalance(0)
-        setGemBalance(0)
         setUserLevel(1)
       } finally {
         if (isMounted) setIsLoading(false)
@@ -328,9 +323,7 @@ export default function ShopPage() {
       <div className="flex gap-4">
         <Card className="flex-1">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
-              <CurrencyDollarIcon className="h-5 w-5 text-yellow-600" />
-            </div>
+            <Image src="/icons/journey/dicecoin_webp.webp" alt="DiceCoin" width={40} height={40} className="rounded-full" />
             <div>
               <div className="text-sm text-muted-foreground">{t('coins')}</div>
               <div className="text-xl font-bold text-foreground">{coinBalance.toLocaleString()}</div>
@@ -339,12 +332,12 @@ export default function ShopPage() {
         </Card>
         <Card className="flex-1">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-              <SparklesIcon className="h-5 w-5 text-purple-600" />
+            <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
+              <TrophyIcon className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <div className="text-sm text-muted-foreground">Gems</div>
-              <div className="text-xl font-bold text-foreground">{gemBalance}</div>
+              <div className="text-sm text-muted-foreground">{t('level')}</div>
+              <div className="text-xl font-bold text-foreground">{userLevel}</div>
             </div>
           </CardContent>
         </Card>
@@ -393,7 +386,7 @@ export default function ShopPage() {
                 <div className="flex items-center justify-between mt-4">
                   <div className="flex items-center gap-1">
                     {featuredItem.currency === 'coins' ? (
-                      <CurrencyDollarIcon className="h-5 w-5 text-yellow-500" />
+                      <Image src="/icons/journey/dicecoin_webp.webp" alt="DiceCoin" width={20} height={20} />
                     ) : (
                       <SparklesIcon className="h-5 w-5 text-purple-500" />
                     )}
@@ -535,7 +528,7 @@ export default function ShopPage() {
               <div className={`flex items-center justify-between ${viewMode === 'grid' ? 'mt-2' : 'ml-4'}`}>
                 <div className="flex items-center gap-1">
                   {item.currency === 'coins' ? (
-                    <CurrencyDollarIcon className="h-4 w-4 text-yellow-500" />
+                    <Image src="/icons/journey/dicecoin_webp.webp" alt="DiceCoin" width={16} height={16} />
                   ) : (
                     <SparklesIcon className="h-4 w-4 text-purple-500" />
                   )}

@@ -115,6 +115,13 @@ export interface FilterDefinition {
    */
   minCoverage?: number;
 
+  /**
+   * When true, this filter holds a single scalar value (not an array).
+   * Clicking the active option deselects (sets to null).
+   * Used for fields like playMode where only one value is allowed.
+   */
+  singleSelect?: boolean;
+
   /** Sort order within group (lower = higher priority) */
   priority: number;
 }
@@ -246,6 +253,7 @@ export const FILTER_REGISTRY: readonly FilterDefinition[] = [
     labelKey: 'browse.filter.playMode.label',
     icon: '🎮',
     type: 'enum',
+    singleSelect: true,
     dbMapping: { column: 'play_mode' },
     options: [
       { value: 'basic', labelKey: 'browse.filter.playMode.basic' },

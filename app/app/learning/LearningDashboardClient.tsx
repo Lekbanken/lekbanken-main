@@ -1,5 +1,6 @@
 'use client';
 
+import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from 'next-intl'
 import {
@@ -9,7 +10,6 @@ import {
   CheckCircleIcon,
   PlayIcon,
   ClockIcon,
-  TrophyIcon,
   ChevronRightIcon,
   StarIcon,
 } from "@heroicons/react/24/outline";
@@ -116,9 +116,7 @@ export function LearningDashboardClient({ data }: LearningDashboardClientProps) 
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
-              <TrophyIcon className="h-5 w-5 text-purple-500" />
-            </div>
+            <Image src="/icons/journey/dicecoin_webp.webp" alt="DiceCoin" width={40} height={40} className="rounded-full" />
             <div>
               <p className="text-xl font-bold">{stats.totalDicecoinEarned}</p>
               <p className="text-xs text-muted-foreground">DiceCoin</p>
@@ -229,7 +227,8 @@ export function LearningDashboardClient({ data }: LearningDashboardClientProps) 
                           )}
                           {course.rewards.dicecoin && (
                             <span className="flex items-center gap-1">
-                              🪙 +{course.rewards.dicecoin} DiceCoin
+                              <Image src="/icons/journey/dicecoin_webp.webp" alt="DiceCoin" width={14} height={14} />
+                              +{course.rewards.dicecoin} DiceCoin
                             </span>
                           )}
                         </div>

@@ -1,21 +1,33 @@
-﻿/**
- * DirectorModeDrawer → DirectorFullscreenShell
+/**
+ * DirectorModeDrawer — DirectorFullscreenShell
  *
- * Full-screen overlay for Director Mode during active sessions.
- * Now a proper fullscreen shell (parity with ParticipantFullscreenShell):
+ * Full-screen overlay for Director Mode in two modes:
+ *
+ *   1. **Session mode** (`mode: 'session'`) — live session with realtime
+ *      data, all action callbacks, haptic feedback, signal/event chip lane.
+ *
+ *   2. **Preview mode** (`mode: 'preview'`) — offline, no session.
+ *      Game data only. Same fullscreen shell, keyboard shortcuts
+ *      (Arrow Left/Right, Esc, F), swipe gestures, scroll lock.
+ *      No session callbacks.
+ *
+ * Shell features (both modes):
  *   - Fullscreen viewport (mobile) / centred modal (desktop)
  *   - Safe area insets for notch + bottom bar
- *   - Backdrop + fade-in animation (no slide-in-right)
+ *   - Backdrop + fade-in animation
  *   - Fullscreen API management
- *   - Keyboard shortcuts (←/→, Space, Escape)
+ *   - Keyboard shortcuts (Arrow Left/Right step nav, Escape close, F fullscreen)
  *   - Swipe gestures for mobile step navigation
- *   - Haptic feedback on trigger fire
  *   - Scroll lock when open
+ *
+ * Session-only features:
+ *   - Haptic feedback on trigger fire
  *   - Reset double-click confirm (3s window)
  *   - Story View modal
+ *   - Director chip lane (signal/trigger/participant cues)
+ *   - Space for hint signal
  *
- * The actual UI is rendered by DirectorModePanel (shared with
- * the Director Preview page).
+ * The actual UI is rendered by DirectorModePanel (shared core).
  */
 
 'use client';
@@ -43,37 +55,44 @@ import type { DirectorChipType } from './DirectorChipLane';
 import { extractSignalMeta, getSignalChannelLabel, type SignalEventLike } from '@/features/play/utils/signalHelpers';
 
 // =============================================================================
-// Types
+// Types — discriminated union
 // =============================================================================
 
-export interface DirectorModeDrawerProps {
+/** Shared props for both modes */
+interface DirectorModeDrawerBase {
   /** Is the drawer open? */
   open: boolean;
   /** Called when user requests to close */
   onClose: () => void;
-  
-  /** Session display name */
-  sessionName: string;
-  /** Session code (kept for internal use, not displayed in header) */
-  sessionCode: string;
-  /** Session status â€” the real session status, mirrors lobby */
-  status: SessionCockpitStatus;
-  
+  /** Title displayed in the header */
+  title: string;
   /** Steps */
   steps: CockpitStep[];
-  /** Current step index */
-  currentStepIndex: number;
   /** Phases */
   phases: CockpitPhase[];
-  /** Current phase index */
-  currentPhaseIndex: number;
-  
   /** Triggers */
   triggers: CockpitTrigger[];
-  
+  /** Artifacts for the artifacts tab */
+  artifacts: CockpitArtifact[];
+  /** Artifact states */
+  artifactStates: Record<string, ArtifactState>;
+  /** Optional class name */
+  className?: string;
+}
+
+/** Session mode — live session with all callbacks */
+export interface DirectorModeDrawerSessionProps extends DirectorModeDrawerBase {
+  mode: 'session';
+  /** Session code (kept for internal use) */
+  sessionCode: string;
+  /** Session status — the real session status, mirrors lobby */
+  status: SessionCockpitStatus;
+  /** Current step index */
+  currentStepIndex: number;
+  /** Current phase index */
+  currentPhaseIndex: number;
   /** Recent signals */
   recentSignals: Signal[];
-
   /** Optional device signal presets */
   signalPresets?: Array<{
     id: string;
@@ -83,23 +102,14 @@ export interface DirectorModeDrawerProps {
     disabled?: boolean;
     disabledReason?: string;
   }>;
-  
   /** Recent events */
   events: SessionEvent[];
-  
   /** Time bank balance (seconds) */
   timeBankBalance: number;
   /** Time bank paused? */
   timeBankPaused: boolean;
-  
   /** Participant count */
   participantCount: number;
-  
-  /** Artifacts for the artifacts tab */
-  artifacts: CockpitArtifact[];
-  /** Artifact states */
-  artifactStates: Record<string, ArtifactState>;
-  
   // Actions
   onPause: () => Promise<void>;
   onResume: () => Promise<void>;
@@ -112,22 +122,26 @@ export interface DirectorModeDrawerProps {
   onSendSignal: (channel: string, payload: unknown) => Promise<void>;
   onExecuteSignal?: (type: string, config: Record<string, unknown>) => Promise<void>;
   onTimeBankDelta: (delta: number, reason: string) => Promise<void>;
-  
   /** Open the chat/message panel */
   onOpenChat?: () => void;
   /** Unread message count for chat badge */
   chatUnreadCount?: number;
-  
   /** Artifact actions */
   onRevealArtifact?: (artifactId: string) => Promise<void>;
   onHideArtifact?: (artifactId: string) => Promise<void>;
   onResetArtifact?: (artifactId: string) => Promise<void>;
   onHighlightArtifact?: (artifactId: string) => Promise<void>;
   onUnhighlightArtifact?: (artifactId: string) => Promise<void>;
-  
-  /** Optional class name */
-  className?: string;
 }
+
+/** Preview mode — offline, no session, no callbacks */
+export interface DirectorModeDrawerPreviewProps extends DirectorModeDrawerBase {
+  mode: 'preview';
+}
+
+export type DirectorModeDrawerProps =
+  | DirectorModeDrawerSessionProps
+  | DirectorModeDrawerPreviewProps;
 
 // =============================================================================
 // Fullscreen helpers
@@ -214,51 +228,42 @@ function useSwipeGesture(
 // Main Component
 // =============================================================================
 
-export function DirectorModeDrawer({
-  open,
-  onClose,
-  sessionName,
-  sessionCode: _sessionCode,
-  status,
-  steps,
-  currentStepIndex,
-  phases,
-  currentPhaseIndex,
-  triggers,
-  recentSignals,
-  signalPresets,
-  events,
-  timeBankBalance,
-  timeBankPaused,
-  participantCount,
-  artifacts,
-  artifactStates,
-  onPause: _onPause,
-  onResume: _onResume,
-  onNextStep,
-  onPreviousStep,
-  onFireTrigger,
-  onArmTrigger,
-  onDisableTrigger,
-  onDisableAllTriggers,
-  onSendSignal,
-  onExecuteSignal,
-  onTimeBankDelta,
-  onOpenChat,
-  chatUnreadCount = 0,
-  onRevealArtifact,
-  onHideArtifact,
-  onResetArtifact,
-  onHighlightArtifact,
-  onUnhighlightArtifact,
-  className,
-}: DirectorModeDrawerProps) {
+export function DirectorModeDrawer(props: DirectorModeDrawerProps) {
+  const { open, onClose, title, steps, phases, triggers, artifacts, artifactStates, className } = props;
+  const isSession = props.mode === 'session';
+
   const t = useTranslations('play.directorDrawer');
   const [showStoryView, setShowStoryView] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [resetConfirmPending, setResetConfirmPending] = useState(false);
   const swipeRef = useRef<HTMLDivElement>(null);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Preview-local step navigation ──────────────────────────────────────
+  const [previewStepIndex, setPreviewStepIndex] = useState(0);
+  const currentStepIndex = isSession ? props.currentStepIndex : previewStepIndex;
+
+  const previewNext = useCallback(() => {
+    setPreviewStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
+  }, [steps.length]);
+
+  const previewPrevious = useCallback(() => {
+    setPreviewStepIndex((prev) => Math.max(prev - 1, 0));
+  }, []);
+
+  const onNextStep = isSession ? props.onNextStep : previewNext;
+  const onPreviousStep = isSession ? props.onPreviousStep : previewPrevious;
+
+  // ── Session-only derived values (safe defaults for preview) ────────────
+  const status: SessionCockpitStatus = isSession ? props.status : 'draft';
+  const currentPhaseIndex = isSession ? props.currentPhaseIndex : 0;
+  const recentSignals = isSession ? props.recentSignals : [];
+  const signalPresets = isSession ? props.signalPresets : undefined;
+  const events: SessionEvent[] = isSession ? props.events : [];
+  const timeBankBalance = isSession ? props.timeBankBalance : 0;
+  const timeBankPaused = isSession ? props.timeBankPaused : false;
+  const participantCount = isSession ? props.participantCount : 0;
+  const chatUnreadCount = isSession ? (props.chatUnreadCount ?? 0) : 0;
 
   // Track when each step started (client-side) for per-step timer
   // Uses useSyncExternalStore to bridge ref (effect-writable) with render (readable)
@@ -283,26 +288,24 @@ export function DirectorModeDrawer({
     }
   }, [open, currentStepIndex]);
 
-  // Director chip lane — host-side system cues
+  // ── Session-only: Director chip lane ───────────────────────────────────
   const { chips: directorChips, pushChip: pushDirectorChip } = useDirectorChips();
   const prevEventsLenRef = useRef(events.length);
 
   // Wrap onSendSignal to push an immediate confirmation chip for the director.
-  // The audit event chip (from the events-watcher below) is deduped by useDirectorChips.
   const handleSendSignal = useCallback((channel: string, payload: unknown) => {
+    if (!isSession) return Promise.resolve();
     const label = getSignalChannelLabel(channel, (k) => t(`signalInbox.${k}`));
     pushDirectorChip('SIGNAL_RECEIVED', label);
-    onSendSignal(channel, payload);
-  }, [onSendSignal, pushDirectorChip, t]);
+    return props.onSendSignal(channel, payload);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSession, pushDirectorChip, t]);
 
-  // Watch for new events → push chips (single source of truth — events array)
-  // NOTE: recentSignals watcher removed to prevent duplicate SIGNAL_RECEIVED chips.
-  // Signal events already appear in the events array via realtime broadcast.
+  // Watch for new events → push chips (session-only)
   useEffect(() => {
-    if (!open) return;
+    if (!open || !isSession) return;
     const prevLen = prevEventsLenRef.current;
     if (events.length > prevLen) {
-      // Check latest events for chip-worthy types
       const newEvents = events.slice(0, events.length - prevLen);
       for (const evt of newEvents) {
         if (evt.type.includes('signal')) {
@@ -317,7 +320,7 @@ export function DirectorModeDrawer({
       }
     }
     prevEventsLenRef.current = events.length;
-  }, [open, events.length, events, pushDirectorChip, t]);
+  }, [open, isSession, events.length, events, pushDirectorChip, t]);
 
   // Director chip labels (i18n)
   const directorChipLabels: Record<DirectorChipType, string> = {
@@ -333,6 +336,8 @@ export function DirectorModeDrawer({
     if (!open) {
       setIsFullscreen(false);
       setResetConfirmPending(false);
+      // Reset preview step index when closing
+      setPreviewStepIndex(0);
     }
   }
 
@@ -388,11 +393,13 @@ export function DirectorModeDrawer({
     }
   }, []);
 
-  // Reset with confirm in active sessions
+  // Reset with confirm in active sessions (session-only)
   const handleResetClick = useCallback(() => {
+    if (!isSession) return;
+    const sendSignal = props.onSendSignal;
     if (status === 'active' || status === 'paused') {
       if (resetConfirmPending) {
-        onSendSignal('reset', { message: 'Reset' });
+        sendSignal('reset', { message: 'Reset' });
         setResetConfirmPending(false);
         if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
       } else {
@@ -402,18 +409,22 @@ export function DirectorModeDrawer({
         }, 3000);
       }
     } else {
-      onSendSignal('reset', { message: 'Reset' });
+      sendSignal('reset', { message: 'Reset' });
     }
-  }, [status, resetConfirmPending, onSendSignal]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSession, status, resetConfirmPending]);
 
-  // Haptic-enhanced trigger fire
+  // Haptic-enhanced trigger fire (session-only)
   const handleFireTrigger = useCallback(async (triggerId: string) => {
-    const result = await onFireTrigger(triggerId);
+    if (!isSession) return { ok: false, action: 'fire', triggerId, kind: 'request_failed', httpStatus: 0, errorCode: 'preview_mode', message: 'Cannot fire triggers in preview mode' } as TriggerActionResult;
+    const result = await props.onFireTrigger(triggerId);
     hapticTap(50);
     return result;
-  }, [onFireTrigger]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSession]);
 
-  // Keyboard shortcuts: Escape, â†/â†’ step nav, 1-6 tabs, Space for hint
+  // Keyboard shortcuts: Escape, Arrow Left/Right step nav, 1-6 tabs
+  // Session-only: Space for hint
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -434,14 +445,16 @@ export function DirectorModeDrawer({
           if (currentStepIndex < steps.length - 1) onNextStep();
           break;
         case ' ':
-          e.preventDefault();
-          onSendSignal('hint', { message: t('quickActions.giveHint') });
+          if (isSession) {
+            e.preventDefault();
+            handleSendSignal('hint', { message: t('quickActions.giveHint') });
+          }
           break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [open, handleClose, currentStepIndex, steps.length, onPreviousStep, onNextStep, onSendSignal, t]);
+  }, [open, handleClose, currentStepIndex, steps.length, onPreviousStep, onNextStep, isSession, handleSendSignal, t]);
 
   // Exit fullscreen when component unmounts while open
   useEffect(() => {
@@ -475,9 +488,9 @@ export function DirectorModeDrawer({
         {/* PlaySurface owns the single border — parity with ParticipantFullscreenShell */}
         <PlaySurface className={cn('lg:shadow-xl', className)}>
           <DirectorModePanel
-          title={sessionName}
+          title={title}
           status={status}
-          isPreview={false}
+          isPreview={!isSession}
           steps={steps}
           currentStepIndex={currentStepIndex}
           phases={phases}
@@ -493,42 +506,44 @@ export function DirectorModeDrawer({
           artifactStates={artifactStates}
           onNextStep={onNextStep}
           onPreviousStep={onPreviousStep}
-          onFireTrigger={handleFireTrigger}
-          onArmTrigger={onArmTrigger}
-          onDisableTrigger={onDisableTrigger}
-          onDisableAllTriggers={onDisableAllTriggers}
-          onSendSignal={handleSendSignal}
-          onExecuteSignal={onExecuteSignal}
-          onTimeBankDelta={onTimeBankDelta}
-          onOpenChat={onOpenChat}
+          onFireTrigger={isSession ? handleFireTrigger : undefined}
+          onArmTrigger={isSession ? props.onArmTrigger : undefined}
+          onDisableTrigger={isSession ? props.onDisableTrigger : undefined}
+          onDisableAllTriggers={isSession ? props.onDisableAllTriggers : undefined}
+          onSendSignal={isSession ? handleSendSignal : undefined}
+          onExecuteSignal={isSession ? props.onExecuteSignal : undefined}
+          onTimeBankDelta={isSession ? props.onTimeBankDelta : undefined}
+          onOpenChat={isSession ? props.onOpenChat : undefined}
           chatUnreadCount={chatUnreadCount}
           onClose={handleClose}
-          onRevealArtifact={onRevealArtifact}
-          onHideArtifact={onHideArtifact}
-          onResetArtifact={onResetArtifact}
-          onHighlightArtifact={onHighlightArtifact}
-          onUnhighlightArtifact={onUnhighlightArtifact}
+          onRevealArtifact={isSession ? props.onRevealArtifact : undefined}
+          onHideArtifact={isSession ? props.onHideArtifact : undefined}
+          onResetArtifact={isSession ? props.onResetArtifact : undefined}
+          onHighlightArtifact={isSession ? props.onHighlightArtifact : undefined}
+          onUnhighlightArtifact={isSession ? props.onUnhighlightArtifact : undefined}
           showFullscreenButton
           isFullscreen={isFullscreen}
           onToggleFullscreen={handleToggleFullscreen}
           stepStartTimes={stepStartTimes}
           swipeRef={swipeRef}
-          resetConfirmPending={resetConfirmPending}
-          onResetClick={handleResetClick}
-          directorChips={directorChips}
+          resetConfirmPending={isSession ? resetConfirmPending : false}
+          onResetClick={isSession ? handleResetClick : undefined}
+          directorChips={isSession ? directorChips : []}
           directorChipLabels={directorChipLabels}
         />
         </PlaySurface>
       </div>
 
-      {/* Story View Modal */}
-      <StoryViewModal
-        open={showStoryView}
-        onClose={() => setShowStoryView(false)}
-        steps={steps}
-        currentStepIndex={currentStepIndex}
-        title={sessionName}
-      />
+      {/* Story View Modal — session only */}
+      {isSession && (
+        <StoryViewModal
+          open={showStoryView}
+          onClose={() => setShowStoryView(false)}
+          steps={steps}
+          currentStepIndex={currentStepIndex}
+          title={title}
+        />
+      )}
     </>
   );
 }

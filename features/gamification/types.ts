@@ -24,6 +24,7 @@ export type CoinTransaction = {
   type: "earn" | "spend";
   amount: number;
   description: string;
+  reasonCode?: string | null;
   date: string;
 };
 

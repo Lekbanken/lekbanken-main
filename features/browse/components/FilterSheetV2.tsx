@@ -155,11 +155,9 @@ export function FilterSheetV2({
     onOpenChange(false);
   };
 
-  // Reset local state when closing without applying
+  // Reset local state when opening (picks up quick-filter changes) or closing without applying
   const handleOpenChange = (state: boolean) => {
-    if (!state) {
-      setLocalFilters(filters);
-    }
+    setLocalFilters(filters);
     onOpenChange(state);
   };
 

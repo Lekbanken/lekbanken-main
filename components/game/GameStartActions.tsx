@@ -7,7 +7,8 @@
  * and any context where the full action set is needed.
  *
  * STRUCTURE:
- * - Primary: "Starta lek" (Start session)
+ * - Primary: "Starta lek" (Start session) — only for participants mode
+ *   OR "Director Mode" — only for basic/facilitated modes
  * - Secondary: "Lägg till i plan" (Add to plan) - optional
  * - Tertiary: Like / Dislike buttons
  *
@@ -40,6 +41,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { LikeButton } from '@/components/game/LikeButton';
 import { createSession } from '@/features/play-participant/api';
 import type { ReactionType } from '@/types/game-reaction';
+import type { PlayMode } from '@/types/games';
 
 // =============================================================================
 // TYPES
@@ -50,6 +52,9 @@ export interface GameStartActionsProps {
   gameId: string;
   /** Game name for display and session creation */
   gameName: string;
+  /** Play mode — used to gate Director Mode visibility.
+   *  Required on game detail; optional for sandbox/storybook backwards compat. */
+  playMode?: PlayMode | null;
   /** Initial liked state (from server) */
   initialLiked?: boolean;
   /** Initial reaction (alternative to initialLiked) */
@@ -164,12 +169,50 @@ const ThumbDownIcon = ({ className, filled }: { className?: string; filled?: boo
 );
 
 // =============================================================================
+// PLAY MODE POLICY
+// =============================================================================
+
+/**
+ * Determines if offline Director Mode preview should be available.
+ *
+ * **Whitelist**: only modes with a facilitator get Director Mode.
+ *   - 'basic'       (Enkel lek)       → yes
+ *   - 'facilitated' (Ledd aktivitet)  → yes
+ *   - 'participants' (Deltagarstyrd)  → no (no facilitator)
+ *   - any future mode                → no (safe default)
+ *   - null/undefined                  → yes (backwards compat / sandbox)
+ */
+const DIRECTOR_ALLOWED_MODES: ReadonlySet<PlayMode> = new Set<PlayMode>(['basic', 'facilitated']);
+
+function canOpenOfflineDirectorMode(playMode?: PlayMode | null): boolean {
+  // NOTE: playMode is optional in Sandbox / Storybook call sites that don't
+  // have a real game record.  When missing we allow preview entry so dev/testing
+  // keeps working.  Production (game detail page) always passes playMode.
+  if (!playMode) return true;
+  return DIRECTOR_ALLOWED_MODES.has(playMode);
+}
+
+/**
+ * Determines if session start should be available.
+ *
+ * **Whitelist**: only participant-driven modes get "Start session".
+ *   - 'participants' (Deltagarlek) → yes
+ *   - 'basic'/'facilitated'       → no  (use Director Mode instead)
+ *   - null/undefined               → yes (backwards compat / sandbox)
+ */
+function canStartSession(playMode?: PlayMode | null): boolean {
+  if (!playMode) return true;
+  return playMode === 'participants';
+}
+
+// =============================================================================
 // COMPONENT
 // =============================================================================
 
 export function GameStartActions({
   gameId,
   gameName,
+  playMode,
   initialLiked = false,
   initialReaction,
   onAddToPlan,
@@ -237,31 +280,34 @@ export function GameStartActions({
           <p className="text-sm text-destructive text-center">{error}</p>
         )}
 
-        {/* PRIMARY: Start Session */}
-        <Button
-          size="lg"
-          className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 text-white font-bold shadow-sm"
-          onClick={handleStartSession}
-          disabled={isStarting}
-        >
-          <PlayIcon className="h-5 w-5 mr-2" />
-          {isStarting ? startingSession : startSession}
-        </Button>
+        {/* PRIMARY: Start Session (only for participant games) */}
+        {canStartSession(playMode) && (
+          <Button
+            size="lg"
+            className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 text-white font-bold shadow-sm"
+            onClick={handleStartSession}
+            disabled={isStarting}
+          >
+            <PlayIcon className="h-5 w-5 mr-2" />
+            {isStarting ? startingSession : startSession}
+          </Button>
+        )}
 
-        {/* SECONDARY: Director Mode Preview */}
-        <Button
-          variant="secondary"
-          size="lg"
-          className="w-full"
-          loading={isOpeningPreview}
-          onClick={() => {
-            setIsOpeningPreview(true);
-            router.push(`/app/games/${gameId}/director-preview`);
-          }}
-        >
-          <EyeIcon className="h-5 w-5 mr-2" />
-          {tDetail('directorPreview.button')}
-        </Button>
+        {/* PRIMARY: Director Mode Preview (only for basic/facilitated modes) */}
+        {canOpenOfflineDirectorMode(playMode) && (
+          <Button
+            size="lg"
+            className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 text-white font-bold shadow-sm"
+            loading={isOpeningPreview}
+            onClick={() => {
+              setIsOpeningPreview(true);
+              router.push(`/app/games/${gameId}/director-preview`);
+            }}
+          >
+            <EyeIcon className="h-5 w-5 mr-2" />
+            {tDetail('directorPreview.button')}
+          </Button>
+        )}
 
         {/* SECONDARY: Add to Plan */}
         {showAddToPlan && onAddToPlan && (

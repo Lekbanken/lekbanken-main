@@ -367,9 +367,9 @@
       "players": "Spelare",
       "playMode": {
         "label": "Spelläge",
-        "basic": "Grundläggande",
-        "facilitated": "Faciliterat",
-        "participants": "Deltagarläge"
+        "basic": "Enkel lek",
+        "facilitated": "Ledd aktivitet",
+        "participants": "Deltagarlek"
       },
       "hasPhases": "Har faser",
       "hasRoles": "Har roller",
@@ -403,6 +403,10 @@
     "minutes": "Minuter",
     "noAccess": "Du har inte tillgång till några produkter ännu.",
     "errorTitle": "Kunde inte ladda",
+    "error": {
+      "title": "Kunde inte ladda aktiviteter",
+      "description": "Försök igen eller ladda om sidan."
+    },
     "emptyTitle": "Inga aktiviteter hittades",
     "emptyDescription": "Försök med andra filter eller sökord.",
     "empty": {
@@ -11607,6 +11611,7 @@
         "offline": "Återansluter…"
       },
       "header": {
+        "back": "Tillbaka",
         "backToLobby": "Till lobbyn",
         "fullscreen": "Helskärm",
         "preview": "Förhandsvisning"

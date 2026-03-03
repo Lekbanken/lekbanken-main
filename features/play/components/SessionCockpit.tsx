@@ -2119,9 +2119,10 @@ export function SessionCockpit({
         
         {/* Director Mode Drawer */}
         <DirectorModeDrawer
+          mode="session"
           open={directorModeOpen}
           onClose={handleExitDirectorMode}
-          sessionName={displayName ?? ''}
+          title={displayName ?? ''}
           sessionCode={sessionCode ?? ''}
           status={drawerStatus}
           steps={steps}

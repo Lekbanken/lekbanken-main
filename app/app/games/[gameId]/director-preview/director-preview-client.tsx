@@ -1,18 +1,19 @@
 /**
- * DirectorPreviewClient — Client component for Director Mode Preview
+ * DirectorPreviewClient — Thin adapter for offline Director Mode Preview
  *
- * Wraps DirectorModePanel with:
- *   - Game → Cockpit type mapping
- *   - Local step navigation (useState for currentStepIndex)
- *   - No realtime, no session, no side-effects
- *   - Back button navigates to game detail page
+ * Renders DirectorModeDrawer in `mode="preview"` with:
+ *   - Game → Cockpit type mapping (one-time)
+ *   - Local step navigation handled inside the Drawer
+ *   - Full shell features (fullscreen, keyboard, swipe, scroll lock)
+ *   - No session, no realtime, no side-effects
+ *   - Close navigates back to game detail page
  */
 
 'use client';
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { DirectorModePanel } from '@/features/play/components/DirectorModePanel';
+import { DirectorModeDrawer } from '@/features/play/components/DirectorModeDrawer';
 import {
   mapGameStepsToCockpit,
   mapGamePhasesToCockpit,
@@ -28,12 +29,10 @@ interface DirectorPreviewClientProps {
   phases: GamePhase[];
   artifacts: GameArtifact[];
   triggers: GameTrigger[];
-  backLabel: string;
   backHref: string;
 }
 
 export default function DirectorPreviewClient({
-  gameId: _gameId,
   gameTitle,
   steps: rawSteps,
   phases: rawPhases,
@@ -49,43 +48,21 @@ export default function DirectorPreviewClient({
   const [{ artifacts, artifactStates }] = useState(() => mapGameArtifactsToCockpit(rawArtifacts));
   const [triggers] = useState(() => mapGameTriggersToCockpit(rawTriggers));
 
-  // Local step navigation
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-
-  const handleNext = useCallback(() => {
-    setCurrentStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
-  }, [steps.length]);
-
-  const handlePrevious = useCallback(() => {
-    setCurrentStepIndex((prev) => Math.max(prev - 1, 0));
-  }, []);
-
   const handleClose = useCallback(() => {
     router.push(backHref);
   }, [router, backHref]);
 
   return (
-    <div className="fixed inset-0 z-40 bg-background">
-      <DirectorModePanel
-        title={gameTitle}
-        status="draft"
-        isPreview
-        steps={steps}
-        currentStepIndex={currentStepIndex}
-        phases={phases}
-        currentPhaseIndex={0}
-        triggers={triggers}
-        recentSignals={[]}
-        events={[]}
-        timeBankBalance={0}
-        timeBankPaused={false}
-        participantCount={0}
-        artifacts={artifacts}
-        artifactStates={artifactStates}
-        onNextStep={handleNext}
-        onPreviousStep={handlePrevious}
-        onClose={handleClose}
-      />
-    </div>
+    <DirectorModeDrawer
+      mode="preview"
+      open={true}
+      onClose={handleClose}
+      title={gameTitle}
+      steps={steps}
+      phases={phases}
+      triggers={triggers}
+      artifacts={artifacts}
+      artifactStates={artifactStates}
+    />
   );
 }

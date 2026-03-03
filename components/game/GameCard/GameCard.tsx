@@ -271,7 +271,7 @@ function GameCardGrid({
             />
           )}
           {/* PlayMode badge - bottom right in image */}
-          {flags.showPlayMode && playMode && playMode.label !== 'Enkel lek' && (
+          {flags.showPlayMode && playMode && (
             <div className="absolute bottom-2 right-2 z-10">
               <Badge size="sm" className={cn('border-0 shadow-sm', playMode.badge)}>
                 {playMode.label}
@@ -375,58 +375,57 @@ function GameCardList({
         className
       )}
     >
-      {/* Image - Compact square */}
+      {/* Image - Larger square for better visual weight */}
       {flags.showImage && (
-        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
           <GameImage src={game.coverUrl} alt={game.title} aspectRatio="square" className="h-full w-full" />
         </div>
       )}
 
-      {/* Content */}
+      {/* Content - 3 rows: title / metadata / description */}
       <div className="min-w-0 flex-1">
-        {/* Title row with metadata aligned right */}
+        {/* Row 1: Title + optional favorite */}
         <div className="flex items-start justify-between gap-2">
           <h3 className={cn('line-clamp-1 text-sm font-semibold text-foreground', playMode?.titleColor ?? 'group-hover:text-primary')}>
             {game.title}
           </h3>
-          {/* Metadata - aligned right on title row */}
-          <div className="flex shrink-0 items-center gap-2 text-[11px] text-muted-foreground">
-            {flags.showDuration && duration && (
-              <span className="inline-flex items-center gap-1">
-                <ClockIcon className="h-3 w-3" />
-                {duration}
-              </span>
-            )}
-            {flags.showPlayers && players && (
-              <span className="inline-flex items-center gap-1">
-                <UsersIcon className="h-3 w-3" />
-                {players}
-              </span>
-            )}
-            {flags.showEnergy && energy && (
-              <span className={cn('inline-flex items-center gap-0.5 font-medium', energy.color)}>
-                <BoltIcon className="h-3 w-3" />
-                {energy.labelShort}
-              </span>
-            )}
-            {flags.showAge && age && (
-              <span>{age}</span>
-            )}
-          </div>
+          {flags.showFavorite && (
+            <FavoriteButton gameId={game.id} isFavorite={game.isFavorite} onFavorite={actions?.onFavorite} className="shrink-0 -mt-0.5" />
+          )}
         </div>
 
-        {/* Description */}
+        {/* Row 2: Metadata chips */}
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+          {flags.showDuration && duration && (
+            <span className="inline-flex items-center gap-1">
+              <ClockIcon className="h-3 w-3" />
+              {duration}
+            </span>
+          )}
+          {flags.showPlayers && players && (
+            <span className="inline-flex items-center gap-1">
+              <UsersIcon className="h-3 w-3" />
+              {players}
+            </span>
+          )}
+          {flags.showEnergy && energy && (
+            <span className={cn('inline-flex items-center gap-0.5 font-medium', energy.color)}>
+              <BoltIcon className="h-3 w-3" />
+              {energy.labelShort}
+            </span>
+          )}
+          {flags.showAge && age && (
+            <span>{age}</span>
+          )}
+        </div>
+
+        {/* Row 3: Description (up to 2 lines) */}
         {flags.showDescription && game.shortDescription && (
           <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
             {game.shortDescription}
           </p>
         )}
       </div>
-
-      {/* Favorite button - right side */}
-      {flags.showFavorite && (
-        <FavoriteButton gameId={game.id} isFavorite={game.isFavorite} onFavorite={actions?.onFavorite} className="shrink-0" />
-      )}
     </div>
   );
 

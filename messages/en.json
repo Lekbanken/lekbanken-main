@@ -306,6 +306,18 @@
     "achievementsTitle": "Achievements",
     "achievementsSubtitle": "Your collection of badges and goals",
     "overview": "Overview",
+    "coinReasonCodes": {
+      "event:session_completed": "Reward for completed session",
+      "event:run_completed": "Reward for completed round",
+      "event:plan_created": "Reward for created plan",
+      "event:plan_published": "Reward for published plan",
+      "event:game_played": "Reward for playing a game",
+      "event:achievement_unlocked": "Reward for unlocked achievement",
+      "event:first_session": "Reward for first session",
+      "event:streak_bonus": "Streak bonus",
+      "powerup:coin_multiplier": "Coin multiplier bonus",
+      "refund": "Refund"
+    },
     "faction": {
       "label": "Faction",
       "chooseFaction": "Choose faction",
@@ -380,9 +392,9 @@
 
       "playMode": {
         "label": "Play mode",
-        "basic": "Basic",
-        "facilitated": "Facilitated",
-        "participants": "Participant mode"
+        "basic": "Simple play",
+        "facilitated": "Facilitated activity",
+        "participants": "Participant play"
       },
       "hasPhases": "Has phases",
       "hasRoles": "Has roles",
@@ -419,8 +431,17 @@
     "minutes": "Minutes",
     "noAccess": "You don't have access to any products yet.",
     "errorTitle": "Could not load",
+    "error": {
+      "title": "Could not load activities",
+      "description": "Try again or reload the page."
+    },
     "emptyTitle": "No activities found",
     "emptyDescription": "Try different filters or search terms.",
+    "empty": {
+      "title": "No activities found",
+      "description": "Try different filters or search terms.",
+      "clearFilters": "Clear filters"
+    },
     "loadMore": "Load more",
     "filterHint": "Tip: Use filters to find the right activity",
     "gameCard": {
@@ -5123,6 +5144,9 @@
             "taxonomyLabel": "Taxonomy / game category",
             "taxonomyPlaceholder": "e.g. Circle games",
             "taxonomyNote": "Keeps previous value on import; saved as game category in the database.",
+            "productLabel": "Product",
+            "productPlaceholder": "Select product...",
+            "productHelp": "Links the game to a licensed product.",
             "statusLabel": "Status",
             "statusDraft": "Draft",
             "statusPublished": "Published",
@@ -8468,8 +8492,27 @@
       "events": {
         "signInRequired": "You need to be signed in to view the event log.",
         "title": "DICECOIN",
-        "subtitle": "Event log (read-only)",
-        "empty": "No events to show yet."
+        "subtitle": "Your activity history",
+        "empty": "No events to show yet. Play games and create sessions to earn rewards!",
+        "sources": {
+          "play": "Game",
+          "planner": "Planner",
+          "system": "System",
+          "admin": "Admin"
+        },
+        "eventTypes": {
+          "session_completed": "Completed a session",
+          "run_completed": "Completed a game round",
+          "plan_created": "Created a plan",
+          "plan_published": "Published a plan",
+          "game_played": "Played a game",
+          "achievement_unlocked": "Unlocked an achievement",
+          "first_session": "Started your first session",
+          "streak_bonus": "Earned a streak bonus",
+          "powerup_consumed": "Used a power-up",
+          "shop_purchase": "Made a purchase in the shop",
+          "reward_issued": "Received a reward"
+        }
       },
       "achievements": {
         "celebration": {
@@ -8755,7 +8798,19 @@
           "noTransactions": "No transactions to show.",
           "unknownTransaction": "Unknown transaction",
           "error": "Could not load coin data",
-          "shopLink": "Spend your coins in the shop"
+          "shopLink": "Spend your coins in the shop",
+          "reasonCodes": {
+            "event:session_completed": "Reward for completed session",
+            "event:run_completed": "Reward for completed round",
+            "event:plan_created": "Reward for created plan",
+            "event:plan_published": "Reward for published plan",
+            "event:game_played": "Reward for playing a game",
+            "event:achievement_unlocked": "Reward for unlocked achievement",
+            "event:first_session": "Reward for first session",
+            "event:streak_bonus": "Streak bonus",
+            "powerup:coin_multiplier": "Coin multiplier bonus",
+            "refund": "Refund"
+          }
         },
         "friends": {
           "title": "Friends",
@@ -9183,6 +9238,7 @@
       "boostRemaining": "{hours}h {minutes}m remaining",
       "coins": "DiceCoin",
       "gems": "Gems",
+      "level": "Level",
       "featured": "Featured",
       "levelLocked": "Locked: level {level}",
       "buyNow": "Buy now",
@@ -10920,6 +10976,7 @@
         "offline": "Reconnecting…"
       },
       "header": {
+        "back": "Back",
         "backToLobby": "Back to lobby",
         "fullscreen": "Fullscreen",
         "preview": "Preview"

@@ -61,6 +61,9 @@ export interface PlayHeaderProps {
   /** Extra elements on the right side (participant count, preview badge, etc.) */
   rightSlot?: ReactNode;
 
+  /** Hide the StatusPill entirely (e.g. in sandbox / preview mode) */
+  hideStatus?: boolean;
+
   /**
    * @deprecated No longer needed — desktop border/rounding lives on PlaySurface.
    * Kept for backwards compat; has no visual effect.
@@ -86,6 +89,7 @@ export function PlayHeader({
   onToggleFullscreen,
   bgTintClass,
   rightSlot,
+  hideStatus = false,
   desktopModal: _desktopModal = false,
   className,
 }: PlayHeaderProps) {
@@ -106,11 +110,13 @@ export function PlayHeader({
           <ArrowLeftIcon className="h-4 w-4" />
           <span className="sr-only sm:not-sr-only sm:ml-1">{backLabel}</span>
         </Button>
-        <StatusPill
-          connectionState={connectionState}
-          sessionStatus={sessionStatus}
-          labels={statusLabels}
-        />
+        {!hideStatus && (
+          <StatusPill
+            connectionState={connectionState}
+            sessionStatus={sessionStatus}
+            labels={statusLabels}
+          />
+        )}
       </div>
 
       {/* Centre: title — absolutely positioned for true centre alignment */}

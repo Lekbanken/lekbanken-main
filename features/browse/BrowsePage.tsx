@@ -15,7 +15,7 @@ import { GameCard, GameCardSkeleton } from "@/components/game/GameCard";
 import { SearchBar } from "./components/SearchBar";
 import type { BrowseFilters, SortOption } from "./types";
 import type { GameSummary } from "@/lib/game-display";
-import { mapDbGameToSummary } from "@/lib/game-display";
+import { mapDbGameToSummary, formatPlayMode } from "@/lib/game-display";
 import type { Tables } from "@/types/supabase";
 import type { GameReactionMap } from "@/types/game-reaction";
 import { cn } from "@/lib/utils";
@@ -74,6 +74,7 @@ const initialFilters: BrowseFilters = {
   maxAge: null,
   minTime: null,
   maxTime: null,
+  playMode: null,
 };
 
 const pageSize = 12;
@@ -168,6 +169,7 @@ export function BrowsePage() {
           minTime: payload.filters.minTime || undefined,
           maxTime: payload.filters.maxTime || undefined,
           showLiked: payload.filters.showLiked || undefined,
+          playMode: payload.filters.playMode ?? undefined,
           sort: payload.sort,
           page: payload.page,
           pageSize,
@@ -176,7 +178,10 @@ export function BrowsePage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to load games");
+        const errBody = await response.json().catch(() => null) as { error?: string } | null;
+        const reason = errBody?.error ?? `HTTP ${response.status}`;
+        console.error("[BrowsePage] fetchGames failed:", reason);
+        throw new Error(`Failed to load games: ${reason}`);
       }
 
       const json = (await response.json()) as {
@@ -330,19 +335,16 @@ export function BrowsePage() {
 
       {featuredGames.length > 0 && (
         <section className="rounded-2xl border border-border/60 bg-gradient-to-r from-primary/5 via-card to-card px-4 py-4">
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">{t("featured.label")}</p>
-              <h2 className="text-lg font-semibold text-foreground">{t("featured.title")}</h2>
-            </div>
-            <span className="text-xs text-muted-foreground">{t("featured.count", { count: featuredGames.length })}</span>
+          <div className="mb-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">{t("featured.label")}</p>
+            <h2 className="text-lg font-semibold text-foreground">{t("featured.title")}</h2>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {featuredGames.map((game) => (
               <GameCard 
                 key={game.id} 
                 game={{ ...game, isFavorite: reactions[game.id] === 'like' }} 
-                variant="list" 
+                variant="compact" 
               />
             ))}
           </div>
@@ -360,6 +362,37 @@ export function BrowsePage() {
           setPage(1);
         }}
       />
+
+      {/* Quick-filter: Play modes — active styling derived from centralized formatPlayMode */}
+      <div className="flex gap-2">
+        {([
+          { mode: 'basic' as const,        label: 'Enkel'     },
+          { mode: 'facilitated' as const,  label: 'Ledd'      },
+          { mode: 'participants' as const, label: 'Deltagare' },
+        ]).map(({ mode, label }) => {
+          const isActive = filters.playMode === mode;
+          const modeFormat = formatPlayMode(mode);
+          return (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => {
+                setFilters((prev) => ({ ...prev, playMode: isActive ? null : mode }));
+                setPage(1);
+              }}
+              className={cn(
+                'flex-1 rounded-xl py-2.5 text-base font-semibold transition-all',
+                isActive
+                  ? (modeFormat?.badge ?? 'bg-muted text-muted-foreground ring-1 ring-border')
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              )}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
       <FilterBar
         filters={filters}
         options={filterOptions}

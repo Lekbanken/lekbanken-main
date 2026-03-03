@@ -125,7 +125,7 @@ function mapAchievements(
   });
 }
 
-function mapCoins(balanceRow: { balance?: number | null } | null, transactions: Array<{ id: string; type: string; amount: number; description?: string | null; created_at: string }> | null): CoinsSummary {
+function mapCoins(balanceRow: { balance?: number | null } | null, transactions: Array<{ id: string; type: string; amount: number; description?: string | null; reason_code?: string | null; created_at: string }> | null): CoinsSummary {
   const formatter = new Intl.DateTimeFormat("sv-SE", { dateStyle: "medium" });
   return {
     balance: balanceRow?.balance ?? 0,
@@ -135,6 +135,7 @@ function mapCoins(balanceRow: { balance?: number | null } | null, transactions: 
         type: t.type === "spend" ? "spend" : "earn",
         amount: t.amount,
         description: t.description ?? "",
+        reasonCode: t.reason_code ?? null,
         date: formatter.format(new Date(t.created_at)),
       })) ?? [],
   };
@@ -238,7 +239,7 @@ export async function GET() {
       .maybeSingle(),
     supabase
       .from("coin_transactions")
-      .select("id,type,amount,description,created_at")
+      .select("id,type,amount,description,reason_code,created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(10),

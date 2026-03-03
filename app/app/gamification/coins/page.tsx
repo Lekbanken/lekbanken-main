@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useMessages, useTranslations } from 'next-intl';
 import { Button, Card, CardContent } from '@/components/ui';
 import {
   ArrowLeftIcon,
@@ -16,6 +17,7 @@ type Transaction = {
   type: 'earn' | 'spend';
   amount: number;
   description: string;
+  reasonCode?: string | null;
   date: string;
 };
 
@@ -28,6 +30,10 @@ type CoinsPayload = {
 
 export default function CoinsHistoryPage() {
   const t = useTranslations('app.profile');
+  const messages = useMessages();
+  const profileSections = ((messages?.app as Record<string, unknown>)?.profile as Record<string, unknown>)?.sections as Record<string, unknown> | undefined;
+  const reasonCodesMap = profileSections?.coins as Record<string, unknown> | undefined;
+  const coinReasonCodes = reasonCodesMap?.reasonCodes as Record<string, string> | undefined;
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState(0);
   const [filter, setFilter] = useState<'all' | 'earn' | 'spend'>('all');
@@ -108,7 +114,9 @@ export default function CoinsHistoryPage() {
       {/* Balance Card */}
       <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
         <CardContent className="p-6 text-center">
-          <span className="text-4xl mb-2 block">🪙</span>
+          <div className="flex justify-center mb-2">
+            <Image src="/icons/journey/dicecoin_webp.webp" alt="DiceCoin" width={48} height={48} />
+          </div>
           <p className="text-3xl font-bold text-foreground tabular-nums">
             {balance.toLocaleString()}
           </p>
@@ -194,7 +202,10 @@ export default function CoinsHistoryPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground truncate">
-                    {tx.description || t('sections.coins.unknownTransaction')}
+                    {tx.reasonCode && coinReasonCodes?.[tx.reasonCode]
+                      ? coinReasonCodes[tx.reasonCode]
+                      : tx.description || t('sections.coins.unknownTransaction')
+                    }
                   </p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <CalendarIcon className="h-3 w-3" />

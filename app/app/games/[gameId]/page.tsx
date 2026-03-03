@@ -287,6 +287,7 @@ export default async function GameDetailPage({ params }: Props) {
             <GameStartActions
               gameId={game.id}
               gameName={game.title}
+              playMode={game.playMode ?? undefined}
               initialReaction={initialReaction}
               showShare={true}
               labels={{

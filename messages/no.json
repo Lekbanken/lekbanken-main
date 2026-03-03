@@ -436,6 +436,37 @@
     "noAchievementsYet": "Ingen prestasjoner ennå",
     "playToEarnBadges": "Spill for å tjene badges!",
     "viewAllAchievements": "Vis alle prestasjoner",
+    "nextStepLabel": "Neste steg",
+    "unlockedDate": "Låst opp {date}",
+    "showcase": {
+      "earned": "Tjent",
+      "emptySlot": "Tom plass",
+      "emptyHint": "Velg opptil 4 badges å vise her",
+      "pinToJourney": "Vis i Reise",
+      "pinnedInJourney": "Vist i Reise",
+      "maxPinned": "Maks 4 valgt"
+    },
+    "faction": {
+      "label": "Fraksjon",
+      "chooseFaction": "Velg fraksjon",
+      "banner": {
+        "forest": "Skovens Vokter",
+        "sea": "Havets Utforsker",
+        "sky": "Himmelens Seiler",
+        "void": "Tomrommets Vandrer",
+        "neutral": "Ingen fraksjon valgt"
+      }
+    },
+    "skillTree": {
+      "title": "Designtre",
+      "unlockedCount": "{unlocked} / {total} opplåst",
+      "hint": "Nå høyere nivåer for å låse opp kosmetikk",
+      "hintClick": "Trykk på en node for å se detaljer",
+      "avatarHint": "Trykk på avataren din for Designtre",
+      "unlockAt": "Låses opp på nivå {level}",
+      "availableAt": "Tilgjengelig på nivå {level}",
+      "nodeUnlocked": "Opplåst"
+    },
     "coins": "Mynter",
     "noCoinsActivityYet": "Ingen myntaktivitet ennå",
     "viewAllTransactions": "Vis alle transaksjoner",
@@ -469,7 +500,19 @@
     },
     "achievementsTitle": "Prestasjoner",
     "achievementsSubtitle": "Din samling av badges og mål",
-    "overview": "Oversikt"
+    "overview": "Oversikt",
+    "coinReasonCodes": {
+      "event:session_completed": "Belønning for fullført økt",
+      "event:run_completed": "Belønning for fullført runde",
+      "event:plan_created": "Belønning for opprettet plan",
+      "event:plan_published": "Belønning for publisert plan",
+      "event:game_played": "Belønning for spilt spill",
+      "event:achievement_unlocked": "Belønning for opplåst prestasjon",
+      "event:first_session": "Belønning for første økt",
+      "event:streak_bonus": "Streak-bonus",
+      "powerup:coin_multiplier": "Myntmultiplikator-bonus",
+      "refund": "Refusjon"
+    }
   },
   "browse": {
     "pageTitle": "Utforsk",
@@ -521,9 +564,9 @@
       "players": "Spillere",
       "playMode": {
         "label": "Spillmodus",
-        "basic": "Grunnleggende",
-        "facilitated": "Fasilitert",
-        "participants": "Deltakermodus"
+        "basic": "Enkel lek",
+        "facilitated": "Ledd aktivitet",
+        "participants": "Deltagarlek"
       },
       "hasPhases": "Har faser",
       "hasRoles": "Har roller",
@@ -556,6 +599,10 @@
     "years": "År",
     "noAccess": "Du har ikke tilgang til noen produkter ennå.",
     "errorTitle": "Kunne ikke laste",
+    "error": {
+      "title": "Kunne ikke laste aktiviteter",
+      "description": "Prøv igjen eller last inn siden på nytt."
+    },
     "emptyTitle": "Ingen aktiviteter funnet",
     "emptyDescription": "Prøv andre filtre eller søkeord.",
     "empty": {
@@ -5034,7 +5081,10 @@
           "step3": "<strong>Reparer</strong> i filen din og kjør dry-run igjen.",
           "step4": "<strong>Importer</strong> først når dry-run viser grønt."
         },
-        "infoDialogTitle": "Informasjon om spill"
+        "infoDialogTitle": "Informasjon om spill",
+        "productSelect": "Koble til produkt",
+        "productSelectDescription": "Spillene kobles til valgt produkt. Påvirker hvilken standardbilde som tildeles.",
+        "productSelectNone": "Ingen produkt (global)"
       },
       "export": {
         "title": "Eksporter spill",
@@ -5587,6 +5637,9 @@
             "taxonomyLabel": "Taksonomi / spillkategori",
             "taxonomyPlaceholder": "f.eks. Sirkelspill",
             "taxonomyNote": "Beholder tidligere verdi ved import; lagres som spillkategori i databasen.",
+            "productLabel": "Produkt",
+            "productPlaceholder": "Velg produkt...",
+            "productHelp": "Kobler spillet til en lisensprodukt.",
             "statusLabel": "Status",
             "statusDraft": "Utkast",
             "statusPublished": "Publisert",
@@ -8742,14 +8795,39 @@
         "unlike": "Fjern likerklikk",
         "dislike": "Mislik",
         "addToPlan": "Legg til i plan"
+      },
+      "directorPreview": {
+        "button": "Director Mode",
+        "title": "Forhåndsvisning",
+        "backToGame": "Tilbake til spillet",
+        "noSteps": "Spillet har ingen steg å vise."
       }
     },
     "gamification": {
       "events": {
         "signInRequired": "Du må være logget inn for å se hendelsesloggen.",
         "title": "DICECOIN",
-        "subtitle": "Hendelseslogg (kun lesing)",
-        "empty": "Ingen hendelser å vise ennå."
+        "subtitle": "Din aktivitetshistorikk",
+        "empty": "Ingen hendelser ennå. Spill spill og opprett økter for å tjene belønninger!",
+        "sources": {
+          "play": "Spill",
+          "planner": "Planlegger",
+          "system": "System",
+          "admin": "Admin"
+        },
+        "eventTypes": {
+          "session_completed": "Fullførte en økt",
+          "run_completed": "Fullførte en spill-runde",
+          "plan_created": "Opprettet en plan",
+          "plan_published": "Publiserte en plan",
+          "game_played": "Spilte et spill",
+          "achievement_unlocked": "Låste opp en prestasjon",
+          "first_session": "Startet din første økt",
+          "streak_bonus": "Oppnådde en streak-bonus",
+          "powerup_consumed": "Brukte en power-up",
+          "shop_purchase": "Kjøpte noe i butikken",
+          "reward_issued": "Mottok en belønning"
+        }
       },
       "achievements": {
         "celebration": {
@@ -9091,7 +9169,19 @@
           "noTransactions": "Ingen transaksjoner å vise.",
           "unknownTransaction": "Ukjent transaksjon",
           "error": "Kunne ikke hente myntdata",
-          "shopLink": "Bruk myntene dine i butikken"
+          "shopLink": "Bruk myntene dine i butikken",
+          "reasonCodes": {
+            "event:session_completed": "Belønning for fullført økt",
+            "event:run_completed": "Belønning for fullført runde",
+            "event:plan_created": "Belønning for opprettet plan",
+            "event:plan_published": "Belønning for publisert plan",
+            "event:game_played": "Belønning for spilt spill",
+            "event:achievement_unlocked": "Belønning for opplåst prestasjon",
+            "event:first_session": "Belønning for første økt",
+            "event:streak_bonus": "Streak-bonus",
+            "powerup:coin_multiplier": "Myntmultiplikator-bonus",
+            "refund": "Refusjon"
+          }
         },
         "friends": {
           "title": "Venner",
@@ -9522,6 +9612,7 @@
       "boostRemaining": "{hours}t {minutes}m igjen",
       "coins": "DiceCoin",
       "gems": "Gems",
+      "level": "Nivå",
       "featured": "Utvalgt",
       "levelLocked": "Låst: nivå {level}",
       "buyNow": "Kjøp nå",
@@ -11253,6 +11344,7 @@
         "offline": "Kobler til på nytt…"
       },
       "header": {
+        "back": "Tilbake",
         "backToLobby": "Tilbake til lobbyen",
         "fullscreen": "Fullskjerm",
         "preview": "Forhåndsvisning"
@@ -12242,28 +12334,163 @@
     "directorDrawer": {
       "tabs": {
         "play": "Spill",
+        "time": "Tid",
+        "artifacts": "Artefakter",
         "triggers": "Triggers",
         "signals": "Signaler",
         "events": "Hendelser"
       },
+      "common": {
+        "dash": "–"
+      },
       "header": {
         "participants": "{count} deltakere",
         "separator": "•",
+        "statusDraft": "UTKAST",
+        "statusLobby": "LOBBY",
         "statusLive": "LIVE",
         "statusPaused": "PAUSET",
+        "statusLocked": "LÅST",
         "statusEnded": "AVSLUTTET",
         "pause": "Pause",
         "resume": "Fortsett",
+        "fullscreen": "Fullskjerm",
+        "preview": "FORHÅNDSVISNING",
         "backToLobby": "Til lobbyen"
+      },
+      "leaderScript": {
+        "title": "LEADER SCRIPT"
       },
       "steps": {
         "noSteps": "Ingen trinn tilgjengelig ennå",
         "stepOf": "Trinn {current} av {total}",
-        "notStarted": "Ikke startet"
+        "notStarted": "Ikke startet",
+        "previous": "Forrige",
+        "next": "Neste"
       },
       "triggers": {
+        "armedLabel": "🟢 ARMED ({count})",
+        "errorLabel": "❌ ERROR ({count})",
+        "firedLabel": "✅ FIRED ({count})",
         "disableAll": "Deaktiver alle",
-        "noTriggers": "Ingen triggers i denne sesjonen"
+        "noTriggers": "Ingen triggers i denne sesjonen",
+        "noMatchingTriggers": "Ingen triggers matcher det valgte filteret",
+        "filterAll": "Alle",
+        "filterArmed": "Aktive",
+        "filterFired": "Avfyrte",
+        "filterError": "Feil",
+        "filterDisabled": "Inaktive",
+        "overrideMode": "Leder-override",
+        "overrideModeDesc": "Tillat manuell trigring av ikke-manuelle triggers. Bruk med forsiktighet.",
+        "overrideConfirmTitle": "Tving triggering?",
+        "overrideConfirmDesc": "Trigge \"{name}\" manuelt? Dette omgår det normale trigger-vilkåret.",
+        "overrideConfirmButton": "Trigg likevel",
+        "pendingTimeout": "{action} på \"{name}\" tok lenger enn forventet — venter på synk",
+        "pendingTimeoutTitle": "Synk forsinket",
+        "requestFailed": "Kunne ikke nå serveren for \"{name}\". Sjekk tilkoblingen og prøv igjen.",
+        "requestFailedTitle": "Forespørsel mislyktes",
+        "actionFailed": "Handling på \"{name}\" mislyktes ({errorCode}). Prøv igjen eller sjekk trigger-konfigurasjonen.",
+        "actionFailedTitle": "Trigger-handling mislyktes"
+      },
+      "triggerCard": {
+        "whenLabel": "NÅR",
+        "thenLabel": "GJØR",
+        "noActions": "Ingen handlinger definert",
+        "status": {
+          "armed": "Aktiv",
+          "fired": "Avfyrt",
+          "disabled": "Av",
+          "error": "Feil"
+        },
+        "conditionTypes": {
+          "phaseStarted": "Fase starter",
+          "phaseCompleted": "Fase slutter",
+          "stepStarted": "Steg starter",
+          "stepCompleted": "Steg slutter",
+          "keypadCorrect": "Kode riktig",
+          "keypadFailed": "Kode feil",
+          "riddleCorrect": "Gåte løst",
+          "counterReached": "Teller",
+          "manual": "Manuell",
+          "signalReceived": "Signal",
+          "timerEnded": "Timer",
+          "artifactUnlocked": "Artefakt",
+          "decisionResolved": "Beslutning",
+          "audioAcknowledged": "Lyd",
+          "multiAnswerComplete": "Flersvar",
+          "scanVerified": "Skanning",
+          "hintRequested": "Ledetråd",
+          "hotspotFound": "Hotspot",
+          "hotspotHuntComplete": "Jakt ferdig",
+          "tilePuzzleComplete": "Puslespill",
+          "cipherDecoded": "Chiffer",
+          "propConfirmed": "Rekvisitt OK",
+          "propRejected": "Rekvisitt avvist",
+          "locationVerified": "Posisjon",
+          "logicGridSolved": "Logikkrutenett",
+          "soundLevelTriggered": "Lydnivå",
+          "timeBankExpired": "Tidsbank",
+          "signalGeneratorTriggered": "Signalgen.",
+          "replayMarkerAdded": "Markør",
+          "unknown": "Ukjent"
+        },
+        "actionTypes": {
+          "send_message": "Melding",
+          "reveal_artifact": "Vis",
+          "hide_artifact": "Skjul",
+          "advance_step": "Neste steg",
+          "advance_phase": "Neste fase",
+          "play_sound": "Lyd",
+          "start_timer": "Timer",
+          "show_countdown": "Nedtelling",
+          "send_signal": "Signal",
+          "increment_counter": "Teller +",
+          "reset_counter": "Nullstill teller",
+          "send_hint": "Ledetråd",
+          "show_leader_script": "Manus",
+          "time_bank_apply_delta": "Tid ±",
+          "time_bank_pause": "Tid pause",
+          "trigger_signal": "Trigg signal",
+          "reset_keypad": "Nullstill kode",
+          "reset_riddle": "Nullstill gåte",
+          "unlock_decision": "Lås opp avstemning",
+          "lock_decision": "Lås avstemning",
+          "add_replay_marker": "Markør",
+          "reset_scan_gate": "Nullstill skanning",
+          "reset_hotspot_hunt": "Nullstill jakt",
+          "reset_tile_puzzle": "Nullstill puslespill",
+          "reset_cipher": "Nullstill chiffer",
+          "reset_prop": "Nullstill rekvisitt",
+          "reset_location": "Nullstill posisjon",
+          "reset_logic_grid": "Nullstill rutenett",
+          "reset_sound_meter": "Nullstill lydmåler"
+        },
+        "meta": {
+          "manual": "Manuell trigger",
+          "once": "Bare én gang",
+          "delay": "{seconds}s forsinkelse",
+          "firedCount": "Avfyrt {count}×",
+          "lastFired": "Sist: {time}",
+          "copyDebug": "Kopier debug-info",
+          "copied": "Kopiert!"
+        },
+        "actions": {
+          "fire": "Trigg nå",
+          "fireOverride": "Tving trigge",
+          "rearm": "Reaktiver",
+          "rearmHint": "Reaktiverer triggeren (historikk beholdes)",
+          "disable": "Deaktiver"
+        },
+        "gating": {
+          "notArmed": "Triggeren er ikke aktiv",
+          "alreadyFiredOnce": "Allerede avfyrt (kjør-en-gang)",
+          "alreadyArmed": "Triggeren er allerede aktiv",
+          "alreadyDisabled": "Triggeren er allerede deaktivert",
+          "overrideRequired": "Aktiver Leder-override for å trigge ikke-manuelle triggers"
+        },
+        "pending": {
+          "timedOut": "Tok lenger enn forventet"
+        }
       },
       "signals": {
         "deviceSignals": "Enhetssignaler",
@@ -12274,6 +12501,17 @@
         "send": "Send",
         "recentSignals": "Nylige signaler",
         "clickToResend": "Klikk for å sende på nytt",
+        "executingIndicator": "●",
+        "notificationsStatus": "Varsler: {status}",
+        "toast": {
+          "title": "Varsel",
+          "body": "In-app toast",
+          "button": "Vis in-app toast"
+        },
+        "toggle": {
+          "show": "+",
+          "hide": "−"
+        },
         "presets": {
           "pause": "Pause",
           "pauseMessage": "Pause!",
@@ -12287,6 +12525,28 @@
       },
       "events": {
         "noEvents": "Ingen hendelser ennå"
+      },
+      "timeBank": {
+        "title": "Tidsbank",
+        "paused": "PAUSET",
+        "manualAdjustment": "Manuell justering"
+      },
+      "stepTimer": {
+        "title": "Stegtider",
+        "current": "Nåværende steg",
+        "elapsed": "Gått",
+        "planned": "Planlagt",
+        "noData": "Ingen tidsinformasjon for stegene",
+        "minutes": "{count} min",
+        "noDuration": "Ingen tid satt"
+      },
+      "quickActions": {
+        "title": "Hurtighandlinger",
+        "story": "Historie",
+        "giveHint": "Gi hint",
+        "reset": "Nullstill",
+        "confirmReset": "Bekreft nullstilling?",
+        "message": "Melding"
       },
       "artifacts": {
         "noArtifacts": "Ingen artefakter i denne sesjonen",
@@ -12312,18 +12572,6 @@
           "fallback": "Hopper til f\u00f8rste tilgjengelige artefakt"
         },
         "new": "Ny"
-      },
-      "timeBank": {
-        "title": "Tidsbank",
-        "paused": "PAUSET",
-        "manualAdjustment": "Manuell justering"
-      },
-      "quickActions": {
-        "title": "Hurtighandlinger",
-        "story": "Historie",
-        "giveHint": "Gi hint",
-        "reset": "Nullstill",
-        "message": "Melding"
       },
       "footer": {
         "backToLobby": "Tilbake til Lobby"
@@ -14585,6 +14833,21 @@
         "title": "Signaltest",
         "body": "Varsler fungerer!"
       }
+    },
+    "sessionCard": {
+      "time": {
+        "justNow": "Akkurat nå",
+        "minutesAgo": "{count} min siden",
+        "hoursAgo": "{count} t siden",
+        "daysAgo": "{count} dager siden"
+      },
+      "duration": {
+        "hoursMinutes": "{hours} t {minutes} min",
+        "minutes": "{minutes} min"
+      },
+      "pause": "Pause",
+      "continue": "Fortsett",
+      "open": "Åpne"
     },
     "sessionHeader": {
       "sessionFor": "Sesjon for",

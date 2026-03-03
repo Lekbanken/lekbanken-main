@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useMessages, useTranslations } from "next-intl";
 import type { CoinsSummary } from "../types";
 import { useCountUp } from "../hooks/useCountUp";
 
@@ -11,6 +11,8 @@ type CoinsSectionProps = {
 
 export function CoinsSection({ summary }: CoinsSectionProps) {
   const t = useTranslations("gamification");
+  const messages = useMessages();
+  const reasonCodesMap = (messages?.gamification as Record<string, unknown>)?.coinReasonCodes as Record<string, string> | undefined;
   const animatedBalance = useCountUp(summary.balance);
   return (
     <section className="space-y-4">
@@ -96,7 +98,9 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
                       {isEarn ? "↑" : "↓"}
                     </div>
                     <span className="text-[11px] text-white/80 truncate max-w-[160px]">
-                      {tx.description}
+                      {tx.reasonCode && reasonCodesMap?.[tx.reasonCode]
+                        ? reasonCodesMap[tx.reasonCode]
+                        : tx.description}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">

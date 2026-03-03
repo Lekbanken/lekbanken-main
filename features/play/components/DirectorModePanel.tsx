@@ -1610,9 +1610,10 @@ export function DirectorModePanel({
           <PlayHeader
             title={title}
             onBack={onClose}
-            backLabel={tShared('header.backToLobby')}
+            backLabel={isPreview ? tShared('header.back') : tShared('header.backToLobby')}
             connectionState={(connectionState || 'connected') as 'connected' | 'degraded' | 'offline'}
             sessionStatus={status}
+            hideStatus={isPreview}
             statusLabels={{
               live: tShared('status.active'),
               paused: tShared('status.paused'),
@@ -1620,24 +1621,17 @@ export function DirectorModePanel({
               degraded: tShared('connection.degraded'),
               offline: tShared('connection.offline'),
             }}
-            bgTintClass={statusConfig.bgTintClass}
+            bgTintClass={isPreview ? undefined : statusConfig.bgTintClass}
             isFullscreen={isFullscreen}
             showFullscreenButton={showFullscreenButton}
             onToggleFullscreen={onToggleFullscreen}
             rightSlot={
-              <>
-                {!isPreview && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <UserGroupIcon className="h-3.5 w-3.5" />
-                    <span className="font-medium">{participantCount}</span>
-                  </div>
-                )}
-                {isPreview && (
-                  <Badge variant="secondary" size="sm" className="uppercase tracking-wider text-[10px]">
-                    {tShared('header.preview')}
-                  </Badge>
-                )}
-              </>
+              !isPreview ? (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <UserGroupIcon className="h-3.5 w-3.5" />
+                  <span className="font-medium">{participantCount}</span>
+                </div>
+              ) : undefined
             }
           />
         }

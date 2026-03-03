@@ -3,6 +3,7 @@ import { Select } from "@/components/ui/select";
 import { ListBulletIcon } from "@heroicons/react/24/solid";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { formatPlayMode } from "@/lib/game-display";
 import type { BrowseFilters, FilterOptions, SortOption } from "../types";
 
 type FilterBarProps = {
@@ -66,6 +67,9 @@ export function FilterBar({ filters, options, sort, view, total, onOpen, onClear
       : []),
     ...(filters.maxTime !== null
       ? [{ key: "maxTime" as const, value: String(filters.maxTime), label: `Max tid ${filters.maxTime} min` }]
+      : []),
+    ...(filters.playMode
+      ? [{ key: "playMode" as const, value: filters.playMode, label: formatPlayMode(filters.playMode)?.label ?? filters.playMode }]
       : []),
   ];
 

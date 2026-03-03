@@ -182,13 +182,23 @@ function EnumFilter({ filter, label, currentFilters, onFilterChange }: EnumFilte
   const t = useTranslations();
   const options = filter.options ?? [];
   const filterKey = filter.key as keyof BrowseFilters;
-  const selected = (currentFilters[filterKey] as string[]) ?? [];
+  const isSingleSelect = filter.singleSelect === true;
+
+  // Single-select: scalar value (e.g. playMode); Multi-select: array
+  const scalarValue = isSingleSelect ? (currentFilters[filterKey] as string | null | undefined) : null;
+  const selected = isSingleSelect ? [] : ((currentFilters[filterKey] as string[]) ?? []);
 
   const handleToggle = (value: string) => {
-    const newSelected = selected.includes(value)
-      ? selected.filter((v) => v !== value)
-      : [...selected, value];
-    onFilterChange(filterKey, newSelected as BrowseFilters[typeof filterKey]);
+    if (isSingleSelect) {
+      // Toggle scalar: clicking active option deselects it
+      const newValue = scalarValue === value ? null : value;
+      onFilterChange(filterKey, newValue as BrowseFilters[typeof filterKey]);
+    } else {
+      const newSelected = selected.includes(value)
+        ? selected.filter((v) => v !== value)
+        : [...selected, value];
+      onFilterChange(filterKey, newSelected as BrowseFilters[typeof filterKey]);
+    }
   };
 
   return (
@@ -196,7 +206,7 @@ function EnumFilter({ filter, label, currentFilters, onFilterChange }: EnumFilte
       <h4 className="mb-2 text-xs font-medium text-muted-foreground">{label}</h4>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => {
-          const isActive = selected.includes(option.value);
+          const isActive = isSingleSelect ? scalarValue === option.value : selected.includes(option.value);
           const optionLabel = (() => {
             try {
               return t(option.labelKey);

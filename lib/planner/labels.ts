@@ -140,6 +140,7 @@ export const BLOCK_TYPE_LABELS: Record<string, string> = {
   pause: 'Paus',
   preparation: 'Förberedelse',
   custom: 'Anpassat',
+  session_game: 'Deltagarlek',
 } as const
 
 export const BLOCK_TYPE_ICONS: Record<string, string> = {
@@ -147,6 +148,7 @@ export const BLOCK_TYPE_ICONS: Record<string, string> = {
   pause: '☕',
   preparation: '📋',
   custom: '✨',
+  session_game: '👥',
 } as const
 
 // =============================================================================

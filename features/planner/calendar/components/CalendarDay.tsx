@@ -13,12 +13,17 @@ interface CalendarDayProps {
   day: CalendarDayType;
   onClick: (date: string) => void;
   compact?: boolean;
+  /** Set of planIds with active runs — used to show amber "in progress" dot */
+  activeRunPlanIds?: Set<string>;
 }
 
-export function CalendarDay({ day, onClick, compact = false }: CalendarDayProps) {
+export function CalendarDay({ day, onClick, compact = false, activeRunPlanIds }: CalendarDayProps) {
   const hasSchedules = day.schedules.length > 0;
   const scheduledCount = day.schedules.filter(s => s.status === 'scheduled').length;
   const completedCount = day.schedules.filter(s => s.status === 'completed').length;
+  const hasActiveRun = activeRunPlanIds
+    ? day.schedules.some(s => activeRunPlanIds.has(s.planId))
+    : false;
 
   return (
     <button
@@ -50,7 +55,10 @@ export function CalendarDay({ day, onClick, compact = false }: CalendarDayProps)
       {/* Schedule indicators */}
       {hasSchedules && !compact && (
         <div className="mt-1 flex flex-wrap gap-0.5 px-0.5">
-          {scheduledCount > 0 && (
+          {hasActiveRun && (
+            <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-soft-pulse" />
+          )}
+          {scheduledCount > 0 && !hasActiveRun && (
             <div className="h-1.5 w-1.5 rounded-full bg-primary" />
           )}
           {completedCount > 0 && (
@@ -65,8 +73,11 @@ export function CalendarDay({ day, onClick, compact = false }: CalendarDayProps)
       )}
 
       {/* Compact mode dot indicator */}
-      {hasSchedules && compact && (
-        <div className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />
+      {(hasSchedules || hasActiveRun) && compact && (
+        <div className={cn(
+          'absolute bottom-1 h-1 w-1 rounded-full',
+          hasActiveRun ? 'bg-amber-500 animate-soft-pulse' : 'bg-primary'
+        )} />
       )}
     </button>
   );

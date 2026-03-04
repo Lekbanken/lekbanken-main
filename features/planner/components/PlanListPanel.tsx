@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useDeferredValue, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlanListItem } from "./PlanListItem";
+import { ScopeSelector, type PlanScope } from "./ScopeSelector";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useActiveRuns } from "@/features/planner/hooks/useActiveRuns";
 import type { PlannerPlan, PlannerStatus, PlannerVisibility } from "@/types/planner";
 
 const PlusIcon = () => (
@@ -19,7 +22,9 @@ interface PlanListPanelProps {
   activePlanId: string | null;
   isLoading: boolean;
   onSelectPlan: (planId: string) => void;
+  onEditPlan?: (planId: string) => void;
   onCreatePlan: () => void;
+  onScopeChange?: (scope: PlanScope) => void;
   isCreating?: boolean;
 }
 
@@ -52,20 +57,42 @@ export function PlanListPanel({
   activePlanId,
   isLoading,
   onSelectPlan,
+  onEditPlan,
   onCreatePlan,
+  onScopeChange,
   isCreating = false,
 }: PlanListPanelProps) {
   const t = useTranslations('planner');
+  const router = useRouter();
+  const { getActiveRun } = useActiveRuns();
+  const [scope, setScope] = useState<PlanScope>('mine');
   const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
   const [statusFilter, setStatusFilter] = useState<PlannerStatus | "all">("all");
   const [visibilityFilter, setVisibilityFilter] = useState<PlannerVisibility | "all">("all");
   const [sort, setSort] = useState<SortOption>("updated-desc");
 
+  const handlePlay = useCallback(
+    (planId: string) => router.push(`/app/play/plan/${planId}`),
+    [router]
+  );
+
+  const handleScopeChange = useCallback(
+    (newScope: PlanScope) => {
+      setScope(newScope);
+      setSearch("");
+      setStatusFilter("all");
+      setVisibilityFilter("all");
+      onScopeChange?.(newScope);
+    },
+    [onScopeChange]
+  );
+
   const filteredAndSortedPlans = useMemo(() => {
     let result = [...plans];
 
-    if (search.trim()) {
-      const searchLower = search.toLowerCase();
+    if (deferredSearch.trim()) {
+      const searchLower = deferredSearch.toLowerCase();
       result = result.filter(
         (plan) =>
           plan.name.toLowerCase().includes(searchLower) ||
@@ -97,18 +124,19 @@ export function PlanListPanel({
     });
 
     return result;
-  }, [plans, search, statusFilter, visibilityFilter, sort]);
+  }, [plans, deferredSearch, statusFilter, visibilityFilter, sort]);
 
   return (
     <Card className="border-border/60 h-full flex flex-col">
       <CardHeader className="space-y-4">
         <div className="flex items-center justify-between">
-          <CardTitle>{t('myPlans')}</CardTitle>
+          <CardTitle>{t('plans')}</CardTitle>
           <Button size="sm" variant="outline" className="gap-1" onClick={onCreatePlan} disabled={isCreating}>
             <PlusIcon />
             {t('newPlan')}
           </Button>
         </div>
+        <ScopeSelector activeScope={scope} onScopeChange={handleScopeChange} />
         <Input
           placeholder={t('search.placeholder')}
           value={search}
@@ -157,14 +185,20 @@ export function PlanListPanel({
               : t('noPlansYet')}
           </div>
         ) : (
-          filteredAndSortedPlans.map((plan) => (
-            <PlanListItem
-              key={plan.id}
-              plan={plan}
-              isActive={plan.id === activePlanId}
-              onClick={() => onSelectPlan(plan.id)}
-            />
-          ))
+          filteredAndSortedPlans.map((plan) => {
+            const activeRun = getActiveRun(plan.id);
+            return (
+              <PlanListItem
+                key={plan.id}
+                plan={plan}
+                isActive={plan.id === activePlanId}
+                onClick={() => onSelectPlan(plan.id)}
+                onEdit={onEditPlan ? () => onEditPlan(plan.id) : undefined}
+                activeRun={activeRun}
+                onPlay={handlePlay}
+              />
+            );
+          })
         )}
       </CardContent>
     </Card>

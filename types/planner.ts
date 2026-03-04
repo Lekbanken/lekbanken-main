@@ -1,5 +1,5 @@
 export type PlannerVisibility = 'private' | 'tenant' | 'public'
-export type PlannerBlockType = 'game' | 'pause' | 'preparation' | 'custom'
+export type PlannerBlockType = 'game' | 'pause' | 'preparation' | 'custom' | 'section' | 'session_game'
 export type PlannerStatus = 'draft' | 'published' | 'modified' | 'archived'
 
 export type PlannerGameSummary = {
@@ -10,6 +10,7 @@ export type PlannerGameSummary = {
   coverUrl?: string | null
   energyLevel?: string | null
   locationType?: string | null
+  playMode?: string | null
 }
 
 export type PlannerBlock = {

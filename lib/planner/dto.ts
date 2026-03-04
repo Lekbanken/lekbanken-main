@@ -13,7 +13,7 @@ import { z } from 'zod'
 
 export const PlannerStatusSchema = z.enum(['draft', 'published', 'modified', 'archived'])
 export const PlannerVisibilitySchema = z.enum(['private', 'tenant', 'public'])
-export const PlannerBlockTypeSchema = z.enum(['game', 'pause', 'preparation', 'custom'])
+export const PlannerBlockTypeSchema = z.enum(['game', 'pause', 'preparation', 'custom', 'section', 'session_game'])
 
 // =============================================================================
 // GAME SUMMARY (embedded in blocks)
@@ -27,6 +27,7 @@ export const PlannerGameSummarySchema = z.object({
   coverUrl: z.string().nullable().optional(),
   energyLevel: z.string().nullable().optional(),
   locationType: z.string().nullable().optional(),
+  playMode: z.string().nullable().optional(),
 })
 
 export type PlannerGameSummaryDTO = z.infer<typeof PlannerGameSummarySchema>

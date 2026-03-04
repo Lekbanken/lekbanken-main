@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { generateStepsFromBlocks } from '@/lib/planner/server/snapshot'
+import type { NormalizedBlock } from '@/lib/planner/server/snapshot'
 import type { Run, RunStep } from '@/features/play/types'
 
 function normalizeId(value: string | string[] | undefined) {
@@ -62,14 +64,25 @@ export async function GET(
     .single()
 
   // Fetch version blocks
-  const { data: blocks } = await supabase
+  const { data: rawBlocks } = await supabase
     .from('plan_version_blocks')
     .select('*')
     .eq('plan_version_id', run.plan_version_id)
     .order('position', { ascending: true })
 
-  // Regenerate steps from blocks
-  const steps = generateStepsFromBlocks(blocks || [])
+  // Normalise to NormalizedBlock[] and regenerate steps via snapshot pipeline
+  const blocks: NormalizedBlock[] = (rawBlocks ?? []).map((b) => ({
+    id: b.id,
+    position: b.position,
+    blockType: b.block_type as NormalizedBlock['blockType'],
+    durationMinutes: b.duration_minutes ?? 5,
+    title: b.title ?? null,
+    notes: b.notes ?? null,
+    isOptional: b.is_optional ?? false,
+    gameSnapshot: normalizeGameSnapshot(b.game_snapshot),
+  }))
+
+  const steps = generateStepsFromBlocks(blocks)
 
   const runMetadata = (run.metadata ?? null) as unknown as {
     timerRemaining?: number
@@ -85,8 +98,8 @@ export async function GET(
     versionNumber: version?.version_number ?? 0,
     name: version?.name ?? 'Okänd plan',
     status: run.status,
-    steps,
-    blockCount: (blocks || []).length,
+    steps: steps as RunStep[],
+    blockCount: blocks.filter((b) => b.blockType !== 'section').length,
     totalDurationMinutes: version?.total_time_minutes || steps.reduce((sum, s) => sum + s.durationMinutes, 0),
     currentStepIndex: run.current_step ?? 0,
     startedAt: run.started_at ?? run.created_at ?? new Date().toISOString(),
@@ -106,94 +119,22 @@ export async function GET(
   return NextResponse.json({ run: runResponse, progress })
 }
 
-type VersionBlock = {
-  id: string
-  position: number
-  block_type: string
-  duration_minutes: number
-  title: string | null
-  notes: string | null
-  is_optional: boolean | null
-  game_snapshot: unknown | null
-}
-
-const DEFAULT_STEP_DURATION = 5
-
-function generateStepsFromBlocks(blocks: VersionBlock[]): RunStep[] {
-  const steps: RunStep[] = []
-  let stepIndex = 0
-
-  for (const block of blocks) {
-    const tag = block.title || getBlockTypeLabel(block.block_type)
-    const baseDuration = block.duration_minutes || DEFAULT_STEP_DURATION
-
-    const snapshot = (block.game_snapshot ?? null) as unknown as {
-      id: string
-      title: string
-      shortDescription?: string | null
-      instructions?: Array<{
-        title: string
-        description?: string | null
-        durationMinutes?: number | null
-      }> | null
-    } | null
-
-    if (snapshot?.instructions && snapshot.instructions.length > 0) {
-      for (let i = 0; i < snapshot.instructions.length; i++) {
-        const instruction = snapshot.instructions[i]
-        steps.push({
-          id: `${block.id}:${i}`,
-          index: stepIndex++,
-          blockId: block.id,
-          blockType: block.block_type as 'game' | 'pause' | 'preparation' | 'custom',
-          title: instruction.title || `Steg ${i + 1}`,
-          description: instruction.description || '',
-          durationMinutes: instruction.durationMinutes ?? baseDuration,
-          tag,
-          note: i === 0 ? block.notes || undefined : undefined,
-          gameSnapshot: {
-            id: snapshot.id,
-            title: snapshot.title,
-            shortDescription: snapshot.shortDescription,
-          },
-        })
-      }
-    } else {
-      steps.push({
-        id: `${block.id}:0`,
-        index: stepIndex++,
-        blockId: block.id,
-        blockType: block.block_type as 'game' | 'pause' | 'preparation' | 'custom',
-        title: tag,
-        description: block.notes || getBlockTypeDefaultDescription(block.block_type),
-        durationMinutes: baseDuration,
-        tag,
-        gameSnapshot: snapshot ? {
-          id: snapshot.id,
-          title: snapshot.title,
-          shortDescription: snapshot.shortDescription,
-        } : undefined,
-      })
-    }
-  }
-
-  return steps
-}
-
-function getBlockTypeLabel(blockType: string): string {
-  switch (blockType) {
-    case 'game': return 'Lek'
-    case 'pause': return 'Paus'
-    case 'preparation': return 'Förberedelse'
-    case 'custom': return 'Moment'
-    default: return 'Moment'
-  }
-}
-
-function getBlockTypeDefaultDescription(blockType: string): string {
-  switch (blockType) {
-    case 'pause': return 'Ta en paus. Fortsätt när gruppen är redo.'
-    case 'preparation': return 'Förbered nästa moment.'
-    default: return 'Fortsätt när gruppen är redo.'
+// ── Helper: normalise raw game_snapshot JSON to typed object ──────────
+function normalizeGameSnapshot(raw: unknown): NormalizedBlock['gameSnapshot'] {
+  if (!raw || typeof raw !== 'object') return null
+  const obj = raw as Record<string, unknown>
+  return {
+    id: (obj.id as string) ?? '',
+    title: (obj.title as string) ?? 'Okänd lek',
+    shortDescription: (obj.shortDescription as string) ?? null,
+    durationMinutes: (obj.durationMinutes as number) ?? null,
+    instructions: Array.isArray(obj.instructions)
+      ? (obj.instructions as Array<Record<string, unknown>>).map((s, i) => ({
+          title: (s.title as string) || `Steg ${i + 1}`,
+          description: (s.description as string) || null,
+          durationMinutes: (s.durationMinutes as number) || null,
+        }))
+      : null,
+    materials: Array.isArray(obj.materials) ? (obj.materials as string[]) : null,
   }
 }

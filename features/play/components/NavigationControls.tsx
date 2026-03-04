@@ -9,9 +9,13 @@ type NavigationControlsProps = {
   onNext: () => void;
   onEnd?: () => void;
   progress?: number; // 0-1
+  /** When true, the Next button is disabled (e.g. session not started) */
+  nextDisabled?: boolean;
+  /** Tooltip shown when Next is disabled */
+  nextDisabledReason?: string;
 };
 
-export function NavigationControls({ current, total, onPrev, onNext, onEnd, progress }: NavigationControlsProps) {
+export function NavigationControls({ current, total, onPrev, onNext, onEnd, progress, nextDisabled, nextDisabledReason }: NavigationControlsProps) {
   const t = useTranslations('play.navigationControls');
   const isFirst = current === 0;
   const isLast = current === total - 1;
@@ -71,14 +75,20 @@ export function NavigationControls({ current, total, onPrev, onNext, onEnd, prog
             {t('previous')}
           </Button>
           {!isLast ? (
-            <Button 
-              size="lg" 
-              onClick={onNext}
-              className="h-12 flex-1 gap-2 text-sm font-medium shadow-lg shadow-primary/20 transition-all active:scale-95"
-            >
-              {t('next')}
-              <ChevronRightIcon className="h-4 w-4" aria-hidden />
-            </Button>
+            <div className="flex-1 relative">
+              <Button 
+                size="lg" 
+                onClick={onNext}
+                disabled={nextDisabled}
+                className="h-12 w-full gap-2 text-sm font-medium shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50"
+              >
+                {t('next')}
+                <ChevronRightIcon className="h-4 w-4" aria-hidden />
+              </Button>
+              {nextDisabled && nextDisabledReason && (
+                <p className="mt-1 text-center text-[10px] text-muted-foreground">{nextDisabledReason}</p>
+              )}
+            </div>
           ) : (
             <Button 
               size="lg" 

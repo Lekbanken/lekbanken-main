@@ -44,6 +44,11 @@ export function CalendarHeader({
 }: CalendarHeaderProps) {
   const t = useTranslations('planner.wizard.calendar');
 
+  // Handle week view title format: "weekNum|year" from useCalendar
+  const displayTitle = title.includes('|') 
+    ? t('weekLabel', { week: title.split('|')[0], year: title.split('|')[1] })
+    : title;
+
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       {/* Title and Navigation */}
@@ -59,7 +64,7 @@ export function CalendarHeader({
         </Button>
         
         <h2 className="min-w-[160px] text-center text-lg font-semibold capitalize">
-          {title}
+          {displayTitle}
         </h2>
         
         <Button

@@ -80,16 +80,6 @@ export type {
   CopyPlanRequestDTO,
 } from './dto'
 
-// i18n
-export {
-  t,
-  getSection,
-  scopedT,
-  usePlannerTranslations,
-  plannerLocales,
-} from './i18n'
-export type { PlannerLocale, PlannerTranslationKey } from './i18n'
-
 // AI Assistance
 export {
   generatePlanSuggestions,

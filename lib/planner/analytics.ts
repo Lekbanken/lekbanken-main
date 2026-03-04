@@ -119,6 +119,8 @@ export function calculateAggregateStats(plans: PlannerPlan[]): PlanAggregateStat
     pause: 0,
     preparation: 0,
     custom: 0,
+    section: 0,
+    session_game: 0,
   }
   
   const gameUsage: Record<string, { id: string; title: string; count: number }> = {}

@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { PlusIcon, PauseIcon, PencilSquareIcon, RectangleGroupIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, PauseIcon, PencilSquareIcon, RectangleGroupIcon, Bars3BottomLeftIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type AddBlockButtonProps = {
-  onAdd: (type: "game" | "pause" | "preparation" | "custom") => void;
+  onAdd: (type: "game" | "pause" | "preparation" | "custom" | "section" | "session_game") => void;
 };
 
 export function AddGameButton({ onAdd }: AddBlockButtonProps) {
@@ -45,6 +45,14 @@ export function AddGameButton({ onAdd }: AddBlockButtonProps) {
         <DropdownMenuItem onClick={() => onAdd("custom")}>
           <PencilSquareIcon className="mr-2 h-4 w-4" />
           {t('addBlock.custom')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onAdd("section")}>
+          <Bars3BottomLeftIcon className="mr-2 h-4 w-4" />
+          {t('addBlock.section')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onAdd("session_game")}>
+          <UserGroupIcon className="mr-2 h-4 w-4" />
+          {t('addBlock.sessionGame')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

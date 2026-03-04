@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { Tooltip, TooltipProvider } from "@/components/ui/tooltip";
 
 type Version = {
@@ -18,10 +19,13 @@ type VersionTimelineProps = {
   onShowAll?: () => void;
 };
 
-function formatShortDate(dateString: string | null): string {
+const BCP47_MAP: Record<string, string> = { sv: 'sv-SE', no: 'nb-NO', en: 'en-US' };
+
+function formatShortDate(dateString: string | null, locale: string): string {
   if (!dateString) return "";
   const date = new Date(dateString);
-  return new Intl.DateTimeFormat("sv-SE", {
+  const bcp47 = BCP47_MAP[locale] ?? locale;
+  return new Intl.DateTimeFormat(bcp47, {
     month: "short",
     day: "numeric",
   }).format(date);
@@ -34,6 +38,8 @@ export function VersionTimeline({
   onVersionClick,
   onShowAll,
 }: VersionTimelineProps) {
+  const t = useTranslations('planner');
+  const locale = useLocale();
   const [versions, setVersions] = useState<Version[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -79,7 +85,7 @@ export function VersionTimeline({
   if (versions.length === 0) {
     return (
       <span className="text-xs text-muted-foreground">
-        Ej publicerad
+        {t('versions.unpublished')}
       </span>
     );
   }
@@ -95,14 +101,14 @@ export function VersionTimeline({
           const isCurrent = version.versionNumber === currentVersionNumber;
           const tooltipContent = (
             <div>
-              <p className="font-medium">Version {version.versionNumber}</p>
+              <p className="font-medium">{t('versions.versionNumber', { number: version.versionNumber })}</p>
               {version.publishedAt && (
                 <p className="text-muted-foreground">
-                  {formatShortDate(version.publishedAt)}
+                  {formatShortDate(version.publishedAt, locale)}
                 </p>
               )}
               {isCurrent && (
-                <p className="text-primary">Aktuell version</p>
+                <p className="text-primary">{t('versions.currentVersion')}</p>
               )}
             </div>
           );
@@ -129,11 +135,11 @@ export function VersionTimeline({
         })}
 
         {hiddenCount > 0 && onShowAll && (
-          <Tooltip content={`Visa alla ${versions.length} versioner`} position="bottom">
+          <Tooltip content={t('versions.showAll', { count: versions.length })} position="bottom">
             <button
               onClick={onShowAll}
               className="flex h-6 items-center justify-center rounded-full bg-muted px-2 text-xs font-medium text-muted-foreground hover:bg-muted/80"
-              aria-label={`Visa alla ${versions.length} versioner`}
+              aria-label={t('versions.showAll', { count: versions.length })}
             >
               +{hiddenCount}
             </button>

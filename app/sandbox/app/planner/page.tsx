@@ -133,6 +133,16 @@ const blockMeta: Record<
     className: 'bg-slate-500/10 text-slate-600',
     icon: PencilSquareIcon,
   },
+  section: {
+    label: 'Sektion',
+    className: 'bg-violet-500/10 text-violet-600',
+    icon: Squares2X2Icon,
+  },
+  session_game: {
+    label: 'Deltagarlek',
+    className: 'bg-violet-500/10 text-violet-600',
+    icon: UserGroupIcon,
+  },
 }
 
 const seedSearchResults = [

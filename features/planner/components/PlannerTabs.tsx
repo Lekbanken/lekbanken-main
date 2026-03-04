@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Tabs } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { ClipboardDocumentListIcon, PencilSquareIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
@@ -12,8 +13,8 @@ import type { ReactNode } from 'react';
 
 interface TabConfig {
   id: string;
-  label: string;
-  mobileLabel: string;  // Shorter label for mobile
+  labelKey: string;
+  mobileLabelKey: string;
   href: string;
   icon: ReactNode;
   /** Pattern to match for active state */
@@ -23,24 +24,24 @@ interface TabConfig {
 const PLANNER_TABS: TabConfig[] = [
   {
     id: 'plans',
-    label: 'Mina planer',
-    mobileLabel: 'Planer',
+    labelKey: 'wizard.tabs.plans',
+    mobileLabelKey: 'wizard.tabs.mobilePlans',
     href: '/app/planner/plans',
     icon: <ClipboardDocumentListIcon className="h-4 w-4" />,
     matchPattern: /^\/app\/planner\/plans/,
   },
   {
     id: 'edit',
-    label: 'Planera',
-    mobileLabel: 'Planera',
+    labelKey: 'wizard.tabs.edit',
+    mobileLabelKey: 'wizard.tabs.edit',
     href: '/app/planner/plan',
     icon: <PencilSquareIcon className="h-4 w-4" />,
     matchPattern: /^\/app\/planner\/plan\//,
   },
   {
     id: 'calendar',
-    label: 'Kalender',
-    mobileLabel: 'Kalender',
+    labelKey: 'wizard.tabs.calendar',
+    mobileLabelKey: 'wizard.tabs.calendar',
     href: '/app/planner/calendar',
     icon: <CalendarDaysIcon className="h-4 w-4" />,
     matchPattern: /^\/app\/planner\/calendar/,
@@ -72,6 +73,7 @@ export function PlannerTabs({
 }: PlannerTabsProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations('planner');
 
   // Determine which tab is active
   const getActiveTabId = (): string => {
@@ -93,8 +95,8 @@ export function PlannerTabs({
   // Build tab config for ui/tabs
   const tabs = PLANNER_TABS.map((tab) => {
     // "Planera" tab shows plan name when available
-    let label = tab.label;
-    let mobileLabel = tab.mobileLabel;
+    let label = t(tab.labelKey);
+    let mobileLabel = t(tab.mobileLabelKey);
     
     if (tab.id === 'edit' && planName) {
       const maxLen = 15;
@@ -115,7 +117,7 @@ export function PlannerTabs({
         </span>
       ) as unknown as string,
       disabled: isDisabled,
-      title: isDisabled ? 'Välj en plan först' : undefined,
+      title: isDisabled ? t('selectPlanFirst') : undefined,
     };
   });
 

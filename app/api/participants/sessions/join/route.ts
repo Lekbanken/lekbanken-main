@@ -17,6 +17,7 @@ import { normalizeSessionCode } from '@/lib/services/participants/session-code-g
 import { logger } from '@/lib/utils/logger';
 import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
 import { errorTracker } from '@/lib/utils/error-tracker';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
 interface JoinSessionRequest {
   sessionCode: string;
@@ -184,6 +185,13 @@ export async function POST(request: NextRequest) {
       sessionId: session.id,
       participantId: participant.id,
       displayName: participant.display_name,
+    });
+    
+    // Broadcast participants_changed so hosts get live count updates (MS9)
+    void broadcastPlayEvent(session.id, {
+      type: 'participants_changed',
+      payload: { sessionId: session.id },
+      timestamp: new Date().toISOString(),
     });
     
     return NextResponse.json({

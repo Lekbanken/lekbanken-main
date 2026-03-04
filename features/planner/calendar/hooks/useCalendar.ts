@@ -7,6 +7,7 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
+import { useLocale } from 'next-intl';
 import type { CalendarView, CalendarMonth, CalendarWeek } from '../types';
 import { 
   addMonths, 
@@ -16,6 +17,18 @@ import {
 } from '../utils/dateUtils';
 import { generateMonthGrid, generateWeekGrid } from '../utils/calendarUtils';
 import type { PlanSchedule } from '../types';
+
+/**
+ * Map next-intl locale code to BCP-47 locale tag for date formatting
+ */
+function toBcp47Locale(locale: string): string {
+  switch (locale) {
+    case 'no': return 'nb-NO';
+    case 'sv': return 'sv-SE';
+    case 'en': return 'en-US';
+    default: return locale;
+  }
+}
 
 interface UseCalendarOptions {
   initialDate?: Date;
@@ -46,6 +59,9 @@ interface UseCalendarReturn {
   currentYear: number;
   headerTitle: string;
   
+  // Locale
+  dateLocale: string;
+  
   // Grid generation
   getMonthGrid: (schedules: PlanSchedule[]) => CalendarMonth;
   getWeekGrid: (schedules: PlanSchedule[]) => CalendarWeek;
@@ -63,6 +79,9 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [view, setView] = useState<CalendarView>(initialView);
+  
+  const intlLocale = useLocale();
+  const dateLocale = toBcp47Locale(intlLocale);
 
   // Navigation
   const goToToday = useCallback(() => {
@@ -109,8 +128,8 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
 
   // Display helpers
   const currentMonthName = useMemo(() => 
-    getMonthName(currentDate.getMonth()), 
-    [currentDate]
+    getMonthName(currentDate.getMonth(), dateLocale), 
+    [currentDate, dateLocale]
   );
 
   const currentYear = useMemo(() => 
@@ -122,14 +141,16 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
     if (view === 'month') {
       return `${currentMonthName} ${currentYear}`;
     } else if (view === 'week') {
-      return `Vecka ${getWeekNumber(currentDate)}, ${currentYear}`;
+      // Week header is formatted in CalendarHeader using translation
+      const weekNum = getWeekNumber(currentDate);
+      return `${weekNum}|${currentYear}`;
     }
-    return currentDate.toLocaleDateString('sv-SE', { 
+    return currentDate.toLocaleDateString(dateLocale, { 
       weekday: 'long', 
       day: 'numeric', 
       month: 'long' 
     });
-  }, [view, currentMonthName, currentYear, currentDate]);
+  }, [view, currentMonthName, currentYear, currentDate, dateLocale]);
 
   // Grid generation
   const getMonthGrid = useCallback((schedules: PlanSchedule[]) => {
@@ -193,6 +214,7 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
     currentMonthName,
     currentYear,
     headerTitle,
+    dateLocale,
     getMonthGrid,
     getWeekGrid,
     visibleRange,

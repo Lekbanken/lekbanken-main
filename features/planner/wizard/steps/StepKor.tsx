@@ -29,7 +29,7 @@ export function StepKor({ plan, capabilities, wizard }: StepKorProps) {
   const totalDuration = plan.blocks.reduce((sum, b) => sum + (b.durationMinutes ?? 0), 0);
 
   const handleStartRun = () => {
-    router.push(`/app/play/${plan.id}/start`);
+    router.push(`/app/play/plan/${plan.id}`);
   };
 
   return (
@@ -59,7 +59,7 @@ export function StepKor({ plan, capabilities, wizard }: StepKorProps) {
           <div className="mt-4 flex flex-wrap gap-4">
             <div className="flex items-center gap-2">
               <BlocksIcon className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{plan.blocks.length} block</span>
+              <span className="text-sm">{t('blockCount', { count: plan.blocks.length })}</span>
             </div>
             <div className="flex items-center gap-2">
               <ClockIcon className="h-4 w-4 text-muted-foreground" />
@@ -116,12 +116,12 @@ export function StepKor({ plan, capabilities, wizard }: StepKorProps) {
               </div>
             </div>
             {!isPlanPublished && (
-              <Button variant="outline" onClick={() => wizard.goToStep('granska')}>
+              <Button variant="outline" onClick={() => wizard.goToStep('save-and-run')}>
                 {t('goToGranska')}
               </Button>
             )}
             {isPlanPublished && !hasBlocks && (
-              <Button variant="outline" onClick={() => wizard.goToStep('bygg')}>
+              <Button variant="outline" onClick={() => wizard.goToStep('build')}>
                 {t('goToBygg')}
               </Button>
             )}

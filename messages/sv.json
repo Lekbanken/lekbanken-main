@@ -441,20 +441,50 @@
     "sandbox2Description": "Använd den här sektionen för att testa varianter av samma komponent eller helt andra komponenttyper."
   },
   "planner": {
+    "pageTitle": "Planera",
+    "untitledPlan": "Namnlös plan",
+    "selectPlanFirst": "Välj en plan först",
+    "planCreated": "Plan skapad!",
+    "planCreateError": "Kunde inte skapa plan",
+    "statusLabels": {
+      "draft": "Utkast",
+      "published": "Publicerad",
+      "modified": "Ändrad",
+      "archived": "Arkiverad"
+    },
     "myPlans": "Mina planer",
+    "plans": "Planer",
     "newPlan": "Ny plan",
     "noPlansYet": "Du har inga planer ännu",
     "noPlansByFilter": "Inga planer matchar dina filter",
+    "addToPlanModal": {
+      "title": "Lägg till i plan",
+      "description": "Välj en plan att lägga till \"{gameName}\" i.",
+      "addButton": "Lägg till",
+      "adding": "Lägger till…",
+      "added": "Tillagd",
+      "openPlan": "Öppna plan",
+      "addedToPlan": "Tillagd i {planName}",
+      "addFailed": "Kunde inte lägga till i planen"
+    },
     "noBlocksInPlanYet": "Inga block i planen ännu",
     "dragToSort": "Dra för att sortera",
     "editBlock": "Redigera block",
     "deleteBlock": "Ta bort block",
+    "pendingAdd": "Lägger till…",
+    "sectionTitlePlaceholder": "Ange sektionstitel…",
     "optional": "Valfri",
+    "blockRow": {
+      "energy": "Energi",
+      "location": "Plats"
+    },
     "blockTypes": {
       "game": "Lek",
       "pause": "Paus",
       "preparation": "Förberedelse",
-      "custom": "Notis"
+      "custom": "Notis",
+      "section": "Sektion",
+      "session_game": "Deltagarlek"
     },
     "search": {
       "placeholder": "Sök planer..."
@@ -482,7 +512,16 @@
       "saving": "Sparar...",
       "cancel": "Avbryt",
       "delete": "Radera",
-      "save": "Spara"
+      "save": "Spara",
+      "archive": "Arkivera",
+      "restore": "Återställ",
+      "preview": "Förhandsgranska",
+      "edit": "Redigera",
+      "saveAndRun": "Spara & Utför",
+      "continue": "Fortsätt",
+      "restart": "Starta om",
+      "resume": "Fortsätt",
+      "play": "Kör"
     },
     "header": {
       "versions": "Versioner",
@@ -495,7 +534,9 @@
       "publishing": "Publicerar...",
       "publish": "Publicera",
       "deletePlan": "Radera plan",
-      "actions": "Åtgärder"
+      "actions": "Åtgärder",
+      "blockCount": "{count, plural, one {# block} other {# block}}",
+      "moreOptions": "Fler alternativ"
     },
     "deleteDialog": {
       "title": "Radera plan?",
@@ -544,7 +585,9 @@
       "game": "Lek",
       "pause": "Paus",
       "preparation": "Förberedelse",
-      "custom": "Anpassad"
+      "custom": "Anpassad",
+      "section": "Sektion",
+      "sessionGame": "Deltagarlek"
     },
     "blockDetail": {
       "title": "Blockdetaljer",
@@ -563,19 +606,44 @@
       "search": "Sök",
       "emptyState": "Sök efter lekar att lägga till",
       "noResults": "Inga resultat för \"{query}\"",
+      "noFilterResults": "Inga lekar matchar de valda filtren",
+      "resultCount": "{count, plural, one {# lek hittad} other {# lekar hittade}}",
       "openFilters": "Öppna filter",
       "activeFilters": "{count, plural, one {# aktivt filter} other {# aktiva filter}}",
       "clearFilters": "Rensa filter",
-      "loadMore": "Ladda fler"
+      "loadMore": "Ladda fler",
+      "updating": "Uppdaterar...",
+      "moreFilters": "Fler filter",
+      "energy": {
+        "low": "Lugn",
+        "medium": "Medel",
+        "high": "Energi"
+      },
+      "time": {
+        "short": "< 10 min",
+        "medium": "10–20 min",
+        "long": "20+ min"
+      }
     },
     "versions": {
       "noPublishedVersionsYet": "Inga publicerade versioner ännu",
-      "publishToCreateVersion": "Publicera planen för att skapa en version"
+      "publishToCreateVersion": "Publicera planen för att skapa en version",
+      "title": "Versionshistorik",
+      "loadError": "Kunde inte ladda versioner",
+      "versionNumber": "Version {number}",
+      "current": "Aktuell",
+      "totalTime": "Total tid: {minutes} min",
+      "unpublished": "Ej publicerad",
+      "currentVersion": "Aktuell version",
+      "showAll": "Visa alla ({count})"
     },
     "preview": {
-      "title": "Förhandsgranskning"
+      "title": "Förhandsgranskning",
+      "blockCount": "{count, plural, one {# block} other {# block}}",
+      "print": "Skriv ut"
     },
     "share": {
+      "title": "Dela plan",
       "privatePlan": "Privat plan",
       "privatePlanWarning": "Denna plan är privat och kan inte delas",
       "shareLink": "Delningslänk",
@@ -585,9 +653,18 @@
       "tenantVisibilityDescription": "Synlig för alla i din organisation",
       "publicVisibilityDescription": "Synlig för alla användare"
     },
+    "overview": {
+      "plan": "Plan",
+      "blocks": "Block"
+    },
+    "confirm": {
+      "confirm": "Bekräfta",
+      "cancel": "Avbryt"
+    },
     "wizard": {
       "tabs": {
         "plans": "Mina planer",
+        "mobilePlans": "Planer",
         "edit": "Planera",
         "calendar": "Kalender"
       },
@@ -605,12 +682,26 @@
           "visibilityPublic": "Alla användare kan se denna plan.",
           "saveButton": "Spara",
           "saving": "Sparar...",
-          "continueButton": "Fortsätt till block"
+          "continueButton": "Fortsätt till block",
+          "errors": {
+            "saveFailed": "Kunde inte spara planen",
+            "visibilityFailed": "Kunde inte ändra synlighet"
+          }
         },
         "bygg": {
           "title": "Bygg plan",
           "description": "Lägg till och ordna aktiviteter",
-          "continueButton": "Fortsätt till anteckningar"
+          "continueButton": "Fortsätt till anteckningar",
+          "blockCount": "{count, plural, one {# block} other {# block}}",
+          "defaultSectionTitle": "Ny sektion",
+          "errors": {
+            "addBlockFailed": "Kunde inte lägga till block",
+            "addGameFailed": "Kunde inte lägga till lek",
+            "deleteBlockFailed": "Kunde inte ta bort block",
+            "updateDurationFailed": "Kunde inte uppdatera tid",
+            "updateBlockFailed": "Kunde inte uppdatera block",
+            "reorderFailed": "Kunde inte ändra blockordning"
+          }
         },
         "anteckningar": {
           "title": "Anteckningar",
@@ -625,7 +716,11 @@
           "tenantNotesDescription": "Dessa anteckningar delas med alla i din organisation som har tillgång till planen.",
           "tenantNotesDisabled": "Delade anteckningar blir tillgängliga när planens synlighet ändras till \"Organisation\" eller \"Publik\".",
           "backButton": "Tillbaka",
-          "continueButton": "Fortsätt till granskning"
+          "continueButton": "Fortsätt till granskning",
+          "errors": {
+            "savePrivateNoteFailed": "Kunde inte spara privata anteckningar",
+            "saveTenantNoteFailed": "Kunde inte spara delade anteckningar"
+          }
         },
         "granska": {
           "title": "Granska & Publicera",
@@ -644,7 +739,21 @@
           "publishedTitle": "Planen är publicerad",
           "publishedDescription": "Version {version} är aktiv och redo att köras.",
           "backButton": "Tillbaka",
-          "continueButton": "Fortsätt till körning"
+          "continueButton": "Fortsätt till körning",
+          "publishSuccess": "Planen publicerades!",
+          "summaryLabels": {
+            "blocks": "Block",
+            "totalTime": "Total tid",
+            "visibility": "Synlighet",
+            "version": "Version"
+          },
+          "csv": {
+            "yes": "Ja",
+            "no": "Nej"
+          },
+          "errors": {
+            "publishFailed": "Kunde inte publicera planen"
+          }
         },
         "kor": {
           "title": "Kör",
@@ -662,7 +771,16 @@
           "tip1": "Förbered eventuellt material innan du startar",
           "tip2": "Använd timern för att hålla koll på tiden per block",
           "tip3": "Du kan pausa och återuppta körningen när som helst",
-          "backButton": "Tillbaka"
+          "backButton": "Tillbaka",
+          "blockCount": "{count, plural, one {# block} other {# block}}"
+        },
+        "build": {
+          "title": "Bygg plan",
+          "description": "Lägg till och ordna block, anteckningar"
+        },
+        "save-and-run": {
+          "title": "Spara & Utför",
+          "description": "Förhandsgranska, spara och starta"
         }
       },
       "calendar": {
@@ -674,14 +792,18 @@
         "nextPeriod": "Nästa period",
         "monthView": "Månad",
         "weekView": "Vecka",
+        "weekLabel": "Vecka {week}, {year}",
         "noData": "Ingen kalenderdata tillgänglig",
         "selectDay": "Välj en dag",
         "selectDayDescription": "Klicka på en dag i kalendern för att se schemalagda planer.",
         "addSchedule": "Schemalägg",
+        "pickPlan": "Välj plan att schemalägga",
+        "schedule": "Planlägg",
         "noSchedulesForDay": "Inga schemalagda planer denna dag",
         "scheduleFirst": "Schemalägg din första plan",
         "blocks": "block",
         "startPlan": "Starta plan",
+        "resumePlan": "Fortsätt",
         "markComplete": "Klar",
         "markSkipped": "Hoppa över",
         "status": {
@@ -724,6 +846,41 @@
     },
     "sharedPlan": {
       "viewOnlyBanner": "Du visar en delad plan. Du har endast läsbehörighet."
+    },
+    "success": {
+      "saved": "Sparad!",
+      "published": "Publicerad!",
+      "deleted": "Plan borttagen",
+      "copied": "Plan kopierad!",
+      "archived": "Plan arkiverad",
+      "restored": "Plan återställd"
+    },
+    "warnings": {
+      "archivedPlan": "Denna plan är arkiverad",
+      "planChangedSinceRun": "Planen har ändrats — körningen fortsätter på tidigare version",
+      "sessionBlockNotSupported": "Kräver session — stöds i nästa version"
+    },
+    "errors": {
+      "deleteFailed": "Kunde inte ta bort",
+      "copyFailed": "Kunde inte kopiera plan",
+      "loadFailed": "Kunde inte ladda planer",
+      "saveFailed": "Kunde inte spara",
+      "publishFailed": "Kunde inte publicera"
+    },
+    "wizardSteps": {
+      "buildPlan": "Bygg plan",
+      "saveAndRun": "Spara & Utför"
+    },
+    "scopeTabs": {
+      "mine": "Mina",
+      "org": "{orgName}",
+      "global": "Global",
+      "comingSoon": "Kommer snart (Beta)"
+    },
+    "runStatus": {
+      "inProgress": "Pågår",
+      "lastActive": "senast {time}",
+      "progress": "{current} av {total}"
     }
   },
   "admin": {
@@ -11764,6 +11921,67 @@
       },
       "errors": {
         "fetchFailed": "Kunde inte hämta sessioner"
+      },
+      "tabs": {
+        "sessions": "Sessioner",
+        "runs": "Planruns"
+      }
+    },
+    "runsDashboard": {
+      "title": "Aktiva planruns",
+      "description": "Dina pågående planspelningar med sessionssteg",
+      "empty": {
+        "title": "Inga aktiva planruns",
+        "description": "Starta en plan med sessionssteg för att se den här.",
+        "action": "Bläddra planer"
+      },
+      "columns": {
+        "plan": "Plan",
+        "step": "Steg",
+        "runStatus": "Runstatus",
+        "session": "Session",
+        "participants": "Deltagare",
+        "actions": "Åtgärder"
+      },
+      "stepLabel": "Steg {current} av {total}",
+      "runStatus": {
+        "in_progress": "Pågår",
+        "completed": "Klar",
+        "abandoned": "Avbruten",
+        "not_started": "Ej startad"
+      },
+      "sessionStatus": {
+        "created": "Skapad",
+        "active": "Aktiv",
+        "completed": "Avslutad",
+        "ended": "Avslutad",
+        "abandoned": "Avbruten",
+        "noSession": "Ingen session"
+      },
+      "stale": "Inaktiv",
+      "staleDescription": "Inget heartbeat på 24h",
+      "actions": {
+        "resume": "Fortsätt",
+        "openSession": "Öppna session",
+        "end": "Avsluta",
+        "ending": "Avslutar…"
+      },
+      "endConfirm": {
+        "title": "Avsluta session?",
+        "description": "Sessionen \"{sessionName}\" kommer att avslutas. Deltagare kommer att kopplas från. Denna åtgärd kan inte ångras.",
+        "confirm": "Avsluta session",
+        "cancel": "Avbryt",
+        "alreadyEnded": "Sessionen var redan avslutad"
+      },
+      "needsAttention": "Behöver uppmärksamhet",
+      "needsAttentionDescription": "Session saknas för sessionssteg",
+      "scope": {
+        "active": "Aktiva",
+        "all": "Alla"
+      },
+      "loading": "Laddar planruns...",
+      "errors": {
+        "fetchFailed": "Kunde inte hämta planruns"
       }
     },
     "participantsHost": {
@@ -12987,13 +13205,56 @@
         "trackMaterials": "Håll koll på materialtaggar i första steget per lek."
       },
       "actions": {
-        "reset": "Nollställ"
+        "reset": "Nollställ",
+        "abandonRun": "Avbryt körning",
+        "abandonConfirm": "Är du säker? Körningen avbryts och du kan starta om."
       },
       "defaults": {
         "continueWhenReady": "Fortsätt när gruppen är redo.",
         "stepTitle": "Steg {index}",
         "pauseTag": "Paus",
         "blockTag": "Moment"
+      },
+      "runSession": {
+        "title": "Deltagarsession",
+        "description": "Starta en session så deltagarna kan ansluta med sin enhet.",
+        "startSession": "Starta session",
+        "starting": "Startar…",
+        "sessionCode": "Sessionskod",
+        "participants": "{count} deltagare",
+        "status": {
+          "draft": "Utkast",
+          "lobby": "Lobby",
+          "created": "Skapad",
+          "active": "Aktiv",
+          "paused": "Pausad",
+          "locked": "Låst",
+          "completed": "Avslutad",
+          "ended": "Avslutad",
+          "archived": "Arkiverad",
+          "cancelled": "Avbruten",
+          "abandoned": "Avbruten"
+        },
+        "openSessionView": "Öppna sessionsvyn",
+        "openDirectorMode": "Öppna Director Mode",
+        "sessionActive": "Sessionen pågår",
+        "sessionCompleted": "Sessionen är avslutad",
+        "waitingForSession": "Väntar på att session startas…",
+        "errorCreating": "Kunde inte starta sessionen",
+        "navBlocked": "Starta sessionen innan du går vidare",
+        "copyCode": "Kopiera sessionskod",
+        "codeCopied": "Sessionskod kopierad!",
+        "copyLink": "Kopiera anslutningslänk",
+        "linkCopied": "Länk kopierad!",
+        "showQr": "Visa QR-kod",
+        "qrTitle": "Skanna för att ansluta",
+        "qrAlt": "QR-kod för att ansluta till sessionen",
+        "statusMessage": {
+          "draft": "Sessionen är redo att publiceras.",
+          "lobby": "Väntar på deltagare… ({count} anslutna)",
+          "paused": "Sessionen är pausad."
+        },
+        "connectionDegraded": "Anslutning instabil"
       }
     },
     "decisionsPanel": {

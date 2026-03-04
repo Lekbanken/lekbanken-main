@@ -9,7 +9,7 @@ export function PlanOverview({ plan }: { plan: PlannerPlan }) {
       <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-sm">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Plan</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('overview.plan')}</p>
             <h1 className="text-xl font-bold text-foreground">{plan.name}</h1>
             {plan.description ? <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p> : null}
           </div>
@@ -23,7 +23,7 @@ export function PlanOverview({ plan }: { plan: PlannerPlan }) {
       <div className="space-y-2">
         <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <Squares2X2Icon className="h-4 w-4 text-muted-foreground" />
-          Block
+          {t('overview.blocks')}
         </div>
         {plan.blocks.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-muted/20 p-4 text-sm text-muted-foreground">
@@ -35,7 +35,7 @@ export function PlanOverview({ plan }: { plan: PlannerPlan }) {
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <p className="text-sm font-semibold text-foreground">
-                    {block.blockType === "game" ? block.game?.title ?? "Lek" : block.title ?? "Block"}
+                    {block.blockType === "game" ? block.game?.title ?? t('blockTypes.game') : block.title ?? t('blockTypes.custom')}
                   </p>
                   {block.notes ? <p className="text-xs text-muted-foreground">{block.notes}</p> : null}
                 </div>

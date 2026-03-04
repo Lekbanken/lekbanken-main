@@ -65,8 +65,10 @@ export async function POST(
     })
   }
 
-  // Update real run
-  const updatePayload: Record<string, unknown> = {}
+  // Update real run — piggyback heartbeat on every progress save
+  const updatePayload: Record<string, unknown> = {
+    last_heartbeat_at: new Date().toISOString(),
+  }
 
   if (typeof payload.currentStepIndex === 'number') {
     updatePayload.current_step = payload.currentStepIndex

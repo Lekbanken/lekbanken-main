@@ -5,6 +5,7 @@ import { getUserReactionForGame } from '@/lib/services/game-reactions.server'
 import { mapDbGameToDetailPreview, mapDbGameToSummary } from '@/lib/game-display'
 import type { DbGame } from '@/lib/game-display'
 import { GameStartActions } from '@/components/game/GameStartActions'
+import { GameActionsWithPlanModal } from '@/components/game/GameActionsWithPlanModal'
 import { GameCard } from '@/components/game/GameCard'
 import {
   GameDetailHeader,
@@ -283,8 +284,8 @@ export default async function GameDetailPage({ params }: Props) {
             }}
             className="lg:col-span-1"
           >
-            {/* Unified Game Actions: Start Session + Like + Share */}
-            <GameStartActions
+            {/* Unified Game Actions: Start Session + Like + Share + Add to Plan */}
+            <GameActionsWithPlanModal
               gameId={game.id}
               gameName={game.title}
               playMode={game.playMode ?? undefined}

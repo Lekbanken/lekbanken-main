@@ -133,10 +133,14 @@ export async function POST(
   const version = versionData as unknown as PlanVersionRow
 
   // Copy blocks with game snapshots
-  const versionBlocks = plan.blocks.map((block) => ({
+  const versionBlocks = plan.blocks
+    .filter((block) => block.blockType !== 'section') // section blocks are UI-only grouping, not versioned
+    .map((block) => ({
     plan_version_id: version.id,
     position: block.position,
-    block_type: block.blockType,
+    // Cast block_type: Supabase generated types don't include 'session_game' yet
+    // (migration hasn't been applied to regenerate types)
+    block_type: block.blockType as 'game' | 'pause' | 'preparation' | 'custom',
     duration_minutes: block.durationMinutes ?? 0,
     title: block.title ?? null,
     notes: block.notes ?? null,
@@ -151,6 +155,7 @@ export async function POST(
           coverUrl: block.game.coverUrl,
           energyLevel: block.game.energyLevel,
           locationType: block.game.locationType,
+          playMode: block.game.playMode ?? null,
         }
       : null) as Json | null,
     metadata: (block.metadata ?? {}) as Json,

@@ -6,11 +6,13 @@
  * Card displaying a single scheduled plan run.
  */
 
+import { memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { PlanSchedule } from '../types';
+import type { ActiveRun } from '@/features/play/api';
 
 // Icons
 const PlayIcon = () => (
@@ -51,17 +53,28 @@ interface ScheduleCardProps {
   onMarkSkipped?: () => void;
   onEdit?: () => void;
   showActions?: boolean;
+  /** If set, this schedule's plan has an active run — show "Fortsätt" */
+  hasActiveRun?: boolean;
+  /** Full active run data for progress display */
+  activeRun?: ActiveRun;
 }
 
-export function ScheduleCard({
+export const ScheduleCard = memo(function ScheduleCard({
   schedule,
   onPlay,
   onMarkComplete,
   onMarkSkipped,
   onEdit,
   showActions = true,
+  hasActiveRun = false,
+  activeRun,
 }: ScheduleCardProps) {
   const t = useTranslations('planner.wizard.calendar');
+  const tPlanner = useTranslations('planner');
+  
+  const progressLabel = hasActiveRun && activeRun && activeRun.totalSteps > 0
+    ? tPlanner('runStatus.progress', { current: activeRun.currentStepIndex + 1, total: activeRun.totalSteps })
+    : null;
   
   const statusColors = {
     scheduled: 'bg-blue-500/10 text-blue-600 border-blue-200',
@@ -101,13 +114,21 @@ export function ScheduleCard({
         
         {showActions && schedule.status === 'scheduled' && (
           <Button
-            variant="ghost"
+            variant={hasActiveRun ? 'default' : 'ghost'}
             size="sm"
             onClick={onPlay}
-            className="h-8 w-8 p-0 opacity-0 transition-opacity group-hover:opacity-100"
-            aria-label={t('startPlan')}
+            className={cn(
+              'h-8 p-0 transition-opacity',
+              hasActiveRun ? 'px-2 opacity-100' : 'w-8 opacity-0 group-hover:opacity-100'
+            )}
+            aria-label={hasActiveRun ? t('resumePlan') : t('startPlan')}
           >
             <PlayIcon />
+            {hasActiveRun && (
+              <span className="ml-1 text-xs">
+                {t('resumePlan')}{progressLabel && ` · ${progressLabel}`}
+              </span>
+            )}
           </Button>
         )}
       </div>
@@ -168,7 +189,7 @@ export function ScheduleCard({
       )}
     </div>
   );
-}
+});
 
 /**
  * ScheduleCardSkeleton

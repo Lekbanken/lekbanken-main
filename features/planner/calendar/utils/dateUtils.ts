@@ -30,8 +30,8 @@ export function parseISODate(dateString: string): Date {
 /**
  * Format time string from Date
  */
-export function formatTime(date: Date): string {
-  return date.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
+export function formatTime(date: Date, locale: string = 'sv-SE'): string {
+  return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 }
 
 /**
@@ -164,7 +164,7 @@ export function addWeeks(date: Date, weeks: number): Date {
 /**
  * Get month name
  */
-export function getMonthName(month: number, locale: string = 'sv-SE'): string {
+export function getMonthName(month: number, locale: string): string {
   const date = new Date(2024, month, 1);
   return date.toLocaleDateString(locale, { month: 'long' });
 }
@@ -172,7 +172,7 @@ export function getMonthName(month: number, locale: string = 'sv-SE'): string {
 /**
  * Get short weekday names starting from Monday
  */
-export function getWeekdayNames(locale: string = 'sv-SE', format: 'narrow' | 'short' = 'narrow'): string[] {
+export function getWeekdayNames(locale: string, format: 'narrow' | 'short' = 'narrow'): string[] {
   const days: string[] = [];
   const baseDate = new Date(2024, 0, 1); // A Monday
   

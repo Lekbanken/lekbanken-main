@@ -50,7 +50,7 @@ export function ShareDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Dela plan</DialogTitle>
+          <DialogTitle>{t('share.title')}</DialogTitle>
         </DialogHeader>
 
         <div className="mt-4 space-y-4">

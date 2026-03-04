@@ -1,7 +1,7 @@
 /**
  * Planner Wizard Module
  *
- * Exports for the 5-step plan wizard.
+ * Exports for the 2-step plan wizard (v2.0).
  */
 
 export { PlanWizard } from './PlanWizard';
@@ -11,8 +11,5 @@ export { usePlanWizard } from './hooks/usePlanWizard';
 export * from './types';
 
 // Steps (for direct import if needed)
-export { StepGrund } from './steps/StepGrund';
-export { StepByggPlan } from './steps/StepByggPlan';
-export { StepAnteckningar } from './steps/StepAnteckningar';
-export { StepGranska } from './steps/StepGranska';
-export { StepKor } from './steps/StepKor';
+export { StepBuildPlan } from './steps/StepBuildPlan';
+export { StepSaveAndRun } from './steps/StepSaveAndRun';

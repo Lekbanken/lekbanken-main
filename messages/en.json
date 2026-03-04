@@ -469,20 +469,50 @@
     "sandbox2Description": "Use this section to test variants of the same component or entirely different component types."
   },
   "planner": {
+    "pageTitle": "Plan",
+    "untitledPlan": "Untitled plan",
+    "selectPlanFirst": "Select a plan first",
+    "planCreated": "Plan created!",
+    "planCreateError": "Could not create plan",
+    "statusLabels": {
+      "draft": "Draft",
+      "published": "Published",
+      "modified": "Modified",
+      "archived": "Archived"
+    },
     "myPlans": "My plans",
+    "plans": "Plans",
     "newPlan": "New plan",
     "noPlansYet": "You have no plans yet",
     "noPlansByFilter": "No plans match your filters",
+    "addToPlanModal": {
+      "title": "Add to plan",
+      "description": "Choose a plan to add \"{gameName}\" to.",
+      "addButton": "Add",
+      "adding": "Adding\u2026",
+      "added": "Added",
+      "openPlan": "Open plan",
+      "addedToPlan": "Added to {planName}",
+      "addFailed": "Failed to add to plan"
+    },
     "noBlocksInPlanYet": "No blocks in the plan yet",
     "dragToSort": "Drag to sort",
     "editBlock": "Edit block",
     "deleteBlock": "Delete block",
+    "pendingAdd": "Adding…",
+    "sectionTitlePlaceholder": "Enter section title…",
     "optional": "Optional",
+    "blockRow": {
+      "energy": "Energy",
+      "location": "Location"
+    },
     "blockTypes": {
       "game": "Game",
       "pause": "Pause",
       "preparation": "Preparation",
-      "custom": "Note"
+      "custom": "Note",
+      "section": "Section",
+      "session_game": "Participant Game"
     },
     "search": {
       "placeholder": "Search plans..."
@@ -510,7 +540,16 @@
       "saving": "Saving...",
       "cancel": "Cancel",
       "delete": "Delete",
-      "save": "Save"
+      "save": "Save",
+      "archive": "Archive",
+      "restore": "Restore",
+      "preview": "Preview",
+      "edit": "Edit",
+      "saveAndRun": "Save & Run",
+      "continue": "Continue",
+      "restart": "Restart",
+      "resume": "Resume",
+      "play": "Play"
     },
     "header": {
       "versions": "Versions",
@@ -523,7 +562,9 @@
       "publishing": "Publishing...",
       "publish": "Publish",
       "deletePlan": "Delete plan",
-      "actions": "Actions"
+      "actions": "Actions",
+      "blockCount": "{count, plural, one {# block} other {# blocks}}",
+      "moreOptions": "More options"
     },
     "deleteDialog": {
       "title": "Delete plan?",
@@ -572,7 +613,9 @@
       "game": "Game",
       "pause": "Break",
       "preparation": "Preparation",
-      "custom": "Custom"
+      "custom": "Custom",
+      "section": "Section",
+      "sessionGame": "Session Game"
     },
     "blockDetail": {
       "title": "Block details",
@@ -591,19 +634,44 @@
       "search": "Search",
       "emptyState": "Search for games to add",
       "noResults": "No results for \"{query}\"",
+      "noFilterResults": "No games match the selected filters",
+      "resultCount": "{count, plural, one {# game found} other {# games found}}",
       "openFilters": "Open filters",
       "activeFilters": "{count, plural, one {# active filter} other {# active filters}}",
       "clearFilters": "Clear filters",
-      "loadMore": "Load more"
+      "loadMore": "Load more",
+      "updating": "Updating...",
+      "moreFilters": "More filters",
+      "energy": {
+        "low": "Calm",
+        "medium": "Medium",
+        "high": "Energetic"
+      },
+      "time": {
+        "short": "< 10 min",
+        "medium": "10–20 min",
+        "long": "20+ min"
+      }
     },
     "versions": {
       "noPublishedVersionsYet": "No published versions yet",
-      "publishToCreateVersion": "Publish the plan to create a version"
+      "publishToCreateVersion": "Publish the plan to create a version",
+      "title": "Version history",
+      "loadError": "Could not load versions",
+      "versionNumber": "Version {number}",
+      "current": "Current",
+      "totalTime": "Total time: {minutes} min",
+      "unpublished": "Unpublished",
+      "currentVersion": "Current version",
+      "showAll": "Show all ({count})"
     },
     "preview": {
-      "title": "Preview"
+      "title": "Preview",
+      "blockCount": "{count, plural, one {# block} other {# blocks}}",
+      "print": "Print"
     },
     "share": {
+      "title": "Share plan",
       "privatePlan": "Private plan",
       "privatePlanWarning": "This plan is private and cannot be shared",
       "shareLink": "Share link",
@@ -613,9 +681,18 @@
       "tenantVisibilityDescription": "Visible to everyone in your organization",
       "publicVisibilityDescription": "Visible to all users"
     },
+    "overview": {
+      "plan": "Plan",
+      "blocks": "Blocks"
+    },
+    "confirm": {
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    },
     "wizard": {
       "tabs": {
         "plans": "My plans",
+        "mobilePlans": "Plans",
         "edit": "Plan",
         "calendar": "Calendar"
       },
@@ -633,12 +710,26 @@
           "visibilityPublic": "All users can see this plan.",
           "saveButton": "Save",
           "saving": "Saving...",
-          "continueButton": "Continue to blocks"
+          "continueButton": "Continue to blocks",
+          "errors": {
+            "saveFailed": "Could not save the plan",
+            "visibilityFailed": "Could not change visibility"
+          }
         },
         "bygg": {
           "title": "Build plan",
           "description": "Add and organize activities",
-          "continueButton": "Continue to notes"
+          "continueButton": "Continue to notes",
+          "blockCount": "{count, plural, one {# block} other {# blocks}}",
+          "defaultSectionTitle": "New section",
+          "errors": {
+            "addBlockFailed": "Could not add block",
+            "addGameFailed": "Could not add game",
+            "deleteBlockFailed": "Could not delete block",
+            "updateDurationFailed": "Could not update duration",
+            "updateBlockFailed": "Could not update block",
+            "reorderFailed": "Could not reorder blocks"
+          }
         },
         "anteckningar": {
           "title": "Notes",
@@ -653,7 +744,11 @@
           "tenantNotesDescription": "These notes are shared with everyone in your organization who has access to the plan.",
           "tenantNotesDisabled": "Shared notes become available when plan visibility is changed to \"Organization\" or \"Public\".",
           "backButton": "Back",
-          "continueButton": "Continue to review"
+          "continueButton": "Continue to review",
+          "errors": {
+            "savePrivateNoteFailed": "Could not save private notes",
+            "saveTenantNoteFailed": "Could not save shared notes"
+          }
         },
         "granska": {
           "title": "Review & Publish",
@@ -672,7 +767,21 @@
           "publishedTitle": "Plan is published",
           "publishedDescription": "Version {version} is active and ready to run.",
           "backButton": "Back",
-          "continueButton": "Continue to run"
+          "continueButton": "Continue to run",
+          "publishSuccess": "Plan published successfully!",
+          "summaryLabels": {
+            "blocks": "Blocks",
+            "totalTime": "Total time",
+            "visibility": "Visibility",
+            "version": "Version"
+          },
+          "csv": {
+            "yes": "Yes",
+            "no": "No"
+          },
+          "errors": {
+            "publishFailed": "Could not publish the plan"
+          }
         },
         "kor": {
           "title": "Run",
@@ -690,7 +799,16 @@
           "tip1": "Prepare any materials before starting",
           "tip2": "Use the timer to keep track of time per block",
           "tip3": "You can pause and resume the run at any time",
-          "backButton": "Back"
+          "backButton": "Back",
+          "blockCount": "{count, plural, one {# block} other {# blocks}}"
+        },
+        "build": {
+          "title": "Build Plan",
+          "description": "Add and arrange blocks, notes"
+        },
+        "save-and-run": {
+          "title": "Save & Run",
+          "description": "Preview, save and start"
         }
       },
       "calendar": {
@@ -702,14 +820,18 @@
         "nextPeriod": "Next period",
         "monthView": "Month",
         "weekView": "Week",
+        "weekLabel": "Week {week}, {year}",
         "noData": "No calendar data available",
         "selectDay": "Select a day",
         "selectDayDescription": "Click on a day in the calendar to see scheduled plans.",
         "addSchedule": "Schedule",
+        "pickPlan": "Choose a plan to schedule",
+        "schedule": "Schedule",
         "noSchedulesForDay": "No scheduled plans for this day",
         "scheduleFirst": "Schedule your first plan",
         "blocks": "blocks",
         "startPlan": "Start plan",
+        "resumePlan": "Resume",
         "markComplete": "Complete",
         "markSkipped": "Skip",
         "status": {
@@ -752,6 +874,41 @@
     },
     "sharedPlan": {
       "viewOnlyBanner": "You are viewing a shared plan. You have read-only access."
+    },
+    "success": {
+      "saved": "Saved!",
+      "published": "Published!",
+      "deleted": "Plan deleted",
+      "copied": "Plan copied!",
+      "archived": "Plan archived",
+      "restored": "Plan restored"
+    },
+    "warnings": {
+      "archivedPlan": "This plan is archived",
+      "planChangedSinceRun": "The plan has changed — the run continues on the previous version",
+      "sessionBlockNotSupported": "Requires session — supported in the next version"
+    },
+    "errors": {
+      "deleteFailed": "Could not delete",
+      "copyFailed": "Could not copy plan",
+      "loadFailed": "Could not load plans",
+      "saveFailed": "Could not save",
+      "publishFailed": "Could not publish"
+    },
+    "wizardSteps": {
+      "buildPlan": "Build plan",
+      "saveAndRun": "Save & Run"
+    },
+    "scopeTabs": {
+      "mine": "Mine",
+      "org": "{orgName}",
+      "global": "Global",
+      "comingSoon": "Coming soon (Beta)"
+    },
+    "runStatus": {
+      "inProgress": "In progress",
+      "lastActive": "last active {time}",
+      "progress": "{current} of {total}"
     }
   },
   "admin": {
@@ -11129,6 +11286,67 @@
       },
       "errors": {
         "fetchFailed": "Could not fetch sessions"
+      },
+      "tabs": {
+        "sessions": "Sessions",
+        "runs": "Plan Runs"
+      }
+    },
+    "runsDashboard": {
+      "title": "Active Plan Runs",
+      "description": "Your ongoing plan playthroughs with session steps",
+      "empty": {
+        "title": "No active plan runs",
+        "description": "Start a plan with session steps to see it here.",
+        "action": "Browse plans"
+      },
+      "columns": {
+        "plan": "Plan",
+        "step": "Step",
+        "runStatus": "Run Status",
+        "session": "Session",
+        "participants": "Participants",
+        "actions": "Actions"
+      },
+      "stepLabel": "Step {current} of {total}",
+      "runStatus": {
+        "in_progress": "In Progress",
+        "completed": "Completed",
+        "abandoned": "Abandoned",
+        "not_started": "Not Started"
+      },
+      "sessionStatus": {
+        "created": "Created",
+        "active": "Active",
+        "completed": "Completed",
+        "ended": "Ended",
+        "abandoned": "Abandoned",
+        "noSession": "No session"
+      },
+      "stale": "Stale",
+      "staleDescription": "No heartbeat for 24h",
+      "actions": {
+        "resume": "Resume",
+        "openSession": "Open Session",
+        "end": "End",
+        "ending": "Ending…"
+      },
+      "endConfirm": {
+        "title": "End session?",
+        "description": "The session \"{sessionName}\" will be ended. Participants will be disconnected. This action cannot be undone.",
+        "confirm": "End session",
+        "cancel": "Cancel",
+        "alreadyEnded": "Session was already ended"
+      },
+      "needsAttention": "Needs Attention",
+      "needsAttentionDescription": "Missing session for session step",
+      "scope": {
+        "active": "Active",
+        "all": "All"
+      },
+      "loading": "Loading plan runs...",
+      "errors": {
+        "fetchFailed": "Could not fetch plan runs"
       }
     },
     "participantsHost": {
@@ -12356,13 +12574,56 @@
         "trackMaterials": "Keep track of material tags in the first step of each game."
       },
       "actions": {
-        "reset": "Reset"
+        "reset": "Reset",
+        "abandonRun": "Abandon run",
+        "abandonConfirm": "Are you sure? The run will be abandoned and you can start over."
       },
       "defaults": {
         "continueWhenReady": "Continue when the group is ready.",
         "stepTitle": "Step {index}",
         "pauseTag": "Pause",
         "blockTag": "Block"
+      },
+      "runSession": {
+        "title": "Participant session",
+        "description": "Start a session so participants can join with their device.",
+        "startSession": "Start session",
+        "starting": "Starting…",
+        "sessionCode": "Session code",
+        "participants": "{count} participants",
+        "status": {
+          "draft": "Draft",
+          "lobby": "Lobby",
+          "created": "Created",
+          "active": "Active",
+          "paused": "Paused",
+          "locked": "Locked",
+          "completed": "Completed",
+          "ended": "Ended",
+          "archived": "Archived",
+          "cancelled": "Cancelled",
+          "abandoned": "Abandoned"
+        },
+        "openSessionView": "Open session view",
+        "openDirectorMode": "Open Director Mode",
+        "sessionActive": "Session is active",
+        "sessionCompleted": "Session is completed",
+        "waitingForSession": "Waiting for session to start…",
+        "errorCreating": "Could not start the session",
+        "navBlocked": "Start the session before proceeding",
+        "copyCode": "Copy session code",
+        "codeCopied": "Session code copied!",
+        "copyLink": "Copy join link",
+        "linkCopied": "Link copied!",
+        "showQr": "Show QR code",
+        "qrTitle": "Scan to join",
+        "qrAlt": "QR code to join the session",
+        "statusMessage": {
+          "draft": "Session is ready to be published.",
+          "lobby": "Waiting for participants… ({count} joined)",
+          "paused": "Session is paused."
+        },
+        "connectionDegraded": "Connection unstable"
       }
     },
     "decisionsPanel": {

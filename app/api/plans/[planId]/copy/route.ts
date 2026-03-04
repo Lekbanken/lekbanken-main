@@ -129,7 +129,7 @@ export async function POST(
   const sourceBlocks = sourcePlan.blocks ?? []
   if (sourceBlocks.length > 0) {
     const blockInserts = sourceBlocks.map((block: {
-      block_type: 'game' | 'pause' | 'preparation' | 'custom'
+      block_type: 'game' | 'pause' | 'preparation' | 'custom' | 'section' | 'session_game'
       game_id: string | null
       duration_minutes: number | null
       title: string | null

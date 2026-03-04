@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { PlanListPanel } from '@/features/planner/components/PlanListPanel';
 import { PlannerTabs } from '@/features/planner/components/PlannerTabs';
 import { 
@@ -11,7 +12,9 @@ import {
 import { CreatePlanDialog } from '@/features/planner/components/CreatePlanDialog';
 import { fetchPlans, createPlan } from '@/features/planner/api';
 import { useActionFeedback } from '@/features/planner/hooks/useActionFeedback';
+import { useTenant } from '@/lib/context/TenantContext';
 import type { PlannerPlan } from '@/types/planner';
+import type { PlanScope } from '@/features/planner/components/ScopeSelector';
 
 /**
  * Plan Library Page (/app/planner/plans)
@@ -22,28 +25,45 @@ import type { PlannerPlan } from '@/types/planner';
 export default function PlanLibraryPage() {
   const router = useRouter();
   const { withFeedback, isPending } = useActionFeedback();
+  const t = useTranslations('planner');
+  const { currentTenant } = useTenant();
 
   const [plans, setPlans] = useState<PlannerPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [currentScope, setCurrentScope] = useState<PlanScope>('mine');
 
-  // Load plans on mount
-  useEffect(() => {
-    const loadPlans = async () => {
-      try {
-        const loadedPlans = await fetchPlans();
-        setPlans(loadedPlans);
-      } catch (err) {
-        console.error('Failed to load plans:', err);
-      } finally {
-        setIsLoading(false);
+  // Load plans based on scope
+  const loadPlans = useCallback(async (scope: PlanScope = 'mine') => {
+    setIsLoading(true);
+    try {
+      const params: { scope: PlanScope; tenantId?: string } = { scope };
+      if (scope === 'org' && currentTenant?.id) {
+        params.tenantId = currentTenant.id;
       }
-    };
-    void loadPlans();
+      const loadedPlans = await fetchPlans(params);
+      setPlans(loadedPlans);
+    } catch (err) {
+      console.error('Failed to load plans:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentTenant?.id]);
+
+  useEffect(() => {
+    void loadPlans(currentScope);
+  }, [loadPlans, currentScope]);
+
+  const handleScopeChange = useCallback((scope: PlanScope) => {
+    setCurrentScope(scope);
   }, []);
 
   const handleSelectPlan = (planId: string) => {
     router.push(`/app/planner/plan/${planId}`);
+  };
+
+  const handleEditPlan = (planId: string) => {
+    router.push(`/app/planner/plan/${planId}?step=build`);
   };
 
   const handleCreatePlan = async (name: string, description: string) => {
@@ -53,7 +73,7 @@ export default function PlanLibraryPage() {
         const newPlan = await createPlan({ name, description });
         return newPlan;
       },
-      { successMessage: 'Plan skapad!', errorMessage: 'Kunde inte skapa plan' }
+      { successMessage: t('planCreated'), errorMessage: t('planCreateError') }
     );
     if (result.data) {
       setPlans((prev) => [result.data!, ...prev]);
@@ -65,7 +85,7 @@ export default function PlanLibraryPage() {
   return (
     <PlannerPageLayout>
       <PlannerPageHeader 
-        title="Planera" 
+        title={t('pageTitle')} 
         eyebrow="App"
       />
       
@@ -77,7 +97,9 @@ export default function PlanLibraryPage() {
           activePlanId={null}
           isLoading={isLoading}
           onSelectPlan={handleSelectPlan}
+          onEditPlan={handleEditPlan}
           onCreatePlan={() => setShowCreateDialog(true)}
+          onScopeChange={handleScopeChange}
           isCreating={isPending('create-plan')}
         />
       </div>

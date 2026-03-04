@@ -17,13 +17,14 @@ import { CalendarDaysIcon } from '@heroicons/react/24/outline';
  */
 export default function PlanCalendarPage() {
   const t = useTranslations('planner.wizard.calendar');
+  const tp = useTranslations('planner');
   const calendarEnabled = usePlannerFeature('planner_calendar');
 
   return (
     <PlannerPageLayout>
       <PlannerPageHeader 
         title={t('title')} 
-        eyebrow="Planera"
+        eyebrow={tp('pageTitle')}
       />
       
       <PlannerTabs activeTab="calendar" />

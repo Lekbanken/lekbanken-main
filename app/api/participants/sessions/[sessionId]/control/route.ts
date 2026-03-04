@@ -16,6 +16,7 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -173,7 +174,7 @@ export async function PATCH(
         },
       });
     
-    // Broadcast to all participants
+    // Broadcast to all participants (legacy session: channel for participant UI)
     const supabaseService = createClient<Database>(supabaseUrl, supabaseServiceKey);
     const channel = supabaseService.channel(`session:${sessionId}`);
     
@@ -190,6 +191,13 @@ export async function PATCH(
         },
         timestamp: new Date().toISOString(),
       },
+    });
+
+    // Broadcast on play: channel for host cockpit (RunSessionCockpit)
+    void broadcastPlayEvent(sessionId, {
+      type: 'state_change',
+      payload: { status: newStatus },
+      timestamp: new Date().toISOString(),
     });
     
     return NextResponse.json({

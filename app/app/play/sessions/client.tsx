@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { listHostSessions, type PlaySession } from '@/features/play-participant/api';
 import { SessionListItem, SessionListItemSkeleton } from '@/components/play/SessionListItem';
+import { RunsDashboard } from '@/features/play/components/RunsDashboard';
 import { PageTitleHeader } from '@/components/app/PageTitleHeader';
 import { appNavItems } from '@/components/app/nav-items';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ import type { Database } from '@/types/supabase';
 
 type SessionStatus = Database['public']['Enums']['participant_session_status'];
 type FilterType = 'active' | 'all' | SessionStatus;
+type TopTab = 'sessions' | 'runs';
 
 export function HostSessionsClient() {
   const t = useTranslations('play.hostSessions');
@@ -29,6 +31,7 @@ export function HostSessionsClient() {
   // Default to showing only active sessions (not ended)
   const [filter, setFilter] = useState<FilterType>('active');
   const [showEnded, setShowEnded] = useState(false);
+  const [topTab, setTopTab] = useState<TopTab>('sessions');
 
   useEffect(() => {
     void (async () => {
@@ -82,6 +85,31 @@ export function HostSessionsClient() {
           </Button>
         }
       />
+
+      {/* Top-level tabs: Sessions / Planruns */}
+      <div className="flex items-center gap-1 border-b border-border">
+        {(['sessions', 'runs'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setTopTab(tab)}
+            className={cn(
+              'px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
+              topTab === tab
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30'
+            )}
+          >
+            {t(`tabs.${tab}`)}
+          </button>
+        ))}
+      </div>
+
+      {/* Runs Dashboard tab */}
+      {topTab === 'runs' && <RunsDashboard />}
+
+      {/* Sessions tab (original content) */}
+      {topTab === 'sessions' && (
+      <>
 
       <div className="space-y-1">
         <h2 className="text-lg font-semibold text-foreground">{t('summary.title')}</h2>
@@ -201,6 +229,9 @@ export function HostSessionsClient() {
             </div>
           )}
         </div>
+      )}
+
+      </>
       )}
     </div>
   );

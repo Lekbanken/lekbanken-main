@@ -7,10 +7,24 @@
  */
 
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { ScheduleCard, ScheduleCardSkeleton } from './ScheduleCard';
 import { formatDisplayDate, parseISODate } from '../utils/dateUtils';
 import type { PlanSchedule } from '../types';
+import type { ActiveRun } from '@/features/play/api';
+
+/**
+ * Map next-intl locale code to BCP-47 locale tag for date formatting
+ */
+function toBcp47Locale(locale: string): string {
+  switch (locale) {
+    case 'no': return 'nb-NO';
+    case 'sv': return 'sv-SE';
+    case 'en': return 'en-US';
+    default: return locale;
+  }
+}
 
 // Icons
 const PlusIcon = () => (
@@ -36,6 +50,10 @@ interface ScheduleListProps {
   onMarkComplete: (schedule: PlanSchedule) => void;
   onMarkSkipped: (schedule: PlanSchedule) => void;
   onEditSchedule: (schedule: PlanSchedule) => void;
+  /** Map of planId to existence of active run */
+  activeRunPlanIds?: Set<string>;
+  /** Full map for progress data */
+  activeRunByPlanId?: Map<string, ActiveRun>;
 }
 
 export function ScheduleList({
@@ -47,8 +65,12 @@ export function ScheduleList({
   onMarkComplete,
   onMarkSkipped,
   onEditSchedule,
+  activeRunPlanIds,
+  activeRunByPlanId,
 }: ScheduleListProps) {
   const t = useTranslations('planner.wizard.calendar');
+  const intlLocale = useLocale();
+  const dateLocale = toBcp47Locale(intlLocale);
 
   // No date selected
   if (!date) {
@@ -65,7 +87,7 @@ export function ScheduleList({
     );
   }
 
-  const displayDate = formatDisplayDate(parseISODate(date));
+  const displayDate = formatDisplayDate(parseISODate(date), dateLocale);
 
   return (
     <div className="space-y-4">
@@ -118,6 +140,8 @@ export function ScheduleList({
               onMarkComplete={() => onMarkComplete(schedule)}
               onMarkSkipped={() => onMarkSkipped(schedule)}
               onEdit={() => onEditSchedule(schedule)}
+              hasActiveRun={activeRunPlanIds?.has(schedule.planId) ?? false}
+              activeRun={activeRunByPlanId?.get(schedule.planId)}
             />
           ))}
         </div>

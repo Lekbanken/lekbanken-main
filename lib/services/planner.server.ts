@@ -56,6 +56,7 @@ function mapGameSummary(
     energyLevel: game.energy_level ?? null,
     locationType: game.location_type ?? null,
     coverUrl: getCoverUrl(game.media),
+    playMode: game.play_mode ?? null,
   }
 }
 

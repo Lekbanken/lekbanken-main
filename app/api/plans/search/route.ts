@@ -21,6 +21,7 @@ type SearchBody = {
   search?: string
   tenantId?: string | null
   visibility?: 'private' | 'tenant' | 'public'
+  scope?: 'mine' | 'org' | 'global'
   status?: 'draft' | 'published' | 'modified' | 'archived'
   statuses?: Array<'draft' | 'published' | 'modified' | 'archived'>
   page?: number
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
     search,
     tenantId = null,
     visibility,
+    scope,
     status,
     statuses,
     page = 1,
@@ -73,7 +75,23 @@ export async function POST(request: Request) {
     query = query.ilike('name', `%${search}%`)
   }
 
-  if (visibility) {
+  // Scope-based filtering (MS5 Tenant RLS)
+  // RLS already limits results to what user can see (own + tenant + public).
+  // Scope narrows further:
+  //   mine   → only plans owned by current user
+  //   org    → tenant-visible plans (optionally filtered by tenantId)
+  //   global → public-visibility plans
+  if (scope === 'mine') {
+    query = query.eq('owner_user_id', user.id)
+  } else if (scope === 'org') {
+    query = query.eq('visibility', 'tenant')
+    if (tenantId) {
+      query = query.eq('owner_tenant_id', tenantId)
+    }
+  } else if (scope === 'global') {
+    query = query.eq('visibility', 'public')
+  } else if (visibility) {
+    // Legacy: explicit visibility param (backward compatible)
     query = query.eq('visibility', visibility)
   } else if (tenantId) {
     query = query.or(`owner_tenant_id.eq.${tenantId},visibility.eq.public`)

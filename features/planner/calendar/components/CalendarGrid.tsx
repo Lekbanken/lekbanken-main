@@ -15,14 +15,17 @@ interface CalendarGridProps {
   monthGrid?: CalendarMonth;
   weekGrid?: CalendarWeek;
   onSelectDate: (date: string) => void;
-  locale?: string;
+  locale: string;
+  /** PlanIds with active runs — threaded to CalendarDay for amber dot */
+  activeRunPlanIds?: Set<string>;
 }
 
 export function CalendarGrid({
   monthGrid,
   weekGrid,
   onSelectDate,
-  locale = 'sv-SE',
+  locale,
+  activeRunPlanIds,
 }: CalendarGridProps) {
   const t = useTranslations('planner.wizard.calendar');
   const weekdays = getWeekdayNames(locale, 'short');
@@ -41,6 +44,7 @@ export function CalendarGrid({
                   key={day.date}
                   day={day}
                   onClick={onSelectDate}
+                  activeRunPlanIds={activeRunPlanIds}
                 />
               ))}
             </div>
@@ -62,6 +66,7 @@ export function CalendarGrid({
               key={day.date}
               day={day}
               onClick={onSelectDate}
+              activeRunPlanIds={activeRunPlanIds}
             />
           ))}
         </div>

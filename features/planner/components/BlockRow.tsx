@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactElement } from "react";
+import { useState, useRef, useEffect, type ReactElement } from "react";
 import { useTranslations } from "next-intl";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -37,30 +37,47 @@ const ClipboardIcon = () => (
 const NoteIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
 );
+const SectionIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 5h18"/><path d="M3 10h14"/><path d="M3 15h10"/></svg>
+);
+const SessionGameIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+);
 
-const blockMeta: Record<
+/** Style + icon config per block type (labels resolved via i18n) */
+const blockStyles: Record<
   PlannerBlock["blockType"],
-  { label: string; className: string; Icon: () => ReactElement }
+  { labelKey: string; className: string; Icon: () => ReactElement }
 > = {
   game: {
-    label: "Lek",
+    labelKey: "blockTypes.game",
     className: "bg-primary/10 text-primary",
     Icon: GamepadIcon,
   },
   pause: {
-    label: "Paus",
+    labelKey: "blockTypes.pause",
     className: "bg-amber-500/10 text-amber-600",
     Icon: PauseIcon,
   },
   preparation: {
-    label: "Förberedelse",
+    labelKey: "blockTypes.preparation",
     className: "bg-indigo-500/10 text-indigo-600",
     Icon: ClipboardIcon,
   },
   custom: {
-    label: "Notis",
+    labelKey: "blockTypes.custom",
     className: "bg-slate-500/10 text-slate-600",
     Icon: NoteIcon,
+  },
+  section: {
+    labelKey: "blockTypes.section",
+    className: "bg-emerald-500/10 text-emerald-600",
+    Icon: SectionIcon,
+  },
+  session_game: {
+    labelKey: "blockTypes.session_game",
+    className: "bg-violet-500/10 text-violet-600",
+    Icon: SessionGameIcon,
   },
 };
 
@@ -73,6 +90,12 @@ interface BlockRowProps {
   onEdit: () => void;
   onDelete: () => void;
   onDurationChange: (duration: number) => void;
+  /** Trigger inline title editing (e.g. after creation) */
+  isAutoEditingTitle?: boolean;
+  onTitleSave?: (blockId: string, title: string) => void;
+  onTitleEditDone?: () => void;
+  /** Visual grouping: block appears under a section header */
+  isUnderSection?: boolean;
 }
 
 /**
@@ -94,19 +117,72 @@ export function BlockRow({
   onEdit,
   onDelete,
   onDurationChange,
+  isAutoEditingTitle = false,
+  onTitleSave,
+  onTitleEditDone,
+  isUnderSection = false,
 }: BlockRowProps) {
   const t = useTranslations('planner');
   const [isEditingDuration, setIsEditingDuration] = useState(false);
   const [durationValue, setDurationValue] = useState(String(block.durationMinutes ?? 15));
 
+  const style = blockStyles[block.blockType];
+  const blockTypeLabel = t(style.labelKey);
+  const isGame = block.blockType === "game" && block.game;
+  const isSection = block.blockType === 'section';
+  const isOptimistic = block.id.startsWith('optimistic-');
+  // Disable editing on optimistic blocks (no real DB id yet)
+  const effectiveCanEdit = canEdit && !isOptimistic;
+  const effectiveCanDelete = canDelete && !isOptimistic;
+  const effectiveCanReorder = canReorder && !isOptimistic;
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: block.id,
-    disabled: !canReorder,
+    disabled: !effectiveCanReorder,
   });
 
-  const style = {
+  const dragStyle = {
     transform: CSS.Transform.toString(transform),
     transition,
+  };
+
+  // Inline title editing for section headers
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editTitleValue, setEditTitleValue] = useState(block.title ?? '');
+  const titleInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-start inline title editing (e.g. after section creation)
+  useEffect(() => {
+    if (isAutoEditingTitle && isSection && !isOptimistic) {
+      setIsEditingTitle(true);
+      setEditTitleValue(block.title ?? '');
+    }
+  }, [isAutoEditingTitle, isSection, isOptimistic, block.title]);
+
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [isEditingTitle]);
+
+  const handleTitleSave = () => {
+    const trimmed = editTitleValue.trim();
+    if (trimmed && trimmed !== block.title && onTitleSave) {
+      onTitleSave(block.id, trimmed);
+    }
+    setIsEditingTitle(false);
+    onTitleEditDone?.();
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleTitleSave();
+    } else if (e.key === 'Escape') {
+      setEditTitleValue(block.title ?? '');
+      setIsEditingTitle(false);
+      onTitleEditDone?.();
+    }
   };
 
   const handleDurationBlur = () => {
@@ -127,11 +203,8 @@ export function BlockRow({
       setIsEditingDuration(false);
     }
   };
-
-  const meta = blockMeta[block.blockType];
-  const isGame = block.blockType === "game" && block.game;
   const title =
-    block.blockType === "game" ? block.game?.title ?? "Lek" : block.title ?? meta.label;
+    block.blockType === "game" ? block.game?.title ?? blockTypeLabel : block.title ?? blockTypeLabel;
   
   // Use centralized formatters
   const energyFormatted = formatEnergyLevel(
@@ -139,17 +212,86 @@ export function BlockRow({
   );
   const locationFormatted = formatEnvironment(mapLocationType(block.game?.locationType));
 
+  // Section blocks render as full-width header rows
+  if (isSection) {
+    return (
+      <li
+        ref={setNodeRef}
+        style={dragStyle}
+        className={cn(
+          'group flex items-center gap-3 rounded-lg border-b border-border/40 bg-muted/30 px-4 py-2.5 transition',
+          'mt-3 first:mt-0',
+          isDragging ? 'shadow-lg ring-1 ring-primary/30' : 'hover:bg-muted/50',
+          isOptimistic && 'animate-pulse opacity-75'
+        )}
+      >
+        {effectiveCanReorder ? (
+          <button
+            {...attributes}
+            {...listeners}
+            className="text-muted-foreground/60 hover:text-muted-foreground active:cursor-grabbing"
+            aria-label={t('dragToSort')}
+          >
+            <GripVerticalIcon />
+          </button>
+        ) : null}
+        <span className={cn('flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium', style.className)}>
+          <style.Icon />
+        </span>
+        {isEditingTitle ? (
+          <Input
+            ref={titleInputRef}
+            value={editTitleValue}
+            onChange={(e) => setEditTitleValue(e.target.value)}
+            onBlur={handleTitleSave}
+            onKeyDown={handleTitleKeyDown}
+            className="h-7 flex-1 text-sm font-semibold"
+            placeholder={t('sectionTitlePlaceholder')}
+          />
+        ) : (
+          <span className="flex-1 text-sm font-semibold text-foreground">
+            {block.title ?? blockTypeLabel}
+          </span>
+        )}
+        {isOptimistic && (
+          <span className="text-xs text-muted-foreground">{t('pendingAdd')}</span>
+        )}
+        <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          {effectiveCanEdit && (
+            <Tooltip content={t('editBlock')}>
+              <Button variant="ghost" size="sm" onClick={() => { setEditTitleValue(block.title ?? ''); setIsEditingTitle(true); }} className="h-7 w-7 p-0">
+                <PencilIcon />
+              </Button>
+            </Tooltip>
+          )}
+          {effectiveCanDelete && (
+            <Tooltip content={t('deleteBlock')}>
+              <Button variant="ghost" size="sm" onClick={onDelete} className="h-7 w-7 p-0 text-destructive hover:text-destructive">
+                <Trash2Icon />
+              </Button>
+            </Tooltip>
+          )}
+        </div>
+      </li>
+    );
+  }
+
   return (
     <li
       ref={setNodeRef}
-      style={style}
+      style={dragStyle}
       className={cn(
         "group rounded-xl border border-border/60 bg-card p-4 transition",
-        isDragging ? "shadow-lg ring-1 ring-primary/30" : "hover:border-primary/30"
+        isDragging ? "shadow-lg ring-1 ring-primary/30" : "hover:border-primary/30",
+        isOptimistic && "animate-pulse opacity-75",
+        isUnderSection && "ml-6 border-l-2 border-l-emerald-300/40 -mt-1"
       )}
     >
+      {isOptimistic && (
+        <div className="mb-1 text-xs text-muted-foreground">{t('pendingAdd')}</div>
+      )}
       <div className="flex flex-wrap items-start gap-4">
-        {canReorder ? (
+        {effectiveCanReorder ? (
           <button
             {...attributes}
             {...listeners}
@@ -166,32 +308,45 @@ export function BlockRow({
         )}
 
         <div className="flex flex-1 flex-wrap items-start justify-between gap-4">
-          <div className="space-y-2">
+          <div className="min-w-0 flex-1 space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className={cn("flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium", meta.className)}>
-                <meta.Icon />
-                {meta.label}
+              <span className={cn("flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium", style.className)}>
+                <style.Icon />
+                {blockTypeLabel}
               </span>
               {block.isOptional && (
                 <Badge variant="outline" size="sm">
-                  Valfri
+                  {t('optional')}
                 </Badge>
               )}
             </div>
-            <div>
-              <p className="font-semibold text-foreground">{title}</p>
-              {block.notes ? (
-                <p className="text-sm text-muted-foreground">{block.notes}</p>
-              ) : block.game?.shortDescription ? (
-                <p className="text-sm text-muted-foreground">{block.game.shortDescription}</p>
-              ) : null}
-            </div>
+            <p className="text-base font-semibold leading-snug text-foreground truncate">{title}</p>
+            {/* Metadata: pills for energy/location, separate line-clamped description */}
+            {isGame && (energyFormatted || locationFormatted) && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {energyFormatted && (
+                  <span className="inline-flex items-center rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                    {energyFormatted.labelShort}
+                  </span>
+                )}
+                {locationFormatted && (
+                  <span className="inline-flex items-center rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+                    {locationFormatted.labelShort}
+                  </span>
+                )}
+              </div>
+            )}
+            {isGame && block.game?.shortDescription ? (
+              <p className="line-clamp-1 text-sm text-muted-foreground">{block.game.shortDescription}</p>
+            ) : block.notes ? (
+              <p className="line-clamp-1 text-sm text-muted-foreground">{block.notes}</p>
+            ) : null}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <ClockIcon />
-              {isEditingDuration && canEdit ? (
+              {isEditingDuration && effectiveCanEdit ? (
                 <Input
                   type="number"
                   min="1"
@@ -205,27 +360,27 @@ export function BlockRow({
                 />
               ) : (
                 <button
-                  onClick={() => canEdit && setIsEditingDuration(true)}
+                  onClick={() => effectiveCanEdit && setIsEditingDuration(true)}
                   className={cn(
                     "text-sm tabular-nums",
-                    canEdit ? "hover:text-primary hover:underline" : "cursor-default"
+                    effectiveCanEdit ? "hover:text-primary hover:underline" : "cursor-default"
                   )}
-                  disabled={!canEdit}
+                  disabled={!effectiveCanEdit}
                 >
                   {block.durationMinutes ?? 0} min
                 </button>
               )}
             </div>
             <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-              {canEdit && (
-                <Tooltip content="Redigera block">
+              {effectiveCanEdit && (
+                <Tooltip content={t('editBlock')}>
                   <Button variant="ghost" size="sm" onClick={onEdit} className="h-8 w-8 p-0">
                     <PencilIcon />
                   </Button>
                 </Tooltip>
               )}
-              {canDelete && (
-                <Tooltip content="Ta bort block">
+              {effectiveCanDelete && (
+                <Tooltip content={t('deleteBlock')}>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -240,21 +395,6 @@ export function BlockRow({
           </div>
         </div>
       </div>
-
-      {isGame && (energyFormatted || locationFormatted) ? (
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          {energyFormatted && (
-            <Badge variant="secondary" size="sm">
-              Energi: {energyFormatted.labelShort}
-            </Badge>
-          )}
-          {locationFormatted && (
-            <Badge variant="secondary" size="sm">
-              Plats: {locationFormatted.labelShort}
-            </Badge>
-          )}
-        </div>
-      ) : null}
     </li>
   );
 }

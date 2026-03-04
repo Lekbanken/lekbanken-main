@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -17,10 +17,13 @@ type VersionsDialogProps = {
   versionsOverride?: VersionWithCurrent[];
 };
 
-function formatDate(dateString: string | null): string {
+const BCP47_MAP: Record<string, string> = { sv: 'sv-SE', no: 'nb-NO', en: 'en-US' };
+
+function formatDate(dateString: string | null, locale: string): string {
   if (!dateString) return "";
   const date = new Date(dateString);
-  return new Intl.DateTimeFormat("sv-SE", {
+  const bcp47 = BCP47_MAP[locale] ?? locale;
+  return new Intl.DateTimeFormat(bcp47, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -36,6 +39,7 @@ export function VersionsDialog({
   versionsOverride,
 }: VersionsDialogProps) {
   const t = useTranslations('planner');
+  const locale = useLocale();
   const [versions, setVersions] = React.useState<VersionWithCurrent[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -63,7 +67,7 @@ export function VersionsDialog({
       } catch (err) {
         if (!cancelled) {
           console.error("Failed to load versions", err);
-          setError("Kunde inte ladda versioner");
+          setError(t('versions.loadError'));
         }
       } finally {
         if (!cancelled) {
@@ -83,7 +87,7 @@ export function VersionsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Versionshistorik</DialogTitle>
+          <DialogTitle>{t('versions.title')}</DialogTitle>
         </DialogHeader>
 
         <div className="mt-4 max-h-[400px] overflow-y-auto">
@@ -158,15 +162,15 @@ export function VersionsDialog({
                       </span>
                       <div>
                         <p className="text-sm font-medium text-foreground">
-                          Version {version.versionNumber}
+                          {t('versions.versionNumber', { number: version.versionNumber })}
                           {version.isCurrent && (
                             <span className="ml-2 rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">
-                              Aktuell
+                              {t('versions.current')}
                             </span>
                           )}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {formatDate(version.publishedAt)}
+                          {formatDate(version.publishedAt, locale)}
                         </p>
                       </div>
                     </div>
@@ -174,7 +178,7 @@ export function VersionsDialog({
 
                   <div className="mt-3 rounded-lg bg-muted/50 p-2">
                     <p className="text-xs text-muted-foreground">
-                      Total tid: {version.totalTimeMinutes} min
+                      {t('versions.totalTime', { minutes: version.totalTimeMinutes })}
                     </p>
                   </div>
                 </div>

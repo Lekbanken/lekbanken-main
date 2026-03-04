@@ -75,68 +75,62 @@ test.describe('Wizard Navigation', () => {
   });
 
   test('can navigate through wizard steps', async ({ page }) => {
-    // Step 1: Grund
-    await expect(page.getByRole('heading', { name: /grund|basics/i })).toBeVisible();
-
-    // Click continue
-    await page.getByRole('button', { name: /fortsätt till block|continue to blocks/i }).click();
-
-    // Step 2: Bygg plan
-    await expect(page).toHaveURL(/\?step=bygg/);
+    // Step 1: Build Plan (blocks + notes)
     await expect(page.getByRole('heading', { name: /bygg plan|build plan/i })).toBeVisible();
 
-    // Click continue
-    await page.getByRole('button', { name: /fortsätt till anteckningar|continue to notes/i }).click();
+    // Click continue to save & run
+    await page.getByRole('button', { name: /spara.*utför|save.*run/i }).click();
 
-    // Step 3: Anteckningar
-    await expect(page).toHaveURL(/\?step=anteckningar/);
-    await expect(page.getByRole('heading', { name: /anteckningar|notes/i })).toBeVisible();
-
-    // Click continue
-    await page.getByRole('button', { name: /fortsätt till granskning|continue to review/i }).click();
-
-    // Step 4: Granska
-    await expect(page).toHaveURL(/\?step=granska/);
-    await expect(page.getByRole('heading', { name: /granska|review/i })).toBeVisible();
+    // Step 2: Save & Run
+    await expect(page).toHaveURL(/\?step=save-and-run/);
+    await expect(page.getByRole('heading', { name: /spara.*utför|save.*run/i })).toBeVisible();
   });
 
   test('preserves step on page refresh', async ({ page }) => {
     // Navigate to step 2
-    await page.getByRole('button', { name: /fortsätt till block|continue to blocks/i }).click();
-    await expect(page).toHaveURL(/\?step=bygg/);
+    await page.getByRole('button', { name: /spara.*utför|save.*run/i }).click();
+    await expect(page).toHaveURL(/\?step=save-and-run/);
 
     // Refresh the page
     await page.reload();
 
     // Should still be on step 2
-    await expect(page).toHaveURL(/\?step=bygg/);
-    await expect(page.getByRole('heading', { name: /bygg plan|build plan/i })).toBeVisible();
+    await expect(page).toHaveURL(/\?step=save-and-run/);
+    await expect(page.getByRole('heading', { name: /spara.*utför|save.*run/i })).toBeVisible();
   });
 
   test('can navigate back with browser back button', async ({ page }) => {
     // Go to step 2
-    await page.getByRole('button', { name: /fortsätt till block|continue to blocks/i }).click();
-    await expect(page).toHaveURL(/\?step=bygg/);
+    await page.getByRole('button', { name: /spara.*utför|save.*run/i }).click();
+    await expect(page).toHaveURL(/\?step=save-and-run/);
 
     // Use browser back
     await page.goBack();
 
     // Should be back on step 1
     await expect(page).toHaveURL(/\/app\/planner\/plan\/[\w-]+$/);
-    await expect(page.getByRole('heading', { name: /grund|basics/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /bygg plan|build plan/i })).toBeVisible();
   });
 
   test('can deep link to specific step', async ({ page }) => {
     // Get current URL and add step param
     const url = page.url();
-    await page.goto(url + '?step=anteckningar');
+    await page.goto(url + '?step=save-and-run');
 
-    // Should be on step 3
-    await expect(page.getByRole('heading', { name: /anteckningar|notes/i })).toBeVisible();
+    // Should be on step 2
+    await expect(page.getByRole('heading', { name: /spara.*utför|save.*run/i })).toBeVisible();
+  });
+
+  test('legacy step URLs are resolved to new steps', async ({ page }) => {
+    // Old ?step=anteckningar should resolve to build
+    const url = page.url();
+    await page.goto(url + '?step=anteckningar');
+    await expect(page).toHaveURL(/\?step=build/);
+    await expect(page.getByRole('heading', { name: /bygg plan|build plan/i })).toBeVisible();
   });
 });
 
-test.describe('Step 1: Grund', () => {
+test.describe('Step 1: Build Plan', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/app/planner/plans');
     await page.getByRole('button', { name: /ny plan|new plan/i }).click();

@@ -86,17 +86,7 @@ interface PlanHeaderBarProps {
   isCopying?: boolean;
 }
 
-const VISIBILITY_OPTIONS = [
-  { value: "private", label: "Privat" },
-  { value: "tenant", label: "Organisation" },
-  { value: "public", label: "Publik" },
-];
-
-const visibilityLabels: Record<PlannerVisibility, string> = {
-  private: "Privat",
-  tenant: "Organisation",
-  public: "Publik",
-};
+// Visibility options are resolved via translations in the component
 
 function formatDuration(minutes: number): string {
   if (minutes < 60) return `${minutes} min`;
@@ -153,29 +143,29 @@ export function PlanHeaderBar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="gap-1">
-                {visibilityLabels[plan.visibility]}
+                {t(`wizard.visibility.${plan.visibility}`)}
                 <ChevronDownIcon />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              {VISIBILITY_OPTIONS.map((option) => (
+              {(['private', 'tenant', 'public'] as const).map((vis) => (
                 <DropdownMenuItem
-                  key={option.value}
-                  onClick={() => onChangeVisibility(option.value as PlannerVisibility)}
+                  key={vis}
+                  onClick={() => onChangeVisibility(vis)}
                 >
-                  {option.label}
+                  {t(`wizard.visibility.${vis}`)}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
           <Badge variant="outline" size="sm">
-            {visibilityLabels[plan.visibility]}
+            {t(`wizard.visibility.${plan.visibility}`)}
           </Badge>
         )}
 
         <span className="text-sm text-muted-foreground">
-          {blockCount} block &middot; {formatDuration(totalDuration)}
+          {t('header.blockCount', { count: blockCount })} &middot; {formatDuration(totalDuration)}
         </span>
 
         {isSaving && (
@@ -243,7 +233,7 @@ export function PlanHeaderBar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <span className="sr-only">Fler alternativ</span>
+                <span className="sr-only">{t('header.moreOptions')}</span>
                 <MoreVerticalIcon />
               </Button>
             </DropdownMenuTrigger>

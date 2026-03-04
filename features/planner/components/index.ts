@@ -28,6 +28,8 @@ export { PlanListPanel } from './PlanListPanel';
 export { PlanListItem } from './PlanListItem';
 export { PlanOverview } from './PlanOverview';
 export { CreatePlanDialog } from './CreatePlanDialog';
+export { ScopeSelector, type PlanScope } from './ScopeSelector';
+export { AddToPlanModal } from './AddToPlanModal';
 
 // Block Components
 export { BlockList } from './BlockList';
@@ -49,15 +51,8 @@ export { VersionsDialog } from './VersionsDialog';
 export { StatusBadge } from './StatusBadge';
 export { VersionTimeline } from './VersionTimeline';
 export { PlanHeaderBar } from './PlanHeaderBar';
-export { ActionBar } from './ActionBar';
 
 // Animation Components
-export { 
-  AnimatedList, 
-  AnimatedItem, 
-  AnimatedCard, 
-  AnimatedButton 
-} from './AnimatedList';
 export { WizardStepTransition, useStepDirection } from './WizardStepTransition';
 export { PullToRefresh } from './PullToRefresh';
 export { LongPressIndicator } from './LongPressIndicator';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, type ReactElement, type TouchEvent } from 'react';
+import { useState, useRef, useEffect, type ReactElement, type TouchEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -66,6 +66,19 @@ const NoteIcon = () => (
   </svg>
 );
 
+const SectionIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 5h18"/><path d="M3 10h14"/><path d="M3 15h10"/>
+  </svg>
+);
+
+const SessionGameIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
 // =============================================================================
 // Block Type Metadata
 // =============================================================================
@@ -94,6 +107,16 @@ const blockMeta: Record<
     className: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
     Icon: NoteIcon,
   },
+  section: {
+    labelKey: 'blockTypes.section',
+    className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+    Icon: SectionIcon,
+  },
+  session_game: {
+    labelKey: 'blockTypes.session_game',
+    className: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+    Icon: SessionGameIcon,
+  },
 };
 
 // =============================================================================
@@ -109,6 +132,12 @@ interface TouchBlockRowProps {
   onEdit: () => void;
   onDelete: () => void;
   onDurationChange?: (duration: number) => void;
+  /** Trigger inline title editing (e.g. after creation) */
+  isAutoEditingTitle?: boolean;
+  onTitleSave?: (blockId: string, title: string) => void;
+  onTitleEditDone?: () => void;
+  /** Visual grouping: block appears under a section header */
+  isUnderSection?: boolean;
 }
 
 // =============================================================================
@@ -214,9 +243,56 @@ export function TouchBlockRow({
   onEdit,
   onDelete,
   onDurationChange: _onDurationChange,
+  isAutoEditingTitle = false,
+  onTitleSave,
+  onTitleEditDone,
+  isUnderSection = false,
 }: TouchBlockRowProps) {
   const t = useTranslations('planner');
   const { offset, isRevealed, handlers, reset } = useSwipeActions();
+  const isOptimistic = block.id.startsWith('optimistic-');
+  const effectiveCanEdit = canEdit && !isOptimistic;
+  const effectiveCanDelete = canDelete && !isOptimistic;
+  const effectiveCanReorder = canReorder && !isOptimistic;
+
+  // Inline title editing for section headers
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editTitleValue, setEditTitleValue] = useState(block.title ?? '');
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const isSection = block.blockType === 'section';
+
+  useEffect(() => {
+    if (isAutoEditingTitle && isSection && !isOptimistic) {
+      setIsEditingTitle(true);
+      setEditTitleValue(block.title ?? '');
+    }
+  }, [isAutoEditingTitle, isSection, isOptimistic, block.title]);
+
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [isEditingTitle]);
+
+  const handleTitleSave = () => {
+    const trimmed = editTitleValue.trim();
+    if (trimmed && trimmed !== block.title && onTitleSave) {
+      onTitleSave(block.id, trimmed);
+    }
+    setIsEditingTitle(false);
+    onTitleEditDone?.();
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleTitleSave();
+    } else if (e.key === 'Escape') {
+      setEditTitleValue(block.title ?? '');
+      setIsEditingTitle(false);
+      onTitleEditDone?.();
+    }
+  };
   
   const {
     attributes,
@@ -227,7 +303,7 @@ export function TouchBlockRow({
     isDragging,
   } = useSortable({
     id: block.id,
-    disabled: !canReorder,
+    disabled: !effectiveCanReorder,
   });
 
   const sortableStyle = {
@@ -250,18 +326,79 @@ export function TouchBlockRow({
     onDelete();
   };
 
+  // Section blocks render as compact header rows
+  if (isSection) {
+    return (
+      <li
+        ref={setNodeRef}
+        style={sortableStyle}
+        className={cn(
+          'flex items-center gap-3 rounded-lg border-b border-border/40 bg-muted/30 px-3 py-2 transition',
+          'mt-3 first:mt-0',
+          isDragging && 'z-10 shadow-lg',
+          isOptimistic && 'animate-pulse opacity-75'
+        )}
+      >
+        {effectiveCanReorder && (
+          <button
+            {...attributes}
+            {...listeners}
+            className="touch-none text-muted-foreground/60"
+            aria-label={t('dragToSort')}
+          >
+            <GripVerticalIcon />
+          </button>
+        )}
+        <span className={cn('flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium', meta.className)}>
+          <meta.Icon />
+        </span>
+        {isEditingTitle ? (
+          <input
+            ref={titleInputRef}
+            value={editTitleValue}
+            onChange={(e) => setEditTitleValue(e.target.value)}
+            onBlur={handleTitleSave}
+            onKeyDown={handleTitleKeyDown}
+            className="flex-1 rounded border border-border bg-background px-2 py-0.5 text-sm font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+            placeholder={t('sectionTitlePlaceholder')}
+          />
+        ) : (
+          <span
+            className="flex-1 text-sm font-semibold text-foreground truncate"
+            onDoubleClick={() => effectiveCanEdit && !isOptimistic && setIsEditingTitle(true)}
+          >{title}</span>
+        )}
+        {isOptimistic && (
+          <span className="text-xs text-muted-foreground">{t('pendingAdd')}</span>
+        )}
+        {effectiveCanDelete && (
+          <button
+            type="button"
+            onClick={onDelete}
+            className="text-muted-foreground/60 hover:text-destructive"
+            aria-label={t('deleteBlock')}
+          >
+            <Trash2Icon />
+          </button>
+        )}
+      </li>
+    );
+  }
+
   return (
     <li
       ref={setNodeRef}
       style={sortableStyle}
       className={cn(
         'relative overflow-hidden rounded-xl',
-        isDragging && 'z-10 shadow-lg'
+        isDragging && 'z-10 shadow-lg',
+        isOptimistic && 'animate-pulse opacity-75',
+        isUnderSection && 'ml-6 border-l-2 border-l-emerald-300/40 -mt-1'
       )}
     >
       {/* Swipe action buttons (revealed on swipe) */}
       <div className="absolute inset-y-0 right-0 flex">
-        {canEdit && (
+        {effectiveCanEdit && (
           <button
             type="button"
             onClick={handleEdit}
@@ -275,7 +412,7 @@ export function TouchBlockRow({
             <PencilIcon />
           </button>
         )}
-        {canDelete && (
+        {effectiveCanDelete && (
           <button
             type="button"
             onClick={handleDelete}
@@ -319,6 +456,9 @@ export function TouchBlockRow({
 
         {/* Block content */}
         <div className="min-w-0 flex-1">
+          {isOptimistic && (
+            <div className="mb-0.5 text-xs text-muted-foreground">{t('pendingAdd')}</div>
+          )}
           {/* Title row */}
           <div className="flex items-center gap-2">
             <span className={cn(
@@ -353,7 +493,7 @@ export function TouchBlockRow({
 
         {/* Desktop-only action buttons */}
         <div className="hidden items-center gap-1 sm:flex">
-          {canEdit && (
+          {effectiveCanEdit && (
             <button
               type="button"
               onClick={onEdit}
@@ -366,7 +506,7 @@ export function TouchBlockRow({
               <PencilIcon />
             </button>
           )}
-          {canDelete && (
+          {effectiveCanDelete && (
             <button
               type="button"
               onClick={onDelete}

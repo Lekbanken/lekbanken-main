@@ -8,22 +8,61 @@
  * Mobile: Stacked view (calendar top, schedules bottom)
  */
 
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { CalendarHeader } from './CalendarHeader';
 import { CalendarGrid } from './CalendarGrid';
 import { ScheduleList } from './ScheduleList';
+import { PlanPickerModal } from './PlanPickerModal';
 import { useCalendar } from '../hooks/useCalendar';
 import { useSchedules } from '../hooks/useSchedules';
+import { useActiveRuns } from '@/features/planner/hooks/useActiveRuns';
 import { getSchedulesForDate } from '../utils/calendarUtils';
 import { toISODateString } from '../utils/dateUtils';
 import type { PlanSchedule } from '../types';
+import type { CalendarView } from '../types';
+import type { PlannerPlan } from '@/types/planner';
 
 interface PlanCalendarProps {
   onScheduleChange?: () => void;
 }
 
+const CALENDAR_VIEW_KEY = 'lekbanken-calendar-view';
+
+/**
+ * Determine initial calendar view with this priority:
+ * 1. User's saved preference (localStorage)
+ * 2. Mobile viewport → 'week'
+ * 3. Default → 'month'
+ * 
+ * Uses a lazy initializer so the value is correct on first render (no flash).
+ */
+function usePersistedCalendarView() {
+  const [view, setViewState] = useState<CalendarView>(() => {
+    if (typeof window === 'undefined') return 'month';
+    const saved = localStorage.getItem(CALENDAR_VIEW_KEY);
+    if (saved === 'week' || saved === 'month') return saved;
+    return window.innerWidth < 768 ? 'week' : 'month';
+  });
+
+  const setView = (v: CalendarView) => {
+    setViewState(v);
+    try { localStorage.setItem(CALENDAR_VIEW_KEY, v); } catch { /* quota */ }
+  };
+
+  return { view, setView };
+}
+
 export function PlanCalendar({ onScheduleChange }: PlanCalendarProps) {
   const router = useRouter();
+  const { view: persistedView, setView: setPersistedView } = usePersistedCalendarView();
+  const { activeRunByPlanId } = useActiveRuns();
+
+  // Build a Set<string> of planIds with active runs for ScheduleList
+  const activeRunPlanIds = useMemo(
+    () => new Set(activeRunByPlanId.keys()),
+    [activeRunByPlanId]
+  );
 
   // Calendar state and navigation
   const {
@@ -34,21 +73,32 @@ export function PlanCalendar({ onScheduleChange }: PlanCalendarProps) {
     goToPrevious,
     goToNext,
     selectDate,
-    setView,
+    setView: setCalendarView,
     headerTitle,
+    dateLocale,
     getMonthGrid,
     getWeekGrid,
     visibleRange,
-  } = useCalendar();
+  } = useCalendar({ initialView: persistedView });
+
+  // Sync view changes to localStorage
+  const handleViewChange = (v: CalendarView) => {
+    setCalendarView(v);
+    setPersistedView(v);
+  };
 
   // Schedule data and operations
   const {
     schedules,
     isLoading,
+    create,
     markComplete,
     markSkipped,
+    dialog,
     openCreateDialog,
     openEditDialog,
+    closeDialog,
+    isMutating,
   } = useSchedules({
     filters: visibleRange,
     enabled: true,
@@ -75,7 +125,7 @@ export function PlanCalendar({ onScheduleChange }: PlanCalendarProps) {
 
   const handlePlaySchedule = (schedule: PlanSchedule) => {
     // Navigate to play mode for this plan
-    router.push(`/app/planner/plan/${schedule.planId}/play`);
+    router.push(`/app/play/plan/${schedule.planId}`);
   };
 
   const handleMarkComplete = async (schedule: PlanSchedule) => {
@@ -92,6 +142,21 @@ export function PlanCalendar({ onScheduleChange }: PlanCalendarProps) {
     openEditDialog(schedule);
   };
 
+  // Create a schedule when the user picks a plan from the modal
+  const handlePickPlan = async (plan: PlannerPlan) => {
+    if (!dialog.selectedDate) return;
+    try {
+      await create({
+        planId: plan.id,
+        scheduledDate: dialog.selectedDate,
+      });
+      closeDialog();
+      onScheduleChange?.();
+    } catch {
+      // Error is handled inside useSchedules (mutationError)
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -101,7 +166,7 @@ export function PlanCalendar({ onScheduleChange }: PlanCalendarProps) {
         onPrevious={goToPrevious}
         onNext={goToNext}
         onToday={goToToday}
-        onViewChange={setView}
+        onViewChange={handleViewChange}
       />
 
       {/* Main content - responsive layout */}
@@ -111,6 +176,8 @@ export function PlanCalendar({ onScheduleChange }: PlanCalendarProps) {
           monthGrid={monthGrid}
           weekGrid={weekGrid}
           onSelectDate={handleSelectDate}
+          locale={dateLocale}
+          activeRunPlanIds={activeRunPlanIds}
         />
 
         {/* Schedule List */}
@@ -124,9 +191,20 @@ export function PlanCalendar({ onScheduleChange }: PlanCalendarProps) {
             onMarkComplete={handleMarkComplete}
             onMarkSkipped={handleMarkSkipped}
             onEditSchedule={handleEditSchedule}
+            activeRunPlanIds={activeRunPlanIds}
+            activeRunByPlanId={activeRunByPlanId}
           />
         </div>
       </div>
+
+      {/* Plan Picker Modal — opens when user clicks "Add Schedule" */}
+      <PlanPickerModal
+        open={dialog.isOpen && dialog.mode === 'create'}
+        onOpenChange={(open) => !open && closeDialog()}
+        onSelectPlan={handlePickPlan}
+        scheduledDate={dialog.selectedDate}
+        isSubmitting={isMutating}
+      />
     </div>
   );
 }

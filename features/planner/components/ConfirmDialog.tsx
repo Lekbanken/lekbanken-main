@@ -11,6 +11,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 type ConfirmDialogProps = {
@@ -38,11 +39,14 @@ export function ConfirmDialog({
   trigger,
   title,
   description,
-  confirmLabel = "Bekräfta",
-  cancelLabel = "Avbryt",
+  confirmLabel,
+  cancelLabel,
   destructive = true,
   onConfirm,
 }: ConfirmDialogProps) {
+  const t = useTranslations('planner');
+  const resolvedConfirmLabel = confirmLabel ?? t('confirm.confirm');
+  const resolvedCancelLabel = cancelLabel ?? t('confirm.cancel');
   const handleConfirm = async () => {
     await onConfirm();
   };
@@ -58,12 +62,12 @@ export function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
+          <AlertDialogCancel>{resolvedCancelLabel}</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => void handleConfirm()}
             variant={destructive ? "destructive" : "default"}
           >
-            {confirmLabel}
+            {resolvedConfirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

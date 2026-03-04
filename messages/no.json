@@ -637,12 +637,51 @@
     "sandbox2Description": "Bruk denne seksjonen for å teste varianter av samme komponent eller helt andre komponenttyper."
   },
   "planner": {
+    "pageTitle": "Planlegg",
+    "untitledPlan": "Navnløs plan",
+    "selectPlanFirst": "Velg en plan først",
+    "planCreated": "Plan opprettet!",
+    "planCreateError": "Kunne ikke opprette plan",
+    "statusLabels": {
+      "draft": "Utkast",
+      "published": "Publisert",
+      "modified": "Endret",
+      "archived": "Arkivert"
+    },
     "myPlans": "Mine planer",
+    "plans": "Planer",
     "newPlan": "Ny plan",
     "noPlansYet": "Du har ingen planer ennå",
     "noPlansByFilter": "Ingen planer matcher filtrene dine",
+    "addToPlanModal": {
+      "title": "Legg til i plan",
+      "description": "Velg en plan å legge \"{gameName}\" til i.",
+      "addButton": "Legg til",
+      "adding": "Legger til…",
+      "added": "Lagt til",
+      "openPlan": "Åpne plan",
+      "addedToPlan": "Lagt til i {planName}",
+      "addFailed": "Kunne ikke legge til i planen"
+    },
     "noBlocksInPlanYet": "Ingen blokker i planen ennå",
     "dragToSort": "Dra for å sortere",
+    "editBlock": "Rediger blokk",
+    "deleteBlock": "Slett blokk",
+    "pendingAdd": "Legger til…",
+    "sectionTitlePlaceholder": "Skriv inn seksjonsnamn…",
+    "optional": "Valgfritt",
+    "blockRow": {
+      "energy": "Energi",
+      "location": "Sted"
+    },
+    "blockTypes": {
+      "game": "Lek",
+      "pause": "Pause",
+      "preparation": "Forberedelse",
+      "custom": "Notat",
+      "section": "Seksjon",
+      "session_game": "Deltakerlek"
+    },
     "search": {
       "placeholder": "Søk planer..."
     },
@@ -669,7 +708,16 @@
       "saving": "Lagrer...",
       "cancel": "Avbryt",
       "delete": "Slett",
-      "save": "Lagre"
+      "save": "Lagre",
+      "archive": "Arkiver",
+      "restore": "Gjenopprett",
+      "preview": "Forhåndsvisning",
+      "edit": "Rediger",
+      "saveAndRun": "Lagre & Kjør",
+      "continue": "Fortsett",
+      "restart": "Start på nytt",
+      "resume": "Fortsett",
+      "play": "Kjør"
     },
     "header": {
       "versions": "Versjoner",
@@ -682,7 +730,9 @@
       "publishing": "Publiserer...",
       "publish": "Publiser",
       "deletePlan": "Slett plan",
-      "actions": "Handlinger"
+      "actions": "Handlinger",
+      "blockCount": "{count, plural, one {# blokk} other {# blokker}}",
+      "moreOptions": "Flere alternativer"
     },
     "deleteDialog": {
       "title": "Slette plan?",
@@ -731,7 +781,9 @@
       "game": "Lek",
       "pause": "Pause",
       "preparation": "Forberedelse",
-      "custom": "Tilpasset"
+      "custom": "Tilpasset",
+      "section": "Seksjon",
+      "sessionGame": "Deltakerlek"
     },
     "blockDetail": {
       "title": "Blokkdetaljer",
@@ -749,16 +801,45 @@
       "searching": "Søker...",
       "search": "Søk",
       "emptyState": "Søk etter leker å legge til",
-      "noResults": "Ingen resultater for \"{query}\""
+      "noResults": "Ingen resultater for \"{query}\"",
+      "noFilterResults": "Ingen leker matcher de valgte filtrene",
+      "resultCount": "{count, plural, one {# lek funnet} other {# leker funnet}}",
+      "openFilters": "Åpne filter",
+      "activeFilters": "{count, plural, one {# aktivt filter} other {# aktive filtre}}",
+      "clearFilters": "Fjern filter",
+      "loadMore": "Last flere",
+      "updating": "Oppdaterer...",
+      "moreFilters": "Flere filter",
+      "energy": {
+        "low": "Rolig",
+        "medium": "Middels",
+        "high": "Energi"
+      },
+      "time": {
+        "short": "< 10 min",
+        "medium": "10–20 min",
+        "long": "20+ min"
+      }
     },
     "versions": {
       "noPublishedVersionsYet": "Ingen publiserte versjoner ennå",
-      "publishToCreateVersion": "Publiser planen for å opprette en versjon"
+      "publishToCreateVersion": "Publiser planen for å opprette en versjon",
+      "title": "Versjonshistorikk",
+      "loadError": "Kunne ikke laste versjoner",
+      "versionNumber": "Versjon {number}",
+      "current": "Aktiv",
+      "totalTime": "Total tid: {minutes} min",
+      "unpublished": "Upublisert",
+      "currentVersion": "Gjeldende versjon",
+      "showAll": "Vis alle ({count})"
     },
     "preview": {
-      "title": "Forhåndsvisning"
+      "title": "Forhåndsvisning",
+      "blockCount": "{count, plural, one {# blokk} other {# blokker}}",
+      "print": "Skriv ut"
     },
     "share": {
+      "title": "Del plan",
       "privatePlan": "Privat plan",
       "privatePlanWarning": "Denne planen er privat og kan ikke deles",
       "shareLink": "Delingslenke",
@@ -768,8 +849,234 @@
       "tenantVisibilityDescription": "Synlig for alle i organisasjonen din",
       "publicVisibilityDescription": "Synlig for alle brukere"
     },
+    "overview": {
+      "plan": "Plan",
+      "blocks": "Blokker"
+    },
+    "confirm": {
+      "confirm": "Bekreft",
+      "cancel": "Avbryt"
+    },
+    "wizard": {
+      "tabs": {
+        "plans": "Mine planer",
+        "mobilePlans": "Planer",
+        "edit": "Planlegg",
+        "calendar": "Kalender"
+      },
+      "steps": {
+        "grund": {
+          "title": "Grunnleggende",
+          "description": "Angi grunnleggende informasjon om planen din",
+          "nameLabel": "Tittel",
+          "namePlaceholder": "F.eks. Morgensamling mandag",
+          "descriptionLabel": "Beskrivelse",
+          "descriptionPlaceholder": "Kort beskrivelse av planens formål...",
+          "visibilityLabel": "Synlighet",
+          "visibilityPrivate": "Bare du kan se denne planen.",
+          "visibilityTenant": "Alle i organisasjonen din kan se denne planen.",
+          "visibilityPublic": "Alle brukere kan se denne planen.",
+          "saveButton": "Lagre",
+          "saving": "Lagrer...",
+          "continueButton": "Fortsett til blokker",
+          "errors": {
+            "saveFailed": "Kunne ikke lagre planen",
+            "visibilityFailed": "Kunne ikke endre synlighet"
+          }
+        },
+        "bygg": {
+          "title": "Bygg plan",
+          "description": "Legg til og organiser aktiviteter",
+          "continueButton": "Fortsett til notater",
+          "blockCount": "{count, plural, one {# blokk} other {# blokker}}",
+          "defaultSectionTitle": "Ny seksjon",
+          "errors": {
+            "addBlockFailed": "Kunne ikke legge til blokk",
+            "addGameFailed": "Kunne ikke legge til lek",
+            "deleteBlockFailed": "Kunne ikke slette blokk",
+            "updateDurationFailed": "Kunne ikke oppdatere tid",
+            "updateBlockFailed": "Kunne ikke oppdatere blokk",
+            "reorderFailed": "Kunne ikke endre blokkrekkefølge"
+          }
+        },
+        "anteckningar": {
+          "title": "Notater",
+          "description": "Legg til notater for deg selv og teamet ditt",
+          "privateNotesLabel": "Private notater",
+          "privateNotesHint": "Kun synlig for deg",
+          "privateNotesPlaceholder": "Egne notater, tanker, forberedelser...",
+          "privateNotesDescription": "Disse notatene lagres automatisk og er kun synlige for deg.",
+          "tenantNotesLabel": "Delte notater",
+          "tenantNotesHint": "Synlig for organisasjonen",
+          "tenantNotesPlaceholder": "Informasjon å dele med kolleger...",
+          "tenantNotesDescription": "Disse notatene deles med alle i organisasjonen din som har tilgang til planen.",
+          "tenantNotesDisabled": "Delte notater blir tilgjengelige når planens synlighet endres til \"Organisasjon\" eller \"Offentlig\".",
+          "backButton": "Tilbake",
+          "continueButton": "Fortsett til gjennomgang",
+          "errors": {
+            "savePrivateNoteFailed": "Kunne ikke lagre private notater",
+            "saveTenantNoteFailed": "Kunne ikke lagre delte notater"
+          }
+        },
+        "granska": {
+          "title": "Gjennomgå & Publiser",
+          "description": "Forhåndsvis og publiser planen din",
+          "previewButton": "Forhåndsvisning",
+          "versionsButton": "Versjonshistorikk",
+          "shareButton": "Del plan",
+          "exportButton": "Eksporter CSV",
+          "publishTitle": "Klar til å publisere?",
+          "publishDescriptionDraft": "Publiser planen for å kunne kjøre den og dele med andre.",
+          "publishDescriptionModified": "Du har gjort endringer siden siste publisering. Publiser for å oppdatere.",
+          "publishButton": "Publiser plan",
+          "publishUpdateButton": "Publiser oppdatering",
+          "publishing": "Publiserer...",
+          "addBlocksFirst": "Legg til minst én blokk før du publiserer.",
+          "publishedTitle": "Planen er publisert",
+          "publishedDescription": "Versjon {version} er aktiv og klar til å kjøres.",
+          "backButton": "Tilbake",
+          "continueButton": "Fortsett til kjøring",
+          "publishSuccess": "Planen ble publisert!",
+          "summaryLabels": {
+            "blocks": "Blokker",
+            "totalTime": "Total tid",
+            "visibility": "Synlighet",
+            "version": "Versjon"
+          },
+          "csv": {
+            "yes": "Ja",
+            "no": "Nei"
+          },
+          "errors": {
+            "publishFailed": "Kunne ikke publisere planen"
+          }
+        },
+        "kor": {
+          "title": "Kjør",
+          "description": "Start og gjennomfør planen din",
+          "readyTitle": "Klar til å kjøre!",
+          "readyDescription": "Planen er publisert og klar til å gjennomføres.",
+          "startButton": "Start kjøring",
+          "notReadyTitle": "Kan ikke kjøre ennå",
+          "notReadyNotPublished": "Planen må publiseres før den kan kjøres.",
+          "notReadyNoBlocks": "Legg til minst én blokk i planen.",
+          "notReadyNoPermission": "Du har ikke tillatelse til å kjøre planer.",
+          "goToGranska": "Gå til Gjennomgå & Publiser",
+          "goToBygg": "Gå til Bygg plan",
+          "tipsTitle": "Tips for gjennomføring",
+          "tip1": "Forbered eventuelt materiell før du starter",
+          "tip2": "Bruk tidtakeren for å holde oversikt over tid per blokk",
+          "tip3": "Du kan pause og gjenoppta kjøringen når som helst",
+          "backButton": "Tilbake",
+          "blockCount": "{count, plural, one {# blokk} other {# blokker}}"
+        },
+        "build": {
+          "title": "Bygg plan",
+          "description": "Legg til og organiser blokker, notater"
+        },
+        "save-and-run": {
+          "title": "Lagre & Kjør",
+          "description": "Forhåndsvis, lagre og start"
+        }
+      },
+      "calendar": {
+        "title": "Kalender",
+        "comingSoonTitle": "Kalendervisning kommer snart",
+        "comingSoonDescription": "Her vil du kunne se planlagte aktiviteter og planlegge gjennomføringer i en kalendervisning.",
+        "today": "I dag",
+        "previousPeriod": "Forrige periode",
+        "nextPeriod": "Neste periode",
+        "monthView": "Måned",
+        "weekView": "Uke",
+        "weekLabel": "Uke {week}, {year}",
+        "noData": "Ingen kalenderdata tilgjengelig",
+        "selectDay": "Velg en dag",
+        "selectDayDescription": "Klikk på en dag i kalenderen for å se planlagte planer.",
+        "addSchedule": "Planlegg",
+        "pickPlan": "Velg en plan å planlegge",
+        "schedule": "Planlegg",
+        "noSchedulesForDay": "Ingen planlagte planer denne dagen",
+        "scheduleFirst": "Planlegg din første plan",
+        "blocks": "blokker",
+        "startPlan": "Start plan",
+        "resumePlan": "Fortsett",
+        "markComplete": "Fullført",
+        "markSkipped": "Hopp over",
+        "status": {
+          "scheduled": "Planlagt",
+          "completed": "Gjennomført",
+          "skipped": "Hoppet over"
+        }
+      },
+      "navigation": {
+        "previousStep": "Forrige steg",
+        "nextStep": "Neste steg",
+        "goToStep": "Gå til {stepName}",
+        "stepOf": "Steg {current} av {total}"
+      },
+      "visibility": {
+        "private": "Privat",
+        "tenant": "Organisasjon",
+        "public": "Offentlig"
+      },
+      "createDialog": {
+        "title": "Opprett ny plan",
+        "description": "Gi planen din et navn og en valgfri beskrivelse.",
+        "nameLabel": "Navn",
+        "namePlaceholder": "Min aktivitetsplan",
+        "descriptionLabel": "Beskrivelse",
+        "descriptionPlaceholder": "Beskriv hva planen inneholder...",
+        "cancelButton": "Avbryt",
+        "createButton": "Opprett plan",
+        "creating": "Oppretter..."
+      },
+      "readOnly": {
+        "notice": "Du ser en delt plan. Du har kun lesetilgang."
+      },
+      "errors": {
+        "planNotFound": "Planen ble ikke funnet",
+        "loadFailed": "Noe gikk galt ved lasting av planen.",
+        "checkLink": "Sjekk at du har riktig lenke eller opprett en ny plan.",
+        "goToPlans": "Gå til mine planer"
+      }
+    },
     "sharedPlan": {
       "viewOnlyBanner": "Du ser en delt plan. Du har kun lesetilgang."
+    },
+    "success": {
+      "saved": "Lagret!",
+      "published": "Publisert!",
+      "deleted": "Plan slettet",
+      "copied": "Plan kopiert!",
+      "archived": "Plan arkivert",
+      "restored": "Plan gjenopprettet"
+    },
+    "warnings": {
+      "archivedPlan": "Denne planen er arkivert",
+      "planChangedSinceRun": "Planen er endret — kjøringen fortsetter på forrige versjon",
+      "sessionBlockNotSupported": "Krever økt — støttes i neste versjon"
+    },
+    "errors": {
+      "deleteFailed": "Kunne ikke slette",
+      "copyFailed": "Kunne ikke kopiere plan",
+      "loadFailed": "Kunne ikke laste planer",
+      "saveFailed": "Kunne ikke lagre",
+      "publishFailed": "Kunne ikke publisere"
+    },
+    "wizardSteps": {
+      "buildPlan": "Bygg plan",
+      "saveAndRun": "Lagre & Kjør"
+    },
+    "scopeTabs": {
+      "mine": "Mine",
+      "org": "{orgName}",
+      "global": "Global",
+      "comingSoon": "Kommer snart (Beta)"
+    },
+    "runStatus": {
+      "inProgress": "Pågår",
+      "lastActive": "sist aktiv {time}",
+      "progress": "{current} av {total}"
     }
   },
   "admin": {
@@ -1994,6 +2301,41 @@
         "planArchiveError": "Kunne ikke arkivere plan.",
         "planRestored": "Plan gjenopprettet.",
         "planRestoreError": "Kunne ikke gjenopprette plan."
+      },
+      "filters": {
+        "all": "Alle",
+        "draft": "Utkast",
+        "published": "Publisert",
+        "modified": "Endret",
+        "archived": "Arkivert",
+        "private": "Privat",
+        "tenant": "Organisasjon",
+        "public": "Offentlig"
+      },
+      "sort": {
+        "newest": "Nyeste",
+        "oldest": "Eldste",
+        "aToZ": "A-Å",
+        "zToA": "Å-A"
+      },
+      "noPlansYet": "Ingen planer ennå",
+      "noBlocksInPlanYet": "Ingen blokker i denne planen ennå.",
+      "preview": {
+        "title": "Forhåndsvisning"
+      },
+      "share": {
+        "privatePlan": "Privat plan",
+        "privatePlanWarning": "Denne planen er privat og kan ikke deles. Endre synlighet til \"Organisasjon\" eller \"Offentlig\" for å dele den.",
+        "shareLink": "Delingslenke",
+        "copy": "Kopier",
+        "copied": "Kopiert!",
+        "visibilityLabel": "Synlighet:",
+        "tenantVisibilityDescription": "Bare medlemmer i organisasjonen din kan se denne planen.",
+        "publicVisibilityDescription": "Alle med lenken kan se denne planen."
+      },
+      "versions": {
+        "noPublishedVersionsYet": "Ingen publiserte versjoner ennå",
+        "publishToCreateVersion": "Publiser planen for å opprette en versjon"
       }
     },
     "organizations": {
@@ -11518,6 +11860,67 @@
       },
       "errors": {
         "fetchFailed": "Kunne ikke hente økter"
+      },
+      "tabs": {
+        "sessions": "Sesjoner",
+        "runs": "Plankjøringer"
+      }
+    },
+    "runsDashboard": {
+      "title": "Aktive plankjøringer",
+      "description": "Dine pågående plangjennomspillinger med sesjonssteg",
+      "empty": {
+        "title": "Ingen aktive plankjøringer",
+        "description": "Start en plan med sesjonssteg for å se den her.",
+        "action": "Bla i planer"
+      },
+      "columns": {
+        "plan": "Plan",
+        "step": "Steg",
+        "runStatus": "Kjørestatus",
+        "session": "Sesjon",
+        "participants": "Deltakere",
+        "actions": "Handlinger"
+      },
+      "stepLabel": "Steg {current} av {total}",
+      "runStatus": {
+        "in_progress": "Pågår",
+        "completed": "Fullført",
+        "abandoned": "Avbrutt",
+        "not_started": "Ikke startet"
+      },
+      "sessionStatus": {
+        "created": "Opprettet",
+        "active": "Aktiv",
+        "completed": "Fullført",
+        "ended": "Avsluttet",
+        "abandoned": "Avbrutt",
+        "noSession": "Ingen sesjon"
+      },
+      "stale": "Inaktiv",
+      "staleDescription": "Ingen heartbeat på 24t",
+      "actions": {
+        "resume": "Fortsett",
+        "openSession": "Åpne sesjon",
+        "end": "Avslutt",
+        "ending": "Avslutter…"
+      },
+      "endConfirm": {
+        "title": "Avslutte sesjon?",
+        "description": "Sesjonen \"{sessionName}\" vil bli avsluttet. Deltakere vil bli frakoblet. Denne handlingen kan ikke angres.",
+        "confirm": "Avslutt sesjon",
+        "cancel": "Avbryt",
+        "alreadyEnded": "Sesjonen var allerede avsluttet"
+      },
+      "needsAttention": "Trenger oppmerksomhet",
+      "needsAttentionDescription": "Mangler sesjon for sesjonssteg",
+      "scope": {
+        "active": "Aktive",
+        "all": "Alle"
+      },
+      "loading": "Laster plankjøringer...",
+      "errors": {
+        "fetchFailed": "Kunne ikke hente plankjøringer"
       }
     },
     "participantsHost": {
@@ -12748,13 +13151,56 @@
         "trackMaterials": "Hold styr på materialtagger i det første steget for hver lek."
       },
       "actions": {
-        "reset": "Nullstill"
+        "reset": "Nullstill",
+        "abandonRun": "Avbryt kjøring",
+        "abandonConfirm": "Er du sikker? Kjøringen avbrytes og du kan starte på nytt."
       },
       "defaults": {
         "continueWhenReady": "Fortsett når gruppen er klar.",
         "stepTitle": "Steg {index}",
         "pauseTag": "Pause",
         "blockTag": "Moment"
+      },
+      "runSession": {
+        "title": "Deltakersesjon",
+        "description": "Start en sesjon slik at deltakerne kan koble til med sin enhet.",
+        "startSession": "Start sesjon",
+        "starting": "Starter…",
+        "sessionCode": "Sesjonskode",
+        "participants": "{count} deltakere",
+        "status": {
+          "draft": "Utkast",
+          "lobby": "Lobby",
+          "created": "Opprettet",
+          "active": "Aktiv",
+          "paused": "Pauset",
+          "locked": "Låst",
+          "completed": "Fullført",
+          "ended": "Avsluttet",
+          "archived": "Arkivert",
+          "cancelled": "Avbrutt",
+          "abandoned": "Avbrutt"
+        },
+        "openSessionView": "Åpne sesjonsvisningen",
+        "openDirectorMode": "Åpne Director Mode",
+        "sessionActive": "Sesjonen pågår",
+        "sessionCompleted": "Sesjonen er fullført",
+        "waitingForSession": "Venter på at sesjonen skal starte…",
+        "errorCreating": "Kunne ikke starte sesjonen",
+        "navBlocked": "Start sesjonen før du fortsetter",
+        "copyCode": "Kopier sesjonskode",
+        "codeCopied": "Sesjonskode kopiert!",
+        "copyLink": "Kopier tilkoblingslenke",
+        "linkCopied": "Lenke kopiert!",
+        "showQr": "Vis QR-kode",
+        "qrTitle": "Skann for å bli med",
+        "qrAlt": "QR-kode for å bli med i sesjonen",
+        "statusMessage": {
+          "draft": "Sesjonen er klar til å publiseres.",
+          "lobby": "Venter på deltakere… ({count} tilkoblet)",
+          "paused": "Sesjonen er pauset."
+        },
+        "connectionDegraded": "Tilkobling ustabil"
       }
     },
     "decisionsPanel": {

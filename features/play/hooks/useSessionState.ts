@@ -34,8 +34,8 @@ import type { SessionRole } from '@/types/play-runtime';
 import {
   getHostSession,
   getParticipants,
-  updateSessionStatus,
 } from '@/features/play-participant/api';
+import { sendSessionCommand } from '@/features/play/api';
 import { buildPreflightItems, type SessionChecklistState } from '@/features/play/components/PreflightChecklist';
 
 // =============================================================================
@@ -599,7 +599,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
 
   const startSession = useCallback(async () => {
     try {
-      await updateSessionStatus(sessionId, 'start');
+      const result = await sendSessionCommand(sessionId, 'start');
+      if (!result.ok) throw new Error(result.error ?? 'Failed to start session');
       setState((prev) => ({ ...prev, status: 'active' }));
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to start session'));
@@ -608,7 +609,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
 
   const publishSession = useCallback(async () => {
     try {
-      await updateSessionStatus(sessionId, 'publish');
+      const result = await sendSessionCommand(sessionId, 'publish');
+      if (!result.ok) throw new Error(result.error ?? 'Failed to publish session');
       setState((prev) => ({ ...prev, status: 'lobby' }));
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to publish session'));
@@ -617,7 +619,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
 
   const unpublishSession = useCallback(async () => {
     try {
-      await updateSessionStatus(sessionId, 'unpublish');
+      const result = await sendSessionCommand(sessionId, 'unpublish');
+      if (!result.ok) throw new Error(result.error ?? 'Failed to unpublish session');
       setState((prev) => ({ ...prev, status: 'draft' }));
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to unpublish session'));
@@ -626,7 +629,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
 
   const pauseSession = useCallback(async () => {
     try {
-      await updateSessionStatus(sessionId, 'pause');
+      const result = await sendSessionCommand(sessionId, 'pause');
+      if (!result.ok) throw new Error(result.error ?? 'Failed to pause session');
       setState((prev) => ({ ...prev, status: 'paused' }));
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to pause session'));
@@ -635,7 +639,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
 
   const resumeSession = useCallback(async () => {
     try {
-      await updateSessionStatus(sessionId, 'resume');
+      const result = await sendSessionCommand(sessionId, 'resume');
+      if (!result.ok) throw new Error(result.error ?? 'Failed to resume session');
       setState((prev) => ({ ...prev, status: 'active' }));
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to resume session'));
@@ -644,7 +649,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
 
   const endSession = useCallback(async () => {
     try {
-      await updateSessionStatus(sessionId, 'end');
+      const result = await sendSessionCommand(sessionId, 'end');
+      if (!result.ok) throw new Error(result.error ?? 'Failed to end session');
       setState((prev) => ({ ...prev, status: 'ended' }));
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to end session'));
@@ -654,14 +660,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
   const goToStep = useCallback(async (stepIndex: number) => {
     if (stepIndex < 0) return;
     try {
-      const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'set_step', step_index: stepIndex }),
-      });
-
-      if (!res.ok) throw new Error('Failed to update step');
-
+      const result = await sendSessionCommand(sessionId, 'set_step', { step_index: stepIndex });
+      if (!result.ok) throw new Error(result.error ?? 'Failed to update step');
       setState((prev) => ({ ...prev, currentStepIndex: stepIndex }));
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to update step'));
@@ -671,14 +671,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
   const goToPhase = useCallback(async (phaseIndex: number) => {
     if (phaseIndex < 0) return;
     try {
-      const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'set_phase', phase_index: phaseIndex }),
-      });
-
-      if (!res.ok) throw new Error('Failed to update phase');
-
+      const result = await sendSessionCommand(sessionId, 'set_phase', { phase_index: phaseIndex });
+      if (!result.ok) throw new Error(result.error ?? 'Failed to update phase');
       setState((prev) => ({ ...prev, currentPhaseIndex: phaseIndex }));
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to update phase'));

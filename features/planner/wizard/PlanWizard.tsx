@@ -4,11 +4,8 @@ import { Suspense } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MobileWizardStepper } from './MobileWizardStepper';
-import { StepGrund } from './steps/StepGrund';
-import { StepByggPlan } from './steps/StepByggPlan';
-import { StepAnteckningar } from './steps/StepAnteckningar';
-import { StepGranska } from './steps/StepGranska';
-import { StepKor } from './steps/StepKor';
+import { StepBuildPlan } from './steps/StepBuildPlan';
+import { StepSaveAndRun } from './steps/StepSaveAndRun';
 import type { PlannerPlan } from '@/types/planner';
 import type { WizardStep } from './types';
 import type { UsePlanWizardResult } from './hooks/usePlanWizard';
@@ -36,18 +33,12 @@ export function PlanWizard({ plan, capabilities, onPlanUpdate, wizard }: PlanWiz
     };
 
     switch (wizard.currentStep) {
-      case 'grund':
-        return <StepGrund {...stepProps} />;
-      case 'bygg':
-        return <StepByggPlan {...stepProps} />;
-      case 'anteckningar':
-        return <StepAnteckningar {...stepProps} />;
-      case 'granska':
-        return <StepGranska {...stepProps} />;
-      case 'kor':
-        return <StepKor {...stepProps} />;
+      case 'build':
+        return <StepBuildPlan {...stepProps} />;
+      case 'save-and-run':
+        return <StepSaveAndRun {...stepProps} />;
       default:
-        return <StepGrund {...stepProps} />;
+        return <StepBuildPlan {...stepProps} />;
     }
   };
 

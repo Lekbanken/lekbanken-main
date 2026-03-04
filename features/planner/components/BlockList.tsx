@@ -36,6 +36,10 @@ interface BlockListProps {
   onDeleteBlock: (blockId: string) => void;
   onDurationChange: (blockId: string, duration: number) => void;
   isReordering?: boolean;
+  /** Section whose title should be auto-edited (just created) */
+  editingSectionId?: string | null;
+  onSectionTitleSave?: (blockId: string, title: string) => void;
+  onSectionEditDone?: () => void;
 }
 
 export function BlockList({
@@ -46,6 +50,9 @@ export function BlockList({
   onDeleteBlock,
   onDurationChange,
   isReordering = false,
+  editingSectionId = null,
+  onSectionTitleSave,
+  onSectionEditDone,
 }: BlockListProps) {
   const t = useTranslations('planner');
   const useTouchUI = usePlannerFeature('planner_gestures');
@@ -66,6 +73,21 @@ export function BlockList({
       onReorder(String(active.id), String(over.id));
     }
   };
+
+  // Compute visual grouping: blocks after a section header get indent
+  const sectionGrouping = (() => {
+    const map = new Map<string, boolean>();
+    let afterSection = false;
+    for (const block of blocks) {
+      if (block.blockType === 'section') {
+        afterSection = true;
+        map.set(block.id, false); // sections themselves are not indented
+      } else {
+        map.set(block.id, afterSection);
+      }
+    }
+    return map;
+  })();
 
   if (blocks.length === 0) {
     return (
@@ -100,6 +122,10 @@ export function BlockList({
                   canDelete={capabilities.canDeleteBlocks}
                   onEdit={() => onEditBlock(block)}
                   onDelete={() => onDeleteBlock(block.id)}
+                  isAutoEditingTitle={block.id === editingSectionId}
+                  onTitleSave={onSectionTitleSave}
+                  onTitleEditDone={onSectionEditDone}
+                  isUnderSection={sectionGrouping.get(block.id) ?? false}
                 />
               ) : (
                 <BlockRow
@@ -112,6 +138,10 @@ export function BlockList({
                   onEdit={() => onEditBlock(block)}
                   onDelete={() => onDeleteBlock(block.id)}
                   onDurationChange={(duration: number) => onDurationChange(block.id, duration)}
+                  isAutoEditingTitle={block.id === editingSectionId}
+                  onTitleSave={onSectionTitleSave}
+                  onTitleEditDone={onSectionEditDone}
+                  isUnderSection={sectionGrouping.get(block.id) ?? false}
                 />
               )
             ))}

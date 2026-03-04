@@ -52,7 +52,7 @@ export type RunStep = {
   id: string;
   index: number;
   blockId: string;
-  blockType: 'game' | 'pause' | 'preparation' | 'custom';
+  blockType: 'game' | 'pause' | 'preparation' | 'custom' | 'section' | 'session_game';
   title: string;
   description: string;
   durationMinutes: number;
@@ -60,6 +60,13 @@ export type RunStep = {
   safety?: string;
   tag?: string;
   note?: string;
+  /** True if this step requires a participant session */
+  requiresSession?: boolean;
+  /** Session configuration — present when requiresSession is true */
+  sessionSpec?: {
+    gameId: string;
+    autoCreate: boolean;
+  };
   gameSnapshot?: {
     id: string;
     title: string;
@@ -85,6 +92,15 @@ export type RunProgress = {
  */
 export type StartRunResponse = {
   run: Run;
+  /** True if an existing in_progress run was returned instead of creating new */
+  resumed?: boolean;
+  resumeReason?: 'active_run_exists';
+  resumeMeta?: {
+    currentStep: number;
+    totalSteps: number;
+    versionNumber: number;
+    startedAt: string;
+  };
 };
 
 /**
@@ -93,4 +109,59 @@ export type StartRunResponse = {
 export type FetchRunResponse = {
   run: Run;
   progress: RunProgress | null;
+};
+
+// ============================================
+// Dashboard Types (MS7)
+// ============================================
+
+/**
+ * A row in the Active Sessions Dashboard.
+ * Combines run, session, and plan data into a single DTO
+ * for the `/app/play/sessions` dashboard view.
+ */
+export type DashboardRunRow = {
+  /** run id */
+  id: string;
+  planId: string;
+  planName: string;
+  runStatus: RunStatus;
+  currentStepIndex: number;
+  totalSteps: number;
+  startedAt: string;
+  lastHeartbeatAt: string | null;
+  /** true if heartbeat is older than stale threshold */
+  isStale: boolean;
+  /** Session-step info — non-null when the run has session_game steps */
+  sessions: DashboardSessionInfo[];
+};
+
+/** Status of a run_session row (mirrors DB CHECK constraint). */
+export type RunSessionStatus = 'created' | 'active' | 'completed' | 'ended' | 'abandoned';
+
+/** Terminal states where no further action is possible. */
+const TERMINAL_RUN_SESSION_STATUSES: ReadonlySet<RunSessionStatus> = new Set([
+  'ended',
+  'completed',
+  'abandoned',
+]);
+
+/** Returns true if the run_session status is terminal (ended/completed/abandoned). */
+export function isTerminalRunSessionStatus(status: string): boolean {
+  return TERMINAL_RUN_SESSION_STATUSES.has(status as RunSessionStatus);
+}
+
+export type DashboardSessionInfo = {
+  runSessionId: string;
+  stepIndex: number;
+  /** Status of the run_session row */
+  runSessionStatus: RunSessionStatus;
+  /** Linked participant_session (null if auto-create failed or not yet created) */
+  participantSession: {
+    id: string;
+    sessionCode: string;
+    displayName: string;
+    status: string;
+    participantCount: number;
+  } | null;
 };

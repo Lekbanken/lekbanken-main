@@ -30,7 +30,7 @@ async function handleJson<T>(res: Response): Promise<T> {
   return (await res.json()) as T
 }
 
-export async function fetchPlans(query?: { search?: string; tenantId?: string | null; page?: number; pageSize?: number }): Promise<PlanWithCapabilities[]> {
+export async function fetchPlans(query?: { search?: string; tenantId?: string | null; scope?: 'mine' | 'org' | 'global'; page?: number; pageSize?: number }): Promise<PlanWithCapabilities[]> {
   const res = await fetch('/api/plans/search', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -100,7 +100,7 @@ export async function updateVisibility(
 export async function addBlock(
   planId: string,
   payload: {
-    block_type: 'game' | 'pause' | 'preparation' | 'custom'
+    block_type: 'game' | 'pause' | 'preparation' | 'custom' | 'section' | 'session_game'
     game_id?: string | null
     duration_minutes?: number | null
     title?: string | null
@@ -123,7 +123,7 @@ export async function updateBlock(
   planId: string,
   blockId: string,
   payload: {
-    block_type?: 'game' | 'pause' | 'preparation' | 'custom'
+    block_type?: 'game' | 'pause' | 'preparation' | 'custom' | 'section' | 'session_game'
     game_id?: string | null
     duration_minutes?: number | null
     title?: string | null

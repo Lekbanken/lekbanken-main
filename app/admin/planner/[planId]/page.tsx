@@ -378,7 +378,7 @@ export default function AdminPlannerDetailPage() {
               />
             )}
             {plan._capabilities?.canStartRun && plan.status !== 'archived' && (
-              <Button size="sm" variant="outline" href={`/app/play/${plan.id}/start`}>
+              <Button size="sm" variant="outline" href={`/app/play/plan/${plan.id}`}>
                 {t("actions.startRun")}
               </Button>
             )}

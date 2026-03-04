@@ -6,6 +6,7 @@ import {
   type WizardStep,
   WIZARD_STEPS,
   isValidStep,
+  resolveStep,
   getStepIndex,
   getNextStep,
   getPrevStep,
@@ -45,13 +46,15 @@ export interface UsePlanWizardResult {
 /**
  * Hook for managing wizard navigation state.
  * URL is the source of truth for the current step.
+ * Handles backwards compatibility with old 5-step URLs (grund, bygg, etc.)
  */
-export function usePlanWizard({ planId, initialStep = 'grund' }: UsePlanWizardOptions): UsePlanWizardResult {
+export function usePlanWizard({ planId, initialStep = 'build' }: UsePlanWizardOptions): UsePlanWizardResult {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const stepParam = searchParams.get('step');
-  const currentStep: WizardStep = isValidStep(stepParam) ? stepParam : initialStep;
+  // resolveStep handles both new step names and legacy 5-step names
+  const currentStep: WizardStep = isValidStep(stepParam) ? resolveStep(stepParam) : initialStep;
   const currentStepIndex = getStepIndex(currentStep);
 
   const goToStep = useCallback(

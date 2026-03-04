@@ -189,9 +189,19 @@ body {
   .animate-bounce-in,
   .animate-confetti,
   .animate-scale-pop,
-  .animate-fade-in-delayed {
+  .animate-fade-in-delayed,
+  .animate-soft-pulse {
     animation: none;
   }
+}
+
+/* Soft pulse for calendar active-run dots (subtler than default pulse) */
+@keyframes soft-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-soft-pulse {
+  animation: soft-pulse 2.5s ease-in-out infinite;
 }
 
 /* Hide native scrollbar while keeping scroll functionality */

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { getPlanSnapshot } from '@/lib/planner/server/snapshot'
 import type { Run, RunStep, RunStatus } from '@/features/play/types'
 import type { Json } from '@/types/supabase'
 
@@ -8,37 +9,33 @@ function normalizeId(value: string | string[] | undefined) {
   return id?.trim() || null
 }
 
-const DEFAULT_STEP_DURATION = 5
-
-type GameSnapshot = {
-  id: string
-  title: string
-  shortDescription?: string | null
-  durationMinutes?: number | null
-  instructions?: Array<{
-    title: string
-    description?: string | null
-    durationMinutes?: number | null
-  }> | null
-  materials?: string[] | null
-}
-
-type VersionBlock = {
-  id: string
-  position: number
-  block_type: string
-  duration_minutes: number
-  title: string | null
-  notes: string | null
-  is_optional: boolean | null
-  game_snapshot: GameSnapshot | null
+/**
+ * Upsert a run_session row for the given run + step index.
+ * Uses type assertion because run_sessions isn't in generated Supabase types yet
+ * (migration 20260305200000 needs to be applied first).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function upsertRunSession(supabase: any, runId: string, stepIndex: number) {
+  const { data, error } = await supabase
+    .from('run_sessions')
+    .upsert(
+      { run_id: runId, step_index: stepIndex, status: 'created' },
+      { onConflict: 'run_id,step_index', ignoreDuplicates: true }
+    )
+    .select('*')
+    .single()
+  if (error) {
+    console.warn('[api/play/:id/start] run_session upsert failed (table may not exist yet)', error.message)
+    return null
+  }
+  return data
 }
 
 /**
  * POST /api/play/[planId]/start
  * 
- * Creates a new Run from the plan's current published version.
- * Server generates steps from version blocks - client receives ready-to-play structure.
+ * Creates a new Run from the plan's current published version (or draft fallback).
+ * Uses PlanSnapshot pipeline as the Single Source of Truth for block→step generation.
  */
 export async function POST(
   _request: Request,
@@ -59,87 +56,107 @@ export async function POST(
     return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
   }
 
-  // Fetch plan with current version
-  const { data: plan, error: planError } = await supabase
-    .from('plans')
-    .select('id, name, status, current_version_id')
-    .eq('id', planId)
-    .maybeSingle()
+  // ── Get snapshot (published → draft fallback) ─────────────────────
+  const result = await getPlanSnapshot(planId, 'auto', supabase)
 
-  if (planError || !plan) {
+  if (!result.ok) {
+    const status = result.code === 'NOT_FOUND' ? 404
+      : result.code === 'NO_BLOCKS' ? 400
+      : 500
     return NextResponse.json(
-      { error: { code: 'NOT_FOUND', message: 'Plan not found or access denied' } },
-      { status: 404 }
+      { error: { code: result.code, message: result.error } },
+      { status }
     )
   }
 
-  // Check if plan has a published version
-  if (!plan.current_version_id) {
-    // Fallback: Allow playing draft plans (backward compatibility)
-    // In future, might require published version
-    return await startFromDraftPlan(supabase, planId, plan.name, user.id)
-  }
+  const { snapshot } = result
 
-  // Fetch the current version with its blocks
-  const { data: version, error: versionError } = await supabase
-    .from('plan_versions')
-    .select(`
-      id,
-      plan_id,
-      version_number,
-      name,
-      description,
-      total_time_minutes,
-      published_at
-    `)
-    .eq('id', plan.current_version_id)
-    .single()
-
-  if (versionError || !version) {
-    console.error('[api/play/:id/start] version fetch error', versionError)
-    return NextResponse.json(
-      { error: { code: 'NOT_FOUND', message: 'Published version not found' } },
-      { status: 404 }
-    )
-  }
-
-  // Fetch version blocks
-  const { data: versionBlocks, error: blocksError } = await supabase
-    .from('plan_version_blocks')
-    .select('*')
-    .eq('plan_version_id', version.id)
-    .order('position', { ascending: true })
-
-  if (blocksError) {
-    console.error('[api/play/:id/start] blocks fetch error', blocksError)
-    return NextResponse.json(
-      { error: { code: 'SERVER_ERROR', message: 'Failed to fetch version blocks' } },
-      { status: 500 }
-    )
-  }
-
-  const blocks = (versionBlocks || []) as VersionBlock[]
-
-  // Generate steps from version blocks (server-side logic)
-  const steps = generateStepsFromBlocks(blocks)
-
-  if (steps.length === 0) {
+  if (snapshot.steps.length === 0) {
     return NextResponse.json(
       { error: { code: 'VALIDATION_ERROR', message: 'Plan has no playable content' } },
       { status: 400 }
     )
   }
 
-  // Create run record
+  // ── Draft plans → virtual run (not persisted) ─────────────────────
+  if (snapshot.source === 'draft_blocks' || !snapshot.version) {
+    const run: Run = {
+      id: `draft-${planId}-${Date.now()}`,
+      planId,
+      planVersionId: 'draft',
+      versionNumber: 0,
+      name: snapshot.plan.name,
+      status: 'in_progress',
+      steps: snapshot.steps as RunStep[],
+      blockCount: snapshot.stats.blockCount,
+      totalDurationMinutes: snapshot.stats.totalTimeMinutes,
+      currentStepIndex: 0,
+      startedAt: new Date().toISOString(),
+      completedAt: null,
+    }
+    return NextResponse.json({ run })
+  }
+
+  // ── Resume existing run (idempotent) ──────────────────────────────
+  const { data: existingRun } = await supabase
+    .from('runs')
+    .select('*')
+    .eq('plan_version_id', snapshot.version.id)
+    .eq('user_id', user.id)
+    .eq('status', 'in_progress')
+    .maybeSingle()
+
+  if (existingRun) {
+    // Upsert run_session for current step if it requires a session
+    const currentStep = existingRun.current_step ?? 0
+    const stepAtCurrent = snapshot.steps[currentStep]
+    let runSession = null
+
+    if (stepAtCurrent?.requiresSession) {
+      runSession = await upsertRunSession(supabase, existingRun.id, currentStep)
+    }
+
+    const run: Run = {
+      id: existingRun.id,
+      planId,
+      planVersionId: existingRun.plan_version_id,
+      versionNumber: snapshot.version.versionNumber,
+      name: snapshot.version.name ?? snapshot.plan.name,
+      status: existingRun.status,
+      steps: snapshot.steps as RunStep[],
+      blockCount: snapshot.stats.blockCount,
+      totalDurationMinutes: snapshot.stats.totalTimeMinutes,
+      currentStepIndex: existingRun.current_step ?? 0,
+      startedAt: existingRun.started_at ?? existingRun.created_at ?? new Date().toISOString(),
+      completedAt: existingRun.completed_at ?? null,
+    }
+
+    return NextResponse.json({
+      run,
+      resumed: true,
+      resumeReason: 'active_run_exists',
+      resumeMeta: {
+        currentStep: existingRun.current_step ?? 0,
+        totalSteps: snapshot.stats.totalSteps,
+        versionNumber: snapshot.version.versionNumber,
+        startedAt: existingRun.started_at ?? existingRun.created_at ?? new Date().toISOString(),
+      },
+      ...(runSession ? { runSession } : {}),
+    })
+  }
+
+  // ── Create new run ────────────────────────────────────────────────
   const runPayload = {
-    plan_version_id: version.id,
+    plan_version_id: snapshot.version.id,
     user_id: user.id,
+    tenant_id: snapshot.plan.ownerTenantId ?? null,
     status: 'in_progress' as RunStatus,
     current_step: 0,
+    last_heartbeat_at: new Date().toISOString(),
     metadata: ({
       planId,
-      stepsGenerated: steps.length,
-      versionNumber: version.version_number,
+      stepsGenerated: snapshot.stats.totalSteps,
+      versionNumber: snapshot.version.versionNumber,
     } as Json),
   }
 
@@ -151,239 +168,49 @@ export async function POST(
 
   if (runError) {
     console.error('[api/play/:id/start] run insert error', runError)
-    // If runs table doesn't exist yet (migration not run), return a virtual run
-    return NextResponse.json({
-      run: buildVirtualRun(planId, version, steps),
-    })
+    // Fallback: return virtual run if runs table is unavailable
+    const run: Run = {
+      id: `virtual-${planId}-${Date.now()}`,
+      planId,
+      planVersionId: snapshot.version.id,
+      versionNumber: snapshot.version.versionNumber,
+      name: snapshot.version.name ?? snapshot.plan.name,
+      status: 'in_progress',
+      steps: snapshot.steps as RunStep[],
+      blockCount: snapshot.stats.blockCount,
+      totalDurationMinutes: snapshot.stats.totalTimeMinutes,
+      currentStepIndex: 0,
+      startedAt: new Date().toISOString(),
+      completedAt: null,
+    }
+    return NextResponse.json({ run })
   }
 
   const run: Run = {
     id: runData.id,
     planId,
     planVersionId: runData.plan_version_id,
-    versionNumber: version.version_number,
-    name: version.name,
+    versionNumber: snapshot.version.versionNumber,
+    name: snapshot.version.name ?? snapshot.plan.name,
     status: runData.status,
-    steps,
-    blockCount: blocks.length,
-    totalDurationMinutes: version.total_time_minutes || steps.reduce((sum, s) => sum + s.durationMinutes, 0),
+    steps: snapshot.steps as RunStep[],
+    blockCount: snapshot.stats.blockCount,
+    totalDurationMinutes: snapshot.stats.totalTimeMinutes,
     currentStepIndex: 0,
     startedAt: runData.started_at || runData.created_at || new Date().toISOString(),
     completedAt: null,
   }
 
-  return NextResponse.json({ run })
-}
+  // Upsert run_session for step 0 if it requires a session
+  const firstStep = snapshot.steps[0]
+  let newRunSession = null
 
-/**
- * Fallback for draft plans without published versions.
- * Maintains backward compatibility with existing plans.
- */
-async function startFromDraftPlan(
-  supabase: Awaited<ReturnType<typeof createServerRlsClient>>,
-  planId: string,
-  planName: string,
-  _userId: string
-): Promise<NextResponse> {
-  // Fetch plan blocks directly
-  const { data: blocks, error: blocksError } = await supabase
-    .from('plan_blocks')
-    .select(`
-      id,
-      position,
-      block_type,
-      duration_minutes,
-      title,
-      notes,
-      is_optional,
-      game:games(
-        id,
-        translations:game_translations(
-          locale,
-          title,
-          short_description,
-          instructions
-        )
-      )
-    `)
-    .eq('plan_id', planId)
-    .order('position', { ascending: true })
-
-  if (blocksError || !blocks || blocks.length === 0) {
-    return NextResponse.json(
-      { error: { code: 'NOT_FOUND', message: 'Plan has no blocks' } },
-      { status: 404 }
-    )
+  if (firstStep?.requiresSession) {
+    newRunSession = await upsertRunSession(supabase, runData.id, 0)
   }
 
-  // Convert to version block format for step generation
-  const versionBlocks: VersionBlock[] = blocks.map((b: {
-    id: string
-    position: number
-    block_type: 'game' | 'pause' | 'preparation' | 'custom'
-    duration_minutes: number | null
-    title: string | null
-    notes: string | null
-    is_optional: boolean | null
-    game: {
-      id: string
-      translations?: Array<{
-        locale: string
-        title: string
-        short_description?: string | null
-        instructions?: unknown
-      }>
-    } | null
-  }) => {
-    const translation = b.game?.translations?.find((t: { locale: string }) => t.locale === 'sv') 
-      || b.game?.translations?.[0]
-    
-    return {
-      id: b.id,
-      position: b.position,
-      block_type: b.block_type,
-      duration_minutes: b.duration_minutes ?? DEFAULT_STEP_DURATION,
-      title: b.title,
-      notes: b.notes,
-      is_optional: b.is_optional,
-      game_snapshot: b.game ? {
-        id: b.game.id,
-        title: translation?.title || 'Okänd lek',
-        shortDescription: translation?.short_description,
-        instructions: parseInstructions(translation?.instructions),
-        materials: [],
-      } : null,
-    }
+  return NextResponse.json({
+    run,
+    ...(newRunSession ? { runSession: newRunSession } : {}),
   })
-
-  const steps = generateStepsFromBlocks(versionBlocks)
-
-  // Return virtual run (not persisted since no version)
-  const run: Run = {
-    id: `draft-${planId}-${Date.now()}`,
-    planId,
-    planVersionId: 'draft',
-    versionNumber: 0,
-    name: planName,
-    status: 'in_progress',
-    steps,
-    blockCount: blocks.length,
-    totalDurationMinutes: steps.reduce((sum, s) => sum + s.durationMinutes, 0),
-    currentStepIndex: 0,
-    startedAt: new Date().toISOString(),
-    completedAt: null,
-  }
-
-  return NextResponse.json({ run })
-}
-
-function parseInstructions(instructions: unknown): Array<{
-  title: string
-  description?: string | null
-  durationMinutes?: number | null
-}> | null {
-  if (!instructions) return null
-  if (Array.isArray(instructions)) {
-    return instructions.map((step, idx) => ({
-      title: step?.title || `Steg ${idx + 1}`,
-      description: step?.description || null,
-      durationMinutes: step?.durationMinutes || null,
-    }))
-  }
-  return null
-}
-
-/**
- * Generate RunSteps from version blocks.
- * This is the core server-side logic that transforms blocks into playable steps.
- */
-function generateStepsFromBlocks(blocks: VersionBlock[]): RunStep[] {
-  const steps: RunStep[] = []
-  let stepIndex = 0
-
-  for (const block of blocks) {
-    const tag = block.title || getBlockTypeLabel(block.block_type)
-    const baseDuration = block.duration_minutes || DEFAULT_STEP_DURATION
-
-    if (block.game_snapshot?.instructions && block.game_snapshot.instructions.length > 0) {
-      // Game block with instructions → multiple steps
-      const materials = block.game_snapshot.materials || []
-      
-      for (let i = 0; i < block.game_snapshot.instructions.length; i++) {
-        const instruction = block.game_snapshot.instructions[i]
-        steps.push({
-          id: `${block.id}:${i}`,
-          index: stepIndex++,
-          blockId: block.id,
-          blockType: block.block_type as 'game' | 'pause' | 'preparation' | 'custom',
-          title: instruction.title || `Steg ${i + 1}`,
-          description: instruction.description || '',
-          durationMinutes: instruction.durationMinutes ?? baseDuration,
-          materials: i === 0 && materials.length > 0 ? materials : undefined,
-          tag,
-          note: i === 0 ? block.notes || undefined : undefined,
-          gameSnapshot: {
-            id: block.game_snapshot.id,
-            title: block.game_snapshot.title,
-            shortDescription: block.game_snapshot.shortDescription,
-          },
-        })
-      }
-    } else {
-      // Non-game block or game without instructions → single step
-      steps.push({
-        id: `${block.id}:0`,
-        index: stepIndex++,
-        blockId: block.id,
-        blockType: block.block_type as 'game' | 'pause' | 'preparation' | 'custom',
-        title: tag,
-        description: block.notes || getBlockTypeDefaultDescription(block.block_type),
-        durationMinutes: baseDuration,
-        tag,
-        gameSnapshot: block.game_snapshot ? {
-          id: block.game_snapshot.id,
-          title: block.game_snapshot.title,
-          shortDescription: block.game_snapshot.shortDescription,
-        } : undefined,
-      })
-    }
-  }
-
-  return steps
-}
-
-function getBlockTypeLabel(blockType: string): string {
-  switch (blockType) {
-    case 'game': return 'Lek'
-    case 'pause': return 'Paus'
-    case 'preparation': return 'Förberedelse'
-    case 'custom': return 'Moment'
-    default: return 'Moment'
-  }
-}
-
-function getBlockTypeDefaultDescription(blockType: string): string {
-  switch (blockType) {
-    case 'pause': return 'Ta en paus. Fortsätt när gruppen är redo.'
-    case 'preparation': return 'Förbered nästa moment.'
-    default: return 'Fortsätt när gruppen är redo.'
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function buildVirtualRun(planId: string, version: any, steps: RunStep[]): Run {
-  return {
-    id: `virtual-${planId}-${Date.now()}`,
-    planId,
-    planVersionId: version.id,
-    versionNumber: version.version_number,
-    name: version.name,
-    status: 'in_progress',
-    steps,
-    blockCount: steps.length,
-    totalDurationMinutes: version.total_time_minutes || steps.reduce((sum, s) => sum + s.durationMinutes, 0),
-    currentStepIndex: 0,
-    startedAt: new Date().toISOString(),
-    completedAt: null,
-  }
 }

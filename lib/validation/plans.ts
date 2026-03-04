@@ -55,8 +55,8 @@ export function validatePlanBlockPayload(
     push(errors, !payload.block_type, 'block_type is required')
   }
 
-  if (payload.block_type && !['game', 'pause', 'preparation', 'custom'].includes(payload.block_type)) {
-    errors.push('block_type must be one of game, pause, preparation, custom')
+  if (payload.block_type && !['game', 'pause', 'preparation', 'custom', 'section'].includes(payload.block_type)) {
+    errors.push('block_type must be one of game, pause, preparation, custom, section')
   }
 
   if (payload.block_type === 'game') {

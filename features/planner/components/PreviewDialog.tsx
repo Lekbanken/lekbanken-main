@@ -26,6 +26,8 @@ function getBlockTypeLabel(type: PlannerBlock["blockType"]): string {
       return "Paus";
     case "preparation":
       return "Förberedelse";
+    case "section":
+      return "Sektion";
     case "custom":
       return "Notis";
     default:
@@ -96,6 +98,8 @@ function getBlockColor(type: PlannerBlock["blockType"]): string {
       return "bg-amber-500/10 text-amber-600 border-amber-500/20";
     case "preparation":
       return "bg-purple-500/10 text-purple-600 border-purple-500/20";
+    case "section":
+      return "bg-emerald-500/10 text-emerald-700 border-emerald-500/30";
     case "custom":
       return "bg-gray-500/10 text-gray-600 border-gray-500/20";
     default:
@@ -105,10 +109,15 @@ function getBlockColor(type: PlannerBlock["blockType"]): string {
 
 export function PreviewDialog({ open, onOpenChange, plan }: PreviewDialogProps) {
   const t = useTranslations('planner');
-  const totalDuration = plan.blocks.reduce(
+  const contentBlocks = plan.blocks.filter((b) => b.blockType !== 'section');
+  const totalDuration = contentBlocks.reduce(
     (sum, block) => sum + (block.durationMinutes ?? 0),
     0
   );
+
+  const getBlockTypeLabelI18n = (type: PlannerBlock["blockType"]): string => {
+    return t(`blockTypes.${type}`);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -165,25 +174,48 @@ export function PreviewDialog({ open, onOpenChange, plan }: PreviewDialogProps) 
                     d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"
                   />
                 </svg>
-                {plan.blocks.length} block
+                {t('preview.blockCount', { count: contentBlocks.length })}
               </span>
             </div>
           </div>
 
           {plan.blocks.length === 0 ? (
             <div className="py-8 text-center text-sm text-muted-foreground">
-              Inga block i planen
+              {t('noBlocksInPlanYet')}
             </div>
           ) : (
             <div className="space-y-3">
-              {plan.blocks.map((block, index) => (
+              {plan.blocks.map((block, index) => {
+                // Section blocks render as divider headers
+                if (block.blockType === 'section') {
+                  return (
+                    <div
+                      key={block.id}
+                      className="flex items-center gap-3 rounded-lg border-b border-emerald-500/30 bg-emerald-500/5 px-4 py-2"
+                    >
+                      <svg className="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path d="M3 5h18"/><path d="M3 10h14"/><path d="M3 15h10"/>
+                      </svg>
+                      <span className="text-sm font-semibold text-emerald-700">
+                        {block.title ?? t('blockTypes.section')}
+                      </span>
+                    </div>
+                  );
+                }
+
+                // Count only non-section blocks for numbering
+                const contentIndex = plan.blocks
+                  .slice(0, index)
+                  .filter((b) => b.blockType !== 'section').length + 1;
+
+                return (
                 <div
                   key={block.id}
                   className={`rounded-xl border p-4 ${getBlockColor(block.blockType)}`}
                 >
                   <div className="flex items-start gap-4">
                     <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-background/50 text-sm font-bold">
-                      {index + 1}
+                      {contentIndex}
                     </div>
 
                     {block.blockType === "game" &&
@@ -210,18 +242,18 @@ export function PreviewDialog({ open, onOpenChange, plan }: PreviewDialogProps) 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium uppercase tracking-wider opacity-70">
-                          {getBlockTypeLabel(block.blockType)}
+                          {getBlockTypeLabelI18n(block.blockType)}
                         </span>
                         {block.isOptional && (
                           <span className="rounded-full bg-background/50 px-2 py-0.5 text-xs">
-                            Valfri
+                            {t('optional')}
                           </span>
                         )}
                       </div>
                       <h3 className="mt-1 font-semibold">
                         {block.blockType === "game"
-                          ? block.game?.title ?? "Okänd lek"
-                          : block.title ?? getBlockTypeLabel(block.blockType)}
+                          ? block.game?.title ?? t('blockTypes.game')
+                          : block.title ?? getBlockTypeLabelI18n(block.blockType)}
                       </h3>
                       {block.notes && (
                         <p className="mt-1 text-sm opacity-80">{block.notes}</p>
@@ -236,7 +268,8 @@ export function PreviewDialog({ open, onOpenChange, plan }: PreviewDialogProps) 
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
@@ -255,7 +288,7 @@ export function PreviewDialog({ open, onOpenChange, plan }: PreviewDialogProps) 
                   d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
                 />
               </svg>
-              Skriv ut
+              {t('preview.print')}
             </Button>
           </div>
         </div>

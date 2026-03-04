@@ -14,7 +14,7 @@ import { usePlanWizard } from '@/features/planner/wizard/hooks/usePlanWizard';
 import { fetchPlan } from '@/features/planner/api';
 import type { PlannerPlan } from '@/types/planner';
 import type { PlanCapabilities } from '@/lib/auth/capabilities';
-import type { WizardStep } from '@/features/planner/wizard/types';
+import { type WizardStep, isValidStep, resolveStep } from '@/features/planner/wizard/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
@@ -37,25 +37,26 @@ const DEFAULT_CAPABILITIES: PlanCapabilities = {
 /**
  * Plan Wizard Page (/app/planner/plan/[planId])
  *
- * The 5-step wizard for editing a plan.
+ * The 2-step wizard for editing a plan.
  * URL tracks current step via ?step= search param.
+ * Legacy step names (grund, bygg, etc.) are auto-mapped to new steps.
  */
 export default function PlanWizardPage({ params }: PageProps) {
   const { planId } = use(params);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const t = useTranslations('planner.wizard.errors');
+  const t = useTranslations('planner');
 
   const [plan, setPlan] = useState<PlannerPlan | null>(null);
   const [capabilities, setCapabilities] = useState<PlanCapabilities>(DEFAULT_CAPABILITIES);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Get initial step from URL or default to 'grund'
-  const stepParam = searchParams.get('step') as WizardStep | null;
-  const initialStep: WizardStep = stepParam && ['grund', 'bygg', 'anteckningar', 'granska', 'kor'].includes(stepParam)
-    ? stepParam
-    : 'grund';
+  // Get initial step from URL — supports both new and legacy step names
+  const stepParam = searchParams.get('step');
+  const initialStep: WizardStep = stepParam && isValidStep(stepParam)
+    ? resolveStep(stepParam)
+    : 'build';
 
   const wizard = usePlanWizard({ planId, initialStep });
 
@@ -93,7 +94,7 @@ export default function PlanWizardPage({ params }: PageProps) {
         setCapabilities(caps);
       } catch (err) {
         console.error('Failed to load plan:', err);
-        setError('Något gick fel vid hämtning av planen.');
+        setError(t('wizard.errors.loadFailed'));
       } finally {
         setIsLoading(false);
       }
@@ -125,11 +126,11 @@ export default function PlanWizardPage({ params }: PageProps) {
         <div className="mt-6">
           <PlannerEmptyState
             icon={<ExclamationTriangleIcon className="h-16 w-16" />}
-            title={error ?? t('planNotFound')}
-            description={t('checkLink')}
+            title={error ?? t('wizard.errors.planNotFound')}
+            description={t('wizard.errors.checkLink')}
             action={
               <Button href="/app/planner/plans">
-                {t('goToPlans')}
+                {t('wizard.errors.goToPlans')}
               </Button>
             }
           />
@@ -142,9 +143,9 @@ export default function PlanWizardPage({ params }: PageProps) {
     <PlannerPageLayout maxWidth="4xl">
       <PlannerPageHeader 
         title={plan.name}
-        eyebrow="Planera"
+        eyebrow={t('pageTitle')}
         breadcrumbs={[
-          { label: 'Mina planer', href: '/app/planner/plans' },
+          { label: t('myPlans'), href: '/app/planner/plans' },
           { label: plan.name },
         ]}
       />

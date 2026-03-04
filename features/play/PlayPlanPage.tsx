@@ -9,12 +9,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SessionHeader } from "./components/SessionHeader";
 import { StepViewer } from "./components/StepViewer";
 import { NavigationControls } from "./components/NavigationControls";
-import { startRun, updateRunProgress, fetchLegacyPlayView } from "./api";
+import { RunSessionCockpit } from "./components/RunSessionCockpit";
+import { startRun, updateRunProgress, fetchLegacyPlayView, sendRunHeartbeat, abandonRun } from "./api";
 import type { Step, Run, RunStep } from "./types";
 
 const DEFAULT_STEP_DURATION_MINUTES = 5;
 const STORAGE_PREFIX = "play-run:";
 const PROGRESS_DEBOUNCE_MS = 800;
+/** Heartbeat interval in milliseconds (30 seconds) */
+const HEARTBEAT_INTERVAL_MS = 30_000;
 
 type ErrorCode = "not-found" | "network" | null;
 
@@ -54,6 +57,8 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
   const [timerRemaining, setTimerRemaining] = useState(0);
   const [timerTotal, setTimerTotal] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  /** Session state per step: 'none' | 'active' | 'completed' */
+  const [sessionState, setSessionState] = useState<'none' | 'active' | 'completed'>('none');
   const restoredTimerRef = useRef(false);
   const saveProgressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastProgressRef = useRef<string>("");
@@ -61,10 +66,14 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
   const storageKey = run?.id ? `${STORAGE_PREFIX}${run.id}` : null;
 
   const totalSteps = run?.steps.length ?? 0;
+  const currentRunStep = run?.steps[currentStep] ?? null;
   const step = useMemo(() => {
     if (!run || !run.steps[currentStep]) return null;
     return runStepToStep(run.steps[currentStep]);
   }, [run, currentStep]);
+
+  /** True if the current step requires a participant session */
+  const stepRequiresSession = currentRunStep?.requiresSession === true;
 
   // Legacy fallback: convert old play view to Run format
   const mapLegacyPlayToRun = useCallback((play: {
@@ -90,6 +99,9 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
     let stepIndex = 0;
 
     play.blocks.forEach((block) => {
+      // Section blocks are structural headers – not playable steps
+      if (block.type === 'section') return;
+
       const tag = block.title || (block.type === "pause" ? t('defaults.pauseTag') : t('defaults.blockTag'));
       const baseDuration = block.durationMinutes ?? DEFAULT_STEP_DURATION_MINUTES;
 
@@ -306,11 +318,51 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
     }
   }, [timerRemaining, isTimerRunning]);
 
-  const gotoPrev = () => setCurrentStep((i) => clampStep(i - 1, totalSteps));
-  const gotoNext = () => setCurrentStep((i) => clampStep(i + 1, totalSteps));
-  const handleEnd = () => setCurrentStep(Math.max(totalSteps - 1, 0));
+  // ── Heartbeat (MS4.8) ─────────────────────────────────────────────
+  // Send a periodic heartbeat so the active-runs endpoint knows this
+  // run is still being used (prevents stale-run filtering).
+  useEffect(() => {
+    const runId = run?.id;
+    if (!runId || runId.startsWith('draft-') || runId.startsWith('virtual-') || runId.startsWith('legacy-')) {
+      return;
+    }
+    // Fire one immediately, then every HEARTBEAT_INTERVAL_MS
+    sendRunHeartbeat(runId);
+    const interval = window.setInterval(() => {
+      sendRunHeartbeat(runId);
+    }, HEARTBEAT_INTERVAL_MS);
+    return () => window.clearInterval(interval);
+  }, [run?.id]);
+
+  const gotoPrev = () => {
+    setSessionState('none');
+    setCurrentStep((i) => clampStep(i - 1, totalSteps));
+  };
+  const gotoNext = () => {
+    // Block navigation if session required but not started
+    if (stepRequiresSession && sessionState === 'none') return;
+    setSessionState('none');
+    setCurrentStep((i) => clampStep(i + 1, totalSteps));
+  };
+  const handleEnd = () => {
+    setSessionState('none');
+    setCurrentStep(Math.max(totalSteps - 1, 0));
+  };
 
   const handleBack = () => router.push("/app/planner");
+
+  const handleAbandon = useCallback(async () => {
+    if (!run) return;
+    const result = await abandonRun(run.id);
+    if (result.success) {
+      // Clean up local storage
+      if (storageKey) {
+        try { window.localStorage.removeItem(storageKey); } catch { /* noop */ }
+      }
+      router.push("/app/planner");
+    }
+  }, [run, storageKey, router]);
+
   const handleToggleTimer = () => {
     if (!step) return;
     if (timerTotal === 0 || timerRemaining === 0) {
@@ -424,6 +476,15 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
         }}
       />
 
+      {/* Session cockpit — shown for steps that require a participant session */}
+      {stepRequiresSession && currentRunStep && run && (
+        <RunSessionCockpit
+          step={currentRunStep}
+          runId={run.id}
+          onSessionStateChange={setSessionState}
+        />
+      )}
+
       <details className="group rounded-2xl bg-muted/30 text-sm" open>
         <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 font-medium text-foreground">
           <svg className="h-4 w-4 text-primary transition-transform group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -483,6 +544,27 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
         </Button>
       </div>
 
+      {/* Abandon run — destructive, separated from utility buttons */}
+      {run && !run.id.startsWith('draft-') && !run.id.startsWith('virtual-') && !run.id.startsWith('legacy-') && (
+        <div className="flex justify-center pt-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-destructive/70 hover:text-destructive"
+            onClick={() => {
+              if (window.confirm(t('actions.abandonConfirm'))) {
+                void handleAbandon();
+              }
+            }}
+          >
+            <svg className="mr-1 h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            {t('actions.abandonRun')}
+          </Button>
+        </div>
+      )}
+
       <NavigationControls
         current={currentStep}
         total={totalSteps}
@@ -490,6 +572,8 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
         onNext={gotoNext}
         onEnd={handleEnd}
         progress={totalSteps > 1 ? (currentStep + 1) / totalSteps : 1}
+        nextDisabled={stepRequiresSession && sessionState === 'none'}
+        nextDisabledReason={stepRequiresSession && sessionState === 'none' ? t('runSession.navBlocked') : undefined}
       />
     </div>
   );

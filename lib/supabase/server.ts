@@ -18,13 +18,9 @@ const supabaseServiceRoleKey = env.supabase.serviceRoleKey
  * Request-scoped RLS-aware client for server code (app router, server actions, route handlers).
  * Uses @supabase/ssr so refreshed tokens are written back to response cookies.
  * 
- * NOTE: This will trigger a Supabase warning in dev mode about getSession() being insecure.
- * This is expected behavior when using SSR with cookies. The warning means:
- * - Don't trust session data from cookies for security-critical operations
- * - Always use getUser() to validate user identity (validates with auth server)
- * - We handle this correctly by using getAuthUser() helper for auth checks
- * 
- * The warning is informational and does not indicate a security issue in our code.
+ * The internal @supabase/auth-js library wraps session.user in a warning Proxy
+ * when cookie storage is used on the server. We suppress this because all server
+ * code uses getUser() (which validates with the auth server), never getSession().user.
  */
 export async function createServerRlsClient() {
   return createServerRlsClientCached()
@@ -37,7 +33,7 @@ const createServerRlsClientCached = cache(async () => {
   const headerStore = await headers()
   const hostname = headerStore.get('host')?.split(':')[0] || null
 
-  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+  const client = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll()
@@ -53,6 +49,13 @@ const createServerRlsClientCached = cache(async () => {
       fetch: createFetchWithTimeout(fetch, { logPrefix: '[supabase fetch:server]' }),
     },
   })
+
+  // Suppress the "Using the user object as returned from supabase.auth.getSession()" warning.
+  // Safe: all server code uses getUser() which validates with the auth server.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(client.auth as any).suppressGetSessionWarning = true
+
+  return client
 })
 
 /**

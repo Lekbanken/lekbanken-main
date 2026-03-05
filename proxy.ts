@@ -426,6 +426,10 @@ export default async function proxy(request: NextRequest) {
     },
   })
 
+  // Suppress the server-side getSession() warning — middleware uses getUser() for auth.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(supabase.auth as any).suppressGetSessionWarning = true
+
   const isProtected = isProtectedPath(pathname)
   
   // ============================================

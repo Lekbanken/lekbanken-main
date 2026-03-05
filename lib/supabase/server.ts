@@ -52,6 +52,7 @@ const createServerRlsClientCached = cache(async () => {
 
   // Suppress the "Using the user object as returned from supabase.auth.getSession()" warning.
   // Safe: all server code uses getUser() which validates with the auth server.
+  // NOTE: Internal @supabase/auth-js API — may change on upgrades. Re-verify after bumping @supabase/ssr.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(client.auth as any).suppressGetSessionWarning = true
 

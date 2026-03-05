@@ -427,6 +427,7 @@ export default async function proxy(request: NextRequest) {
   })
 
   // Suppress the server-side getSession() warning — middleware uses getUser() for auth.
+  // NOTE: Internal @supabase/auth-js API — may change on upgrades. Re-verify after bumping @supabase/ssr.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(supabase.auth as any).suppressGetSessionWarning = true
 

@@ -15,6 +15,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useMemo,
   useTransition,
   useRef,
 } from 'react'
@@ -227,14 +228,14 @@ export function TenantProvider({
     await loadTenants()
   }, [loadTenants])
 
-  // Derived values for personal license support
-  const personalTenant = getPersonalTenantForUser(userTenants)
-  const organizationTenants = getOrganizationTenants(userTenants)
-  const isCurrentTenantPrivate = isPrivateTenant(currentTenant)
-  const contextMode = getTenantContextMode(userTenants)
-  const showTenantSelector = shouldShowTenantSelector(userTenants)
+  // Derived values for personal license support — memoized to stabilize context value
+  const personalTenant = useMemo(() => getPersonalTenantForUser(userTenants), [userTenants])
+  const organizationTenants = useMemo(() => getOrganizationTenants(userTenants), [userTenants])
+  const isCurrentTenantPrivate = useMemo(() => isPrivateTenant(currentTenant), [currentTenant])
+  const contextMode = useMemo(() => getTenantContextMode(userTenants), [userTenants])
+  const showTenantSelector = useMemo(() => shouldShowTenantSelector(userTenants), [userTenants])
 
-  const value: TenantContextType = {
+  const value: TenantContextType = useMemo(() => ({
     currentTenant,
     userTenants,
     tenantRole,
@@ -250,7 +251,11 @@ export function TenantProvider({
     isCurrentTenantPrivate,
     contextMode,
     showTenantSelector,
-  }
+  }), [
+    currentTenant, userTenants, tenantRole, isLoadingTenants, hasTenants, isSystemAdmin,
+    selectTenant, createTenant, reloadTenants,
+    personalTenant, organizationTenants, isCurrentTenantPrivate, contextMode, showTenantSelector,
+  ])
 
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>
 }

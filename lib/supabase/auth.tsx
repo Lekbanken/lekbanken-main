@@ -520,7 +520,7 @@ export function AuthProvider({
     // API response above already contains everything we need.
   }, [fetchProfile, user])
 
-  const value: AuthContextType = {
+  const value: AuthContextType = useMemo(() => ({
     user,
     userProfile,
     memberships,
@@ -535,7 +535,10 @@ export function AuthProvider({
     resetPassword,
     updatePassword,
     updateProfile,
-  }
+  }), [
+    user, userProfile, memberships, effectiveGlobalRole, isLoading,
+    signUp, signIn, signInWithGoogle, signOut, resetPassword, updatePassword, updateProfile,
+  ])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

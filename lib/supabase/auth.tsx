@@ -286,11 +286,40 @@ export function AuthProvider({
         return
       }
 
-      // IMPORTANT: Never read session.user directly - it triggers Supabase security warning
-      // Always use getUser() which validates with auth server
-      const { data: { user: authUser } } = await supabase.auth.getUser()
+      // TOKEN_REFRESHED: The token was just refreshed — session.user is authoritative.
+      // Calling getUser() here risks a timeout that would incorrectly clear auth
+      // state (getUser() returns { user: null } on network/timeout errors).
+      // This is the most frequent auth event (~every 55 min + tab focus) and must
+      // never cause state loss.
+      if (event === 'TOKEN_REFRESHED') {
+        if (isMountedRef.current) {
+          const refreshedUser = session.user
+          setUser((prev) => {
+            if (!prev) return refreshedUser
+            try {
+              return JSON.stringify(prev) === JSON.stringify(refreshedUser) ? prev : refreshedUser
+            } catch {
+              return refreshedUser
+            }
+          })
+        }
+        return
+      }
+
+      // SIGNED_IN, USER_UPDATED, PASSWORD_RECOVERY, MFA_CHALLENGE_VERIFIED:
+      // Validate with auth server via getUser()
+      const { data: { user: authUser }, error: getUserError } = await supabase.auth.getUser()
 
       if (!authUser) {
+        // If getUser() failed with an error (timeout, network, server error),
+        // the session may still be valid — keep existing state to prevent
+        // the "page disconnection" cascade where a transient failure wipes
+        // the entire auth context and forces a hard refresh.
+        if (getUserError) {
+          console.warn('[auth] getUser() failed during', event, '— keeping existing state:', getUserError.message)
+          return
+        }
+        // No error but no user: genuine "no user" state — clear
         if (isMountedRef.current) {
           setUser(null)
           setUserProfile(null)
@@ -308,30 +337,9 @@ export function AuthProvider({
       //   user on a guest-only path and returns a redirect, which can interfere
       //   with the pending window.location navigation.
       // - USER_UPDATED: Full refresh (metadata may affect profile/role) + router.refresh()
-      // - TOKEN_REFRESHED: Just update user (reduce traffic, token refresh is frequent)
-      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-        await refreshAuthData(authUser)
-        if (event === 'USER_UPDATED') {
-          router.refresh()
-        }
-      } else {
-        // TOKEN_REFRESHED and other events: update user object only if the
-        // payload actually changed. A full JSON comparison avoids creating a
-        // new object reference (and triggering a React re-render cascade) on
-        // the frequent token refreshes (~60 min / tab focus). This covers
-        // all fields including user_metadata, app_metadata, aud, and role.
-        // The comparison runs at most once per hour — negligible cost.
-        if (isMountedRef.current) {
-          setUser((prev) => {
-            if (!prev) return authUser
-            try {
-              return JSON.stringify(prev) === JSON.stringify(authUser) ? prev : authUser
-            } catch {
-              // Safety fallback: if serialization fails, always update
-              return authUser
-            }
-          })
-        }
+      await refreshAuthData(authUser)
+      if (event === 'USER_UPDATED') {
+        router.refresh()
       }
     })
 

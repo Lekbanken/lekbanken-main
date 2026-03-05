@@ -195,16 +195,17 @@ export class ProfileService {
   /**
    * Update user preferences
    */
-  async updatePreferences(userId: string, data: Partial<UserPreferences>): Promise<UserPreferences | null> {
+  async updatePreferences(tenantId: string, userId: string, data: Partial<UserPreferences>): Promise<UserPreferences | null> {
     const { data: preferences, error } = await this.supabase
       .from('user_preferences')
       .upsert(
         {
+          tenant_id: tenantId,
           user_id: userId,
           ...data,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: 'user_id' }
+        { onConflict: 'tenant_id,user_id' }
       )
       .select()
       .single();

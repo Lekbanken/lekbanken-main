@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/supabase/auth';
+import { useTenant } from '@/lib/context/TenantContext';
 import { ProfileService, type UserPreferences } from '@/lib/profile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -42,6 +43,7 @@ export default function PreferencesPage() {
   const locale = useLocale();
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
+  const { currentTenant } = useTenant();
   const { supabase, error: supabaseError, isInitializing } = useBrowserSupabase();
 
   const [preferences, setPreferences] = useState<Partial<UserPreferences>>({
@@ -100,12 +102,12 @@ export default function PreferencesPage() {
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (!user?.id || !supabase) return;
+    if (!user?.id || !supabase || !currentTenant?.id) return;
 
     setIsSaving(true);
     try {
       const profileService = new ProfileService(supabase);
-      await profileService.updatePreferences(user.id, preferences);
+      await profileService.updatePreferences(currentTenant.id, user.id, preferences);
 
       // If language changed, update the route
       if (preferences.language !== locale) {
@@ -121,7 +123,7 @@ export default function PreferencesPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [user?.id, supabase, preferences, locale, router]);
+  }, [user?.id, supabase, currentTenant?.id, preferences, locale, router]);
 
   if (!authLoading && supabaseError) {
     return (

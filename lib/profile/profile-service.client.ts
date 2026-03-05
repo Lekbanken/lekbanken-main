@@ -33,6 +33,18 @@ export class ProfileService {
   private toError(err: unknown): Error {
     if (err instanceof Error) return err
     if (typeof err === 'string') return new Error(err)
+    if (!err || typeof err !== 'object') return new Error(String(err))
+
+    const maybe = err as { message?: unknown; details?: unknown; hint?: unknown; code?: unknown }
+    const parts = [
+      typeof maybe.message === 'string' ? maybe.message : null,
+      typeof maybe.details === 'string' ? maybe.details : null,
+      typeof maybe.hint === 'string' ? maybe.hint : null,
+      typeof maybe.code === 'string' ? maybe.code : null,
+    ].filter((p): p is string => Boolean(p))
+
+    if (parts.length > 0) return new Error(parts.join(' | '))
+
     try {
       return new Error(JSON.stringify(err))
     } catch {
@@ -117,16 +129,22 @@ export class ProfileService {
   /**
    * Get user preferences (lightweight; avoids fetching full profile).
    */
-  async getPreferences(userId: string): Promise<UserPreferences | null> {
+  async getPreferences(tenantId: string, userId: string): Promise<UserPreferences | null> {
     const { data, error } = await this.supabase
       .from('user_preferences')
       .select('*')
+      .eq('tenant_id', tenantId)
       .eq('user_id', userId)
       .maybeSingle()
 
     if (error) {
       console.error('[ProfileService] Failed to get preferences:', error)
       return null
+    }
+
+    // Back-compat: older DB rows might still contain 'auto' while UI expects 'system'.
+    if (data && typeof (data as { theme?: unknown }).theme === 'string' && (data as { theme: string }).theme === 'auto') {
+      ;(data as { theme: string }).theme = 'system'
     }
 
     return (data as UserPreferences) || null
@@ -196,13 +214,21 @@ export class ProfileService {
    * Update user preferences
    */
   async updatePreferences(tenantId: string, userId: string, data: Partial<UserPreferences>): Promise<UserPreferences | null> {
+    // Prevent cross-tenant bugs and PK conflicts by never sending identity columns from UI state.
+    const updates = { ...(data as Record<string, unknown>) }
+    delete updates.id
+    delete updates.tenant_id
+    delete updates.user_id
+    delete updates.created_at
+    delete updates.updated_at
+
     const { data: preferences, error } = await this.supabase
       .from('user_preferences')
       .upsert(
         {
+          ...updates,
           tenant_id: tenantId,
           user_id: userId,
-          ...data,
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'tenant_id,user_id' }
@@ -212,7 +238,7 @@ export class ProfileService {
 
     if (error) {
       console.error('[ProfileService] Failed to update preferences:', error);
-      return null;
+      throw this.toError(error)
     }
 
     return preferences;

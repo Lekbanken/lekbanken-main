@@ -52,6 +52,7 @@ export default function PreferencesPage() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
 
   // Create stable profileService instance
@@ -70,16 +71,16 @@ export default function PreferencesPage() {
     isTimeout,
     retry,
   } = useProfileQuery<UserPreferences | null>(
-    `preferences-${user?.id}`,
+    `preferences-${currentTenant?.id ?? 'no-tenant'}-${user?.id ?? 'no-user'}`,
     async () => {
-      if (!profileService || !user?.id) {
+      if (!profileService || !user?.id || !currentTenant?.id) {
         throw new Error('Not ready');
       }
-      return profileService.getPreferences(user.id);
+      return profileService.getPreferences(currentTenant.id, user.id);
     },
-    { userId: user?.id },
+    { userId: user?.id, tenantId: currentTenant?.id },
     {
-      skip: authLoading || isInitializing || !supabase || !user?.id,
+      skip: authLoading || isInitializing || !supabase || !user?.id || !currentTenant?.id,
       timeout: 10000,
     }
   );
@@ -99,6 +100,7 @@ export default function PreferencesPage() {
     setPreferences((prev) => ({ ...prev, [key]: value }));
     setHasChanges(true);
     setSaveSuccess(false);
+    setSaveError(null);
   }, []);
 
   const handleSave = useCallback(async () => {
@@ -117,13 +119,15 @@ export default function PreferencesPage() {
 
       setSaveSuccess(true);
       setHasChanges(false);
+      setSaveError(null);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('Failed to save preferences:', error);
+      setSaveError(error instanceof Error ? error.message : t('sections.preferences.unexpectedError'));
     } finally {
       setIsSaving(false);
     }
-  }, [user?.id, supabase, currentTenant?.id, preferences, locale, router]);
+  }, [user?.id, supabase, currentTenant?.id, preferences, locale, router, t]);
 
   if (!authLoading && supabaseError) {
     return (
@@ -216,6 +220,12 @@ export default function PreferencesPage() {
             <p className="font-medium">{t('sections.preferences.saved')}</p>
           </div>
         </div>
+      )}
+
+      {saveError && (
+        <Alert variant="error" title={t('sections.preferences.loadError')}>
+          <p>{saveError}</p>
+        </Alert>
       )}
 
       {/* Language */}

@@ -19,6 +19,9 @@ describe('Supabase internal API stability', () => {
       autoRefreshToken: false,
       persistSession: false,
     })
+    // Verify the property exists AND is settable (not just present)
     expect('suppressGetSessionWarning' in client).toBe(true)
+    ;(client as any).suppressGetSessionWarning = true
+    expect((client as any).suppressGetSessionWarning).toBe(true)
   })
 })

@@ -10,10 +10,12 @@ import { SecuritySettingsClient } from './SecuritySettingsClient';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = {
-  title: 'Säkerhetsinställningar | Lekbanken',
-  description: 'Hantera tvåfaktorsautentisering och säkerhetsinställningar',
-};
+export async function generateMetadata() {
+  const t = await getTranslations('auth.mfa.settings');
+  return {
+    title: `${t('title')} | Lekbanken`,
+  };
+}
 
 export default async function SecuritySettingsPage() {
   const supabase = await createServerRlsClient();
@@ -38,8 +40,7 @@ export default async function SecuritySettingsPage() {
   const phoneFactor = factors?.phone?.find(f => f.status === 'verified');
   
   return (
-    <div className="p-6 lg:p-8">
-      <div className="space-y-8">
+    <div className="p-6 lg:p-8 space-y-8">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-foreground">
@@ -57,7 +58,6 @@ export default async function SecuritySettingsPage() {
           userId={user.id}
           userEmail={user.email}
         />
-      </div>
     </div>
   );
 }

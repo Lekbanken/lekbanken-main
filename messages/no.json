@@ -10471,7 +10471,8 @@
         "noTrustedDevices": "Ingen betrodde enheter ennå",
         "unknownDevice": "Ukjent enhet",
         "on": "på",
-        "retry": "Prøv igjen"
+        "retry": "Prøv igjen",
+        "unknownDate": "Ukjent dato"
       }
     }
   },

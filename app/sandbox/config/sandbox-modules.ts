@@ -319,8 +319,8 @@ export const sandboxCategories: SandboxCategory[] = [
         href: '/sandbox/app/profile', 
         description: 'Nivå, XP, achievements, milestones', 
         status: 'done',
-        components: ['@/features/profile/components/ProfileHeader', '@/features/profile/components/AchievementList'],
-        routes: ['/app/profile', '/app/profile/achievements'],
+        components: [],
+        routes: ['/app/profile'],
       },
       { 
         id: 'app-leaderboard', 

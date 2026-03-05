@@ -9,7 +9,6 @@ import {
   UserIcon,
   AtSymbolIcon,
   ShieldCheckIcon,
-  LockClosedIcon,
   Cog6ToothIcon,
   BuildingOfficeIcon,
   ChevronLeftIcon,
@@ -51,13 +50,6 @@ const navItems: ProfileNavItem[] = [
     href: '/app/profile/security',
     icon: ShieldCheckIcon,
     descriptionKey: 'nav.securityDesc',
-  },
-  {
-    id: 'privacy',
-    labelKey: 'nav.privacy',
-    href: '/app/profile/privacy',
-    icon: LockClosedIcon,
-    descriptionKey: 'nav.privacyDesc',
   },
   {
     id: 'preferences',
@@ -138,7 +130,7 @@ export function ProfileMobileNav() {
       {/* Current Section Header */}
       <div className="flex items-center gap-3 mb-4">
         <Link
-          href="/app"
+          href="/app/profile"
           className="p-2 rounded-lg hover:bg-muted transition-colors"
         >
           <ChevronLeftIcon className="h-5 w-5 text-muted-foreground" />

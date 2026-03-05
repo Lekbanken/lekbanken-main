@@ -14,12 +14,14 @@ import {
   ExclamationTriangleIcon,
   EyeIcon,
   EyeSlashIcon,
+  ShieldCheckIcon,
+  EnvelopeIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 
 export default function AccountSettingsPage() {
   const t = useTranslations('app.profile');
-  const { user, updatePassword } = useAuth();
+  const { user } = useAuth();
 
   // Email change state
   const [showEmailChange, setShowEmailChange] = useState(false);
@@ -62,7 +64,7 @@ export default function AccountSettingsPage() {
     setEmailSuccess(false);
 
     try {
-      const res = await fetch('/api/profile/email', {
+      const res = await fetch('/api/accounts/auth/email/change', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -105,19 +107,20 @@ export default function AccountSettingsPage() {
     setPasswordSuccess(false);
 
     try {
-      // Verify current password first
-      const verifyRes = await fetch('/api/profile/password/verify', {
+      // Verify current password + update in a single server call
+      const res = await fetch('/api/accounts/auth/password/change', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: currentPassword }),
+        body: JSON.stringify({
+          current_password: currentPassword,
+          new_password: newPassword,
+        }),
       });
 
-      if (!verifyRes.ok) {
-        throw new Error(t('sections.account.currentPasswordWrong'));
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || t('common.errorGeneric'));
       }
-
-      // Update password using auth context
-      await updatePassword(newPassword);
 
       setPasswordSuccess(true);
       setShowPasswordChange(false);
@@ -131,7 +134,7 @@ export default function AccountSettingsPage() {
     } finally {
       setIsChangingPassword(false);
     }
-  }, [currentPassword, newPassword, confirmPassword, allPasswordChecksPass, updatePassword, t]);
+  }, [currentPassword, newPassword, confirmPassword, allPasswordChecksPass, t]);
 
   return (
     <div className="p-6 lg:p-8 space-y-8">
@@ -451,6 +454,46 @@ export default function AccountSettingsPage() {
                     })
                   : '—'}
               </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* GDPR / Privacy */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <ShieldCheckIcon className="h-5 w-5 text-primary" />
+            <CardTitle>{t('sections.privacy.gdprRights.title')}</CardTitle>
+          </div>
+          <CardDescription>{t('sections.privacy.gdprRights.description')}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-lg bg-muted p-4">
+            <h3 className="font-medium mb-2">{t('sections.privacy.gdprRights.title')}</h3>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li>{t('sections.privacy.gdprRights.access')}</li>
+              <li>{t('sections.privacy.gdprRights.rectification')}</li>
+              <li>{t('sections.privacy.gdprRights.erasure')}</li>
+              <li>{t('sections.privacy.gdprRights.portability')}</li>
+              <li>{t('sections.privacy.gdprRights.restriction')}</li>
+              <li>{t('sections.privacy.gdprRights.objection')}</li>
+            </ul>
+          </div>
+
+          <div className="flex items-start gap-3 p-4 border rounded-lg">
+            <EnvelopeIcon className="h-5 w-5 text-muted-foreground mt-0.5" />
+            <div>
+              <h3 className="font-medium">{t('sections.privacy.contact.title')}</h3>
+              <p className="text-sm text-muted-foreground mb-2">
+                {t('sections.privacy.contact.description')}
+              </p>
+              <a
+                href="mailto:privacy@lekbanken.se"
+                className="text-sm text-primary hover:underline"
+              >
+                privacy@lekbanken.se
+              </a>
             </div>
           </div>
         </CardContent>

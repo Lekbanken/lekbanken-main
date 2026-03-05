@@ -304,9 +304,16 @@ export function SecuritySettingsClient({
             
             {hasMFA && mfaStatus && (
               <div className="mt-3 text-sm text-muted-foreground">
-                <p>Aktiverat: {new Date(mfaStatus.enrolled_at!).toLocaleDateString('sv-SE')}</p>
+                {/* enrolled_at comes from /api/accounts/auth/mfa/status — can be null, empty, or epoch (0/"1970-01-01") when the factor exists but timestamp was never recorded */}
+                <p>{t('enrolledAt')}: {(() => {
+                  const raw = mfaStatus.enrolled_at;
+                  if (!raw) return t('unknownDate');
+                  const d = new Date(raw);
+                  if (isNaN(d.getTime()) || d.getTime() === 0) return t('unknownDate');
+                  return d.toLocaleDateString();
+                })()}</p>
                 {mfaStatus.last_verified_at && (
-                  <p>Senast verifierat: {new Date(mfaStatus.last_verified_at).toLocaleDateString('sv-SE')}</p>
+                  <p>{t('lastUsed')}: {new Date(mfaStatus.last_verified_at).toLocaleDateString()}</p>
                 )}
               </div>
             )}

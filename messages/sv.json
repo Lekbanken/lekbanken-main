@@ -10504,7 +10504,8 @@
           "deviceRevoked": "Enheten har tagits bort",
           "allDevicesRevoked": "Alla enheter har tagits bort"
         },
-        "retry": "Försök igen"
+        "retry": "Försök igen",
+        "unknownDate": "Okänt datum"
       }
     },
     "errors": {

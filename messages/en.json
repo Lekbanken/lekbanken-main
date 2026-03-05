@@ -9912,7 +9912,8 @@
         "noTrustedDevices": "No trusted devices yet",
         "unknownDevice": "Unknown device",
         "on": "on",
-        "retry": "Try again"
+        "retry": "Try again",
+        "unknownDate": "Unknown date"
       }
     }
   },

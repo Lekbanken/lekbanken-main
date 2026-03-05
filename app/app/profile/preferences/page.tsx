@@ -7,9 +7,7 @@ import { useAuth } from '@/lib/supabase/auth';
 import { ProfileService, type UserPreferences } from '@/lib/profile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { Alert } from '@/components/ui/alert';
-import { Select } from '@/components/ui/select';
 import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
 import {
@@ -19,9 +17,6 @@ import {
   MoonIcon,
   ComputerDesktopIcon,
   CheckCircleIcon,
-  EyeIcon,
-  SpeakerWaveIcon,
-  ClockIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 
@@ -37,33 +32,9 @@ const themes = [
   { id: 'system', label: 'System', icon: ComputerDesktopIcon },
 ];
 
-const timezones = [
-  { value: 'Europe/Stockholm', label: 'Stockholm (CET/CEST)' },
-  { value: 'Europe/Oslo', label: 'Oslo (CET/CEST)' },
-  { value: 'Europe/London', label: 'London (GMT/BST)' },
-  { value: 'Europe/Helsinki', label: 'Helsingfors (EET/EEST)' },
-  { value: 'UTC', label: 'UTC' },
-];
-
-const fontSizes = [
-  { id: 'small', label: 'Liten', size: '14px' },
-  { id: 'medium', label: 'Normal', size: '16px' },
-  { id: 'large', label: 'Stor', size: '18px' },
-  { id: 'extra-large', label: 'Extra stor', size: '20px' },
-];
-
 const defaultPreferences: Partial<UserPreferences> = {
   language: 'sv',
   theme: 'system',
-  timezone: 'Europe/Stockholm',
-  date_format: 'YYYY-MM-DD',
-  time_format: '24h',
-  text_size: 'medium',
-  reduce_motion: false,
-  high_contrast: false,
-  animations_enabled: true,
-  compact_mode: false,
-  screen_reader_mode: false,
 };
 
 export default function PreferencesPage() {
@@ -326,235 +297,6 @@ export default function PreferencesPage() {
                 </button>
               );
             })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Timezone & Date/Time */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ClockIcon className="h-5 w-5" />
-            {t('sections.preferences.dateTime.title')}
-          </CardTitle>
-          <CardDescription>
-            {t('sections.preferences.dateTime.description')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Timezone */}
-          <div>
-            <Select
-              id="timezone"
-              label={t('sections.preferences.timezone')}
-              value={preferences.timezone}
-              onChange={(e) => handlePreferenceChange('timezone', e.target.value)}
-              options={timezones}
-            />
-          </div>
-
-          {/* Time Format */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Tidsformat
-            </label>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                { id: '24h', label: '24-timmar', example: '14:30' },
-                { id: '12h', label: '12-timmar', example: '2:30 PM' },
-              ].map((format) => (
-                <button
-                  key={format.id}
-                  onClick={() => handlePreferenceChange('time_format', format.id)}
-                  className={cn(
-                    'flex items-center justify-between p-4 rounded-lg border text-left transition-colors',
-                    preferences.time_format === format.id
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/50'
-                  )}
-                >
-                  <span className={cn(
-                    'font-medium',
-                    preferences.time_format === format.id
-                      ? 'text-primary'
-                      : 'text-foreground'
-                  )}>
-                    {format.label}
-                  </span>
-                  <span className="text-sm text-muted-foreground">{format.example}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Date Format */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Datumformat
-            </label>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {[
-                { id: 'YYYY-MM-DD', example: '2024-01-15' },
-                { id: 'DD/MM/YYYY', example: '15/01/2024' },
-                { id: 'MM/DD/YYYY', example: '01/15/2024' },
-              ].map((format) => (
-                <button
-                  key={format.id}
-                  onClick={() => handlePreferenceChange('date_format', format.id)}
-                  className={cn(
-                    'p-4 rounded-lg border text-center transition-colors',
-                    preferences.date_format === format.id
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/50'
-                  )}
-                >
-                  <span className={cn(
-                    'font-medium',
-                    preferences.date_format === format.id
-                      ? 'text-primary'
-                      : 'text-foreground'
-                  )}>
-                    {format.example}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Accessibility */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <EyeIcon className="h-5 w-5" />
-            {t('sections.preferences.accessibility')}
-          </CardTitle>
-          <CardDescription>
-            {t('sections.preferences.accessibilitySection.description')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Font Size */}
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              {t('sections.preferences.fontSize')}
-            </label>
-            <div className="grid gap-2 sm:grid-cols-4">
-              {fontSizes.map((size) => (
-                <button
-                  key={size.id}
-                  onClick={() => handlePreferenceChange('text_size', size.id)}
-                  className={cn(
-                    'p-3 rounded-lg border text-center transition-colors',
-                    preferences.text_size === size.id
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/50'
-                  )}
-                >
-                  <span
-                    className={cn(
-                      'font-medium',
-                      preferences.text_size === size.id
-                        ? 'text-primary'
-                        : 'text-foreground'
-                    )}
-                    style={{ fontSize: size.size }}
-                  >
-                    {size.label}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Reduced Motion */}
-          <div className="flex items-center justify-between p-4 rounded-lg border border-border">
-            <div>
-              <p className="font-medium text-foreground">{t('sections.preferences.reducedMotion')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('sections.preferences.accessibilitySection.reduceMotionDesc')}
-              </p>
-            </div>
-            <Switch
-              checked={preferences.reduce_motion ?? false}
-              onCheckedChange={(checked) => handlePreferenceChange('reduce_motion', checked)}
-            />
-          </div>
-
-          {/* High Contrast */}
-          <div className="flex items-center justify-between p-4 rounded-lg border border-border">
-            <div>
-              <p className="font-medium text-foreground">{t('sections.preferences.highContrast')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('sections.preferences.accessibilitySection.highContrastDesc')}
-              </p>
-            </div>
-            <Switch
-              checked={preferences.high_contrast ?? false}
-              onCheckedChange={(checked) => handlePreferenceChange('high_contrast', checked)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Animations & Feedback */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <SpeakerWaveIcon className="h-5 w-5" />
-            {t('sections.preferences.animationsSection.title')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Animations */}
-          <div className="flex items-center justify-between p-4 rounded-lg border border-border">
-            <div>
-              <p className="font-medium text-foreground">{t('sections.preferences.animationsSection.animations')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('sections.preferences.animationsSection.animationsDesc')}
-              </p>
-            </div>
-            <Switch
-              checked={preferences.animations_enabled ?? true}
-              onCheckedChange={(checked) => handlePreferenceChange('animations_enabled', checked)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* UI Preferences */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('sections.preferences.uiSection.title')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Compact Mode */}
-          <div className="flex items-center justify-between p-4 rounded-lg border border-border">
-            <div>
-              <p className="font-medium text-foreground">{t('sections.preferences.uiSection.compactMode')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('sections.preferences.uiSection.compactModeDesc')}
-              </p>
-            </div>
-            <Switch
-              checked={preferences.compact_mode ?? false}
-              onCheckedChange={(checked) => handlePreferenceChange('compact_mode', checked)}
-            />
-          </div>
-
-          {/* Screen Reader Mode */}
-          <div className="flex items-center justify-between p-4 rounded-lg border border-border">
-            <div>
-              <p className="font-medium text-foreground">{t('sections.preferences.uiSection.screenReaderMode')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('sections.preferences.uiSection.screenReaderModeDesc')}
-              </p>
-            </div>
-            <Switch
-              checked={preferences.screen_reader_mode ?? false}
-              onCheckedChange={(checked) => handlePreferenceChange('screen_reader_mode', checked)}
-            />
           </div>
         </CardContent>
       </Card>

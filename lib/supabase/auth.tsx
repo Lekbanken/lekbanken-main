@@ -64,6 +64,21 @@ export function AuthProvider({
   const [memberships, setMemberships] = useState<TenantMembership[]>(initialMemberships ?? [])
   const [isLoading, setIsLoading] = useState(initialUser === undefined)
 
+  // Debounce router.refresh() to prevent SSR auth storms.
+  // Multiple auth events (e.g. USER_UPDATED firing rapidly, or tab-focus
+  // cascades) can trigger many server re-renders in quick succession.
+  // Each re-render runs getUser() on the server, increasing latency and
+  // auth timeout risk. Debouncing collapses them into one refresh.
+  const lastRouterRefreshRef = useRef(0)
+  const ROUTER_REFRESH_DEBOUNCE_MS = 2_000
+
+  const debouncedRouterRefresh = useCallback(() => {
+    const now = Date.now()
+    if (now - lastRouterRefreshRef.current < ROUTER_REFRESH_DEBOUNCE_MS) return
+    lastRouterRefreshRef.current = now
+    router.refresh()
+  }, [router])
+
   const effectiveGlobalRole = useMemo(
     () => deriveEffectiveGlobalRole(userProfile, user),
     [userProfile, user]
@@ -308,7 +323,28 @@ export function AuthProvider({
 
       // SIGNED_IN, USER_UPDATED, PASSWORD_RECOVERY, MFA_CHALLENGE_VERIFIED:
       // Validate with auth server via getUser()
-      const { data: { user: authUser }, error: getUserError } = await supabase.auth.getUser()
+      const sessionUser = session.user
+      if (sessionUser) {
+        try {
+          await refreshAuthData(sessionUser)
+          if (event === 'USER_UPDATED') {
+            debouncedRouterRefresh()
+          }
+        } catch (error) {
+          console.warn('[auth] refreshAuthData failed during', event, '- keeping existing state:', error)
+        }
+        return
+      }
+      let authUser: User | null = null
+      let getUserError: { message?: string } | null = null
+      try {
+        const result = await supabase.auth.getUser()
+        authUser = result.data.user
+        getUserError = result.error as { message?: string } | null
+      } catch (error) {
+        console.warn('[auth] getUser() threw during', event, '- keeping existing state:', error)
+        return
+      }
 
       if (!authUser) {
         // If getUser() failed with an error (timeout, network, server error),
@@ -339,12 +375,12 @@ export function AuthProvider({
       // - USER_UPDATED: Full refresh (metadata may affect profile/role) + router.refresh()
       await refreshAuthData(authUser)
       if (event === 'USER_UPDATED') {
-        router.refresh()
+        debouncedRouterRefresh()
       }
     })
 
     return () => subscription?.unsubscribe()
-  }, [refreshAuthData, router])
+  }, [refreshAuthData, debouncedRouterRefresh])
 
   const signUp = useCallback(async (email: string, password: string, fullName?: string) => {
     const { data, error } = await supabase.auth.signUp({

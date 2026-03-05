@@ -9093,6 +9093,15 @@
         "activityDesc": "Senaste aktivitet och historik"
       },
       "sections": {
+        "overview": {
+          "streak": "Streak",
+          "days": "dagar",
+          "best": "Bäst",
+          "achievements": "Utmärkelser",
+          "noAchievements": "Inga utmärkelser ännu",
+          "viewAll": "Visa alla",
+          "recommended": "Rekommenderas"
+        },
         "personalInfo": {
           "title": "Personuppgifter",
           "description": "Hantera ditt namn, avatar och kontaktinformation"

@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { TenantSelector } from '@/components/tenant/TenantSelector';
-import { Avatar } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -16,12 +15,11 @@ import {
   Cog6ToothIcon,
   BuildingOfficeIcon,
   ChevronRightIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
 import { profileCacheKeys } from '@/lib/profile/cacheKeys';
+import { ProfileHero, StatsCards, AchievementShowcaseCard, SecurityStatusCard } from '@/features/profile-overview';
+import type { GamificationPayload } from '@/features/gamification/types';
 
 interface QuickLinkProps {
   href: string;
@@ -65,15 +63,10 @@ export default function ProfileOverviewPage() {
 
   const displayName = userProfile?.full_name || user?.email?.split('@')[0] || 'Användare';
   const email = user?.email || '';
-  const avatarUrl = userProfile?.avatar_url;
-  const _initials = displayName
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const avatarUrl = userProfile?.avatar_url ?? null;
 
-  const mfaFetchKey = user?.id ? profileCacheKeys.mfaStatus(user.id) : 'mfa-status-anon'
+  // ── MFA status ──────────────────────────────────────────────────────────
+  const mfaFetchKey = user?.id ? profileCacheKeys.mfaStatus(user.id) : 'mfa-status-anon';
   const {
     data: mfaStatus,
     status: mfaStatusStatus,
@@ -84,39 +77,50 @@ export default function ProfileOverviewPage() {
       const res = await fetch('/api/accounts/auth/mfa/status', {
         credentials: 'include',
         signal,
-      })
-
+      });
       if (!res.ok) {
-        const body = await res.text().catch(() => '')
-        throw new Error(body || `Failed to load MFA status (${res.status})`)
+        const body = await res.text().catch(() => '');
+        throw new Error(body || `Failed to load MFA status (${res.status})`);
       }
-
-      return (await res.json()) as { is_enabled?: boolean }
+      return (await res.json()) as { is_enabled?: boolean };
     },
     { userId: user?.id },
     { timeout: 12000, skip: !user?.id }
-  )
+  );
 
-  const mfaEnabled = mfaStatusStatus === 'success' ? Boolean(mfaStatus?.is_enabled) : null
+  const mfaEnabled = mfaStatusStatus === 'success' ? Boolean(mfaStatus?.is_enabled) : null;
+  const mfaLoading = mfaStatusStatus === 'loading' || mfaStatusStatus === 'idle';
+
+  // ── Gamification data ───────────────────────────────────────────────────
+  const {
+    data: gamification,
+  } = useProfileQuery<GamificationPayload | null>(
+    user?.id ? `gamification-overview::${user.id}` : 'gamification-overview-anon',
+    async (signal) => {
+      const res = await fetch('/api/gamification', {
+        credentials: 'include',
+        signal,
+      });
+      if (!res.ok) return null;
+      return (await res.json()) as GamificationPayload;
+    },
+    { userId: user?.id },
+    { timeout: 12000, skip: !user?.id }
+  );
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
-      {/* Profile Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-        <Avatar src={avatarUrl || undefined} name={displayName} size="xl" />
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground">{displayName}</h1>
-          <p className="text-muted-foreground">{email}</p>
-          {currentTenant && (
-            <div className="flex items-center gap-2 mt-2">
-              <BuildingOfficeIcon className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">{currentTenant.name}</span>
-            </div>
-          )}
-        </div>
-      </div>
+    <div className="p-6 lg:p-8 space-y-6">
+      {/* Hero: avatar + name + level + XP */}
+      <ProfileHero
+        displayName={displayName}
+        email={email}
+        avatarUrl={avatarUrl}
+        tenantName={currentTenant?.name ?? null}
+        progress={gamification?.progress ?? null}
+        identity={gamification?.identity ?? null}
+      />
 
-      {/* Mobile Tenant Selector - only visible on small screens */}
+      {/* Mobile Tenant Selector */}
       <div className="block lg:hidden">
         <Card>
           <CardHeader className="pb-2">
@@ -131,114 +135,64 @@ export default function ProfileOverviewPage() {
         </Card>
       </div>
 
-      {/* Security Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ShieldCheckIcon className="h-5 w-5 text-primary" />
-            {t('sections.security.title')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-4">
-            <div className="flex items-center gap-2">
-              {user?.email_confirmed_at ? (
-                <>
-                  <CheckCircleIcon className="h-5 w-5 text-emerald-500" />
-                  <span className="text-sm">{t('sections.security.emailVerified')}</span>
-                </>
-              ) : (
-                <>
-                  <ExclamationTriangleIcon className="h-5 w-5 text-amber-500" />
-                  <span className="text-sm text-amber-600">{t('sections.security.emailNotVerified')}</span>
-                </>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              {mfaEnabled === true ? (
-                <>
-                  <CheckCircleIcon className="h-5 w-5 text-emerald-500" />
-                  <span className="text-sm">{t('sections.security.mfaEnabled')}</span>
-                </>
-              ) : mfaEnabled === false ? (
-                <>
-                  <ExclamationTriangleIcon className="h-5 w-5 text-amber-500" />
-                  <span className="text-sm text-amber-600">{t('sections.security.mfaDisabled')}</span>
-                  <Link
-                    href="/app/profile/security"
-                    className="text-sm text-primary hover:underline"
-                  >
-                    {t('sections.security.enableMfa')}
-                  </Link>
-                </>
-              ) : mfaStatusStatus === 'loading' || mfaStatusStatus === 'idle' ? (
-                <>
-                  <ArrowPathIcon className="h-5 w-5 text-muted-foreground animate-spin" />
-                  <span className="text-sm text-muted-foreground">{tCommon('actions.loading')}</span>
-                </>
-              ) : (
-                <>
-                  <ExclamationTriangleIcon className="h-5 w-5 text-amber-500" />
-                  <span className="text-sm text-amber-600">
-                    MFA-status: {tCommon('messages.loadingError')}
-                  </span>
-                  <Link
-                    href="/app/profile/security"
-                    className="text-sm text-primary hover:underline"
-                    title={mfaStatusError || undefined}
-                  >
-                    {t('nav.security')}
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* DiceCoin + Streak */}
+      <StatsCards
+        coins={gamification?.coins ?? null}
+        streak={gamification?.streak ?? null}
+      />
 
-      {/* Quick Links */}
+      {/* Achievement Showcase */}
+      <AchievementShowcaseCard
+        showcase={gamification?.showcase ?? null}
+        achievements={gamification?.achievements ?? []}
+      />
+
+      {/* Security + Quick Links — 2-column on desktop */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <QuickLink
-          href="/app/profile/general"
-          icon={UserIcon}
-          title={t('nav.general')}
-          description={t('nav.generalDesc')}
+        <SecurityStatusCard
+          emailVerified={Boolean(user?.email_confirmed_at)}
+          mfaEnabled={mfaEnabled}
+          mfaLoading={mfaLoading}
+          mfaError={mfaStatusError}
         />
-        <QuickLink
-          href="/app/profile/account"
-          icon={AtSymbolIcon}
-          title={t('nav.account')}
-          description={t('nav.accountDesc')}
-        />
-        <QuickLink
-          href="/app/profile/security"
-          icon={ShieldCheckIcon}
-          title={t('nav.security')}
-          description={t('nav.securityDesc')}
-          badge={mfaEnabled === false ? 'Rekommenderas' : undefined}
-          badgeVariant="warning"
-        />
-        <QuickLink
-          href="/app/profile/privacy"
-          icon={LockClosedIcon}
-          title={t('nav.privacy')}
-          description={t('nav.privacyDesc')}
-        />
-        <QuickLink
-          href="/app/profile/preferences"
-          icon={Cog6ToothIcon}
-          title={t('nav.preferences')}
-          description={t('nav.preferencesDesc')}
-        />
-        <QuickLink
-          href="/app/profile/organizations"
-          icon={BuildingOfficeIcon}
-          title={t('nav.organizations')}
-          description={t('nav.organizationsDesc')}
-          badge={userTenants.length > 0 ? `${userTenants.length}` : undefined}
-        />
-      </div>
 
+        {/* Quick Links column */}
+        <div className="space-y-3">
+          <QuickLink
+            href="/app/profile/general"
+            icon={UserIcon}
+            title={t('nav.general')}
+            description={t('nav.generalDesc')}
+          />
+          <QuickLink
+            href="/app/profile/account"
+            icon={AtSymbolIcon}
+            title={t('nav.account')}
+            description={t('nav.accountDesc')}
+          />
+          <QuickLink
+            href="/app/profile/security"
+            icon={ShieldCheckIcon}
+            title={t('nav.security')}
+            description={t('nav.securityDesc')}
+            badge={mfaEnabled === false ? t('sections.overview.recommended') : undefined}
+            badgeVariant="warning"
+          />
+          <QuickLink
+            href="/app/profile/preferences"
+            icon={Cog6ToothIcon}
+            title={t('nav.preferences')}
+            description={t('nav.preferencesDesc')}
+          />
+          <QuickLink
+            href="/app/profile/organizations"
+            icon={BuildingOfficeIcon}
+            title={t('nav.organizations')}
+            description={t('nav.organizationsDesc')}
+            badge={userTenants.length > 0 ? `${userTenants.length}` : undefined}
+          />
+        </div>
+      </div>
     </div>
   );
 }

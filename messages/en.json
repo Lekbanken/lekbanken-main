@@ -8733,6 +8733,15 @@
         "savedMessage": "Your changes have been saved!"
       },
       "sections": {
+        "overview": {
+          "streak": "Streak",
+          "days": "days",
+          "best": "Best",
+          "achievements": "Achievements",
+          "noAchievements": "No achievements yet",
+          "viewAll": "View all",
+          "recommended": "Recommended"
+        },
         "personalInfo": {
           "title": "Personal Information",
           "description": "Manage your name, avatar and contact information"

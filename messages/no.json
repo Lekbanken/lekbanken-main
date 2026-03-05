@@ -9270,6 +9270,15 @@
         "activityDesc": "Nylig aktivitet og historikk"
       },
       "sections": {
+        "overview": {
+          "streak": "Streak",
+          "days": "dager",
+          "best": "Best",
+          "achievements": "Utmerkelser",
+          "noAchievements": "Ingen utmerkelser ennå",
+          "viewAll": "Vis alle",
+          "recommended": "Anbefales"
+        },
         "personalInfo": {
           "title": "Personopplysninger",
           "description": "Administrer navn, avatar og kontaktinformasjon"

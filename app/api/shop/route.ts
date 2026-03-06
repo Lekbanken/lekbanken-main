@@ -280,6 +280,29 @@ export async function POST(request: Request) {
     }
 
     const row = Array.isArray(data) ? data[0] : data
+
+    // Journey v2.0 — auto-grant linked cosmetic on purchase
+    try {
+      const { data: shopItem } = await admin
+        .from('shop_items')
+        .select('cosmetic_id')
+        .eq('id', itemId)
+        .maybeSingle()
+
+      const cosmeticId = (shopItem as { cosmetic_id?: string | null } | null)?.cosmetic_id
+      if (cosmeticId) {
+        await admin
+          .from('user_cosmetics')
+          .upsert(
+            { user_id: user.id, cosmetic_id: cosmeticId, unlock_type: 'shop' },
+            { onConflict: 'user_id,cosmetic_id' }
+          )
+      }
+    } catch {
+      // Non-blocking — shop purchase already succeeded
+      console.error('[shop] Failed to auto-grant cosmetic for item', itemId)
+    }
+
     return NextResponse.json(
       {
         purchaseId: row?.purchase_id ?? null,

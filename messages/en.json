@@ -324,7 +324,7 @@
       "banner": {
         "forest": "Guardian of the Forest",
         "sea": "Explorer of the Sea",
-        "sky": "Sailor of the Sky",
+        "desert": "Wanderer of the Desert",
         "void": "Wanderer of the Void",
         "neutral": "No faction chosen"
       }
@@ -334,17 +334,52 @@
       "unlockedCount": "{unlocked} / {total} unlocked",
       "hint": "Reach higher levels to unlock cosmetics",
       "hintClick": "Tap a node to see details",
-      "avatarHint": "Tap your avatar for Design Tree",
+      "avatarHint": "Tap your avatar for cosmetics",
       "unlockAt": "Unlocks at level {level}",
       "availableAt": "Available at level {level}",
       "nodeUnlocked": "Unlocked"
+    },
+    "cosmeticPanel": {
+      "title": "Choose costume",
+      "hint": "Tap a cosmetic to equip or swap",
+      "tabs": {
+        "avatar_frame": "Frame",
+        "scene_background": "Background",
+        "particles": "Particles",
+        "xp_bar": "XP Bar",
+        "section_divider": "Divider"
+      },
+      "equipped": "Active",
+      "equip": "Equip",
+      "unequip": "Unequip",
+      "locked": "Locked",
+      "lockedLevel": "Level {level}",
+      "lockedAchievement": "Achievement",
+      "lockedShop": "Shop",
+      "loading": "Loading cosmetics\u2026",
+      "error": "Could not load cosmetic catalog",
+      "noItems": "No cosmetics in this category yet",
+      "active": "Active: {name}",
+      "rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      }
+    },
+    "unlockToast": {
+      "title": "New cosmetic!",
+      "unlocked": "You unlocked: {name}",
+      "show": "Show",
+      "dismiss": "Close"
     },
     "onboarding": {
       "title": "Welcome to Journey",
       "step1Title": "What is Journey?",
       "step1Desc": "Journey is your personal achievement canvas — a visual layer on top of gamification with themes, cosmetics and progression.",
       "step2Title": "Choose your faction",
-      "step2Desc": "Four unique themes to choose from — forest, sea, sky or void. Each faction has its own design.",
+      "step2Desc": "Four unique themes to choose from — forest, sea, desert or void. Each faction has its own design.",
       "step3Title": "Unlock cosmetics",
       "step3Desc": "Level up and unlock visual rewards like frames, effects and badges.",
       "step4Title": "Show your achievements",
@@ -365,6 +400,32 @@
       "yourAchievements": "Your achievements",
       "quickNav": "Quick navigation"
     }
+  },
+  "cosmetics": {
+    "void_stars": { "name": "Starfield", "description": "A glittering starfield background" },
+    "void_orbit": { "name": "Orbital", "description": "Particles orbiting your avatar" },
+    "void_warp": { "name": "Hyperspace", "description": "A warp-speed XP bar" },
+    "void_meteors": { "name": "Meteors", "description": "Falling meteors in the background" },
+    "void_nebula": { "name": "Nebula", "description": "A cosmic nebula divider" },
+    "void_constellation": { "name": "Constellation", "description": "A glowing constellation frame" },
+    "sea_bubbles": { "name": "Bubbles", "description": "Rising bubbles in the background" },
+    "sea_ripple": { "name": "Ripple", "description": "Rippling water particles" },
+    "sea_current": { "name": "Current", "description": "A flowing XP bar" },
+    "sea_waves": { "name": "Waves", "description": "Rolling waves in the background" },
+    "sea_tide": { "name": "Tide", "description": "A tide-themed divider" },
+    "sea_coral": { "name": "Coral Reef", "description": "A beautiful coral frame" },
+    "forest_leaves": { "name": "Leaves", "description": "Drifting leaves in the background" },
+    "forest_spores": { "name": "Spores", "description": "Glowing forest particles" },
+    "forest_growth": { "name": "Growth", "description": "An organic XP bar" },
+    "forest_fireflies": { "name": "Fireflies", "description": "Glowing fireflies in the background" },
+    "forest_roots": { "name": "Roots", "description": "A natural root divider" },
+    "forest_vines": { "name": "Vines", "description": "A winding vine frame" },
+    "desert_clouds": { "name": "Clouds", "description": "Drifting clouds in the background" },
+    "desert_halo": { "name": "Halo", "description": "A glowing halo effect" },
+    "desert_rainbow": { "name": "Rainbow", "description": "A shimmering rainbow XP bar" },
+    "desert_rays": { "name": "God Rays", "description": "Pulsing light rays" },
+    "desert_breeze": { "name": "Breeze", "description": "A gentle breeze divider" },
+    "desert_aurora": { "name": "Aurora", "description": "A shimmering aurora frame" }
   },
   "browse": {
     "pageTitle": "Explore",
@@ -1006,6 +1067,7 @@
         "dicecoinXp": "DiceCoin & XP",
         "achievements": "Achievements",
         "shopRewards": "Shop & Rewards",
+        "cosmetics": "Cosmetics",
         "libraryExports": "Library Exports",
         "courses": "Courses",
         "learningPaths": "Learning Paths",
@@ -4325,6 +4387,122 @@
             "createFailed": "Could not create item",
             "unexpected": "An unexpected error occurred"
           }
+        }
+      },
+      "cosmetics": {
+        "pageTitle": "Cosmetic catalog",
+        "pageDescription": "Manage cosmetics, unlock rules and manual grants.",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "cosmetics": "Cosmetics",
+          "create": "Create",
+          "edit": "Edit"
+        },
+        "actions": {
+          "create": "New cosmetic",
+          "edit": "Edit",
+          "save": "Save",
+          "cancel": "Cancel",
+          "saving": "Saving...",
+          "deactivate": "Deactivate",
+          "activate": "Activate",
+          "addRule": "Add rule",
+          "removeRule": "Remove rule",
+          "grant": "Grant to user"
+        },
+        "filters": {
+          "search": "Search cosmetics...",
+          "category": "Category",
+          "faction": "Faction",
+          "rarity": "Rarity",
+          "all": "All"
+        },
+        "columns": {
+          "key": "Key",
+          "category": "Category",
+          "faction": "Faction",
+          "rarity": "Rarity",
+          "renderType": "Render type",
+          "status": "Status",
+          "rules": "Rules",
+          "actions": "Actions"
+        },
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "categories": {
+          "avatar_frame": "Avatar frame",
+          "scene_background": "Scene background",
+          "particles": "Particles",
+          "xp_bar": "XP bar",
+          "section_divider": "Section divider"
+        },
+        "factions": {
+          "forest": "Forest",
+          "sea": "Sea",
+          "desert": "Desert",
+          "void": "Void",
+          "universal": "Universal"
+        },
+        "rarities": {
+          "common": "Common",
+          "uncommon": "Uncommon",
+          "rare": "Rare",
+          "epic": "Epic",
+          "legendary": "Legendary"
+        },
+        "form": {
+          "key": "Key",
+          "keyPlaceholder": "e.g. void_avatar_frame_constellation",
+          "category": "Category",
+          "faction": "Faction",
+          "factionNone": "None (universal)",
+          "rarity": "Rarity",
+          "nameKey": "Name key (i18n)",
+          "nameKeyPlaceholder": "cosmetics.void_constellation.name",
+          "descriptionKey": "Description key (i18n)",
+          "descriptionKeyPlaceholder": "cosmetics.void_constellation.description",
+          "renderType": "Render type",
+          "renderConfig": "Render config (JSON)",
+          "sortOrder": "Sort order",
+          "isActive": "Active"
+        },
+        "rules": {
+          "title": "Unlock rules",
+          "unlockType": "Unlock type",
+          "config": "Configuration (JSON)",
+          "priority": "Priority",
+          "empty": "No unlock rules defined.",
+          "types": {
+            "level": "Level",
+            "achievement": "Achievement",
+            "shop": "Shop",
+            "event": "Event",
+            "manual": "Manual"
+          }
+        },
+        "grant": {
+          "title": "Grant cosmetic",
+          "userSearch": "Search user (email or ID)",
+          "reason": "Reason",
+          "reasonPlaceholder": "e.g. Beta tester reward",
+          "submit": "Grant",
+          "success": "Cosmetic granted to user.",
+          "error": "Could not grant cosmetic."
+        },
+        "empty": {
+          "title": "No cosmetics",
+          "description": "Create your first cosmetic to get started."
+        },
+        "notifications": {
+          "created": "Cosmetic created",
+          "updated": "Cosmetic updated",
+          "deactivated": "Cosmetic deactivated",
+          "activated": "Cosmetic activated",
+          "ruleAdded": "Unlock rule added",
+          "ruleRemoved": "Unlock rule removed",
+          "error": "An error occurred"
         }
       },
       "libraryExports": {

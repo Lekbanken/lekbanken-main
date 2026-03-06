@@ -1,6 +1,7 @@
 'use client'
 
 import type { JourneySceneProps } from '@/types/journey'
+import type { CssBackgroundConfig } from '@/features/journey/cosmetic-types'
 import { getThemeCSSVariables } from '@/lib/factions'
 import { cn } from '@/lib/utils'
 
@@ -20,7 +21,11 @@ export function JourneyScene({
   children, 
   className,
   showPattern = false,
-}: JourneySceneProps) {
+  backgroundConfig,
+}: JourneySceneProps & {
+  /** v2.0 loadout config — when present, adds CSS class to scene */
+  backgroundConfig?: CssBackgroundConfig | null;
+}) {
   const cssVars = getThemeCSSVariables(theme)
 
   return (
@@ -28,6 +33,7 @@ export function JourneyScene({
       className={cn(
         'relative min-h-[500px] w-full overflow-hidden',
         'bg-gradient-to-b from-[var(--journey-gradient-from)] to-[var(--journey-gradient-to)]',
+        backgroundConfig?.className,
         className
       )}
       style={cssVars as React.CSSProperties}

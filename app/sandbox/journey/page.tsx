@@ -151,7 +151,7 @@ const COSMETIC_META: Record<string, { rarity: string; unlock: string; exclusive?
   'headerFrame:constellation': { rarity: 'epic', unlock: 'Void-tema Level 15', exclusive: true },
   'headerFrame:coral': { rarity: 'epic', unlock: 'Sea-tema Level 15', exclusive: true },
   'headerFrame:vines': { rarity: 'epic', unlock: 'Forest-tema Level 15', exclusive: true },
-  'headerFrame:aurora': { rarity: 'epic', unlock: 'Sky-tema Level 15', exclusive: true },
+  'headerFrame:aurora': { rarity: 'epic', unlock: 'Desert-tema Level 15', exclusive: true },
   // Avatar frames
   'avatarFrame:default': { rarity: 'common', unlock: 'Alltid tillgänglig' },
   'avatarFrame:metallic': { rarity: 'rare', unlock: 'Level 8 eller 200 DiceCoin' },
@@ -165,7 +165,7 @@ const COSMETIC_META: Record<string, { rarity: string; unlock: string; exclusive?
   'avatarEffect:orbit': { rarity: 'epic', unlock: 'Void-tema Level 8', exclusive: true },
   'avatarEffect:ripple': { rarity: 'epic', unlock: 'Sea-tema Level 8', exclusive: true },
   'avatarEffect:spores': { rarity: 'epic', unlock: 'Forest-tema Level 8', exclusive: true },
-  'avatarEffect:halo': { rarity: 'epic', unlock: 'Sky-tema Level 8', exclusive: true },
+  'avatarEffect:halo': { rarity: 'epic', unlock: 'Desert-tema Level 8', exclusive: true },
   // Level badges
   'levelBadge:flat': { rarity: 'common', unlock: 'Alltid tillgänglig' },
   'levelBadge:shield': { rarity: 'rare', unlock: 'Level 5' },
@@ -179,7 +179,7 @@ const COSMETIC_META: Record<string, { rarity: string; unlock: string; exclusive?
   'xpBarSkin:warp': { rarity: 'epic', unlock: 'Void-tema Level 12', exclusive: true },
   'xpBarSkin:current': { rarity: 'epic', unlock: 'Sea-tema Level 12', exclusive: true },
   'xpBarSkin:growth': { rarity: 'epic', unlock: 'Forest-tema Level 12', exclusive: true },
-  'xpBarSkin:rainbow': { rarity: 'epic', unlock: 'Sky-tema Level 12', exclusive: true },
+  'xpBarSkin:rainbow': { rarity: 'epic', unlock: 'Desert-tema Level 12', exclusive: true },
   // Background effects
   'backgroundEffect:none': { rarity: 'common', unlock: 'Alltid tillgänglig' },
   'backgroundEffect:particles': { rarity: 'common', unlock: 'Alltid tillgänglig' },
@@ -192,7 +192,7 @@ const COSMETIC_META: Record<string, { rarity: string; unlock: string; exclusive?
   'backgroundEffect:waves': { rarity: 'epic', unlock: 'Sea-tema Level 18', exclusive: true },
   'backgroundEffect:leaves': { rarity: 'rare', unlock: 'Forest-tema Level 5', exclusive: true },
   'backgroundEffect:fireflies': { rarity: 'epic', unlock: 'Forest-tema Level 18', exclusive: true },
-  'backgroundEffect:clouds': { rarity: 'rare', unlock: 'Sky-tema Level 5', exclusive: true },
+  'backgroundEffect:clouds': { rarity: 'rare', unlock: 'Desert-tema Level 5', exclusive: true },
   // Section dividers
   'sectionDivider:line': { rarity: 'common', unlock: 'Alltid tillgänglig' },
   'sectionDivider:glow': { rarity: 'common', unlock: 'Level 3' },
@@ -201,7 +201,7 @@ const COSMETIC_META: Record<string, { rarity: string; unlock: string; exclusive?
   'sectionDivider:nebula': { rarity: 'epic', unlock: 'Void-tema Level 10', exclusive: true },
   'sectionDivider:tide': { rarity: 'epic', unlock: 'Sea-tema Level 10', exclusive: true },
   'sectionDivider:roots': { rarity: 'epic', unlock: 'Forest-tema Level 10', exclusive: true },
-  'sectionDivider:breeze': { rarity: 'epic', unlock: 'Sky-tema Level 10', exclusive: true },
+  'sectionDivider:breeze': { rarity: 'epic', unlock: 'Desert-tema Level 10', exclusive: true },
   // Color modes
   'colorMode:accent': { rarity: 'common', unlock: 'Alltid tillgänglig' },
   'colorMode:duo': { rarity: 'rare', unlock: 'Level 8' },
@@ -1923,7 +1923,7 @@ type NonNullFactionId = Exclude<FactionId, null>
 const _FACTION_DICE: Record<NonNullFactionId, string> = {
   forest: '/achievements/utmarkelser/lg/ic_dice.png',
   sea: '/achievements/utmarkelser/lg/ic_dice.png',
-  sky: '/achievements/utmarkelser/lg/ic_dice.png',
+  desert: '/achievements/utmarkelser/lg/ic_dice.png',
   void: '/achievements/utmarkelser/lg/ic_dice.png',
 }
 
@@ -1970,8 +1970,8 @@ const THEME_SKILL_TREES: Record<NonNullFactionId, ThemeTreeDef> = {
     { id: 'color',   label: 'Giftigt Neon',     icon: 'gift',  row: 3, col: 0, connectsFrom: ['bg2', 'divider'], cosmeticKey: 'colorMode:toxic',            cosmeticCategory: 'color' },
     { id: 'title',   label: 'Forest Walker',    icon: 'crown', row: 3, col: 2, connectsFrom: ['divider', 'header'], cosmeticCategory: 'prestige' },
   ],
-  sky: [
-    { id: 'root',    label: 'Välj Himmel',      icon: 'star',  row: 0, col: 1, connectsFrom: [],             cosmeticCategory: 'root' },
+  desert: [
+    { id: 'root',    label: 'Välj Öken',      icon: 'star',  row: 0, col: 1, connectsFrom: [],             cosmeticCategory: 'root' },
     { id: 'bg1',     label: 'Moln',             icon: 'heart', row: 1, col: 0, connectsFrom: ['root'],       cosmeticKey: 'backgroundEffect:clouds',        cosmeticCategory: 'bg' },
     { id: 'avatar',  label: 'Gloriagloria',     icon: 'heart', row: 1, col: 1, connectsFrom: ['root'],       cosmeticKey: 'avatarEffect:halo',              cosmeticCategory: 'avatar' },
     { id: 'xp',      label: 'Regnbåge',         icon: 'flame', row: 1, col: 2, connectsFrom: ['root'],       cosmeticKey: 'xpBarSkin:rainbow',              cosmeticCategory: 'xp' },
@@ -1979,7 +1979,7 @@ const THEME_SKILL_TREES: Record<NonNullFactionId, ThemeTreeDef> = {
     { id: 'divider', label: 'Bris',             icon: 'badge', row: 2, col: 1, connectsFrom: ['avatar'],     cosmeticKey: 'sectionDivider:breeze',          cosmeticCategory: 'divider' },
     { id: 'header',  label: 'Norrsken',         icon: 'crown', row: 2, col: 2, connectsFrom: ['xp'],         cosmeticKey: 'headerFrame:aurora',             cosmeticCategory: 'header' },
     { id: 'color',   label: 'Solnedgång',       icon: 'gift',  row: 3, col: 0, connectsFrom: ['bg2', 'divider'], cosmeticKey: 'colorMode:sunset',           cosmeticCategory: 'color' },
-    { id: 'title',   label: 'Sky Walker',       icon: 'crown', row: 3, col: 2, connectsFrom: ['divider', 'header'], cosmeticCategory: 'prestige' },
+    { id: 'title',   label: 'Desert Walker',    icon: 'crown', row: 3, col: 2, connectsFrom: ['divider', 'header'], cosmeticCategory: 'prestige' },
   ],
 }
 
@@ -2408,7 +2408,7 @@ function SectionDivider({
     )
   }
 
-  // ── Sky: Breeze ──
+  // ── Desert: Breeze ──
   if (dividerStyle === 'breeze') {
     return (
       <div className="relative my-8" style={{ height: 36 }}>
@@ -5551,7 +5551,7 @@ const THEME_OVERVIEW: { id: NonNullFactionId; emoji: string; name: string; color
     ],
   },
   {
-    id: 'sky', emoji: '☀️', name: 'Himmel', color: '#f59e0b',
+    id: 'desert', emoji: '☀️', name: 'Öken', color: '#f59e0b',
     unlocks: [
       { category: '🌌 Bakgrund', label: 'Moln', key: 'backgroundEffect:clouds' },
       { category: '✨ Avatar', label: 'Gloriagloria', key: 'avatarEffect:halo' },
@@ -5560,7 +5560,7 @@ const THEME_OVERVIEW: { id: NonNullFactionId; emoji: string; name: string; color
       { category: '➖ Divider', label: 'Bris', key: 'sectionDivider:breeze' },
       { category: '🖼️ Header', label: 'Norrsken', key: 'headerFrame:aurora' },
       { category: '🎨 Färgläge', label: 'Solnedgång', key: 'colorMode:sunset' },
-      { category: '👑 Titel', label: 'Sky Walker', key: '' },
+      { category: '👑 Titel', label: 'Desert Walker', key: '' },
     ],
   },
 ]
@@ -6213,7 +6213,7 @@ export default function JourneySandboxPage() {
   const [completedPerFaction, _setCompletedPerFaction] = useState<Record<NonNullFactionId, number>>({
     forest: 1,
     sea: 0,
-    sky: 5,
+    desert: 5,
     void: 2,
   })
 

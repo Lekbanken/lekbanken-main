@@ -20,6 +20,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { checkAndGrantCosmetics } from '@/lib/journey/cosmetic-grants';
 import { z } from 'zod';
 
 // Constants for metadata limits
@@ -235,6 +236,12 @@ export async function POST(request: NextRequest) {
         context,
       });
     }
+
+    // Journey v2.0 — grant cosmetics linked to this achievement
+    await checkAndGrantCosmetics(serviceClient, user.id, {
+      type: 'achievement',
+      achievementId,
+    });
 
     return NextResponse.json({
       success: true,

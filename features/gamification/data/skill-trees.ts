@@ -1,5 +1,7 @@
 /**
- * Skill Tree Data Definitions
+ * @deprecated v2.0 — Replaced by cosmetic loadout system (CosmeticControlPanel + cosmetics table).
+ * Kept as fallback for legacy XP/header node resolution until v2.1.
+ * Scheduled for removal: v2.1
  *
  * 9 nodes per faction arranged in a 4-row tree.
  * Unlock is level-gated: node.requiredLevel <= user level → unlocked.
@@ -98,8 +100,8 @@ const TREES: Record<NonNullFaction, SkillNodeDef[]> = {
     { id: "color", label: "Giftig Neon", icon: "gift", row: 3, col: 0, connectsFrom: ["bg2", "divider"], requiredLevel: 8, cosmeticKey: "colorMode:toxic", cosmeticCategory: "color" },
     { id: "title", label: "Forest Walker", icon: "crown", row: 3, col: 2, connectsFrom: ["divider", "header"], requiredLevel: 10, cosmeticCategory: "prestige" },
   ],
-  sky: [
-    { id: "root", label: "Välj Himmel", icon: "star", row: 0, col: 1, connectsFrom: [], requiredLevel: 1, cosmeticCategory: "root" },
+  desert: [
+    { id: "root", label: "Välj Öken", icon: "star", row: 0, col: 1, connectsFrom: [], requiredLevel: 1, cosmeticCategory: "root" },
     { id: "bg1", label: "Moln", icon: "heart", row: 1, col: 0, connectsFrom: ["root"], requiredLevel: 2, cosmeticKey: "backgroundEffect:clouds", cosmeticCategory: "bg" },
     { id: "avatar", label: "Gloria", icon: "heart", row: 1, col: 1, connectsFrom: ["root"], requiredLevel: 2, cosmeticKey: "avatarEffect:halo", cosmeticCategory: "avatar" },
     { id: "xp", label: "Regnbåge", icon: "flame", row: 1, col: 2, connectsFrom: ["root"], requiredLevel: 3, cosmeticKey: "xpBarSkin:rainbow", cosmeticCategory: "xp" },
@@ -107,7 +109,7 @@ const TREES: Record<NonNullFaction, SkillNodeDef[]> = {
     { id: "divider", label: "Bris", icon: "badge", row: 2, col: 1, connectsFrom: ["avatar"], requiredLevel: 5, cosmeticKey: "sectionDivider:breeze", cosmeticCategory: "divider" },
     { id: "header", label: "Norrsken", icon: "crown", row: 2, col: 2, connectsFrom: ["xp"], requiredLevel: 6, cosmeticKey: "headerFrame:aurora", cosmeticCategory: "header" },
     { id: "color", label: "Solnedgång", icon: "gift", row: 3, col: 0, connectsFrom: ["bg2", "divider"], requiredLevel: 8, cosmeticKey: "colorMode:sunset", cosmeticCategory: "color" },
-    { id: "title", label: "Sky Walker", icon: "crown", row: 3, col: 2, connectsFrom: ["divider", "header"], requiredLevel: 10, cosmeticCategory: "prestige" },
+    { id: "title", label: "Desert Walker", icon: "crown", row: 3, col: 2, connectsFrom: ["divider", "header"], requiredLevel: 10, cosmeticCategory: "prestige" },
   ],
 };
 

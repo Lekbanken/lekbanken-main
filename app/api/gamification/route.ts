@@ -5,6 +5,7 @@ import type {
   Achievement,
   AchievementStatus,
   CoinsSummary,
+  CosmeticsSnapshot,
   GamificationIdentity,
   GamificationPayload,
   JourneyPreference,
@@ -14,6 +15,7 @@ import type {
   StreakSummary,
 } from "@/features/gamification/types";
 import type { Database } from "@/types/supabase";
+import type { ActiveLoadout, RenderConfig } from "@/features/journey/cosmetic-types";
 
 type AchievementRow = {
   id: string;
@@ -228,7 +230,7 @@ export async function GET() {
     achievementsQuery = achievementsQuery.is("tenant_id", null);
   }
 
-  const [achievementsRes, userAchievementsRes, coinsRes, txRes, streakRes, showcaseRes] = await Promise.all([
+  const [achievementsRes, userAchievementsRes, coinsRes, txRes, streakRes, showcaseRes, loadoutRes, recentUnlocksRes, unlockedCountRes] = await Promise.all([
     achievementsQuery,
     supabase.from("user_achievements").select("achievement_id,unlocked_at").eq("user_id", userId),
     supabase
@@ -261,6 +263,21 @@ export async function GET() {
       .select("slot,achievement_id")
       .eq("user_id", userId)
       .order("slot", { ascending: true }),
+    // Cosmetics — loadout, recent unlocks, count
+    supabase
+      .from("user_cosmetic_loadout")
+      .select("slot,cosmetic_id")
+      .eq("user_id", userId),
+    supabase
+      .from("user_cosmetics")
+      .select("cosmetic_id,unlocked_at,cosmetics!inner(key)")
+      .eq("user_id", userId)
+      .gte("unlocked_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .order("unlocked_at", { ascending: false }),
+    supabase
+      .from("user_cosmetics")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId),
   ]);
 
   const achievements = mapAchievements(achievementsRes.data ?? [], userAchievementsRes.data ?? []);
@@ -299,9 +316,9 @@ export async function GET() {
 
   // Identity — auth metadata + faction from user_journey_preferences
   const rawFaction = (prefsRes.data as PrefsRow | null)?.faction_id ?? null;
-  const VALID_FACTIONS = new Set<string>(["forest", "sea", "sky", "void"]);
+  const VALID_FACTIONS = new Set<string>(["forest", "sea", "desert", "void"]);
   const factionId = rawFaction && VALID_FACTIONS.has(rawFaction)
-    ? (rawFaction as "forest" | "sea" | "sky" | "void")
+    ? (rawFaction as "forest" | "sea" | "desert" | "void")
     : null;
   const identity: GamificationIdentity = {
     displayName:
@@ -320,6 +337,44 @@ export async function GET() {
     decisionAt: prefsData?.journey_decision_at ?? null,
   };
 
+  // Cosmetics — build loadout with render configs
+  const loadoutRows = (loadoutRes.data ?? []) as Array<{ slot: string; cosmetic_id: string }>;
+  const loadout: ActiveLoadout = {};
+  if (loadoutRows.length > 0) {
+    const cosmeticIds = loadoutRows.map((r) => r.cosmetic_id);
+    const { data: cosmeticRows } = await supabase
+      .from("cosmetics")
+      .select("id,category,render_type,render_config")
+      .in("id", cosmeticIds);
+    const cosmeticMap = new Map((cosmeticRows ?? []).map((c) => [c.id, c]));
+    for (const row of loadoutRows) {
+      const c = cosmeticMap.get(row.cosmetic_id);
+      if (c) {
+        const config = (typeof c.render_config === 'object' && c.render_config !== null ? c.render_config : {}) as Record<string, unknown>;
+        let renderConfig: RenderConfig;
+        switch (c.render_type) {
+          case 'svg_frame': renderConfig = { renderType: 'svg_frame', variant: String(config.variant ?? ''), glowColor: config.glowColor as string | undefined }; break;
+          case 'css_background': renderConfig = { renderType: 'css_background', className: String(config.className ?? ''), keyframes: config.keyframes as string | undefined }; break;
+          case 'css_particles': renderConfig = { renderType: 'css_particles', className: String(config.className ?? ''), count: typeof config.count === 'number' ? config.count : undefined }; break;
+          case 'xp_skin': renderConfig = { renderType: 'xp_skin', skin: String(config.skin ?? ''), colorMode: config.colorMode as string | undefined }; break;
+          case 'css_divider': renderConfig = { renderType: 'css_divider', variant: String(config.variant ?? ''), className: config.className as string | undefined }; break;
+          default: continue;
+        }
+        loadout[c.category as keyof ActiveLoadout] = renderConfig;
+      }
+    }
+  }
+
+  const recentUnlockRows = (recentUnlocksRes.data ?? []) as Array<{ cosmetic_id: string; unlocked_at: string | null; cosmetics: { key: string } }>;
+  const cosmetics: CosmeticsSnapshot = {
+    loadout,
+    unlockedCount: unlockedCountRes.count ?? 0,
+    recentUnlocks: recentUnlockRows.map((r) => ({
+      cosmeticKey: r.cosmetics.key,
+      unlockedAt: r.unlocked_at ?? '',
+    })),
+  };
+
   const payload: GamificationPayload = {
     identity,
     achievements,
@@ -328,6 +383,7 @@ export async function GET() {
     progress,
     showcase,
     journeyPreference,
+    cosmetics,
   };
 
   return NextResponse.json(payload, { status: 200 });

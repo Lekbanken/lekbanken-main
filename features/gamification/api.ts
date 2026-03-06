@@ -124,5 +124,10 @@ export async function fetchGamificationSnapshotMock(): Promise<GamificationPaylo
       totalAchievements: 3,
       nextReward: "Profilram",
     },
+    cosmetics: {
+      loadout: {},
+      unlockedCount: 0,
+      recentUnlocks: [],
+    },
   };
 }

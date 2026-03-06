@@ -2,6 +2,7 @@
 
 import { paletteGradient } from "@/lib/palette";
 import type { ColorMode } from "@/lib/palette";
+import type { XpSkinConfig } from "@/features/journey/cosmetic-types";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -26,6 +27,8 @@ type XPProgressBarProps = {
   skin?: XPBarSkin;
   /** Color mode for gradient fills */
   colorMode?: ColorMode;
+  /** v2.0 loadout config — when present, overrides skin + colorMode */
+  loadoutConfig?: XpSkinConfig | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -51,19 +54,27 @@ export function XPProgressBar({
   glowColor,
   skin = "shimmer",
   colorMode = "accent",
+  loadoutConfig,
 }: XPProgressBarProps) {
+  // v2.0 loadout override
+  const resolvedSkin: XPBarSkin = loadoutConfig
+    ? resolveXPBarSkin(`xpBarSkin:${loadoutConfig.skin}`)
+    : skin;
+  const resolvedColorMode: ColorMode = loadoutConfig?.colorMode
+    ? (loadoutConfig.colorMode as ColorMode)
+    : colorMode;
   const fillBg =
-    colorMode === "accent"
+    resolvedColorMode === "accent"
       ? accentColor
-      : paletteGradient(colorMode, accentColor, 90);
+      : paletteGradient(resolvedColorMode, accentColor, 90);
 
   const fillStyle: React.CSSProperties = {
     width: `${percent}%`,
-    ...(colorMode === "accent"
+    ...(resolvedColorMode === "accent"
       ? { backgroundColor: accentColor }
       : { backgroundImage: fillBg }),
     boxShadow:
-      skin === "energy"
+      resolvedSkin === "energy"
         ? `0 0 14px ${accentColor}50, 0 0 28px ${glowColor ?? accentColor + "18"}, inset 0 0 6px rgba(255,255,255,0.08)`
         : `0 0 20px ${glowColor ?? "transparent"}, 0 0 8px ${accentColor}`,
   };
@@ -82,11 +93,11 @@ export function XPProgressBar({
         style={{
           backgroundColor: `${accentColor}15`,
           boxShadow:
-            skin === "energy" ? "inset 0 2px 4px rgba(0,0,0,0.3)" : "none",
+            resolvedSkin === "energy" ? "inset 0 2px 4px rgba(0,0,0,0.3)" : "none",
         }}
       >
         {/* Energy: track texture */}
-        {skin === "energy" && (
+        {resolvedSkin === "energy" && (
           <div
             className="absolute inset-0 rounded-full"
             style={{
@@ -102,7 +113,7 @@ export function XPProgressBar({
           style={fillStyle}
         >
           {/* ── Clean: glass highlight only ── */}
-          {skin === "clean" && (
+          {resolvedSkin === "clean" && (
             <div
               className="absolute inset-x-0 top-0 h-1/2"
               style={{
@@ -114,7 +125,7 @@ export function XPProgressBar({
           )}
 
           {/* ── Shimmer: glass + traveling light ── */}
-          {skin === "shimmer" && (
+          {resolvedSkin === "shimmer" && (
             <>
               <div
                 className="absolute inset-x-0 top-0 h-1/2"
@@ -138,7 +149,7 @@ export function XPProgressBar({
           )}
 
           {/* ── Energy: plasma lines + wave + edge spark ── */}
-          {skin === "energy" && (
+          {resolvedSkin === "energy" && (
             <>
               {/* Plasma flow lines */}
               <div

@@ -44,10 +44,10 @@ export const FACTION_THEMES: Record<NonNullable<FactionId>, FactionTheme> = {
     glowColor: 'rgba(14, 165, 233, 0.25)',
     iconVariant: 'sharp',
   },
-  sky: {
-    id: 'sky',
-    name: 'Sky',
-    description: 'Öppen himmel, solstrålar och fria vindar',
+  desert: {
+    id: 'desert',
+    name: 'Desert',
+    description: 'Solbränd öken, sand och hetta',
     accentColor: '#f59e0b',           // Amber / Sun gold
     accentColorMuted: 'rgba(245, 158, 11, 0.12)',
     gradientFrom: '#3d3520',

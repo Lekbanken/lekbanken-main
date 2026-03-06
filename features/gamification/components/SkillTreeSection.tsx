@@ -1,3 +1,8 @@
+/**
+ * @deprecated v2.0 — Replaced by CosmeticControlPanel.
+ * This component is no longer imported anywhere in production code.
+ * Scheduled for removal: v2.1
+ */
 "use client";
 
 import { useEffect, useRef, useState } from "react";

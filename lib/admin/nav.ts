@@ -125,6 +125,7 @@ const systemAdminCategories: AdminNavCategory[] = [
       { id: 'dicecoin-xp', labelKey: 'dicecoinXp', href: '/admin/gamification/dicecoin-xp', icon: 'leaderboard' },
       { id: 'achievements', labelKey: 'achievements', href: '/admin/gamification/achievements', icon: 'achievements' },
       { id: 'shop-rewards', labelKey: 'shopRewards', href: '/admin/gamification/shop-rewards', icon: 'marketplace' },
+      { id: 'cosmetics', labelKey: 'cosmetics', href: '/admin/cosmetics', icon: 'swatch', systemAdminOnly: true },
     ],
   },
   {

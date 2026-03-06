@@ -16,10 +16,18 @@ import { FactionSelector } from "./components/FactionSelector";
 import { StreakSection } from "./components/StreakSection";
 import { CallToActionSection } from "./components/CallToActionSection";
 import { SectionDivider } from "./components/SectionDivider";
-import { SkillTreeSection } from "./components/SkillTreeSection";
+import { CosmeticControlPanel } from "./components/CosmeticControlPanel";
+import { CosmeticUnlockToast } from "./components/CosmeticUnlockToast";
 import { XPProgressBar, resolveXPBarSkin, resolveXPBarColorMode } from "./components/XPProgressBar";
 import { AvatarFrame, resolveAvatarFrame } from "./components/AvatarFrame";
 import { getSkillTree } from "./data/skill-trees";
+import type {
+  SvgFrameConfig,
+  CssBackgroundConfig,
+  CssParticlesConfig,
+  XpSkinConfig,
+  CssDividerConfig,
+} from "@/features/journey/cosmetic-types";
 
 type GamificationPageProps = {
   fetcher?: () => Promise<GamificationPayload>;
@@ -172,10 +180,23 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
   );
   const avatarFrameStyle = resolveAvatarFrame(headerNode?.cosmeticKey);
 
+  // v2.0 loadout — type-narrow each slot's render config
+  const loadout = data.cosmetics.loadout;
+  const frameConfig = loadout.avatar_frame?.renderType === "svg_frame"
+    ? (loadout.avatar_frame as SvgFrameConfig) : null;
+  const backgroundConfig = loadout.scene_background?.renderType === "css_background"
+    ? (loadout.scene_background as CssBackgroundConfig) : null;
+  const particlesConfig = loadout.particles?.renderType === "css_particles"
+    ? (loadout.particles as CssParticlesConfig) : null;
+  const xpConfig = loadout.xp_bar?.renderType === "xp_skin"
+    ? (loadout.xp_bar as XpSkinConfig) : null;
+  const dividerConfig = loadout.section_divider?.renderType === "css_divider"
+    ? (loadout.section_divider as CssDividerConfig) : null;
+
   return (
-    <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-10 sm:px-6">
+    <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-10 sm:px-6" backgroundConfig={backgroundConfig}>
       {/* ── Ambient particles ── */}
-      <ParticleField accentColor={theme.accentColor} />
+      <ParticleField accentColor={theme.accentColor} loadoutConfig={particlesConfig} />
 
       {/* ── Hero: Avatar + Name + Skill Tree ── */}
       <div
@@ -252,7 +273,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
               }}
             />
             {/* Cosmetic frame overlay */}
-            <AvatarFrame style={avatarFrameStyle} accentColor={theme.accentColor} />
+            <AvatarFrame style={avatarFrameStyle} accentColor={theme.accentColor} loadoutConfig={frameConfig} />
             <div
               className="relative w-28 h-28 rounded-full border-4 overflow-hidden bg-gradient-to-br from-white/10 to-white/5"
               style={{ borderColor: theme.accentColor }}
@@ -343,10 +364,12 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
             }}
           >
             {isSkillTreeOpen && (
-              <SkillTreeSection
-                factionId={identity.factionId}
-                userLevel={data.progress.level}
+              <CosmeticControlPanel
                 theme={theme}
+                onLoadoutChange={() => {
+                  // Refresh gamification snapshot to pick up new loadout
+                  fetcher().then((result) => setData(result)).catch(() => {});
+                }}
               />
             )}
           </div>
@@ -378,6 +401,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
           glowColor={theme.glowColor}
           skin={xpSkin}
           colorMode={xpColorMode}
+          loadoutConfig={xpConfig}
         />
       </div>
 
@@ -417,13 +441,23 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
       {/* ── Content Sections (glassmorphism cards) ── */}
       <div className="space-y-8">
         <CoinsSection summary={data.coins} />
-        <SectionDivider variant="glow" />
+        <SectionDivider variant="glow" loadoutConfig={dividerConfig} />
         <StreakSection streak={data.streak} />
-        <SectionDivider variant="ornament" />
+        <SectionDivider variant="ornament" loadoutConfig={dividerConfig} />
         <BadgeShowcase showcase={data.showcase!} achievements={data.achievements} />
-        <SectionDivider variant="glow" label={t("nextStepLabel")} />
+        <SectionDivider variant="glow" label={t("nextStepLabel")} loadoutConfig={dividerConfig} />
         <CallToActionSection />
       </div>
+
+      {/* ── Cosmetic Unlock Toast ── */}
+      {data.cosmetics.recentUnlocks.length > 0 && (
+        <CosmeticUnlockToast
+          items={data.cosmetics.recentUnlocks.map((u) => ({
+            cosmeticKey: u.cosmeticKey,
+          }))}
+          onShow={() => setIsSkillTreeOpen(true)}
+        />
+      )}
 
       {/* XP shimmer keyframe + reduced-motion guard */}
       <style jsx>{`

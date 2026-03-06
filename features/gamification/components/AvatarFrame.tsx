@@ -13,6 +13,8 @@
 // 0 new keyframes. Pure SVG + CSS transitions.
 // ---------------------------------------------------------------------------
 
+import type { SvgFrameConfig } from "@/features/journey/cosmetic-types";
+
 export type AvatarFrameStyle =
   | "none"
   | "constellation"
@@ -25,6 +27,8 @@ type AvatarFrameProps = {
   accentColor: string;
   /** Diameter of the parent avatar in px (default 112 = w-28) */
   size?: number;
+  /** v2.0 loadout config — when present, overrides `style` prop */
+  loadoutConfig?: SvgFrameConfig | null;
 };
 
 /**
@@ -51,8 +55,14 @@ export function resolveAvatarFrame(
  * Decorative SVG overlay rendered around the avatar circle.
  * Absolutely positioned — place inside the avatar's relative container.
  */
-export function AvatarFrame({ style, accentColor, size = 112 }: AvatarFrameProps) {
-  if (style === "none") return null;
+export function AvatarFrame({ style, accentColor, size = 112, loadoutConfig }: AvatarFrameProps) {
+  // v2.0 loadout override: derive style + accent from config
+  const resolvedStyle = loadoutConfig
+    ? (loadoutConfig.variant as AvatarFrameStyle) || "none"
+    : style;
+  const resolvedAccent = loadoutConfig?.glowColor ?? accentColor;
+
+  if (resolvedStyle === "none") return null;
 
   // Frame is slightly larger than avatar to create a decorative ring
   const pad = 14;
@@ -71,17 +81,17 @@ export function AvatarFrame({ style, accentColor, size = 112 }: AvatarFrameProps
       style={{ top: offset, left: offset, zIndex: 20 }}
       aria-hidden
     >
-      {style === "constellation" && (
-        <ConstellationFrame cx={cx} cy={cy} r={r} color={accentColor} />
+      {resolvedStyle === "constellation" && (
+        <ConstellationFrame cx={cx} cy={cy} r={r} color={resolvedAccent} />
       )}
-      {style === "coral" && (
-        <CoralFrame cx={cx} cy={cy} r={r} color={accentColor} />
+      {resolvedStyle === "coral" && (
+        <CoralFrame cx={cx} cy={cy} r={r} color={resolvedAccent} />
       )}
-      {style === "vines" && (
-        <VinesFrame cx={cx} cy={cy} r={r} color={accentColor} />
+      {resolvedStyle === "vines" && (
+        <VinesFrame cx={cx} cy={cy} r={r} color={resolvedAccent} />
       )}
-      {style === "aurora" && (
-        <AuroraFrame cx={cx} cy={cy} r={r} color={accentColor} />
+      {resolvedStyle === "aurora" && (
+        <AuroraFrame cx={cx} cy={cy} r={r} color={resolvedAccent} />
       )}
     </svg>
   );

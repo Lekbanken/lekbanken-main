@@ -452,7 +452,7 @@
       "banner": {
         "forest": "Skovens Vokter",
         "sea": "Havets Utforsker",
-        "sky": "Himmelens Seiler",
+        "desert": "Ørkenens Vandrer",
         "void": "Tomrommets Vandrer",
         "neutral": "Ingen fraksjon valgt"
       }
@@ -462,17 +462,52 @@
       "unlockedCount": "{unlocked} / {total} opplåst",
       "hint": "Nå høyere nivåer for å låse opp kosmetikk",
       "hintClick": "Trykk på en node for å se detaljer",
-      "avatarHint": "Trykk på avataren din for Designtre",
+      "avatarHint": "Trykk på avataren din for kosmetikk",
       "unlockAt": "Låses opp på nivå {level}",
       "availableAt": "Tilgjengelig på nivå {level}",
       "nodeUnlocked": "Opplåst"
+    },
+    "cosmeticPanel": {
+      "title": "Velg kostyme",
+      "hint": "Trykk på en kosmetikk for å aktivere eller bytte",
+      "tabs": {
+        "avatar_frame": "Ramme",
+        "scene_background": "Bakgrunn",
+        "particles": "Partikler",
+        "xp_bar": "XP-bar",
+        "section_divider": "Deler"
+      },
+      "equipped": "Aktiv",
+      "equip": "Aktiver",
+      "unequip": "Ta av",
+      "locked": "Låst",
+      "lockedLevel": "Nivå {level}",
+      "lockedAchievement": "Prestasjon",
+      "lockedShop": "Butikk",
+      "loading": "Laster kosmetikk\u2026",
+      "error": "Kunne ikke laste kosmetikkatalogen",
+      "noItems": "Ingen kosmetikk i denne kategorien ennå",
+      "active": "Aktiv: {name}",
+      "rarity": {
+        "common": "Vanlig",
+        "uncommon": "Uvanlig",
+        "rare": "Sjelden",
+        "epic": "Episk",
+        "legendary": "Legendarisk"
+      }
+    },
+    "unlockToast": {
+      "title": "Ny kosmetikk!",
+      "unlocked": "Du låste opp: {name}",
+      "show": "Vis",
+      "dismiss": "Lukk"
     },
     "onboarding": {
       "title": "Velkommen til Journey",
       "step1Title": "Hva er Journey?",
       "step1Desc": "Journey er ditt personlige prestasjonslerret — et visuelt lag oppå gamification med temaer, kosmetikk og progresjon.",
       "step2Title": "Velg din fraksjon",
-      "step2Desc": "Fire unike temaer å velge mellom — skog, hav, himmel eller rommet. Hver fraksjon har sin egen design.",
+      "step2Desc": "Fire unike temaer å velge mellom — skog, hav, ørken eller rommet. Hver fraksjon har sin egen design.",
       "step3Title": "Lås opp kosmetikk",
       "step3Desc": "Gå opp i nivå og lås opp visuelle belønninger som rammer, effekter og merker.",
       "step4Title": "Vis dine prestasjoner",
@@ -539,6 +574,32 @@
       "powerup:coin_multiplier": "Myntmultiplikator-bonus",
       "refund": "Refusjon"
     }
+  },
+  "cosmetics": {
+    "void_stars": { "name": "Stjernefelt", "description": "Et glitrende stjernefelt i bakgrunnen" },
+    "void_orbit": { "name": "Orbital", "description": "Partikler som kretser rundt avataren din" },
+    "void_warp": { "name": "Hyperspace", "description": "En warp-hastighetbar" },
+    "void_meteors": { "name": "Meteorer", "description": "Fallende meteorer i bakgrunnen" },
+    "void_nebula": { "name": "Nebulosa", "description": "En kosmisk nebulosadeler" },
+    "void_constellation": { "name": "Stjernebilde", "description": "En lysende stjernebilderamme" },
+    "sea_bubbles": { "name": "Bobler", "description": "Stigende bobler i bakgrunnen" },
+    "sea_ripple": { "name": "Krusning", "description": "Krusende vannpartikler" },
+    "sea_current": { "name": "Havstrøm", "description": "En flytende XP-bar" },
+    "sea_waves": { "name": "Bølger", "description": "Rullende bølger i bakgrunnen" },
+    "sea_tide": { "name": "Tidevann", "description": "En tidvannsdeler" },
+    "sea_coral": { "name": "Korallrev", "description": "En vakker korallramme" },
+    "forest_leaves": { "name": "Løv", "description": "Drivende løv i bakgrunnen" },
+    "forest_spores": { "name": "Sporer", "description": "Lysende skogspartikler" },
+    "forest_growth": { "name": "Vekst", "description": "En organisk XP-bar" },
+    "forest_fireflies": { "name": "Ildfluer", "description": "Glødende ildfluer i bakgrunnen" },
+    "forest_roots": { "name": "Røtter", "description": "En naturlig rotdeler" },
+    "forest_vines": { "name": "Ranker", "description": "En slingrende rankeramme" },
+    "desert_clouds": { "name": "Skyer", "description": "Drivende skyer i bakgrunnen" },
+    "desert_halo": { "name": "Glorie", "description": "En lysende glorieeffekt" },
+    "desert_rainbow": { "name": "Regnbue", "description": "En skimrende regnbue XP-bar" },
+    "desert_rays": { "name": "Gudestråler", "description": "Pulserende lysstråler" },
+    "desert_breeze": { "name": "Bris", "description": "En myk brisdeler" },
+    "desert_aurora": { "name": "Nordlys", "description": "En skimrende nordlysramme" }
   },
   "browse": {
     "pageTitle": "Utforsk",
@@ -1164,6 +1225,7 @@
         "dicecoinXp": "DiceCoin & XP",
         "achievements": "Achievements",
         "shopRewards": "Butikk & Belønninger",
+        "cosmetics": "Kosmetikk",
         "libraryExports": "Bibliotekeksport",
         "courses": "Kurs",
         "learningPaths": "Læringsveier",
@@ -5048,6 +5110,122 @@
             "createFailed": "Kunne ikke opprette varen",
             "unexpected": "En uventet feil oppstod"
           }
+        }
+      },
+      "cosmetics": {
+        "pageTitle": "Kosmetikk-katalog",
+        "pageDescription": "Administrer kosmetikk, opplåsingsregler og manuelle grants.",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "cosmetics": "Kosmetikk",
+          "create": "Opprett",
+          "edit": "Rediger"
+        },
+        "actions": {
+          "create": "Ny kosmetikk",
+          "edit": "Rediger",
+          "save": "Lagre",
+          "cancel": "Avbryt",
+          "saving": "Lagrer...",
+          "deactivate": "Deaktiver",
+          "activate": "Aktiver",
+          "addRule": "Legg til regel",
+          "removeRule": "Fjern regel",
+          "grant": "Grant til bruker"
+        },
+        "filters": {
+          "search": "Søk kosmetikk...",
+          "category": "Kategori",
+          "faction": "Fraksjon",
+          "rarity": "Sjeldenhet",
+          "all": "Alle"
+        },
+        "columns": {
+          "key": "Nøkkel",
+          "category": "Kategori",
+          "faction": "Fraksjon",
+          "rarity": "Sjeldenhet",
+          "renderType": "Render-type",
+          "status": "Status",
+          "rules": "Regler",
+          "actions": "Handlinger"
+        },
+        "status": {
+          "active": "Aktiv",
+          "inactive": "Inaktiv"
+        },
+        "categories": {
+          "avatar_frame": "Avatar-ramme",
+          "scene_background": "Scene-bakgrunn",
+          "particles": "Partikler",
+          "xp_bar": "XP-bar",
+          "section_divider": "Seksjonsdeler"
+        },
+        "factions": {
+          "forest": "Skog",
+          "sea": "Hav",
+          "desert": "Ørken",
+          "void": "Void",
+          "universal": "Universell"
+        },
+        "rarities": {
+          "common": "Vanlig",
+          "uncommon": "Uvanlig",
+          "rare": "Sjelden",
+          "epic": "Episk",
+          "legendary": "Legendarisk"
+        },
+        "form": {
+          "key": "Nøkkel",
+          "keyPlaceholder": "f.eks. void_avatar_frame_constellation",
+          "category": "Kategori",
+          "faction": "Fraksjon",
+          "factionNone": "Ingen (universell)",
+          "rarity": "Sjeldenhet",
+          "nameKey": "Navnnøkkel (i18n)",
+          "nameKeyPlaceholder": "cosmetics.void_constellation.name",
+          "descriptionKey": "Beskrivelsesnøkkel (i18n)",
+          "descriptionKeyPlaceholder": "cosmetics.void_constellation.description",
+          "renderType": "Render-type",
+          "renderConfig": "Render-config (JSON)",
+          "sortOrder": "Sorteringsrekkefølge",
+          "isActive": "Aktiv"
+        },
+        "rules": {
+          "title": "Opplåsingsregler",
+          "unlockType": "Opplåsingstype",
+          "config": "Konfigurasjon (JSON)",
+          "priority": "Prioritet",
+          "empty": "Ingen opplåsingsregler definert.",
+          "types": {
+            "level": "Nivå",
+            "achievement": "Achievement",
+            "shop": "Butikk",
+            "event": "Event",
+            "manual": "Manuell"
+          }
+        },
+        "grant": {
+          "title": "Grant kosmetikk",
+          "userSearch": "Søk bruker (e-post eller ID)",
+          "reason": "Grunn",
+          "reasonPlaceholder": "F.eks. Beta-tester belønning",
+          "submit": "Grant",
+          "success": "Kosmetikk grantet til bruker.",
+          "error": "Kunne ikke grante kosmetikk."
+        },
+        "empty": {
+          "title": "Ingen kosmetikk",
+          "description": "Opprett din første kosmetikk for å komme i gang."
+        },
+        "notifications": {
+          "created": "Kosmetikk opprettet",
+          "updated": "Kosmetikk oppdatert",
+          "deactivated": "Kosmetikk deaktivert",
+          "activated": "Kosmetikk aktivert",
+          "ruleAdded": "Opplåsingsregel lagt til",
+          "ruleRemoved": "Opplåsingsregel fjernet",
+          "error": "En feil oppstod"
         }
       },
       "libraryExports": {

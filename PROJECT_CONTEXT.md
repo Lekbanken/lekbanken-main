@@ -23,6 +23,7 @@
 | **Play/Run** | Köra en plan steg-för-steg i fält. | Starta körning → Visa steg → Markera klar → Nästa |
 | **Sessions** | Deltagarlekar med realtids-interaktion. | Skapa session → Dela kod → Deltagare ansluter → Spela |
 | **Calendar** | Schemalägga planer på datum. | Välj dag → Välj plan → Schemalägg → Starta körning |
+| **Gamification / Journey** | Progressionssystem med fraktioner, kosmetik, XP. | Välj fraktion → Samla XP → Lås upp kosmetik → Utrusta loadout |
 
 ## Design Philosophy
 
@@ -59,6 +60,23 @@
 - No participant session integration in plans yet (post-beta, MS6)
 - No offline-first sync (optimistic UI only — requires connectivity for saves)
 - No AI-generated plans (ai-assist.ts is a stub, not exposed)
+
+## Journey v2.0 Status
+
+Journey v2.0 replaces the legacy SkillTree system with a flexible cosmetic loadout architecture.
+
+| Component | Status |
+|-----------|--------|
+| Faction rename (sky → desert) | ✅ Complete |
+| Database schema (cosmetics, user_cosmetics, cosmetic_unlock_rules) | ✅ Complete |
+| Cosmetic API (catalog, loadout, equip/unequip) | ✅ Complete |
+| Loadout rendering (5 slot types with typed render configs) | ✅ Complete |
+| CosmeticControlPanel (user-facing equip UI) | ✅ Complete |
+| Unlock motor (level-based auto-grants via service role) | ✅ Complete |
+| Admin UI (system-admin CRUD for catalog, rules, grants) | ✅ Complete |
+| Cleanup + subroute-gating | ✅ Complete |
+
+Key files: `features/gamification/`, `lib/journey/`, `app/api/admin/cosmetics/`, `app/admin/cosmetics/`
 
 ## AI Agent Quick Start
 

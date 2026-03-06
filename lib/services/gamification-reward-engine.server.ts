@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { checkAndGrantCosmetics } from '@/lib/journey/cosmetic-grants'
 import type { Json } from '@/types/supabase'
 
 // ============================================================================
@@ -934,6 +935,14 @@ export async function evaluateAndApplyRewardV2(
     )
     if (xpResult) {
       xp = xpResult.newXp
+
+      // 6.1 Journey v2.0 — grant cosmetics on level-up
+      if (xpResult.leveledUp) {
+        await checkAndGrantCosmetics(admin, input.actorUserId, {
+          type: 'level',
+          level: xpResult.newLevel,
+        })
+      }
     }
   }
 

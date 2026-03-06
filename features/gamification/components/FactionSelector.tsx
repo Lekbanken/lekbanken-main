@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { getAllFactions, DEFAULT_THEME } from "@/lib/factions";
+import { getAllFactions } from "@/lib/factions";
 import type { FactionId, FactionTheme } from "@/types/journey";
 
 type FactionSelectorProps = {
@@ -13,8 +13,9 @@ type FactionSelectorProps = {
 const factions = getAllFactions();
 
 /**
- * Faction selector – a compact row of faction buttons for the Journey hub.
+ * Faction selector – a compact row of 4 faction buttons for the Journey hub.
  * Purely cosmetic: changes theme colors, nothing else.
+ * Neutral is not a selectable option — DEFAULT_THEME is an internal fallback only.
  * 0 new keyframes (uses transitions only).
  */
 export function FactionSelector({ currentFactionId, onSelect }: FactionSelectorProps) {
@@ -22,10 +23,10 @@ export function FactionSelector({ currentFactionId, onSelect }: FactionSelectorP
   const [pending, setPending] = useState<FactionId | "idle">("idle");
   const [isPending, startTransition] = useTransition();
 
-  const options: Array<FactionTheme & { selected: boolean }> = [
-    { ...DEFAULT_THEME, selected: currentFactionId === null },
-    ...factions.map((f) => ({ ...f, selected: currentFactionId === f.id })),
-  ];
+  const options: Array<FactionTheme & { selected: boolean }> = factions.map((f) => ({
+    ...f,
+    selected: currentFactionId === f.id,
+  }));
 
   async function handleSelect(factionId: FactionId) {
     if (factionId === currentFactionId) return;
@@ -49,7 +50,7 @@ export function FactionSelector({ currentFactionId, onSelect }: FactionSelectorP
           const isLoading = pending === opt.id && isPending;
           return (
             <button
-              key={opt.id ?? "neutral"}
+              key={opt.id}
               role="radio"
               aria-checked={opt.selected}
               aria-label={opt.name}

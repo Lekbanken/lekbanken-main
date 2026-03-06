@@ -1,5 +1,7 @@
 "use client";
 
+import type { CssDividerConfig } from "@/features/journey/cosmetic-types";
+
 /**
  * SectionDivider — themed separator between journey sections.
  * Three styles: line (default), glow (energy pulse), ornament (diamond SVGs).
@@ -11,14 +13,19 @@ type DividerStyle = "line" | "glow" | "ornament";
 export function SectionDivider({
   label,
   variant = "line",
+  loadoutConfig,
 }: {
   label?: string;
   variant?: DividerStyle;
+  /** v2.0 loadout config — when present, overrides variant */
+  loadoutConfig?: CssDividerConfig | null;
 }) {
+  const resolvedVariant: DividerStyle =
+    loadoutConfig?.variant ? (loadoutConfig.variant as DividerStyle) : variant;
   const accent = "var(--journey-accent, #8661ff)";
 
   // ── Glow: energy pulse center node ──
-  if (variant === "glow") {
+  if (resolvedVariant === "glow") {
     return (
       <div className="relative flex items-center gap-3 my-6">
         <div className="flex-1 relative h-px">
@@ -95,7 +102,7 @@ export function SectionDivider({
   }
 
   // ── Ornament: diamond SVGs + decorative dots ──
-  if (variant === "ornament") {
+  if (resolvedVariant === "ornament") {
     return (
       <div className="flex items-center gap-2 my-6">
         <div className="flex-1 flex items-center">

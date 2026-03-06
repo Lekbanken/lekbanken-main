@@ -301,7 +301,7 @@
       "banner": {
         "forest": "Skogens väktare",
         "sea": "Havets utforskare",
-        "sky": "Himlens seglare",
+        "desert": "Öknens vandrare",
         "void": "Rymdens vandrare",
         "neutral": "Ingen fraktion vald"
       }
@@ -311,17 +311,52 @@
       "unlockedCount": "{unlocked} / {total} upplåsta",
       "hint": "Nå högre nivåer för att låsa upp cosmetics",
       "hintClick": "Tryck på en nod för att se detaljer",
-      "avatarHint": "Tryck på din avatar för Design Tree",
+      "avatarHint": "Tryck på din avatar för kosmetik",
       "unlockAt": "Låser upp på level {level}",
       "availableAt": "Tillgänglig på level {level}",
       "nodeUnlocked": "Upplåst"
+    },
+    "cosmeticPanel": {
+      "title": "Välj kostym",
+      "hint": "Tryck på en kostym för att aktivera eller byta",
+      "tabs": {
+        "avatar_frame": "Ram",
+        "scene_background": "Bakgrund",
+        "particles": "Partiklar",
+        "xp_bar": "XP-bar",
+        "section_divider": "Avdelare"
+      },
+      "equipped": "Aktiv",
+      "equip": "Aktivera",
+      "unequip": "Ta av",
+      "locked": "Låst",
+      "lockedLevel": "Nivå {level}",
+      "lockedAchievement": "Utmärkelse",
+      "lockedShop": "Butik",
+      "loading": "Laddar kosmetik\u2026",
+      "error": "Kunde inte ladda kosmetikkatalogen",
+      "noItems": "Inga kosmetik i denna kategori än",
+      "active": "Aktiv: {name}",
+      "rarity": {
+        "common": "Vanlig",
+        "uncommon": "Ovanlig",
+        "rare": "Sällsynt",
+        "epic": "Episk",
+        "legendary": "Legendarisk"
+      }
+    },
+    "unlockToast": {
+      "title": "Ny kosmetik!",
+      "unlocked": "Du låste upp: {name}",
+      "show": "Visa",
+      "dismiss": "Stäng"
     },
     "onboarding": {
       "title": "Välkommen till Journey",
       "step1Title": "Vad är Journey?",
       "step1Desc": "Journey är din personliga prestationscanvas — ett visuellt lager ovanpå gamification med teman, kosmetik och progression.",
       "step2Title": "Välj din fraktion",
-      "step2Desc": "Fyra unika teman att välja mellan — skog, hav, himmel eller rymd. Varje fraktion har sin egen design.",
+      "step2Desc": "Fyra unika teman att välja mellan — skog, hav, öken eller rymd. Varje fraktion har sin egen design.",
       "step3Title": "Lås upp kosmetik",
       "step3Desc": "Gå upp i level och lås upp visuella belöningar som ramar, effekter och badges.",
       "step4Title": "Visa dina utmärkelser",
@@ -342,6 +377,32 @@
       "yourAchievements": "Dina prestationer",
       "quickNav": "Snabbnavigation"
     }
+  },
+  "cosmetics": {
+    "void_stars": { "name": "Stjärnfält", "description": "Ett glittrande stjärnfält i bakgrunden" },
+    "void_orbit": { "name": "Orbital", "description": "Partiklar som kretsar runt din avatar" },
+    "void_warp": { "name": "Hyperspace", "description": "En XP-bar med warp-effekt" },
+    "void_meteors": { "name": "Meteorer", "description": "Fallande meteorer i bakgrunden" },
+    "void_nebula": { "name": "Nebulosa", "description": "En kosmisk nebulosadelare" },
+    "void_constellation": { "name": "Stjärnbild", "description": "En lysande stjärnbildsram" },
+    "sea_bubbles": { "name": "Bubblor", "description": "Stigande bubblor i bakgrunden" },
+    "sea_ripple": { "name": "Krusning", "description": "Krusande vattenpartiklar" },
+    "sea_current": { "name": "Havsström", "description": "En flödande XP-bar" },
+    "sea_waves": { "name": "Vågor", "description": "Rullande vågor i bakgrunden" },
+    "sea_tide": { "name": "Tidvatten", "description": "En tidvattendelare" },
+    "sea_coral": { "name": "Korallrev", "description": "En vacker korallram" },
+    "forest_leaves": { "name": "Löv", "description": "Svävande löv i bakgrunden" },
+    "forest_spores": { "name": "Sporer", "description": "Lysande skogspartiklar" },
+    "forest_growth": { "name": "Tillväxt", "description": "En organisk XP-bar" },
+    "forest_fireflies": { "name": "Eldflugor", "description": "Glödande eldflugor i bakgrunden" },
+    "forest_roots": { "name": "Rötter", "description": "En naturlig rotdelare" },
+    "forest_vines": { "name": "Rankor", "description": "En slingrande rankram" },
+    "desert_clouds": { "name": "Moln", "description": "Drivande moln i bakgrunden" },
+    "desert_halo": { "name": "Gloria", "description": "En lysande gloriaeffekt" },
+    "desert_rainbow": { "name": "Regnbåge", "description": "En regnbågsskimrande XP-bar" },
+    "desert_rays": { "name": "Gudastrålar", "description": "Pulserande ljusstrålar" },
+    "desert_breeze": { "name": "Bris", "description": "En mjuk brisdelare" },
+    "desert_aurora": { "name": "Norrsken", "description": "En skimrande norrskensram" }
   },
   "browse": {
     "pageTitle": "Utforska",
@@ -980,6 +1041,7 @@
         "dicecoinXp": "DiceCoin & XP",
         "achievements": "Achievements",
         "shopRewards": "Shop & Rewards",
+        "cosmetics": "Kosmetik",
         "libraryExports": "Library Exports",
         "courses": "Kurser",
         "learningPaths": "Lärstigar",
@@ -4322,6 +4384,122 @@
             "createFailed": "Kunde inte skapa item",
             "unexpected": "Ett oväntat fel uppstod"
           }
+        }
+      },
+      "cosmetics": {
+        "pageTitle": "Kosmetik-katalog",
+        "pageDescription": "Hantera kosmetik, unlock-regler och manuella grants.",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "cosmetics": "Kosmetik",
+          "create": "Skapa",
+          "edit": "Redigera"
+        },
+        "actions": {
+          "create": "Ny kosmetik",
+          "edit": "Redigera",
+          "save": "Spara",
+          "cancel": "Avbryt",
+          "saving": "Sparar...",
+          "deactivate": "Inaktivera",
+          "activate": "Aktivera",
+          "addRule": "Lägg till regel",
+          "removeRule": "Ta bort regel",
+          "grant": "Granta till användare"
+        },
+        "filters": {
+          "search": "Sök kosmetik...",
+          "category": "Kategori",
+          "faction": "Fraktion",
+          "rarity": "Raritet",
+          "all": "Alla"
+        },
+        "columns": {
+          "key": "Nyckel",
+          "category": "Kategori",
+          "faction": "Fraktion",
+          "rarity": "Raritet",
+          "renderType": "Render-typ",
+          "status": "Status",
+          "rules": "Regler",
+          "actions": "Åtgärder"
+        },
+        "status": {
+          "active": "Aktiv",
+          "inactive": "Inaktiv"
+        },
+        "categories": {
+          "avatar_frame": "Avatar-ram",
+          "scene_background": "Scen-bakgrund",
+          "particles": "Partiklar",
+          "xp_bar": "XP-bar",
+          "section_divider": "Sektionsdelning"
+        },
+        "factions": {
+          "forest": "Skog",
+          "sea": "Hav",
+          "desert": "Öken",
+          "void": "Void",
+          "universal": "Universell"
+        },
+        "rarities": {
+          "common": "Vanlig",
+          "uncommon": "Ovanlig",
+          "rare": "Sällsynt",
+          "epic": "Episk",
+          "legendary": "Legendarisk"
+        },
+        "form": {
+          "key": "Nyckel",
+          "keyPlaceholder": "t.ex. void_avatar_frame_constellation",
+          "category": "Kategori",
+          "faction": "Fraktion",
+          "factionNone": "Ingen (universell)",
+          "rarity": "Raritet",
+          "nameKey": "Namn-nyckel (i18n)",
+          "nameKeyPlaceholder": "cosmetics.void_constellation.name",
+          "descriptionKey": "Beskrivningsnyckel (i18n)",
+          "descriptionKeyPlaceholder": "cosmetics.void_constellation.description",
+          "renderType": "Render-typ",
+          "renderConfig": "Render-config (JSON)",
+          "sortOrder": "Sorteringsordning",
+          "isActive": "Aktiv"
+        },
+        "rules": {
+          "title": "Unlock-regler",
+          "unlockType": "Unlock-typ",
+          "config": "Konfiguration (JSON)",
+          "priority": "Prioritet",
+          "empty": "Inga unlock-regler definierade.",
+          "types": {
+            "level": "Nivå",
+            "achievement": "Achievement",
+            "shop": "Butik",
+            "event": "Event",
+            "manual": "Manuell"
+          }
+        },
+        "grant": {
+          "title": "Granta kosmetik",
+          "userSearch": "Sök användare (e-post eller ID)",
+          "reason": "Anledning",
+          "reasonPlaceholder": "T.ex. Beta-testare belöning",
+          "submit": "Granta",
+          "success": "Kosmetik grantad till användare.",
+          "error": "Kunde inte granta kosmetik."
+        },
+        "empty": {
+          "title": "Inga kosmetik",
+          "description": "Skapa din första kosmetik för att komma igång."
+        },
+        "notifications": {
+          "created": "Kosmetik skapad",
+          "updated": "Kosmetik uppdaterad",
+          "deactivated": "Kosmetik inaktiverad",
+          "activated": "Kosmetik aktiverad",
+          "ruleAdded": "Unlock-regel tillagd",
+          "ruleRemoved": "Unlock-regel borttagen",
+          "error": "Ett fel uppstod"
         }
       },
       "libraryExports": {

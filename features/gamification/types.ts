@@ -54,7 +54,7 @@ export type ProgressSnapshot = {
 export type GamificationIdentity = {
   displayName: string;
   avatarUrl: string | null;
-  factionId: 'forest' | 'sea' | 'sky' | 'void' | null;
+  factionId: 'forest' | 'sea' | 'desert' | 'void' | null;
 };
 
 export type ShowcaseSlot = {
@@ -71,6 +71,12 @@ export type JourneyPreference = {
   decisionAt: string | null;
 };
 
+export type CosmeticsSnapshot = {
+  loadout: import('@/features/journey/cosmetic-types').ActiveLoadout;
+  unlockedCount: number;
+  recentUnlocks: { cosmeticKey: string; unlockedAt: string }[];
+};
+
 export type GamificationPayload = {
   identity?: GamificationIdentity;
   achievements: Achievement[];
@@ -79,4 +85,5 @@ export type GamificationPayload = {
   progress: ProgressSnapshot;
   showcase?: ShowcaseSummary;
   journeyPreference?: JourneyPreference;
+  cosmetics: CosmeticsSnapshot;
 };

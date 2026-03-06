@@ -9,7 +9,7 @@
 // Faction Types
 // =============================================================================
 
-export type FactionId = 'forest' | 'sea' | 'sky' | 'void' | null
+export type FactionId = 'forest' | 'sea' | 'desert' | 'void' | null
 
 export interface FactionTheme {
   id: FactionId

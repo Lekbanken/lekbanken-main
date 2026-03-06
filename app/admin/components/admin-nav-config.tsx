@@ -305,6 +305,7 @@ export const adminNavConfig: AdminNavConfig = [
       { id: 'dicecoin-xp', href: '/admin/gamification/dicecoin-xp', labelKey: 'admin.nav.items.dicecoinXp', icon: navIcons.leaderboard },
       { id: 'achievements', href: '/admin/gamification/achievements', labelKey: 'admin.nav.items.achievements', icon: navIcons.achievements },
       { id: 'shop-rewards', href: '/admin/gamification/shop-rewards', labelKey: 'admin.nav.items.shopRewards', icon: navIcons.marketplace },
+      { id: 'cosmetics', href: '/admin/cosmetics', labelKey: 'admin.nav.items.cosmetics', icon: navIcons.swatch, systemAdminOnly: true },
       { id: 'library-exports', href: '/admin/gamification/library-exports', labelKey: 'admin.nav.items.libraryExports', icon: navIcons.content },
     ],
   },

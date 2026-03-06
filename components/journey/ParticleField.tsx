@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import type { CssParticlesConfig } from "@/features/journey/cosmetic-types";
 
 /**
  * ParticleField — CSS-only ambient floating particles for JourneyScene.
@@ -11,14 +12,18 @@ export function ParticleField({
   count = 16,
   accentColor = "#8661ff",
   enabled = true,
+  loadoutConfig,
 }: {
   count?: number;
   accentColor?: string;
   enabled?: boolean;
+  /** v2.0 loadout config — when present, overrides count */
+  loadoutConfig?: CssParticlesConfig | null;
 }) {
+  const resolvedCount = loadoutConfig?.count ?? count;
   const particles = useMemo(
     () =>
-      Array.from({ length: Math.min(count, 20) }, (_, i) => ({
+      Array.from({ length: Math.min(resolvedCount, 20) }, (_, i) => ({
         id: i,
         left: (i * 31) % 100,
         top: (i * 17) % 100,
@@ -27,14 +32,14 @@ export function ParticleField({
         delay: (i * 0.5) % 10,
         opacity: 0.3 + (i % 5) * 0.1,
       })),
-    [count],
+    [resolvedCount],
   );
 
   if (!enabled) return null;
 
   return (
     <div
-      className="absolute inset-0 overflow-hidden pointer-events-none"
+      className={`absolute inset-0 overflow-hidden pointer-events-none${loadoutConfig?.className ? ` ${loadoutConfig.className}` : ""}`}
       aria-hidden="true"
     >
       {particles.map((p) => (

@@ -1,11 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerRlsClient } from "@/lib/supabase/server";
 
-const VALID_FACTIONS = new Set(["forest", "sea", "sky", "void"]);
+const VALID_FACTIONS = new Set(["forest", "sea", "desert", "void"]);
 
 /**
  * POST /api/gamification/faction
- * Body: { factionId: "forest" | "sea" | "sky" | "void" | null }
+ * Body: { factionId: "forest" | "sea" | "desert" | "void" | null }
  *
  * Sets (or clears) the user's cosmetic faction.
  * Stored in user_journey_preferences (global, 1 row per user).

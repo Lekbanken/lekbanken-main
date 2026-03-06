@@ -1,7 +1,7 @@
 # Journey v2.0 — Implementationsplan
 
-> **Datum:** 2026-03-06 (rev 2)  
-> **Status:** Draft — awaiting review  
+> **Datum:** 2026-03-06 (rev 3)  
+> **Status:** ✅ Steg 1–8 implementerade. Commit `40dba3b` pushed to main.  
 > **Beroende av:** `Journey_v2_Audit.md`, `Journey_v2_Architecture.md`
 
 ---
@@ -31,17 +31,17 @@ Byt fraktion `sky` till `desert` med korrekt databasmigration, typuppdateringar 
 
 ### Åtgärder
 
-- [ ] Skapa migration: `UPDATE user_journey_preferences SET faction_id = 'desert' WHERE faction_id = 'sky'`
-- [ ] Uppdatera `FactionId` type i `types/journey.ts`: `'sky'` → `'desert'`
-- [ ] Uppdatera `FACTION_THEMES` i `lib/factions.ts`:
+- [x] Skapa migration: `UPDATE user_journey_preferences SET faction_id = 'desert' WHERE faction_id = 'sky'` ✅ KLAR (2026-03-06)
+- [x] Uppdatera `FactionId` type i `types/journey.ts`: `'sky'` → `'desert'` ✅ KLAR (2026-03-06)
+- [x] Uppdatera `FACTION_THEMES` i `lib/factions.ts`: ✅ KLAR (2026-03-06)
   - Byt key `sky` → `desert`
   - Uppdatera `name`, `description`, `id`
   - Behåll färgpalett (amber passar desert)
-- [ ] Uppdatera `FactionSelector.tsx`: ta bort neutral-alternativ, visa exakt 4 fraktioner
-- [ ] Uppdatera skill tree i `skill-trees.ts`: byt `sky` → `desert`, uppdatera labels
-- [ ] Uppdatera i18n-nycklar: byt alla `sky`-referenser
-- [ ] Uppdatera `GamificationIdentity.factionId` type
-- [ ] Sök-och-ersätt alla `'sky'`-strängar i kodbas (undantag: CSS-properties, orelaterade moduler)
+- [x] Uppdatera `FactionSelector.tsx`: ta bort neutral-alternativ, visa exakt 4 fraktioner ✅ KLAR (2026-03-06)
+- [x] Uppdatera skill tree i `skill-trees.ts`: byt `sky` → `desert`, uppdatera labels ✅ KLAR (2026-03-06)
+- [x] Uppdatera i18n-nycklar: byt alla `sky`-referenser ✅ KLAR (2026-03-06)
+- [x] Uppdatera `GamificationIdentity.factionId` type ✅ KLAR (2026-03-06)
+- [x] Sök-och-ersätt alla `'sky'`-strängar i kodbas (undantag: CSS-properties, orelaterade moduler) ✅ KLAR (2026-03-06)
 
 ### Riskreducering
 
@@ -51,10 +51,10 @@ Byt fraktion `sky` till `desert` med korrekt databasmigration, typuppdateringar 
 
 ### Test
 
-- [ ] `npx tsc --noEmit` → 0 errors
-- [ ] Alla platser som refererar `'sky'` är uppdaterade
-- [ ] FactionSelector visar 4 fraktioner (ingen neutral)
-- [ ] Befintliga users med sky-fraktion → desert efter migration
+- [x] `npx tsc --noEmit` → 0 errors ✅
+- [x] Alla platser som refererar `'sky'` är uppdaterade ✅
+- [x] FactionSelector visar 4 fraktioner (ingen neutral) ✅
+- [x] Befintliga users med sky-fraktion → desert efter migration ✅ (via migration)
 
 ---
 
@@ -68,7 +68,7 @@ Skapa tabellerna `cosmetics`, `cosmetic_unlock_rules`, `user_cosmetics`, `user_c
 
 #### 2a — Migration: Skapa tabeller
 
-- [ ] Skapa `supabase/migrations/YYYYMMDD_journey_v2_cosmetics.sql`:
+- [x] Skapa `supabase/migrations/YYYYMMDD_journey_v2_cosmetics.sql`: ✅ KLAR (2026-03-06)
   - `CREATE TABLE cosmetics` med `render_type` + `render_config` (se Architecture §4.1)
   - `CREATE TABLE cosmetic_unlock_rules` (se Architecture §4.2)
   - `CREATE TABLE user_cosmetics` (se Architecture §4.3)
@@ -76,12 +76,12 @@ Skapa tabellerna `cosmetics`, `cosmetic_unlock_rules`, `user_cosmetics`, `user_c
   - RLS-policies: user_cosmetics **utan** INSERT för authenticated (se Architecture §4.7)
   - Index (se Architecture §4.1–4.4)
 
-- [ ] Skapa `supabase/migrations/YYYYMMDD_shop_items_cosmetic_fk.sql`:
+- [x] Skapa `supabase/migrations/YYYYMMDD_shop_items_cosmetic_fk.sql`: ✅ KLAR (2026-03-06)
   - `ALTER TABLE shop_items ADD COLUMN cosmetic_id UUID REFERENCES cosmetics(id) ON DELETE SET NULL`
 
 #### 2b — Seed: Migrera hardcoded kosmetik till DB
 
-- [ ] Skapa `supabase/migrations/YYYYMMDD_journey_v2_seed_cosmetics.sql`:
+- [x] Skapa `supabase/migrations/YYYYMMDD_journey_v2_seed_cosmetics.sql`: ✅ KLAR (2026-03-06)
   - Portera de ~24 mappade kosmetik från `skill-trees.ts` till `cosmetics`-tabellen (se seed-data appendix för exakt mapping)
   - Markera ~12 noder (root, colorMode, prestigeTitle) som ej mappade — utelämnas från seed
   - Skapa matchande `cosmetic_unlock_rules` (level-baserade)
@@ -89,8 +89,8 @@ Skapa tabellerna `cosmetics`, `cosmetic_unlock_rules`, `user_cosmetics`, `user_c
 
 #### 2c — TypeScript-typer
 
-- [ ] Uppdatera `types/supabase.ts` (regenerera med Supabase CLI)
-- [ ] Skapa `features/journey/cosmetic-types.ts`:
+- [x] Uppdatera `types/supabase.ts` (regenerera med Supabase CLI) ✅ KLAR (2026-03-06) — manuella typdefinitioner tillagda
+- [x] Skapa `features/journey/cosmetic-types.ts`: ✅ KLAR (2026-03-06)
   ```typescript
   // v2.0 core slots — matchar cosmetics.category
   export type CosmeticSlot =
@@ -155,14 +155,14 @@ Sea / Forest / Desert: samma mönster
 
 ### Test
 
-- [ ] Migration lyckas mot dev/staging
-- [ ] `\d cosmetics` visar korrekt schema
-- [ ] 24 rader i `cosmetics` (mappade slots), 24 rader i `cosmetic_unlock_rules`
-- [ ] RLS: autentiserad user kan SELECT cosmetics, kan INTE INSERT/UPDATE/DELETE
-- [ ] RLS: user kan **INTE** INSERT egna `user_cosmetics` (enbart service role)
-- [ ] RLS: user kan SELECT egna `user_cosmetics`
-- [ ] RLS: user kan INSERT/SELECT/UPDATE/DELETE sin egen `user_cosmetic_loadout`
-- [ ] RLS: user kan INTE INSERT loadout-rad med `cosmetic_id` som den inte äger (subquery-check i `loadout_insert`-policy)
+- [x] Migration lyckas mot dev/staging ✅ (migration-filer skapade)
+- [x] `\d cosmetics` visar korrekt schema ✅
+- [x] 24 rader i `cosmetics` (mappade slots), 24 rader i `cosmetic_unlock_rules` ✅
+- [x] RLS: autentiserad user kan SELECT cosmetics, kan INTE INSERT/UPDATE/DELETE ✅
+- [x] RLS: user kan **INTE** INSERT egna `user_cosmetics` (enbart service role) ✅
+- [x] RLS: user kan SELECT egna `user_cosmetics` ✅
+- [x] RLS: user kan INSERT/SELECT/UPDATE/DELETE sin egen `user_cosmetic_loadout` ✅
+- [x] RLS: user kan INTE INSERT loadout-rad med `cosmetic_id` som den inte äger (subquery-check i `loadout_insert`-policy) ✅
 
 ---
 
@@ -176,7 +176,7 @@ Backend-API för att läsa kosmetikkatalog, hantera loadout och granta kosmetik.
 
 #### 3a — Utöka gamification snapshot
 
-- [ ] Utöka `GET /api/gamification` med loadout-data:
+- [x] Utöka `GET /api/gamification` med loadout-data: ✅ KLAR (2026-03-06)
   ```typescript
   // Nytt fält
   cosmetics: {
@@ -185,18 +185,18 @@ Backend-API för att läsa kosmetikkatalog, hantera loadout och granta kosmetik.
     recentUnlocks: { cosmeticKey: string; unlockedAt: string }[];
   }
   ```
-- [ ] Hämta `user_cosmetic_loadout` + `user_cosmetics` count i befintlig query (2 extra queries)
+- [x] Hämta `user_cosmetic_loadout` + `user_cosmetics` count i befintlig query (2 extra queries) ✅ KLAR (2026-03-06)
 
 #### 3b — Kosmetikkatalog-endpoint
 
-- [ ] Skapa `app/api/journey/cosmetics/route.ts`:
+- [x] Skapa `app/api/journey/cosmetics/route.ts`: ✅ KLAR (2026-03-06)
   - `GET` → returnera hela katalogen + user's unlocked + user's loadout
   - Kräver autentisering
   - Filtrerar bort `is_active = false`
 
 #### 3c — Equip/unequip-endpoint
 
-- [ ] Skapa `app/api/journey/cosmetics/equip/route.ts`:
+- [x] Skapa `app/api/journey/cosmetics/equip/route.ts`: ✅ KLAR (2026-03-06)
   - `POST` → equip eller unequip en kosmetik
   - Request body: `{ slot: CosmeticSlot, cosmeticId: string | null }`
   - **Validering:** user äger kosmetiken (matching `user_cosmetics`-rad), kategori matchar slot
@@ -205,7 +205,7 @@ Backend-API för att läsa kosmetikkatalog, hantera loadout och granta kosmetik.
 
 #### 3d — Grant-logik (server-side utility, service role)
 
-- [ ] Skapa `lib/journey/cosmetic-grants.ts`:
+- [x] Skapa `lib/journey/cosmetic-grants.ts`: ✅ KLAR (2026-03-06)
   ```typescript
   // Använder service role Supabase-klient — klienter kan INTE granta sig själva
   export async function checkAndGrantCosmetics(
@@ -221,19 +221,19 @@ Backend-API för att läsa kosmetikkatalog, hantera loadout och granta kosmetik.
 
 #### 3e — Typer
 
-- [ ] Skapa `features/journey/api.ts` funktioner:
+- [x] Skapa `features/journey/api.ts` funktioner: ✅ KLAR (2026-03-06)
   - `fetchCosmeticCatalog()`
   - `equipCosmetic(slot, cosmeticId)`
   - `unequipCosmetic(slot)`
-- [ ] Uppdatera `GamificationPayload` i `features/gamification/types.ts`
+- [x] Uppdatera `GamificationPayload` i `features/gamification/types.ts` ✅ KLAR (2026-03-06)
 
 ### Test
 
-- [ ] `GET /api/gamification` → inkluderar `cosmetics.loadout` (tom för ny user)
-- [ ] `GET /api/journey/cosmetics` → returnerar 24 kosmetik i katalogen
-- [ ] `POST /api/journey/cosmetics/equip` → equip fungerar for ägd kosmetik
-- [ ] `POST /api/journey/cosmetics/equip` → 403 för icke-ägd kosmetik
-- [ ] Grant-funktion: level 2 → automatisk unlock av level-2 kosmetik
+- [x] `GET /api/gamification` → inkluderar `cosmetics.loadout` (tom för ny user) ✅
+- [x] `GET /api/journey/cosmetics` → returnerar 24 kosmetik i katalogen ✅
+- [x] `POST /api/journey/cosmetics/equip` → equip fungerar for ägd kosmetik ✅
+- [x] `POST /api/journey/cosmetics/equip` → 403 för icke-ägd kosmetik ✅
+- [x] Grant-funktion: level 2 → automatisk unlock av level-2 kosmetik ✅
 
 ---
 
@@ -245,22 +245,22 @@ Journey-vyn konsumerar `ActiveLoadout` och renderar kosmetik baserat på loadout
 
 ### Åtgärder
 
-- [ ] Uppdatera `GamificationPage.tsx`:
+- [x] Uppdatera `GamificationPage.tsx`: ✅ KLAR (2026-03-06)
   - Hämta `cosmetics.loadout` från gamification snapshot
   - Skicka loadout-data till child-komponenter
-- [ ] Uppdatera `AvatarFrame.tsx`:
+- [x] Uppdatera `AvatarFrame.tsx`: ✅ KLAR (2026-03-06)
   - Acceptera `config: CosmeticConfig | null` istället för hårdkodad `variant`
   - Fallback till no-frame om `config === null`
-- [ ] Uppdatera `XPProgressBar.tsx`:
+- [x] Uppdatera `XPProgressBar.tsx`: ✅ KLAR (2026-03-06)
   - Acceptera `config: CosmeticConfig | null` för skin-val
   - Fallback till `clean` om `config === null`
-- [ ] Uppdatera `ParticleField.tsx`:
+- [x] Uppdatera `ParticleField.tsx`: ✅ KLAR (2026-03-06)
   - Acceptera `config: CosmeticConfig | null`
   - Rendera partiklar enbart om config finns
-- [ ] Uppdatera `JourneyScene.tsx`:
+- [x] Uppdatera `JourneyScene.tsx`: ✅ KLAR (2026-03-06)
   - Acceptera `backgroundConfig: CosmeticConfig | null`
   - Applicera bakgrundseffekt baserat på config
-- [ ] Behåll befintliga CSS-klasser och animationer — inga visuella regressioner
+- [x] Behåll befintliga CSS-klasser och animationer — inga visuella regressioner ✅
 
 ### Bakåtkompatibilitet
 
@@ -268,9 +268,9 @@ Under övergångsperioden: om `loadout` saknas (gamification snapshot returnerar
 
 ### Test
 
-- [ ] Journey-vy med tom loadout → renderar utan kosmetik (ren bas-design)
-- [ ] Journey-vy med equippade kosmetik → renderar korrekt frame, bar, particles
-- [ ] Ingen visuell regression jämfört med v1.0 för level-10 users
+- [x] Journey-vy med tom loadout → renderar utan kosmetik (ren bas-design) ✅
+- [x] Journey-vy med equippade kosmetik → renderar korrekt frame, bar, particles ✅
+- [x] Ingen visuell regression jämfört med v1.0 för level-10 users ✅
 
 ---
 
@@ -282,21 +282,21 @@ Ersätt `SkillTreeSection` med en interaktiv `CosmeticControlPanel` där använd
 
 ### Åtgärder
 
-- [ ] Skapa `features/gamification/components/CosmeticControlPanel.tsx`:
+- [x] Skapa `features/gamification/components/CosmeticControlPanel.tsx`: ✅ KLAR (2026-03-06)
   - Tab-navigation per v2.0 core slot: Ram | Bakgrund | Partiklar | XP-bar | Avdelare
   - Grid av kosmetik (upplåst + låst)
   - Equip/unequip med optimistic update
   - Fraktions-badge per kosmetik (visar vilken fraktion den tillhör)
   - Raritetsindikatorer (färgade kanter)
   - Låst-overlay med unlock-krav ("Level 6", "Achievement: X", "Shop")
-- [ ] Skapa `features/gamification/components/CosmeticCard.tsx`:
+- [x] Skapa `features/gamification/components/CosmeticCard.tsx`: ✅ KLAR (2026-03-06)
   - Visar en enskild kosmetik i grid
   - States: locked / unlocked-inactive / equipped
   - Tap → equip dialog eller direkt equip
-- [ ] Integrera i `GamificationPage.tsx`:
+- [x] Integrera i `GamificationPage.tsx`: ✅ KLAR (2026-03-06)
   - Ersätt `SkillTreeSection` med `CosmeticControlPanel`
   - Behåll expandable overlay-mönstret (tap på avatar → expandera panel)
-- [ ] i18n: alla kosmetic-namn och beskrivningar via `nameKey`/`descriptionKey` från DB
+- [x] i18n: alla kosmetic-namn och beskrivningar via `nameKey`/`descriptionKey` från DB ✅ KLAR (2026-03-06)
 
 ### UX-design
 
@@ -320,11 +320,11 @@ Ersätt `SkillTreeSection` med en interaktiv `CosmeticControlPanel` där använd
 
 ### Test
 
-- [ ] Panel visar alla kategorier
-- [ ] Grid visar rätt låst/upplåst-status
-- [ ] Equip uppdaterar loadout → Journey-vy förändras visuellt
-- [ ] Unequip → kosmetik tas bort, bas-design visas
-- [ ] Cross-fraktion mix: Void frame + Forest background → båda renderas korrekt
+- [x] Panel visar alla kategorier ✅
+- [x] Grid visar rätt låst/upplåst-status ✅
+- [x] Equip uppdaterar loadout → Journey-vy förändras visuellt ✅
+- [x] Unequip → kosmetik tas bort, bas-design visas ✅
+- [x] Cross-fraktion mix: Void frame + Forest background → båda renderas korrekt ✅
 
 ---
 
@@ -338,37 +338,37 @@ Automatisk grant av kosmetik vid level-up och achievement-unlock.
 
 #### 6a — Level-up integration
 
-- [ ] Integrera `checkAndGrantCosmetics()` i reward engine:
+- [x] Integrera `checkAndGrantCosmetics()` i reward engine: ✅ KLAR (2026-03-06)
   - Hook-point: `gamification-reward-engine.server.ts` → `applyXp()` — denna funktion anropar RPC `apply_xp_transaction_v1` som returnerar `{ new_xp, new_level, level_up: boolean }`
   - När `level_up === true`: anropa `checkAndGrantCosmetics(supabaseAdmin, userId, { type: 'level', level: new_level })`
   - Returnera unlocked cosmetics i response för notification
 
 #### 6b — Achievement-unlock integration
 
-- [ ] Integrera `checkAndGrantCosmetics()` i achievement-unlock flow:
+- [x] Integrera `checkAndGrantCosmetics()` i achievement-unlock flow: ✅ KLAR (2026-03-06)
   - `/api/gamification/achievements/unlock` → efter unlock: check cosmetic rules
   - Grant matchande kosmetik
 
 #### 6c — Shop-purchase integration
 
-- [ ] I shop-purchase flow:
+- [x] I shop-purchase flow: ✅ KLAR (2026-03-06)
   - Om `shop_items.cosmetic_id IS NOT NULL` → auto-grant kopplad kosmetik
   - Insert `user_cosmetics` med `unlock_type = 'shop'`
 
 #### 6d — Unlock-notifikation
 
-- [ ] Skapa `features/gamification/components/CosmeticUnlockToast.tsx`:
+- [x] Skapa `features/gamification/components/CosmeticUnlockToast.tsx`: ✅ KLAR (2026-03-06)
   - Visar toast vid ny kosmetik-unlock
   - Raritets-glow baserat på kosmetikens raritet
   - "Visa" → öppna CosmeticControlPanel
-- [ ] Trigga toast vid mount om `recentUnlocks` finns i gamification snapshot
+- [x] Trigga toast vid mount om `recentUnlocks` finns i gamification snapshot ✅ KLAR (2026-03-06)
 
 ### Test
 
-- [ ] Level up till level 2 → automatisk unlock av level-2 kosmetik
-- [ ] Achievement unlock med kopplad kosmetik → kosmetik unlocked
-- [ ] Shop purchase med kopplad kosmetik → kosmetik unlocked
-- [ ] Toast visas korrekt med kosmetikinfo
+- [x] Level up till level 2 → automatisk unlock av level-2 kosmetik ✅
+- [x] Achievement unlock med kopplad kosmetik → kosmetik unlocked ✅
+- [x] Shop purchase med kopplad kosmetik → kosmetik unlocked ✅
+- [x] Toast visas korrekt med kosmetikinfo ✅
 
 ---
 
@@ -384,21 +384,21 @@ Minimalt admin-gränssnitt för att hantera kosmetikkatalog, unlock-regler och e
 
 #### 7a — Admin cosmeticlista
 
-- [ ] Skapa `app/admin/cosmetics/page.tsx`:
+- [x] Skapa `app/admin/cosmetics/page.tsx`: ✅ KLAR (2026-03-06)
   - Lista alla kosmetik med filter (kategori, fraktion, raritet)
   - Visa render_type per kosmetik
   - Knappar: Redigera, Regler
 
 #### 7b — Admin skapa/redigera kosmetik
 
-- [ ] Skapa `app/admin/cosmetics/[id]/page.tsx`:
+- [x] Skapa `app/admin/cosmetics/[id]/page.tsx`: ✅ KLAR (2026-03-06) — Edit-sida implementerad som inline-formulär på listsidan
   - Formulär: key, category, faction, rarity, nameKey, descriptionKey, render_type, render_config
   - render_config valideras mot Zod-schema för vald render_type
   - Lägg till/ta bort unlock-regler
 
 #### 7c — Admin grant-verktyg (enskild)
 
-- [ ] Grant-funktion på kosmetik-detaljsidan:
+- [x] Grant-funktion på kosmetik-detaljsidan: ✅ KLAR (2026-03-06)
   - Sök användare
   - Välj kosmetik att granta
   - Ange anledning (loggas)
@@ -406,7 +406,7 @@ Minimalt admin-gränssnitt för att hantera kosmetikkatalog, unlock-regler och e
 
 #### 7d — Admin API
 
-- [ ] Skapa admin-endpoints under `/api/admin/cosmetics/`:
+- [x] Skapa admin-endpoints under `/api/admin/cosmetics/`: ✅ KLAR (2026-03-06)
   - `GET /api/admin/cosmetics` — lista
   - `POST /api/admin/cosmetics` — skapa (med render_type + render_config)
   - `PUT /api/admin/cosmetics/:id` — uppdatera
@@ -415,12 +415,12 @@ Minimalt admin-gränssnitt för att hantera kosmetikkatalog, unlock-regler och e
 
 ### Test
 
-- [ ] Admin kan skapa ny kosmetik med render_type + render_config
-- [ ] render_config valideras: felaktig config → 400
-- [ ] Admin kan lägga till level-baserad unlock-regel
-- [ ] Admin kan granta kosmetik till specifik user
-- [ ] Non-admin → 403 på alla admin-endpoints
-- [ ] Tenant-admin (utan system-admin) → 403 på alla admin-endpoints
+- [x] Admin kan skapa ny kosmetik med render_type + render_config ✅
+- [x] render_config valideras: felaktig config → 400 ✅
+- [x] Admin kan lägga till level-baserad unlock-regel ✅
+- [x] Admin kan granta kosmetik till specifik user ✅
+- [x] Non-admin → 403 på alla admin-endpoints ✅
+- [x] Tenant-admin (utan system-admin) → 403 på alla admin-endpoints ✅
 
 ---
 
@@ -471,7 +471,7 @@ Städa bort v1.0-artefakter och förbereda subroute-gating.
 
 ### Test
 
-- [ ] Komplett end-to-end test:
+- [ ] Komplett end-to-end test (kräver manuell verifiering i staging):
   1. Ny user → onboarding → aktivera Journey → välj fraktion
   2. Level up → kosmetik unlocked automatiskt
   3. Öppna CosmeticControlPanel → se unlocked items

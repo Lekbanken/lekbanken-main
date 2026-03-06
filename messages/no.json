@@ -470,6 +470,7 @@
     "cosmeticPanel": {
       "title": "Velg kostyme",
       "hint": "Trykk på en kosmetikk for å aktivere eller bytte",
+      "unlockedCount": "opplåste",
       "tabs": {
         "avatar_frame": "Ramme",
         "scene_background": "Bakgrunn",
@@ -1328,6 +1329,7 @@
       "achievements": "Achievements",
       "awards": "Utmerkelser",
       "shopRewards": "Butikk & Belønninger",
+      "cosmetics": "Kosmetikk",
       "learning": "Opplæring",
       "courses": "Kurs",
       "learningPaths": "Læringsveier",

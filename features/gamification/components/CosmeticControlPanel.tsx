@@ -17,6 +17,17 @@ import type { FactionTheme } from "@/types/journey";
 import { CosmeticCard } from "./CosmeticCard";
 
 // ---------------------------------------------------------------------------
+// Inject pulse keyframe once (SSR-safe)
+// ---------------------------------------------------------------------------
+const PULSE_KEYFRAME_ID = "__cosmetic-pulse-kf";
+if (typeof document !== "undefined" && !document.getElementById(PULSE_KEYFRAME_ID)) {
+  const style = document.createElement("style");
+  style.id = PULSE_KEYFRAME_ID;
+  style.textContent = `@keyframes cosmeticPulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:.15;transform:scale(1.04)}}`;
+  document.head.appendChild(style);
+}
+
+// ---------------------------------------------------------------------------
 // Tab icons (inline SVG, no deps)
 // ---------------------------------------------------------------------------
 
@@ -130,6 +141,13 @@ export function CosmeticControlPanel({
 
   const accent = theme.accentColor;
 
+  // ── Unlock count per tab ──
+  const tabUnlockCount = (slot: CosmeticSlot) => {
+    const total = catalog.filter((c) => c.category === slot).length;
+    const owned = catalog.filter((c) => c.category === slot && unlocked.has(c.id)).length;
+    return { owned, total };
+  };
+
   // ── Loading state ──
   if (loading) {
     return (
@@ -154,15 +172,25 @@ export function CosmeticControlPanel({
 
   return (
     <div className="w-full">
-      {/* ── Title ── */}
-      <h2 className="text-base font-bold text-white text-center mb-3">
-        {t("title")}
-      </h2>
+      {/* ── Title with unlock progress ── */}
+      <div className="text-center mb-4">
+        <h2 className="text-base font-bold text-white">
+          {t("title")}
+        </h2>
+        <p className="text-[10px] text-white/35 mt-0.5">
+          {(() => {
+            const total = catalog.length;
+            const owned = catalog.filter((c) => unlocked.has(c.id)).length;
+            return `${owned} / ${total} ${t("unlockedCount")}`;
+          })()}
+        </p>
+      </div>
 
       {/* ── Category Tabs ── */}
-      <div className="flex justify-center gap-1 mb-4 flex-wrap">
+      <div className="flex justify-center gap-1.5 mb-4 flex-wrap">
         {COSMETIC_SLOTS.map((slot) => {
           const isActive = slot === activeTab;
+          const { owned, total } = tabUnlockCount(slot);
           return (
             <button
               key={slot}
@@ -172,10 +200,18 @@ export function CosmeticControlPanel({
                 backgroundColor: isActive ? `${accent}20` : "rgba(255,255,255,0.05)",
                 border: isActive ? `1.5px solid ${accent}` : "1.5px solid rgba(255,255,255,0.10)",
                 color: isActive ? "white" : "rgba(255,255,255,0.6)",
+                boxShadow: isActive ? `0 0 12px ${accent}20` : "none",
               }}
             >
               <span className="text-sm">{TAB_ICONS[slot]}</span>
               {t(`tabs.${slot}`)}
+              {total > 0 && (
+                <span
+                  className="text-[9px] ml-0.5 opacity-50"
+                >
+                  {owned}/{total}
+                </span>
+              )}
             </button>
           );
         })}
@@ -202,32 +238,48 @@ export function CosmeticControlPanel({
           {t("noItems")}
         </p>
       ) : (
-        <div
-          className="grid gap-2"
-          style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
-          }}
-        >
-          {tabItems.map((item) => {
-            const isItemUnlocked = unlocked.has(item.id);
-            const isEquipped = loadout[activeTab] === item.id;
+        <>
+          {/* ── Progression separator ── */}
+          <div className="flex items-center gap-3 mb-3 px-2">
+            <div className="flex-1 h-px" style={{ background: `linear-gradient(to right, transparent, ${accent}30, transparent)` }} />
+            <span className="text-[9px] uppercase tracking-widest text-white/25 font-medium">
+              {t(`tabs.${activeTab}`)}
+            </span>
+            <div className="flex-1 h-px" style={{ background: `linear-gradient(to right, transparent, ${accent}30, transparent)` }} />
+          </div>
 
-            return (
-              <CosmeticCard
-                key={item.id}
-                item={item}
-                isUnlocked={isItemUnlocked}
-                isEquipped={isEquipped}
-                onEquip={() => handleEquip(activeTab, item.id)}
-                onUnequip={() => handleUnequip(activeTab)}
-                displayName={tCosmetics(item.nameKey)}
-                rarityLabel={t(`rarity.${item.rarity}`)}
-                lockLabel={undefined}
-                accentColor={accent}
-              />
-            );
-          })}
-        </div>
+          <div
+            className="grid gap-2.5"
+            style={{
+              gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))",
+            }}
+          >
+            {tabItems.map((item) => {
+              const isItemUnlocked = unlocked.has(item.id);
+              const isEquipped = loadout[activeTab] === item.id;
+
+              // Build lock label from sortOrder (which maps to unlock level)
+              const itemLockLabel = !isItemUnlocked
+                ? `Lv${item.sortOrder + 1}`
+                : undefined;
+
+              return (
+                <CosmeticCard
+                  key={item.id}
+                  item={item}
+                  isUnlocked={isItemUnlocked}
+                  isEquipped={isEquipped}
+                  onEquip={() => handleEquip(activeTab, item.id)}
+                  onUnequip={() => handleUnequip(activeTab)}
+                  displayName={tCosmetics(item.nameKey)}
+                  rarityLabel={t(`rarity.${item.rarity}`)}
+                  lockLabel={itemLockLabel}
+                  accentColor={accent}
+                />
+              );
+            })}
+          </div>
+        </>
       )}
 
       {/* ── Pending indicator ── */}

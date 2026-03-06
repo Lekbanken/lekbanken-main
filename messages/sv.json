@@ -319,6 +319,7 @@
     "cosmeticPanel": {
       "title": "Välj kostym",
       "hint": "Tryck på en kostym för att aktivera eller byta",
+      "unlockedCount": "upplåsta",
       "tabs": {
         "avatar_frame": "Ram",
         "scene_background": "Bakgrund",
@@ -1144,6 +1145,7 @@
       "achievements": "Achievements",
       "awards": "Utmärkelser",
       "shopRewards": "Shop & Rewards",
+      "cosmetics": "Kosmetik",
       "learning": "Utbildning",
       "courses": "Kurser",
       "learningPaths": "Lärstigar",

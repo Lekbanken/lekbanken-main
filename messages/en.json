@@ -342,6 +342,7 @@
     "cosmeticPanel": {
       "title": "Choose costume",
       "hint": "Tap a cosmetic to equip or swap",
+      "unlockedCount": "unlocked",
       "tabs": {
         "avatar_frame": "Frame",
         "scene_background": "Background",
@@ -1170,6 +1171,7 @@
       "achievements": "Achievements",
       "awards": "Awards",
       "shopRewards": "Shop & Rewards",
+      "cosmetics": "Cosmetics",
       "learning": "Learning",
       "courses": "Courses",
       "learningPaths": "Learning Paths",

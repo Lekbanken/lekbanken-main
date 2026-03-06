@@ -8,7 +8,7 @@
 //   void  → constellation (stars + connecting lines)
 //   sea   → coral (bubbles + wave arcs)
 //   forest → vines (leaf curls + tendrils)
-//   sky   → aurora (gradient arcs + light dots)
+//   desert → aurora (gradient arcs + light dots)
 //
 // 0 new keyframes. Pure SVG + CSS transitions.
 // ---------------------------------------------------------------------------
@@ -273,7 +273,7 @@ function VinesFrame({ cx, cy, r, color }: FrameProps) {
   );
 }
 
-/** Sky: gradient arcs + light dots suggesting aurora borealis */
+/** Desert: gradient arcs + light dots suggesting aurora borealis */
 function AuroraFrame({ cx, cy, r, color }: FrameProps) {
   const arcs = [
     { startA: -1.8, sweep: 1.2, offset: 0, width: 3 },

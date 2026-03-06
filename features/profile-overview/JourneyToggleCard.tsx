@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { trackJourneyEvent } from '@/lib/analytics/journey-tracking';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +16,13 @@ export function JourneyToggleCard({ enabled, onToggle }: JourneyToggleCardProps)
   const t = useTranslations('app.profile.sections.journey');
   const [optimistic, setOptimistic] = useState(enabled);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Sync local state when prop changes (e.g. after API data arrives)
+  useEffect(() => {
+    if (!isUpdating) {
+      setOptimistic(enabled);
+    }
+  }, [enabled, isUpdating]);
 
   const handleToggle = async (checked: boolean) => {
     setOptimistic(checked);

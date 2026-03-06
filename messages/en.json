@@ -338,6 +338,32 @@
       "unlockAt": "Unlocks at level {level}",
       "availableAt": "Available at level {level}",
       "nodeUnlocked": "Unlocked"
+    },
+    "onboarding": {
+      "title": "Welcome to Journey",
+      "step1Title": "What is Journey?",
+      "step1Desc": "Journey is your personal achievement canvas — a visual layer on top of gamification with themes, cosmetics and progression.",
+      "step2Title": "Choose your faction",
+      "step2Desc": "Four unique themes to choose from — forest, sea, sky or void. Each faction has its own design.",
+      "step3Title": "Unlock cosmetics",
+      "step3Desc": "Level up and unlock visual rewards like frames, effects and badges.",
+      "step4Title": "Show your achievements",
+      "step4Desc": "Display your proudest achievements in your personal showcase.",
+      "activate": "Activate Journey",
+      "skip": "Not now",
+      "changeHint": "You can always change this in your profile",
+      "next": "Next",
+      "previous": "Previous"
+    },
+    "standard": {
+      "activateJourneyTitle": "Try Journey",
+      "activateJourneyDesc": "Activate Journey for visual themes, cosmetics and progression on your gamification page.",
+      "activateJourneyButton": "Activate Journey",
+      "xpProgress": "XP progress",
+      "yourCoins": "Your coins",
+      "yourStreak": "Your streak",
+      "yourAchievements": "Your achievements",
+      "quickNav": "Quick navigation"
     }
   },
   "browse": {
@@ -8741,6 +8767,12 @@
           "noAchievements": "No achievements yet",
           "viewAll": "View all",
           "recommended": "Recommended"
+        },
+        "journey": {
+          "title": "Journey",
+          "description": "Activate Journey design on your gamification page for visual themes, cosmetics and progression.",
+          "toggleLabel": "Journey enabled",
+          "updateFailed": "Could not update Journey setting"
         },
         "personalInfo": {
           "title": "Personal Information",

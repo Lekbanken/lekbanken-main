@@ -18,7 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
 import { profileCacheKeys } from '@/lib/profile/cacheKeys';
-import { ProfileHero, StatsCards, AchievementShowcaseCard, SecurityStatusCard } from '@/features/profile-overview';
+import { ProfileHero, StatsCards, AchievementShowcaseCard, SecurityStatusCard, JourneyToggleCard } from '@/features/profile-overview';
 import type { GamificationPayload } from '@/features/gamification/types';
 
 interface QuickLinkProps {
@@ -108,6 +108,16 @@ export default function ProfileOverviewPage() {
     { timeout: 12000, skip: !user?.id }
   );
 
+  const handleJourneyToggle = async (enabled: boolean) => {
+    const res = await fetch('/api/gamification/journey-preference', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ enabled }),
+    });
+    if (!res.ok) throw new Error('Failed to update journey preference');
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-6">
       {/* Hero: avatar + name + level + XP */}
@@ -118,6 +128,12 @@ export default function ProfileOverviewPage() {
         tenantName={currentTenant?.name ?? null}
         progress={gamification?.progress ?? null}
         identity={gamification?.identity ?? null}
+      />
+
+      {/* Journey toggle */}
+      <JourneyToggleCard
+        enabled={gamification?.journeyPreference?.enabled ?? false}
+        onToggle={handleJourneyToggle}
       />
 
       {/* Mobile Tenant Selector */}

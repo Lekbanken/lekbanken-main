@@ -66,6 +66,11 @@ export type ShowcaseSummary = {
   slots: [ShowcaseSlot, ShowcaseSlot, ShowcaseSlot, ShowcaseSlot];
 };
 
+export type JourneyPreference = {
+  enabled: boolean;
+  decisionAt: string | null;
+};
+
 export type GamificationPayload = {
   identity?: GamificationIdentity;
   achievements: Achievement[];
@@ -73,4 +78,5 @@ export type GamificationPayload = {
   streak: StreakSummary;
   progress: ProgressSnapshot;
   showcase?: ShowcaseSummary;
+  journeyPreference?: JourneyPreference;
 };

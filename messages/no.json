@@ -467,6 +467,32 @@
       "availableAt": "Tilgjengelig på nivå {level}",
       "nodeUnlocked": "Opplåst"
     },
+    "onboarding": {
+      "title": "Velkommen til Journey",
+      "step1Title": "Hva er Journey?",
+      "step1Desc": "Journey er ditt personlige prestasjonslerret — et visuelt lag oppå gamification med temaer, kosmetikk og progresjon.",
+      "step2Title": "Velg din fraksjon",
+      "step2Desc": "Fire unike temaer å velge mellom — skog, hav, himmel eller rommet. Hver fraksjon har sin egen design.",
+      "step3Title": "Lås opp kosmetikk",
+      "step3Desc": "Gå opp i nivå og lås opp visuelle belønninger som rammer, effekter og merker.",
+      "step4Title": "Vis dine prestasjoner",
+      "step4Desc": "Vis frem dine stolteste prestasjoner i din personlige utstilling.",
+      "activate": "Aktiver Journey",
+      "skip": "Ikke nå",
+      "changeHint": "Du kan alltid endre dette i profilen din",
+      "next": "Neste",
+      "previous": "Forrige"
+    },
+    "standard": {
+      "activateJourneyTitle": "Prøv Journey",
+      "activateJourneyDesc": "Aktiver Journey for visuelle temaer, kosmetikk og progresjon på gamification-siden din.",
+      "activateJourneyButton": "Aktiver Journey",
+      "xpProgress": "XP-fremgang",
+      "yourCoins": "Dine mynter",
+      "yourStreak": "Din streak",
+      "yourAchievements": "Dine prestasjoner",
+      "quickNav": "Hurtignavigasjon"
+    },
     "coins": "Mynter",
     "noCoinsActivityYet": "Ingen myntaktivitet ennå",
     "viewAllTransactions": "Vis alle transaksjoner",
@@ -9278,6 +9304,12 @@
           "noAchievements": "Ingen utmerkelser ennå",
           "viewAll": "Vis alle",
           "recommended": "Anbefales"
+        },
+        "journey": {
+          "title": "Journey",
+          "description": "Aktiver Journey-design på gamification-siden din for visuelle temaer, kosmetikk og progresjon.",
+          "toggleLabel": "Journey aktivert",
+          "updateFailed": "Kunne ikke oppdatere Journey-innstillingen"
         },
         "personalInfo": {
           "title": "Personopplysninger",

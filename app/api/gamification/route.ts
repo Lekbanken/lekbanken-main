@@ -7,6 +7,7 @@ import type {
   CoinsSummary,
   GamificationIdentity,
   GamificationPayload,
+  JourneyPreference,
   ProgressSnapshot,
   ShowcaseSlot,
   ShowcaseSummary,
@@ -197,8 +198,8 @@ export async function GET() {
 
   const tenantId = (progressRes.data as { tenant_id?: string | null } | null)?.tenant_id ?? null;
 
-  // Faction lives in its own table — 1 row per user, no tenant dependency.
-  type PrefsRow = { faction_id: string | null };
+  // Faction + Journey activation state lives in its own table — 1 row per user, no tenant dependency.
+  type PrefsRow = { faction_id: string | null; journey_enabled: boolean; journey_decision_at: string | null };
   const prefsRes = await (
     supabase.from("user_journey_preferences" as never) as unknown as {
       select: (cols: string) => {
@@ -208,7 +209,7 @@ export async function GET() {
       };
     }
   )
-    .select("faction_id")
+    .select("faction_id,journey_enabled,journey_decision_at")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -297,7 +298,7 @@ export async function GET() {
   const showcase: ShowcaseSummary = { slots: showcaseSlots };
 
   // Identity — auth metadata + faction from user_journey_preferences
-  const rawFaction = (prefsRes.data as { faction_id?: string | null } | null)?.faction_id ?? null;
+  const rawFaction = (prefsRes.data as PrefsRow | null)?.faction_id ?? null;
   const VALID_FACTIONS = new Set<string>(["forest", "sea", "sky", "void"]);
   const factionId = rawFaction && VALID_FACTIONS.has(rawFaction)
     ? (rawFaction as "forest" | "sea" | "sky" | "void")
@@ -312,6 +313,13 @@ export async function GET() {
     factionId,
   };
 
+  // Journey activation preference
+  const prefsData = prefsRes.data as PrefsRow | null;
+  const journeyPreference: JourneyPreference = {
+    enabled: prefsData?.journey_enabled ?? false,
+    decisionAt: prefsData?.journey_decision_at ?? null,
+  };
+
   const payload: GamificationPayload = {
     identity,
     achievements,
@@ -319,6 +327,7 @@ export async function GET() {
     streak,
     progress,
     showcase,
+    journeyPreference,
   };
 
   return NextResponse.json(payload, { status: 200 });

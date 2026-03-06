@@ -315,6 +315,32 @@
       "unlockAt": "Låser upp på level {level}",
       "availableAt": "Tillgänglig på level {level}",
       "nodeUnlocked": "Upplåst"
+    },
+    "onboarding": {
+      "title": "Välkommen till Journey",
+      "step1Title": "Vad är Journey?",
+      "step1Desc": "Journey är din personliga prestationscanvas — ett visuellt lager ovanpå gamification med teman, kosmetik och progression.",
+      "step2Title": "Välj din fraktion",
+      "step2Desc": "Fyra unika teman att välja mellan — skog, hav, himmel eller rymd. Varje fraktion har sin egen design.",
+      "step3Title": "Lås upp kosmetik",
+      "step3Desc": "Gå upp i level och lås upp visuella belöningar som ramar, effekter och badges.",
+      "step4Title": "Visa dina utmärkelser",
+      "step4Desc": "Sätt upp dina stoltaste utmärkelser i din personliga showcase.",
+      "activate": "Aktivera Journey",
+      "skip": "Inte nu",
+      "changeHint": "Du kan alltid ändra detta i din profil",
+      "next": "Nästa",
+      "previous": "Föregående"
+    },
+    "standard": {
+      "activateJourneyTitle": "Prova Journey",
+      "activateJourneyDesc": "Aktivera Journey för visuella teman, kosmetik och progression på din gamification-sida.",
+      "activateJourneyButton": "Aktivera Journey",
+      "xpProgress": "XP-framsteg",
+      "yourCoins": "Dina mynt",
+      "yourStreak": "Din streak",
+      "yourAchievements": "Dina prestationer",
+      "quickNav": "Snabbnavigation"
     }
   },
   "browse": {
@@ -9101,6 +9127,12 @@
           "noAchievements": "Inga utmärkelser ännu",
           "viewAll": "Visa alla",
           "recommended": "Rekommenderas"
+        },
+        "journey": {
+          "title": "Journey",
+          "description": "Aktivera Journey-designen på din gamification-sida för visuella teman, kosmetik och progression.",
+          "toggleLabel": "Journey aktiverad",
+          "updateFailed": "Kunde inte uppdatera Journey-inställningen"
         },
         "personalInfo": {
           "title": "Personuppgifter",

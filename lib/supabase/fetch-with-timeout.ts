@@ -25,8 +25,10 @@ const defaultTimeouts: TimeoutConfig = {
   defaultMs: 15_000,
   // PostgREST queries should complete within a few seconds; fail fast if not.
   restMs: 8_000,
-  // Auth endpoints should be fast; token refresh is the slowest path.
-  authMs: 5_000,
+  // Auth endpoints are usually fast, but token refresh can exceed a few seconds
+  // on mobile networks / brief packet loss. Too-aggressive auth timeouts can
+  // cause false "SIGNED_OUT" cascades when auto-refresh is aborted mid-flight.
+  authMs: 15_000,
   // Edge functions may do more work.
   functionsMs: 30_000,
   // Upload/download can be larger; allow longer.

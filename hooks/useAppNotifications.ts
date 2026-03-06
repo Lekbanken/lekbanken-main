@@ -712,7 +712,9 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
     const setup = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      // Use session payload (local) to avoid auth network calls on mount/focus.
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
       if (!user?.id || !mountedRef.current) return;
 
       channel = supabase

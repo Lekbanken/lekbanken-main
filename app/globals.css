@@ -220,7 +220,7 @@ body {
    ============================================================================ */
 
 /* ── Void: Stars ── */
-.bg-effect-stars::after {
+.scene-stars::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -243,7 +243,7 @@ body {
 }
 
 /* ── Void: Meteors ── */
-.bg-effect-meteors::after {
+.scene-meteors::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -262,7 +262,7 @@ body {
 }
 
 /* ── Sea: Bubbles ── */
-.bg-effect-bubbles::after {
+.scene-bubbles::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -282,7 +282,7 @@ body {
 }
 
 /* ── Sea: Waves ── */
-.bg-effect-waves::after {
+.scene-waves::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -307,7 +307,7 @@ body {
 }
 
 /* ── Forest: Leaves ── */
-.bg-effect-leaves::after {
+.scene-leaves::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -328,7 +328,7 @@ body {
 }
 
 /* ── Forest: Fireflies ── */
-.bg-effect-fireflies::after {
+.scene-fireflies::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -348,7 +348,7 @@ body {
 }
 
 /* ── Desert: Clouds ── */
-.bg-effect-clouds::after {
+.scene-clouds::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -366,7 +366,7 @@ body {
 }
 
 /* ── Desert: Rays ── */
-.bg-effect-rays::after {
+.scene-rays::after {
   content: '';
   position: absolute;
   top: 0;

@@ -103,6 +103,11 @@ export type CosmeticItem = {
   renderConfig: RenderConfig;
   sortOrder: number;
   isActive: boolean;
+  /** Primary unlock method for badge display */
+  unlockInfo?: {
+    type: UnlockType;
+    level?: number;
+  } | null;
 };
 
 // ---------------------------------------------------------------------------

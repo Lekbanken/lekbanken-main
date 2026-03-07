@@ -259,10 +259,31 @@ export function CosmeticControlPanel({
               const isItemUnlocked = unlocked.has(item.id);
               const isEquipped = loadout[activeTab] === item.id;
 
-              // Build lock label from sortOrder (which maps to unlock level)
-              const itemLockLabel = !isItemUnlocked
-                ? `Lv${item.sortOrder + 1}`
-                : undefined;
+              // Build lock label from actual unlock rules
+              let itemLockLabel: string | undefined;
+              if (!isItemUnlocked && item.unlockInfo) {
+                switch (item.unlockInfo.type) {
+                  case 'level':
+                    itemLockLabel = `Lv${item.unlockInfo.level ?? '?'}`;
+                    break;
+                  case 'shop':
+                    itemLockLabel = '🛒';
+                    break;
+                  case 'manual':
+                    itemLockLabel = '🎁';
+                    break;
+                  case 'achievement':
+                    itemLockLabel = '🏆';
+                    break;
+                  case 'event':
+                    itemLockLabel = '📅';
+                    break;
+                  default:
+                    itemLockLabel = '?';
+                }
+              } else if (!isItemUnlocked) {
+                itemLockLabel = '?';
+              }
 
               return (
                 <CosmeticCard

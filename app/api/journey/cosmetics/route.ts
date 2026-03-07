@@ -22,6 +22,8 @@ function toRenderConfig(renderType: string, raw: unknown): RenderConfig {
       return { renderType: 'xp_skin', skin: String(config.skin ?? ''), colorMode: config.colorMode as string | undefined };
     case 'css_divider':
       return { renderType: 'css_divider', variant: String(config.variant ?? ''), className: config.className as string | undefined };
+    case 'title':
+      return { renderType: 'title', label: String(config.label ?? '') };
     default:
       return { renderType: 'svg_frame', variant: '' };
   }
@@ -37,8 +39,8 @@ export async function GET() {
 
   const userId = user.id;
 
-  // Parallel fetches — catalog (RLS: is_active=true), user's unlocked, user's loadout
-  const [catalogRes, unlockedRes, loadoutRes] = await Promise.all([
+  // Parallel fetches — catalog (RLS: is_active=true), user's unlocked, user's loadout, unlock rules
+  const [catalogRes, unlockedRes, loadoutRes, rulesRes] = await Promise.all([
     supabase
       .from('cosmetics')
       .select('id,key,category,faction_id,rarity,name_key,description_key,render_type,render_config,sort_order,is_active')
@@ -52,21 +54,47 @@ export async function GET() {
       .from('user_cosmetic_loadout')
       .select('slot,cosmetic_id')
       .eq('user_id', userId),
+    supabase
+      .from('cosmetic_unlock_rules')
+      .select('cosmetic_id,unlock_type,unlock_config,priority')
+      .order('priority', { ascending: false }),
   ]);
 
-  const catalog = (catalogRes.data ?? []).map((row) => ({
-    id: row.id,
-    key: row.key,
-    category: row.category as CosmeticSlot,
-    factionId: row.faction_id,
-    rarity: row.rarity as CosmeticRarity,
-    nameKey: row.name_key,
-    descriptionKey: row.description_key,
-    renderType: row.render_type,
-    renderConfig: toRenderConfig(row.render_type, row.render_config),
-    sortOrder: row.sort_order ?? 0,
-    isActive: row.is_active ?? true,
-  }));
+  // Build a map: cosmeticId → primary unlock rule (highest priority)
+  const unlockRuleMap = new Map<string, { type: string; config: Record<string, unknown> }>();
+  for (const rule of (rulesRes.data ?? [])) {
+    if (!unlockRuleMap.has(rule.cosmetic_id)) {
+      unlockRuleMap.set(rule.cosmetic_id, {
+        type: rule.unlock_type,
+        config: (rule.unlock_config ?? {}) as Record<string, unknown>,
+      });
+    }
+  }
+
+  const catalog = (catalogRes.data ?? []).map((row) => {
+    const rule = unlockRuleMap.get(row.id);
+    return {
+      id: row.id,
+      key: row.key,
+      category: row.category as CosmeticSlot,
+      factionId: row.faction_id,
+      rarity: row.rarity as CosmeticRarity,
+      nameKey: row.name_key,
+      descriptionKey: row.description_key,
+      renderType: row.render_type,
+      renderConfig: toRenderConfig(row.render_type, row.render_config),
+      sortOrder: row.sort_order ?? 0,
+      isActive: row.is_active ?? true,
+      unlockInfo: rule
+        ? {
+            type: rule.type,
+            ...(rule.type === 'level' && typeof rule.config.required_level === 'number'
+              ? { level: rule.config.required_level }
+              : {}),
+          }
+        : null,
+    };
+  });
 
   const unlocked = (unlockedRes.data ?? []).map((r) => r.cosmetic_id);
 

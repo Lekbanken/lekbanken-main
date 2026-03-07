@@ -49,14 +49,6 @@ export function JourneyScene({
         />
       )}
       
-      {/* Subtle radial glow at top */}
-      <div 
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] h-48 pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse at center top, var(--journey-glow) 0%, transparent 70%)`,
-        }}
-      />
-      
       {/* Content */}
       <div className="relative z-10">
         {children}

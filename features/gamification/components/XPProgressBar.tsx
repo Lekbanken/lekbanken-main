@@ -52,7 +52,7 @@ export function XPProgressBar({
   level,
   accentColor,
   glowColor,
-  skin = "shimmer",
+  skin = "clean",
   colorMode = "accent",
   loadoutConfig,
 }: XPProgressBarProps) {
@@ -76,7 +76,9 @@ export function XPProgressBar({
     boxShadow:
       resolvedSkin === "energy" || resolvedSkin === "warp"
         ? `0 0 14px ${accentColor}50, 0 0 28px ${glowColor ?? accentColor + "18"}, inset 0 0 6px rgba(255,255,255,0.08)`
-        : `0 0 20px ${glowColor ?? "transparent"}, 0 0 8px ${accentColor}`,
+        : resolvedSkin === "clean"
+          ? "none"
+          : `0 0 20px ${glowColor ?? "transparent"}, 0 0 8px ${accentColor}`,
   };
 
   const palette = getColorPalette(resolvedColorMode, accentColor);
@@ -157,17 +159,7 @@ export function XPProgressBar({
           className="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
           style={fillStyle}
         >
-          {/* ── Clean: glass highlight only ── */}
-          {resolvedSkin === "clean" && (
-            <div
-              className="absolute inset-x-0 top-0 h-1/2"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%)",
-              }}
-              aria-hidden
-            />
-          )}
+          {/* ── Clean: neutral baseline, no extra overlays ── */}
 
           {/* ── Shimmer: glass + traveling light ── */}
           {resolvedSkin === "shimmer" && (

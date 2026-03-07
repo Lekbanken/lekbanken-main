@@ -191,23 +191,10 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
       <div
         className="relative mb-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden"
         style={{
-          boxShadow: isSkillTreeOpen
-            ? `0 0 40px ${theme.glowColor}50`
-            : `0 0 16px ${theme.glowColor}15`,
+          boxShadow: "none",
           transition: "box-shadow 500ms ease",
         }}
       >
-        {/* Avatar hint-pulse keyframe (replaces skill-node-pulse — same slot 13/15) */}
-        <style>{`
-          @keyframes avatar-tap-hint {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-          }
-          @media (prefers-reduced-motion: reduce) {
-            [style*="avatar-tap-hint"] { animation: none !important; }
-          }
-        `}</style>
-
         <div
           className="relative z-10 flex flex-col items-center text-center"
           style={{
@@ -251,16 +238,6 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
               transition: "transform 400ms ease, margin-bottom 400ms ease",
             }}
           >
-            {/* Glow ring — breathes when closed to hint interactivity */}
-            <div
-              className="absolute -inset-1 w-[7.5rem] h-[7.5rem] rounded-full blur-xl opacity-50"
-              style={{
-                backgroundColor: theme.accentColor,
-                ...(isSkillTreeOpen
-                  ? {}
-                  : { animation: "avatar-tap-hint 3s ease-in-out infinite" }),
-              }}
-            />
             {/* Cosmetic frame overlay */}
             <AvatarFrame style="none" accentColor={theme.accentColor} loadoutConfig={frameConfig} />
             <div
@@ -284,10 +261,10 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
             </div>
             {/* Level badge */}
             <div
-              className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full font-bold text-white text-sm shadow-lg"
+              className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full font-bold text-white text-sm"
               style={{
                 backgroundColor: theme.accentColor,
-                boxShadow: `0 4px 14px ${theme.glowColor}`,
+                boxShadow: "none",
               }}
             >
               Lvl {data.progress.level}
@@ -320,7 +297,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
               >
                 <span
                   className="w-2.5 h-2.5 rounded-full shrink-0"
-                  style={{ backgroundColor: theme.accentColor, boxShadow: `0 0 8px ${theme.glowColor}` }}
+                  style={{ backgroundColor: theme.accentColor, boxShadow: "none" }}
                 />
                 <span className="text-xs font-medium text-white/70">
                   {t(`faction.banner.${identity.factionId}`)}
@@ -428,11 +405,11 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
       {/* ── Content Sections (glassmorphism cards) ── */}
       <div className="space-y-8">
         <CoinsSection summary={data.coins} />
-        <SectionDivider variant="glow" loadoutConfig={dividerConfig} />
+        <SectionDivider variant="line" loadoutConfig={dividerConfig} />
         <StreakSection streak={data.streak} />
-        <SectionDivider variant="ornament" loadoutConfig={dividerConfig} />
+        <SectionDivider variant="line" loadoutConfig={dividerConfig} />
         <BadgeShowcase showcase={data.showcase!} achievements={data.achievements} />
-        <SectionDivider variant="glow" label={t("nextStepLabel")} loadoutConfig={dividerConfig} />
+        <SectionDivider variant="line" label={t("nextStepLabel")} loadoutConfig={dividerConfig} />
         <CallToActionSection />
       </div>
 

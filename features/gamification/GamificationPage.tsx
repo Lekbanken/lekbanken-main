@@ -18,9 +18,8 @@ import { CallToActionSection } from "./components/CallToActionSection";
 import { SectionDivider } from "./components/SectionDivider";
 import { CosmeticControlPanel } from "./components/CosmeticControlPanel";
 import { CosmeticUnlockToast } from "./components/CosmeticUnlockToast";
-import { XPProgressBar, resolveXPBarSkin, resolveXPBarColorMode } from "./components/XPProgressBar";
-import { AvatarFrame, resolveAvatarFrame } from "./components/AvatarFrame";
-import { getSkillTree } from "./data/skill-trees";
+import { XPProgressBar } from "./components/XPProgressBar";
+import { AvatarFrame } from "./components/AvatarFrame";
 import type {
   SvgFrameConfig,
   CssBackgroundConfig,
@@ -168,19 +167,6 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
 
   const xpPercent = getLevelProgress(data.progress.currentXp, data.progress.nextLevelXp);
 
-  // Resolve cosmetics from skill tree
-  const skillTree = getSkillTree(identity.factionId, data.progress.level);
-  const xpNode = skillTree.find(
-    (n) => n.cosmeticCategory === "xp" && n.status === "unlocked",
-  );
-  const xpSkin = resolveXPBarSkin(xpNode?.cosmeticKey);
-  const xpColorMode = resolveXPBarColorMode(xpNode?.cosmeticKey);
-
-  const headerNode = skillTree.find(
-    (n) => n.cosmeticCategory === "header" && n.status === "unlocked",
-  );
-  const avatarFrameStyle = resolveAvatarFrame(headerNode?.cosmeticKey);
-
   // v2.0 loadout — type-narrow each slot's render config
   const loadout = data.cosmetics.loadout;
   const frameConfig = loadout.avatar_frame?.renderType === "svg_frame"
@@ -198,8 +184,8 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
 
   return (
     <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-10 sm:px-6" backgroundConfig={backgroundConfig}>
-      {/* ── Ambient particles ── */}
-      <ParticleField accentColor={theme.accentColor} loadoutConfig={particlesConfig} />
+      {/* ── Ambient particles (only when cosmetic equipped) ── */}
+      <ParticleField accentColor={theme.accentColor} enabled={!!particlesConfig} loadoutConfig={particlesConfig} />
 
       {/* ── Hero: Avatar + Name + Skill Tree ── */}
       <div
@@ -276,7 +262,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
               }}
             />
             {/* Cosmetic frame overlay */}
-            <AvatarFrame style={avatarFrameStyle} accentColor={theme.accentColor} loadoutConfig={frameConfig} />
+            <AvatarFrame style="none" accentColor={theme.accentColor} loadoutConfig={frameConfig} />
             <div
               className="relative w-28 h-28 rounded-full border-4 overflow-hidden bg-gradient-to-br from-white/10 to-white/5"
               style={{ borderColor: theme.accentColor }}
@@ -402,8 +388,6 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
           level={data.progress.level}
           accentColor={theme.accentColor}
           glowColor={theme.glowColor}
-          skin={xpSkin}
-          colorMode={xpColorMode}
           loadoutConfig={xpConfig}
         />
       </div>

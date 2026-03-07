@@ -45,6 +45,22 @@ export function hexToHSL(hex: string): { h: number; s: number; l: number } {
   return { h: h * 360, s: s * 100, l: l * 100 };
 }
 
+/** Build a CSS animated gradient background for palette color shifting. */
+export function paletteAnimatedBg(
+  mode: ColorMode,
+  accent: string,
+  angle = 124,
+): Record<string, string> {
+  if (mode === "accent") return { backgroundColor: accent };
+  const colors = getColorPalette(mode, accent);
+  const doubled = [...colors, ...colors.slice(0, Math.min(3, colors.length))];
+  return {
+    backgroundImage: `linear-gradient(${angle}deg, ${doubled.join(", ")})`,
+    backgroundSize: "1800% 1800%",
+    animation: "color-shift-flow 12s ease infinite",
+  };
+}
+
 /** Convert HSL values to hex (#rrggbb) */
 export function hslToHex(h: number, s: number, l: number): string {
   s /= 100;

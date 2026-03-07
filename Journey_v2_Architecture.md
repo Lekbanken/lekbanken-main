@@ -1,7 +1,7 @@
 # Journey v2.0 — Arkitektur
 
-> **Datum:** 2026-03-06 (rev 2)  
-> **Status:** Draft — revision 2 after GPT review  
+> **Datum:** 2026-03-07 (rev 3)  
+> **Status:** Draft — revision 3: §11 Tenant Override-arkitektur, CosmeticAccess multi-source model  
 > **Beroende av:** `Journey_v2_Audit.md`
 
 ---
@@ -36,7 +36,7 @@ Journey **feature-access** sker i tenant-kontext — användaren interagerar med
 | `cosmetic_unlock_rules` | Global | Admin-definierade regler |
 | `player_cosmetics` (shop) | Per tenant | Marketplace är tenant-scoped (oförändrad från v1.0) |
 
-**Framtida extension (utanför v2.0):** Tenant-specifik kosmetik-tillgänglighet eller tenant-exklusiva kosmetik kan läggas som ett lager ovanpå denna modell.
+**Framtida extension (v2.1 — se §11):** Tenant-specifik kosmetik-synlighet, presentation-overrides och tenant-egna cosmetics. Arkitekturen är definierad i §11.
 
 ---
 
@@ -364,7 +364,9 @@ CREATE POLICY "loadout_delete" ON user_cosmetic_loadout FOR DELETE TO authentica
   USING (user_id = (SELECT auth.uid()));
 ```
 
-**Defense-in-depth:** `loadout_insert`-policyn innehåller en subquery som verifierar att usern äger kosmetiken via `user_cosmetics`. Detta blockerar direkt Supabase-INSERT av kosmetik usern inte äger — oavsett om klienten går via equip-API:t eller inte. Equip-endpointen validerar *också* ägarskap server-side (dubbelkontroll). FK-constrainten mot `cosmetics` verifierar att kosmetiken existerar, och RLS-subqueryn verifierar att usern äger den.
+**Defense-in-depth:** `loadout_insert`-policyn verifierar att usern har access till kosmetiken — antingen via explicit grant i `user_cosmetics` ELLER via dynamisk level-eligibility (user level >= required_level i `cosmetic_unlock_rules`). Se migration `20260307130000_loadout_policy_dynamic_level.sql`.
+
+**Notering:** Equip-endpointen validerar *också* access server-side (dubbelkontroll). FK-constrainten mot `cosmetics` verifierar att kosmetiken existerar.
 
 ---
 
@@ -825,7 +827,224 @@ Om v2.0 behöver rullas tillbaka:
 
 ---
 
-## 11. Framtida expansionspunkter (utanför v2.0 scope)
+## 11. Tenant Override-arkitektur (v2.1)
+
+> **Status:** Designdokument — ej implementerat ännu  
+> **Datum:** 2026-03-07  
+> **Princip:** Global kärna + tenant presentation-overrides + tenant-egna cosmetics som extension
+
+### 11.1 Grundläggande modell
+
+Cosmetic-systemet har en **global kärna** som ägs av systemadmin. Tenants kan:
+
+1. **Overridea presentation** — ändra titel, beskrivning, rarity-label per locale
+2. **Styra synlighet** — dölja globala cosmetics som inte passar deras kontext
+3. **Skapa tenant-egna cosmetics** — egna items som bara existerar inom deras tenant
+
+Tenants får **inte** overridea:
+
+- Global cosmetic identity (`id`, `key`)
+- Render-typ och render-config (visuell implementation)
+- Unlock-logik och regler (eligibility)
+- Ägarskap (`user_cosmetics`) — global per user
+- Loadout-kompatibilitet (slot/category)
+
+### 11.2 Vad som är overridbart
+
+| Fält | Overridbart? | Kommentar |
+|------|-------------|-----------|
+| `name_key` / presentation title | ✅ Ja | Via `tenant_translation_overrides` (redan etablerat mönster) |
+| `description_key` / presentation desc | ✅ Ja | Via `tenant_translation_overrides` |
+| Rarity label | ✅ Ja | Via `tenant_translation_overrides` (key: `gamification.cosmeticPanel.rarity.*`) |
+| Synlighet i katalog | ✅ Ja | Via `tenant_cosmetic_visibility` (ny tabell) |
+| Sort order per tenant | ✅ Ja | Via `tenant_cosmetic_visibility.sort_order_override` |
+| `render_config` | ❌ Nej | Visuell implementation är global — annars tappar vi kontroll |
+| `render_type` | ❌ Nej | |
+| `category` / slot | ❌ Nej | Loadout-kompatibilitet kräver global konsistens |
+| Unlock rules | ❌ Nej | Eligibility är global — men shop-priser är redan tenant-scoped via `shop_items` |
+| `user_cosmetics` ägande | ❌ Nej | Personlig identitet, tenant-oberoende |
+
+### 11.3 Ny tabell: `tenant_cosmetic_visibility`
+
+```sql
+CREATE TABLE tenant_cosmetic_visibility (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  cosmetic_id UUID NOT NULL REFERENCES cosmetics(id) ON DELETE CASCADE,
+  is_visible BOOLEAN NOT NULL DEFAULT true,    -- false = dold i denna tenant
+  sort_order_override INTEGER,                 -- null = använd global sort_order
+  UNIQUE(tenant_id, cosmetic_id)
+);
+
+CREATE INDEX idx_tcv_tenant ON tenant_cosmetic_visibility(tenant_id);
+```
+
+**Semantik:**
+- Om ingen rad finns för en cosmetic+tenant → **synlig** (opt-out-modell, inte opt-in)
+- `is_visible = false` → dölj i katalog för denna tenant
+- `sort_order_override` → tenant-specifik sortering (null = global default)
+
+### 11.4 Tenant-egna cosmetics
+
+Tenant-egna cosmetics lever i samma `cosmetics`-tabell med ett nytt scope-fält:
+
+```sql
+ALTER TABLE cosmetics
+  ADD COLUMN scope TEXT NOT NULL DEFAULT 'global'
+    CHECK (scope IN ('global', 'tenant')),
+  ADD COLUMN owner_tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE;
+
+-- Constraint: tenant-scoped cosmetics måste ha owner_tenant_id
+ALTER TABLE cosmetics
+  ADD CONSTRAINT chk_tenant_cosmetics
+    CHECK (scope = 'global' OR owner_tenant_id IS NOT NULL);
+
+CREATE INDEX idx_cosmetics_scope ON cosmetics(scope);
+CREATE INDEX idx_cosmetics_owner ON cosmetics(owner_tenant_id) WHERE owner_tenant_id IS NOT NULL;
+```
+
+**Regler:**
+- `scope = 'global'` + `owner_tenant_id = NULL` → systemadmin-ägd, alla ser den (default)
+- `scope = 'tenant'` + `owner_tenant_id = X` → bara tenant X ser den i sin katalog
+- Tenant-cosmetics har samma unlock model (rules, grants, loadout)
+- Tenant-admins kan skapa cosmetics via admin-UI med `scope = 'tenant'`
+
+### 11.5 Catalog API-anpassning
+
+Catalog-endpointen anpassas i tenant-kontext:
+
+```ts
+// Pseudocode: catalog query med tenant-medvetenhet
+const catalog = cosmetics
+  .where(is_active = true)
+  .where(
+    scope = 'global'                            // Alla globala
+    OR owner_tenant_id = currentTenantId        // + egna tenant-cosmetics
+  )
+  .leftJoin(tenant_cosmetic_visibility, on: cosmetic_id AND tenant_id = currentTenantId)
+  .where(
+    visibility.is_visible IS NULL               // Ingen override = synlig
+    OR visibility.is_visible = true             // Explicit synlig
+  )
+  .orderBy(
+    COALESCE(visibility.sort_order_override, cosmetics.sort_order)
+  );
+```
+
+**API-respons utökning (framtida):**
+```ts
+// Per item i catalog:
+{
+  ...existingCosmeticItem,
+  origin: 'global' | 'tenant',      // Var cosmetic definierades
+  presentation: {                    // Effective presentation (efter overrides)
+    name: string,                    // Resolved via tenant_translation_overrides
+    description: string | null,
+    tenantOverridden: boolean,       // true om tenanten har overridat presentation
+  }
+}
+```
+
+### 11.6 Presentation-overrides via befintligt mönster
+
+Presentation-overrides (titel, beskrivning) hanteras via det **redan etablerade** `tenant_translation_overrides`-systemet:
+
+```
+// Befintlig tabell, inga schemaändringar behövs
+tenant_translation_overrides:
+  tenant_id = X
+  locale = 'sv'
+  namespace = 'cosmetics'
+  key = 'void_constellation.name'
+  override_value = 'Konstellation av Natten'   -- Tenant-anpassad titel
+  original_value = 'Void Constellation'
+  is_active = true
+```
+
+**Fördelar:**
+- Noll ny kod för presentation-overrides — befintlig infrastruktur
+- Frontend hämtar redan `tenant_translation_overrides` via i18n-pipeline
+- Admin-UI för overrides finns redan
+
+### 11.7 Samspel med shop
+
+```
+                    ┌─────────────────────────────┐
+                    │ cosmetics (global catalog)   │
+                    │ scope: global | tenant       │
+                    └──────────┬──────────────────┘
+                               │
+          ┌────────────────────┼──────────────────────┐
+          │                    │                      │
+  ┌───────┴───────┐  ┌────────┴────────┐   ┌────────┴──────────┐
+  │ unlock_rules  │  │ shop_items      │   │ tenant_cosmetic   │
+  │ (global)      │  │ (per tenant)    │   │ _visibility       │
+  │ eligibility   │  │ distribution    │   │ (per tenant)      │
+  └───────────────┘  └────────┬────────┘   └───────────────────┘
+                              │
+                    ┌─────────┴──────────┐
+                    │ player_cosmetics   │
+                    │ (shop ownership)   │
+                    └────────────────────┘
+```
+
+**Shop-interaktion:**
+- `shop_items.cosmetic_id` pekar på `cosmetics.id` (redan implementerat)
+- Shop-köp skapar rad i `user_cosmetics` med `unlock_type: 'shop'` (redan implementerat)
+- `player_cosmetics` bevaras som tenant-scoped shop-historik (redan implementerat)
+- Tenant-egna cosmetics kan säljas via tenant-egna shop-items
+
+### 11.8 Ägarskap och loadout — förtydligande
+
+```
+┌──────────────────────────────────────────────────────┐
+│                  Ägarskapsmodell                     │
+│                                                      │
+│  user_cosmetics (global)                             │
+│  ├── Explicit grants: shop, admin, achievement,      │
+│  │   event, manual                                   │
+│  └── Applies across ALL tenants                      │
+│                                                      │
+│  Dynamic eligibility (computed)                      │
+│  ├── Level-baserade unlock_rules                     │
+│  ├── user_progress.level >= required_level           │
+│  └── Applies across ALL tenants                      │
+│                                                      │
+│  user_cosmetic_loadout (global)                      │
+│  ├── Vad användaren bär                             │
+│  ├── Max 1 per slot                                  │
+│  └── Samma loadout visas i alla tenants              │
+│                                                      │
+│  CosmeticAccess (API-computed)                       │
+│  ├── sources[] — alla anledningar till access        │
+│  ├── primarySource — enkel förklaring                │
+│  └── requirement — vad som saknas                    │
+└──────────────────────────────────────────────────────┘
+```
+
+**Tenant-context påverkar INTE ägarskap.** En user som äger "Void Constellation Frame" via level 5 i tenant A ser den också i tenant B. Loadout är global — samma visuella identitet i alla tenants.
+
+Tenant-context påverkar:
+- **Vilka cosmetics som visas** i katalogen (via `tenant_cosmetic_visibility`)
+- **Presentationen** av cosmetics (via `tenant_translation_overrides`)
+- **Tenant-egna cosmetics** (via `scope = 'tenant'`)
+- **Shop-priser och tillgänglighet** (via `shop_items`, redan tenant-scoped)
+
+### 11.9 Implementationsordning
+
+| Steg | Åtgärd | Svårighetsgrad |
+|------|--------|---------------|
+| 1 | Kör RLS-migrationen (`20260307130000`) | Trivial — SQL i Dashboard |
+| 2 | Lägg till `scope` + `owner_tenant_id` på `cosmetics` | Migration |
+| 3 | Skapa `tenant_cosmetic_visibility` | Migration + RLS |
+| 4 | Uppdatera catalog API att filtrera per tenant-kontext | Endpoint-ändring |
+| 5 | Admin-UI för tenant-visibility | Frontend |
+| 6 | Admin-UI för tenant-egna cosmetics | Frontend |
+| 7 | Verifiera translation overrides fungerar end-to-end | Test |
+
+---
+
+## 12. Framtida expansionspunkter (utanför v2.0 scope)
 
 | Funktion | Förutsättning | Kommentar |
 |----------|---------------|-----------|

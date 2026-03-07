@@ -34,7 +34,7 @@ interface Props {
 // Constants
 // ---------------------------------------------------------------------------
 
-const CATEGORIES: CosmeticSlot[] = ['avatar_frame', 'scene_background', 'particles', 'xp_bar', 'section_divider'];
+const CATEGORIES: CosmeticSlot[] = ['avatar_frame', 'scene_background', 'particles', 'xp_bar', 'section_divider', 'title'];
 const RARITIES: CosmeticRarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 const FACTIONS = ['forest', 'sea', 'desert', 'void'] as const;
 
@@ -44,6 +44,7 @@ const CATEGORY_RENDER_TYPES: Record<string, string> = {
   particles: 'css_particles',
   xp_bar: 'xp_skin',
   section_divider: 'css_divider',
+  title: 'title',
 };
 
 // ---------------------------------------------------------------------------

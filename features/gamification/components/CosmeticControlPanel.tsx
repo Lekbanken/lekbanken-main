@@ -37,6 +37,7 @@ const TAB_ICONS: Record<CosmeticSlot, string> = {
   particles: "✨",
   xp_bar: "📊",
   section_divider: "➖",
+  title: "🏷",
 };
 
 // ---------------------------------------------------------------------------

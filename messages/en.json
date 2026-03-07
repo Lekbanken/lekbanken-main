@@ -348,7 +348,8 @@
         "scene_background": "Background",
         "particles": "Particles",
         "xp_bar": "XP Bar",
-        "section_divider": "Divider"
+        "section_divider": "Divider",
+        "title": "Title"
       },
       "equipped": "Active",
       "equip": "Equip",
@@ -426,7 +427,23 @@
     "desert_rainbow": { "name": "Rainbow", "description": "A shimmering rainbow XP bar" },
     "desert_rays": { "name": "God Rays", "description": "Pulsing light rays" },
     "desert_breeze": { "name": "Breeze", "description": "A gentle breeze divider" },
-    "desert_aurora": { "name": "Aurora", "description": "A shimmering aurora frame" }
+    "desert_aurora": { "name": "Aurora", "description": "A shimmering aurora frame" },
+    "forest_title_lv1": { "name": "Forest Apprentice", "description": "Starting title for the Forest faction" },
+    "forest_title_lv5": { "name": "Forest Warden", "description": "Level 5 title in Forest" },
+    "forest_title_lv10": { "name": "Master of the Leaf Song", "description": "Level 10 title in Forest" },
+    "forest_title_lv20": { "name": "Ancient of the Forest", "description": "Level 20 title in Forest" },
+    "sea_title_lv1": { "name": "Shore Walker", "description": "Starting title for the Sea faction" },
+    "sea_title_lv5": { "name": "Tidekeeper", "description": "Level 5 title in Sea" },
+    "sea_title_lv10": { "name": "Lord of the Corals", "description": "Level 10 title in Sea" },
+    "sea_title_lv20": { "name": "Ruler of the Deep", "description": "Level 20 title in Sea" },
+    "desert_title_lv1": { "name": "Sand Novice", "description": "Starting title for the Desert faction" },
+    "desert_title_lv5": { "name": "Sun's Messenger", "description": "Level 5 title in Desert" },
+    "desert_title_lv10": { "name": "The Sandstorm", "description": "Level 10 title in Desert" },
+    "desert_title_lv20": { "name": "Heir of the Sun", "description": "Level 20 title in Desert" },
+    "void_title_lv1": { "name": "Space Wanderer", "description": "Starting title for the Void faction" },
+    "void_title_lv5": { "name": "Star Weaver", "description": "Level 5 title in Void" },
+    "void_title_lv10": { "name": "Nebula Guardian", "description": "Level 10 title in Void" },
+    "void_title_lv20": { "name": "Cosmic Overlord", "description": "Level 20 title in Void" }
   },
   "browse": {
     "pageTitle": "Explore",
@@ -4438,7 +4455,8 @@
           "scene_background": "Scene background",
           "particles": "Particles",
           "xp_bar": "XP bar",
-          "section_divider": "Section divider"
+          "section_divider": "Section divider",
+          "title": "Title"
         },
         "factions": {
           "forest": "Forest",

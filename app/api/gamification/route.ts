@@ -230,6 +230,13 @@ export async function GET() {
     achievementsQuery = achievementsQuery.is("tenant_id", null);
   }
 
+  // Fetch user's profile avatar from the users table (the source of truth for avatars)
+  const userProfileRes = await supabase
+    .from("users")
+    .select("avatar_url")
+    .eq("id", userId)
+    .maybeSingle();
+
   const [achievementsRes, userAchievementsRes, coinsRes, txRes, streakRes, showcaseRes, loadoutRes, recentUnlocksRes, unlockedCountRes] = await Promise.all([
     achievementsQuery,
     supabase.from("user_achievements").select("achievement_id,unlocked_at").eq("user_id", userId),
@@ -326,7 +333,9 @@ export async function GET() {
       user.email ??
       "Spelare",
     avatarUrl:
-      (user.user_metadata?.avatar_url as string | undefined) ?? null,
+      (userProfileRes.data as { avatar_url?: string | null } | null)?.avatar_url ??
+      (user.user_metadata?.avatar_url as string | undefined) ??
+      null,
     factionId,
   };
 
@@ -358,6 +367,7 @@ export async function GET() {
           case 'css_particles': renderConfig = { renderType: 'css_particles', className: String(config.className ?? ''), count: typeof config.count === 'number' ? config.count : undefined }; break;
           case 'xp_skin': renderConfig = { renderType: 'xp_skin', skin: String(config.skin ?? ''), colorMode: config.colorMode as string | undefined }; break;
           case 'css_divider': renderConfig = { renderType: 'css_divider', variant: String(config.variant ?? ''), className: config.className as string | undefined }; break;
+          case 'title': renderConfig = { renderType: 'title', label: String(config.label ?? '') }; break;
           default: continue;
         }
         loadout[c.category as keyof ActiveLoadout] = renderConfig;

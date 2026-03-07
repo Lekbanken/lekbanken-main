@@ -476,7 +476,8 @@
         "scene_background": "Bakgrunn",
         "particles": "Partikler",
         "xp_bar": "XP-bar",
-        "section_divider": "Deler"
+        "section_divider": "Deler",
+        "title": "Tittel"
       },
       "equipped": "Aktiv",
       "equip": "Aktiver",
@@ -600,7 +601,23 @@
     "desert_rainbow": { "name": "Regnbue", "description": "En skimrende regnbue XP-bar" },
     "desert_rays": { "name": "Gudestråler", "description": "Pulserende lysstråler" },
     "desert_breeze": { "name": "Bris", "description": "En myk brisdeler" },
-    "desert_aurora": { "name": "Nordlys", "description": "En skimrende nordlysramme" }
+    "desert_aurora": { "name": "Nordlys", "description": "En skimrende nordlysramme" },
+    "forest_title_lv1": { "name": "Skogens lærling", "description": "Starttittel for Forest-fraksjonen" },
+    "forest_title_lv5": { "name": "Skogvokter", "description": "Tittel ved nivå 5 i Forest" },
+    "forest_title_lv10": { "name": "Løvsangens mester", "description": "Tittel ved nivå 10 i Forest" },
+    "forest_title_lv20": { "name": "Skogens eldgamle", "description": "Tittel ved nivå 20 i Forest" },
+    "sea_title_lv1": { "name": "Strandvandrer", "description": "Starttittel for Sea-fraksjonen" },
+    "sea_title_lv5": { "name": "Tidevannets vokter", "description": "Tittel ved nivå 5 i Sea" },
+    "sea_title_lv10": { "name": "Korallenes herre", "description": "Tittel ved nivå 10 i Sea" },
+    "sea_title_lv20": { "name": "Dypets hersker", "description": "Tittel ved nivå 20 i Sea" },
+    "desert_title_lv1": { "name": "Sandens nybegynner", "description": "Starttittel for Desert-fraksjonen" },
+    "desert_title_lv5": { "name": "Solens budbringer", "description": "Tittel ved nivå 5 i Desert" },
+    "desert_title_lv10": { "name": "Ørkenstormen", "description": "Tittel ved nivå 10 i Desert" },
+    "desert_title_lv20": { "name": "Solens arving", "description": "Tittel ved nivå 20 i Desert" },
+    "void_title_lv1": { "name": "Romvandrer", "description": "Starttittel for Void-fraksjonen" },
+    "void_title_lv5": { "name": "Stjernevever", "description": "Tittel ved nivå 5 i Void" },
+    "void_title_lv10": { "name": "Nebulavokter", "description": "Tittel ved nivå 10 i Void" },
+    "void_title_lv20": { "name": "Kosmisk overherre", "description": "Tittel ved nivå 20 i Void" }
   },
   "browse": {
     "pageTitle": "Utforsk",
@@ -5161,7 +5178,8 @@
           "scene_background": "Scene-bakgrunn",
           "particles": "Partikler",
           "xp_bar": "XP-bar",
-          "section_divider": "Seksjonsdeler"
+          "section_divider": "Seksjonsdeler",
+          "title": "Tittel"
         },
         "factions": {
           "forest": "Skog",

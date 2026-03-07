@@ -325,7 +325,8 @@
         "scene_background": "Bakgrund",
         "particles": "Partiklar",
         "xp_bar": "XP-bar",
-        "section_divider": "Avdelare"
+        "section_divider": "Avdelare",
+        "title": "Titel"
       },
       "equipped": "Aktiv",
       "equip": "Aktivera",
@@ -403,7 +404,23 @@
     "desert_rainbow": { "name": "Regnbåge", "description": "En regnbågsskimrande XP-bar" },
     "desert_rays": { "name": "Gudastrålar", "description": "Pulserande ljusstrålar" },
     "desert_breeze": { "name": "Bris", "description": "En mjuk brisdelare" },
-    "desert_aurora": { "name": "Norrsken", "description": "En skimrande norrskensram" }
+    "desert_aurora": { "name": "Norrsken", "description": "En skimrande norrskensram" },
+    "forest_title_lv1": { "name": "Skogens lärling", "description": "Starttitel för Forest-faktionen" },
+    "forest_title_lv5": { "name": "Skogsväktare", "description": "Titel vid nivå 5 i Forest" },
+    "forest_title_lv10": { "name": "Lövsångens mästare", "description": "Titel vid nivå 10 i Forest" },
+    "forest_title_lv20": { "name": "Skogens uråldriga", "description": "Titel vid nivå 20 i Forest" },
+    "sea_title_lv1": { "name": "Strandvandrare", "description": "Starttitel för Sea-faktionen" },
+    "sea_title_lv5": { "name": "Tidvattnets väktare", "description": "Titel vid nivå 5 i Sea" },
+    "sea_title_lv10": { "name": "Korallernas herre", "description": "Titel vid nivå 10 i Sea" },
+    "sea_title_lv20": { "name": "Djupens härskare", "description": "Titel vid nivå 20 i Sea" },
+    "desert_title_lv1": { "name": "Sandens novis", "description": "Starttitel för Desert-faktionen" },
+    "desert_title_lv5": { "name": "Solens budbärare", "description": "Titel vid nivå 5 i Desert" },
+    "desert_title_lv10": { "name": "Ökenstormen", "description": "Titel vid nivå 10 i Desert" },
+    "desert_title_lv20": { "name": "Solens arvinge", "description": "Titel vid nivå 20 i Desert" },
+    "void_title_lv1": { "name": "Rymdens vandrare", "description": "Starttitel för Void-faktionen" },
+    "void_title_lv5": { "name": "Stjärnvävare", "description": "Titel vid nivå 5 i Void" },
+    "void_title_lv10": { "name": "Nebulans väktare", "description": "Titel vid nivå 10 i Void" },
+    "void_title_lv20": { "name": "Kosmisk överherre", "description": "Titel vid nivå 20 i Void" }
   },
   "browse": {
     "pageTitle": "Utforska",
@@ -4435,7 +4452,8 @@
           "scene_background": "Scen-bakgrund",
           "particles": "Partiklar",
           "xp_bar": "XP-bar",
-          "section_divider": "Sektionsdelning"
+          "section_divider": "Sektionsdelning",
+          "title": "Titel"
         },
         "factions": {
           "forest": "Skog",

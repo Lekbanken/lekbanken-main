@@ -42,9 +42,6 @@ export function FactionSelector({ currentFactionId, onSelect }: FactionSelectorP
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <p className="text-xs text-white/40 uppercase tracking-wider font-medium">
-        {t("label")}
-      </p>
       <div className="flex gap-2" role="radiogroup" aria-label={t("chooseFaction")}>
         {options.map((opt) => {
           const isLoading = pending === opt.id && isPending;
@@ -76,14 +73,6 @@ export function FactionSelector({ currentFactionId, onSelect }: FactionSelectorP
                     : "none",
                 }}
               />
-              {/* Label */}
-              <span
-                className="text-[10px] font-semibold transition-colors duration-200"
-                style={{ color: opt.selected ? opt.accentColor : "rgba(255,255,255,0.5)" }}
-              >
-                {opt.name}
-              </span>
-
               {/* Selected indicator dot */}
               {opt.selected && (
                 <span

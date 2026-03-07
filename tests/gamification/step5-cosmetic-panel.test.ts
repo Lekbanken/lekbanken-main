@@ -217,15 +217,16 @@ describe("Step 5 — CosmeticControlPanel Verification", () => {
       expect(state.activeTab).toBe("avatar_frame");
     });
 
-    it("all 5 tabs are available from COSMETIC_SLOTS", () => {
+    it("all 6 tabs are available from COSMETIC_SLOTS", () => {
       expect(COSMETIC_SLOTS).toEqual([
         "avatar_frame",
         "scene_background",
         "particles",
         "xp_bar",
         "section_divider",
+        "title",
       ]);
-      expect(COSMETIC_SLOTS).toHaveLength(5);
+      expect(COSMETIC_SLOTS).toHaveLength(6);
     });
 
     it("filters items correctly into avatar_frame tab", () => {

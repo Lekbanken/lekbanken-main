@@ -27,6 +27,7 @@ import type {
   CssParticlesConfig,
   XpSkinConfig,
   CssDividerConfig,
+  TitleConfig,
 } from "@/features/journey/cosmetic-types";
 
 type GamificationPageProps = {
@@ -192,6 +193,8 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
     ? (loadout.xp_bar as XpSkinConfig) : null;
   const dividerConfig = loadout.section_divider?.renderType === "css_divider"
     ? (loadout.section_divider as CssDividerConfig) : null;
+  const titleConfig = loadout.title?.renderType === "title"
+    ? (loadout.title as TitleConfig) : null;
 
   return (
     <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-10 sm:px-6" backgroundConfig={backgroundConfig}>
@@ -318,8 +321,8 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
             <h1 className="mt-2 text-xl font-bold text-white">
               {identity.displayName}
             </h1>
-            {data.progress.levelName && (
-              <p className="text-sm text-white/50">{data.progress.levelName}</p>
+            {titleConfig?.label && (
+              <p className="text-sm text-white/50">{titleConfig.label}</p>
             )}
             {identity.factionId && (
               <div

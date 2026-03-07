@@ -38,7 +38,7 @@ type FilterFaction = 'all' | 'forest' | 'sea' | 'desert' | 'void' | 'universal';
 // Constants
 // ---------------------------------------------------------------------------
 
-const CATEGORY_OPTIONS: CosmeticSlot[] = ['avatar_frame', 'scene_background', 'particles', 'xp_bar', 'section_divider'];
+const CATEGORY_OPTIONS: CosmeticSlot[] = ['avatar_frame', 'scene_background', 'particles', 'xp_bar', 'section_divider', 'title'];
 const RARITY_OPTIONS: CosmeticRarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 const FACTION_OPTIONS: FilterFaction[] = ['all', 'forest', 'sea', 'desert', 'void', 'universal'];
 

@@ -10,7 +10,8 @@ export type CosmeticSlot =
   | 'scene_background'
   | 'particles'
   | 'xp_bar'
-  | 'section_divider';
+  | 'section_divider'
+  | 'title';
 
 export const COSMETIC_SLOTS: readonly CosmeticSlot[] = [
   'avatar_frame',
@@ -18,6 +19,7 @@ export const COSMETIC_SLOTS: readonly CosmeticSlot[] = [
   'particles',
   'xp_bar',
   'section_divider',
+  'title',
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -66,12 +68,18 @@ export type CssDividerConfig = {
   className?: string;
 };
 
+export type TitleConfig = {
+  renderType: 'title';
+  label: string;
+};
+
 export type RenderConfig =
   | SvgFrameConfig
   | CssBackgroundConfig
   | CssParticlesConfig
   | XpSkinConfig
-  | CssDividerConfig;
+  | CssDividerConfig
+  | TitleConfig;
 
 // ---------------------------------------------------------------------------
 // Active loadout — partial record, one render config per slot

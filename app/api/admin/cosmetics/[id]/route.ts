@@ -37,7 +37,7 @@ export async function PUT(req: NextRequest, context: RouteContext) {
     );
   }
 
-  const { renderType, renderConfig, factionId, nameKey, descriptionKey, isActive, sortOrder, ...rest } = parsed.data;
+  const { renderType, renderConfig, factionId, nameKey, descriptionKey, isActive, sortOrder, requiredLevel, ...rest } = parsed.data;
 
   // If both renderType and renderConfig are provided, validate config against type
   if (renderType && renderConfig) {
@@ -74,6 +74,27 @@ export async function PUT(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Cosmetic not found' }, { status: 404 });
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Upsert or delete level-based unlock rule if requiredLevel was provided
+  if (requiredLevel !== undefined) {
+    // Delete existing level rules for this cosmetic
+    await supabase
+      .from('cosmetic_unlock_rules')
+      .delete()
+      .eq('cosmetic_id', id)
+      .eq('unlock_type', 'level');
+
+    // Insert new rule if level is set
+    if (requiredLevel !== null) {
+      await supabase
+        .from('cosmetic_unlock_rules')
+        .insert({
+          cosmetic_id: id,
+          unlock_type: 'level',
+          unlock_config: { required_level: requiredLevel },
+        });
+    }
   }
 
   return NextResponse.json({ cosmetic: data });

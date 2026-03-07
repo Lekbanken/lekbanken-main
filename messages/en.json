@@ -4486,7 +4486,10 @@
           "renderType": "Render type",
           "renderConfig": "Render config (JSON)",
           "sortOrder": "Sort order",
-          "isActive": "Active"
+          "isActive": "Active",
+          "requiredLevel": "Required level",
+          "requiredLevelPlaceholder": "E.g. 5",
+          "requiredLevelHint": "The level required to unlock. Leave empty for no level requirement."
         },
         "rules": {
           "title": "Unlock rules",

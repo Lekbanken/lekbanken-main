@@ -4483,7 +4483,10 @@
           "renderType": "Render-typ",
           "renderConfig": "Render-config (JSON)",
           "sortOrder": "Sorteringsordning",
-          "isActive": "Aktiv"
+          "isActive": "Aktiv",
+          "requiredLevel": "Krävd nivå",
+          "requiredLevelPlaceholder": "T.ex. 5",
+          "requiredLevelHint": "Vilken nivå som krävs för att låsa upp. Lämna tomt om ingen nivågräns."
         },
         "rules": {
           "title": "Unlock-regler",

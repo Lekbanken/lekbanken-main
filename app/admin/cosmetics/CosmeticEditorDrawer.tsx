@@ -21,6 +21,7 @@ interface CosmeticRow {
   description_key: string;
   sort_order: number;
   is_active: boolean;
+  cosmetic_unlock_rules?: { id: string; unlock_type: string; unlock_config: Record<string, unknown>; priority: number }[];
 }
 
 interface Props {
@@ -66,6 +67,7 @@ export function CosmeticEditorDrawer({ open, onClose, cosmetic, onSaved }: Props
   const [renderConfigJson, setRenderConfigJson] = useState('{}');
   const [sortOrder, setSortOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
+  const [requiredLevel, setRequiredLevel] = useState<number | null>(null);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -90,6 +92,13 @@ export function CosmeticEditorDrawer({ open, onClose, cosmetic, onSaved }: Props
       setRenderConfigJson(JSON.stringify(cosmetic.render_config, null, 2));
       setSortOrder(cosmetic.sort_order);
       setIsActive(cosmetic.is_active);
+      // Extract required_level from level-type unlock rule
+      const levelRule = cosmetic.cosmetic_unlock_rules?.find(r => r.unlock_type === 'level');
+      setRequiredLevel(
+        levelRule?.unlock_config?.required_level != null
+          ? Number(levelRule.unlock_config.required_level)
+          : null
+      );
     } else {
       setKey('');
       setCategory('avatar_frame');
@@ -101,6 +110,7 @@ export function CosmeticEditorDrawer({ open, onClose, cosmetic, onSaved }: Props
       setRenderConfigJson('{}');
       setSortOrder(0);
       setIsActive(true);
+      setRequiredLevel(null);
     }
     setError(null);
   }, [cosmetic]);
@@ -129,6 +139,7 @@ export function CosmeticEditorDrawer({ open, onClose, cosmetic, onSaved }: Props
       renderConfig,
       sortOrder,
       isActive,
+      requiredLevel,
     };
 
     try {
@@ -263,6 +274,21 @@ export function CosmeticEditorDrawer({ open, onClose, cosmetic, onSaved }: Props
               value={sortOrder}
               onChange={(e) => setSortOrder(Number(e.target.value))}
             />
+          </div>
+
+          {/* Required level */}
+          <div>
+            <label className="mb-1 block text-sm font-medium">{t('form.requiredLevel')}</label>
+            <Input
+              type="number"
+              min={1}
+              value={requiredLevel ?? ''}
+              onChange={(e) => setRequiredLevel(e.target.value ? Number(e.target.value) : null)}
+              placeholder={t('form.requiredLevelPlaceholder')}
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t('form.requiredLevelHint')}
+            </p>
           </div>
 
           {/* Active toggle */}

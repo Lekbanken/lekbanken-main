@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { renderType, renderConfig, factionId, nameKey, descriptionKey, isActive, sortOrder, ...rest } = parsed.data;
+  const { renderType, renderConfig, factionId, nameKey, descriptionKey, isActive, sortOrder, requiredLevel, ...rest } = parsed.data;
 
   // Validate render_config against render_type-specific schema
   const configResult = validateRenderConfig(renderType, renderConfig);
@@ -108,6 +108,17 @@ export async function POST(req: NextRequest) {
       );
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Create level-based unlock rule if requiredLevel was provided
+  if (requiredLevel) {
+    await supabase
+      .from('cosmetic_unlock_rules')
+      .insert({
+        cosmetic_id: data.id,
+        unlock_type: 'level',
+        unlock_config: { required_level: requiredLevel },
+      });
   }
 
   return NextResponse.json({ cosmetic: data }, { status: 201 });

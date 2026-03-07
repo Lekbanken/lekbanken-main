@@ -33,12 +33,17 @@ export const cssDividerConfigSchema = z.object({
   className: z.string().optional(),
 });
 
+export const titleConfigSchema = z.object({
+  label: z.string().min(1),
+});
+
 export const RENDER_TYPE_SCHEMAS: Record<string, z.ZodType> = {
   svg_frame: svgFrameConfigSchema,
   css_background: cssBackgroundConfigSchema,
   css_particles: cssParticlesConfigSchema,
   xp_skin: xpSkinConfigSchema,
   css_divider: cssDividerConfigSchema,
+  title: titleConfigSchema,
 };
 
 // ---------------------------------------------------------------------------
@@ -47,15 +52,16 @@ export const RENDER_TYPE_SCHEMAS: Record<string, z.ZodType> = {
 
 export const cosmeticCreateSchema = z.object({
   key: z.string().min(1).max(200),
-  category: z.enum(['avatar_frame', 'scene_background', 'particles', 'xp_bar', 'section_divider']),
+  category: z.enum(['avatar_frame', 'scene_background', 'particles', 'xp_bar', 'section_divider', 'title']),
   factionId: z.enum(['forest', 'sea', 'desert', 'void']).nullable().optional(),
   rarity: z.enum(['common', 'uncommon', 'rare', 'epic', 'legendary']).default('common'),
   nameKey: z.string().min(1).max(300),
   descriptionKey: z.string().min(1).max(300),
-  renderType: z.enum(['svg_frame', 'css_background', 'css_particles', 'xp_skin', 'css_divider']),
+  renderType: z.enum(['svg_frame', 'css_background', 'css_particles', 'xp_skin', 'css_divider', 'title']),
   renderConfig: z.record(z.unknown()),
   sortOrder: z.number().int().default(0),
   isActive: z.boolean().default(true),
+  requiredLevel: z.number().int().min(1).nullable().optional(),
 });
 
 export const cosmeticUpdateSchema = cosmeticCreateSchema.partial();

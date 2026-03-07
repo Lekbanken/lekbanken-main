@@ -5209,7 +5209,10 @@
           "renderType": "Render-type",
           "renderConfig": "Render-config (JSON)",
           "sortOrder": "Sorteringsrekkefølge",
-          "isActive": "Aktiv"
+          "isActive": "Aktiv",
+          "requiredLevel": "Påkrevd nivå",
+          "requiredLevelPlaceholder": "F.eks. 5",
+          "requiredLevelHint": "Nivåen som kreves for å låse opp. La stå tom hvis ingen nivågrense."
         },
         "rules": {
           "title": "Opplåsingsregler",

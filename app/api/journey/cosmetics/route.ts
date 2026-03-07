@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { checkAndGrantCosmetics } from '@/lib/journey/cosmetic-grants';
 import type { CosmeticSlot, CosmeticRarity, RenderConfig } from '@/features/journey/cosmetic-types';
 
 export const dynamic = 'force-dynamic';
@@ -38,6 +40,29 @@ export async function GET() {
   }
 
   const userId = user.id;
+
+  // ── Lazy sync: grant any cosmetics the user qualifies for but hasn't received ──
+  // Fetch user's highest level across tenants, then call the idempotent grant function.
+  try {
+    const adminClient = getSupabaseAdmin();
+    const { data: progressRows } = await adminClient
+      .from('user_progress')
+      .select('level')
+      .eq('user_id', userId)
+      .order('level', { ascending: false })
+      .limit(1);
+
+    const highestLevel = progressRows?.[0]?.level;
+    if (highestLevel && highestLevel >= 1) {
+      await checkAndGrantCosmetics(adminClient, userId, {
+        type: 'level',
+        level: highestLevel,
+      });
+    }
+  } catch (e) {
+    // Non-fatal — log and continue serving catalog
+    console.error('[cosmetics] Lazy sync failed:', e);
+  }
 
   // Parallel fetches — catalog (RLS: is_active=true), user's unlocked, user's loadout, unlock rules
   const [catalogRes, unlockedRes, loadoutRes, rulesRes] = await Promise.all([

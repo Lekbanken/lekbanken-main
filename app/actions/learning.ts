@@ -250,6 +250,28 @@ export async function submitQuizAnswers(
         achievement: r.achievement_unlocked || undefined,
         levelUp: r.level_up || false,
       }
+
+      // Grant any cosmetics unlocked by this level-up
+      if (r.level_up) {
+        try {
+          const { getSupabaseAdmin } = await import('@/lib/supabase/server');
+          const { checkAndGrantCosmetics } = await import('@/lib/journey/cosmetic-grants');
+          const adminClient = getSupabaseAdmin();
+          const { data: progress } = await adminClient
+            .from('user_progress')
+            .select('level')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          if (progress?.level) {
+            await checkAndGrantCosmetics(adminClient, user.id, {
+              type: 'level',
+              level: progress.level,
+            });
+          }
+        } catch (e) {
+          console.error('Failed to grant cosmetics on level-up:', e);
+        }
+      }
     }
   }
 

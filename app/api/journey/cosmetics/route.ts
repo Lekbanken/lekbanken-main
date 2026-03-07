@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
-import { checkAndGrantCosmetics } from '@/lib/journey/cosmetic-grants';
-import type { CosmeticSlot, CosmeticRarity, RenderConfig } from '@/features/journey/cosmetic-types';
+import type { CosmeticSlot, CosmeticRarity, RenderConfig, UnlockType } from '@/features/journey/cosmetic-types';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,31 +39,8 @@ export async function GET() {
 
   const userId = user.id;
 
-  // ── Lazy sync: grant any cosmetics the user qualifies for but hasn't received ──
-  // Fetch user's highest level across tenants, then call the idempotent grant function.
-  try {
-    const adminClient = getSupabaseAdmin();
-    const { data: progressRows } = await adminClient
-      .from('user_progress')
-      .select('level')
-      .eq('user_id', userId)
-      .order('level', { ascending: false })
-      .limit(1);
-
-    const highestLevel = progressRows?.[0]?.level;
-    if (highestLevel && highestLevel >= 1) {
-      await checkAndGrantCosmetics(adminClient, userId, {
-        type: 'level',
-        level: highestLevel,
-      });
-    }
-  } catch (e) {
-    // Non-fatal — log and continue serving catalog
-    console.error('[cosmetics] Lazy sync failed:', e);
-  }
-
-  // Parallel fetches — catalog (RLS: is_active=true), user's unlocked, user's loadout, unlock rules
-  const [catalogRes, unlockedRes, loadoutRes, rulesRes] = await Promise.all([
+  // Parallel fetches — all reads, no writes
+  const [catalogRes, grantsRes, loadoutRes, rulesRes, levelRes] = await Promise.all([
     supabase
       .from('cosmetics')
       .select('id,key,category,faction_id,rarity,name_key,description_key,render_type,render_config,sort_order,is_active')
@@ -73,7 +48,7 @@ export async function GET() {
       .order('sort_order', { ascending: true }),
     supabase
       .from('user_cosmetics')
-      .select('cosmetic_id')
+      .select('cosmetic_id,unlock_type')
       .eq('user_id', userId),
     supabase
       .from('user_cosmetic_loadout')
@@ -83,7 +58,15 @@ export async function GET() {
       .from('cosmetic_unlock_rules')
       .select('cosmetic_id,unlock_type,unlock_config,priority')
       .order('priority', { ascending: false }),
+    supabase
+      .from('user_progress')
+      .select('level')
+      .eq('user_id', userId)
+      .order('level', { ascending: false })
+      .limit(1),
   ]);
+
+  const userLevel = levelRes.data?.[0]?.level ?? 0;
 
   // Build a map: cosmeticId → primary unlock rule (highest priority)
   const unlockRuleMap = new Map<string, { type: string; config: Record<string, unknown> }>();
@@ -96,8 +79,33 @@ export async function GET() {
     }
   }
 
+  // Build a map: cosmeticId → explicit grant type (from user_cosmetics)
+  const grantMap = new Map<string, string>();
+  for (const row of (grantsRes.data ?? [])) {
+    grantMap.set(row.cosmetic_id, row.unlock_type);
+  }
+
   const catalog = (catalogRes.data ?? []).map((row) => {
     const rule = unlockRuleMap.get(row.id);
+    const grantType = grantMap.get(row.id);
+
+    // Resolve access: explicit grant OR dynamic level eligibility
+    let isUnlocked = false;
+    let unlockSource: UnlockType | null = null;
+
+    if (grantType) {
+      // Explicit grant (achievement, shop, admin, event, or previously materialized level)
+      isUnlocked = true;
+      unlockSource = grantType as UnlockType;
+    } else if (rule?.type === 'level') {
+      // Dynamic level eligibility — no grant row needed
+      const requiredLevel = Number(rule.config.required_level ?? 0);
+      if (userLevel >= requiredLevel) {
+        isUnlocked = true;
+        unlockSource = 'level';
+      }
+    }
+
     return {
       id: row.id,
       key: row.key,
@@ -112,21 +120,20 @@ export async function GET() {
       isActive: row.is_active ?? true,
       unlockInfo: rule
         ? {
-            type: rule.type,
+            type: rule.type as UnlockType,
             ...(rule.type === 'level' && typeof rule.config.required_level === 'number'
               ? { level: rule.config.required_level }
               : {}),
           }
         : null,
+      access: { isUnlocked, unlockSource },
     };
   });
-
-  const unlocked = (unlockedRes.data ?? []).map((r) => r.cosmetic_id);
 
   const loadout: Record<string, string> = {};
   for (const row of (loadoutRes.data ?? [])) {
     loadout[row.slot] = row.cosmetic_id;
   }
 
-  return NextResponse.json({ catalog, unlocked, loadout }, { status: 200 });
+  return NextResponse.json({ catalog, loadout, userLevel }, { status: 200 });
 }

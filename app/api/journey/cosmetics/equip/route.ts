@@ -68,16 +68,38 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Cosmetic category does not match slot' }, { status: 400 });
   }
 
-  // 2. Verify user owns the cosmetic (server-side ownership check)
-  const { data: ownership, error: ownershipError } = await supabase
+  // 2. Verify user has access: explicit grant OR dynamic level eligibility
+  const { data: ownership } = await supabase
     .from('user_cosmetics')
     .select('id')
     .eq('user_id', userId)
     .eq('cosmetic_id', cosmeticId)
     .maybeSingle();
 
-  if (ownershipError || !ownership) {
-    return NextResponse.json({ error: 'You do not own this cosmetic' }, { status: 403 });
+  if (!ownership) {
+    // No explicit grant — check dynamic level eligibility
+    const [ruleRes, levelRes] = await Promise.all([
+      supabase
+        .from('cosmetic_unlock_rules')
+        .select('unlock_config')
+        .eq('cosmetic_id', cosmeticId)
+        .eq('unlock_type', 'level')
+        .limit(1),
+      supabase
+        .from('user_progress')
+        .select('level')
+        .eq('user_id', userId)
+        .order('level', { ascending: false })
+        .limit(1),
+    ]);
+
+    const config = (ruleRes.data?.[0]?.unlock_config ?? {}) as Record<string, unknown>;
+    const requiredLevel = Number(config.required_level ?? 0);
+    const userLevel = levelRes.data?.[0]?.level ?? 0;
+
+    if (!requiredLevel || userLevel < requiredLevel) {
+      return NextResponse.json({ error: 'You do not own this cosmetic' }, { status: 403 });
+    }
   }
 
   // 3. Upsert loadout — RLS loadout_insert policy also validates ownership as defense-in-depth

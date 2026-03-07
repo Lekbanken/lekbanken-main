@@ -35,6 +35,17 @@ export type CosmeticRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendar
 export type UnlockType = 'level' | 'achievement' | 'shop' | 'event' | 'manual';
 
 // ---------------------------------------------------------------------------
+// Per-item access resolution (computed by the catalog API)
+// ---------------------------------------------------------------------------
+
+export type CosmeticAccess = {
+  /** Whether the user can equip this cosmetic right now */
+  isUnlocked: boolean;
+  /** How the user gained access (null = still locked) */
+  unlockSource: UnlockType | null;
+};
+
+// ---------------------------------------------------------------------------
 // Render types — discriminated union per category
 // ---------------------------------------------------------------------------
 
@@ -103,11 +114,13 @@ export type CosmeticItem = {
   renderConfig: RenderConfig;
   sortOrder: number;
   isActive: boolean;
-  /** Primary unlock method for badge display */
+  /** How this cosmetic can be unlocked (the rule) */
   unlockInfo?: {
     type: UnlockType;
     level?: number;
   } | null;
+  /** Current user's access state (computed per request) */
+  access: CosmeticAccess;
 };
 
 // ---------------------------------------------------------------------------

@@ -22,8 +22,8 @@ export async function fetchJourneyFeed(params?: { cursor?: string; limit?: numbe
 
 export type CosmeticCatalogResponse = {
   catalog: CosmeticItem[];
-  unlocked: string[];
   loadout: Record<string, string>;
+  userLevel: number;
 };
 
 export async function fetchCosmeticCatalog(): Promise<CosmeticCatalogResponse> {

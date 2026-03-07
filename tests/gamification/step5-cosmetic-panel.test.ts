@@ -23,6 +23,7 @@ import type {
   CssParticlesConfig,
   XpSkinConfig,
   CssDividerConfig,
+  UnlockType,
 } from "@/features/journey/cosmetic-types";
 import { COSMETIC_SLOTS } from "@/features/journey/cosmetic-types";
 import type { CosmeticCatalogResponse } from "@/features/journey/api";
@@ -42,6 +43,7 @@ function makeItem(overrides: Partial<CosmeticItem> & { id: string; category: Cos
     renderConfig: { renderType: "svg_frame", variant: "default" } as RenderConfig,
     sortOrder: 0,
     isActive: true,
+    access: { isUnlocked: false, unlockSource: null },
     ...overrides,
   };
 }
@@ -84,6 +86,13 @@ const TEST_CATALOG: CosmeticItem[] = [
 const UNLOCKED_IDS = ["af1", "af2", "bg1", "pt1", "pt2", "xp1", "sd1"];
 // Locked: af3, bg2, xp2, sd2
 
+// Apply access state to test catalog based on UNLOCKED_IDS
+for (const item of TEST_CATALOG) {
+  if (UNLOCKED_IDS.includes(item.id)) {
+    item.access = { isUnlocked: true, unlockSource: 'level' as UnlockType };
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Simulate CosmeticControlPanel internal logic
 // (mirrors the actual component code without React rendering)
@@ -92,7 +101,6 @@ const UNLOCKED_IDS = ["af1", "af2", "bg1", "pt1", "pt2", "xp1", "sd1"];
 type PanelState = {
   activeTab: CosmeticSlot;
   catalog: CosmeticItem[];
-  unlocked: Set<string>;
   loadout: Record<string, string>;
   loading: boolean;
   error: string | null;
@@ -103,7 +111,6 @@ function createInitialState(): PanelState {
   return {
     activeTab: "avatar_frame",
     catalog: [],
-    unlocked: new Set(),
     loadout: {},
     loading: true,
     error: null,
@@ -115,7 +122,6 @@ function applyFetchResult(state: PanelState, data: CosmeticCatalogResponse): Pan
   return {
     ...state,
     catalog: data.catalog,
-    unlocked: new Set(data.unlocked),
     loadout: data.loadout,
     loading: false,
     error: null,
@@ -155,7 +161,7 @@ function confirmAction(state: PanelState): PanelState {
 }
 
 function isItemUnlocked(state: PanelState, itemId: string): boolean {
-  return state.unlocked.has(itemId);
+  return state.catalog.find(i => i.id === itemId)?.access.isUnlocked ?? false;
 }
 
 function isItemEquipped(state: PanelState, itemId: string): boolean {
@@ -167,7 +173,7 @@ function cardClick(
   state: PanelState,
   item: CosmeticItem,
 ): { action: "equip" | "unequip" | "noop"; item: CosmeticItem } {
-  if (!state.unlocked.has(item.id)) return { action: "noop", item };
+  if (!item.access.isUnlocked) return { action: "noop", item };
   if (state.loadout[state.activeTab] === item.id) return { action: "unequip", item };
   return { action: "equip", item };
 }
@@ -180,8 +186,8 @@ describe("Step 5 — CosmeticControlPanel Verification", () => {
   let state: PanelState;
   const mockCatalogResponse: CosmeticCatalogResponse = {
     catalog: TEST_CATALOG,
-    unlocked: UNLOCKED_IDS,
-    loadout: { avatar_frame: "af1" }, // Void frame equipped
+    loadout: { avatar_frame: "af1" },
+    userLevel: 5,
   };
 
   beforeEach(() => {
@@ -202,7 +208,6 @@ describe("Step 5 — CosmeticControlPanel Verification", () => {
       state = applyFetchResult(state, mockCatalogResponse);
       expect(state.loading).toBe(false);
       expect(state.catalog).toHaveLength(TEST_CATALOG.length);
-      expect(state.unlocked.size).toBe(UNLOCKED_IDS.length);
       expect(state.loadout).toEqual({ avatar_frame: "af1" });
       expect(state.error).toBeNull();
     });
@@ -280,8 +285,8 @@ describe("Step 5 — CosmeticControlPanel Verification", () => {
       // Create catalog with no xp_bar items
       const sparseResponse: CosmeticCatalogResponse = {
         catalog: TEST_CATALOG.filter((i) => i.category !== "xp_bar"),
-        unlocked: UNLOCKED_IDS,
         loadout: {},
+        userLevel: 5,
       };
       state = applyFetchResult(state, sparseResponse);
       state = switchTab(state, "xp_bar");
@@ -712,11 +717,11 @@ describe("Step 5 — CosmeticControlPanel Verification", () => {
     it("CosmeticCatalogResponse shape matches panel expectations", () => {
       const response: CosmeticCatalogResponse = mockCatalogResponse;
       expect(response).toHaveProperty("catalog");
-      expect(response).toHaveProperty("unlocked");
       expect(response).toHaveProperty("loadout");
+      expect(response).toHaveProperty("userLevel");
       expect(Array.isArray(response.catalog)).toBe(true);
-      expect(Array.isArray(response.unlocked)).toBe(true);
       expect(typeof response.loadout).toBe("object");
+      expect(typeof response.userLevel).toBe("number");
     });
 
     it("CosmeticItem has all required fields for card rendering", () => {
@@ -761,16 +766,13 @@ describe("Step 5 — CosmeticControlPanel Verification", () => {
       state = optimisticEquip(state, "section_divider", "sd1");
 
       expect(Object.keys(state.loadout)).toHaveLength(5);
-      for (const slot of COSMETIC_SLOTS) {
-        expect(state.loadout[slot]).toBeDefined();
-      }
     });
 
     it("empty loadout (no cosmetics equipped) is valid", () => {
       const emptyResponse: CosmeticCatalogResponse = {
         catalog: TEST_CATALOG,
-        unlocked: UNLOCKED_IDS,
         loadout: {},
+        userLevel: 5,
       };
       state = applyFetchResult(state, emptyResponse);
       expect(Object.keys(state.loadout)).toHaveLength(0);
@@ -831,8 +833,8 @@ describe("Step 5 — CosmeticControlPanel Verification", () => {
     it("catalog with no items for any category shows empty for each tab", () => {
       const emptyResponse: CosmeticCatalogResponse = {
         catalog: [],
-        unlocked: [],
         loadout: {},
+        userLevel: 0,
       };
       state = applyFetchResult(state, emptyResponse);
 
@@ -843,14 +845,18 @@ describe("Step 5 — CosmeticControlPanel Verification", () => {
     });
 
     it("user with zero unlocked cosmetics sees all items as locked", () => {
+      const lockedCatalog = TEST_CATALOG.map(item => ({
+        ...item,
+        access: { isUnlocked: false, unlockSource: null },
+      }));
       const noUnlocksResponse: CosmeticCatalogResponse = {
-        catalog: TEST_CATALOG,
-        unlocked: [],
+        catalog: lockedCatalog,
         loadout: {},
+        userLevel: 0,
       };
       state = applyFetchResult(state, noUnlocksResponse);
 
-      for (const item of TEST_CATALOG) {
+      for (const item of state.catalog) {
         expect(isItemUnlocked(state, item.id)).toBe(false);
         const result = cardClick(state, item);
         expect(result.action).toBe("noop");

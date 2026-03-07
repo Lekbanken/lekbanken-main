@@ -63,7 +63,6 @@ export function CosmeticControlPanel({
 
   const [activeTab, setActiveTab] = useState<CosmeticSlot>("avatar_frame");
   const [catalog, setCatalog] = useState<CosmeticItem[]>([]);
-  const [unlocked, setUnlocked] = useState<Set<string>>(new Set());
   const [loadout, setLoadout] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,7 +75,6 @@ export function CosmeticControlPanel({
       .then((data: CosmeticCatalogResponse) => {
         if (!mounted) return;
         setCatalog(data.catalog);
-        setUnlocked(new Set(data.unlocked));
         setLoadout(data.loadout);
         setError(null);
       })
@@ -145,7 +143,7 @@ export function CosmeticControlPanel({
   // ── Unlock count per tab ──
   const tabUnlockCount = (slot: CosmeticSlot) => {
     const total = catalog.filter((c) => c.category === slot).length;
-    const owned = catalog.filter((c) => c.category === slot && unlocked.has(c.id)).length;
+    const owned = catalog.filter((c) => c.category === slot && c.access.isUnlocked).length;
     return { owned, total };
   };
 
@@ -181,7 +179,7 @@ export function CosmeticControlPanel({
         <p className="text-[10px] text-white/35 mt-0.5">
           {(() => {
             const total = catalog.length;
-            const owned = catalog.filter((c) => unlocked.has(c.id)).length;
+            const owned = catalog.filter((c) => c.access.isUnlocked).length;
             return `${owned} / ${total} ${t("unlockedCount")}`;
           })()}
         </p>
@@ -256,7 +254,7 @@ export function CosmeticControlPanel({
             }}
           >
             {tabItems.map((item) => {
-              const isItemUnlocked = unlocked.has(item.id);
+              const isItemUnlocked = item.access.isUnlocked;
               const isEquipped = loadout[activeTab] === item.id;
 
               // Build lock label from actual unlock rules

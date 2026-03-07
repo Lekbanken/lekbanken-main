@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import type { CosmeticSlot, CosmeticRarity, RenderConfig, UnlockType } from '@/features/journey/cosmetic-types';
+import type { CosmeticSlot, CosmeticRarity, RenderConfig, UnlockType, UnlockRequirement } from '@/features/journey/cosmetic-types';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,15 +68,15 @@ export async function GET() {
 
   const userLevel = levelRes.data?.[0]?.level ?? 0;
 
-  // Build a map: cosmeticId → primary unlock rule (highest priority)
-  const unlockRuleMap = new Map<string, { type: string; config: Record<string, unknown> }>();
+  // Build a map: cosmeticId → ALL unlock rules (highest priority first)
+  const allRulesMap = new Map<string, Array<{ type: string; config: Record<string, unknown> }>>();
   for (const rule of (rulesRes.data ?? [])) {
-    if (!unlockRuleMap.has(rule.cosmetic_id)) {
-      unlockRuleMap.set(rule.cosmetic_id, {
-        type: rule.unlock_type,
-        config: (rule.unlock_config ?? {}) as Record<string, unknown>,
-      });
-    }
+    const list = allRulesMap.get(rule.cosmetic_id) ?? [];
+    list.push({
+      type: rule.unlock_type,
+      config: (rule.unlock_config ?? {}) as Record<string, unknown>,
+    });
+    allRulesMap.set(rule.cosmetic_id, list);
   }
 
   // Build a map: cosmeticId → explicit grant type (from user_cosmetics)
@@ -86,23 +86,38 @@ export async function GET() {
   }
 
   const catalog = (catalogRes.data ?? []).map((row) => {
-    const rule = unlockRuleMap.get(row.id);
+    const rules = allRulesMap.get(row.id) ?? [];
+    const primaryRule = rules[0] ?? null;
     const grantType = grantMap.get(row.id);
 
-    // Resolve access: explicit grant OR dynamic level eligibility
-    let isUnlocked = false;
-    let unlockSource: UnlockType | null = null;
+    // Collect all active unlock sources
+    const sources: UnlockType[] = [];
 
+    // Explicit grant (achievement, shop, admin, event)
     if (grantType) {
-      // Explicit grant (achievement, shop, admin, event, or previously materialized level)
-      isUnlocked = true;
-      unlockSource = grantType as UnlockType;
-    } else if (rule?.type === 'level') {
-      // Dynamic level eligibility — no grant row needed
-      const requiredLevel = Number(rule.config.required_level ?? 0);
-      if (userLevel >= requiredLevel) {
-        isUnlocked = true;
-        unlockSource = 'level';
+      sources.push(grantType as UnlockType);
+    }
+
+    // Dynamic level eligibility — check all level rules
+    for (const rule of rules) {
+      if (rule.type === 'level') {
+        const requiredLevel = Number(rule.config.required_level ?? 0);
+        if (userLevel >= requiredLevel) {
+          if (!sources.includes('level')) sources.push('level');
+        }
+      }
+    }
+
+    const isUnlocked = sources.length > 0;
+    const primarySource = sources[0] ?? null;
+
+    // Build requirement info for locked items
+    let requirement: UnlockRequirement | null = null;
+    if (!isUnlocked && primaryRule) {
+      requirement = { type: primaryRule.type as UnlockType };
+      if (primaryRule.type === 'level') {
+        requirement.requiredLevel = Number(primaryRule.config.required_level ?? 0);
+        requirement.currentLevel = userLevel;
       }
     }
 
@@ -118,15 +133,15 @@ export async function GET() {
       renderConfig: toRenderConfig(row.render_type, row.render_config),
       sortOrder: row.sort_order ?? 0,
       isActive: row.is_active ?? true,
-      unlockInfo: rule
+      unlockInfo: primaryRule
         ? {
-            type: rule.type as UnlockType,
-            ...(rule.type === 'level' && typeof rule.config.required_level === 'number'
-              ? { level: rule.config.required_level }
+            type: primaryRule.type as UnlockType,
+            ...(primaryRule.type === 'level' && typeof primaryRule.config.required_level === 'number'
+              ? { level: primaryRule.config.required_level }
               : {}),
           }
         : null,
-      access: { isUnlocked, unlockSource },
+      access: { isUnlocked, sources, primarySource, requirement },
     };
   });
 

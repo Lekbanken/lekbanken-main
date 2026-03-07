@@ -43,7 +43,7 @@ function makeItem(overrides: Partial<CosmeticItem> & { id: string; category: Cos
     renderConfig: { renderType: "svg_frame", variant: "default" } as RenderConfig,
     sortOrder: 0,
     isActive: true,
-    access: { isUnlocked: false, unlockSource: null },
+    access: { isUnlocked: false, sources: [], primarySource: null, requirement: null },
     ...overrides,
   };
 }
@@ -89,7 +89,7 @@ const UNLOCKED_IDS = ["af1", "af2", "bg1", "pt1", "pt2", "xp1", "sd1"];
 // Apply access state to test catalog based on UNLOCKED_IDS
 for (const item of TEST_CATALOG) {
   if (UNLOCKED_IDS.includes(item.id)) {
-    item.access = { isUnlocked: true, unlockSource: 'level' as UnlockType };
+    item.access = { isUnlocked: true, sources: ['level' as UnlockType], primarySource: 'level' as UnlockType, requirement: null };
   }
 }
 
@@ -847,7 +847,7 @@ describe("Step 5 — CosmeticControlPanel Verification", () => {
     it("user with zero unlocked cosmetics sees all items as locked", () => {
       const lockedCatalog = TEST_CATALOG.map(item => ({
         ...item,
-        access: { isUnlocked: false, unlockSource: null },
+        access: { isUnlocked: false, sources: [], primarySource: null, requirement: null },
       }));
       const noUnlocksResponse: CosmeticCatalogResponse = {
         catalog: lockedCatalog,

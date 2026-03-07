@@ -38,11 +38,22 @@ export type UnlockType = 'level' | 'achievement' | 'shop' | 'event' | 'manual';
 // Per-item access resolution (computed by the catalog API)
 // ---------------------------------------------------------------------------
 
+/** Structured unlock requirement for locked cosmetics */
+export type UnlockRequirement = {
+  type: UnlockType;
+  requiredLevel?: number;
+  currentLevel?: number;
+};
+
 export type CosmeticAccess = {
   /** Whether the user can equip this cosmetic right now */
   isUnlocked: boolean;
-  /** How the user gained access (null = still locked) */
-  unlockSource: UnlockType | null;
+  /** All sources granting access (empty if locked) */
+  sources: UnlockType[];
+  /** Primary/first source for simple UI display (null = still locked) */
+  primarySource: UnlockType | null;
+  /** What the user needs to unlock this (null if unlocked or no known requirement) */
+  requirement: UnlockRequirement | null;
 };
 
 // ---------------------------------------------------------------------------

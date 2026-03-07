@@ -257,12 +257,12 @@ export function CosmeticControlPanel({
               const isItemUnlocked = item.access.isUnlocked;
               const isEquipped = loadout[activeTab] === item.id;
 
-              // Build lock label from actual unlock rules
+              // Build lock label from access requirement (richer than unlockInfo)
               let itemLockLabel: string | undefined;
-              if (!isItemUnlocked && item.unlockInfo) {
-                switch (item.unlockInfo.type) {
+              if (!isItemUnlocked && item.access.requirement) {
+                switch (item.access.requirement.type) {
                   case 'level':
-                    itemLockLabel = `Lv${item.unlockInfo.level ?? '?'}`;
+                    itemLockLabel = `Lv${item.access.requirement.requiredLevel ?? '?'}`;
                     break;
                   case 'shop':
                     itemLockLabel = '🛒';

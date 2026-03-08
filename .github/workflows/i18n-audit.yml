@@ -3,8 +3,32 @@ name: i18n Audit
 on:
   push:
     branches: [main, develop]
+    paths:
+      - .github/workflows/i18n-audit.yml
+      - messages/**/*.json
+      - app/**
+      - components/**
+      - features/**
+      - lib/**
+      - hooks/**
+      - scripts/i18n-audit*.mjs
+      - scripts/i18n-audit*.json
   pull_request:
     branches: [main, develop]
+    paths:
+      - .github/workflows/i18n-audit.yml
+      - messages/**/*.json
+      - app/**
+      - components/**
+      - features/**
+      - lib/**
+      - hooks/**
+      - scripts/i18n-audit*.mjs
+      - scripts/i18n-audit*.json
+
+concurrency:
+  group: i18n-audit-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   i18n-audit:

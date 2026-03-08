@@ -33,9 +33,18 @@ export function HeroV2() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState<number | null>(null);
   const [direction, setDirection] = useState<'left' | 'right'>('left');
+  const [ready, setReady] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wordMeasureRef = useRef<HTMLSpanElement>(null);
   const [wordWidth, setWordWidth] = useState<number | undefined>(undefined);
+
+  // Mark ready after first paint + first image load
+  useEffect(() => {
+    const img = new window.Image();
+    img.src = SCREENSHOT_SRCS[0];
+    const done = () => setReady(true);
+    if (img.complete) { done(); } else { img.onload = done; img.onerror = done; }
+  }, []);
 
   // Measure active word width
   useEffect(() => {
@@ -76,9 +85,49 @@ export function HeroV2() {
         <div className="absolute -bottom-40 left-0 h-[500px] w-[500px] rounded-full bg-[#00c7b0]/[0.06] blur-3xl" />
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-12 sm:py-20 lg:flex lg:items-center lg:gap-x-16 lg:px-8 lg:py-28">
-        {/* Left column — Text */}
-        <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto">
+      {/* Skeleton placeholder — shown while loading */}
+      {!ready && (
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:py-20 lg:py-28 lg:px-8" aria-hidden>
+          <div className="flex flex-col items-center lg:flex-row lg:items-center lg:gap-x-16">
+            {/* Skeleton phone (shown first on mobile) */}
+            <div className="mx-auto w-full max-w-[240px] sm:max-w-[280px] lg:order-2 lg:max-w-[300px]">
+              <div className="aspect-[380/780] w-full animate-pulse rounded-[2rem] bg-gray-200" />
+              <div className="mt-4 flex justify-center gap-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className={`h-2 rounded-full bg-gray-200 ${i === 0 ? 'w-6' : 'w-2'}`} />
+                ))}
+              </div>
+            </div>
+            {/* Skeleton text */}
+            <div className="mt-10 w-full max-w-2xl lg:order-1 lg:mt-0 lg:flex-auto">
+              <div className="h-10 w-3/4 animate-pulse rounded-lg bg-gray-200 sm:h-14" />
+              <div className="mt-2 h-10 w-1/2 animate-pulse rounded-lg bg-gray-200 sm:h-14" />
+              <div className="mt-6 space-y-3">
+                <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
+                <div className="h-4 w-5/6 animate-pulse rounded bg-gray-200" />
+              </div>
+              <div className="mt-4 h-4 w-2/3 animate-pulse rounded bg-gray-100" />
+              <div className="mt-8 h-12 w-48 animate-pulse rounded-lg bg-gray-200" />
+              <div className="mt-8 flex gap-8">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex flex-col items-center gap-1.5">
+                    <div className="h-9 w-9 animate-pulse rounded-full bg-gray-200" />
+                    <div className="h-3 w-12 animate-pulse rounded bg-gray-200" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Real content — fade in when ready */}
+      <div
+        className={`mx-auto max-w-7xl px-6 py-12 sm:py-20 lg:px-8 lg:py-28 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'}`}
+      >
+        <div className="flex flex-col lg:flex-row lg:items-center lg:gap-x-16">
+        {/* Text column — order-2 on mobile (phone first), order-1 on desktop */}
+        <div className="order-2 mx-auto mt-10 max-w-2xl sm:mt-14 lg:order-1 lg:mx-0 lg:mt-0 lg:flex-auto">
           {/* Headline */}
           <h1 className="text-3xl font-semibold leading-tight tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
             {/* Width-measuring hidden span */}
@@ -158,8 +207,8 @@ export function HeroV2() {
           </div>
         </div>
 
-        {/* Right column — Phone mockup */}
-        <div className="relative mx-auto mt-10 w-full max-w-[240px] flex-none sm:mt-14 sm:max-w-[280px] lg:mt-0 lg:max-w-[300px]">
+        {/* Phone column — order-1 on mobile (first), order-2 on desktop */}
+        <div className="order-1 relative mx-auto w-full max-w-[240px] flex-none sm:max-w-[280px] lg:order-2 lg:mt-0 lg:max-w-[300px]">
           {/* Glow behind phone */}
           <div
             className="absolute -inset-8 -z-10 rounded-[3rem] bg-gradient-to-br from-[#8661ff]/20 via-[#00c7b0]/10 to-[#ffd166]/10 blur-3xl animate-pulse"
@@ -243,6 +292,7 @@ export function HeroV2() {
               />
             ))}
           </div>
+        </div>
         </div>
       </div>
 

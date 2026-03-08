@@ -159,45 +159,62 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check for demo policy keywords
+      - name: Check for current demo security markers
         run: |
-          echo "Checking for required demo security keywords in migrations..."
+          echo "Checking for current demo security markers in migrations..."
 
-          REQUIRED_KEYWORDS=(
-            "demo_tenant_write_protection"
-            "demo_content_access"
-            "demo_user_flag_protection"
-            "demo_no_public_sessions"
+          REQUIRED_MARKERS=(
+            "CREATE POLICY \"demo_tenant_write_protection\""
+            "CREATE POLICY \"demo_tenant_delete_protection\""
+            "CREATE POLICY \"demo_content_access\""
+            "CREATE OR REPLACE FUNCTION public.enforce_demo_flag_protection()"
+            "CREATE TRIGGER enforce_demo_flags"
+            "CREATE POLICY \"demo_no_public_sessions\""
           )
 
-          MISSING_KEYWORDS=()
+          MISSING_MARKERS=()
 
-          for keyword in "${REQUIRED_KEYWORDS[@]}"; do
-            if ! grep -rq "$keyword" supabase/migrations/; then
-              MISSING_KEYWORDS+=("$keyword")
+          for marker in "${REQUIRED_MARKERS[@]}"; do
+            if ! grep -Rqs "$marker" supabase/migrations/; then
+              MISSING_MARKERS+=("$marker")
             fi
           done
 
-          if [ ${#MISSING_KEYWORDS[@]} -gt 0 ]; then
-            echo "❌ Missing required demo security policies:"
-            printf '%s\n' "${MISSING_KEYWORDS[@]}"
+          if [ ${#MISSING_MARKERS[@]} -gt 0 ]; then
+            echo "❌ Missing required demo security markers:"
+            printf '%s\n' "${MISSING_MARKERS[@]}"
             exit 1
           fi
 
-          echo "✅ All required demo security policies found"
+          echo "✅ All required demo security markers found"
 
       - name: Verify RLS enabled on critical tables
         run: |
-          echo "Verifying RLS is enabled on critical tables..."
+          echo "Verifying RLS enablement on critical tables..."
 
-          # Check migrations for RLS enablement
-          if ! grep -rq "ALTER TABLE.*ENABLE ROW LEVEL SECURITY" supabase/migrations/ &&
-             ! grep -rq "ENABLE ROW LEVEL SECURITY" supabase/migrations/; then
-            echo "⚠️  Warning: No explicit RLS enablement found in migrations"
-            echo "Ensure RLS is enabled on: tenants, games, users, participant_sessions, game_sessions"
-          else
-            echo "✅ RLS enablement commands found in migrations"
+          REQUIRED_TABLES=(
+            "tenants"
+            "games"
+            "users"
+            "participant_sessions"
+            "game_sessions"
+          )
+
+          MISSING_RLS_TABLES=()
+
+          for table in "${REQUIRED_TABLES[@]}"; do
+            if ! grep -RiqE "ALTER TABLE( IF EXISTS)? (public\.)?${table} ENABLE ROW LEVEL SECURITY" supabase/migrations/; then
+              MISSING_RLS_TABLES+=("$table")
+            fi
+          done
+
+          if [ ${#MISSING_RLS_TABLES[@]} -gt 0 ]; then
+            echo "❌ Missing explicit RLS enablement for critical tables:"
+            printf '%s\n' "${MISSING_RLS_TABLES[@]}"
+            exit 1
           fi
+
+          echo "✅ RLS enablement found for all critical tables"
 
   documentation-check:
     name: Documentation Check

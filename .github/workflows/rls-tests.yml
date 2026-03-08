@@ -71,14 +71,11 @@ jobs:
         with:
           version: latest
 
-      - name: Start Supabase local instance
-        run: supabase start
-
-      - name: Run migrations
+      - name: Start local database and apply migrations
         run: |
           set -o pipefail
-          echo "Running database migrations..."
-          supabase db reset --debug 2>&1 | tee migration_output.log
+          echo "Starting local database and applying migrations..."
+          supabase db start --debug 2>&1 | tee startup_output.log
         continue-on-error: false
 
       - name: Run RLS policy tests
@@ -118,7 +115,7 @@ jobs:
           name: rls-test-results
           path: |
             test_output.log
-            migration_output.log
+            startup_output.log
 
       - name: Stop Supabase
         if: always()
@@ -133,14 +130,14 @@ jobs:
             const testOutput = fs.existsSync('test_output.log')
               ? fs.readFileSync('test_output.log', 'utf8')
               : null;
-            const migrationOutput = fs.existsSync('migration_output.log')
-              ? fs.readFileSync('migration_output.log', 'utf8')
+            const startupOutput = fs.existsSync('startup_output.log')
+              ? fs.readFileSync('startup_output.log', 'utf8')
               : null;
-            const output = testOutput ?? migrationOutput ?? 'No test or migration log was captured.';
+            const output = testOutput ?? startupOutput ?? 'No startup or test log was captured.';
             const summary = testOutput
               ? 'RLS policy test harness failed.'
-              : migrationOutput
-                ? 'Database reset/migration step failed before the RLS SQL harness started.'
+              : startupOutput
+                ? 'Supabase database startup failed before the RLS SQL harness started.'
                 : 'Workflow failed before logs were captured.';
 
             github.rest.issues.createComment({

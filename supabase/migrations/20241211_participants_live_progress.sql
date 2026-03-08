@@ -8,7 +8,7 @@
 -- The actual schema now lives in:
 --   20251129000016_participants_live_progress.sql
 
-DO $$
+DO LANGUAGE plpgsql $$
 BEGIN
   RAISE NOTICE 'Skipping legacy participant live-progress migration 20241211; schema is recreated later in 20251129000016_participants_live_progress.sql';
 END $$;

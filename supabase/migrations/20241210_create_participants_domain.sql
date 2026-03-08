@@ -12,7 +12,7 @@
 -- that already recorded it remain valid, while fresh resets continue through
 -- the corrected migration order.
 
-DO $$
+DO LANGUAGE plpgsql $$
 BEGIN
   RAISE NOTICE 'Skipping legacy participant domain migration 20241210; schema is recreated later in 20251129000015_participants_domain.sql';
 END $$;

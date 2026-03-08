@@ -85,7 +85,7 @@ ALTER TABLE public.participant_game_progress ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.participant_achievement_unlocks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.session_statistics ENABLE ROW LEVEL SECURITY;
 
-DO $$
+DO LANGUAGE plpgsql $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'participant_game_progress' AND policyname = 'hosts_can_read_session_progress'

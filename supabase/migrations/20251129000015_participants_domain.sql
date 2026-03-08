@@ -6,7 +6,7 @@
 -- This migration is intentionally idempotent because older remote databases
 -- may already have received the original 20241210 migration.
 
-DO $$
+DO LANGUAGE plpgsql $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_type WHERE typname = 'participant_session_status'
@@ -147,7 +147,7 @@ ALTER TABLE public.participants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.participant_activity_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.participant_token_quotas ENABLE ROW LEVEL SECURITY;
 
-DO $$
+DO LANGUAGE plpgsql $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'participant_sessions' AND policyname = 'Hosts can create sessions'

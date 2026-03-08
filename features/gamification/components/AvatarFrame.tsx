@@ -78,9 +78,11 @@ export function AvatarFrame({ style, accentColor, size = 112, loadoutConfig }: A
       height={s}
       viewBox={`0 0 ${s} ${s}`}
       className="absolute pointer-events-none"
-      style={{ top: offset, left: offset, zIndex: 20 }}
+      style={{ top: offset, left: offset, zIndex: 20, filter: `drop-shadow(0 0 8px ${resolvedAccent}66) drop-shadow(0 0 18px ${resolvedAccent}33)` }}
       aria-hidden
     >
+      <circle cx={cx} cy={cy} r={r + 3} fill="none" stroke={resolvedAccent} strokeWidth={2.2} opacity={0.18} />
+      <circle cx={cx} cy={cy} r={r + 1} fill="none" stroke={resolvedAccent} strokeWidth={1.5} opacity={0.4} />
       {resolvedStyle === "constellation" && (
         <ConstellationFrame cx={cx} cy={cy} r={r} color={resolvedAccent} />
       )}
@@ -124,8 +126,8 @@ function ConstellationFrame({ cx, cy, r, color }: FrameProps) {
             x2={next.x}
             y2={next.y}
             stroke={color}
-            strokeWidth={0.8}
-            opacity={0.2}
+            strokeWidth={1.2}
+            opacity={0.38}
           />
         );
       })}
@@ -142,20 +144,20 @@ function ConstellationFrame({ cx, cy, r, color }: FrameProps) {
               x2={opp.x}
               y2={opp.y}
               stroke={color}
-              strokeWidth={0.5}
-              opacity={0.1}
+              strokeWidth={0.8}
+              opacity={0.2}
             />
           );
         })}
       {/* Star dots */}
       {pts.map((p, i) => (
         <g key={`s${i}`}>
-          <circle cx={p.x} cy={p.y} r={i % 2 === 0 ? 3 : 2} fill={color} opacity={0.7} />
-          <circle cx={p.x} cy={p.y} r={i % 2 === 0 ? 5 : 3.5} fill={color} opacity={0.15} />
+          <circle cx={p.x} cy={p.y} r={i % 2 === 0 ? 3.6 : 2.6} fill={color} opacity={0.92} />
+          <circle cx={p.x} cy={p.y} r={i % 2 === 0 ? 6.5 : 4.8} fill={color} opacity={0.24} />
         </g>
       ))}
       {/* Faint circle arc */}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={1} opacity={0.12} strokeDasharray="4 8" />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={1.4} opacity={0.28} strokeDasharray="4 8" />
     </g>
   );
 }
@@ -190,8 +192,8 @@ function CoralFrame({ cx, cy, r, color }: FrameProps) {
             d={`M ${x1} ${y1} A ${r2} ${r2} 0 0 1 ${x2} ${y2}`}
             fill="none"
             stroke={color}
-            strokeWidth={1.5}
-            opacity={0.25}
+            strokeWidth={2.2}
+            opacity={0.42}
             strokeLinecap="round"
           />
         );
@@ -202,8 +204,8 @@ function CoralFrame({ cx, cy, r, color }: FrameProps) {
         const by = cy + Math.sin(b.a) * (r + b.d);
         return (
           <g key={`b${i}`}>
-            <circle cx={bx} cy={by} r={b.s} fill="none" stroke={color} strokeWidth={0.8} opacity={0.3} />
-            <circle cx={bx - b.s * 0.3} cy={by - b.s * 0.3} r={b.s * 0.2} fill={color} opacity={0.2} />
+            <circle cx={bx} cy={by} r={b.s} fill="none" stroke={color} strokeWidth={1.2} opacity={0.48} />
+            <circle cx={bx - b.s * 0.3} cy={by - b.s * 0.3} r={b.s * 0.24} fill={color} opacity={0.38} />
           </g>
         );
       })}
@@ -218,7 +220,7 @@ function VinesFrame({ cx, cy, r, color }: FrameProps) {
   return (
     <g>
       {/* Base organic ring */}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={1.5} opacity={0.15} />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={2.1} opacity={0.34} />
       {/* Vine tendrils */}
       {Array.from({ length: tendrils }, (_, i) => {
         const a = (i / tendrils) * Math.PI * 2 - Math.PI / 2;
@@ -238,18 +240,18 @@ function VinesFrame({ cx, cy, r, color }: FrameProps) {
               d={`M ${x1} ${y1} Q ${cpx} ${cpy} ${x2} ${y2}`}
               fill="none"
               stroke={color}
-              strokeWidth={1.2}
-              opacity={0.35}
+              strokeWidth={1.8}
+              opacity={0.56}
               strokeLinecap="round"
             />
             {/* Leaf at end */}
             <ellipse
               cx={x2}
               cy={y2}
-              rx={3}
-              ry={1.5}
+              rx={3.4}
+              ry={1.8}
               fill={color}
-              opacity={0.25}
+              opacity={0.48}
               transform={`rotate(${(a * 180) / Math.PI + 45} ${x2} ${y2})`}
             />
           </g>
@@ -263,9 +265,9 @@ function VinesFrame({ cx, cy, r, color }: FrameProps) {
             key={`d${i}`}
             cx={cx + Math.cos(a) * r}
             cy={cy + Math.sin(a) * r}
-            r={1.5}
+            r={1.8}
             fill={color}
-            opacity={i % 3 === 0 ? 0.4 : 0.15}
+            opacity={i % 3 === 0 ? 0.62 : 0.28}
           />
         );
       })}
@@ -300,7 +302,7 @@ function AuroraFrame({ cx, cy, r, color }: FrameProps) {
             fill="none"
             stroke={color}
             strokeWidth={arc.width}
-            opacity={0.15 + (i % 3) * 0.08}
+            opacity={0.3 + (i % 3) * 0.1}
             strokeLinecap="round"
           />
         );
@@ -314,9 +316,9 @@ function AuroraFrame({ cx, cy, r, color }: FrameProps) {
             key={`ld${i}`}
             cx={cx + Math.cos(a) * (r + jitter)}
             cy={cy + Math.sin(a) * (r + jitter)}
-            r={i % 3 === 0 ? 2.5 : 1.5}
+            r={i % 3 === 0 ? 3 : 1.8}
             fill={color}
-            opacity={0.2 + (i % 4) * 0.05}
+            opacity={0.38 + (i % 4) * 0.08}
           />
         );
       })}

@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
-import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
 import {
   BuildingOffice2Icon,
@@ -39,14 +38,9 @@ const orgTypeIcons: Record<string, React.ElementType> = {
 export default function OrganizationsPage() {
   const t = useTranslations('app.profile');
   const { user, isLoading: authLoading } = useAuth();
-  const { supabase, error: supabaseError, isInitializing } = useBrowserSupabase();
   const roleLabels = useMemo(() => getRoleLabels(t), [t]);
 
-  // Create stable profileService instance
-  const profileService = useMemo(
-    () => (supabase ? new ProfileService(supabase) : null),
-    [supabase]
-  );
+  const profileService = useMemo(() => new ProfileService(), []);
 
   // Use the new single-flight hook for fetching
   // NOTE: Only primitives in deps! profileService is accessed via closure.
@@ -60,43 +54,25 @@ export default function OrganizationsPage() {
   } = useProfileQuery<OrganizationMembership[]>(
     `organizations-${user?.id}`,
     async () => {
-      if (!profileService || !user?.id) {
+      if (!user?.id) {
         throw new Error('Not ready');
       }
       return profileService.getOrganizationMemberships(user.id);
     },
     { userId: user?.id },
     {
-      skip: authLoading || isInitializing || !supabase || !user?.id,
+      skip: authLoading || !user?.id,
       timeout: 10000,
     }
   );
 
-  const stillLoading = isLoading || authLoading || isInitializing;
+  const stillLoading = isLoading || authLoading;
 
   const membershipsList = memberships ?? [];
 
   const ownedOrgs = membershipsList.filter((m) => m.role === 'owner');
   const adminOrgs = membershipsList.filter((m) => m.role === 'admin');
   const memberOrgs = membershipsList.filter((m) => m.role === 'member' || m.role === 'editor');
-
-  if (!authLoading && supabaseError) {
-    return (
-      <div className="p-6 lg:p-8 space-y-4">
-        <Alert variant="error" title={t('sections.organizations.loadError')}>
-          <p>{t('sections.organizations.initError')}</p>
-          {process.env.NODE_ENV !== 'production' && (
-            <pre className="mt-2 whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs text-foreground">
-              {supabaseError.message}
-            </pre>
-          )}
-        </Alert>
-        <Button onClick={() => window.location.reload()} variant="outline">
-          {t('sections.organizations.reload')}
-        </Button>
-      </div>
-    );
-  }
 
   if (stillLoading) {
     return (

@@ -17,7 +17,7 @@ type BadgeShowcaseProps = {
  * Badge Showcase — 4-slot pinned achievement display.
  * Slot 1 = hero (large, centered), slots 2-4 = row below.
  * Empty slots show a greyed-out placeholder badge.
- * Uses existing ach-hero-glow + ach-sparkle keyframes from AchievementsSection.
+ * Uses a soft hero glow behind the featured badge.
  */
 export function BadgeShowcase({ showcase, achievements }: BadgeShowcaseProps) {
   const t = useTranslations("gamification");
@@ -54,52 +54,28 @@ export function BadgeShowcase({ showcase, achievements }: BadgeShowcaseProps) {
       {/* Hero badge — slot 1 or fallback to most recent */}
       {displayHero ? (
         <div
-          className="relative flex flex-col items-center pt-10 pb-8 mb-2 rounded-2xl overflow-hidden"
+          className="relative mb-3 flex flex-col items-center overflow-hidden rounded-2xl px-4 pb-8 pt-8"
           style={{
             background: "radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.04) 0%, transparent 70%)",
           }}
         >
           {/* Ambient glow */}
           <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full ach-hero-glow pointer-events-none"
+            className="pointer-events-none absolute left-1/2 top-[46%] h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full ach-hero-glow sm:h-64 sm:w-64"
             style={{
               background: "radial-gradient(circle, var(--journey-accent, #8661ff)35 0%, var(--journey-accent, #8661ff)12 40%, transparent 70%)",
             }}
           />
 
-          {/* Sparkle orbs */}
-          <div className="absolute inset-0 pointer-events-none" aria-hidden>
-            {[
-              { left: "35%", top: "15%", size: 4, delay: 0 },
-              { left: "65%", top: "70%", size: 3, delay: 0.6 },
-              { left: "25%", top: "55%", size: 3.5, delay: 1.2 },
-              { left: "70%", top: "25%", size: 2.5, delay: 1.8 },
-            ].map((s, i) => (
-              <span
-                key={i}
-                className={`absolute rounded-full ach-sparkle-${i}`}
-                style={{
-                  left: s.left,
-                  top: s.top,
-                  width: s.size,
-                  height: s.size,
-                  backgroundColor: "var(--journey-accent, #8661ff)",
-                  boxShadow: "0 0 4px var(--journey-accent, #8661ff)",
-                  animationDelay: `${s.delay}s`,
-                }}
-              />
-            ))}
-          </div>
-
           {/* Badge */}
-          <div className="relative transition-transform duration-300 hover:scale-110">
+          <div className="relative mb-4 origin-center scale-[1.35] transition-transform duration-300 hover:scale-[1.48] sm:scale-[1.55] sm:hover:scale-[1.66]">
             <BadgeIcon iconConfig={displayHero.icon_config} size="lg" showGlow />
           </div>
 
           {/* Name + description */}
-          <div className="mt-4 text-center relative z-10">
-            <h4 className="text-base font-bold text-white">{displayHero.name}</h4>
-            <p className="text-xs mt-0.5 text-white/50">{displayHero.description}</p>
+          <div className="relative z-10 mt-2 max-w-[18rem] text-center sm:max-w-sm">
+            <h4 className="text-lg font-bold text-white sm:text-xl">{displayHero.name}</h4>
+            <p className="mt-1 text-xs text-white/50 sm:text-sm">{displayHero.description}</p>
           </div>
 
           {/* Earned date */}
@@ -111,9 +87,9 @@ export function BadgeShowcase({ showcase, achievements }: BadgeShowcaseProps) {
 
           {/* Points pill */}
           {displayHero.points && (
-            <div className="mt-2 flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-0.5 relative z-10">
+            <div className="relative z-10 mt-3 flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1">
               <Image src="/icons/journey/dicecoin_webp.webp" alt="" width={14} height={14} />
-              <span className="text-[11px] font-semibold text-white/80">{displayHero.points}</span>
+              <span className="text-xs font-semibold text-white/80">{displayHero.points}</span>
             </div>
           )}
 
@@ -123,17 +99,9 @@ export function BadgeShowcase({ showcase, achievements }: BadgeShowcaseProps) {
               0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
               50% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.8; }
             }
-            @keyframes ach-sparkle {
-              0%, 100% { opacity: 0; transform: scale(0.5); }
-              50% { opacity: 1; transform: scale(1); }
-            }
             .ach-hero-glow { animation: ach-hero-glow 3s ease-in-out infinite; }
-            .ach-sparkle-0 { animation: ach-sparkle 2.4s ease-in-out infinite; }
-            .ach-sparkle-1 { animation: ach-sparkle 2.8s ease-in-out infinite; }
-            .ach-sparkle-2 { animation: ach-sparkle 3.2s ease-in-out infinite; }
-            .ach-sparkle-3 { animation: ach-sparkle 2.6s ease-in-out infinite; }
             @media (prefers-reduced-motion: reduce) {
-              .ach-hero-glow, .ach-sparkle-0, .ach-sparkle-1, .ach-sparkle-2, .ach-sparkle-3 {
+              .ach-hero-glow {
                 animation: none !important;
               }
             }
@@ -149,28 +117,28 @@ export function BadgeShowcase({ showcase, achievements }: BadgeShowcaseProps) {
       )}
 
       {/* Showcase grid — slots 2-4 (always show 3 cells) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
         {gridSlots.map((slot, i) => (
           <div
             key={`slot-${i + 2}`}
-            className="flex flex-col items-center gap-1.5 rounded-xl py-3 px-2 transition-all duration-200"
+            className="flex min-w-0 flex-col items-center gap-1.5 rounded-xl px-1 py-2 transition-all duration-200 sm:px-2 sm:py-3"
             style={{
-              backgroundColor: slot.achievement ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.02)",
+              backgroundColor: slot.achievement ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.015)",
               border: slot.achievement
-                ? "1px solid rgba(255,255,255,0.1)"
-                : "1px dashed rgba(255,255,255,0.08)",
+                ? "1px solid rgba(255,255,255,0.06)"
+                : "1px dashed rgba(255,255,255,0.06)",
             }}
           >
-            <div className={slot.achievement ? "" : "grayscale opacity-30"}>
+            <div className={slot.achievement ? "origin-center scale-90 sm:scale-100" : "origin-center scale-90 grayscale opacity-30 sm:scale-100"}>
               <BadgeIcon
                 iconConfig={slot.achievement?.icon_config ?? null}
-                size="md"
+                size="sm"
                 showGlow={!!slot.achievement}
                 isLocked={!slot.achievement}
               />
             </div>
             <span
-              className="text-[11px] font-medium text-center leading-tight"
+              className="line-clamp-2 min-h-[2rem] text-center text-[10px] font-medium leading-tight sm:text-[11px]"
               style={{
                 color: slot.achievement ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.25)",
               }}

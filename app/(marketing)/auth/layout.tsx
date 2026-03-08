@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { useAuth } from "@/lib/supabase/auth";
 import { TenantProvider } from "@/lib/context/TenantContext";
-import AuthLayoutContent from "./layout-client";
+import AuthLayoutContent from "./auth-layout-content";
 
 function TenantProviderWithAuth({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -17,3 +17,4 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     </TenantProviderWithAuth>
   );
 }
+

@@ -9,7 +9,6 @@ import { ProfileService, type UserPreferences } from '@/lib/profile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert } from '@/components/ui/alert';
-import { useBrowserSupabase } from '@/hooks/useBrowserSupabase';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
 import {
   AdjustmentsHorizontalIcon,
@@ -44,7 +43,6 @@ export default function PreferencesPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
   const { currentTenant } = useTenant();
-  const { supabase, error: supabaseError, isInitializing } = useBrowserSupabase();
 
   const [preferences, setPreferences] = useState<Partial<UserPreferences>>({
     ...defaultPreferences,
@@ -55,11 +53,7 @@ export default function PreferencesPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Create stable profileService instance
-  const profileService = useMemo(
-    () => (supabase ? new ProfileService(supabase) : null),
-    [supabase]
-  );
+  const profileService = useMemo(() => new ProfileService(), []);
 
   // Use the new single-flight hook for fetching
   // NOTE: Only primitives in deps! profileService is accessed via closure.
@@ -73,14 +67,14 @@ export default function PreferencesPage() {
   } = useProfileQuery<UserPreferences | null>(
     `preferences-${currentTenant?.id ?? 'no-tenant'}-${user?.id ?? 'no-user'}`,
     async () => {
-      if (!profileService || !user?.id || !currentTenant?.id) {
+      if (!user?.id || !currentTenant?.id) {
         throw new Error('Not ready');
       }
       return profileService.getPreferences(currentTenant.id, user.id);
     },
     { userId: user?.id, tenantId: currentTenant?.id },
     {
-      skip: authLoading || isInitializing || !supabase || !user?.id || !currentTenant?.id,
+      skip: authLoading || !user?.id || !currentTenant?.id,
       timeout: 10000,
     }
   );
@@ -94,7 +88,7 @@ export default function PreferencesPage() {
     })
   }, [fetchedPreferences]);
 
-  const stillLoading = isLoading || authLoading || isInitializing;
+  const stillLoading = isLoading || authLoading;
 
   const handlePreferenceChange = useCallback((key: keyof UserPreferences, value: unknown) => {
     setPreferences((prev) => ({ ...prev, [key]: value }));
@@ -104,11 +98,10 @@ export default function PreferencesPage() {
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (!user?.id || !supabase || !currentTenant?.id) return;
+    if (!user?.id || !currentTenant?.id) return;
 
     setIsSaving(true);
     try {
-      const profileService = new ProfileService(supabase);
       await profileService.updatePreferences(currentTenant.id, user.id, preferences);
 
       // If language changed, update the route
@@ -127,25 +120,7 @@ export default function PreferencesPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [user?.id, supabase, currentTenant?.id, preferences, locale, router, t]);
-
-  if (!authLoading && supabaseError) {
-    return (
-      <div className="p-6 lg:p-8 space-y-4">
-        <Alert variant="error" title={t('sections.preferences.loadError')}>
-          <p>{t('sections.preferences.initError')}</p>
-          {process.env.NODE_ENV !== 'production' && (
-            <pre className="mt-2 whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs text-foreground">
-              {supabaseError.message}
-            </pre>
-          )}
-        </Alert>
-        <Button onClick={() => window.location.reload()} variant="outline">
-          {t('sections.preferences.reload')}
-        </Button>
-      </div>
-    );
-  }
+  }, [user?.id, currentTenant?.id, preferences, locale, router, t, profileService]);
 
   if (stillLoading) {
     return (

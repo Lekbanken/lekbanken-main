@@ -14,6 +14,10 @@ const supabaseUrl = env.supabase.url
 const supabaseAnonKey = env.supabase.anonKey
 const supabaseServiceRoleKey = env.supabase.serviceRoleKey
 
+function isCookieMutationDenied(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('Cookies can only be modified in a Server Action or Route Handler')
+}
+
 /**
  * Request-scoped RLS-aware client for server code (app router, server actions, route handlers).
  * Uses @supabase/ssr so refreshed tokens are written back to response cookies.
@@ -41,7 +45,15 @@ const createServerRlsClientCached = cache(async () => {
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value, options }) => {
           const enhancedOptions = enhanceCookieOptions(options, hostname)
-          cookieStore.set(name, value, enhancedOptions)
+
+          try {
+            cookieStore.set(name, value, enhancedOptions)
+          } catch (error) {
+            if (isCookieMutationDenied(error)) {
+              return
+            }
+            throw error
+          }
         })
       },
     },

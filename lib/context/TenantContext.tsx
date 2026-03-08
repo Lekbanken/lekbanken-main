@@ -104,7 +104,7 @@ export function TenantProvider({
   )
   const [, startTransition] = useTransition()
 
-  const prevUserIdRef = useRef<string | null>(null)
+  const prevUserIdRef = useRef<string | null>(userId ?? null)
   const loadTenantsInFlightRef = useRef<{ userId: string; promise: Promise<void> } | null>(null)
 
   const tenantRole = currentTenant?.membership?.role ?? initialRole ?? null

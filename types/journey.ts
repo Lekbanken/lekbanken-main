@@ -88,6 +88,10 @@ export interface JourneySceneProps {
   theme: FactionTheme
   children: React.ReactNode
   className?: string
+  /** Optional viewport-bound background/effects content rendered behind foreground content */
+  backgroundChildren?: React.ReactNode
+  /** Classes applied to the foreground content wrapper */
+  contentClassName?: string
   /** Show faction pattern overlay */
   showPattern?: boolean
 }

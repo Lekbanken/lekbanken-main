@@ -24,10 +24,39 @@ import type {
 // =============================================================================
 
 export class ProfileService {
-  private supabase: SupabaseClient;
+  private supabase?: SupabaseClient<Database>;
 
-  constructor(supabase: SupabaseClient) {
+  constructor(supabase?: SupabaseClient<Database>) {
     this.supabase = supabase;
+  }
+
+  private getSupabase(): SupabaseClient<Database> {
+    if (!this.supabase) {
+      throw new Error('Supabase client is required for this operation')
+    }
+    return this.supabase
+  }
+
+  private async requestJson<T>(input: string, init?: RequestInit): Promise<T> {
+    const response = await fetch(input, {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(init?.headers ?? {}),
+      },
+    })
+
+    const payload = (await response.json().catch(() => null)) as
+      | { error?: string; details?: string }
+      | T
+      | null
+
+    if (!response.ok) {
+      const errorPayload = payload as { error?: string; details?: string } | null
+      throw new Error(errorPayload?.details || errorPayload?.error || `Request failed: ${response.status}`)
+    }
+
+    return payload as T
   }
 
   private toError(err: unknown): Error {
@@ -60,8 +89,9 @@ export class ProfileService {
    * Get complete user profile with all related data
    */
   async getCompleteProfile(userId: string): Promise<CompleteProfile | null> {
+    const supabase = this.getSupabase()
     // Fetch user from users table
-    const { data: user, error: userError } = await this.supabase
+    const { data: user, error: userError } = await supabase
       .from('users')
       .select('*')
       .eq('id', userId)
@@ -73,28 +103,28 @@ export class ProfileService {
     }
 
     // Fetch extended profile
-    const { data: profile } = await this.supabase
+    const { data: profile } = await supabase
       .from('user_profiles')
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
 
     // Fetch preferences
-    const { data: preferences } = await this.supabase
+    const { data: preferences } = await supabase
       .from('user_preferences')
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
 
     // Fetch notification settings (using notification_preferences table)
-    const { data: notifications } = await this.supabase
+    const { data: notifications } = await supabase
       .from('notification_preferences')
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
 
     // Fetch organization memberships
-    const { data: memberships } = await this.supabase
+    const { data: memberships } = await supabase
       .from('user_tenant_memberships')
       .select(`
         id,
@@ -110,7 +140,7 @@ export class ProfileService {
       .eq('status', 'active');
 
     // Fetch MFA status
-    const { data: mfaData } = await this.supabase
+    const { data: mfaData } = await supabase
       .from('user_mfa')
       .select('*')
       .eq('user_id', userId)
@@ -130,17 +160,11 @@ export class ProfileService {
    * Get user preferences (lightweight; avoids fetching full profile).
    */
   async getPreferences(tenantId: string, userId: string): Promise<UserPreferences | null> {
-    const { data, error } = await this.supabase
-      .from('user_preferences')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .eq('user_id', userId)
-      .maybeSingle()
-
-    if (error) {
-      console.error('[ProfileService] Failed to get preferences:', error)
-      return null
-    }
+    void userId
+    const payload = await this.requestJson<{ preferences: UserPreferences | null }>(
+      `/api/accounts/profile/preferences?tenantId=${encodeURIComponent(tenantId)}`
+    )
+    const data = payload.preferences
 
     // Back-compat: older DB rows might still contain 'auto' while UI expects 'system'.
     if (data && typeof (data as { theme?: unknown }).theme === 'string' && (data as { theme: string }).theme === 'auto') {
@@ -154,27 +178,12 @@ export class ProfileService {
    * Get organization memberships for the user (lightweight).
    */
   async getOrganizationMemberships(userId: string): Promise<OrganizationMembership[]> {
-    const { data, error } = await this.supabase
-      .from('user_tenant_memberships')
-      .select(`
-        id,
-        user_id,
-        tenant_id,
-        role,
-        is_primary,
-        status,
-        created_at,
-        tenant:tenants(id, name, slug, logo_url, type, status)
-      `)
-      .eq('user_id', userId)
-      .eq('status', 'active')
+    void userId
+    const payload = await this.requestJson<{ organizations: OrganizationMembership[] }>(
+      '/api/accounts/profile/organizations'
+    )
 
-    if (error) {
-      console.error('[ProfileService] Failed to get organization memberships:', error)
-      return []
-    }
-
-    return (data || []) as unknown as OrganizationMembership[]
+    return payload.organizations ?? []
   }
 
   // ---------------------------------------------------------------------------
@@ -185,7 +194,8 @@ export class ProfileService {
    * Update user profile
    */
   async updateProfile(userId: string, data: Partial<UserProfile>): Promise<UserProfile | null> {
-    const { data: profile, error } = await this.supabase
+    const supabase = this.getSupabase()
+    const { data: profile, error } = await supabase
       .from('user_profiles')
       .upsert(
         {
@@ -222,26 +232,16 @@ export class ProfileService {
     delete updates.created_at
     delete updates.updated_at
 
-    const { data: preferences, error } = await this.supabase
-      .from('user_preferences')
-      .upsert(
-        {
-          ...updates,
-          tenant_id: tenantId,
-          user_id: userId,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'tenant_id,user_id' }
-      )
-      .select()
-      .single();
+    void userId
+    const payload = await this.requestJson<{ preferences: UserPreferences | null }>(
+      '/api/accounts/profile/preferences',
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ tenantId, preferences: updates }),
+      }
+    )
 
-    if (error) {
-      console.error('[ProfileService] Failed to update preferences:', error);
-      throw this.toError(error)
-    }
-
-    return preferences;
+    return payload.preferences;
   }
 
   // ---------------------------------------------------------------------------
@@ -254,60 +254,14 @@ export class ProfileService {
   async getNotificationSettings(
     userId: string
   ): Promise<{ settings: NotificationSettings | null; error: Error | null }> {
-    const { data, error } = await this.supabase
-      .from('notification_preferences')
-      .select('*')
-      .eq('user_id', userId)
-      // Profile notification settings are currently treated as a user-level preference (not tenant-scoped).
-      // Use tenant_id IS NULL to avoid ambiguity for multi-tenant users and to prevent multi-row errors.
-      .is('tenant_id', null)
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      console.error('[ProfileService] Failed to get notification settings:', error);
+    void userId
+    try {
+      const payload = await this.requestJson<{ settings: NotificationSettings | null }>(
+        '/api/accounts/profile/notifications'
+      )
+      return { settings: payload.settings, error: null }
+    } catch (error) {
       return { settings: null, error: this.toError(error) }
-    }
-
-    if (!data) return { settings: null, error: null }
-
-    // Map database columns to NotificationSettings type
-    const digest = (() => {
-      const raw = String(data.digest_frequency ?? 'realtime')
-      if (raw === 'realtime') return 'real-time'
-      return raw as NotificationSettings['email_digest']
-    })()
-
-    return {
-      error: null,
-      settings: {
-        id: data.id,
-        user_id: data.user_id,
-        email_enabled: data.email_enabled ?? true,
-        email_activity: data.email_enabled ?? true,
-        email_mentions: data.email_enabled ?? true,
-        email_comments: data.email_enabled ?? true,
-        email_updates: data.email_enabled ?? true,
-        // Not persisted yet (no dedicated column in `notification_preferences`).
-        email_marketing: false,
-        email_digest: digest,
-        push_enabled: data.push_enabled ?? true,
-        push_activity: data.push_enabled ?? true,
-        push_mentions: data.push_enabled ?? true,
-        push_comments: data.push_enabled ?? true,
-        sms_enabled: data.sms_enabled ?? false,
-        sms_security_alerts: data.sms_enabled ?? false,
-        sms_important_updates: data.sms_enabled ?? false,
-        inapp_enabled: data.in_app_enabled ?? true,
-        inapp_sound: true,
-        dnd_enabled: data.quiet_hours_enabled ?? false,
-        dnd_start_time: (data.quiet_hours_start as string | null) ?? null,
-        dnd_end_time: (data.quiet_hours_end as string | null) ?? null,
-        dnd_days: [],
-        created_at: data.created_at || new Date().toISOString(),
-        updated_at: data.updated_at || new Date().toISOString(),
-      } as NotificationSettings,
     }
   }
 
@@ -315,66 +269,16 @@ export class ProfileService {
    * Update notification settings
    */
   async updateNotificationSettings(userId: string, settings: Partial<NotificationSettings>): Promise<NotificationSettings | null> {
-    // Map NotificationSettings to database columns
-    const dbUpdate: Record<string, unknown> = {
-      user_id: userId,
-      updated_at: new Date().toISOString(),
-    };
+    void userId
+    const payload = await this.requestJson<{ settings: NotificationSettings | null }>(
+      '/api/accounts/profile/notifications',
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ settings }),
+      }
+    )
 
-    if (settings.email_enabled !== undefined) dbUpdate.email_enabled = settings.email_enabled;
-    if (settings.push_enabled !== undefined) dbUpdate.push_enabled = settings.push_enabled;
-    if (settings.sms_enabled !== undefined) dbUpdate.sms_enabled = settings.sms_enabled;
-    if (settings.inapp_enabled !== undefined) dbUpdate.in_app_enabled = settings.inapp_enabled;
-    if (settings.dnd_enabled !== undefined) dbUpdate.quiet_hours_enabled = settings.dnd_enabled;
-    if (settings.dnd_start_time !== undefined) dbUpdate.quiet_hours_start = settings.dnd_start_time;
-    if (settings.dnd_end_time !== undefined) dbUpdate.quiet_hours_end = settings.dnd_end_time;
-    if (settings.email_digest !== undefined) {
-      const raw = settings.email_digest
-      dbUpdate.digest_frequency =
-        raw === 'real-time' || raw === 'hourly'
-          ? 'realtime'
-          : raw
-    }
-
-    // `notification_preferences` has historically been modeled as tenant-scoped (UNIQUE(user_id, tenant_id)),
-    // but profile settings are currently user-scoped. To be robust across schemas and multi-tenant users,
-    // we resolve (or create) a single "global" row where tenant_id IS NULL.
-    const { data: existingRow, error: existingError } = await this.supabase
-      .from('notification_preferences')
-      .select('id')
-      .eq('user_id', userId)
-      .is('tenant_id', null)
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-
-    if (existingError) {
-      console.error('[ProfileService] Failed to resolve existing notification settings row:', existingError)
-      return null
-    }
-
-    const { data, error } = existingRow?.id
-      ? await this.supabase
-          .from('notification_preferences')
-          .update(dbUpdate as Database['public']['Tables']['notification_preferences']['Update'])
-          .eq('id', existingRow.id)
-          .select()
-          .single()
-      : await this.supabase
-          .from('notification_preferences')
-          .insert({
-            ...(dbUpdate as Database['public']['Tables']['notification_preferences']['Insert']),
-            tenant_id: null,
-          })
-          .select()
-          .single()
-
-    if (error) {
-      console.error('[ProfileService] Failed to update notification settings:', error);
-      return null;
-    }
-
-    return data;
+    return payload.settings;
   }
 
   // ---------------------------------------------------------------------------
@@ -385,7 +289,8 @@ export class ProfileService {
    * Get active sessions
    */
   async getActiveSessions(userId: string): Promise<UserSession[]> {
-    const { data, error } = await this.supabase
+    const supabase = this.getSupabase()
+    const { data, error } = await supabase
       .from('user_sessions')
       .select('*')
       .eq('user_id', userId)
@@ -421,7 +326,8 @@ export class ProfileService {
    * Revoke a session
    */
   async revokeSession(userId: string, sessionId: string): Promise<void> {
-    const { error } = await this.supabase
+    const supabase = this.getSupabase()
+    const { error } = await supabase
       .from('user_sessions')
       .update({ revoked_at: new Date().toISOString() })
       .eq('id', sessionId)
@@ -437,7 +343,8 @@ export class ProfileService {
    * Revoke all sessions except current
    */
   async revokeAllSessions(userId: string, currentSessionId?: string): Promise<number> {
-    let query = this.supabase
+    const supabase = this.getSupabase()
+    let query = supabase
       .from('user_sessions')
       .update({ is_active: false, ended_at: new Date().toISOString() })
       .eq('user_id', userId)
@@ -465,7 +372,8 @@ export class ProfileService {
    * Get user consents
    */
   async getUserConsents(userId: string): Promise<UserConsent[]> {
-    const { data, error } = await this.supabase
+    const supabase = this.getSupabase()
+    const { data, error } = await supabase
       .from('user_consents')
       .select('*')
       .eq('user_id', userId)
@@ -488,7 +396,8 @@ export class ProfileService {
     granted: boolean,
     source?: string
   ): Promise<UserConsent | null> {
-    const { data, error } = await this.supabase
+    const supabase = this.getSupabase()
+    const { data, error } = await supabase
       .from('user_consents')
       .upsert(
         {
@@ -521,7 +430,8 @@ export class ProfileService {
    * Get GDPR requests
    */
   async getGDPRRequests(userId: string): Promise<GDPRRequest[]> {
-    const { data, error } = await this.supabase
+    const supabase = this.getSupabase()
+    const { data, error } = await supabase
       .from('gdpr_requests')
       .select('*')
       .eq('user_id', userId)
@@ -543,10 +453,11 @@ export class ProfileService {
     request_type: GDPRRequestType;
     reason?: string;
   }): Promise<GDPRRequest | null> {
+    const supabase = this.getSupabase()
     const responseDeadline = new Date();
     responseDeadline.setDate(responseDeadline.getDate() + 30);
 
-    const { data, error } = await this.supabase
+    const { data, error } = await supabase
       .from('gdpr_requests')
       .insert({
         user_id: request.user_id,
@@ -575,7 +486,8 @@ export class ProfileService {
    * Get activity log
    */
   async getActivityLog(userId: string, limit = 50): Promise<ActivityLogEntry[]> {
-    const { data, error } = await this.supabase
+    const supabase = this.getSupabase()
+    const { data, error } = await supabase
       .from('user_audit_logs')
       .select('*')
       .eq('user_id', userId)

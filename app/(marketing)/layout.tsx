@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import MarketingLayoutContent from "./layout-client";
+import MarketingLayoutContent from "./marketing-layout-content";
 
 export const metadata: Metadata = {
   title: "Lekbanken - Gör planeringen lekfull, snabb och delbar",
@@ -11,3 +11,4 @@ export const metadata: Metadata = {
 export default function MarketingLayout({ children }: { children: ReactNode }) {
   return <MarketingLayoutContent>{children}</MarketingLayoutContent>;
 }
+

@@ -18,7 +18,7 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from './client'
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
@@ -58,6 +58,7 @@ export function AuthProvider({
   initialMemberships,
 }: AuthProviderProps) {
   const router = useRouter()
+  const pathname = usePathname()
 
   const [user, setUser] = useState<User | null>(initialUser ?? null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(initialProfile ?? null)
@@ -78,6 +79,16 @@ export function AuthProvider({
     lastRouterRefreshRef.current = now
     router.refresh()
   }, [router])
+
+  const shouldRefreshForUserUpdate = useMemo(() => {
+    if (!pathname) return false
+
+    return (
+      pathname.startsWith('/app/profile') ||
+      pathname.startsWith('/admin') ||
+      pathname.startsWith('/legal')
+    )
+  }, [pathname])
 
   const effectiveGlobalRole = useMemo(
     () => deriveEffectiveGlobalRole(userProfile, user),
@@ -327,7 +338,7 @@ export function AuthProvider({
       if (sessionUser) {
         try {
           await refreshAuthData(sessionUser)
-          if (event === 'USER_UPDATED') {
+          if (event === 'USER_UPDATED' && shouldRefreshForUserUpdate) {
             debouncedRouterRefresh()
           }
         } catch (error) {
@@ -374,13 +385,13 @@ export function AuthProvider({
       //   with the pending window.location navigation.
       // - USER_UPDATED: Full refresh (metadata may affect profile/role) + router.refresh()
       await refreshAuthData(authUser)
-      if (event === 'USER_UPDATED') {
+      if (event === 'USER_UPDATED' && shouldRefreshForUserUpdate) {
         debouncedRouterRefresh()
       }
     })
 
     return () => subscription?.unsubscribe()
-  }, [refreshAuthData, debouncedRouterRefresh])
+  }, [refreshAuthData, debouncedRouterRefresh, shouldRefreshForUserUpdate])
 
   const signUp = useCallback(async (email: string, password: string, fullName?: string) => {
     const { data, error } = await supabase.auth.signUp({

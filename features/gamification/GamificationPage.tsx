@@ -183,18 +183,33 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
     ? (loadout.title as TitleConfig) : null;
 
   return (
-    <JourneyScene theme={theme} className="min-h-screen rounded-2xl px-4 pb-32 pt-10 sm:px-6" backgroundConfig={backgroundConfig}>
-      {/* ── Ambient particles (only when cosmetic equipped) ── */}
-      <ParticleField accentColor={theme.accentColor} enabled={!!particlesConfig} loadoutConfig={particlesConfig} />
-
+    <JourneyScene
+      theme={theme}
+      className="min-h-screen rounded-2xl"
+      backgroundChildren={
+        <ParticleField
+          accentColor={theme.accentColor}
+          enabled={!!particlesConfig}
+          loadoutConfig={particlesConfig}
+        />
+      }
+      contentClassName="px-4 pb-32 pt-10 sm:px-6"
+      backgroundConfig={backgroundConfig}
+    >
       {/* ── Hero: Avatar + Name + Skill Tree ── */}
       <div
-        className="relative mb-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden"
+        className="relative mb-8 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06]"
         style={{
           boxShadow: "none",
           transition: "box-shadow 500ms ease",
         }}
       >
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background: `linear-gradient(180deg, ${theme.accentColor}08 0%, rgba(255,255,255,0.01) 55%, rgba(255,255,255,0.02) 100%)`,
+          }}
+        />
         <div
           className="relative z-10 flex flex-col items-center text-center"
           style={{
@@ -261,9 +276,10 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
             </div>
             {/* Level badge */}
             <div
-              className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full font-bold text-white text-sm"
+              className="absolute -bottom-1 -right-3 rounded-full border px-2.5 py-1 text-xs font-bold text-white sm:text-sm"
               style={{
                 backgroundColor: theme.accentColor,
+                borderColor: 'rgba(255,255,255,0.22)',
                 boxShadow: "none",
               }}
             >

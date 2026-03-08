@@ -150,6 +150,11 @@ interface RpcCooldownState {
 }
 const rpcStateByUser = new Map<string, RpcCooldownState>();
 
+interface CachedNotificationsEntry {
+  notifications: AppNotification[];
+}
+const cachedNotificationsByUser = new Map<string, CachedNotificationsEntry>();
+
 /** Check if RPC is available (not in cooldown) for a user */
 function isRpcAvailable(userId: string): boolean {
   const state = rpcStateByUser.get(userId);
@@ -319,6 +324,28 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // calling `createBrowserClient()` when `window` is not available.
   const supabase = typeof window !== 'undefined' ? createBrowserClient() : null;
 
+  const applyNotifications = useCallback((nextNotifications: AppNotification[]) => {
+    if (!mountedRef.current) return;
+
+    setNotifications(nextNotifications);
+    setUnreadCount(nextNotifications.filter((n) => !n.readAt).length);
+    setError(null);
+    hasLoadedOnce.current = true;
+    setIsLoading(false);
+  }, []);
+
+  const finishWithoutSession = useCallback((options?: { clearState?: boolean }) => {
+    if (!mountedRef.current) return;
+
+    if (options?.clearState ?? !hasLoadedOnce.current) {
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+    setError(null);
+    hasLoadedOnce.current = true;
+    setIsLoading(false);
+  }, []);
+
   // =========================================================================
   // Helpers: attach AbortSignal to PostgREST builders (if method exists)
   // =========================================================================
@@ -469,6 +496,10 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
           'consecutive failures'
         );
       }
+      if (!hasLoadedOnce.current) {
+        setError('Notifikationer kunde inte laddas. Prova att ladda om sidan.');
+        setIsLoading(false);
+      }
       return;
     }
 
@@ -479,6 +510,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         if (process.env.NODE_ENV === 'development') {
           console.debug('[useAppNotifications] No active session — skipping fetch');
         }
+        finishWithoutSession();
         return;
       }
       const newUserId = session.user.id;
@@ -491,7 +523,16 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         retainUser(newUserId);
       }
       userIdRef.current = newUserId;
+
+      const cached = cachedNotificationsByUser.get(newUserId);
+      if (cached && !hasLoadedOnce.current) {
+        applyNotifications(cached.notifications.slice(0, limit));
+      }
     } catch {
+      if (!hasLoadedOnce.current) {
+        setError('Kunde inte läsa session för notifikationer');
+        setIsLoading(false);
+      }
       return;
     }
 
@@ -513,10 +554,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
           if (!mountedRef.current) return;
           const sliced = existing.limit > limit ? result.slice(0, limit) : result;
           consecutiveFailures.current = 0;
-          setNotifications(sliced);
-          setUnreadCount(sliced.filter((n) => !n.readAt).length);
-          setError(null);
-          hasLoadedOnce.current = true;
+          applyNotifications(sliced);
           return;
         } catch {
           // Existing fetch failed — fall through to start our own
@@ -594,9 +632,10 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       if (!mountedRef.current || ac.signal.aborted) return;
 
       consecutiveFailures.current = 0;
-      setNotifications(result);
-      setUnreadCount(result.filter((n) => !n.readAt).length);
-      hasLoadedOnce.current = true;
+      cachedNotificationsByUser.set(userId, {
+        notifications: result,
+      });
+      applyNotifications(result);
     } catch {
       if (!mountedRef.current || ac.signal.aborted) return;
 
@@ -610,11 +649,11 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       if (abortRef.current === ac) {
         abortRef.current = null;
       }
-      if (mountedRef.current) {
+      if (mountedRef.current && !hasLoadedOnce.current) {
         setIsLoading(false);
       }
     }
-  }, [supabase, limit, executeFetch]);
+  }, [supabase, limit, executeFetch, applyNotifications, finishWithoutSession]);
 
   // =========================================================================
   // Lifecycle: mount/unmount tracking + abort cleanup + user refcount
@@ -639,6 +678,45 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   useEffect(() => {
     fetchNotifications();
   }, [fetchNotifications]);
+
+  // Recover quickly when auth state changes after route transitions.
+  useEffect(() => {
+    if (!supabase) return;
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        const previousUserId = userIdRef.current;
+        userIdRef.current = null;
+        if (previousUserId) {
+          releaseUser(previousUserId);
+        }
+        consecutiveFailures.current = 0;
+        finishWithoutSession({ clearState: true });
+        return;
+      }
+
+      if (!session?.user) return;
+
+      const nextUserId = session.user.id;
+      const previousUserId = userIdRef.current;
+
+      if (!previousUserId) {
+        retainUser(nextUserId);
+      } else if (previousUserId !== nextUserId) {
+        releaseUser(previousUserId);
+        retainUser(nextUserId);
+      }
+
+      userIdRef.current = nextUserId;
+      consecutiveFailures.current = 0;
+      setError(null);
+      void fetchNotifications();
+    });
+
+    return () => subscription?.unsubscribe();
+  }, [supabase, fetchNotifications, finishWithoutSession]);
 
   // Ref so the visibility handler can restart polling after circuit breaker
   const restartPollingRef = useRef<(() => void) | null>(null);

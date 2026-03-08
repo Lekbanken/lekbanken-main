@@ -1,6 +1,7 @@
 import { test as setup, expect } from '@playwright/test';
 import path from 'path';
 import dotenv from 'dotenv';
+import { finishLoginFlow } from './utils/auth-flow';
 
 // Load env vars (override to ensure fresh values)
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local'), override: true });
@@ -37,35 +38,7 @@ setup('authenticate regular user', async ({ page }) => {
   // Wait for redirect (regular users should go to /app or /legal/accept)
   await page.waitForURL(/\/(app|legal\/accept)/, { timeout: 10000 });
 
-  // Handle legal acceptance if required
-  if (page.url().includes('/legal/accept')) {
-    await page.waitForTimeout(1000);
-    
-    // Dismiss cookie consent dialog first
-    const cookieAcceptButton = page.locator('button').filter({ hasText: /godta alle|accept all|acceptera alla/i }).first();
-    if (await cookieAcceptButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-      await cookieAcceptButton.click();
-      await page.waitForTimeout(500);
-    }
-    
-    let attempts = 0;
-    while (page.url().includes('/legal/accept') && attempts < 10) {
-      attempts++;
-      const checkbox = page.locator('input[type="checkbox"]:not(:checked)').first();
-      if (await checkbox.count() > 0) {
-        await checkbox.check({ force: true });
-        await page.waitForTimeout(300);
-      }
-      const acceptButton = page.locator('button:not([disabled])').filter({ hasText: /godta og fortsett|acceptera|accept|godkänn|fortsätt|continue/i }).first();
-      if (await acceptButton.count() > 0) {
-        await acceptButton.click();
-        await page.waitForTimeout(500);
-      } else {
-        await page.waitForTimeout(500);
-      }
-    }
-    await page.waitForURL(/\/app/, { timeout: 15000 });
-  }
+  await finishLoginFlow(page, /\/app/);
 
   // Verify we're logged in but NOT on admin pages
   await expect(page).toHaveURL(/\/app/);

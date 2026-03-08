@@ -6,7 +6,7 @@ import { SideNav } from "./SideNav";
 
 export function AppShell({ children, header }: { children: ReactNode; header?: ReactNode }) {
   return (
-    <div className="bg-background text-foreground overflow-x-hidden">
+    <div className="bg-background text-foreground overflow-x-clip">
       <SideNav />
       <div className="relative flex min-h-[100dvh] flex-col lg:pl-64">
         <div 

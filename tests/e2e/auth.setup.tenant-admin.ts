@@ -1,7 +1,7 @@
 import { test as setup } from '@playwright/test';
 import path from 'path';
 import dotenv from 'dotenv';
-import { finishLoginFlow } from './utils/auth-flow';
+import { finishLoginFlow, resetMfaFactorsForTestUser, waitForPostLoginRedirect } from './utils/auth-flow';
 
 // Load env vars (override to ensure fresh values)
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local'), override: true });
@@ -15,16 +15,17 @@ const authFile = path.join(__dirname, '../.auth/tenant-admin.json');
  * Used by tests that verify tenant-scoped admin functionality.
  */
 setup('authenticate tenant admin', async ({ page }) => {
-  // Fallback to AUTH_TEST_EMAIL if no separate tenant admin exists
-  const email = process.env.TEST_TENANT_ADMIN_EMAIL || process.env.AUTH_TEST_EMAIL;
-  const password = process.env.TEST_TENANT_ADMIN_PASSWORD || process.env.AUTH_TEST_PASSWORD;
+  const email = process.env.TEST_TENANT_ADMIN_EMAIL;
+  const password = process.env.TEST_TENANT_ADMIN_PASSWORD;
 
   if (!email || !password) {
-    console.warn('⚠️  TEST_TENANT_ADMIN_EMAIL/AUTH_TEST_EMAIL not set. Skipping tenant admin auth setup.');
+    console.warn('⚠️  TEST_TENANT_ADMIN_EMAIL and TEST_TENANT_ADMIN_PASSWORD not set. Skipping tenant admin auth setup.');
     // Create empty auth state to prevent test failures
     await page.context().storageState({ path: authFile });
     return;
   }
+
+  await resetMfaFactorsForTestUser(email);
 
   // Navigate to login page
   await page.goto('/auth/login');
@@ -36,8 +37,7 @@ setup('authenticate tenant admin', async ({ page }) => {
   // Click login button (type=submit to avoid Google button)
   await page.locator('button[type="submit"]').first().click();
 
-  // Wait for redirect (tenant admins may go to /admin/tenant/[id], /app, or /legal/accept)
-  await page.waitForURL(/\/(admin|app|legal\/accept)/, { timeout: 10000 });
+  await waitForPostLoginRedirect(page, /\/(admin|app|legal\/accept|auth\/mfa-challenge|app\/profile\/security)/);
 
   await finishLoginFlow(page, /\/(admin|app)/);
 

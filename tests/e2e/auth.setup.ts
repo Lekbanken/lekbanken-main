@@ -1,7 +1,7 @@
 import { test as setup } from '@playwright/test';
 import path from 'path';
 import dotenv from 'dotenv';
-import { finishLoginFlow } from './utils/auth-flow';
+import { finishLoginFlow, waitForPostLoginRedirect } from './utils/auth-flow';
 
 // Load env vars (override to ensure fresh values)
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local'), override: true });
@@ -13,12 +13,11 @@ const authFile = path.join(__dirname, '../.auth/user.json');
  * Stores auth state for reuse across tests
  */
 setup('authenticate', async ({ page }) => {
-  // Use AUTH_TEST_EMAIL from .env.local
-  const email = process.env.AUTH_TEST_EMAIL;
-  const password = process.env.AUTH_TEST_PASSWORD;
+  const email = process.env.TEST_REGULAR_USER_EMAIL || process.env.AUTH_TEST_EMAIL;
+  const password = process.env.TEST_REGULAR_USER_PASSWORD || process.env.AUTH_TEST_PASSWORD;
 
   if (!email || !password) {
-    console.warn('⚠️  AUTH_TEST_EMAIL and AUTH_TEST_PASSWORD not set. Skipping auth setup.');
+    console.warn('⚠️  No generic auth setup credentials configured. Skipping auth setup.');
     await page.context().storageState({ path: authFile });
     return;
   }
@@ -33,8 +32,7 @@ setup('authenticate', async ({ page }) => {
   // Click login button (type=submit to avoid Google button)
   await page.locator('button[type="submit"]').first().click();
 
-  // Wait for redirect (may include /legal/accept for pending documents)
-  await page.waitForURL(/\/(app|admin|dashboard|legal\/accept)/, { timeout: 10000 });
+  await waitForPostLoginRedirect(page, /\/(app|admin|dashboard|legal\/accept|auth\/mfa-challenge|app\/profile\/security)/);
 
   await finishLoginFlow(page, /\/(app|admin|dashboard)/);
 

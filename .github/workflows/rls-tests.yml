@@ -41,7 +41,7 @@ jobs:
       - name: Run migrations
         run: |
           echo "Running database migrations..."
-          supabase db reset --debug
+          supabase db reset --debug 2>&1 | tee migration_output.log
         continue-on-error: false
 
       - name: Run RLS policy tests
@@ -79,7 +79,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rls-test-results
-          path: test_output.log
+          path: |
+            test_output.log
+            migration_output.log
 
       - name: Stop Supabase
         if: always()
@@ -144,7 +146,7 @@ jobs:
           if ! grep -rq "ALTER TABLE.*ENABLE ROW LEVEL SECURITY" supabase/migrations/ &&
              ! grep -rq "ENABLE ROW LEVEL SECURITY" supabase/migrations/; then
             echo "⚠️  Warning: No explicit RLS enablement found in migrations"
-            echo "Ensure RLS is enabled on: tenants, activities, profiles, sessions"
+            echo "Ensure RLS is enabled on: tenants, games, users, participant_sessions, game_sessions"
           else
             echo "✅ RLS enablement commands found in migrations"
           fi

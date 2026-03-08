@@ -29,8 +29,8 @@ jobs:
     name: Detect RLS Scope
     runs-on: ubuntu-latest
     outputs:
-      db_or_tests: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.filter.outputs.db_or_tests }}
-      workflow_only: ${{ github.event_name != 'workflow_dispatch' && steps.filter.outputs.workflow == 'true' && steps.filter.outputs.db_or_tests != 'true' && 'true' || 'false' }}
+      db_or_tests: ${{ steps.scope.outputs.db_or_tests }}
+      workflow_only: ${{ steps.scope.outputs.workflow_only }}
 
     steps:
       - name: Checkout code
@@ -46,6 +46,23 @@ jobs:
               - 'tests/rls/**'
             workflow:
               - '.github/workflows/rls-tests.yml'
+
+      - name: Resolve scope outputs
+        id: scope
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "db_or_tests=true" >> "$GITHUB_OUTPUT"
+            echo "workflow_only=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "db_or_tests=${{ steps.filter.outputs.db_or_tests }}" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ steps.filter.outputs.workflow }}" = "true" ] && [ "${{ steps.filter.outputs.db_or_tests }}" != "true" ]; then
+            echo "workflow_only=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "workflow_only=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Explain manual full run
         if: github.event_name == 'workflow_dispatch'

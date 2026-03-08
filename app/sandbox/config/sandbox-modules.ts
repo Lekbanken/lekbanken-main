@@ -540,6 +540,15 @@ export const sandboxCategories: SandboxCategory[] = [
         components: ['@/components/marketing/Hero', '@/components/marketing/HeroStats'],
         routes: ['/'],
       },
+      {
+        id: 'hero-v2',
+        label: 'Hero V2',
+        href: '/sandbox/hero-v2',
+        description: 'Experimentell hero med telefonmockup',
+        status: 'design',
+        components: ['@/components/marketing/hero-v2'],
+        routes: ['/'],
+      },
       { 
         id: 'pricing', 
         label: 'Pricing', 

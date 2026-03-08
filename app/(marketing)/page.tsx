@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ActivityFeed } from "@/components/marketing/activity-feed";
 import { CategoryHubLoader } from "@/components/marketing/category-hub-loader";
 import { FeatureGrid } from "@/components/marketing/feature-grid";
-import { Hero } from "@/components/marketing/hero";
+import { HeroV2 as Hero } from "@/components/marketing/hero-v2";
 import { LoginCta } from "@/components/marketing/login-cta";
 import { PricingCta } from "@/components/marketing/pricing-cta";
 import { StepsTimeline } from "@/components/marketing/steps-timeline";

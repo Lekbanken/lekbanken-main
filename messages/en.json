@@ -10441,29 +10441,25 @@
       }
     },
     "hero": {
-      "badge": "✨ New: AI-powered activity plans",
-      "title": "Plan <highlight>activities</highlight> that engage",
-      "description": "Lekbanken is your digital toolbox for planning, running and sharing activities. Perfect for sports coaches, teachers and activity leaders.",
-      "tryFree": "Try free",
-      "tryDemo": "See demo",
-      "stats": {
-        "activities": {
-          "label": "Activities",
-          "value": "500+"
-        },
-        "timeSaved": {
-          "label": "Time saved",
-          "value": "10h/week"
-        },
-        "shares": {
-          "label": "Shares",
-          "value": "1000+"
-        }
+      "actionWords": ["Discover", "Lead", "Plan", "Run", "Grow"],
+      "title": "<word></word> <highlight>activities</highlight> that engage",
+      "description": "From idea to action — all in one place. Browse hundreds of ready-made activities, build your own plans, run sessions live and track your growth as a leader.",
+      "quote": "Lekbanken is the tool that helps you create engaging moments — every time.",
+      "cta": "Try Lekbanken in Demo Mode",
+      "features": {
+        "browse": "Discover",
+        "play": "Play",
+        "plan": "Plan"
       },
-      "mockup": {
-        "plan": "Weekly plan",
-        "ageRange": "Ages 6-12"
-      }
+      "screenshots": {
+        "browse": "Discover activities",
+        "play": "Play activities",
+        "planner": "Plan activities",
+        "inGame": "Active session",
+        "journey": "Your journey"
+      },
+      "phoneAlt": "Phone",
+      "dotLabel": "Show screenshot {index}"
     },
     "features": {
       "tagline": "Everything you need",

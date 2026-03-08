@@ -11060,29 +11060,25 @@
       }
     },
     "hero": {
-      "badge": "✨ Nyhet: AI-drivna spelplaner",
-      "title": "Planera <highlight>aktiviteter</highlight> som engagerar",
-      "description": "Lekbanken är din digitala verktygslåda för att planera, genomföra och dela aktiviteter. Perfekt för idrottsledare, lärare och fritidspedagoger.",
-      "tryFree": "Prova gratis",
-      "tryDemo": "Se demo",
-      "stats": {
-        "activities": {
-          "label": "Aktiviteter",
-          "value": "500+"
-        },
-        "timeSaved": {
-          "label": "Tid sparad",
-          "value": "10h/vecka"
-        },
-        "shares": {
-          "label": "Delningar",
-          "value": "1000+"
-        }
+      "actionWords": ["Upptäck", "Led", "Planera", "Genomför", "Utveckla"],
+      "title": "<word></word> <highlight>aktiviteter</highlight> som engagerar",
+      "description": "Från idé till genomförande — allt på ett ställe. Bläddra bland hundratals färdiga lekar, bygg egna planer, kör aktiviteter live och följ din utveckling som ledare.",
+      "quote": "Lekbanken är verktyget som hjälper dig att skapa engagerande stunder — varje gång.",
+      "cta": "Testa Lekbanken i Demoläge",
+      "features": {
+        "browse": "Upptäck",
+        "play": "Spela",
+        "plan": "Planera"
       },
-      "mockup": {
-        "plan": "Veckoplan",
-        "ageRange": "6-12 år"
-      }
+      "screenshots": {
+        "browse": "Upptäck aktiviteter",
+        "play": "Spela aktiviteter",
+        "planner": "Planera aktiviteter",
+        "inGame": "Pågående aktivitet",
+        "journey": "Din resa"
+      },
+      "phoneAlt": "Telefon",
+      "dotLabel": "Visa skärmbild {index}"
     },
     "features": {
       "tagline": "Allt du behöver",

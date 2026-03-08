@@ -18,6 +18,7 @@ on:
       - 'supabase/migrations/**'
       - 'tests/rls/**'
       - '.github/workflows/rls-tests.yml'
+  workflow_dispatch:
 
 concurrency:
   group: rls-tests-${{ github.event.pull_request.number || github.ref }}
@@ -28,8 +29,8 @@ jobs:
     name: Detect RLS Scope
     runs-on: ubuntu-latest
     outputs:
-      db_or_tests: ${{ steps.filter.outputs.db_or_tests }}
-      workflow_only: ${{ steps.filter.outputs.workflow && steps.filter.outputs.db_or_tests != 'true' }}
+      db_or_tests: ${{ github.event_name == 'workflow_dispatch' && 'true' || steps.filter.outputs.db_or_tests }}
+      workflow_only: ${{ github.event_name != 'workflow_dispatch' && steps.filter.outputs.workflow == 'true' && steps.filter.outputs.db_or_tests != 'true' && 'true' || 'false' }}
 
     steps:
       - name: Checkout code
@@ -45,6 +46,10 @@ jobs:
               - 'tests/rls/**'
             workflow:
               - '.github/workflows/rls-tests.yml'
+
+      - name: Explain manual full run
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "workflow_dispatch requested; forcing full RLS database checks."
 
   workflow-config-only:
     name: Workflow Config Only

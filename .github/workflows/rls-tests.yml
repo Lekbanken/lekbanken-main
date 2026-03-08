@@ -93,13 +93,24 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const output = fs.readFileSync('test_output.log', 'utf8');
+            const testOutput = fs.existsSync('test_output.log')
+              ? fs.readFileSync('test_output.log', 'utf8')
+              : null;
+            const migrationOutput = fs.existsSync('migration_output.log')
+              ? fs.readFileSync('migration_output.log', 'utf8')
+              : null;
+            const output = testOutput ?? migrationOutput ?? 'No test or migration log was captured.';
+            const summary = testOutput
+              ? 'RLS policy test harness failed.'
+              : migrationOutput
+                ? 'Database reset/migration step failed before the RLS SQL harness started.'
+                : 'Workflow failed before logs were captured.';
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## ❌ RLS Policy Tests Failed\n\n<details>\n<summary>Test Output</summary>\n\n\`\`\`\n${output}\n\`\`\`\n\n</details>\n\nPlease review the RLS policies and fix the failing tests before merging.`
+              body: `## ❌ RLS Policy Tests Failed\n\n${summary}\n\n<details>\n<summary>Captured Output</summary>\n\n\`\`\`\n${output}\n\`\`\`\n\n</details>\n\nPlease review the RLS policies and fix the failing tests before merging.`
             });
 
   security-check:

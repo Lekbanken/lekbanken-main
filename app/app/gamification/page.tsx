@@ -23,7 +23,7 @@ const GamificationJourneyPage = dynamic(
 
 function GamificationDispatcherSkeleton() {
   return (
-    <div className="p-4 lg:p-6 space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-4 sm:space-y-6 sm:p-4 lg:p-6 max-w-3xl mx-auto">
       <Skeleton className="h-32 w-full rounded-xl" />
       <Skeleton className="h-20 w-full rounded-xl" />
       <div className="grid gap-4 sm:grid-cols-2">

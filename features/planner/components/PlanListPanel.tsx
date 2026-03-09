@@ -6,16 +6,12 @@ import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { PlanListItem } from "./PlanListItem";
 import { ScopeSelector, type PlanScope } from "./ScopeSelector";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActiveRuns } from "@/features/planner/hooks/useActiveRuns";
 import type { PlannerPlan, PlannerStatus, PlannerVisibility } from "@/types/planner";
-
-const PlusIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-);
 
 interface PlanListPanelProps {
   plans: PlannerPlan[];
@@ -127,15 +123,8 @@ export function PlanListPanel({
   }, [plans, deferredSearch, statusFilter, visibilityFilter, sort]);
 
   return (
-    <Card className="border-border/60 h-full flex flex-col">
+    <Card padding="none" className="h-full flex flex-col border-0 bg-transparent rounded-none">
       <CardHeader className="space-y-4">
-        <div className="flex items-center justify-between">
-          <CardTitle>{t('plans')}</CardTitle>
-          <Button size="sm" variant="outline" className="gap-1" onClick={onCreatePlan} disabled={isCreating}>
-            <PlusIcon />
-            {t('newPlan')}
-          </Button>
-        </div>
         <ScopeSelector activeScope={scope} onScopeChange={handleScopeChange} />
         <Input
           placeholder={t('search.placeholder')}

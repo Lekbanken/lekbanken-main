@@ -2,10 +2,9 @@
 
 import { useTranslations } from 'next-intl';
 import { PlannerTabs } from '@/features/planner/components/PlannerTabs';
-import { 
-  PlannerPageLayout, 
-  PlannerPageHeader,
-} from '@/features/planner/components/PlannerPageLayout';
+import { PlannerPageLayout } from '@/features/planner/components/PlannerPageLayout';
+import { PageTitleHeader } from '@/components/app/PageTitleHeader';
+import { appNavItems } from '@/components/app/nav-items';
 import { PlanCalendar } from '@/features/planner/calendar';
 import { usePlannerFeature } from '@/lib/features/planner-features';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
@@ -19,12 +18,14 @@ export default function PlanCalendarPage() {
   const t = useTranslations('planner.wizard.calendar');
   const tp = useTranslations('planner');
   const calendarEnabled = usePlannerFeature('planner_calendar');
+  const plannerIcon = appNavItems.find((item) => item.href === '/app/planner')?.icon;
 
   return (
     <PlannerPageLayout>
-      <PlannerPageHeader 
-        title={t('title')} 
-        eyebrow={tp('pageTitle')}
+      <PageTitleHeader
+        icon={plannerIcon}
+        title={tp('pageHeaderTitle')}
+        subtitle={t('title')}
       />
       
       <PlannerTabs activeTab="calendar" />

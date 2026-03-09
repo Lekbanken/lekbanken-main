@@ -120,7 +120,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
 
   if (isLoading || !data) {
     return (
-      <div className="min-h-screen rounded-2xl bg-gradient-to-b from-[#1a1a2e] to-[#16162a] px-4 pb-32 pt-8 sm:px-6 space-y-6">
+      <div className="-mx-4 sm:-mx-6 lg:-mx-8 min-h-screen bg-gradient-to-b from-[#1a1a2e] to-[#16162a] px-4 pb-32 pt-8 sm:px-6 space-y-6">
         {/* Avatar skeleton */}
         <div className="flex flex-col items-center gap-3">
           <div className="w-24 h-24 rounded-full bg-white/10" />
@@ -183,9 +183,10 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
     ? (loadout.title as TitleConfig) : null;
 
   return (
+    <div className="-mx-4 sm:-mx-6 lg:-mx-8">
     <JourneyScene
       theme={theme}
-      className="min-h-screen rounded-2xl"
+      className="min-h-screen"
       backgroundChildren={
         <ParticleField
           accentColor={theme.accentColor}
@@ -453,5 +454,6 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
         }
       `}</style>
     </JourneyScene>
+    </div>
   );
 }

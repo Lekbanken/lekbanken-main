@@ -120,7 +120,7 @@ export default function GeneralSettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 lg:p-8 flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4" />
           <p className="text-muted-foreground">{t('sections.general.loading')}</p>
@@ -130,7 +130,7 @@ export default function GeneralSettingsPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">

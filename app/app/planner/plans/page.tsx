@@ -5,14 +5,15 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { PlanListPanel } from '@/features/planner/components/PlanListPanel';
 import { PlannerTabs } from '@/features/planner/components/PlannerTabs';
-import { 
-  PlannerPageLayout, 
-  PlannerPageHeader 
-} from '@/features/planner/components/PlannerPageLayout';
+import { PlannerPageLayout } from '@/features/planner/components/PlannerPageLayout';
+import { PageTitleHeader } from '@/components/app/PageTitleHeader';
+import { appNavItems } from '@/components/app/nav-items';
+import { Button } from '@/components/ui/button';
 import { CreatePlanDialog } from '@/features/planner/components/CreatePlanDialog';
 import { fetchPlans, createPlan } from '@/features/planner/api';
 import { useActionFeedback } from '@/features/planner/hooks/useActionFeedback';
 import { useTenant } from '@/lib/context/TenantContext';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import type { PlannerPlan } from '@/types/planner';
 import type { PlanScope } from '@/features/planner/components/ScopeSelector';
 
@@ -82,11 +83,20 @@ export default function PlanLibraryPage() {
     }
   };
 
+  const plannerIcon = appNavItems.find((item) => item.href === '/app/planner')?.icon;
+
   return (
     <PlannerPageLayout>
-      <PlannerPageHeader 
-        title={t('pageTitle')} 
-        eyebrow="App"
+      <PageTitleHeader
+        icon={plannerIcon}
+        title={t('pageHeaderTitle')}
+        subtitle={t('pageSubtitle')}
+        rightSlot={
+          <Button size="sm" variant="primary" className="gap-1" onClick={() => setShowCreateDialog(true)} disabled={isPending('create-plan')}>
+            <PlusIcon className="h-4 w-4" />
+            {t('newPlan')}
+          </Button>
+        }
       />
       
       <PlannerTabs activeTab="plans" />

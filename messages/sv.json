@@ -370,6 +370,8 @@
       "previous": "Föregående"
     },
     "standard": {
+      "pageTitle": "DIN RESA",
+      "pageSubtitle": "Framsteg & belöningar",
       "activateJourneyTitle": "Prova Journey",
       "activateJourneyDesc": "Aktivera Journey för visuella teman, kosmetik och progression på din gamification-sida.",
       "activateJourneyButton": "Aktivera Journey",
@@ -547,6 +549,8 @@
   },
   "planner": {
     "pageTitle": "Planera",
+    "pageHeaderTitle": "PLANERA",
+    "pageSubtitle": "Mina planer",
     "untitledPlan": "Namnlös plan",
     "selectPlanFirst": "Välj en plan först",
     "planCreated": "Plan skapad!",
@@ -9264,6 +9268,8 @@
     },
     "profile": {
       "title": "Profil",
+      "pageHeaderTitle": "PROFIL",
+      "pageSubtitle": "Din profil",
       "editProfile": "Redigera profil",
       "personalInfo": "Personlig information",
       "preferences": "Preferenser",

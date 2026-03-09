@@ -124,7 +124,7 @@ export default function PreferencesPage() {
 
   if (stillLoading) {
     return (
-      <div className="p-6 lg:p-8">
+      <div>
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-48 bg-muted rounded" />
           <div className="h-4 w-72 bg-muted rounded" />
@@ -151,7 +151,7 @@ export default function PreferencesPage() {
 
   if (status === 'error' || status === 'timeout') {
     return (
-      <div className="p-6 lg:p-8 space-y-4">
+      <div className="space-y-4">
         <Alert variant="error" title={t('sections.preferences.loadError')}>
           <p>{loadError || t('sections.preferences.unexpectedError')}</p>
         </Alert>
@@ -168,7 +168,7 @@ export default function PreferencesPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Page Header */}
       <div className="flex items-start justify-between">
         <div>

@@ -521,6 +521,8 @@
       "previous": "Forrige"
     },
     "standard": {
+      "pageTitle": "DIN REISE",
+      "pageSubtitle": "Fremgang & belønninger",
       "activateJourneyTitle": "Prøv Journey",
       "activateJourneyDesc": "Aktiver Journey for visuelle temaer, kosmetikk og progresjon på gamification-siden din.",
       "activateJourneyButton": "Aktiver Journey",
@@ -743,6 +745,8 @@
   },
   "planner": {
     "pageTitle": "Planlegg",
+    "pageHeaderTitle": "PLANLEGGER",
+    "pageSubtitle": "Mine planer",
     "untitledPlan": "Navnløs plan",
     "selectPlanFirst": "Velg en plan først",
     "planCreated": "Plan opprettet!",
@@ -9441,6 +9445,8 @@
     },
     "profile": {
       "title": "Profil",
+      "pageHeaderTitle": "PROFIL",
+      "pageSubtitle": "Din profil",
       "editProfile": "Rediger profil",
       "personalInfo": "Personlig informasjon",
       "preferences": "Preferanser",

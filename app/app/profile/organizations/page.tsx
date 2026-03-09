@@ -76,7 +76,7 @@ export default function OrganizationsPage() {
 
   if (stillLoading) {
     return (
-      <div className="p-6 lg:p-8">
+      <div>
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-48 bg-muted rounded" />
           <div className="h-4 w-72 bg-muted rounded" />
@@ -106,7 +106,7 @@ export default function OrganizationsPage() {
 
   if (status === 'error' || status === 'timeout') {
     return (
-      <div className="p-6 lg:p-8 space-y-4">
+      <div className="space-y-4">
         <Alert variant="error" title={t('sections.organizations.loadError')}>
           <p>{loadError || t('sections.organizations.unexpectedError')}</p>
         </Alert>
@@ -123,7 +123,7 @@ export default function OrganizationsPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">

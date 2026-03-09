@@ -137,7 +137,7 @@ export default function AccountSettingsPage() {
   }, [currentPassword, newPassword, confirmPassword, allPasswordChecksPass, t]);
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">

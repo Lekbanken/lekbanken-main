@@ -19,6 +19,8 @@ import {
 import { useProfileQuery } from '@/hooks/useProfileQuery';
 import { profileCacheKeys } from '@/lib/profile/cacheKeys';
 import { ProfileHero, StatsCards, AchievementShowcaseCard, SecurityStatusCard, JourneyToggleCard } from '@/features/profile-overview';
+import { PageTitleHeader } from '@/components/app/PageTitleHeader';
+import { appNavItems } from '@/components/app/nav-items';
 import type { GamificationPayload } from '@/features/gamification/types';
 
 interface QuickLinkProps {
@@ -118,8 +120,16 @@ export default function ProfileOverviewPage() {
     if (!res.ok) throw new Error('Failed to update journey preference');
   };
 
+  const profileIcon = appNavItems.find((item) => item.href === '/app/profile')?.icon;
+
   return (
-    <div className="p-6 lg:p-8 space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      <PageTitleHeader
+        icon={profileIcon}
+        title={t('pageHeaderTitle')}
+        subtitle={t('pageSubtitle')}
+      />
+
       {/* Hero: avatar + name + level + XP */}
       <ProfileHero
         displayName={displayName}

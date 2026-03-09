@@ -19,7 +19,7 @@ export default async function ProfileLayout({ children }: ProfileLayoutProps) {
   return (
     <div className="min-h-0">
       {/* Remove container and horizontal padding - AppShell handles it */}
-      <div className="py-6 lg:py-8">
+      <div className="py-2 sm:py-6 lg:py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
@@ -34,9 +34,7 @@ export default async function ProfileLayout({ children }: ProfileLayoutProps) {
             <ProfileMobileNav />
             
             {/* Page Content */}
-            <div className="bg-card rounded-xl border border-border shadow-sm">
-              {children}
-            </div>
+            {children}
           </main>
         </div>
       </div>

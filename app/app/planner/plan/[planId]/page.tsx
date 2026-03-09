@@ -7,9 +7,10 @@ import { PlanWizard } from '@/features/planner/wizard';
 import { PlannerTabs } from '@/features/planner/components/PlannerTabs';
 import { 
   PlannerPageLayout, 
-  PlannerPageHeader,
   PlannerEmptyState 
 } from '@/features/planner/components/PlannerPageLayout';
+import { PageTitleHeader } from '@/components/app/PageTitleHeader';
+import { appNavItems } from '@/components/app/nav-items';
 import { usePlanWizard } from '@/features/planner/wizard/hooks/usePlanWizard';
 import { fetchPlan } from '@/features/planner/api';
 import type { PlannerPlan } from '@/types/planner';
@@ -139,15 +140,14 @@ export default function PlanWizardPage({ params }: PageProps) {
     );
   }
 
+  const plannerIcon = appNavItems.find((item) => item.href === '/app/planner')?.icon;
+
   return (
     <PlannerPageLayout maxWidth="4xl">
-      <PlannerPageHeader 
-        title={plan.name}
-        eyebrow={t('pageTitle')}
-        breadcrumbs={[
-          { label: t('myPlans'), href: '/app/planner/plans' },
-          { label: plan.name },
-        ]}
+      <PageTitleHeader
+        icon={plannerIcon}
+        title={t('pageHeaderTitle')}
+        subtitle={plan.name}
       />
       
       <PlannerTabs activeTab="edit" planId={planId} planName={plan.name} />

@@ -44,7 +44,7 @@ export const PlanListItem = memo(function PlanListItem({ plan, isActive, onClick
   return (
     <div
       className={cn(
-        "group flex w-full items-start justify-between rounded-xl border p-4 text-left transition",
+        "group flex w-full items-start justify-between rounded-xl border p-3 sm:p-4 text-left transition",
         isActive
           ? "border-primary/50 bg-primary/5 shadow-sm"
           : "border-border/60 bg-card hover:border-primary/30 hover:bg-muted/40"

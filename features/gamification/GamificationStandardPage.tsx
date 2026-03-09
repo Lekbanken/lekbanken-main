@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { PageTitleHeader } from '@/components/app/PageTitleHeader';
+import { appNavItems } from '@/components/app/nav-items';
 import {
   AcademicCapIcon,
   TrophyIcon,
@@ -43,8 +45,16 @@ export function GamificationStandardPage({ data }: GamificationStandardPageProps
     { href: '/app/gamification/events', icon: ClockIcon, label: t('nav.eventlog'), desc: t('nav.eventlogDesc') },
   ];
 
+  const gamificationIcon = appNavItems.find((item) => item.href === '/app/gamification')?.icon;
+
   return (
-    <div className="p-4 lg:p-6 space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-4 sm:space-y-6">
+      <PageTitleHeader
+        icon={gamificationIcon}
+        title={t('standard.pageTitle')}
+        subtitle={t('standard.pageSubtitle')}
+      />
+
       {/* Journey CTA banner */}
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="flex items-center gap-4 py-4">

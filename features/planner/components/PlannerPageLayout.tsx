@@ -43,7 +43,7 @@ export function PlannerPageLayout({
 }: PlannerPageLayoutProps) {
   return (
     <div className={cn(
-      'mx-auto w-full px-4 py-4 lg:px-8 lg:py-6',
+      'mx-auto w-full',
       maxWidthClasses[maxWidth],
       className
     )}>

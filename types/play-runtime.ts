@@ -69,6 +69,28 @@ export interface SessionRuntimeState {
 
 // =============================================================================
 // Session Role (snapshot from game_roles)
+//
+// SessionRole is a runtime snapshot of GameRole (lib/game-display/types.ts).
+// When a play session starts, game_roles are copied into session_roles.
+// The `source_role_id` field references the original GameRole.id.
+//
+// Field mapping (GameRole → SessionRole):
+//   name             → name
+//   icon             → icon
+//   color            → color
+//   publicNote       → public_description
+//   privateNote      → private_instructions
+//   minCount         → min_count
+//   maxCount         → max_count
+//   assignmentStrategy → assignment_strategy
+//   scalingRules     → scaling_rules
+//   conflictsWith    → conflicts_with
+//
+// SessionRole adds runtime fields not present in GameRole:
+//   session_id, source_role_id, role_order, private_hints,
+//   assigned_count, created_at
+//
+// @see GameRole in lib/game-display/types.ts for the authoring/display type
 // =============================================================================
 
 export interface SessionRole {

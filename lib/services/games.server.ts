@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { cache } from 'react'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import type { Tables } from '@/types/supabase'
 
@@ -162,6 +163,26 @@ type GameMaterialRow = {
   preparation: string | null
 }
 
+type GameBoardConfigRow = {
+  id: string
+  game_id: string
+  show_timer: boolean | null
+  show_phase_name: boolean | null
+  show_step_text: boolean | null
+  show_roles: boolean | null
+  theme: string | null
+  layout: string | null
+}
+
+type GameToolRow = {
+  id: string
+  game_id: string
+  tool_type: string | null
+  name: string | null
+  config: unknown
+  sort_order: number | null
+}
+
 type GameRole = {
   id: string
   game_id: string
@@ -230,6 +251,8 @@ export type GamePreviewData = GameRow & {
   steps?: GameStep[]
   materials?: GameMaterialRow[]
   phases?: GamePhase[]
+  board_config?: GameBoardConfigRow | null
+  tools?: GameToolRow[]
 }
 
 /**
@@ -250,7 +273,7 @@ export type GameFullData = GamePreviewData & {
  *
  * @param gameId - The UUID of the game
  */
-export async function getGameByIdPreview(gameId: string): Promise<GamePreviewData | null> {
+export const getGameByIdPreview = cache(async function getGameByIdPreview(gameId: string): Promise<GamePreviewData | null> {
   const supabase = await createServerRlsClient()
 
   const { data, error } = await supabase
@@ -287,7 +310,7 @@ export async function getGameByIdPreview(gameId: string): Promise<GamePreviewDat
   }
 
   return result
-}
+})
 
 /**
  * Get full game data - complete for run mode
@@ -311,6 +334,8 @@ export async function getGameByIdFull(gameId: string): Promise<GameFullData | nu
         steps:game_steps(*),
         materials:game_materials(*),
         phases:game_phases(*),
+        board_config:game_board_config(*),
+        tools:game_tools(*),
         roles:game_roles(*),
         artifacts:game_artifacts(*, variants:game_artifact_variants(*)),
         triggers:game_triggers(*)
@@ -354,6 +379,23 @@ export async function getGameByIdFull(gameId: string): Promise<GameFullData | nu
 // =============================================================================
 // LAZY LOAD QUERIES (for roles, artifacts, triggers)
 // =============================================================================
+
+/**
+ * Get minimal game info for access checks (lazy routes).
+ * Only fetches id + status to minimize DB overhead.
+ */
+export async function getGameStatus(gameId: string): Promise<{ id: string; status: string } | null> {
+  const supabase = await createServerRlsClient()
+
+  const { data, error } = await supabase
+    .from('games')
+    .select('id, status')
+    .eq('id', gameId)
+    .single()
+
+  if (error || !data) return null
+  return data as { id: string; status: string }
+}
 
 /**
  * Get roles for a game (lazy load)

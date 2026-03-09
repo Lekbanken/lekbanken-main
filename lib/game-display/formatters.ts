@@ -5,10 +5,114 @@
  * UI får ALDRIG formatera grunddata på egen hand.
  * Alla labels och styling måste komma härifrån.
  *
+ * ## i18n Pattern (B5)
+ *
+ * Each formatter accepts an optional `labels` parameter with a typed interface.
+ * When `labels` is provided, its values override the internal Swedish defaults.
+ * When omitted, the formatter returns Swedish text — backward compatible.
+ *
+ * ### Data flow (prop drilling):
+ *
+ *   Server Component (page.tsx)
+ *     ↓  const t = await getTranslations('app.gameDetail')
+ *     ↓  builds label objects from t('formatters.*')
+ *     ↓
+ *   Client Component (GameDetailBadges)
+ *     ↓  receives e.g. durationLabels, energyLabels as props
+ *     ↓
+ *   Formatter function (formatDuration, formatEnergyLevel, etc.)
+ *     ↓  uses labels?.unit ?? 'min' (Swedish default)
+ *     ↓
+ *   Returns formatted string/object
+ *
+ * ### Why prop drilling (not a hook)?
+ *
+ * Formatters are pure functions — no React context needed. The `t()` function
+ * lives in the server component, so label objects are built there and passed
+ * down as serializable props. This keeps formatters testable, tree-shakeable,
+ * and usable outside React (e.g., in server actions, API routes).
+ *
+ * ### Adding a new formatter:
+ *
+ * 1. Define a `FooLabels` interface with optional string fields
+ * 2. Add `labels?: FooLabels` as the last parameter
+ * 3. Use `labels?.key ?? 'Swedish default'` for each string
+ * 4. Export the type from `lib/game-display/index.ts`
+ * 5. Add message keys to `messages/{sv,en,no}.json` under `app.gameDetail.formatters`
+ * 6. Wire in the consuming component's parent (usually page.tsx)
+ *
  * @see GAMECARD_UNIFIED_IMPLEMENTATION.md för full dokumentation
  */
 
 import type { EnergyLevel, PlayMode, Environment, Difficulty } from './types';
+
+// =============================================================================
+// I18N LABELS TYPES
+// =============================================================================
+
+/** Labels for formatDuration / formatPlayers / formatAge */
+export interface RangeFormatterLabels {
+  /** Unit suffix, e.g. "min", "participants", "years" */
+  unit?: string;
+  /** Template for "Up to {max} {unit}" */
+  upTo?: string;
+}
+
+/** Labels for formatPlayCount */
+export interface PlayCountLabels {
+  singular?: string;
+  plural?: string;
+}
+
+/** Labels for formatStatus */
+export interface StatusLabels {
+  draft?: string;
+  published?: string;
+  archived?: string;
+}
+
+/** Labels for energy level config */
+export interface EnergyLabels {
+  low?: string;
+  lowShort?: string;
+  medium?: string;
+  mediumShort?: string;
+  high?: string;
+  highShort?: string;
+}
+
+/** Labels for play mode config */
+export interface PlayModeLabels {
+  basicLabel?: string;
+  basicShort?: string;
+  basicDescription?: string;
+  facilitatedLabel?: string;
+  facilitatedShort?: string;
+  facilitatedDescription?: string;
+  participantsLabel?: string;
+  participantsShort?: string;
+  participantsDescription?: string;
+}
+
+/** Labels for environment config */
+export interface EnvironmentLabels {
+  indoorLabel?: string;
+  indoorShort?: string;
+  outdoorLabel?: string;
+  outdoorShort?: string;
+  bothLabel?: string;
+  bothShort?: string;
+}
+
+/** Labels for difficulty config */
+export interface DifficultyLabels {
+  easyLabel?: string;
+  easyShort?: string;
+  mediumLabel?: string;
+  mediumShort?: string;
+  hardLabel?: string;
+  hardShort?: string;
+}
 
 // =============================================================================
 // DURATION
@@ -25,18 +129,20 @@ import type { EnergyLevel, PlayMode, Environment, Difficulty } from './types';
  */
 export function formatDuration(
   min?: number | null,
-  max?: number | null
+  max?: number | null,
+  labels?: RangeFormatterLabels
 ): string | null {
   if (min == null && max == null) return null;
 
+  const unit = labels?.unit ?? 'min';
   const minVal = min ?? max;
   const maxVal = max ?? min;
 
   if (minVal === maxVal) {
-    return `${minVal} min`;
+    return `${minVal} ${unit}`;
   }
 
-  return `${minVal}-${maxVal} min`;
+  return `${minVal}-${maxVal} ${unit}`;
 }
 
 /**
@@ -76,17 +182,21 @@ export function formatDurationShort(
  */
 export function formatPlayers(
   min?: number | null,
-  max?: number | null
+  max?: number | null,
+  labels?: RangeFormatterLabels
 ): string | null {
   if (min == null && max == null) return null;
 
+  const unit = labels?.unit ?? 'deltagare';
+  const upTo = labels?.upTo ?? `Upp till {max} ${unit}`;
+
   if (min != null && max != null) {
-    if (min === max) return `${min} deltagare`;
-    return `${min}-${max} deltagare`;
+    if (min === max) return `${min} ${unit}`;
+    return `${min}-${max} ${unit}`;
   }
 
-  if (min != null) return `${min}+ deltagare`;
-  return `Upp till ${max} deltagare`;
+  if (min != null) return `${min}+ ${unit}`;
+  return upTo.replace('{max}', String(max));
 }
 
 /**
@@ -126,20 +236,24 @@ export function formatPlayersShort(
  */
 export function formatAge(
   min?: number | null,
-  max?: number | null
+  max?: number | null,
+  labels?: RangeFormatterLabels
 ): string | null {
   if (min == null && max == null) return null;
+
+  const unit = labels?.unit ?? 'år';
+  const upTo = labels?.upTo ?? `Upp till {max} ${unit}`;
 
   // Behandla 99 som "ingen övre gräns"
   const effectiveMax = max != null && max >= 99 ? null : max;
 
   if (min != null && effectiveMax != null) {
-    if (min === effectiveMax) return `${min} år`;
-    return `${min}-${effectiveMax} år`;
+    if (min === effectiveMax) return `${min} ${unit}`;
+    return `${min}-${effectiveMax} ${unit}`;
   }
 
-  if (min != null) return `${min}+ år`;
-  return `Upp till ${effectiveMax} år`;
+  if (min != null) return `${min}+ ${unit}`;
+  return upTo.replace('{max}', String(effectiveMax));
 }
 
 /**
@@ -213,10 +327,20 @@ const ENERGY_CONFIG: Record<EnergyLevel, EnergyLevelFormat> = {
  * formatEnergyLevel('high') // { label: 'Hög energi', color: '...', ... }
  */
 export function formatEnergyLevel(
-  level?: EnergyLevel | null
+  level?: EnergyLevel | null,
+  labels?: EnergyLabels
 ): EnergyLevelFormat | null {
   if (!level) return null;
-  return ENERGY_CONFIG[level];
+  const base = ENERGY_CONFIG[level];
+  if (!labels) return base;
+
+  // Override labels if provided
+  const overrides: Record<EnergyLevel, Partial<EnergyLevelFormat>> = {
+    low: { label: labels.low ?? base.label, labelShort: labels.lowShort ?? base.labelShort },
+    medium: { label: labels.medium ?? base.label, labelShort: labels.mediumShort ?? base.labelShort },
+    high: { label: labels.high ?? base.label, labelShort: labels.highShort ?? base.labelShort },
+  };
+  return { ...base, ...overrides[level] };
 }
 
 // =============================================================================
@@ -277,9 +401,32 @@ const PLAYMODE_CONFIG: Record<PlayMode, PlayModeFormat> = {
  * @example
  * formatPlayMode('facilitated') // { label: 'Ledd aktivitet', border: '...', ... }
  */
-export function formatPlayMode(mode?: PlayMode | null): PlayModeFormat | null {
+export function formatPlayMode(
+  mode?: PlayMode | null,
+  labels?: PlayModeLabels
+): PlayModeFormat | null {
   if (!mode) return null;
-  return PLAYMODE_CONFIG[mode];
+  const base = PLAYMODE_CONFIG[mode];
+  if (!labels) return base;
+
+  const overrides: Record<PlayMode, Partial<PlayModeFormat>> = {
+    basic: {
+      label: labels.basicLabel ?? base.label,
+      labelShort: labels.basicShort ?? base.labelShort,
+      description: labels.basicDescription ?? base.description,
+    },
+    facilitated: {
+      label: labels.facilitatedLabel ?? base.label,
+      labelShort: labels.facilitatedShort ?? base.labelShort,
+      description: labels.facilitatedDescription ?? base.description,
+    },
+    participants: {
+      label: labels.participantsLabel ?? base.label,
+      labelShort: labels.participantsShort ?? base.labelShort,
+      description: labels.participantsDescription ?? base.description,
+    },
+  };
+  return { ...base, ...overrides[mode] };
 }
 
 // =============================================================================
@@ -317,10 +464,19 @@ const ENVIRONMENT_CONFIG: Record<Environment, EnvironmentFormat> = {
  * formatEnvironment('indoor') // { label: 'Inomhus', labelShort: 'Inne', icon: '🏠' }
  */
 export function formatEnvironment(
-  env?: Environment | null
+  env?: Environment | null,
+  labels?: EnvironmentLabels
 ): EnvironmentFormat | null {
   if (!env) return null;
-  return ENVIRONMENT_CONFIG[env];
+  const base = ENVIRONMENT_CONFIG[env];
+  if (!labels) return base;
+
+  const overrides: Record<Environment, Partial<EnvironmentFormat>> = {
+    indoor: { label: labels.indoorLabel ?? base.label, labelShort: labels.indoorShort ?? base.labelShort },
+    outdoor: { label: labels.outdoorLabel ?? base.label, labelShort: labels.outdoorShort ?? base.labelShort },
+    both: { label: labels.bothLabel ?? base.label, labelShort: labels.bothShort ?? base.labelShort },
+  };
+  return { ...base, ...overrides[env] };
 }
 
 // =============================================================================
@@ -362,10 +518,19 @@ const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyFormat> = {
  * formatDifficulty('hard') // { label: 'Svår', color: '...', ... }
  */
 export function formatDifficulty(
-  diff?: Difficulty | null
+  diff?: Difficulty | null,
+  labels?: DifficultyLabels
 ): DifficultyFormat | null {
   if (!diff) return null;
-  return DIFFICULTY_CONFIG[diff];
+  const base = DIFFICULTY_CONFIG[diff];
+  if (!labels) return base;
+
+  const overrides: Record<Difficulty, Partial<DifficultyFormat>> = {
+    easy: { label: labels.easyLabel ?? base.label, labelShort: labels.easyShort ?? base.labelShort },
+    medium: { label: labels.mediumLabel ?? base.label, labelShort: labels.mediumShort ?? base.labelShort },
+    hard: { label: labels.hardLabel ?? base.label, labelShort: labels.hardShort ?? base.labelShort },
+  };
+  return { ...base, ...overrides[diff] };
 }
 
 // =============================================================================
@@ -412,10 +577,15 @@ export function formatRatingWithCount(
  * formatPlayCount(1234) // "1 234 spelningar"
  * formatPlayCount(1) // "1 spelning"
  */
-export function formatPlayCount(count?: number | null): string | null {
+export function formatPlayCount(
+  count?: number | null,
+  labels?: PlayCountLabels
+): string | null {
   if (count == null) return null;
   const formatted = count.toLocaleString('sv-SE');
-  return count === 1 ? `${formatted} spelning` : `${formatted} spelningar`;
+  const singular = labels?.singular ?? 'spelning';
+  const plural = labels?.plural ?? 'spelningar';
+  return count === 1 ? `${formatted} ${singular}` : `${formatted} ${plural}`;
 }
 
 // =============================================================================
@@ -432,23 +602,24 @@ export interface StatusFormat {
  * Formaterar game status till objekt med label och styling
  */
 export function formatStatus(
-  status?: 'draft' | 'published' | 'archived' | null
+  status?: 'draft' | 'published' | 'archived' | null,
+  labels?: StatusLabels
 ): StatusFormat | null {
   if (!status) return null;
 
   const config: Record<string, StatusFormat> = {
     draft: {
-      label: 'Utkast',
+      label: labels?.draft ?? 'Utkast',
       color: 'text-amber-600 dark:text-amber-400',
       bgColor: 'bg-amber-50 dark:bg-amber-950/50',
     },
     published: {
-      label: 'Publicerad',
+      label: labels?.published ?? 'Publicerad',
       color: 'text-green-600 dark:text-green-400',
       bgColor: 'bg-green-50 dark:bg-green-950/50',
     },
     archived: {
-      label: 'Arkiverad',
+      label: labels?.archived ?? 'Arkiverad',
       color: 'text-gray-600 dark:text-gray-400',
       bgColor: 'bg-gray-50 dark:bg-gray-950/50',
     },

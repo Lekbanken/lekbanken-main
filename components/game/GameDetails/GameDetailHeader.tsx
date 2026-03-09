@@ -16,8 +16,8 @@ import type { GameDetailHeaderProps } from './types';
  */
 export function GameDetailHeader({
   game,
-  backLink = { href: '/app/browse', label: 'Tillbaka' },
-  label = 'LEK',
+  backLink = { href: '/app/browse', label: '' },
+  label = '',
   className = '',
 }: GameDetailHeaderProps) {
   return (

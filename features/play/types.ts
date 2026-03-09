@@ -1,3 +1,13 @@
+/**
+ * Step — Content fields for a play step.
+ *
+ * Represents the displayable content of a single step in a game or plan run.
+ * Conceptually related to GameStep in the display domain, but uses
+ * play-specific field names (description vs body, materials as string[]).
+ *
+ * @see GameStep in lib/game-display/types.ts for the display-domain equivalent
+ * @see RunStep below which extends Step with execution-specific fields
+ */
 export type Step = {
   id: string;
   title: string;
@@ -9,6 +19,11 @@ export type Step = {
   note?: string;
 };
 
+/**
+ * GameRun — Legacy play representation of a single game.
+ *
+ * @see GameDetailData in lib/game-display/types.ts for the display-domain equivalent
+ */
 export type GameRun = {
   id: string;
   title: string;
@@ -47,19 +62,19 @@ export type Run = {
 /**
  * A single step in a Run, derived from version blocks.
  * Steps are generated server-side and frozen at run start.
+ *
+ * Extends Step with execution-specific fields (index, blockId, blockType)
+ * and optional session configuration for participant games.
  */
-export type RunStep = {
-  id: string;
-  index: number;
-  blockId: string;
-  blockType: 'game' | 'pause' | 'preparation' | 'custom' | 'section' | 'session_game';
-  title: string;
-  description: string;
+export type RunStep = Step & {
+  /** Override: durationMinutes is required in a RunStep (always resolved) */
   durationMinutes: number;
-  materials?: string[];
-  safety?: string;
-  tag?: string;
-  note?: string;
+  /** Position in the run's step sequence (0-based) */
+  index: number;
+  /** Reference to the source plan version block */
+  blockId: string;
+  /** Type of the source block */
+  blockType: 'game' | 'pause' | 'preparation' | 'custom' | 'section' | 'session_game';
   /** True if this step requires a participant session */
   requiresSession?: boolean;
   /** Session configuration — present when requiresSession is true */

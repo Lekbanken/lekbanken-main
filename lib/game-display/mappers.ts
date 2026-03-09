@@ -60,6 +60,9 @@ export interface DbGame {
   accessibility_notes?: string | null;
   space_requirements?: string | null;
   leader_tips?: string | null;
+  // Sprint D fields (from DB migration D11/D16)
+  outcomes?: string[] | null;
+  highlights?: string[] | null;
   // Pre-computed translated fields (from API applyTranslation)
   _translatedTitle?: string;
   _translatedShortDescription?: string;
@@ -93,6 +96,7 @@ export interface DbGame {
     optional?: boolean | null;
     phase_id?: string | null;
     media_ref?: string | null;
+    conditional?: string | null;
   }> | null;
   phases?: Array<{
     id?: string | null;
@@ -125,6 +129,8 @@ export interface DbGame {
     min_count?: number | null;
     max_count?: number | null;
     assignment_strategy?: string | null;
+    scaling_rules?: Record<string, number> | null;
+    conflicts_with?: string[] | null;
   }> | null;
   artifacts?: Array<{
     id?: string | null;
@@ -546,6 +552,7 @@ export function mapSteps(steps?: DbGame['steps']): GameStep[] {
       optional: s.optional ?? undefined,
       phaseId: s.phase_id ?? undefined,
       mediaRef: s.media_ref ?? undefined,
+      conditional: s.conditional ?? undefined,
     }));
 }
 
@@ -651,6 +658,8 @@ export function mapRoles(roles?: DbGame['roles']): GameRole[] {
         r.assignment_strategy === 'player_picks'
           ? r.assignment_strategy
           : undefined,
+      scalingRules: r.scaling_rules ?? undefined,
+      conflictsWith: r.conflicts_with ?? undefined,
     }));
 }
 
@@ -710,29 +719,43 @@ export function mapTriggers(triggers?: DbGame['triggers']): GameTrigger[] {
     }));
 }
 
+/** Labels for board widget titles/descriptions */
+export interface BoardWidgetLabels {
+  timerTitle?: string;
+  timerDetail?: string;
+  phaseNameTitle?: string;
+  phaseNameDetail?: string;
+  stepTextTitle?: string;
+  stepTextDetail?: string;
+  rolesTitle?: string;
+  rolesDetail?: string;
+  themeTitle?: string;
+}
+
 /**
  * Map DB board_config to GameBoardWidget[] (summary)
  * Creates widget descriptions based on enabled features
  */
 export function mapBoardConfigToWidgets(
-  config: NonNullable<DbGame['board_config']>
+  config: NonNullable<DbGame['board_config']>,
+  labels?: BoardWidgetLabels
 ): GameBoardWidget[] {
   const widgets: GameBoardWidget[] = [];
   
   if (config.show_timer) {
-    widgets.push({ title: 'Timer', detail: 'Visar nedräkning för varje fas' });
+    widgets.push({ title: labels?.timerTitle ?? 'Timer', detail: labels?.timerDetail ?? 'Visar nedräkning för varje fas' });
   }
   if (config.show_phase_name) {
-    widgets.push({ title: 'Fasnamn', detail: 'Visar aktuell fas på tavlan' });
+    widgets.push({ title: labels?.phaseNameTitle ?? 'Fasnamn', detail: labels?.phaseNameDetail ?? 'Visar aktuell fas på tavlan' });
   }
   if (config.show_step_text) {
-    widgets.push({ title: 'Stegtext', detail: 'Visar instruktioner för deltagare' });
+    widgets.push({ title: labels?.stepTextTitle ?? 'Stegtext', detail: labels?.stepTextDetail ?? 'Visar instruktioner för deltagare' });
   }
   if (config.show_roles) {
-    widgets.push({ title: 'Roller', detail: 'Visar aktiva roller på tavlan' });
+    widgets.push({ title: labels?.rolesTitle ?? 'Roller', detail: labels?.rolesDetail ?? 'Visar aktiva roller på tavlan' });
   }
   if (config.theme) {
-    widgets.push({ title: 'Tema', detail: config.theme });
+    widgets.push({ title: labels?.themeTitle ?? 'Tema', detail: config.theme });
   }
   
   return widgets;
@@ -753,7 +776,7 @@ export function mapBoardConfigToWidgets(
  */
 export function mapDbGameToDetailPreview(
   dbGame: DbGame,
-  options?: { localeOrder?: string[] }
+  options?: { localeOrder?: string[]; boardWidgetLabels?: BoardWidgetLabels }
 ): GameDetailData {
   const summary = mapDbGameToSummary(dbGame, options);
   const translation = pickTranslation(dbGame.translations, options?.localeOrder);
@@ -781,9 +804,16 @@ export function mapDbGameToDetailPreview(
       ? dbGame.space_requirements.split('\n').filter(Boolean)
       : undefined,
     // Board config (summary only - full details lazy-loaded)
-    boardWidgets: dbGame.board_config ? mapBoardConfigToWidgets(dbGame.board_config) : undefined,
+    boardWidgets: dbGame.board_config ? mapBoardConfigToWidgets(dbGame.board_config, options?.boardWidgetLabels) : undefined,
     // Facilitator tools
     facilitatorTools: dbGame.tools?.map(t => t.name ?? t.tool_type ?? 'Tool').filter(Boolean),
+    // Leader tips
+    leaderTips: dbGame.leader_tips
+      ? dbGame.leader_tips.split('\n').filter(Boolean)
+      : undefined,
+    // Sprint D: outcomes + highlights (from DB TEXT[] columns)
+    outcomes: dbGame.outcomes?.length ? dbGame.outcomes : undefined,
+    highlights: dbGame.highlights?.length ? dbGame.highlights : undefined,
     meta: {
       gameKey: dbGame.slug ?? dbGame.id,
       updatedAt: dbGame.updated_at ?? undefined,

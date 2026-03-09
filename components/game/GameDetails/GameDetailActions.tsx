@@ -15,9 +15,9 @@ export function GameDetailActions({
   className,
 }: GameDetailActionsProps) {
   const {
-    share = 'Dela',
-    favorite = 'Favorit',
-    shareTitle = 'Dela denna lek',
+    share = '',
+    favorite = '',
+    shareTitle = '',
   } = labels;
 
   const handleShare = async () => {

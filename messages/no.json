@@ -9308,6 +9308,7 @@
       "ageRange": "{min}-{max} år",
       "playersRange": "{min}-{max} deltakere",
       "approxMinutes": "~{minutes} min",
+      "relatedGames": "Lignende spill",
       "sections": {
         "about": "Om spillet",
         "instructions": "Slik spiller du",
@@ -9324,23 +9325,66 @@
         "accessibility": "Tilgjengelighet",
         "requirements": "Krav for spillet",
         "board": "Offentlig tavle",
-        "tools": "Fasilitatorverktøy"
+        "tools": "Fasilitatorverktøy",
+        "leaderTips": "Ledertips",
+        "metadata": "Metadata",
+        "outcomes": "Læringsmål"
       },
       "loading": "Laster...",
       "loadError": "Kunne ikke laste data",
+      "about": {
+        "highlights": "Høydepunkter"
+      },
+      "metadata": {
+        "gameId": "Spill-ID",
+        "created": "Opprettet",
+        "updated": "Oppdatert"
+      },
+      "header": {
+        "back": "Tilbake",
+        "label": "SPILL"
+      },
+      "steps": {
+        "hide": "Skjul",
+        "showAll": "Vis alle {count} {unit}",
+        "showLess": "Vis færre",
+        "stepsUnit": "steg",
+        "optional": "Valgfritt",
+        "approxMinutes": "ca {minutes} min"
+      },
       "phases": {
         "goal": "Mål",
-        "duration": "Varighet"
+        "duration": "Varighet",
+        "phaseNumber": "Fase {number}"
       },
       "roles": {
-        "count": "Antall"
+        "count": "Antall",
+        "loadingRoles": "Laster roller...",
+        "loadError": "Kunne ikke laste roller"
       },
       "artifacts": {
-        "variants": "Varianter"
+        "variants": "Varianter",
+        "loadingArtifacts": "Laster artefakter...",
+        "loadError": "Kunne ikke laste artefakter",
+        "use": "Bruk",
+        "openMap": "Åpne kart",
+        "mapLoadError": "Kunne ikke laste kartet",
+        "mapNoAccess": "Ingen tilgang til kartet"
       },
       "triggers": {
         "condition": "Vilkår",
-        "effect": "Effekt"
+        "effect": "Effekt",
+        "loadingTriggers": "Laster hendelser...",
+        "loadError": "Kunne ikke laste hendelser",
+        "executeOnce": "Kjøres én gang",
+        "delay": "Forsinkelse",
+        "disabled": "Inaktiv"
+      },
+      "board": {
+        "description": "Følgende vises på den offentlige skjermen under spillet:"
+      },
+      "tools": {
+        "description": "Verktøy som er tilgjengelige under spillet:"
       },
       "details": {
         "participants": "Antall deltakere",
@@ -9367,13 +9411,74 @@
         "like": "Lik",
         "unlike": "Fjern likerklikk",
         "dislike": "Mislik",
-        "addToPlan": "Legg til i plan"
+        "addToPlan": "Legg til i plan",
+        "edit": "Rediger"
       },
       "directorPreview": {
         "button": "Director Mode",
         "title": "Forhåndsvisning",
         "backToGame": "Tilbake til spillet",
         "noSteps": "Spillet har ingen steg å vise."
+      },
+      "formatters": {
+        "durationUnit": "min",
+        "playersUnit": "deltakere",
+        "playersUpTo": "Opptil {max} deltakere",
+        "ageUnit": "år",
+        "ageUpTo": "Opptil {max} år",
+        "playCountSingular": "spilling",
+        "playCountPlural": "spillinger",
+        "energyLow": "Lav energi",
+        "energyLowShort": "Lav",
+        "energyMedium": "Middels energi",
+        "energyMediumShort": "Middels",
+        "energyHigh": "Høy energi",
+        "energyHighShort": "Høy",
+        "playModeBasic": "Enkelt spill",
+        "playModeBasicShort": "Enkelt",
+        "playModeBasicDesc": "Et enkelt spill uten digitale verktøy",
+        "playModeFacilitated": "Ledet aktivitet",
+        "playModeFacilitatedShort": "Ledet",
+        "playModeFacilitatedDesc": "Strukturert aktivitet med faser og timer",
+        "playModeParticipants": "Deltakerspill",
+        "playModeParticipantsShort": "Deltakere",
+        "playModeParticipantsDesc": "Med roller, private kort og offentlig tavle",
+        "envIndoor": "Innendørs",
+        "envIndoorShort": "Inne",
+        "envOutdoor": "Utendørs",
+        "envOutdoorShort": "Ute",
+        "envBoth": "Inne eller ute",
+        "envBothShort": "Inne/Ute",
+        "diffEasy": "Lett",
+        "diffEasyShort": "Lett",
+        "diffMedium": "Middels",
+        "diffMediumShort": "Middels",
+        "diffHard": "Vanskelig",
+        "diffHardShort": "Vanskelig",
+        "statusDraft": "Utkast",
+        "statusPublished": "Publisert",
+        "statusArchived": "Arkivert"
+      },
+      "boardWidgets": {
+        "timerTitle": "Timer",
+        "timerDetail": "Viser nedtelling for hver fase",
+        "phaseNameTitle": "Fasenavn",
+        "phaseNameDetail": "Viser gjeldende fase på tavlen",
+        "stepTextTitle": "Stegtekst",
+        "stepTextDetail": "Viser instruksjoner for deltakere",
+        "rolesTitle": "Roller",
+        "rolesDetail": "Viser aktive roller på tavlen",
+        "themeTitle": "Tema"
+      },
+      "errorBoundary": {
+        "title": "Kunne ikke laste spillet",
+        "description": "En uventet feil oppstod. Prøv igjen, eller last inn siden på nytt.",
+        "retry": "Prøv igjen",
+        "reload": "Last inn siden på nytt"
+      },
+      "breadcrumbs": {
+        "home": "Hjem",
+        "games": "Spill"
       }
     },
     "gamification": {

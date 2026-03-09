@@ -8804,6 +8804,7 @@
       "ageRange": "{min}-{max} years",
       "playersRange": "{min}-{max} participants",
       "approxMinutes": "~{minutes} min",
+      "relatedGames": "Similar games",
       "sections": {
         "about": "About the game",
         "instructions": "How to play",
@@ -8820,23 +8821,66 @@
         "accessibility": "Accessibility",
         "requirements": "Requirements",
         "board": "Public board",
-        "tools": "Facilitator tools"
+        "tools": "Facilitator tools",
+        "leaderTips": "Leader tips",
+        "metadata": "Metadata",
+        "outcomes": "Learning outcomes"
       },
       "loading": "Loading...",
       "loadError": "Could not load data",
+      "about": {
+        "highlights": "Highlights"
+      },
+      "metadata": {
+        "gameId": "Game ID",
+        "created": "Created",
+        "updated": "Updated"
+      },
+      "header": {
+        "back": "Back",
+        "label": "GAME"
+      },
+      "steps": {
+        "hide": "Hide",
+        "showAll": "Show all {count} {unit}",
+        "showLess": "Show less",
+        "stepsUnit": "steps",
+        "optional": "Optional",
+        "approxMinutes": "~{minutes} min"
+      },
       "phases": {
         "goal": "Goal",
-        "duration": "Duration"
+        "duration": "Duration",
+        "phaseNumber": "Phase {number}"
       },
       "roles": {
-        "count": "Count"
+        "count": "Count",
+        "loadingRoles": "Loading roles...",
+        "loadError": "Could not load roles"
       },
       "artifacts": {
-        "variants": "Variants"
+        "variants": "Variants",
+        "loadingArtifacts": "Loading artifacts...",
+        "loadError": "Could not load artifacts",
+        "use": "Usage",
+        "openMap": "Open map",
+        "mapLoadError": "Could not load map",
+        "mapNoAccess": "No access to map"
       },
       "triggers": {
         "condition": "Condition",
-        "effect": "Effect"
+        "effect": "Effect",
+        "loadingTriggers": "Loading events...",
+        "loadError": "Could not load events",
+        "executeOnce": "Runs once",
+        "delay": "Delay",
+        "disabled": "Disabled"
+      },
+      "board": {
+        "description": "The following is shown on the public screen during the game:"
+      },
+      "tools": {
+        "description": "Tools available during the game:"
       },
       "details": {
         "participants": "Participants",
@@ -8863,13 +8907,74 @@
         "like": "Like",
         "unlike": "Unlike",
         "dislike": "Dislike",
-        "addToPlan": "Add to plan"
+        "addToPlan": "Add to plan",
+        "edit": "Edit"
       },
       "directorPreview": {
         "button": "Director Mode",
         "title": "Preview",
         "backToGame": "Back to game",
         "noSteps": "This game has no steps to display."
+      },
+      "formatters": {
+        "durationUnit": "min",
+        "playersUnit": "participants",
+        "playersUpTo": "Up to {max} participants",
+        "ageUnit": "years",
+        "ageUpTo": "Up to {max} years",
+        "playCountSingular": "play",
+        "playCountPlural": "plays",
+        "energyLow": "Low energy",
+        "energyLowShort": "Low",
+        "energyMedium": "Medium energy",
+        "energyMediumShort": "Medium",
+        "energyHigh": "High energy",
+        "energyHighShort": "High",
+        "playModeBasic": "Simple game",
+        "playModeBasicShort": "Simple",
+        "playModeBasicDesc": "A simple game without digital tools",
+        "playModeFacilitated": "Facilitated activity",
+        "playModeFacilitatedShort": "Facilitated",
+        "playModeFacilitatedDesc": "Structured activity with phases and timer",
+        "playModeParticipants": "Participant game",
+        "playModeParticipantsShort": "Participants",
+        "playModeParticipantsDesc": "With roles, private cards and public board",
+        "envIndoor": "Indoor",
+        "envIndoorShort": "Indoor",
+        "envOutdoor": "Outdoor",
+        "envOutdoorShort": "Outdoor",
+        "envBoth": "Indoor or outdoor",
+        "envBothShort": "In/Out",
+        "diffEasy": "Easy",
+        "diffEasyShort": "Easy",
+        "diffMedium": "Medium",
+        "diffMediumShort": "Medium",
+        "diffHard": "Hard",
+        "diffHardShort": "Hard",
+        "statusDraft": "Draft",
+        "statusPublished": "Published",
+        "statusArchived": "Archived"
+      },
+      "boardWidgets": {
+        "timerTitle": "Timer",
+        "timerDetail": "Shows countdown for each phase",
+        "phaseNameTitle": "Phase name",
+        "phaseNameDetail": "Shows current phase on the board",
+        "stepTextTitle": "Step text",
+        "stepTextDetail": "Shows instructions for participants",
+        "rolesTitle": "Roles",
+        "rolesDetail": "Shows active roles on the board",
+        "themeTitle": "Theme"
+      },
+      "errorBoundary": {
+        "title": "Could not load the game",
+        "description": "An unexpected error occurred. Try again, or reload the page.",
+        "retry": "Try again",
+        "reload": "Reload page"
+      },
+      "breadcrumbs": {
+        "home": "Home",
+        "games": "Games"
       }
     },
     "gamification": {

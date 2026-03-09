@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useId, useRef, useCallback } from 'react';
 import { UserGroupIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import type { GameRole } from '@/lib/game-display';
 import type { GameDetailRolesProps } from './types';
@@ -8,7 +8,7 @@ import type { GameDetailRolesProps } from './types';
 /**
  * GameDetailRoles - Lazy-loaded roles for participant games
  *
- * Fetches roles on mount from /api/games/[gameId]/roles.
+ * Fetches roles on first expand from /api/games/[gameId]/roles.
  * Only shown for games with playMode === 'participants'.
  */
 export function GameDetailRoles({
@@ -17,43 +17,42 @@ export function GameDetailRoles({
   className = '',
 }: GameDetailRolesProps) {
   const [roles, setRoles] = useState<GameRole[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const hasFetched = useRef(false);
 
-  const titleLabel = labels.title ?? 'Roller';
-  const loadingLabel = labels.loading ?? 'Laddar roller...';
-  const errorLabel = labels.error ?? 'Kunde inte ladda roller';
-  const countLabel = labels.count ?? 'Antal';
+  const regionId = useId();
+  const regionRef = useRef<HTMLDivElement>(null);
+
+  const titleLabel = labels.title ?? '';
+  const loadingLabel = labels.loading ?? '';
+  const errorLabel = labels.error ?? '';
+  const countLabel = labels.count ?? '';
 
   // Only fetch for participant games
   const shouldFetch = game.playMode === 'participants';
 
-  useEffect(() => {
-    if (!shouldFetch) {
+  const fetchRoles = useCallback(async () => {
+    if (hasFetched.current || !shouldFetch) return;
+    hasFetched.current = true;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/games/${game.id}/roles`);
+      if (!res.ok) throw new Error('Failed to fetch roles');
+      const data = await res.json();
+      setRoles(data.roles ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const fetchRoles = async () => {
-      try {
-        const res = await fetch(`/api/games/${game.id}/roles`);
-        if (!res.ok) throw new Error('Failed to fetch roles');
-        const data = await res.json();
-        setRoles(data.roles ?? []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRoles();
   }, [game.id, shouldFetch]);
 
-  // Don't render if not a participant game or no roles
+  // Don't render if not a participant game
   if (!shouldFetch) return null;
-  if (!loading && roles.length === 0 && !error) return null;
+  // Hide after fetch if no roles and no error
+  if (hasFetched.current && !loading && roles.length === 0 && !error) return null;
 
   // Get role color style
   const getRoleColor = (color?: string) => {
@@ -77,7 +76,17 @@ export function GameDetailRoles({
     >
       <button
         type="button"
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => {
+          const next = !expanded;
+          setExpanded(next);
+          if (next) {
+            fetchRoles();
+            // Focus the content region after React renders it
+            requestAnimationFrame(() => regionRef.current?.focus());
+          }
+        }}
+        aria-expanded={expanded}
+        aria-controls={regionId}
         className="flex items-center justify-between w-full text-left"
       >
         <div className="flex items-center gap-2">
@@ -99,7 +108,7 @@ export function GameDetailRoles({
       </button>
 
       {expanded && (
-        <div className="mt-4">
+        <div id={regionId} ref={regionRef} role="region" aria-label={titleLabel} tabIndex={-1} className="mt-4 outline-none">
           {loading && (
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />

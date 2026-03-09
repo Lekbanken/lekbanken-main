@@ -32,6 +32,8 @@ export interface LikeButtonProps {
   initialLiked?: boolean;
   /** Initial reaction (alternative to initialLiked) */
   initialReaction?: ReactionType | null;
+  /** Server-side like count (displayed next to icon) */
+  likeCount?: number;
   /** Button size */
   size?: LikeButtonSize;
   /** Usage context (affects styling) */
@@ -65,6 +67,7 @@ export function LikeButton({
   gameId,
   initialLiked = false,
   initialReaction,
+  likeCount,
   size = 'sm',
   context = 'standalone',
   className,
@@ -119,6 +122,11 @@ export function LikeButton({
           isLoading && 'animate-pulse'
         )}
       />
+      {likeCount != null && likeCount > 0 && (
+        <span className="ml-1 text-xs tabular-nums text-muted-foreground">
+          {likeCount}
+        </span>
+      )}
     </button>
   );
 }

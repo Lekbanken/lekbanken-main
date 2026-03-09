@@ -30,18 +30,18 @@ export function GameDetailSteps({
   }
 
   // Labels with defaults
-  const titleLabel = labels.title ?? 'Instruktioner';
-  const hideLabel = labels.hide ?? 'Dölj';
-  const showLessLabel = labels.showLess ?? 'Visa färre';
-  const stepsLabel = labels.steps ?? 'steg';
-  const optionalLabel = labels.optional ?? 'Valfritt';
+  const titleLabel = labels.title ?? '';
+  const hideLabel = labels.hide ?? '';
+  const showLessLabel = labels.showLess ?? '';
+  const stepsLabel = labels.steps ?? '';
+  const optionalLabel = labels.optional ?? '';
   
   // Function to format minutes
   const formatMinutes = (minutes: number) => {
     if (labels.approxMinutes) {
       return labels.approxMinutes.replace('{minutes}', String(minutes));
     }
-    return `ca ${minutes} min`;
+    return `~${minutes} min`;
   };
 
   // Determine which steps to show
@@ -144,7 +144,9 @@ export function GameDetailSteps({
         >
           {showAll
             ? showLessLabel
-            : (labels.showAll ?? `Visa alla ${steps.length} ${stepsLabel}`)}
+            : (labels.showAll
+                ? labels.showAll.replace('{count}', String(steps.length)).replace('{unit}', stepsLabel)
+                : `${steps.length}`)}
         </button>
       )}
     </section>

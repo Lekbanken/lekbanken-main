@@ -22,7 +22,7 @@ export function GameDetailAccessibility({
     return null;
   }
 
-  const titleLabel = labels.title ?? 'Tillgänglighet';
+  const titleLabel = labels.title ?? '';
 
   return (
     <section

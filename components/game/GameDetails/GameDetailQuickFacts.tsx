@@ -14,20 +14,20 @@ export function GameDetailQuickFacts({
   className,
 }: GameDetailQuickFactsProps) {
   const {
-    title = 'Snabbfakta',
-    participants = 'Deltagare',
-    time = 'Tid',
-    age = 'Ålder',
-    energy = 'Energinivå',
-    playersRange = '{min}–{max} spelare',
-    ageRange = '{min}–{max} år',
-    approxMinutes = 'ca {min} min',
+    title = '',
+    participants = '',
+    time = '',
+    age = '',
+    energy = '',
+    playersRange = '{min}–{max}',
+    ageRange = '{min}–{max}',
+    approxMinutes = '~{min} min',
   } = labels;
 
   const {
-    low = 'Låg',
-    medium = 'Medium',
-    high = 'Hög',
+    low = '',
+    medium = '',
+    high = '',
   } = energyLabels;
 
   // Format participants range

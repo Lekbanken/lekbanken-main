@@ -206,7 +206,7 @@ describe("Step 4 — Per-slot rendering with equipped cosmetics", () => {
       "shimmer",
       "accent",
     );
-    expect(resolvedSkin).toBe("energy"); // warp maps to energy
+    expect(resolvedSkin).toBe("warp"); // warp is its own skin
     expect(resolvedColorMode).toBe("galaxy");
   });
 
@@ -215,10 +215,10 @@ describe("Step 4 — Per-slot rendering with equipped cosmetics", () => {
       { input: "clean", expected: "clean" },
       { input: "shimmer", expected: "shimmer" },
       { input: "energy", expected: "energy" },
-      { input: "warp", expected: "energy" },
-      { input: "current", expected: "energy" },
-      { input: "growth", expected: "energy" },
-      { input: "rainbow", expected: "energy" },
+      { input: "warp", expected: "warp" },
+      { input: "current", expected: "current" },
+      { input: "growth", expected: "growth" },
+      { input: "rainbow", expected: "rainbow" },
     ] as const;
 
     for (const { input, expected } of skins) {
@@ -334,7 +334,7 @@ describe("Step 4 — Cross-faction loadout mix", () => {
     expect(particles.resolvedCount).toBe(20);
 
     const xp = resolveXPBarFromConfig(narrowed.xpConfig!, "shimmer", "accent");
-    expect(xp.resolvedSkin).toBe("energy"); // rainbow → energy
+    expect(xp.resolvedSkin).toBe("rainbow"); // rainbow is its own skin
     expect(xp.resolvedColorMode).toBe("rainbow");
 
     const divider = resolveDividerFromConfig(narrowed.dividerConfig!, "line");
@@ -394,10 +394,10 @@ describe("Step 4 — v1.0 resolver no-regression", () => {
   });
 
   it("resolveXPBarSkin handles all known cosmetic keys", () => {
-    expect(resolveXPBarSkin("xpBarSkin:warp")).toBe("energy");
-    expect(resolveXPBarSkin("xpBarSkin:current")).toBe("energy");
-    expect(resolveXPBarSkin("xpBarSkin:growth")).toBe("energy");
-    expect(resolveXPBarSkin("xpBarSkin:rainbow")).toBe("energy");
+    expect(resolveXPBarSkin("xpBarSkin:warp")).toBe("warp");
+    expect(resolveXPBarSkin("xpBarSkin:current")).toBe("current");
+    expect(resolveXPBarSkin("xpBarSkin:growth")).toBe("growth");
+    expect(resolveXPBarSkin("xpBarSkin:rainbow")).toBe("rainbow");
     expect(resolveXPBarSkin("xpBarSkin:clean")).toBe("clean");
     expect(resolveXPBarSkin("xpBarSkin:shimmer")).toBe("shimmer");
     expect(resolveXPBarSkin("xpBarSkin:energy")).toBe("energy");

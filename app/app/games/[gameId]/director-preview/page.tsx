@@ -18,6 +18,7 @@ import { notFound } from 'next/navigation';
 import { getGameByIdFull } from '@/lib/services/games.server';
 import { mapDbGameToDetailFull } from '@/lib/game-display/mappers';
 import type { DbGame } from '@/lib/game-display';
+import { canViewGame } from '@/lib/game-display/access';
 import DirectorPreviewClient from './director-preview-client';
 
 type Props = {
@@ -28,7 +29,10 @@ export default async function DirectorPreviewPage({ params }: Props) {
   const { gameId } = await params;
 
   const dbGame = await getGameByIdFull(gameId);
-  if (!dbGame) notFound();
+
+  // Enforce access: published games visible to all, drafts only to admins
+  const access = await canViewGame(dbGame ? { id: dbGame.id, status: dbGame.status } : null);
+  if (!access.allowed) notFound();
 
   // We use getGameByIdFull intentionally (not Preview) so artifacts, triggers
   // and roles are included — parity with the live Director Mode session shell.

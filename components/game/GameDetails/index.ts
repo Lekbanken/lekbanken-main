@@ -37,9 +37,17 @@ export { GameDetailSidebar } from './GameDetailSidebar';
 
 // P1 components
 export { GameDetailAccessibility } from './GameDetailAccessibility';
+
+// Sprint D components
+export { GameDetailLeaderTips } from './GameDetailLeaderTips';
+export { GameDetailMetadata } from './GameDetailMetadata';
+export { GameDetailOutcomes } from './GameDetailOutcomes';
 export { GameDetailRequirements } from './GameDetailRequirements';
 export { GameDetailBoard } from './GameDetailBoard';
 export { GameDetailTools } from './GameDetailTools';
+
+// Sprint F components
+export { GameDetailRelated } from './GameDetailRelated';
 
 // Disabled section (for P2 without DB support)
 export { DisabledSection } from './DisabledSection';
@@ -101,4 +109,8 @@ export type {
   GameDetailRequirementsProps,
   GameDetailBoardProps,
   GameDetailToolsProps,
+  // Sprint D types
+  GameDetailLeaderTipsProps,
+  GameDetailMetadataProps,
+  GameDetailOutcomesProps,
 } from './types';

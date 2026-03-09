@@ -5,7 +5,7 @@
  * All components consume GameDetailData from lib/game-display.
  */
 
-import type { GameDetailData } from '@/lib/game-display';
+import type { GameDetailData, RangeFormatterLabels, EnergyLabels } from '@/lib/game-display';
 
 /**
  * Common props for all GameDetail section components
@@ -36,6 +36,14 @@ export interface GameDetailHeaderProps extends GameDetailSectionProps {
 export interface GameDetailBadgesProps extends GameDetailSectionProps {
   /** Show compact badges (no icons) */
   compact?: boolean;
+  /** i18n labels for duration formatter */
+  durationLabels?: RangeFormatterLabels;
+  /** i18n labels for players formatter */
+  playersLabels?: RangeFormatterLabels;
+  /** i18n labels for age formatter */
+  ageLabels?: RangeFormatterLabels;
+  /** i18n labels for energy level formatter */
+  energyLabels?: EnergyLabels;
 }
 
 /**
@@ -129,6 +137,7 @@ export interface GameDetailPhasesProps extends GameDetailSectionProps {
     title?: string;
     goal?: string;
     duration?: string;
+    phaseNumber?: string;
   };
 }
 
@@ -195,6 +204,7 @@ export interface GameDetailTriggersProps extends GameDetailSectionProps {
     effect?: string;
     executeOnce?: string;
     delay?: string;
+    disabled?: string;
   };
 }
 
@@ -282,6 +292,39 @@ export interface GameDetailAccessibilityProps extends GameDetailSectionProps {
  * Props for GameDetailRequirements
  */
 export interface GameDetailRequirementsProps extends GameDetailSectionProps {
+  /** Section labels */
+  labels?: {
+    title?: string;
+  };
+}
+
+/**
+ * Props for GameDetailOutcomes
+ */
+export interface GameDetailOutcomesProps extends GameDetailSectionProps {
+  /** Section labels */
+  labels?: {
+    title?: string;
+  };
+}
+
+/**
+ * Props for GameDetailMetadata
+ */
+export interface GameDetailMetadataProps extends GameDetailSectionProps {
+  /** Section labels */
+  labels?: {
+    title?: string;
+    gameId?: string;
+    created?: string;
+    updated?: string;
+  };
+}
+
+/**
+ * Props for GameDetailLeaderTips
+ */
+export interface GameDetailLeaderTipsProps extends GameDetailSectionProps {
   /** Section labels */
   labels?: {
     title?: string;

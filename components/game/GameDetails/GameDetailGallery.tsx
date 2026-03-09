@@ -24,7 +24,7 @@ export function GameDetailGallery({
     return null;
   }
 
-  const titleLabel = labels.title ?? 'Bilder';
+  const titleLabel = labels.title ?? '';
 
   return (
     <section

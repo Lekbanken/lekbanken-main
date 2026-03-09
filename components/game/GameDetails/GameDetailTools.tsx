@@ -23,9 +23,8 @@ export function GameDetailTools({
     return null;
   }
 
-  const titleLabel = labels.title ?? 'Facilitatorverktyg';
-  const descriptionLabel = labels.description ?? 
-    'Verktyg som finns tillgängliga under spelets gång:';
+  const titleLabel = labels.title ?? '';
+  const descriptionLabel = labels.description ?? '';
 
   return (
     <section

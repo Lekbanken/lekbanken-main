@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useId, useRef, useCallback } from 'react';
 import { CubeTransparentIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import type { GameArtifact } from '@/lib/game-display';
 import type { GameDetailArtifactsProps } from './types';
@@ -9,7 +9,7 @@ import { SpatialMapArtifactRenderer } from '@/features/play/components/shared/Sp
 /**
  * GameDetailArtifacts - Lazy-loaded artifacts/props for games
  *
- * Fetches artifacts on mount from /api/games/[gameId]/artifacts.
+ * Fetches artifacts on first expand from /api/games/[gameId]/artifacts.
  * Shows game props, cards, tokens, and other physical/digital items.
  */
 export function GameDetailArtifacts({
@@ -18,35 +18,38 @@ export function GameDetailArtifacts({
   className = '',
 }: GameDetailArtifactsProps) {
   const [artifacts, setArtifacts] = useState<GameArtifact[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const hasFetched = useRef(false);
 
-  const titleLabel = labels.title ?? 'Artefakter';
-  const loadingLabel = labels.loading ?? 'Laddar artefakter...';
-  const errorLabel = labels.error ?? 'Kunde inte ladda artefakter';
-  const variantsLabel = labels.variants ?? 'Varianter';
-  const useLabel = labels.use ?? 'Användning';
+  const regionId = useId();
+  const regionRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const fetchArtifacts = async () => {
-      try {
-        const res = await fetch(`/api/games/${game.id}/artifacts`);
-        if (!res.ok) throw new Error('Failed to fetch artifacts');
-        const data = await res.json();
-        setArtifacts(data.artifacts ?? []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const titleLabel = labels.title ?? '';
+  const loadingLabel = labels.loading ?? '';
+  const errorLabel = labels.error ?? '';
+  const variantsLabel = labels.variants ?? '';
+  const useLabel = labels.use ?? '';
 
-    fetchArtifacts();
+  const fetchArtifacts = useCallback(async () => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/games/${game.id}/artifacts`);
+      if (!res.ok) throw new Error('Failed to fetch artifacts');
+      const data = await res.json();
+      setArtifacts(data.artifacts ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
   }, [game.id]);
 
-  // Don't render if no artifacts after loading
-  if (!loading && artifacts.length === 0 && !error) return null;
+  // Hide after fetch if no artifacts and no error
+  if (hasFetched.current && !loading && artifacts.length === 0 && !error) return null;
 
   // Get artifact type badge color
   const getTypeColor = (type?: string) => {
@@ -68,7 +71,16 @@ export function GameDetailArtifacts({
     >
       <button
         type="button"
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => {
+          const next = !expanded;
+          setExpanded(next);
+          if (next) {
+            fetchArtifacts();
+            requestAnimationFrame(() => regionRef.current?.focus());
+          }
+        }}
+        aria-expanded={expanded}
+        aria-controls={regionId}
         className="flex items-center justify-between w-full text-left"
       >
         <div className="flex items-center gap-2">
@@ -90,7 +102,7 @@ export function GameDetailArtifacts({
       </button>
 
       {expanded && (
-        <div className="mt-4">
+        <div id={regionId} ref={regionRef} role="region" aria-label={titleLabel} tabIndex={-1} className="mt-4 outline-none">
           {loading && (
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
@@ -159,9 +171,9 @@ export function GameDetailArtifacts({
                             artifact.title
                           }
                           labels={{
-                            openFull: labels.openMap ?? 'Öppna karta',
-                            loadError: labels.mapLoadError ?? 'Kunde inte ladda kartan',
-                            noAccess: labels.mapNoAccess ?? 'Ingen åtkomst till kartan',
+                            openFull: labels.openMap ?? '',
+                            loadError: labels.mapLoadError ?? '',
+                            noAccess: labels.mapNoAccess ?? '',
                           }}
                         />
                       </div>

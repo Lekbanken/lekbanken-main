@@ -59,6 +59,8 @@ export interface GameStartActionsProps {
   initialLiked?: boolean;
   /** Initial reaction (alternative to initialLiked) */
   initialReaction?: ReactionType | null;
+  /** Server-side like count */
+  likeCount?: number;
   /** Callback to add game to plan */
   onAddToPlan?: () => void;
   /** Show "Add to plan" button */
@@ -215,6 +217,7 @@ export function GameStartActions({
   playMode,
   initialLiked = false,
   initialReaction,
+  likeCount,
   onAddToPlan,
   showAddToPlan = false,
   showDislike = false,
@@ -329,6 +332,7 @@ export function GameStartActions({
             gameId={gameId}
             initialLiked={initialLiked}
             initialReaction={initialReaction}
+            likeCount={likeCount}
             size="md"
             context="details"
           />

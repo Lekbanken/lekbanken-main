@@ -23,9 +23,8 @@ export function GameDetailBoard({
     return null;
   }
 
-  const titleLabel = labels.title ?? 'Publik tavla';
-  const descriptionLabel = labels.description ?? 
-    'Följande visas på den publika skärmen under spelet:';
+  const titleLabel = labels.title ?? '';
+  const descriptionLabel = labels.description ?? '';
 
   return (
     <section

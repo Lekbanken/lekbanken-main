@@ -45,6 +45,9 @@ import {
   GameDetailRequirements,
   GameDetailBoard,
   GameDetailTools,
+  // Sprint D komponenter
+  GameDetailOutcomes,
+  GameDetailLeaderTips,
   // P2 placeholder
   DisabledSection,
   // Config
@@ -62,12 +65,11 @@ import { mockGamesList, playModeConfig } from './mock-games';
 // TYPES
 // =============================================================================
 
-type GameId = 'basic' | 'facilitated' | 'participants';
+type GameId = 'basic' | 'facilitated' | 'participants' | 'minimal';
 
 // P2 sections that are not in DB yet
 const P2_SECTIONS = [
-  { key: 'tags', title: 'Taggar & highlights', reason: 'Saknas: game_tags tabell' },
-  { key: 'experience', title: 'Spelupplevelse', reason: 'Saknas: highlights/experience fält' },
+  { key: 'tags', title: 'Taggar', reason: 'Saknas: game_tags tabell' },
   { key: 'variants', title: 'Varianter', reason: 'Saknas: game_variants tabell' },
   { key: 'reflections', title: 'Reflektion', reason: 'Saknas: reflection_prompts tabell' },
   { key: 'checkpoints', title: 'Checkpoints', reason: 'Saknas: game_checkpoints tabell' },
@@ -93,6 +95,9 @@ const COVERAGE_ITEMS = [
   { key: 'requirements', label: 'Krav för spel', db: 'games.space_requirements' },
   { key: 'board', label: 'Publik tavla', db: 'game_board_config' },
   { key: 'tools', label: 'Facilitatorverktyg', db: 'game_tools' },
+  { key: 'outcomes', label: 'Lärandemål', db: 'games.outcomes' },
+  { key: 'leaderTips', label: 'Ledartips', db: 'games.leader_tips' },
+  { key: 'highlights', label: 'Highlights', db: 'games.highlights' },
 ] as const;
 
 // =============================================================================
@@ -104,6 +109,7 @@ export default function GameDetailSandbox() {
   const [mode, setMode] = useState<GameDetailMode>('preview');
   const [showP2Sections, setShowP2Sections] = useState(true);
   const [showDataProvenance, setShowDataProvenance] = useState(true);
+  const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [sectionOverrides, setSectionOverrides] = useState<Partial<Record<keyof SectionVisibility, boolean>>>({});
 
   const game = mockGamesList.find((g) => g.id.startsWith(selectedGameId)) ?? mockGamesList[0];
@@ -174,9 +180,15 @@ export default function GameDetailSandbox() {
           onResetOverrides={() => setSectionOverrides({})}
           showP2Sections={showP2Sections}
           onToggleP2={() => setShowP2Sections(!showP2Sections)}
+          showPrintPreview={showPrintPreview}
+          onTogglePrint={() => setShowPrintPreview(!showPrintPreview)}
         />
 
-        {/* Game Detail Preview */}
+        {/* Print Preview (7.3) */}
+        {showPrintPreview ? (
+          <PrintPreview game={game} />
+        ) : (
+        /* Game Detail Preview */
         <Card className={cn('border-2 bg-card shadow-sm', meta.border)}>
           <CardContent className="p-4 sm:p-6 lg:p-8">
             {/* Main Content Grid */}
@@ -204,6 +216,58 @@ export default function GameDetailSandbox() {
                 {config.artifacts && <GameDetailArtifacts game={game} />}
                 {config.triggers && <GameDetailTriggers game={game} />}
                 {config.tools && <GameDetailTools game={game} />}
+
+                {/* Sprint D Sections */}
+                {config.outcomes && (
+                  <GameDetailOutcomes game={game} labels={{ title: 'Lärandemål' }} />
+                )}
+                {config.leaderTips && (
+                  <GameDetailLeaderTips game={game} labels={{ title: 'Tips till ledaren' }} />
+                )}
+
+                {/* Highlights badges (7.7) */}
+                {game.highlights && game.highlights.length > 0 && (
+                  <section className="flex flex-wrap gap-2">
+                    {game.highlights.map((h, i) => (
+                      <Badge key={i} size="sm" className="bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800">
+                        {h}
+                      </Badge>
+                    ))}
+                  </section>
+                )}
+
+                {/* Related games mock (7.5 + 7.6) */}
+                {game.id !== 'minimal-sandbox' && (
+                  <section className="mt-8 space-y-3">
+                    <h2 className="text-lg font-semibold text-foreground">Relaterade lekar</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                      {mockGamesList
+                        .filter((g) => g.id !== game.id)
+                        .slice(0, 4)
+                        .map((related) => (
+                          <div
+                            key={related.id}
+                            className="rounded-xl border border-border/60 bg-muted/30 p-3 space-y-1"
+                          >
+                            <p className="text-sm font-medium text-foreground">{related.title}</p>
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {related.shortDescription}
+                            </p>
+                            <Badge size="sm" className={playModeConfig[related.playMode ?? 'basic'].badge}>
+                              {playModeConfig[related.playMode ?? 'basic'].label}
+                            </Badge>
+                          </div>
+                        ))}
+                    </div>
+                    {/* Reactions mock (7.6) */}
+                    <div className="flex items-center gap-3 pt-2">
+                      <button className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/30 px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted/60 transition-colors" disabled>
+                        ❤️ <span className="font-medium text-foreground">42</span>
+                      </button>
+                      <span className="text-xs text-muted-foreground">Mock — reaktionsknapp med count</span>
+                    </div>
+                  </section>
+                )}
                 
                 {/* P2 Sections (disabled) */}
                 {showP2Sections && (
@@ -224,6 +288,41 @@ export default function GameDetailSandbox() {
                         priority="P2"
                       />
                     ))}
+
+                    {/* 7.8 Varianter-preview mockup */}
+                    <div className="rounded-2xl border border-dashed border-purple-300 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/20 p-5 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-purple-600 dark:text-purple-400">🔀</span>
+                        <h3 className="text-sm font-semibold text-purple-800 dark:text-purple-300">Varianter (design mockup)</h3>
+                        <Badge size="sm" className="bg-purple-100 text-purple-700 border-purple-300 text-[10px]">P2</Badge>
+                      </div>
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        {['Kort version (15 min)', 'Inomhusvariant', 'Stor grupp (20+)'].map((v) => (
+                          <div key={v} className="rounded-lg border border-purple-200 dark:border-purple-800/50 bg-white/50 dark:bg-purple-950/30 p-2.5">
+                            <p className="text-xs font-medium text-purple-700 dark:text-purple-300">{v}</p>
+                            <p className="text-[10px] text-purple-500 dark:text-purple-400 mt-0.5">Kräver: game_variants tabell</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 7.9 Beslut/Omröstning-preview mockup */}
+                    <div className="rounded-2xl border border-dashed border-cyan-300 dark:border-cyan-800 bg-cyan-50/50 dark:bg-cyan-950/20 p-5 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-cyan-600 dark:text-cyan-400">🗳️</span>
+                        <h3 className="text-sm font-semibold text-cyan-800 dark:text-cyan-300">Omröstning / Beslut (design mockup)</h3>
+                        <Badge size="sm" className="bg-cyan-100 text-cyan-700 border-cyan-300 text-[10px]">P2</Badge>
+                      </div>
+                      <div className="space-y-2">
+                        {['Vem ska leda nästa runda?', 'Ska vi förlänga tiden?'].map((q) => (
+                          <div key={q} className="flex items-center gap-3 rounded-lg border border-cyan-200 dark:border-cyan-800/50 bg-white/50 dark:bg-cyan-950/30 p-2.5">
+                            <div className="h-4 w-4 rounded-full border-2 border-cyan-400" />
+                            <p className="text-xs font-medium text-cyan-700 dark:text-cyan-300">{q}</p>
+                          </div>
+                        ))}
+                        <p className="text-[10px] text-cyan-500 dark:text-cyan-400">Kräver: game_decisions tabell + live-röstning i Play-mode</p>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -239,6 +338,7 @@ export default function GameDetailSandbox() {
             </div>
           </CardContent>
         </Card>
+        )}
       </div>
     </SandboxShell>
   );
@@ -367,6 +467,8 @@ function ControlPanel({
   onResetOverrides,
   showP2Sections,
   onToggleP2,
+  showPrintPreview,
+  onTogglePrint,
 }: {
   selectedGameId: GameId;
   onSelectGame: (id: GameId) => void;
@@ -378,6 +480,8 @@ function ControlPanel({
   onResetOverrides: () => void;
   showP2Sections: boolean;
   onToggleP2: () => void;
+  showPrintPreview: boolean;
+  onTogglePrint: () => void;
 }) {
   const [showSectionToggles, setShowSectionToggles] = useState(false);
   const hasOverrides = Object.keys(sectionOverrides).length > 0;
@@ -441,6 +545,15 @@ function ControlPanel({
             <p className="text-xs text-muted-foreground">Visar DisabledSection för framtida features</p>
           </div>
           <Switch checked={showP2Sections} onCheckedChange={onToggleP2} />
+        </div>
+
+        {/* Print Preview Toggle (7.3) */}
+        <div className="flex items-center justify-between pt-2 border-t border-border/40">
+          <div>
+            <p className="text-sm font-medium text-foreground">Print Preview</p>
+            <p className="text-xs text-muted-foreground">Printbar layout utan interaktiva element</p>
+          </div>
+          <Switch checked={showPrintPreview} onCheckedChange={onTogglePrint} />
         </div>
 
         {/* Section Toggles */}
@@ -510,6 +623,124 @@ function ControlPanel({
               </div>
             </div>
           )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// =============================================================================
+// PRINT PREVIEW (7.3)
+// =============================================================================
+
+function PrintPreview({ game }: { game: GameDetailData }) {
+  return (
+    <Card className="border bg-white dark:bg-card shadow-sm print:shadow-none print:border-0">
+      <CardContent className="p-6 sm:p-8 lg:p-10 max-w-3xl mx-auto space-y-6 print:p-0">
+        {/* Header */}
+        <div className="border-b border-border/40 pb-4">
+          <h1 className="text-2xl font-bold text-foreground">{game.title}</h1>
+          {game.subtitle && (
+            <p className="mt-1 text-base text-muted-foreground">{game.subtitle}</p>
+          )}
+          <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
+            {game.durationMin && game.durationMax && (
+              <span>{game.durationMin}–{game.durationMax} min</span>
+            )}
+            {game.minPlayers && game.maxPlayers && (
+              <span>• {game.minPlayers}–{game.maxPlayers} deltagare</span>
+            )}
+            {game.ageMin && game.ageMax && (
+              <span>• {game.ageMin}–{game.ageMax} år</span>
+            )}
+          </div>
+        </div>
+
+        {/* Description */}
+        {game.description && (
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-1">Om leken</h2>
+            <p className="text-sm text-muted-foreground">{game.description}</p>
+          </div>
+        )}
+
+        {/* Materials */}
+        {game.materials && game.materials.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-1">Material</h2>
+            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-0.5">
+              {game.materials.map((m, i) => (
+                <li key={i}>{typeof m === 'string' ? m : m.label}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Preparation */}
+        {game.preparation && game.preparation.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-1">Förberedelser</h2>
+            <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-0.5">
+              {game.preparation.map((p, i) => <li key={i}>{p}</li>)}
+            </ol>
+          </div>
+        )}
+
+        {/* Steps */}
+        {game.steps && game.steps.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-2">Steg</h2>
+            <ol className="space-y-3">
+              {game.steps.map((step, i) => (
+                <li key={i} className="text-sm">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-semibold text-foreground">
+                      {i + 1}. {step.title}
+                    </span>
+                    {step.duration && (
+                      <span className="text-xs text-muted-foreground">({step.duration})</span>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground mt-0.5">{step.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {/* Outcomes */}
+        {game.outcomes && game.outcomes.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-1">Lärandemål</h2>
+            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-0.5">
+              {game.outcomes.map((o, i) => <li key={i}>{o}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {/* Leader Tips */}
+        {game.leaderTips && game.leaderTips.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-1">Tips till ledaren</h2>
+            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-0.5">
+              {game.leaderTips.map((t, i) => <li key={i}>{t}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {/* Safety */}
+        {game.safety && game.safety.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-1">Säkerhet</h2>
+            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-0.5">
+              {game.safety.map((s, i) => <li key={i}>{s}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="border-t border-border/40 pt-3 text-xs text-muted-foreground">
+          {game.meta?.gameKey} • {game.meta?.version} • {game.meta?.updatedAt}
         </div>
       </CardContent>
     </Card>

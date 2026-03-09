@@ -14,11 +14,11 @@ export function GameDetailSidebar({
   className,
 }: GameDetailSidebarProps) {
   const {
-    quickInfoTitle = 'Snabbinfo',
-    status = 'Status',
-    published = 'Publicerad',
-    draft = 'Utkast',
-    addedAt = 'Tillagd',
+    quickInfoTitle = '',
+    status = '',
+    published = '',
+    draft = '',
+    addedAt = '',
   } = labels;
 
   const statusText = game.status === 'published' ? published : draft;

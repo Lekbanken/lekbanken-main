@@ -22,7 +22,7 @@ export function GameDetailRequirements({
     return null;
   }
 
-  const titleLabel = labels.title ?? 'Krav för spelet';
+  const titleLabel = labels.title ?? '';
 
   return (
     <section

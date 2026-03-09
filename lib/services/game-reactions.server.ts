@@ -11,7 +11,7 @@
 import 'server-only';
 
 import { createServerRlsClient } from '@/lib/supabase/server';
-import type { ReactionType, GameReactionMap } from '@/types/game-reaction';
+import type { ReactionType, GameReactionMap, GameReactionCounts } from '@/types/game-reaction';
 
 // =============================================================================
 // READ FUNCTIONS
@@ -117,4 +117,34 @@ export async function getLikedGameIds(): Promise<string[]> {
 export async function isGameLiked(gameId: string): Promise<boolean> {
   const reaction = await getUserReactionForGame(gameId);
   return reaction === 'like';
+}
+
+/**
+ * Get aggregated reaction counts for a game.
+ * Uses SECURITY DEFINER RPC to bypass RLS.
+ *
+ * @param gameId - The game to get counts for
+ * @returns Counts of likes and dislikes
+ */
+export async function getReactionCountsForGame(
+  gameId: string
+): Promise<GameReactionCounts> {
+  const supabase = await createServerRlsClient();
+
+  // RPC defined in migration 20260309000000_game_reaction_counts_rpc.sql
+  // Type assertion needed until Supabase types are regenerated
+  const { data, error } = await (supabase.rpc as Function)('get_game_reaction_counts', {
+    p_game_ids: [gameId],
+  });
+
+  if (error) {
+    console.error('[getReactionCountsForGame] Error:', error.message);
+    return { likeCount: 0, dislikeCount: 0 };
+  }
+
+  const row = Array.isArray(data) ? data[0] : null;
+  return {
+    likeCount: Number(row?.like_count ?? 0),
+    dislikeCount: Number(row?.dislike_count ?? 0),
+  };
 }

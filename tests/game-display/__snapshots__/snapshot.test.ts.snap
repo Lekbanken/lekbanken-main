@@ -1,0 +1,462 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`GameDetailData Snapshot (9.5) > mapDbGameToDetailFull shape is stable 1`] = `
+[
+  "accessibility",
+  "ageMax",
+  "ageMin",
+  "artifacts",
+  "boardWidgets",
+  "coverUrl",
+  "description",
+  "durationMax",
+  "durationMin",
+  "energyLevel",
+  "environment",
+  "facilitatorTools",
+  "gallery",
+  "highlights",
+  "id",
+  "leaderTips",
+  "materials",
+  "maxPlayers",
+  "meta",
+  "minPlayers",
+  "outcomes",
+  "phases",
+  "playMode",
+  "preparation",
+  "product",
+  "purpose",
+  "requirements",
+  "roles",
+  "safety",
+  "shortDescription",
+  "slug",
+  "status",
+  "steps",
+  "subtitle",
+  "title",
+  "triggers",
+]
+`;
+
+exports[`GameDetailData Snapshot (9.5) > mapDbGameToDetailFull shape is stable 2`] = `
+{
+  "accessibility": [
+    "Kräver rörelseförmåga",
+    "Inte lämplig vid regn",
+  ],
+  "ageMax": 65,
+  "ageMin": 10,
+  "artifacts": [
+    {
+      "description": "Samla mest mynt",
+      "id": "art-1",
+      "metadata": {
+        "rarity": "epic",
+      },
+      "tags": [
+        "guld",
+        "samla",
+      ],
+      "title": "Guldmyntet",
+      "type": "collectible",
+      "variants": [
+        {
+          "body": "Vanligt mynt",
+          "mediaRef": undefined,
+          "title": "Standard",
+          "visibility": "public",
+          "visibleToRoleId": undefined,
+        },
+      ],
+    },
+  ],
+  "boardWidgets": [
+    {
+      "detail": "Visar nedräkning för varje fas",
+      "title": "Timer",
+    },
+    {
+      "detail": "Visar aktuell fas på tavlan",
+      "title": "Fasnamn",
+    },
+    {
+      "detail": "Visar aktiva roller på tavlan",
+      "title": "Roller",
+    },
+    {
+      "detail": "dark",
+      "title": "Tema",
+    },
+  ],
+  "coverUrl": "https://example.com/cover.jpg",
+  "description": "Full beskrivning för snapshot-test.",
+  "durationMax": 45,
+  "durationMin": 20,
+  "energyLevel": "high",
+  "environment": "outdoor",
+  "facilitatorTools": [
+    "Nedräkning",
+  ],
+  "gallery": [
+    "https://example.com/g1.jpg",
+  ],
+  "highlights": [
+    "Passar alla åldrar",
+    "Enkel setup",
+  ],
+  "id": "snapshot-game-id",
+  "leaderTips": [
+    "Var tydlig med regler",
+    "Ha extra material redo",
+  ],
+  "materials": [
+    {
+      "label": "Boll",
+    },
+    {
+      "label": "Koner",
+    },
+  ],
+  "maxPlayers": 30,
+  "meta": {
+    "createdAt": "2026-01-15T10:00:00Z",
+    "gameKey": "snapshot-lek",
+    "updatedAt": "2026-02-20T14:30:00Z",
+  },
+  "minPlayers": 6,
+  "outcomes": [
+    "Förbättrad koordination",
+    "Stärkt gruppkänsla",
+  ],
+  "phases": [
+    {
+      "autoAdvance": false,
+      "boardMessage": "Fase 1",
+      "description": "Värm upp gruppen",
+      "duration": "5 min",
+      "durationSeconds": 300,
+      "goal": "Värm upp gruppen",
+      "id": "phase-1",
+      "name": "Uppvärmning",
+      "phaseType": "intro",
+      "timerStyle": "countdown",
+      "timerVisible": true,
+      "title": "Uppvärmning",
+    },
+  ],
+  "playMode": "participants",
+  "preparation": [
+    "Ställ ut koner",
+  ],
+  "product": "Lekbanken Pro",
+  "purpose": "Teambuilding",
+  "requirements": [
+    "Stor yta (minst 100 kvm)",
+    "Platt mark",
+  ],
+  "roles": [
+    {
+      "assignmentStrategy": "random",
+      "color": "#ff0000",
+      "conflictsWith": [
+        "role-2",
+      ],
+      "icon": "⚡",
+      "id": "role-1",
+      "maxCount": 5,
+      "minCount": 2,
+      "name": "Anfallare",
+      "privateNote": "Spring snabbt",
+      "publicNote": "Attackerar",
+      "scalingRules": {
+        "10": 3,
+        "20": 5,
+      },
+      "secrets": [
+        "Flanke",
+      ],
+    },
+  ],
+  "safety": [
+    "Inga vassa kanter",
+  ],
+  "shortDescription": "Kort sv",
+  "slug": "snapshot-lek",
+  "status": "published",
+  "steps": [
+    {
+      "boardText": "START",
+      "body": "Beskriv reglerna",
+      "conditional": undefined,
+      "displayMode": "instant",
+      "durationMinutes": 2,
+      "durationSeconds": 120,
+      "id": "step-1",
+      "leaderScript": "Samla gruppen",
+      "mediaRef": undefined,
+      "optional": false,
+      "participantPrompt": "Lyssna",
+      "phaseId": "phase-1",
+      "title": "Intro",
+    },
+    {
+      "boardText": undefined,
+      "body": "Kör igång!",
+      "conditional": "has_materials",
+      "displayMode": "dramatic",
+      "durationMinutes": 10,
+      "durationSeconds": 600,
+      "id": "step-2",
+      "leaderScript": undefined,
+      "mediaRef": "media-ref-1",
+      "optional": true,
+      "participantPrompt": undefined,
+      "phaseId": undefined,
+      "title": "Huvudmoment",
+    },
+  ],
+  "subtitle": "Teambuilding",
+  "title": "Snapshot-leken",
+  "triggers": [
+    {
+      "actions": [
+        {
+          "type": "end_round",
+        },
+      ],
+      "condition": {
+        "threshold": 0,
+        "type": "timer",
+      },
+      "delaySeconds": 5,
+      "description": "Tid slut",
+      "effect": "Tid slut",
+      "enabled": true,
+      "executeOnce": true,
+      "id": "trig-1",
+      "name": "timer_expired",
+      "title": "timer_expired",
+    },
+  ],
+}
+`;
+
+exports[`GameDetailData Snapshot (9.5) > mapDbGameToDetailPreview shape is stable 1`] = `
+[
+  "accessibility",
+  "ageMax",
+  "ageMin",
+  "boardWidgets",
+  "coverUrl",
+  "description",
+  "durationMax",
+  "durationMin",
+  "energyLevel",
+  "environment",
+  "facilitatorTools",
+  "gallery",
+  "highlights",
+  "id",
+  "leaderTips",
+  "materials",
+  "maxPlayers",
+  "meta",
+  "minPlayers",
+  "outcomes",
+  "phases",
+  "playMode",
+  "preparation",
+  "product",
+  "purpose",
+  "requirements",
+  "safety",
+  "shortDescription",
+  "slug",
+  "status",
+  "steps",
+  "subtitle",
+  "title",
+]
+`;
+
+exports[`GameDetailData Snapshot (9.5) > mapDbGameToDetailPreview shape is stable 2`] = `
+{
+  "accessibility": [
+    "Kräver rörelseförmåga",
+    "Inte lämplig vid regn",
+  ],
+  "ageMax": 65,
+  "ageMin": 10,
+  "boardWidgets": [
+    {
+      "detail": "Visar nedräkning för varje fas",
+      "title": "Timer",
+    },
+    {
+      "detail": "Visar aktuell fas på tavlan",
+      "title": "Fasnamn",
+    },
+    {
+      "detail": "Visar aktiva roller på tavlan",
+      "title": "Roller",
+    },
+    {
+      "detail": "dark",
+      "title": "Tema",
+    },
+  ],
+  "coverUrl": "https://example.com/cover.jpg",
+  "description": "Full beskrivning för snapshot-test.",
+  "durationMax": 45,
+  "durationMin": 20,
+  "energyLevel": "high",
+  "environment": "outdoor",
+  "facilitatorTools": [
+    "Nedräkning",
+  ],
+  "gallery": [
+    "https://example.com/g1.jpg",
+  ],
+  "highlights": [
+    "Passar alla åldrar",
+    "Enkel setup",
+  ],
+  "id": "snapshot-game-id",
+  "leaderTips": [
+    "Var tydlig med regler",
+    "Ha extra material redo",
+  ],
+  "materials": [
+    {
+      "label": "Boll",
+    },
+    {
+      "label": "Koner",
+    },
+  ],
+  "maxPlayers": 30,
+  "meta": {
+    "createdAt": "2026-01-15T10:00:00Z",
+    "gameKey": "snapshot-lek",
+    "updatedAt": "2026-02-20T14:30:00Z",
+  },
+  "minPlayers": 6,
+  "outcomes": [
+    "Förbättrad koordination",
+    "Stärkt gruppkänsla",
+  ],
+  "phases": [
+    {
+      "autoAdvance": false,
+      "boardMessage": "Fase 1",
+      "description": "Värm upp gruppen",
+      "duration": "5 min",
+      "durationSeconds": 300,
+      "goal": "Värm upp gruppen",
+      "id": "phase-1",
+      "name": "Uppvärmning",
+      "phaseType": "intro",
+      "timerStyle": "countdown",
+      "timerVisible": true,
+      "title": "Uppvärmning",
+    },
+  ],
+  "playMode": "participants",
+  "preparation": [
+    "Ställ ut koner",
+  ],
+  "product": "Lekbanken Pro",
+  "purpose": "Teambuilding",
+  "requirements": [
+    "Stor yta (minst 100 kvm)",
+    "Platt mark",
+  ],
+  "safety": [
+    "Inga vassa kanter",
+  ],
+  "shortDescription": "Kort sv",
+  "slug": "snapshot-lek",
+  "status": "published",
+  "steps": [
+    {
+      "boardText": "START",
+      "body": "Beskriv reglerna",
+      "conditional": undefined,
+      "displayMode": "instant",
+      "durationMinutes": 2,
+      "durationSeconds": 120,
+      "id": "step-1",
+      "leaderScript": "Samla gruppen",
+      "mediaRef": undefined,
+      "optional": false,
+      "participantPrompt": "Lyssna",
+      "phaseId": "phase-1",
+      "title": "Intro",
+    },
+    {
+      "boardText": undefined,
+      "body": "Kör igång!",
+      "conditional": "has_materials",
+      "displayMode": "dramatic",
+      "durationMinutes": 10,
+      "durationSeconds": 600,
+      "id": "step-2",
+      "leaderScript": undefined,
+      "mediaRef": "media-ref-1",
+      "optional": true,
+      "participantPrompt": undefined,
+      "phaseId": undefined,
+      "title": "Huvudmoment",
+    },
+  ],
+  "subtitle": "Teambuilding",
+  "title": "Snapshot-leken",
+}
+`;
+
+exports[`GameDetailData Snapshot (9.5) > mapDbGameToSummary shape is stable 1`] = `
+[
+  "ageMax",
+  "ageMin",
+  "coverUrl",
+  "durationMax",
+  "durationMin",
+  "energyLevel",
+  "environment",
+  "id",
+  "maxPlayers",
+  "minPlayers",
+  "playMode",
+  "product",
+  "purpose",
+  "shortDescription",
+  "slug",
+  "status",
+  "title",
+]
+`;
+
+exports[`GameDetailData Snapshot (9.5) > mapDbGameToSummary shape is stable 2`] = `
+{
+  "ageMax": 65,
+  "ageMin": 10,
+  "coverUrl": "https://example.com/cover.jpg",
+  "durationMax": 45,
+  "durationMin": 20,
+  "energyLevel": "high",
+  "environment": "outdoor",
+  "id": "snapshot-game-id",
+  "maxPlayers": 30,
+  "minPlayers": 6,
+  "playMode": "participants",
+  "product": "Lekbanken Pro",
+  "purpose": "Teambuilding",
+  "shortDescription": "Kort sv",
+  "slug": "snapshot-lek",
+  "status": "published",
+  "title": "Snapshot-leken",
+}
+`;

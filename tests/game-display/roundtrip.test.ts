@@ -289,4 +289,48 @@ describe('Game Display Roundtrip', () => {
       expect(full.triggers).toBeUndefined();
     });
   });
+
+  // ===========================================================================
+  // Sprint D: outcomes mapper (null → undefined pattern)
+  // ===========================================================================
+
+  describe('outcomes mapping', () => {
+    it('maps null outcomes to undefined', () => {
+      const game = mapDbGameToDetailPreview({ ...mockDbGame, outcomes: null } as DbGame);
+      expect(game.outcomes).toBeUndefined();
+    });
+
+    it('maps empty outcomes array to undefined', () => {
+      const game = mapDbGameToDetailPreview({ ...mockDbGame, outcomes: [] } as DbGame);
+      expect(game.outcomes).toBeUndefined();
+    });
+
+    it('maps populated outcomes array', () => {
+      const outcomes = ['Improve teamwork', 'Build trust'];
+      const game = mapDbGameToDetailPreview({ ...mockDbGame, outcomes } as DbGame);
+      expect(game.outcomes).toEqual(outcomes);
+    });
+  });
+
+  // ===========================================================================
+  // Sprint D: highlights mapper (null → undefined pattern)
+  // ===========================================================================
+
+  describe('highlights mapping', () => {
+    it('maps null highlights to undefined', () => {
+      const game = mapDbGameToDetailPreview({ ...mockDbGame, highlights: null } as DbGame);
+      expect(game.highlights).toBeUndefined();
+    });
+
+    it('maps empty highlights array to undefined', () => {
+      const game = mapDbGameToDetailPreview({ ...mockDbGame, highlights: [] } as DbGame);
+      expect(game.highlights).toBeUndefined();
+    });
+
+    it('maps populated highlights array', () => {
+      const highlights = ['Fun for all ages', 'Easy setup'];
+      const game = mapDbGameToDetailPreview({ ...mockDbGame, highlights } as DbGame);
+      expect(game.highlights).toEqual(highlights);
+    });
+  });
 });

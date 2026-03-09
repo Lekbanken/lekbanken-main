@@ -9167,6 +9167,7 @@
       "ageRange": "{min}-{max} år",
       "playersRange": "{min}-{max} deltagare",
       "approxMinutes": "~{minutes} min",
+      "relatedGames": "Liknande lekar",
       "sections": {
         "about": "Om leken",
         "instructions": "Så spelar du",
@@ -9183,23 +9184,66 @@
         "accessibility": "Tillgänglighet",
         "requirements": "Krav för spelet",
         "board": "Publik tavla",
-        "tools": "Facilitatorverktyg"
+        "tools": "Facilitatorverktyg",
+        "leaderTips": "Ledartips",
+        "metadata": "Metadata",
+        "outcomes": "Lärdommål"
       },
       "loading": "Laddar...",
       "loadError": "Kunde inte ladda data",
+      "about": {
+        "highlights": "Höjdpunkter"
+      },
+      "metadata": {
+        "gameId": "Spel-ID",
+        "created": "Skapad",
+        "updated": "Uppdaterad"
+      },
+      "header": {
+        "back": "Tillbaka",
+        "label": "LEK"
+      },
+      "steps": {
+        "hide": "Dölj",
+        "showAll": "Visa alla {count} {unit}",
+        "showLess": "Visa färre",
+        "stepsUnit": "steg",
+        "optional": "Valfritt",
+        "approxMinutes": "ca {minutes} min"
+      },
       "phases": {
         "goal": "Mål",
-        "duration": "Tid"
+        "duration": "Tid",
+        "phaseNumber": "Fas {number}"
       },
       "roles": {
-        "count": "Antal"
+        "count": "Antal",
+        "loadingRoles": "Laddar roller...",
+        "loadError": "Kunde inte ladda roller"
       },
       "artifacts": {
-        "variants": "Varianter"
+        "variants": "Varianter",
+        "loadingArtifacts": "Laddar artefakter...",
+        "loadError": "Kunde inte ladda artefakter",
+        "use": "Användning",
+        "openMap": "Öppna karta",
+        "mapLoadError": "Kunde inte ladda kartan",
+        "mapNoAccess": "Ingen åtkomst till kartan"
       },
       "triggers": {
         "condition": "Villkor",
-        "effect": "Effekt"
+        "effect": "Effekt",
+        "loadingTriggers": "Laddar händelser...",
+        "loadError": "Kunde inte ladda händelser",
+        "executeOnce": "Körs en gång",
+        "delay": "Fördröjning",
+        "disabled": "Inaktiv"
+      },
+      "board": {
+        "description": "Följande visas på den publika skärmen under spelet:"
+      },
+      "tools": {
+        "description": "Verktyg som finns tillgängliga under spelets gång:"
       },
       "details": {
         "participants": "Antal deltagare",
@@ -9226,13 +9270,74 @@
         "like": "Gilla",
         "unlike": "Sluta gilla",
         "dislike": "Gilla inte",
-        "addToPlan": "Lägg till i plan"
+        "addToPlan": "Lägg till i plan",
+        "edit": "Redigera"
       },
       "directorPreview": {
         "button": "Director Mode",
         "title": "Förhandsvisning",
         "backToGame": "Tillbaka till leken",
         "noSteps": "Leken har inga steg att visa."
+      },
+      "formatters": {
+        "durationUnit": "min",
+        "playersUnit": "deltagare",
+        "playersUpTo": "Upp till {max} deltagare",
+        "ageUnit": "år",
+        "ageUpTo": "Upp till {max} år",
+        "playCountSingular": "spelning",
+        "playCountPlural": "spelningar",
+        "energyLow": "Låg energi",
+        "energyLowShort": "Låg",
+        "energyMedium": "Medel energi",
+        "energyMediumShort": "Medel",
+        "energyHigh": "Hög energi",
+        "energyHighShort": "Hög",
+        "playModeBasic": "Enkel lek",
+        "playModeBasicShort": "Enkel",
+        "playModeBasicDesc": "En enkel lek utan digitala verktyg",
+        "playModeFacilitated": "Ledd aktivitet",
+        "playModeFacilitatedShort": "Ledd",
+        "playModeFacilitatedDesc": "Strukturerad aktivitet med faser och timer",
+        "playModeParticipants": "Deltagarlek",
+        "playModeParticipantsShort": "Deltagare",
+        "playModeParticipantsDesc": "Med roller, privata kort och publik tavla",
+        "envIndoor": "Inomhus",
+        "envIndoorShort": "Inne",
+        "envOutdoor": "Utomhus",
+        "envOutdoorShort": "Ute",
+        "envBoth": "Inne eller ute",
+        "envBothShort": "Inne/Ute",
+        "diffEasy": "Lätt",
+        "diffEasyShort": "Lätt",
+        "diffMedium": "Medel",
+        "diffMediumShort": "Medel",
+        "diffHard": "Svår",
+        "diffHardShort": "Svår",
+        "statusDraft": "Utkast",
+        "statusPublished": "Publicerad",
+        "statusArchived": "Arkiverad"
+      },
+      "boardWidgets": {
+        "timerTitle": "Timer",
+        "timerDetail": "Visar nedräkning för varje fas",
+        "phaseNameTitle": "Fasnamn",
+        "phaseNameDetail": "Visar aktuell fas på tavlan",
+        "stepTextTitle": "Stegtext",
+        "stepTextDetail": "Visar instruktioner för deltagare",
+        "rolesTitle": "Roller",
+        "rolesDetail": "Visar aktiva roller på tavlan",
+        "themeTitle": "Tema"
+      },
+      "errorBoundary": {
+        "title": "Kunde inte ladda leken",
+        "description": "Ett oväntat fel inträffade. Försök igen, eller ladda om sidan.",
+        "retry": "Försök igen",
+        "reload": "Ladda om sidan"
+      },
+      "breadcrumbs": {
+        "home": "Hem",
+        "games": "Lekar"
       }
     },
     "play": {

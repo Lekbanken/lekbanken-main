@@ -42,6 +42,10 @@ export interface SectionVisibility {
   requirements: boolean;
   board: boolean;
   tools: boolean;
+  // Sprint D sections
+  leaderTips: boolean;
+  metadata: boolean;
+  outcomes: boolean;
 }
 
 // =============================================================================
@@ -78,6 +82,10 @@ export const SECTION_VISIBILITY: Record<GameDetailMode, SectionVisibility> = {
     requirements: true,
     board: true,
     tools: true,
+    // Sprint D sections
+    leaderTips: true,
+    metadata: true,
+    outcomes: true,
   },
 
   /**
@@ -105,6 +113,10 @@ export const SECTION_VISIBILITY: Record<GameDetailMode, SectionVisibility> = {
     requirements: true,
     board: true,
     tools: true,
+    // Sprint D sections
+    leaderTips: true,
+    metadata: true,
+    outcomes: true,
   },
 
   /**
@@ -132,6 +144,10 @@ export const SECTION_VISIBILITY: Record<GameDetailMode, SectionVisibility> = {
     requirements: false,  // Already set up
     board: true,          // Control public display
     tools: true,          // Facilitator tools
+    // Sprint D sections
+    leaderTips: true,     // Leader tips are relevant during hosting
+    metadata: false,      // Not needed during gameplay
+    outcomes: false,      // Not needed during gameplay
   },
 } as const;
 

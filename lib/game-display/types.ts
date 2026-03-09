@@ -108,6 +108,9 @@ export interface GameSummary {
 
 /**
  * GameStep - Ett steg i spelinstruktionerna
+ *
+ * @see Step in features/play/types.ts for the play-domain equivalent
+ * @see RunStep in features/play/types.ts which extends Step with execution fields
  */
 export interface GameStep {
   id?: string;
@@ -123,6 +126,8 @@ export interface GameStep {
   optional?: boolean;
   phaseId?: string;
   mediaRef?: string;
+  /** Villkor för när steget visas (från game_steps.conditional) */
+  conditional?: string;
 }
 
 /**
@@ -148,6 +153,9 @@ export interface GamePhase {
 
 /**
  * GameRole - En roll i ett deltagarspel
+ *
+ * @see SessionRole in types/play-runtime.ts for the runtime snapshot
+ * @see GameAuthoringData in lib/game-authoring/types.ts for the canonical authoring type
  */
 export interface GameRole {
   id?: string;
@@ -161,6 +169,10 @@ export interface GameRole {
   privateNote?: string;
   secrets?: string[];
   assignmentStrategy?: 'random' | 'leader_picks' | 'player_picks';
+  /** Skalningsregler per gruppstorlek (från game_roles.scaling_rules) */
+  scalingRules?: Record<string, number>;
+  /** Roll-ID:n som inte kan kombineras med denna roll */
+  conflictsWith?: string[];
 }
 
 /**
@@ -251,10 +263,13 @@ export interface GameBoardWidget {
  */
 export interface GameMetadata {
   gameKey?: string;
+  /** @planned P2 — Ingen versionering i DB. Reserverad */
   version?: string;
   updatedAt?: string;
   createdAt?: string;
+  /** @planned P2 — Aldrig populerad. Reserverad för ägare */
   owner?: string;
+  /** @planned P2 — Aldrig populerad. next-intl hanterar locale externt */
   locale?: string;
 }
 
@@ -270,7 +285,10 @@ export interface GameDetailData extends GameSummary {
   // ─────────────────────────────────────────────────────────────────────────
   description?: string;
   subtitle?: string;
+  /** Korta höjdpunkter/USP:ar för spelet (från games.highlights) */
   highlights?: string[];
+  /** Tips till ledare/facilitatorn (från games.leader_tips) */
+  leaderTips?: string[];
 
   // ─────────────────────────────────────────────────────────────────────────
   // Media (utökat)
@@ -283,11 +301,13 @@ export interface GameDetailData extends GameSummary {
   materials?: GameMaterial[];
   preparation?: string[];
   requirements?: string[];
+  /** @planned P2 — Ingen DB-tabell game_downloads. Reserverad för nedladdningsbart material */
   downloads?: string[];
 
   // ─────────────────────────────────────────────────────────────────────────
   // Innehåll - Resultat & Säkerhet
   // ─────────────────────────────────────────────────────────────────────────
+  /** Spel-outcomes/lärdomål (från games.outcomes) */
   outcomes?: string[];
   safety?: string[];
   accessibility?: string[];
@@ -295,7 +315,9 @@ export interface GameDetailData extends GameSummary {
   // ─────────────────────────────────────────────────────────────────────────
   // Innehåll - Variationer
   // ─────────────────────────────────────────────────────────────────────────
+  /** @planned P2 — Aldrig populerad. Reserverad för variant-beskrivningar */
   variants?: string[];
+  /** @planned P2 — Aldrig populerad. Reserverad för reflektionsfrågor */
   reflections?: string[];
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -303,6 +325,7 @@ export interface GameDetailData extends GameSummary {
   // ─────────────────────────────────────────────────────────────────────────
   steps?: GameStep[];
   phases?: GamePhase[];
+  /** @planned P2 — Ingen DB-tabell game_checkpoints. Reserverad för checkpoints */
   checkpoints?: string[];
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -311,12 +334,14 @@ export interface GameDetailData extends GameSummary {
   roles?: GameRole[];
   artifacts?: GameArtifact[];
   triggers?: GameTrigger[];
+  /** @planned P2 — Ingen DB-tabell game_decisions. Reserverad för beslutslogik */
   decisions?: GameDecision[];
 
   // ─────────────────────────────────────────────────────────────────────────
   // Facilitator
   // ─────────────────────────────────────────────────────────────────────────
   facilitatorTools?: string[];
+  /** @planned P2 — Aldrig populerad. Reserverad för facilitator-handlingar */
   hostActions?: string[];
   boardWidgets?: GameBoardWidget[];
 

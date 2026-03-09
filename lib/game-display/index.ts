@@ -95,6 +95,14 @@ export type {
   EnvironmentFormat,
   DifficultyFormat,
   StatusFormat,
+  // i18n label types for formatters
+  RangeFormatterLabels,
+  PlayCountLabels,
+  StatusLabels,
+  EnergyLabels,
+  PlayModeLabels,
+  EnvironmentLabels,
+  DifficultyLabels,
 } from './formatters';
 
 // =============================================================================
@@ -127,4 +135,5 @@ export type {
   DbGame,
   GameSearchResult,
   PlannerBlockGame,
+  BoardWidgetLabels,
 } from './mappers';

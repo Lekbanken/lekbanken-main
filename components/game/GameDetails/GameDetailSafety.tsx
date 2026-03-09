@@ -21,7 +21,7 @@ export function GameDetailSafety({
     return null;
   }
 
-  const titleLabel = labels.title ?? 'Säkerhet';
+  const titleLabel = labels.title ?? '';
 
   return (
     <section

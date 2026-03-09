@@ -29,11 +29,15 @@ export function GameDetailBadges({
   game,
   compact = false,
   className = '',
+  durationLabels,
+  playersLabels,
+  ageLabels,
+  energyLabels,
 }: GameDetailBadgesProps) {
-  const energy = formatEnergyLevel(game.energyLevel);
-  const players = formatPlayers(game.minPlayers, game.maxPlayers);
-  const age = formatAge(game.ageMin, game.ageMax);
-  const duration = formatDuration(game.durationMin, game.durationMax);
+  const energy = formatEnergyLevel(game.energyLevel, energyLabels);
+  const players = formatPlayers(game.minPlayers, game.maxPlayers, playersLabels);
+  const age = formatAge(game.ageMin, game.ageMax, ageLabels);
+  const duration = formatDuration(game.durationMin, game.durationMax, durationLabels);
 
   // Badge base styles
   const badgeBase = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium';

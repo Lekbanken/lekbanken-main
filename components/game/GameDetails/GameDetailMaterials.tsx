@@ -21,7 +21,7 @@ export function GameDetailMaterials({
     return null;
   }
 
-  const titleLabel = labels.title ?? 'Material';
+  const titleLabel = labels.title ?? '';
 
   return (
     <section

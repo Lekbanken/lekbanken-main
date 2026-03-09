@@ -21,7 +21,7 @@ export function GameDetailPreparation({
     return null;
   }
 
-  const titleLabel = labels.title ?? 'Förberedelser';
+  const titleLabel = labels.title ?? '';
 
   return (
     <section

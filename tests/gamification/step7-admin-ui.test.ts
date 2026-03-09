@@ -245,8 +245,8 @@ describe("Step 7 — Admin UI", () => {
   // 5. Per-render_type config schemas
   // ===========================================================================
   describe("5. Per-render_type config schemas", () => {
-    it("RENDER_TYPE_SCHEMAS covers all 5 render types", () => {
-      const expected = ["svg_frame", "css_background", "css_particles", "xp_skin", "css_divider"];
+    it("RENDER_TYPE_SCHEMAS covers all 6 render types", () => {
+      const expected = ["svg_frame", "css_background", "css_particles", "xp_skin", "css_divider", "title"];
       expect(Object.keys(RENDER_TYPE_SCHEMAS).sort()).toEqual(expected.sort());
     });
 

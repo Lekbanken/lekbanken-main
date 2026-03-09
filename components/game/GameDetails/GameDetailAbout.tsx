@@ -27,8 +27,8 @@ export function GameDetailAbout({
       ? `${description.slice(0, maxLength).trim()}...`
       : description;
 
-  const titleLabel = labels.title ?? 'Om leken';
-  const highlightsLabel = labels.highlights ?? 'Höjdpunkter';
+  const titleLabel = labels.title ?? '';
+  const highlightsLabel = labels.highlights ?? '';
 
   return (
     <section
@@ -44,14 +44,14 @@ export function GameDetailAbout({
         </p>
       )}
 
-      {/* Highlights */}
+      {/* Highlights (max 5 to prevent layout issues) */}
       {game.highlights && game.highlights.length > 0 && (
         <div className="mt-4">
           <h3 className="text-sm font-medium text-foreground mb-2">
             {highlightsLabel}
           </h3>
           <ul className="space-y-1">
-            {game.highlights.map((highlight, idx) => (
+            {game.highlights.slice(0, 5).map((highlight, idx) => (
               <li
                 key={idx}
                 className="flex items-start gap-2 text-sm text-muted-foreground"

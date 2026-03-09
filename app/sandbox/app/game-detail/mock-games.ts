@@ -122,6 +122,7 @@ export const basicExample: GameDetailData = {
   safety: ['Markera gränser för området', 'Undvik trånga passager', 'Ha en vuxen på varje station vid behov'],
   accessibility: ['Kan spelas i sittande format', 'Alternativa uppdrag utan spring', 'Tydliga ikoner på ledtrådskort'],
   outcomes: ['Samarbete under tidspress', 'Problemlösning och logik', 'Rörelse och orientering'],
+  leaderTips: ['Gör en provtur själv först', 'Ha extra ledtrådar redo', 'Håll koll på tiden per station'],
   requirements: ['Papper och pennor', '4-6 stationer i rummet', 'Klocka eller timer'],
   downloads: ['Ledtrådskort A4', 'Karta och stationsskyltar', 'Snabbguide för ledare'],
   variants: ['Kort version: ta bort en station och kapa till 15 min', 'Inomhus: byt stationer till bord med uppdrag', 'Stor grupp: kör stafett och räkna totalpoäng'],
@@ -260,6 +261,7 @@ export const facilitatedExample: GameDetailData = {
   safety: ['Tydlig gruppindelning', 'Säker stopp-signal', 'Lugn zon vid behov'],
   accessibility: ['Faser kan kortas ner', 'Stöd för tyst deltagande', 'Skrivna instruktioner + visuellt stöd'],
   outcomes: ['Samarbete och rollfördelning', 'Kommunikation och feedback', 'Iterativt lärande'],
+  leaderTips: ['Kör igenom fasplanen kvällen innan', 'Var beredd att förlänga fas 2 om engagemanget är högt', 'Använd checkpoints för att hänga med i tempot', 'Ha reservaktiviteter om en grupp blir klar snabbt'],
   requirements: ['Whiteboard eller stor skärm', 'Post-it och pennor', 'Timer i appen', 'Fritt golvutrymme'],
   downloads: ['Fasplan PDF', 'Ledarmanus', 'Tavla-mallar', 'Utvärderingsformulär'],
   variants: ['Förkorta till 30 min genom att kapa fas 2', 'Utomhusvariant med flyttbara stationer', 'Större grupp: lägg till en parallelldemo'],
@@ -480,6 +482,7 @@ export const participantsExample: GameDetailData = {
   safety: ['Samtycke till rollspel', 'Avsluta roll med säkerhetsord', 'Debrief obligatorisk'],
   accessibility: ['Flera svårighetsnivåer', 'Text + ikon i alla promptar', 'Möjlighet till tyst roll'],
   outcomes: ['Rollspel och empati', 'Beslutsfattande under osäkerhet', 'Gemensam problemlösning'],
+  leaderTips: ['Läs igenom alla rollkort innan', 'Ge deltagarna tid att gå in i rollerna', 'Var redo att trigga händelser manuellt om tekniken strular', 'Debrief är obligatorisk — planera minst 10 min'],
   requirements: ['Mobil per deltagare', 'Stor skärm', 'Stabilt internet', 'Ljudsignal', 'Kortlek eller tokens'],
   downloads: ['Rollkort PDF', 'Publik tavla mall', 'Mysteriepaket', 'Ledarmanus'],
   variants: ['Kortare version: hoppa över runda 2', 'Fler roller med sidouppdrag', 'Analog variant utan mobil (röstning via kort)'],
@@ -497,6 +500,42 @@ export const participantsExample: GameDetailData = {
 };
 
 // =============================================================================
+// MINIMAL EXAMPLE: Empty State (7.4)
+// =============================================================================
+
+const minimalSteps: GameStep[] = [
+  {
+    title: 'Steg 1',
+    body: 'Dela in gruppen och förklara reglerna.',
+    duration: '5 min',
+    displayMode: 'instant',
+  },
+  {
+    title: 'Steg 2',
+    body: 'Kör aktiviteten.',
+    duration: '10 min',
+    displayMode: 'instant',
+  },
+];
+
+const minimalExample: GameDetailData = {
+  id: 'minimal-sandbox',
+  title: 'Minimalt spel',
+  shortDescription: 'Bara titel, beskrivning och två steg.',
+  description: 'Ett spel med absolut minsta möjliga data. Används för att testa empty states och null-hantering i alla sektioner.',
+  playMode: 'basic',
+  status: 'published',
+  steps: minimalSteps,
+  meta: {
+    gameKey: 'minimal-test',
+    version: 'v1.0',
+    updatedAt: '2026-03-13',
+    owner: 'Lekbanken',
+    locale: 'sv-SE',
+  },
+};
+
+// =============================================================================
 // EXPORTS
 // =============================================================================
 
@@ -504,6 +543,7 @@ export const mockGames: Record<string, GameDetailData> = {
   basic: basicExample,
   facilitated: facilitatedExample,
   participants: participantsExample,
+  minimal: minimalExample,
 };
 
-export const mockGamesList: GameDetailData[] = [basicExample, facilitatedExample, participantsExample];
+export const mockGamesList: GameDetailData[] = [basicExample, facilitatedExample, participantsExample, minimalExample];

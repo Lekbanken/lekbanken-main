@@ -21,9 +21,9 @@ export function GameDetailPhases({
     return null;
   }
 
-  const titleLabel = labels.title ?? 'Faser';
-  const goalLabel = labels.goal ?? 'Mål';
-  const durationLabel = labels.duration ?? 'Tid';
+  const titleLabel = labels.title ?? '';
+  const goalLabel = labels.goal ?? '';
+  const durationLabel = labels.duration ?? '';
 
   // Map phase type to icon and color
   const getPhaseStyle = (phaseType?: string) => {
@@ -97,7 +97,9 @@ export function GameDetailPhases({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Fas {idx + 1}
+                      {labels.phaseNumber
+                        ? labels.phaseNumber.replace('{number}', String(idx + 1))
+                        : String(idx + 1)}
                     </span>
                     {phase.phaseType && (
                       <span className={`text-xs font-medium ${style.color} capitalize`}>

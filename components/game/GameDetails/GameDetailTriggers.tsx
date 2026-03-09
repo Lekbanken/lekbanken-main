@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useId, useRef, useCallback } from 'react';
 import { BoltIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import type { GameTrigger } from '@/lib/game-display';
 import type { GameDetailTriggersProps } from './types';
@@ -8,7 +8,7 @@ import type { GameDetailTriggersProps } from './types';
 /**
  * GameDetailTriggers - Lazy-loaded triggers/events for games
  *
- * Fetches triggers on mount from /api/games/[gameId]/triggers.
+ * Fetches triggers on first expand from /api/games/[gameId]/triggers.
  * Shows automated events and their conditions/effects.
  */
 export function GameDetailTriggers({
@@ -17,37 +17,40 @@ export function GameDetailTriggers({
   className = '',
 }: GameDetailTriggersProps) {
   const [triggers, setTriggers] = useState<GameTrigger[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const hasFetched = useRef(false);
 
-  const titleLabel = labels.title ?? 'Händelser';
-  const loadingLabel = labels.loading ?? 'Laddar händelser...';
-  const errorLabel = labels.error ?? 'Kunde inte ladda händelser';
-  const conditionLabel = labels.condition ?? 'Villkor';
-  const effectLabel = labels.effect ?? 'Effekt';
-  const executeOnceLabel = labels.executeOnce ?? 'Körs en gång';
-  const delayLabel = labels.delay ?? 'Fördröjning';
+  const regionId = useId();
+  const regionRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const fetchTriggers = async () => {
-      try {
-        const res = await fetch(`/api/games/${game.id}/triggers`);
-        if (!res.ok) throw new Error('Failed to fetch triggers');
-        const data = await res.json();
-        setTriggers(data.triggers ?? []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const titleLabel = labels.title ?? '';
+  const loadingLabel = labels.loading ?? '';
+  const errorLabel = labels.error ?? '';
+  const conditionLabel = labels.condition ?? '';
+  const effectLabel = labels.effect ?? '';
+  const executeOnceLabel = labels.executeOnce ?? '';
+  const delayLabel = labels.delay ?? '';
 
-    fetchTriggers();
+  const fetchTriggers = useCallback(async () => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/games/${game.id}/triggers`);
+      if (!res.ok) throw new Error('Failed to fetch triggers');
+      const data = await res.json();
+      setTriggers(data.triggers ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
   }, [game.id]);
 
-  // Don't render if no triggers after loading
-  if (!loading && triggers.length === 0 && !error) return null;
+  // Hide after fetch if no triggers and no error
+  if (hasFetched.current && !loading && triggers.length === 0 && !error) return null;
 
   // Format condition for display
   const formatCondition = (condition: string | object): string => {
@@ -65,7 +68,16 @@ export function GameDetailTriggers({
     >
       <button
         type="button"
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => {
+          const next = !expanded;
+          setExpanded(next);
+          if (next) {
+            fetchTriggers();
+            requestAnimationFrame(() => regionRef.current?.focus());
+          }
+        }}
+        aria-expanded={expanded}
+        aria-controls={regionId}
         className="flex items-center justify-between w-full text-left"
       >
         <div className="flex items-center gap-2">
@@ -87,7 +99,7 @@ export function GameDetailTriggers({
       </button>
 
       {expanded && (
-        <div className="mt-4">
+        <div id={regionId} ref={regionRef} role="region" aria-label={titleLabel} tabIndex={-1} className="mt-4 outline-none">
           {loading && (
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
@@ -112,7 +124,7 @@ export function GameDetailTriggers({
                     </h3>
                     {trigger.enabled === false && (
                       <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                        Inaktiv
+                        {labels.disabled ?? ''}
                       </span>
                     )}
                   </div>

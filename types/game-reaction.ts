@@ -37,6 +37,14 @@ export interface GameReaction {
  */
 export type GameReactionMap = Record<string, ReactionType | null>;
 
+/**
+ * Aggregated reaction counts for a game
+ */
+export interface GameReactionCounts {
+  likeCount: number;
+  dislikeCount: number;
+}
+
 // =============================================================================
 // API RESPONSE TYPES
 // =============================================================================

@@ -72,7 +72,7 @@ type SessionStatus = 'draft' | 'lobby' | 'active' | 'paused' | 'locked' | 'ended
 
 const STATUS_TRANSITIONS: Record<StatusAction, { from: Set<SessionStatus>; to: SessionStatus }> = {
   publish:   { from: new Set(['draft']),   to: 'lobby'  },
-  unpublish: { from: new Set(['lobby']),   to: 'draft'  },
+  unpublish: { from: new Set(['lobby', 'active', 'paused']),   to: 'draft'  },
   start:     { from: new Set(['lobby']),   to: 'active' },
   pause:     { from: new Set(['active']),  to: 'paused' },
   resume:    { from: new Set(['paused']),  to: 'active' },

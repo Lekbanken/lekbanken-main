@@ -248,9 +248,9 @@ describe('getVisibleSections', () => {
 // =============================================================================
 
 describe('leaderTips section visibility', () => {
-  it('visible in preview mode', () => {
+  it('hidden in preview mode (F1: facilitator-only content)', () => {
     const config = getSectionConfig('preview', null);
-    expect(config.leaderTips).toBe(true);
+    expect(config.leaderTips).toBe(false);
   });
 
   it('visible in admin mode', () => {
@@ -263,9 +263,9 @@ describe('leaderTips section visibility', () => {
     expect(config.leaderTips).toBe(true);
   });
 
-  it('visible for basic playMode', () => {
+  it('hidden for basic playMode in preview (F1: facilitator-only content)', () => {
     const config = getSectionConfig('preview', 'basic');
-    expect(config.leaderTips).toBe(true);
+    expect(config.leaderTips).toBe(false);
   });
 });
 

@@ -83,7 +83,7 @@ export const SECTION_VISIBILITY: Record<GameDetailMode, SectionVisibility> = {
     board: true,
     tools: true,
     // Sprint D sections
-    leaderTips: true,
+    leaderTips: false,
     metadata: true,
     outcomes: true,
   },

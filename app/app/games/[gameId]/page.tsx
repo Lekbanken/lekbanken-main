@@ -85,7 +85,7 @@ export default async function GameDetailPage({ params }: Props) {
   const isAdmin = access.isAdmin
 
   // After access check, dbGame is guaranteed non-null (canViewGame(null) returns not-found → notFound())
-  const game = mapDbGameToDetailPreview(dbGame! as unknown as DbGame, {
+  const fullGame = mapDbGameToDetailPreview(dbGame! as unknown as DbGame, {
     boardWidgetLabels: {
       timerTitle: t('boardWidgets.timerTitle'),
       timerDetail: t('boardWidgets.timerDetail'),
@@ -98,6 +98,15 @@ export default async function GameDetailPage({ params }: Props) {
       themeTitle: t('boardWidgets.themeTitle'),
     },
   })
+
+  // SECURITY: Strip host/facilitator-only fields before RSC serialization to client.
+  // These fields are mapped by mapSteps() but have no purpose in library preview context.
+  // Director Preview is unaffected — it uses mapDbGameToDetailFull() in its own page.
+  const game = {
+    ...fullGame,
+    leaderTips: undefined,
+    steps: fullGame.steps?.map(({ leaderScript, boardText, participantPrompt, ...publicStep }) => publicStep),
+  }
   
   // User-specific reaction + aggregate like count (parallel)
   const [initialReaction, reactionCounts] = await Promise.all([

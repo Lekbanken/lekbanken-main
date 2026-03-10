@@ -35,9 +35,41 @@ export async function GET(
 
     const dbTriggers = await getGameTriggers(gameId)
 
+    // SECURITY (F7): Strip content strings from triggers for library/preview context.
+    // Keep structural fields (type, IDs, numbers, booleans) so trigger design is visible,
+    // but remove content that could reveal puzzle solutions or facilitator instructions.
+    const STRIP_ACTION_KEYS = new Set(['message', 'customScript', 'reason', 'label'])
+    const sanitizedTriggers = dbTriggers.map((t) => {
+      // Strip 'outcome' from decision_resolved conditions
+      const condition =
+        t.condition &&
+        typeof t.condition === 'object' &&
+        'type' in t.condition &&
+        (t.condition as { type: string }).type === 'decision_resolved'
+          ? (() => {
+              const { outcome: _outcome, ...safe } = t.condition as Record<string, unknown>
+              return safe
+            })()
+          : t.condition
+
+      // Strip content strings from actions, keep structure
+      const actions = Array.isArray(t.actions)
+        ? t.actions.map((action) => {
+            if (typeof action !== 'object' || action === null) return action
+            const cleaned: Record<string, unknown> = {}
+            for (const [k, v] of Object.entries(action)) {
+              if (!STRIP_ACTION_KEYS.has(k)) cleaned[k] = v
+            }
+            return cleaned
+          })
+        : t.actions
+
+      return { ...t, condition, actions }
+    })
+
     // Map to canonical GameTrigger format
     const triggers = mapTriggers(
-      dbTriggers.map((t) => ({
+      sanitizedTriggers.map((t) => ({
         id: t.id,
         name: t.name,
         description: t.description,

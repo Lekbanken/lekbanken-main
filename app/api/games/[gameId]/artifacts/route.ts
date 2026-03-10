@@ -35,9 +35,20 @@ export async function GET(
 
     const dbArtifacts = await getGameArtifacts(gameId)
 
+    // SECURITY: Filter to public-only variants and strip metadata secrets
+    // for library/preview context (F8 + F8b)
+    const publicArtifacts = dbArtifacts.map((a) => {
+      const { correctCode: _correctCode, ...safeMetadata } = (a.metadata as Record<string, unknown>) ?? {}
+      return {
+        ...a,
+        metadata: Object.keys(safeMetadata).length > 0 ? safeMetadata : null,
+        variants: a.variants?.filter((v) => v.visibility === 'public'),
+      }
+    })
+
     // Map to canonical GameArtifact format
     const artifacts = mapArtifacts(
-      dbArtifacts.map((a) => ({
+      publicArtifacts.map((a) => ({
         id: a.id,
         title: a.title,
         description: a.description,

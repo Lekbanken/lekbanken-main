@@ -44,11 +44,8 @@ export async function GET(
         color: r.color,
         role_order: r.role_order,
         public_description: r.public_description,
-        private_instructions: r.private_instructions,
-        private_hints: r.private_hints,
         min_count: r.min_count,
         max_count: r.max_count,
-        assignment_strategy: r.assignment_strategy,
       }))
     )
 

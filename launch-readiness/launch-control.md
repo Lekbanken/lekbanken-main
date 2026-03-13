@@ -597,7 +597,7 @@ For the church/youth audience, bottlenecks are expected to hit in this order:
 | Phase 2 — Test Foundation | ⏭️ Skipped | `tsc --noEmit` + code-level regression used. E2E test investment recommended post-launch. |
 | Phase 5 — Regression Audits | ⏭️ Deferred | Each domain regression-verified during audit cycle. Formal pass if significant refactoring occurs. |
 | Phase 6 — Documentation Refresh | ⏭️ Deferred | Root-level `.md` cleanup, Notion sync, Atlas annotations. Low risk. |
-| Phase 1B — Sandbox Strategy | ✅ Config isolation done | ADR-005 (Alt B remote sandbox) decided and implemented 2026-03-13. Preview + Development Vercel-scopes → sandbox. Runtime verification pending (5 RLS errors). |
+| Phase 1B — Sandbox Strategy | ✅ Config + DB layer done | ADR-005 (Alt B remote sandbox) decided and implemented 2026-03-13. DB layer fix applied 2026-03-14 (5/5 permission checks passed). Preview E2E (V7/V8) pending. See `sandbox-phase-1b.md`. |
 
 ### Completed Milestones (reference)
 
@@ -1197,6 +1197,50 @@ Skapa en ny baseline-migration som representerar dagens faktiska produktionssche
 | `database-architecture-audit.md` | Schema-hälsa (domän för domän) + migrationskedjans hälsa |
 | `database-architecture-remediation-plan.md` | Tre alternativ med detaljerad exekveringsplan |
 | `database-rebuild-feasibility.md` | Genomförbarhet, risker, ROI per alternativ |
+
+---
+
+## 15. Launch Readiness Dashboard
+
+> **Purpose:** Single-page blocker view. Scan this before deploy or when assessing launch readiness.  
+> **Last updated:** 2026-03-14
+
+### Launch Gate — Go/No-Go
+
+| Gate | Status | Detail |
+|------|--------|--------|
+| P0 findings | ✅ 0 remaining | 13/13 resolved |
+| P1 findings (actionable) | ✅ 0 remaining | 45/47 resolved, 2 non-actionable (SEC-002b, SYS-001) |
+| TypeScript | ✅ 0 errors | `tsc --noEmit` clean |
+| Migration chain | ✅ Verified | Canonical baseline + 6 incrementals + 1 fix |
+| Production env vars | ✅ Set | 5 Production-scoped, 5 Preview-scoped in Vercel |
+| Sandbox isolation | 🟡 DB verified | Config + DB layer ✅. Preview E2E (V7/V8) pending. |
+| Deploy order constraint | ⚠️ Active | Migration `20260314000000` must be applied before route change deploys (APC-003/011). |
+
+### Active Blockers
+
+| Blocker | Severity | Owner | Next action |
+|---------|----------|-------|-------------|
+| OPS-SAND-001 — Preview runtime E2E | P1 | Engineering | Deploy preview → V7/V8 → close |
+| APC-003/011 deploy order | P1 | Engineering | Apply migration `20260314000000` to prod before deploying session route change |
+| SEC-002b — In-memory rate limiter | P1 (non-actionable) | Infra decision | Works per-instance. Upgrade to Upstash when needed. |
+| SYS-001 — Wrapper convergence | P1 (non-actionable) | Self-resolving | 88.2% → organic convergence |
+
+### Active Incidents
+
+| Date (UTC) | SEV | Summary | Impact | Status | Owner |
+|------------|-----|---------|--------|--------|-------|
+| — | — | No active incidents | — | — | — |
+
+### Pre-Deploy Checklist
+
+Before any production deploy, verify:
+
+- [ ] `tsc --noEmit` passes (0 errors)
+- [ ] No pending migrations that the deploy depends on (check deploy order constraints above)
+- [ ] `git log --oneline -1` matches expected commit
+- [ ] Vercel Production env vars unchanged (no accidental Preview leak)
+- [ ] If migration included: applied to prod Supabase first, types regenerated, committed together
 
 ---
 

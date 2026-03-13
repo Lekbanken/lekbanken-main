@@ -15,6 +15,8 @@ Runbooks och operativa rutiner. Dessa dokument är **repo-förankrade** där det
 - [CI/CD & rollback](cicd_pipeline.md)
 - [Incident response](incident_response.md)
 - [Incident log template](incidents.md)
+- [Production migration workflow](prod-migration-workflow.md)
+- [First production deploy runbook](first-deploy-runbook.md)
 
 ## Source of truth
 

@@ -143,17 +143,27 @@ ALTER POLICY "payment_failures_select_own" ON payment_failures
   );
 
 -- plan_schedules -------------------------------------------------------------
-ALTER POLICY "plan_schedules_access" ON plan_schedules
-  USING (
-    plan_id IN (
-      SELECT p.id FROM plans p
-      WHERE p.owner_user_id = (SELECT auth.uid())
-        OR (
-          p.visibility = 'tenant'::plan_visibility_enum
-          AND p.owner_tenant_id = ANY(get_user_tenant_ids())
+-- Fresh-install fix: plan_schedules table may not exist yet.
+DO $$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'plan_schedules'
+  ) THEN
+    EXECUTE $sql$
+      ALTER POLICY "plan_schedules_access" ON plan_schedules
+        USING (
+          plan_id IN (
+            SELECT p.id FROM plans p
+            WHERE p.owner_user_id = (SELECT auth.uid())
+              OR (
+                p.visibility = 'tenant'::plan_visibility_enum
+                AND p.owner_tenant_id = ANY(get_user_tenant_ids())
+              )
+          )
         )
-    )
-  );
+    $sql$;
+  END IF;
+END $$;
 
 
 -- ============================================================================

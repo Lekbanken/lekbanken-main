@@ -1,6 +1,14 @@
 -- ============================================================================
 -- Demo data: participant_sessions + participants
 -- ============================================================================
+
+-- Safety guard: never run seeds against production
+DO $$
+BEGIN
+  IF current_setting('app.env', true) = 'prod' THEN
+    RAISE EXCEPTION 'Seeds cannot run against production (app.env=prod)';
+  END IF;
+END $$;
 -- 
 -- INSTRUKTIONER:
 -- 1. Kör först dessa queries i Supabase SQL Editor för att hitta rätt IDs:

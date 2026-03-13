@@ -155,34 +155,47 @@ CREATE POLICY "plan_version_blocks_insert" ON plan_version_blocks FOR INSERT TO 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- 5) PLAN_SCHEDULES — sync with plans RLS (fix broader-than-parent)
 -- ═══════════════════════════════════════════════════════════════════════════════
+-- Fresh-install fix: plan_schedules table may not exist yet.
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'plan_schedules'
+  ) THEN
+    RETURN;
+  END IF;
 
-DROP POLICY IF EXISTS "plan_schedules_access" ON plan_schedules;
-DROP POLICY IF EXISTS "plan_schedules_select" ON plan_schedules;
-DROP POLICY IF EXISTS "plan_schedules_insert" ON plan_schedules;
-DROP POLICY IF EXISTS "plan_schedules_update" ON plan_schedules;
-DROP POLICY IF EXISTS "plan_schedules_delete" ON plan_schedules;
+  DROP POLICY IF EXISTS "plan_schedules_access" ON plan_schedules;
+  DROP POLICY IF EXISTS "plan_schedules_select" ON plan_schedules;
+  DROP POLICY IF EXISTS "plan_schedules_insert" ON plan_schedules;
+  DROP POLICY IF EXISTS "plan_schedules_update" ON plan_schedules;
+  DROP POLICY IF EXISTS "plan_schedules_delete" ON plan_schedules;
 
--- SELECT: cascade via plans RLS + own schedules
-CREATE POLICY "plan_schedules_select" ON plan_schedules FOR SELECT TO authenticated
-  USING (
-    plan_id IN (SELECT id FROM plans)
-    OR created_by = (SELECT auth.uid())
-  );
+  EXECUTE $sql$
+    CREATE POLICY "plan_schedules_select" ON plan_schedules FOR SELECT TO authenticated
+      USING (
+        plan_id IN (SELECT id FROM plans)
+        OR created_by = (SELECT auth.uid())
+      )
+  $sql$;
 
--- INSERT: plan must be visible + creator = current user
-CREATE POLICY "plan_schedules_insert" ON plan_schedules FOR INSERT TO authenticated
-  WITH CHECK (
-    created_by = (SELECT auth.uid())
-    AND plan_id IN (SELECT id FROM plans)
-  );
+  EXECUTE $sql$
+    CREATE POLICY "plan_schedules_insert" ON plan_schedules FOR INSERT TO authenticated
+      WITH CHECK (
+        created_by = (SELECT auth.uid())
+        AND plan_id IN (SELECT id FROM plans)
+      )
+  $sql$;
 
--- UPDATE: own schedules + system-admin
-CREATE POLICY "plan_schedules_update" ON plan_schedules FOR UPDATE TO authenticated
-  USING (created_by = (SELECT auth.uid()) OR is_system_admin());
+  EXECUTE $sql$
+    CREATE POLICY "plan_schedules_update" ON plan_schedules FOR UPDATE TO authenticated
+      USING (created_by = (SELECT auth.uid()) OR is_system_admin())
+  $sql$;
 
--- DELETE: own schedules + system-admin
-CREATE POLICY "plan_schedules_delete" ON plan_schedules FOR DELETE TO authenticated
-  USING (created_by = (SELECT auth.uid()) OR is_system_admin());
+  EXECUTE $sql$
+    CREATE POLICY "plan_schedules_delete" ON plan_schedules FOR DELETE TO authenticated
+      USING (created_by = (SELECT auth.uid()) OR is_system_admin())
+  $sql$;
+END $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- 6) PLAN_NOTES_TENANT — require plan visibility (fix data leak)

@@ -664,3 +664,12 @@ Rejected for now: Alt A (local-only), Alt D (branching)
 | OPS-SAND-001 | ⏳ Ready to close after V7/V8 |
 
 **Phase 1B-A engineering work is complete. Remaining action is manual: deploy preview → V7/V8 → close OPS-SAND-001.**
+
+### Next Action
+
+Reference commit: `86ea5ed` (main).
+
+1. Create a branch or PR off `main` → Vercel builds a **preview deployment** (push to `main` triggers production deploy only — V7/V8 require a separate branch/PR preview)
+2. On the preview URL, run **V7**: register user, create data → confirm it appears in sandbox DB (`vmpdejhgpsrfulimsoqn`), not prod
+3. Run **V8**: verify production DB (`qohhnufxididbmzqnjwg`) has no preview test data
+4. If V7 + V8 pass → update `platform-operations-audit.md`: `OPS-SAND-001 → ✅ LÖST`

@@ -160,6 +160,16 @@ export function TenantProvider({
 
     if (userChanged || !hasInitial) {
       loadTenants()
+    } else if (hasInitial && userId) {
+      // SSR provided initial data so we skip the blocking load.
+      // Schedule a deferred server-action call to self-heal a stale
+      // lb_tenant cookie (SSR can read cookies but not write them).
+      // We call resolveCurrentTenant() directly (fire-and-forget) instead
+      // of loadTenants() to avoid unnecessary state updates and rerenders.
+      const id = setTimeout(() => {
+        resolveCurrentTenant().catch(() => { /* non-critical */ })
+      }, 2000)
+      return () => clearTimeout(id)
     }
   }, [hasInitial, loadTenants, userId])
 

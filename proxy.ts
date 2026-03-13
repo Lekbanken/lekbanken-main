@@ -508,7 +508,7 @@ export default async function proxy(request: NextRequest) {
       }
       // For platform subdomains (not app.lekbanken.no or lekbanken.no), resolve tenant via RPC
       // Only do RPC lookup for protected paths to avoid unnecessary DB calls
-      else if (isProtected && isPlatformSubdomain(hostname) && hostname !== PLATFORM_PRIMARY_HOST && hostname !== 'lekbanken.no') {
+      else if (isProtected && isPlatformSubdomain(hostname) && hostname !== PLATFORM_PRIMARY_HOST && hostname !== 'lekbanken.no' && hostname !== `www${PLATFORM_DOMAIN}`) {
         // Try host-scoped cookie cache first to avoid DB roundtrip
         hostTenantId = readHostTenantCookie()
         if (!hostTenantId) {

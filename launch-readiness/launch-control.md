@@ -408,7 +408,7 @@ For each audit in queue:
 | ADR-002 | URL-driven state (no global state store) | ✅ Accepted | Pre-existing | Wizard steps via `?step=` |
 | ADR-003 | RLS-first security model | ✅ Accepted | Pre-existing | All tables protected by RLS |
 | ADR-004 | Supabase Auth + MFA | ✅ Accepted | Pre-existing | JWT-based auth with MFA support |
-| ADR-005 | Sandbox/preview environment strategy | 🟡 Proposed | 2026-03-10 | See launch-readiness-architecture.md |
+| ADR-005 | Sandbox/preview environment strategy | ✅ Accepted | 2026-03-13 | Verified: preview → sandbox isolation working. See launch-readiness-architecture.md |
 | ADR-006 | Test strategy and minimum coverage | 🟡 Proposed | 2026-03-10 | See launch-readiness-architecture.md |
 | DD-PLAY-1 | State machine consolidation: pipeline enrichment + client migration (A+C) | ✅ Decided | 2025-07-24 | Step 1: move gamification+disconnect into pipeline. Step 2: migrate clients. |
 | DD-PLAY-2 | Session-status guard: central `PLAY_ROUTE_STATUS_POLICY` map (A) | ✅ Decided | 2025-07-24 | All 14 route types declare allowed statuses in one table. |
@@ -417,7 +417,7 @@ For each audit in queue:
 | DD-PLAY-5 | Wrapper coverage: puzzle + keypad + vote now (rest Batch 7) | ✅ Decided | 2025-07-24 | 3 play-critical routes first, remaining routes after M1-M4. |
 | ADR-E1 | Enterprise Isolation: shared-by-default, isolated-when-required | 🟡 Proposed | 2026-03-13 | 3-level model (A/B/C). Design study complete. No implementation before enterprise contract. See `enterprise-isolation-architecture.md`. |
 | OPS-001 | WSL2 as local engineering baseline | 🟡 Proposed | 2026-03-13 | Enables Supabase CLI, bash scripts, CI parity. See `platform-operations-architecture.md`. |
-| OPS-002 | Sandbox Supabase + Preview env vars (not separate Vercel project) | 🟡 Proposed | 2026-03-13 | Isolates preview from prod data. Separate Vercel project deferred. |
+| OPS-002 | Sandbox Supabase + Preview env vars (not separate Vercel project) | ✅ Implemented | 2026-03-13 | ✅ Verified: preview → sandbox isolation confirmed via Vercel logs. Separate Vercel project deferred. |
 | OPS-003 | One Vercel project per deploy target | ⏳ Deferred | 2026-03-13 | Relevant for enterprise. Not needed for preview isolation. |
 | OPS-004 | Continuous deploy for prod/sandbox, manual for enterprise | 🟡 Proposed | 2026-03-13 | Enterprise customers may want release coordination. |
 | OPS-005 | Deploy targets tracked in `.deploy-targets.json` | 🟡 Proposed | 2026-03-13 | Central registry for migration orchestration. |
@@ -1014,12 +1014,14 @@ This workstream binds together five interconnected operational initiatives:
 | Design system, shared UI | Secrets, env vars, domain |
 | Internal admin tooling | Stripe webhooks, cron, telemetry |
 
-### ⚠️ Critical Open Risk: OPS-SAND-001
+### ~~⚠️ Critical Open Risk: OPS-SAND-001~~ ✅ **LÖST (2026-03-13)**
 
-> **Preview deployments currently hit the production Supabase database.**
+> ~~**Preview deployments currently hit the production Supabase database.**~~
 >
-> Första exekverbara operationsmål = få bort preview/dev från prod-data-plane.
-> Resolves via Preview env vars pointing at sandbox Supabase. Until then, every Vercel preview can mutate production data.
+> ~~Första exekverbara operationsmål = få bort preview/dev från prod-data-plane.~~
+> ~~Resolves via Preview env vars pointing at sandbox Supabase. Until then, every Vercel preview can mutate production data.~~
+>
+> **Löst:** Preview env vars pekar mot sandbox Supabase (`vmpdejhgpsrfulimsoqn`). Verifierat via Vercel function logs — alla `/app`-routes returnerar 200, auth fungerar, proxy släpper igenom `*.vercel.app`. Legacy JWT-nycklar behålls tills vidare.
 
 ### Beslut: Env-strategi (GPT-godkänd 2026-03-13)
 
@@ -1040,11 +1042,11 @@ Local dev          → local eller sandbox DB
 
 | # | Variable | Scope | Value | Status |
 |---|----------|-------|-------|--------|
-| 1 | `NEXT_PUBLIC_SUPABASE_URL` | Preview | `https://vmpdejhgpsrfulimsoqn.supabase.co` | ⬜ |
-| 2 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Preview | sandbox anon key | ⬜ |
-| 3 | `SUPABASE_SERVICE_ROLE_KEY` | Preview | sandbox service role key | ⬜ |
-| 4 | `DEPLOY_TARGET` | Preview | `preview` | ⬜ |
-| 5 | `APP_ENV` | Preview | `sandbox` | ⬜ |
+| 1 | `NEXT_PUBLIC_SUPABASE_URL` | Preview | `https://vmpdejhgpsrfulimsoqn.supabase.co` | ✅ Set |
+| 2 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Preview | sandbox anon key | ✅ Set |
+| 3 | `SUPABASE_SERVICE_ROLE_KEY` | Preview | sandbox service role key | ✅ Set |
+| 4 | `DEPLOY_TARGET` | Preview | `preview` | ✅ Set |
+| 5 | `APP_ENV` | Preview | `sandbox` | ✅ Set |
 
 **Do NOT modify Production-scoped env vars.** Only add Preview overrides.
 
@@ -1053,12 +1055,24 @@ Local dev          → local eller sandbox DB
 > **🔒 SÄKERHETSKALIBRERING (GPT 2026-03-13):** `SUPABASE_SERVICE_ROLE_KEY` är server-only (ej `NEXT_PUBLIC_*`). Verifierat: Next.js bundlar aldrig den klient-side. Används i server actions (`tickets-admin`, `support-kb`, `support-hub`) och cron-cleanup — appen behöver den. Får aldrig exponeras i klientkod.
 
 **Verification:**
-- [ ] Create test PR → push empty commit
-- [ ] Check preview deploy builds successfully
-- [ ] Check preview `/api/health` returns 200
-- [ ] View source on preview → confirm sandbox Supabase URL in client bundle
-- [ ] Create data on preview → verify it appears in sandbox DB, NOT in prod
-- [ ] Verify `https://app.lekbanken.no/api/health` still returns 200
+- [x] Create test PR → push empty commit ✅ (2026-03-13)
+- [x] Check preview deploy builds successfully ✅ (2026-03-13)
+- [x] Check preview `/api/health` returns 200 ✅ (2026-03-13)
+- [x] View source on preview → confirm sandbox Supabase URL in client bundle ✅ (2026-03-13)
+- [ ] Create data on preview → verify it appears in sandbox DB, NOT in prod (blocked by RLS, see remediation list)
+- [x] Verify `https://app.lekbanken.no/api/health` still returns 200 ✅ (2026-03-13)
+
+### RLS Remediation List (sandbox)
+
+Sekundära RLS-problem i sandbox som inte blockerar preview-isolation men behöver åtgärdas:
+
+| # | Table | Error | Impact | Status |
+|---|-------|-------|--------|--------|
+| 1 | `user_sessions` | 42501 permission denied | Session listing i profil | ⬜ |
+| 2 | `user_devices` | 42501 permission denied | Device tracking vid login | ⬜ |
+| 3 | `user_legal_acceptances` | 42501 permission denied | Legal docs acceptance check | ⬜ |
+| 4 | `legal_documents` | 42501 permission denied | Required legal docs fetch | ⬜ |
+| 5 | `user_tenant_memberships` | 42501 permission denied | Profile update (language/theme) | ⬜ |
 
 ### Workstream Relationship Map
 

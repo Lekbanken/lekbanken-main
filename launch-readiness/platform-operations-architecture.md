@@ -91,7 +91,7 @@ Three strategic workstreams are active. They are related but have distinct scope
  └─────────┘└─────────┘└─────────┘└─────────┘└──────────────────┘
 ```
 
-*Note: Preview deployments currently point at prod Supabase — this is a known risk (ADR-005) to be resolved by sandbox strategy.
+*Note: Preview deployments now point at sandbox Supabase — resolved by ADR-005 (2026-03-13). Config isolation verified via Vercel Dashboard. Runtime verification pending (5 sandbox RLS errors).
 
 ### 2.2 Environment Purposes
 
@@ -107,7 +107,7 @@ Three strategic workstreams are active. They are related but have distinct scope
 
 > **No development or preview traffic should ever hit the production database.**
 >
-> The current state (preview deployments → prod Supabase) is a known risk documented in ADR-005. The sandbox strategy resolves this.
+> Preview deployments now target the sandbox Supabase project (`vmpdejhgpsrfulimsoqn`). ADR-005 (Environment Isolation — Alt B) was decided 2026-03-13. Config isolation verified. Runtime verification pending.
 
 ---
 
@@ -374,7 +374,7 @@ Each deploy target provides its own:
 | ID | Decision | Status | Notes |
 |----|----------|--------|-------|
 | OPS-001 | WSL2 as local engineering baseline | 🟡 Proposed | Enables Supabase CLI, bash scripts, CI parity |
-| OPS-002 | Sandbox Supabase + Preview env vars in existing Vercel project | 🟡 Proposed | Isolates preview from prod data without extra Vercel project |
+| OPS-002 | Sandbox Supabase + Preview env vars in existing Vercel project | ✅ Done | Isolates preview from prod data without extra Vercel project |
 | OPS-003 | One Vercel project per deploy target | ⏳ Deferred | Relevant for enterprise customers and persistent staging |
 | OPS-004 | Continuous deploy for prod/sandbox, manual trigger for enterprise | 🟡 Proposed | Enterprise customers may want release coordination |
 | OPS-005 | All deploy targets tracked in `.deploy-targets.json` | 🟡 Proposed | Central registry for migration orchestration |

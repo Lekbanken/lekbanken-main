@@ -80,7 +80,7 @@ Audit OS    Arkitektur + Sandbox          Audit → Fix → Regression cycle    
 **Mål:** Bestäm hur branches testas, hur migrations verifieras, och hur preview environments fungerar.  
 **Beroende:** Phase 0 klar.  
 **Parallellt med:** Phase 1A.  
-**Status:** ⬜ EJ PÅBÖRJAD — ADR-005 (hybrid) proposed men ej beslutad. Utveckling sker fortfarande mot prod-DB.
+**Status:** ✅ IMPLEMENTERAT (2026-03-13) — Remote sandbox (Alt B) valt och implementerat. Preview + Development Vercel-scopes pekar mot sandbox Supabase (`vmpdejhgpsrfulimsoqn`). ADR-005 beslutad. Runtime-verifiering pågår (5 sandbox RLS-fel kvarstår).
 
 ### Leverabler
 

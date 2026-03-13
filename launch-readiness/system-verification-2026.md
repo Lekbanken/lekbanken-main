@@ -226,7 +226,7 @@ The launch-control domain status table marks test columns as "❌" for most doma
 | Production (Vercel) | ✅ Deployed | app.lekbanken.no |
 | Demo (Vercel) | ✅ Deployed | demo.lekbanken.no |
 | Preview (Vercel) | ⚠️ Points to prod DB | No sandbox isolation |
-| Local dev | ⚠️ Points to prod DB | No local Supabase running |
+| Local dev | ⚠️ .env.local still points to prod DB (should be updated to sandbox or local) | No local Supabase running |
 | Supabase local CLI | ❌ Not configured | Missing `config.toml` |
 
 ---

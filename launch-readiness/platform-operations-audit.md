@@ -38,7 +38,7 @@
 | Finding | ID | Severity | Status |
 |---------|-----|----------|--------|
 | No `.nvmrc` — Node version not pinned for developers | OPS-DEV-001 | P2 | Open |
-| No `.env.local.example` — developers must read `env.ts` | OPS-DEV-002 | P2 | Open |
+| ~~No `.env.local.example` — developers must read `env.ts`~~ | OPS-DEV-002 | P2 | ✅ **LÖST** — `.env.local.example` finns (uppdaterad med `APP_ENV`, `DEPLOY_TARGET`, 2026-03-13) |
 | No developer setup guide (`DEVELOPER_SETUP.md`) | OPS-DEV-003 | P2 | Open |
 | No WSL2 setup instructions | OPS-DEV-004 | P2 | Open |
 
@@ -46,7 +46,7 @@
 - `package.json` scripts exist: `dev`, `build`, `lint`, `type-check`, `test`
 - CI uses Node 20 (hardcoded in workflow files)
 - No `.nvmrc`, `.node-version`, or `.tool-versions` file
-- No `.env.local.example` or `.env.example`
+- ✅ `.env.local.example` exists with `APP_ENV`, `DEPLOY_TARGET`, Supabase, Stripe, and security vars
 - No Dockerfile, docker-compose, or devcontainer
 
 **Impact:** New developers must reverse-engineer the setup from CI workflows and `lib/config/env.ts`. This creates onboarding friction and reduces reproducibility.
@@ -59,16 +59,18 @@
 
 | Finding | ID | Severity | Status |
 |---------|-----|----------|--------|
-| Preview deploys point at production Supabase | OPS-SAND-001 | P1 | 🟡 Ready to resolve — sandbox Supabase created, Preview env vars pending |
-| No remote sandbox environment exists | OPS-SAND-002 | P2 | ✅ Sandbox Supabase project created (`vmpdejhgpsrfulimsoqn`) |
-| No sandbox Supabase project exists | OPS-SAND-003 | P2 | ✅ Created with canonical baseline (247/156/545/28) |
+| ~~Preview deploys point at production Supabase~~ | OPS-SAND-001 | P1 | ✅ **Config isolation done (2026-03-13)** — Preview + Development env vars satta i Vercel. ✅ **DB layer fix applied (2026-03-14)** — Migration `20260314100000` applied to sandbox. 5/5 targeted database-layer permission checks passed. 🟡 **Pending: preview deploy → V7/V8 end-to-end runtime test** (create data on preview → confirm in sandbox DB, not prod). Se sandbox-phase-1b.md §7.1 + §10 för detaljer. |
+| ~~No remote sandbox environment exists~~ | OPS-SAND-002 | P2 | ✅ Sandbox Supabase project created (`vmpdejhgpsrfulimsoqn`) |
+| ~~No sandbox Supabase project exists~~ | OPS-SAND-003 | P2 | ✅ Created with canonical baseline (247/156/545/28) |
 
 **Current state:**
-- Sandbox Supabase project created and verified with canonical baseline
-- **Resolution approach:** Preview-scoped env vars in existing Vercel project (not separate Vercel project)
-- Decision: separate Vercel sandbox project deferred until persistent staging/demo/UAT is needed (GPT, 2026-03-13)
+- ✅ Sandbox Supabase project created and verified with canonical baseline
+- ✅ Preview-scoped env vars set in Vercel (5 vars: SUPABASE_URL, ANON_KEY, SERVICE_ROLE_KEY, APP_ENV, DEPLOY_TARGET)
+- ✅ Development-scoped env vars set in Vercel (same 5 vars)
+- ✅ Production-scoped env vars set separately (APP_ENV=prod, production Supabase keys)
+- ⚠️ 5 RLS errors on sandbox (user_sessions, user_devices, user_legal_acceptances, legal_documents, user_tenant_memberships) — blocks full functional verification
 
-**Remaining action:** Set Preview-scoped env vars in Vercel Dashboard to complete OPS-SAND-001 resolution.
+**Remaining action:** Fix 5 sandbox RLS errors to complete functional verification (V7).
 
 ---
 

@@ -60,7 +60,7 @@ From `launch-readiness-architecture.md` §2:
 
 > **Rekommendation: Alt C — Hybrid** (local for dev + remote sandbox for preview)
 
-ADR-005 was proposed but **never decided**.
+~~ADR-005 was proposed but **never decided**.~~ ✅ **DECIDED (2026-03-13):** Alt B (remote sandbox) implementerat. Preview + Development Vercel-scopes pekar mot sandbox Supabase (`vmpdejhgpsrfulimsoqn`). Verifierat via Vercel Dashboard screenshots (Production, Preview, Development scopes alla korrekt konfigurerade).
 
 ---
 

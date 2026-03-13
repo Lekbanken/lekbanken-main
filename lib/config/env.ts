@@ -55,6 +55,12 @@ function validateEnvironment() {
       console.warn('⚠️  No Stripe keys configured - billing features will be disabled');
     }
   }
+
+  // APP_ENV safety guard: warn if running against production without explicit APP_ENV=prod
+  const appEnv = process.env.APP_ENV;
+  if (!appEnv && nodeEnv === 'production') {
+    console.warn('⚠️  APP_ENV not set in production — set APP_ENV=prod explicitly for safety auditing');
+  }
 }
 
 /**
@@ -129,12 +135,20 @@ export const env = {
   
   // Deployment identity
   deployment: {
-    /** Deploy target identifier for observability (Sentry tags, logs). Values: prod, sandbox, preview, enterprise-<customer> */
-    target: process.env.DEPLOY_TARGET || 'local-dev',
-    /** App environment safety guard. Scripts/seeds check this to prevent running against prod. */
-    appEnv: process.env.APP_ENV || 'local-dev',
+    /** Deploy target identifier for observability (Sentry tags, logs). Values: prod, preview, development, enterprise-<customer> */
+    target: process.env.DEPLOY_TARGET || 'development',
+    /** App environment safety guard. Scripts/seeds check this to prevent running against prod. Values: prod, sandbox, local */
+    appEnv: process.env.APP_ENV || 'local',
   },
 } as const;
+
+/**
+ * Check if the current environment is production.
+ * Uses APP_ENV (set via Vercel env scopes) — NOT NODE_ENV which is always 'production' on Vercel.
+ */
+export function isProductionEnvironment(): boolean {
+  return env.deployment.appEnv === 'prod';
+}
 
 // Run validation on module load (server-side only)
 validateEnvironment();

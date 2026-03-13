@@ -57,22 +57,21 @@
 | C | Hybrid: Lokal för dev + remote sandbox för preview | Bästa av A+B | Mer komplexitet att underhålla |
 | D | Supabase Branching (beta) | Native branch-per-PR | Betafunktion, begränsad kontroll |
 
-**Rekommendation: Alt C — Hybrid**
+**Beslut: Alt B först → Alt C som målbild**
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Local Dev       │    │  Sandbox (remote) │    │  Production     │
-│  Supabase CLI    │    │  Supabase project │    │  Supabase       │
-│  localhost:54321 │    │  (staging)        │    │  app.lekbanken  │
-│                  │    │                   │    │                 │
-│  Lokal dev       │    │  Vercel previews  │    │  Main branch    │
-│  Branch features │    │  PR reviews       │    │  Tagged releases│
-│  Destructive     │    │  Integration test │    │                 │
-│  tests OK        │    │  Demo             │    │                 │
+│  Local Dev       │    │  Preview (Vercel) │    │  Production     │
+│  Sandbox Supa-   │    │  Sandbox Supabase │    │  Prod Supabase  │
+│  base (remote)   │    │  (vmpdejhgpsrful) │    │  (qohhnufxidid) │
+│  eller lokal     │    │                   │    │                 │
+│  (Docker, TBD)   │    │  APP_ENV=sandbox  │    │  APP_ENV=prod   │
+│                  │    │  DEPLOY_TARGET=   │    │  DEPLOY_TARGET= │
+│                  │    │    preview        │    │    prod         │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
-**Status:** 🟡 PROPOSED — Behöver beslut.
+**Status:** ✅ DECIDED (2026-03-13) — Alt B (remote sandbox) implementerat. Preview + Development Vercel-scopes pekar mot sandbox. Alt C (hybrid med lokal Docker) är framtida målbild.
 
 ### Implementeringsplan för Hybrid-setup
 
@@ -419,7 +418,7 @@ Alla arkitekturbeslut som behöver fattas under Phase 1:
 
 | ADR | Beslut | Alternativ | Status | Ägare |
 |-----|--------|-----------|--------|-------|
-| ADR-005 | Environment isolation | A (lokal), B (remote), C (hybrid), D (branching) | 🟡 PROPOSED: C | — |
+| ADR-005 | Environment isolation | A (lokal), B (remote), C (hybrid), D (branching) | ✅ DECIDED: B (remote sandbox) — implementerat 2026-03-13. Hybrid (C) framtida målbild. | Claude + GPT |
 | ADR-006 | Test strategy | Pyramiden ovan | 🟡 PROPOSED | — |
 | ADR-007 | API standardisering | Wrapper vs middleware vs per-route | ✅ DECIDED: Wrapper (`apiHandler()`) | Claude |
 | ADR-008 | Feature flags | Env-based vs DB-based vs service | 🟡 PROPOSED: env-based | — |

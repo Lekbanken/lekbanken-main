@@ -57,7 +57,7 @@ CREATE INDEX IF NOT EXISTS idx_session_trigger_state_armed
 DROP TRIGGER IF EXISTS trg_session_trigger_state_updated ON public.session_trigger_state;
 CREATE TRIGGER trg_session_trigger_state_updated
   BEFORE UPDATE ON public.session_trigger_state
-  FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
 
 -- =============================================================================
 -- 2. RLS Policies

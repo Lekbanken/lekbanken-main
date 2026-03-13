@@ -79,10 +79,20 @@ ALTER TABLE public.tenants
   ADD COLUMN IF NOT EXISTS created_by uuid REFERENCES public.users(id),
   ADD COLUMN IF NOT EXISTS updated_by uuid REFERENCES public.users(id);
 
-ALTER TABLE public.tenant_memberships
-  ADD COLUMN IF NOT EXISTS status text DEFAULT 'active',
-  ADD COLUMN IF NOT EXISTS is_primary boolean DEFAULT false,
-  ADD COLUMN IF NOT EXISTS seat_assignment_id uuid REFERENCES public.tenant_seat_assignments(id);
+-- Alter whichever memberships table exists (tenant_memberships or user_tenant_memberships)
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='tenant_memberships') THEN
+    ALTER TABLE public.tenant_memberships
+      ADD COLUMN IF NOT EXISTS status text DEFAULT 'active',
+      ADD COLUMN IF NOT EXISTS is_primary boolean DEFAULT false,
+      ADD COLUMN IF NOT EXISTS seat_assignment_id uuid REFERENCES public.tenant_seat_assignments(id);
+  ELSIF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='user_tenant_memberships') THEN
+    ALTER TABLE public.user_tenant_memberships
+      ADD COLUMN IF NOT EXISTS status text DEFAULT 'active',
+      ADD COLUMN IF NOT EXISTS is_primary boolean DEFAULT false,
+      ADD COLUMN IF NOT EXISTS seat_assignment_id uuid REFERENCES public.tenant_seat_assignments(id);
+  END IF;
+END $$;
 
 -- RLS enable
 ALTER TABLE public.tenant_settings ENABLE ROW LEVEL SECURITY;

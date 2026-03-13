@@ -77,6 +77,7 @@ No architectural changes will be implemented before real production traffic has 
 | Abuse & Privacy | ✅ | ✅ | 39 findings. ABUSE-001/002 P0 fixed. PRIV-001–006 kill-switched. 12 P1s in post-launch backlog (ABUSE-003/004, UPLOAD-001–003, LEAK-001–003, ENUM-001/002). |
 | React Server/Client Boundary | ✅ | — | 7 findings (0 P0, 0 P1, 3 P2, 4 P3). GPT-calibrated. Zero boundary violations. No launch remediation needed. |
 | Migration Safety | ✅ | — | 14 findings (0 P0, 1 P1, 9 P2, 4 P3). GPT-calibrated. MIG-001 P1 (bootstrap risk, already applied). |
+| Database Architecture | ✅ | ✅ Canonical Baseline | 307 migrations → 1 canonical baseline. Fresh install verified (exit code 0). 247 tables, 156 functions, 545 policies, 28 enums confirmed. Old migrations archived. See §14. |
 | RLS Coverage | ⏭️ | — | Deferred — covered per-domain during audits (all 10+ planner tables, play tables, billing tables verified). |
 | End-to-End Data Flows | ⏭️ | — | Deferred — partially covered by Play/Sessions/Games audits (state machine, snapshot pipeline, join flow). |
 | UI Consistency / Design System | ⏭️ | — | Deferred post-launch. |
@@ -414,6 +415,12 @@ For each audit in queue:
 | DD-PLAY-3 | Atomicity: Postgres RPCs for puzzle/counter ops (A) | ✅ Decided | 2025-07-24 | Generic atomicity primitives preferred. |
 | DD-PLAY-4 | Broadcast completeness: kick/block + readiness + assignments | ✅ Decided | 2025-07-24 | Stricter scope — chat/approve/rejoin/overrides deferred. |
 | DD-PLAY-5 | Wrapper coverage: puzzle + keypad + vote now (rest Batch 7) | ✅ Decided | 2025-07-24 | 3 play-critical routes first, remaining routes after M1-M4. |
+| ADR-E1 | Enterprise Isolation: shared-by-default, isolated-when-required | 🟡 Proposed | 2026-03-13 | 3-level model (A/B/C). Design study complete. No implementation before enterprise contract. See `enterprise-isolation-architecture.md`. |
+| OPS-001 | WSL2 as local engineering baseline | 🟡 Proposed | 2026-03-13 | Enables Supabase CLI, bash scripts, CI parity. See `platform-operations-architecture.md`. |
+| OPS-002 | Sandbox Supabase + Preview env vars (not separate Vercel project) | 🟡 Proposed | 2026-03-13 | Isolates preview from prod data. Separate Vercel project deferred. |
+| OPS-003 | One Vercel project per deploy target | ⏳ Deferred | 2026-03-13 | Relevant for enterprise. Not needed for preview isolation. |
+| OPS-004 | Continuous deploy for prod/sandbox, manual for enterprise | 🟡 Proposed | 2026-03-13 | Enterprise customers may want release coordination. |
+| OPS-005 | Deploy targets tracked in `.deploy-targets.json` | 🟡 Proposed | 2026-03-13 | Central registry for migration orchestration. |
 
 ---
 
@@ -449,6 +456,12 @@ Atlas (`/sandbox/atlas`) tracks the system graph (287 routes, components, domain
 | sessions-architecture.md | launch-readiness/ | ✅ Current | 2026-03-11 |
 | sessions-audit.md | launch-readiness/audits/ | ✅ Current | 2026-03-11 |
 | sessions-remediation.md | launch-readiness/implementation/ | ✅ Current | 2026-03-11 |
+| enterprise-isolation-architecture.md | launch-readiness/ | ✅ Current | 2026-03-13 |
+| enterprise-isolation-audit.md | launch-readiness/ | ✅ Current | 2026-03-13 |
+| enterprise-isolation-implementation-plan.md | launch-readiness/ | ✅ Current | 2026-03-13 |
+| platform-operations-architecture.md | launch-readiness/ | ✅ Current | 2026-03-13 |
+| platform-operations-audit.md | launch-readiness/ | ✅ Current | 2026-03-13 |
+| platform-operations-implementation-plan.md | launch-readiness/ | ✅ Current | 2026-03-13 |
 | dd2-participant-auth-spec.md | launch-readiness/implementation/ | ✅ Current | 2025-07-24 |
 | session-guards.ts | lib/play/ | ✅ Current | 2025-07-24 |
 | Journey_v2_Architecture.md | Root | ✅ Current | — |
@@ -914,10 +927,276 @@ Tenant (= pastorat)
 
 ---
 
+## 12. Strategic Workstream — Enterprise Isolation
+
+> **Source:** GPT strategic analysis (2026-03-13). Johan-initiated.
+> **Principle:** Design-protect now, implement when first enterprise contract requires it.
+> **Status:** Design study complete. Architecture verified against codebase — 0 blockers found.
+
+### Context
+
+Svenska kyrkan, Norska kyrkan, kommuner, and similar organisations may require that their data environment is physically/infrastructurally separated from other customers. Some may require hosting in a specific country/region.
+
+### Decision (ADR-E1)
+
+> **Lekbanken ska vara byggt för shared-by-default, isolated-when-required.**
+
+| Level | Name | Description | Target Customer |
+|-------|------|-------------|-----------------|
+| A | Shared tenant | Same DB, RLS isolation | 95% of customers |
+| B | Isolated data plane | Same app code, separate DB | Enterprise (kyrkan, kommun) |
+| C | Fully isolated | Separate deployment, DB, secrets | Government/compliance |
+
+### Architecture Assessment (verified 2026-03-13)
+
+| Dimension | Ready? | Notes |
+|-----------|--------|-------|
+| Tenant model + RLS (994 policies) | ✅ | All DB-local, no cross-project refs |
+| Env-driven config (22 env vars) | ✅ | No hardcoded Supabase URLs in code |
+| Supabase client creation | ✅ | All clients read URL/keys from env |
+| Auth / JWT | ✅ | Per-project Supabase Auth |
+| Storage (5 buckets, tenant-prefixed) | ✅ | Per-Supabase-project storage |
+| Billing / Stripe | ⚠️ | Webhook endpoint per project (5 min setup) |
+| Global catalog (products/purposes) | ⚠️ | Needs idempotent seed scripts (~2h) |
+| Migration orchestration | ⚠️ | Needs multi-project deploy script (~4h) |
+| Admin panel | ⚠️ | Separate URL per deploy (acceptable) |
+
+**Architectural blockers:** 0. The codebase permits hybrid deployment.
+
+**Readiness tiers:**
+
+| Tier | Name | Effort | Status |
+|------|------|--------|--------|
+| Tier 1 | Minimum technical enablement | ~3 days | Seed scripts, migration tooling, deploy target registry |
+| Tier 2 | Operational readiness | Additional | Backup, incidents, secrets, release mgmt — see `platform-operations-implementation-plan.md` |
+| Tier 3 | Customer-facing compliance | Additional | DPA, hosting description, SLA — per customer |
+
+### Guardrails (locked)
+
+- **G1:** No customer-specific code forks — same app, different deploy targets
+- **G2:** All infrastructure via environment variables
+- **G3:** Global catalog via idempotent seed scripts
+- **G4:** Tenant features drive behavior, not deployment target
+- **G5:** All migrations must be applicable to any Supabase project from scratch
+
+### Documents
+
+| File | Purpose |
+|------|---------|
+| `enterprise-isolation-architecture.md` | System design, topology, control/data plane, provisioning model, guardrails |
+| `enterprise-isolation-audit.md` | 15-dimension isolation readiness audit (0 arch blockers, 8 ops gaps) |
+| `enterprise-isolation-implementation-plan.md` | 4-phase roadmap with 3-tier readiness model |
+
+---
+
+## 13. Strategic Workstream — Platform Operations & Enterprise Readiness
+
+> **Source:** GPT strategic analysis (2026-03-13). Calibration feedback on enterprise isolation study.
+> **Principle:** Lekbanken ska kunna beskrivas som en säker, driftsbar och revisionsbar plattform innan den beskrivs som en feature-rik plattform.
+> **Status:** Design study complete. 23 operational gaps identified. 6-phase implementation plan defined.
+
+### Context
+
+This workstream binds together five interconnected operational initiatives:
+
+1. **Preview isolation strategy** — sandbox Supabase + Preview env vars in existing Vercel project, protect production from preview traffic
+2. **WSL2 local engineering baseline** — standardise developer environment, enable Supabase CLI, CI parity
+3. **Vercel + Supabase operating model** — how environments, branches, deploys, and secrets connect
+4. **Enterprise isolated deployment provisioning** — repeatable flow for new deploy targets
+5. **Multi-target release management** — how releases reach all targets safely
+
+### Control Plane vs Data Plane
+
+| Control Plane (centrally owned) | Data Plane (per-deployment) |
+|--------------------------------|---------------------------|
+| Git repo, CI, release process | Vercel project, Supabase project |
+| Seeds, migrations, docs | DB, Auth, Storage, Realtime |
+| Design system, shared UI | Secrets, env vars, domain |
+| Internal admin tooling | Stripe webhooks, cron, telemetry |
+
+### ⚠️ Critical Open Risk: OPS-SAND-001
+
+> **Preview deployments currently hit the production Supabase database.**
+>
+> Första exekverbara operationsmål = få bort preview/dev från prod-data-plane.
+> Resolves via Preview env vars pointing at sandbox Supabase. Until then, every Vercel preview can mutate production data.
+
+### Beslut: Env-strategi (GPT-godkänd 2026-03-13)
+
+> Lekbanken använder ett gemensamt Vercel-projekt för app-deployment. Production environment variables pekar mot production Supabase, medan Preview environment variables pekar mot sandbox Supabase. Separat Vercel sandbox-projekt är uppskjutet tills persistent staging/UAT eller enterprise-lik deploy-topologi behövs.
+
+**Arkitektur:**
+```
+1 repo → 1 Vercel-projekt → 2 Supabase-projekt
+
+Production deploys → prod DB
+Preview deploys    → sandbox DB
+Local dev          → local eller sandbox DB
+```
+
+### Execution Checklist: Preview Env Vars
+
+**Where:** Vercel Dashboard → existing project → Settings → Environment Variables
+
+| # | Variable | Scope | Value | Status |
+|---|----------|-------|-------|--------|
+| 1 | `NEXT_PUBLIC_SUPABASE_URL` | Preview | `https://vmpdejhgpsrfulimsoqn.supabase.co` | ⬜ |
+| 2 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Preview | sandbox anon key | ⬜ |
+| 3 | `SUPABASE_SERVICE_ROLE_KEY` | Preview | sandbox service role key | ⬜ |
+| 4 | `DEPLOY_TARGET` | Preview | `preview` | ⬜ |
+| 5 | `APP_ENV` | Preview | `sandbox` | ⬜ |
+
+**Do NOT modify Production-scoped env vars.** Only add Preview overrides.
+
+**Verification:**
+- [ ] Create test PR → push empty commit
+- [ ] Check preview deploy builds successfully
+- [ ] Check preview `/api/health` returns 200
+- [ ] View source on preview → confirm sandbox Supabase URL in client bundle
+- [ ] Create data on preview → verify it appears in sandbox DB, NOT in prod
+- [ ] Verify `https://app.lekbanken.no/api/health` still returns 200
+
+### Workstream Relationship Map
+
+| Workstream | Scope | Timeline | Trigger |
+|------------|-------|----------|--------|
+| **Phase 1B** | Immediate sandbox isolation | Now | OPS-SAND-001 (preview → prod) |
+| **Platform Operations** | Operating model across all environments | Ongoing (6 phases) | Operational maturity |
+| **Enterprise Isolation** | Per-customer isolated deployments | On first enterprise contract | Customer interest |
+
+> Phase 1B = **execution task** (get sandbox live). Platform Operations = **operating model** (how all environments work). Enterprise Isolation = **topology model** (how isolated customers are provisioned). They build on each other but must not be conflated.
+
+### Next 3 Moves
+
+| # | Move | Resolves |
+|---|------|----------|
+| 1 | **Sandbox Supabase + Preview env vars** | OPS-SAND-001 (P1), isolates preview from prod data |
+| 2 | **WSL2 developer baseline** | OPS-DEV-001–004, reproducible local setup |
+| 3 | **Deploy target registry + migration tooling** | Foundation for enterprise + multi-target operations |
+
+> **Priority 4:** Observability foundation (Sentry + DEPLOY_TARGET + alerting).
+
+### Implementation Phases
+
+| Phase | Name | When | Effort |
+|-------|------|------|--------|
+| 1 | Developer Baseline | Now | 1–2 days |
+| 2 | Preview isolation (sandbox Supabase + Preview env vars) — **resolves OPS-SAND-001** | Next | 0.5 day |
+| 3 | Observability Foundation | Before enterprise | 1 day |
+| 4 | Release Management Tooling | Before enterprise | 1–2 days |
+| 5 | Enterprise Operational Readiness | With first contract | 2–3 days |
+| 6 | Ops Maturity & Automation | 3+ targets | 3–5 days |
+
+### Architecture Decisions
+
+| ID | Decision | Status |
+|----|----------|--------|
+| OPS-001 | WSL2 as local engineering baseline | 🟡 Proposed |
+| OPS-002 | Sandbox Supabase + Preview env vars (replaces separate Vercel project) | 🟡 Proposed |
+| OPS-003 | One Vercel project per deploy target | ⏳ Deferred — relevant for enterprise/persistent staging |
+| OPS-004 | Continuous deploy prod/sandbox, manual enterprise | 🟡 Proposed |
+| OPS-005 | Deploy targets in `.deploy-targets.json` | 🟡 Proposed |
+
+### Documents
+
+| File | Purpose |
+|------|---------|
+| `platform-operations-architecture.md` | Environment topology, WSL2, sandbox, operating model |
+| `platform-operations-audit.md` | 12-dimension operational readiness audit (23 gaps) |
+| `platform-operations-implementation-plan.md` | 6-phase implementation roadmap |
+| `sandbox-implementation-brief.md` | Preview isolation brief: sandbox Supabase + Preview env vars, verification checklist, rollback plan |
+
+---
+
+## 14. Strategic Workstream — Database Architecture Audit
+
+> **Source:** Sandbox-provisionering (2026-03-13). 10 fresh-install-fel avslöjades i migrationskedjan.
+> **Principle:** Skilja mellan historisk migrationskedja och framtida canonical datamodell.
+> **Status:** ✅ GENOMFÖRT — Alternativ B: Canonical Baseline. Verifierad fresh install. GPT-godkänt 2026-03-13.
+> **Canonical source:** `supabase/migrations/00000000000000_baseline.sql` — alla nya environments startar härifrån.
+> **Historiskt arkiv:** `supabase/migrations/_archived/` — 304 gamla migreringar bevarade som referens, ej canonical.
+
+### Bakgrund
+
+Sandbox-provisioneringen (`supabase db reset` mot tom databas) krävde 10 manuella fixar i migrationskedjan innan alla 307 migreringar kunde köras. Felen föll i 5 kategorier: funktionsordning, namngivningsdrift, saknad CASCADE, fantom-objekt och krockande fix-migreringar.
+
+GPT-analys (2026-03-13): "Det finns tillräckligt starka signaler för att motivera en riktig databas-audit nu. Det är sannolikt billigare att ta detta nu än senare."
+
+### Resultat
+
+| Dimension | Betyg |
+|-----------|-------|
+| Schema-design | 7/10 — Rimlig arkitektur, kända brister |
+| Migrationskedjans hälsa | 4/10 — 10 fresh-install-fel, 29% fix-migreringar |
+| RLS & säkerhet | 8/10 — Grundligt härdad |
+| Tenant isolation | 8/10 — Välfungerande multi-tenant |
+| Framtidssäkerhet | 6/10 — Gamification-sprawl, naming-drift |
+
+### Kärnslutsats
+
+> Problemet är INTE att datamodellen är hopplös. Problemet är att 307 migreringar som vuxit fram över tid inte längre är en tillförlitlig källa för nya environments.
+
+### Rekommendation: Alternativ B — Canonical Baseline
+
+Skapa en ny baseline-migration som representerar dagens faktiska produktionsschema. Arkivera gamla migreringar. Framtida miljöer startar rent. Produktionsdatabasen påverkas inte.
+
+| Alternativ | Tidsåtgång | Risk | Rekommendation |
+|-----------|------------|------|----------------|
+| A: Minimal Repair | 2–4 timmar | 🟢 Noll | Fungerar kortsiktigt, skulden växer |
+| **B: Canonical Baseline** | **2–3 dagar** | **🟢 Låg** | **REKOMMENDERAS** |
+| C: Partial Redesign | 1–2 veckor | 🔴 Hög | Överdrivet för nuvarande behov |
+
+### Sandbox-status
+
+| Steg | Status |
+|------|--------|
+| Sandbox Supabase-projekt skapat | ✅ ref: vmpdejhgpsrfulimsoqn |
+| 307 migreringar applicerade (10 fixar) | ✅ exit code 0 |
+| TypeScript-check | ✅ 0 errors |
+| **Beslut: Alternativ B — Canonical Baseline** | ✅ GPT-godkänt 2026-03-13 |
+| Baseline genererad från schema dump | ✅ 759 KB, 17 600+ rader |
+| Baseline schema-kvalificerad | ✅ 10 fixkategorier applicerade |
+| **Fresh install verifierad** | ✅ `supabase db reset --linked` exit code 0 |
+| **Schema-räkning matchar** | ✅ 247 tabeller, 156 funktioner, 545 policies, 28 enums |
+| Gamla migreringar arkiverade | ✅ 304 filer → `_archived/` |
+| Baseline-process dokumenterad | ✅ `canonical-baseline-execution.md` |
+| Seeds-test | ✅ exit code 0 (demo data, ej applied vid `--linked`) |
+| CI gate: fresh install + schema counts | ✅ `baseline-check.yml` |
+| CI gate: `gen types` drift check | ✅ Genererar typer lokalt, diffar mot committed `types/supabase.ts` |
+| Targeted RLS re-check (post-baseline) | ✅ 5/5 kontroller passerade (helper-fns, RESTRICTIVE, schema-qual, subqueries, triggers) |
+
+### Beslut (fattade)
+
+1. **Strategi: Alternativ B — Canonical Baseline** ✅
+2. **Tidpunkt: Nu**, före sandbox-deploy ✅
+3. **CI-check: Ja**, `db reset` + schema counts + `gen types` drift per PR ✅ IMPLEMENTERAD
+4. **Redesign: Nej** — naming-drift, gamification-sprawl etc. dokumenteras men fixas separat, i kontrollerade steg ✅
+
+### Documents
+
+| File | Purpose |
+|------|---------|
+| `database-architecture-audit.md` | Schema-hälsa (domän för domän) + migrationskedjans hälsa |
+| `database-architecture-remediation-plan.md` | Tre alternativ med detaljerad exekveringsplan |
+| `database-rebuild-feasibility.md` | Genomförbarhet, risker, ROI per alternativ |
+
+---
+
 ## Changelog
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-03-13 | Claude | **v2.40 — GPT FINAL APPROVAL + ENV STRATEGY.** GPT bekräftade att arkitekturen är "exakt rätt för Lekbanken just nu": 1 repo, 1 Vercel-projekt, 2 Supabase-projekt. Formell beslutstext tillagd i §13: "Lekbanken använder ett gemensamt Vercel-projekt för app-deployment. Production environment variables pekar mot production Supabase, medan Preview environment variables pekar mot sandbox Supabase." Execution checklist tillagd med exakt 5 env vars (Preview scope) + 6-stegs verifieringsplan. GPT-rekommenderad namngivning: `DEPLOY_TARGET=prod/preview/development/enterprise-<customer>`, `APP_ENV=prod/sandbox/local`. Rättelsenotering: `NEXT_PUBLIC_AUTH_REDIRECT_URL` används inte i koden (relativa redirects), `SUPABASE_PROJECT_ID`/`SUPABASE_JWT_SECRET` finns bara i legacy-skript. GPT-citat: "Det här är exakt rätt arkitektur för Lekbanken just nu. Du får production isolation, minimal drift, inga extra deploy targets, enkel mental modell." |
+| 2026-03-13 | Claude | **v2.39 — SANDBOX STRATEGY PIVOT (Spår A).** GPT-direktiv: skippa separat Vercel sandbox-projekt, använd istället Preview env vars i befintligt Vercel-projekt. Tre saker vi INTE gör: (1) Vercel Sandboxes-produkten, (2) separat Vercel sandbox-projekt, (3) `sandbox.lekbanken.no`-domän. Tre saker vi GÖR: (1) separat Supabase sandbox (redan klart, `vmpdejhgpsrfulimsoqn`), (2) Preview-scoped env vars i befintligt Vercel-projekt pekar mot sandbox-Supabase, (3) verifiering att preview-builds använder sandbox DB. `sandbox-implementation-brief.md` helt omskriven till ny modell (5 steg istället för 8). §13 uppdaterad: OPS-002 omformulerad, OPS-003 deferred. Nyckelinsikt: Vercel bygger varje preview separat — `NEXT_PUBLIC_*`-variabler för Preview scope bakas in vid build-time för just den builden, så separata env vars räcker utan separat projekt. GPT-citat: "Skippa Vercel Sandboxes-produkten, och skippa också separat Vercel sandbox-projekt just nu. Kör i stället separat Supabase sandbox + Preview env vars i befintligt Vercel-projekt." |
+| 2026-03-13 | Claude | **v2.38 — CI HARDENING + RLS RE-CHECK.** `baseline-check.yml` utökad med `gen types` drift check — genererar typer från lokal Supabase, diffar mot committed `types/supabase.ts`, failar om out-of-sync. Trigger-path utökad med `types/supabase.ts`. Targeted RLS baseline re-check (5 kontroller): (1) helper-funktioner i policies — alla `public.`-kvalificerade, (2) RESTRICTIVE syntax — 1 policy korrekt, (3) schema-kvalificerade funktionsanrop — 0 okvalificerade, (4) view/tabell-refs i policy-subqueries — 0 okvalificerade, (5) trigger-/funktionsrefs för tenant-kritiska tabeller — alla kvalificerade. GPT-citat: "Gå vidare med sandbox rollout nu, inte fler stora audit-loopar." |
+| 2026-03-13 | Claude | **v2.37 — CANONICAL BASELINE GENOMFÖRD.** Baseline genererad, verifierad och formaliserad. Schema dump via Supabase Management API (759 KB). 10 fixkategorier applicerade (enum-kvalificering, trigger/policy/tabell-kvalificering, forward declarations, RESTRICTIVE-syntax, BOM). Fresh install: `supabase db reset --linked` exit code 0. Schema-räkning verifierad: 247 tabeller, 156 funktioner, 545 policies, 28 enums — exakt match. 304 gamla migreringar arkiverade till `_archived/`. Alla 3 audit-dokument uppdaterade med slutstatus. Runbook skapad: `canonical-baseline-execution.md`. Temp-artefakter rensade. GPT-citat: "Formalisera nu Alternativ B som valt spår, hårdna baseline-processen en sista gång, och fortsätt sedan sandbox rollout ovanpå den nya baselinen." |
+| 2026-03-13 | Claude | **v2.36 — CANONICAL BASELINE BESLUT.** GPT godkände audit-resultaten och rekommenderade Alternativ B (Canonical Baseline). Formellt beslut fattat: (1) Strategi B — ny canonical baseline från faktiskt schema, (2) Tidpunkt: nu, före sandbox-deploy, (3) CI-check på db reset per PR, (4) Ingen redesign i samma arbetsfönster. Avgränsning: naming-drift, gamification-sprawl, updated_at-varianter dokumenteras men fixas separat. GPT-citat: "Ta beslut om Canonical Baseline nu, gör den innan vidare sandbox rollout, och håll redesign utanför samma arbetsfönster." |
+| 2026-03-13 | Claude | **v2.35 — DATABASE ARCHITECTURE AUDIT.** Sandbox-provisionering avslöjade 10 fresh-install-fel i migrationskedjan (5 feltyper: funktionsordning, naming-drift, saknad CASCADE, fantom-objekt, krockande fixar). Alla 307 migreringar passerar nu (10 fixar applicerade, exit code 0, tsc 0 errors). GPT-direktiv: "Stanna upp och auditera databasen ordentligt." 3 dokument skapade: `database-architecture-audit.md` (schema + migration chain health, domän-för-domän), `database-architecture-remediation-plan.md` (3 alternativ: Minimal Repair / Canonical Baseline / Partial Redesign), `database-rebuild-feasibility.md` (genomförbarhet per alternativ). **Rekommendation: Alternativ B — Canonical Baseline** (2–3 dagar, låg risk, eliminerar migrationsskuld). Sandbox-deploy pausad i väntan på beslut. §14 tillagd i launch-control. |
+| 2026-03-13 | Claude | **v2.34 — GPT CALIBRATION (Round 5) — SANDBOX BRIEF.** GPT approved sandbox-implementation-brief.md and added 2 calibration points: (1) **DEPLOY_TARGET standardized values** — `prod`, `sandbox`, `preview`, `enterprise-<customer>` convention locked for observability and safety. (2) **APP_ENV safety guard** — `APP_ENV` env var + script/seed guard pattern to prevent running destructive ops against production. Both applied to sandbox-implementation-brief.md (§4.5, §4.6, Step 4 env vars). GPT verdict: "Mycket solid. Gör sandbox deployment denna vecka." |
+| 2026-03-13 | Claude | **v2.33 — SANDBOX IMPLEMENTATION BRIEF.** GPT approved calibration round 4 and directed: "gå från planering till första exekverbara implementation slice." Created `sandbox-implementation-brief.md`: code-verified env var audit (22 vars mapped prod vs sandbox, build-time vs runtime), 8-step implementation sequence (create Supabase project → apply migrations/seeds → create Vercel project → set env vars → connect domain → deploy → verify → configure preview deploys), 17-point verification checklist (infrastructure, application, isolation, preview isolation), rollback plan (zero prod impact — all new infra), enterprise isolation proof matrix (sandbox validates Level B model). Verified against actual code: `lib/config/env.ts`, `app/api/health/route.ts`, `next.config.ts`, `vercel.json`, `lib/supabase/server.ts`, `lib/supabase/client.ts`. Finding: **zero code changes required** — sandbox is a pure infrastructure operation. |
+| 2026-03-13 | Claude | **v2.32 — GPT CALIBRATION (Round 4) — PLATFORM OPERATIONS.** GPT feedback applied (4 points): (1) **OPS-SAND-001 elevated** — critical risk callout added to §13 (launch-control), next-phase-execution-plan.md, and platform-operations-implementation-plan.md Phase 2. Principle: "första exekverbara operationsmål = få bort preview/dev från prod-data-plane." (2) **Workstream relationship map** added to platform-operations-architecture.md (§1.1) and launch-control §13 — Phase 1B (execution task) → Platform Operations (operating model) → Enterprise Isolation (topology model). (3) **Owner perspective** added to enterprise-isolation-architecture.md §11 provisioning model — Owner column on all 11 steps + responsibility matrix (Engineering/Ops/Support/Commercial). (4) **Next 3 Moves** section added to platform-operations-implementation-plan.md (§12.1) and launch-control §13 — concrete prioritised execution: sandbox → WSL2 baseline → deploy target registry. Practical direction locked per GPT: Priority 4 = observability foundation. |
+| 2026-03-13 | Claude | **v2.31 — GPT CALIBRATION + PLATFORM OPERATIONS WORKSTREAM.** GPT feedback applied to enterprise isolation files: (1) "~3 days total engineering" split into 3-tier readiness model (minimum technical enablement / operational readiness / compliance packaging), (2) "0 architectural blockers" clarified — explicit distinction between architectural readiness and operational/enterprise readiness, (3) Control plane vs data plane explicit model added to architecture (§10), (4) Enterprise provisioning model added (§11, 11-step repeatable flow, ~90min per customer). New parallel workstream created: **Platform Operations & Enterprise Readiness** with 3 documents: `platform-operations-architecture.md` (env topology, WSL2 baseline, sandbox strategy, operating model, release management), `platform-operations-audit.md` (12-dimension audit, 23 operational gaps), `platform-operations-implementation-plan.md` (6-phase roadmap from developer baseline through ops automation). 5 architecture decisions proposed (OPS-001–005). §13 added to launch-control. New principle locked: "Lekbanken ska kunna beskrivas som en säker, driftsbar och revisionsbar plattform innan den beskrivs som en feature-rik plattform." |
+| 2026-03-13 | Claude | **v2.30 — ENTERPRISE ISOLATION STUDY.** New strategic workstream added: Enterprise Isolation / Hybrid Deployment Strategy (ADR-E1). 3 documents created: `enterprise-isolation-architecture.md` (system design, 3-level isolation model, deployment topology, design guardrails), `enterprise-isolation-audit.md` (15-dimension code-verified audit, 0 architectural blockers found), `enterprise-isolation-implementation-plan.md` (4-phase roadmap, ~3 days minimum technical enablement before first enterprise contract). Principle locked: "shared-by-default, isolated-when-required — samma produkt, olika deploy targets." §12 added to launch-control. ADR-E1 added to §7. Documentation table updated. Initiated by GPT strategic analysis based on Svenska kyrkan design partner interest. |
 | 2026-03-13 | Claude | **v2.29 — SCOPE DEFINITION.** GPT feedback applied: added scope definition table for Priority 2 (content sharing within tenant). Defines in-scope (plan/course/block type sharing, copy-as-template, browse UI) vs out-of-scope (media sharing, cross-tenant, group-level permissions, collaborative editing). Scope boundary: "sharing = visibility + copy". |
 | 2026-03-13 | Claude | **v2.28 — DESIGN DECISIONS.** GPT feedback applied to §11: priority order updated (content sharing #2, course builder #3 per GPT recommendation). Three formal design decisions added: ADR-K1 (tenant-defined block types via metadata), ADR-K2 (courses must converge toward block model), ADR-K3 (groups before hierarchy). Product Direction statement added. Intermediate org model defined. |
 | 2026-03-13 | Claude | **v2.27 — PRODUCT ROADMAP.** Added §11 "Product Roadmap — Design Partner (Kyrkan)". 4 priorities: (1) tenant-custom planner blocks, (2) course builder 2.0, (3) content sharing within tenant, (4) multi-organisation tenant. Each with architecture readiness assessment verified against codebase. Architecture guardrails defined to prevent lock-in. Key insight: Planner + Courses should share unified block model. |

@@ -76,10 +76,10 @@ ALTER TABLE public.user_tenant_memberships
   ALTER COLUMN role SET DEFAULT 'member';
 
 -- 3) Consolidate helper functions with admin bypass
-DROP FUNCTION IF EXISTS public.is_tenant_member(uuid);
-DROP FUNCTION IF EXISTS public.get_user_tenant_ids();
-DROP FUNCTION IF EXISTS public.has_tenant_role(uuid, text);
-DROP FUNCTION IF EXISTS public.has_tenant_role(uuid, text[]);
+DROP FUNCTION IF EXISTS public.is_tenant_member(uuid) CASCADE;
+DROP FUNCTION IF EXISTS public.get_user_tenant_ids() CASCADE;
+DROP FUNCTION IF EXISTS public.has_tenant_role(uuid, text) CASCADE;
+DROP FUNCTION IF EXISTS public.has_tenant_role(uuid, text[]) CASCADE;
 DROP FUNCTION IF EXISTS public.has_tenant_role(uuid, public.tenant_role_enum) CASCADE;
 DROP FUNCTION IF EXISTS public.has_tenant_role(uuid, public.tenant_role_enum[]) CASCADE;
 

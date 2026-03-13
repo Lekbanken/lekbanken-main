@@ -1,0 +1,66 @@
+name: Database Baseline Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/seed.sql'
+      - 'types/supabase.ts'
+
+jobs:
+  baseline-check:
+    name: Verify Baseline Fresh Install
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase
+        run: supabase start -x realtime,storage-api,imgproxy,inbucket,postgrest,gotrue,studio,edge-runtime,logflare,vector,supavisor
+
+      - name: Verify baseline fresh install
+        run: supabase db reset --local
+
+      - name: Verify generated types in sync
+        run: |
+          supabase gen types typescript --local > types/supabase.ts.ci
+          if ! diff -q types/supabase.ts types/supabase.ts.ci > /dev/null 2>&1; then
+            echo "::error::types/supabase.ts is out of sync with the database schema. Run 'npm run db:types' and commit the result."
+            diff types/supabase.ts types/supabase.ts.ci | head -50
+            exit 1
+          fi
+          echo "✅ types/supabase.ts is in sync with schema"
+          rm types/supabase.ts.ci
+
+      - name: Verify schema counts
+        run: |
+          PGCONN="postgresql://postgres:postgres@localhost:54322/postgres"
+
+          TABLES=$(psql "$PGCONN" -t -c "SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE'" | tr -d ' ')
+          FUNCTIONS=$(psql "$PGCONN" -t -c "SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON p.pronamespace=n.oid WHERE n.nspname='public' AND p.prokind='f'" | tr -d ' ')
+          POLICIES=$(psql "$PGCONN" -t -c "SELECT count(*) FROM pg_policies WHERE schemaname='public'" | tr -d ' ')
+          ENUMS=$(psql "$PGCONN" -t -c "SELECT count(*) FROM pg_type t JOIN pg_namespace n ON t.typnamespace=n.oid WHERE n.nspname='public' AND t.typtype='e'" | tr -d ' ')
+
+          echo "Tables: $TABLES (expected >= 247)"
+          echo "Functions: $FUNCTIONS (expected >= 156)"
+          echo "Policies: $POLICIES (expected >= 545)"
+          echo "Enums: $ENUMS (expected >= 28)"
+
+          # Fail if counts drop below baseline
+          if [ "$TABLES" -lt 247 ]; then echo "::error::Table count dropped below baseline (got $TABLES, expected >= 247)"; exit 1; fi
+          if [ "$FUNCTIONS" -lt 156 ]; then echo "::error::Function count dropped below baseline (got $FUNCTIONS, expected >= 156)"; exit 1; fi
+          if [ "$POLICIES" -lt 545 ]; then echo "::error::Policy count dropped below baseline (got $POLICIES, expected >= 545)"; exit 1; fi
+          if [ "$ENUMS" -lt 28 ]; then echo "::error::Enum count dropped below baseline (got $ENUMS, expected >= 28)"; exit 1; fi
+
+          echo "✅ All schema counts at or above baseline"
+
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop

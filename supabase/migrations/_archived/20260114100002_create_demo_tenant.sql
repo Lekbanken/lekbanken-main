@@ -47,6 +47,9 @@ ON CONFLICT (id) DO UPDATE SET
 -- 2. Register demo.lekbanken.no in tenant_domains
 -- ============================================================================
 
+-- Add kind column if it doesn't exist
+ALTER TABLE public.tenant_domains ADD COLUMN IF NOT EXISTS kind text DEFAULT 'custom';
+
 INSERT INTO tenant_domains (
   tenant_id,
   hostname,

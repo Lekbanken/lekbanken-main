@@ -67,7 +67,7 @@ BEGIN
   
   IF obj_type = 'v' THEN
     -- It's a view - recreate with security_invoker
-    DROP VIEW IF EXISTS public.tenant_memberships;
+    DROP VIEW IF EXISTS public.tenant_memberships CASCADE;
     
     CREATE VIEW public.tenant_memberships
     WITH (security_invoker = on)

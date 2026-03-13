@@ -5,6 +5,14 @@
 -- Date: 2026-01-14
 -- ============================================================================
 
+-- Safety guard: never run seeds against production
+DO $$
+BEGIN
+  IF current_setting('app.env', true) = 'prod' THEN
+    RAISE EXCEPTION 'Seeds cannot run against production (app.env=prod)';
+  END IF;
+END $$;
+
 -- NOTE: 00000000-0000-0000-0000-000000000001 is reserved for Lekbanken main tenant
 -- Demo tenant uses: 00000000-0000-0000-0000-00000000de01 (de01 = demo 01)
 

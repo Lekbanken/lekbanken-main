@@ -6,6 +6,15 @@
 -- This migration is intentionally idempotent because older remote databases
 -- may already have received the original 20241210 migration.
 
+-- Bootstrap: ensure is_system_admin() exists for RLS policies below.
+-- The canonical definition lives in 20251209100000_tenant_domain.sql.
+CREATE OR REPLACE FUNCTION public.is_system_admin() RETURNS boolean AS $$
+  SELECT coalesce(
+    (current_setting('request.jwt.claims', true)::json ->> 'role') = 'system_admin',
+    false
+  );
+$$ LANGUAGE sql STABLE;
+
 DO LANGUAGE plpgsql $$
 BEGIN
   IF NOT EXISTS (

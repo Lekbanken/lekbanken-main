@@ -126,6 +126,14 @@ export const env = {
     /** Trigger kill switch: Emergency disable all triggers. */
     triggerKillSwitch: process.env.FEATURE_TRIGGER_KILL_SWITCH === 'true' || (process.env.NODE_ENV === 'development'),
   },
+  
+  // Deployment identity
+  deployment: {
+    /** Deploy target identifier for observability (Sentry tags, logs). Values: prod, sandbox, preview, enterprise-<customer> */
+    target: process.env.DEPLOY_TARGET || 'local-dev',
+    /** App environment safety guard. Scripts/seeds check this to prevent running against prod. */
+    appEnv: process.env.APP_ENV || 'local-dev',
+  },
 } as const;
 
 // Run validation on module load (server-side only)

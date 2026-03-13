@@ -5,6 +5,14 @@
 -- Date: 2026-01-14
 -- ============================================================================
 
+-- Safety guard: never run seeds against production
+DO $$
+BEGIN
+  IF current_setting('app.env', true) = 'prod' THEN
+    RAISE EXCEPTION 'Seeds cannot run against production (app.env=prod)';
+  END IF;
+END $$;
+
 BEGIN;
 
 \echo 'Curating demo content...'

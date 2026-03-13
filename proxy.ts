@@ -304,7 +304,8 @@ function isPlatformSubdomain(hostname: string): boolean {
 
 /**
  * Check if hostname is allowed without database verification.
- * Returns true for localhost (dev) and *.lekbanken.no (platform).
+ * Returns true for localhost (dev), *.lekbanken.no (platform),
+ * and Vercel preview/production deployments (*.vercel.app).
  */
 function isBuiltInTrustedHost(hostname: string): boolean {
   // Development: localhost
@@ -313,6 +314,10 @@ function isBuiltInTrustedHost(hostname: string): boolean {
   }
   // Platform domains: *.lekbanken.no
   if (isPlatformSubdomain(hostname)) {
+    return true
+  }
+  // Vercel preview & production deployments
+  if (hostname.endsWith('.vercel.app')) {
     return true
   }
   return false

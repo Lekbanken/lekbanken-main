@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { ProfileService, type OrganizationMembership } from '@/lib/profile';
-import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -15,9 +14,7 @@ import {
   BuildingOffice2Icon,
   UserGroupIcon,
   CalendarIcon,
-  ChevronRightIcon,
   ShieldCheckIcon,
-  CogIcon,
   AcademicCapIcon,
 } from '@heroicons/react/24/outline';
 
@@ -219,8 +216,7 @@ export default function OrganizationsPage() {
               return (
                 <div
                   key={membership.id}
-                  className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors cursor-pointer"
-                  onClick={() => window.location.href = `/app/organizations/${membership.tenant.slug}`}
+                  className="flex items-center justify-between p-4 rounded-lg border border-border"
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -249,16 +245,6 @@ export default function OrganizationsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/app/organizations/${membership.tenant.slug}/settings`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="p-2 rounded-lg hover:bg-muted transition-colors"
-                    >
-                      <CogIcon className="h-5 w-5 text-muted-foreground" />
-                    </Link>
-                    <ChevronRightIcon className="h-5 w-5 text-muted-foreground" />
-                  </div>
                 </div>
               );
             })}
@@ -284,10 +270,9 @@ export default function OrganizationsPage() {
               const role = roleLabels[membership.role];
 
               return (
-                <Link
+                <div
                   key={membership.id}
-                  href={`/app/organizations/${membership.tenant.slug}`}
-                  className="flex items-center justify-between p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors"
+                  className="flex items-center justify-between p-4 rounded-lg border border-border"
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
@@ -316,8 +301,7 @@ export default function OrganizationsPage() {
                       </div>
                     </div>
                   </div>
-                  <ChevronRightIcon className="h-5 w-5 text-muted-foreground" />
-                </Link>
+                </div>
               );
             })}
           </CardContent>

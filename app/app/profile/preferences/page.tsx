@@ -42,7 +42,7 @@ export default function PreferencesPage() {
   const locale = useLocale();
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
-  const { currentTenant } = useTenant();
+  const { currentTenant, isLoadingTenants } = useTenant();
 
   const [preferences, setPreferences] = useState<Partial<UserPreferences>>({
     ...defaultPreferences,
@@ -88,7 +88,7 @@ export default function PreferencesPage() {
     })
   }, [fetchedPreferences]);
 
-  const stillLoading = isLoading || authLoading;
+  const stillLoading = isLoading || authLoading || isLoadingTenants;
 
   const handlePreferenceChange = useCallback((key: keyof UserPreferences, value: unknown) => {
     setPreferences((prev) => ({ ...prev, [key]: value }));

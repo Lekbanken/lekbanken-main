@@ -19,6 +19,6 @@ USING (
     FROM public.user_tenant_memberships m
     WHERE m.user_id = (SELECT auth.uid())
       AND m.tenant_id = participant_sessions.tenant_id
-      AND m.role IN ('tenant_admin', 'system_admin')
+      AND m.role IN ('owner', 'admin')
   )
 );

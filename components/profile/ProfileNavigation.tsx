@@ -93,6 +93,7 @@ export function ProfileNavigation({ className }: ProfileNavigationProps) {
           <Link
             key={item.id}
             href={item.href}
+            prefetch={false}
             className={cn(
               'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
               active
@@ -131,6 +132,7 @@ export function ProfileMobileNav() {
       <div className="flex items-center gap-3 mb-4">
         <Link
           href="/app/profile"
+          prefetch={false}
           className="p-2 rounded-lg hover:bg-muted transition-colors"
         >
           <ChevronLeftIcon className="h-5 w-5 text-muted-foreground" />
@@ -154,6 +156,7 @@ export function ProfileMobileNav() {
             <Link
               key={item.id}
               href={item.href}
+              prefetch={false}
               className={cn(
                 'flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-full whitespace-nowrap transition-colors',
                 active

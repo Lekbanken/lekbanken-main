@@ -36,6 +36,7 @@ function QuickLink({ href, icon: Icon, title, description, badge, badgeVariant }
   return (
     <Link
       href={href}
+      prefetch={false}
       className="flex items-center gap-4 p-4 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors group"
     >
       <div className="p-2 rounded-lg bg-primary/10 text-primary">

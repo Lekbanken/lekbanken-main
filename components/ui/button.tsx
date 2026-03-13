@@ -95,7 +95,7 @@ export function Button({
 
   if (href && !isDisabled) {
     return (
-      <Link href={href} className={classes} {...props}>
+      <Link href={href} prefetch={false} className={classes} {...props}>
         {content}
       </Link>
     );

@@ -1,24 +1,22 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
-export async function GET() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth }) => {
+    const supabase = await createServerRlsClient()
+    const { data, error } = await supabase
+      .from('user_sessions')
+      .select('*')
+      .eq('user_id', auth!.user!.id)
+      .order('last_seen_at', { ascending: false })
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (error) {
+      console.error('[accounts/sessions] list error', error)
+      return NextResponse.json({ error: 'Failed to load sessions' }, { status: 500 })
+    }
 
-  const { data, error } = await supabase
-    .from('user_sessions')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('last_seen_at', { ascending: false })
-
-  if (error) {
-    console.error('[accounts/sessions] list error', error)
-    return NextResponse.json({ error: 'Failed to load sessions' }, { status: 500 })
-  }
-
-  return NextResponse.json({ sessions: data ?? [] })
-}
+    return NextResponse.json({ sessions: data ?? [] })
+  },
+})

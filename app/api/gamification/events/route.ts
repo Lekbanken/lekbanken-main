@@ -1,8 +1,8 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
-import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { AuthError, requireTenantRole } from '@/lib/api/auth-guard'
 import type { Json } from '@/types/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -26,63 +26,47 @@ const schema = z.object({
  * - Writes via service role to append-only `public.gamification_events`
  * - Idempotent via unique index (tenant_id, source, idempotency_key)
  */
-export async function POST(request: Request) {
-  const rate = applyRateLimitMiddleware(request as NextRequest, 'api')
-  if (rate) return rate
+export const POST = apiHandler({
+  auth: 'user',
+  rateLimit: 'api',
+  input: schema,
+  handler: async ({ auth, body }) => {
+    const { tenantId: rawTenantId, eventType, source, idempotencyKey, metadata, rewardCoins, rewardReasonCode } = body
+    const tenantId = rawTenantId ?? null
 
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
+    // Admin check: global events require system_admin; tenant events require tenant admin or system_admin
+    if (tenantId) {
+      await requireTenantRole(['admin', 'owner'], tenantId)
+    } else if (auth!.effectiveGlobalRole !== 'system_admin') {
+      throw new AuthError('Forbidden', 403)
+    }
 
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    // Enterprise safety: product sources are server-emitted only.
+    if (source === 'planner' || source === 'play') {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: { source: ['planner/play events must be emitted server-side'] } },
+        { status: 400 }
+      )
+    }
 
-  const body = await request.json().catch(() => ({}))
-  const parsed = schema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
+    // Enterprise safety: coin source restriction
+    if (typeof rewardCoins === 'number' && source !== 'admin' && source !== 'system') {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: { rewardCoins: ['Coins are determined server-side for planner/play events'] } },
+        { status: 400 }
+      )
+    }
 
-  const { tenantId: rawTenantId, eventType, source, idempotencyKey, metadata, rewardCoins, rewardReasonCode } = parsed.data
-  const tenantId = rawTenantId ?? null
+    if (!tenantId && typeof rewardCoins === 'number') {
+      return NextResponse.json({ error: 'Invalid payload', details: { rewardCoins: ['Global events cannot mint coins'] } }, { status: 400 })
+    }
 
-  const isAdmin = isSystemAdmin(user) || (tenantId ? await isTenantAdmin(tenantId, user.id) : false)
+    const admin = createServiceRoleClient()
+    const userId = auth!.user!.id
 
-  // Enterprise safety: product sources are server-emitted only.
-  // This endpoint is reserved for admin/system operations and debugging.
-  if (!isAdmin) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  if (source === 'planner' || source === 'play') {
-    return NextResponse.json(
-      { error: 'Invalid payload', details: { source: ['planner/play events must be emitted server-side'] } },
-      { status: 400 }
-    )
-  }
-
-  // Enterprise safety: minting coins via events is admin/system only.
-  if (typeof rewardCoins === 'number' && !isAdmin) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  if (typeof rewardCoins === 'number' && source !== 'admin' && source !== 'system') {
-    return NextResponse.json(
-      { error: 'Invalid payload', details: { rewardCoins: ['Coins are determined server-side for planner/play events'] } },
-      { status: 400 }
-    )
-  }
-
-  if (!tenantId && typeof rewardCoins === 'number') {
-    return NextResponse.json({ error: 'Invalid payload', details: { rewardCoins: ['Global events cannot mint coins'] } }, { status: 400 })
-  }
-
-  const admin = createServiceRoleClient()
-
-  try {
     const insertPayload = {
       tenant_id: tenantId,
-      actor_user_id: user.id,
+      actor_user_id: userId,
       event_type: eventType,
       source,
       idempotency_key: idempotencyKey,
@@ -118,7 +102,7 @@ export async function POST(request: Request) {
         if (existingEventId && typeof rewardCoins === 'number' && tenantId) {
           const coinIdempotencyKey = `evt:${existingEventId}:coins`
           const { data: coinData, error: coinError } = await admin.rpc('apply_coin_transaction_v1', {
-            p_user_id: user.id,
+            p_user_id: userId,
             p_tenant_id: tenantId,
             p_type: 'earn',
             p_amount: rewardCoins,
@@ -161,7 +145,7 @@ export async function POST(request: Request) {
     if (eventId && typeof rewardCoins === 'number' && tenantId) {
       const coinIdempotencyKey = `evt:${eventId}:coins`
       const { data: coinData, error: coinError } = await admin.rpc('apply_coin_transaction_v1', {
-        p_user_id: user.id,
+        p_user_id: userId,
         p_tenant_id: tenantId,
         p_type: 'earn',
         p_amount: rewardCoins,
@@ -192,8 +176,5 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ eventId, idempotent: false }, { status: 200 })
-  } catch (e) {
-    const message = e instanceof Error ? e.message : 'Unknown error'
-    return NextResponse.json({ error: 'Server error', details: message }, { status: 500 })
-  }
-}
+  },
+})

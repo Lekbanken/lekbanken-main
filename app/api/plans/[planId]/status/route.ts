@@ -8,6 +8,7 @@ import {
   planToResource,
 } from '@/lib/auth/capabilities'
 import { assertTransition, getNextStatus, type PlanStatusAction } from '@/lib/planner/state-machine'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { PlannerStatus } from '@/types/planner'
 
 type RequestBody = {
@@ -15,25 +16,15 @@ type RequestBody = {
   action?: PlanStatusAction
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ planId: string }> }
-) {
-  const { planId } = await params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { planId } = params
+  const user = auth!.user!
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json(
-      { error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
-      { status: 401 }
-    )
-  }
 
   // Parse request body
-  const body = (await request.json().catch(() => ({}))) as RequestBody
+  const body = (await req.json().catch(() => ({}))) as RequestBody
 
   // Fetch existing plan
   const { data: plan, error: planError } = await supabase
@@ -168,4 +159,5 @@ export async function POST(
     previousStatus: plan.status,
     newStatus: targetStatus,
   })
-}
+  },
+})

@@ -14,6 +14,7 @@ import {
   type SupportedLocale,
 } from './helpers'
 import { DEMO_TENANT_ID } from '@/lib/auth/ephemeral-users'
+import { apiHandler } from '@/lib/api/route-handler'
 
 async function getSubPurposeGameIds(
   supabase: Awaited<ReturnType<typeof createServerRlsClient>>,
@@ -38,12 +39,14 @@ async function getSubPurposeGameIds(
   return Array.from(ids)
 }
 
-export async function POST(request: Request) {
+export const POST = apiHandler({
+  auth: 'public',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const body = await request.json().catch(() => ({}))
+  const body = await req.json().catch(() => ({}))
   const parsed = searchSchema.safeParse(body)
 
   if (!parsed.success) {
@@ -94,9 +97,12 @@ export async function POST(request: Request) {
       .eq('status', 'published')
       .eq('is_demo_content', true)
     
-    // Apply search filter
+    // Apply search filter (strip PostgREST DSL metacharacters)
     if (search) {
-      demoQuery = demoQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`)
+      const s = search.replace(/[,()]/g, '')
+      if (s) {
+        demoQuery = demoQuery.or(`name.ilike.%${s}%,description.ilike.%${s}%`)
+      }
     }
     
     // Apply other filters that make sense for demo
@@ -241,7 +247,10 @@ export async function POST(request: Request) {
   }
 
   if (search) {
-    query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`)
+    const s = search.replace(/[,()]/g, '')
+    if (s) {
+      query = query.or(`name.ilike.%${s}%,description.ilike.%${s}%`)
+    }
   }
 
   if (energyLevelsFilter.length > 0) {
@@ -307,8 +316,7 @@ export async function POST(request: Request) {
 
   // Log search (best effort)
   if (search || products.length || mainPurposes.length || subPurposes.length) {
-    const { data: user } = await supabase.auth.getUser()
-    const userId = user.user?.id || null
+    const userId = user?.id || null
     try {
       await supabase.from('browse_search_logs').insert({
         search_term: search || null,
@@ -350,4 +358,5 @@ export async function POST(request: Request) {
       allowedProducts: allowedProductIds,
     },
   })
-}
+},
+})

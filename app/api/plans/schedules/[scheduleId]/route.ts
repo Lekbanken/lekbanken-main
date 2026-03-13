@@ -1,27 +1,19 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { requirePlanEditAccess } from '@/lib/planner/require-plan-access';
 import type { PlanSchedule, UpdateScheduleInput } from '@/features/planner/calendar/types';
-
-interface RouteParams {
-  params: Promise<{ scheduleId: string }>;
-}
 
 /**
  * GET /api/plans/schedules/[scheduleId]
  * 
  * Get a single schedule by ID.
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: RouteParams
-) {
-  const { scheduleId } = await params;
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ params }) => {
+  const { scheduleId } = params;
   const supabase = await createServerRlsClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
 
   try {
     const { data, error } = await supabase
@@ -69,27 +61,37 @@ export async function GET(
     console.error('[schedule] unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+});
 
 /**
  * PUT /api/plans/schedules/[scheduleId]
  * 
  * Update a schedule.
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: RouteParams
-) {
-  const { scheduleId } = await params;
+export const PUT = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { scheduleId } = params;
   const supabase = await createServerRlsClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
 
   try {
-    const body = await request.json() as UpdateScheduleInput;
+    // Fetch schedule to get plan_id for capability check
+    const { data: existing, error: existingError } = await supabase
+      .from('plan_schedules')
+      .select('plan_id')
+      .eq('id', scheduleId)
+      .maybeSingle();
+
+    if (existingError || !existing) {
+      return NextResponse.json({ error: 'Schedule not found' }, { status: 404 });
+    }
+
+    // Capability check: user must be able to edit the plan
+    const access = await requirePlanEditAccess(supabase, auth!.user!, existing.plan_id);
+    if (!access.allowed) return access.response;
+
+    const body = await req.json() as UpdateScheduleInput;
 
     const updates: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
@@ -160,26 +162,36 @@ export async function PUT(
     console.error('[schedule] unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+});
 
 /**
  * DELETE /api/plans/schedules/[scheduleId]
  * 
  * Delete a schedule.
  */
-export async function DELETE(
-  _request: NextRequest,
-  { params }: RouteParams
-) {
-  const { scheduleId } = await params;
+export const DELETE = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { scheduleId } = params;
   const supabase = await createServerRlsClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
 
   try {
+    // Fetch schedule to get plan_id for capability check
+    const { data: existing, error: existingError } = await supabase
+      .from('plan_schedules')
+      .select('plan_id')
+      .eq('id', scheduleId)
+      .maybeSingle();
+
+    if (existingError || !existing) {
+      return NextResponse.json({ error: 'Schedule not found' }, { status: 404 });
+    }
+
+    // Capability check: user must be able to edit the plan
+    const access = await requirePlanEditAccess(supabase, auth!.user!, existing.plan_id);
+    if (!access.allowed) return access.response;
+
     const { error } = await supabase
       .from('plan_schedules')
       .delete()
@@ -195,7 +207,8 @@ export async function DELETE(
     console.error('[schedule] unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+});
 
 // =============================================================================
 // Helpers

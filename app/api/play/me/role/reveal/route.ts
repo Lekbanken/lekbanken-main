@@ -8,23 +8,24 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
-import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
-export async function POST(request: Request) {
-  try {
-    const token = request.headers.get('x-participant-token');
-    const url = new URL(request.url);
+export const POST = apiHandler({
+  auth: 'participant',
+  handler: async ({ req, participant: p }) => {
+    const url = new URL(req.url);
     const sessionCode = url.searchParams.get('session_code');
 
-    if (!token || !sessionCode) {
+    if (!sessionCode) {
       return NextResponse.json(
-        { error: 'Missing participant token or session_code' },
+        { error: 'Missing session_code' },
         { status: 400 }
       );
     }
 
     const normalizedCode = normalizeSessionCode(sessionCode);
-    const supabase = await createServiceRoleClient();
+    const supabase = createServiceRoleClient();
 
     // Note: keep select('*') so it compiles even if generated Supabase types lag behind migrations.
     const { data: session, error: sessionError } = await supabase
@@ -39,6 +40,17 @@ export async function POST(request: Request) {
 
     const sessionId = String((session as Record<string, unknown>).id);
 
+    const statusError = assertSessionStatus(
+      String((session as Record<string, unknown>).status),
+      'role-reveal',
+    );
+    if (statusError) return statusError;
+
+    // Verify participant belongs to this session
+    if (p!.sessionId !== sessionId) {
+      return NextResponse.json({ error: 'Session mismatch' }, { status: 403 });
+    }
+
     if (!(session as Record<string, unknown>)?.secret_instructions_unlocked_at) {
       return NextResponse.json(
         { error: 'Secret instructions are not unlocked' },
@@ -46,30 +58,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data: participant, error: participantError } = await supabase
-      .from('participants')
-      .select('id, token_expires_at, status')
-      .eq('participant_token', token)
-      .eq('session_id', sessionId)
-      .single();
-
-    if (participantError || !participant) {
-      return NextResponse.json({ error: 'Participant not found' }, { status: 404 });
-    }
-
-    if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
-      return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
-    }
-
-    if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) {
-      return NextResponse.json({ error: 'Token expired' }, { status: 401 });
-    }
-
     const { data: existingAssignment, error: assignmentError } = await supabase
       .from('participant_role_assignments')
       .select('*')
       .eq('session_id', sessionId)
-      .eq('participant_id', participant.id)
+      .eq('participant_id', p!.participantId)
       .maybeSingle();
 
     if (assignmentError) {
@@ -112,11 +105,5 @@ export async function POST(request: Request) {
       { success: true, secretRevealedAt: now },
       { status: 200 }
     );
-  } catch (error) {
-    console.error('[me/role/reveal] error:', error);
-    return NextResponse.json(
-      { error: 'Failed to reveal secret instructions' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

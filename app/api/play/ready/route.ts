@@ -12,87 +12,100 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
-import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function POST(request: Request) {
-  const token = request.headers.get('x-participant-token');
-  const url = new URL(request.url);
-  const sessionCode = url.searchParams.get('session_code');
+export const POST = apiHandler({
+  auth: 'participant',
+  handler: async ({ req, participant: p }) => {
+    const url = new URL(req.url);
+    const sessionCode = url.searchParams.get('session_code');
 
-  if (!token || !sessionCode) {
-    return NextResponse.json(
-      { error: 'Missing participant token or session_code' },
-      { status: 400 }
-    );
-  }
+    if (!sessionCode) {
+      return NextResponse.json(
+        { error: 'Missing session_code' },
+        { status: 400 }
+      );
+    }
 
-  let body: { isReady?: boolean };
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    let body: { isReady?: boolean };
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-  if (typeof body.isReady !== 'boolean') {
-    return NextResponse.json(
-      { error: 'isReady must be a boolean' },
-      { status: 400 }
-    );
-  }
+    if (typeof body.isReady !== 'boolean') {
+      return NextResponse.json(
+        { error: 'isReady must be a boolean' },
+        { status: 400 }
+      );
+    }
 
-  const normalizedCode = normalizeSessionCode(sessionCode);
-  const supabase = await createServiceRoleClient();
+    const normalizedCode = normalizeSessionCode(sessionCode);
+    const supabase = createServiceRoleClient();
 
-  // Find session
-  const { data: session, error: sessionError } = await supabase
-    .from('participant_sessions')
-    .select('id, status')
-    .eq('session_code', normalizedCode)
-    .single();
+    // Find session
+    const { data: session, error: sessionError } = await supabase
+      .from('participant_sessions')
+      .select('id, status')
+      .eq('session_code', normalizedCode)
+      .single();
 
-  if (sessionError || !session) {
-    return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-  }
+    if (sessionError || !session) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
 
-  // Only allow readiness toggle in lobby state
-  if (session.status !== 'lobby' && session.status !== 'active') {
-    return NextResponse.json(
-      { error: 'Session is not accepting readiness changes' },
-      { status: 409 }
-    );
-  }
+    // Verify participant belongs to this session
+    if (p!.sessionId !== session.id) {
+      return NextResponse.json({ error: 'Session mismatch' }, { status: 403 });
+    }
 
-  // Verify participant
-  const { data: participant, error: participantError } = await supabase
-    .from('participants')
-    .select('id, progress, status')
-    .eq('participant_token', token)
-    .eq('session_id', session.id)
-    .single();
+    // Only allow readiness toggle in lobby state
+    if (session.status !== 'lobby' && session.status !== 'active') {
+      return NextResponse.json(
+        { error: 'Session is not accepting readiness changes' },
+        { status: 409 }
+      );
+    }
 
-  if (participantError || !participant) {
-    return NextResponse.json({ error: 'Participant not found' }, { status: 404 });
-  }
+    // Fetch participant's progress for merge
+    const { data: participant, error: participantError } = await supabase
+      .from('participants')
+      .select('id, progress')
+      .eq('id', p!.participantId)
+      .single();
 
-  if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
-    return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
-  }
+    if (participantError || !participant) {
+      return NextResponse.json({ error: 'Participant not found' }, { status: 404 });
+    }
 
-  // Merge isReady into existing progress JSON
-  const currentProgress = (participant.progress as Record<string, unknown>) ?? {};
-  const updatedProgress = { ...currentProgress, isReady: body.isReady };
+    // Merge isReady into existing progress JSON
+    const currentProgress = (participant.progress as Record<string, unknown>) ?? {};
+    const updatedProgress = { ...currentProgress, isReady: body.isReady };
 
-  const { error: updateError } = await supabase
-    .from('participants')
-    .update({ progress: updatedProgress as unknown as Record<string, never> })
-    .eq('id', participant.id);
+    const { error: updateError } = await supabase
+      .from('participants')
+      .update({ progress: updatedProgress as unknown as Record<string, never> })
+      .eq('id', participant.id);
 
-  if (updateError) {
-    return NextResponse.json(
-      { error: 'Failed to update readiness' },
-      { status: 500 }
-    );
-  }
+    if (updateError) {
+      return NextResponse.json(
+        { error: 'Failed to update readiness' },
+        { status: 500 }
+      );
+    }
 
-  return NextResponse.json({ ok: true, isReady: body.isReady });
-}
+    await broadcastPlayEvent(session.id, {
+      type: 'participants_changed',
+      payload: {
+        action: 'readiness_changed',
+        participant_id: participant.id,
+        is_ready: body.isReady,
+      },
+      timestamp: new Date().toISOString(),
+    });
+
+    return NextResponse.json({ ok: true, isReady: body.isReady });
+  },
+});

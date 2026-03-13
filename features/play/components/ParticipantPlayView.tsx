@@ -168,6 +168,9 @@ export function ParticipantPlayView({
   // Event de-dupe refs — prevent flicker on duplicate realtime events
   const lastCountdownIdRef = useRef<string | null>(null);
   const lastStoryIdRef = useRef<string | null>(null);
+
+  // Kick/block removal state — set when current participant is kicked or blocked
+  const [removedReason, setRemovedReason] = useState<'kicked' | 'blocked' | null>(null);
   const prevBoardMsgRef = useRef<string | undefined>(undefined);
   const prevConnectedRef = useRef<boolean>(true);
 
@@ -372,6 +375,15 @@ export function ParticipantPlayView({
       lastRealtimeEventRef.current = 'signal_received';
       setLastRealtimeEvent('signal_received');
       handleSignalToast(payload);
+    },
+    onParticipantsChanged: (payload) => {
+      if (
+        participantId &&
+        payload.participant_id === participantId &&
+        (payload.action === 'kicked' || payload.action === 'blocked')
+      ) {
+        setRemovedReason(payload.action);
+      }
     },
     onReconnect: () => {
       // Re-fetch ALL mutable data that could have changed while disconnected.
@@ -694,6 +706,26 @@ export function ParticipantPlayView({
       {/* NOW SUMMARY ROW — portalled into PlayTopArea (same position as Director).
           Renders inside the shell's header zone via ParticipantTopSlotContext. */}
       {nowSummaryNode && topSlotEl && createPortal(nowSummaryNode, topSlotEl)}
+
+      {/* KICK/BLOCK REMOVAL OVERLAY — shown immediately when participant is removed */}
+      {removedReason && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
+          <div className="mx-4 max-w-sm space-y-4 rounded-xl border bg-card p-8 text-center shadow-lg">
+            <h2 className="text-xl font-semibold">{t('session.removedTitle')}</h2>
+            <p className="text-muted-foreground">
+              {removedReason === 'blocked'
+                ? t('session.removedBlocked')
+                : t('session.removedKicked')}
+            </p>
+            <a
+              href="/"
+              className="inline-block rounded-lg bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              {t('session.removedBackToStart')}
+            </a>
+          </div>
+        </div>
+      )}
 
       <div className="mx-auto max-w-2xl space-y-4 pb-24">
         {/* TRIGGER LANE — system cue chips (under header, above Stage)

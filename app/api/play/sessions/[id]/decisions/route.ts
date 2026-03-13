@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { resolveSessionViewer } from '@/lib/api/play-auth';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
-
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
-}
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 type DecisionOption = { key: string; label: string };
 
@@ -49,16 +47,18 @@ function isUnlockedForPosition(
   return current.currentPhase >= itemPhase;
 }
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ req, params }) => {
+  const { id: sessionId } = params;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
+  if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
 
   const current = getCurrentStepPhase(session);
 
-  const viewer = await resolveSessionViewer(sessionId, request);
-  if (!viewer) return jsonError('Unauthorized', 401);
+  const viewer = await resolveSessionViewer(sessionId, req);
+  if (!viewer) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const service = await createServiceRoleClient();
 
@@ -70,7 +70,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     .eq('session_id', sessionId)
     .order('created_at', { ascending: true });
 
-  if (error) return jsonError('Failed to load decisions', 500);
+  if (error) return NextResponse.json({ error: 'Failed to load decisions' }, { status: 500 });
 
   if (viewer.type === 'host') {
     return NextResponse.json({ decisions: decisions ?? [] }, { status: 200 });
@@ -86,39 +86,39 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   });
 
   return NextResponse.json({ decisions: visible }, { status: 200 });
-}
+  },
+});
 
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401);
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { id: sessionId } = params;
+  const userId = auth!.user!.id;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can manage decisions', 403);
+  if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+  if (session.host_user_id !== userId) return NextResponse.json({ error: 'Only host can manage decisions' }, { status: 403 });
+
+  const statusError = assertSessionStatus(session.status, 'decisions');
+  if (statusError) return statusError;
 
   const current = getCurrentStepPhase(session);
 
-  const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
-  if (!body) return jsonError('Invalid body', 400);
+  const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
+  if (!body) return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
 
   const action = typeof body.action === 'string' ? body.action : null;
-  if (!action) return jsonError('Missing action', 400);
+  if (!action) return NextResponse.json({ error: 'Missing action' }, { status: 400 });
 
   const service = await createServiceRoleClient();
 
   if (action === 'create') {
     const title = typeof body.title === 'string' ? body.title.trim() : '';
-    if (!title) return jsonError('Missing title', 400);
+    if (!title) return NextResponse.json({ error: 'Missing title' }, { status: 400 });
 
     const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : null;
     const options = parseOptions(body.options);
-    if (!options || options.length < 2) return jsonError('Invalid options', 400);
+    if (!options || options.length < 2) return NextResponse.json({ error: 'Invalid options' }, { status: 400 });
 
     const allowAnonymous = Boolean(body.allow_anonymous);
     const maxChoices = typeof body.max_choices === 'number' ? Math.max(1, Math.floor(body.max_choices)) : 1;
@@ -136,12 +136,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         max_choices: maxChoices,
         step_index: current.currentStep,
         phase_index: current.currentPhase,
-        created_by: user.id,
+        created_by: userId,
       })
       .select('id')
       .single();
 
-    if (error || !data) return jsonError('Failed to create decision', 500);
+    if (error || !data) return NextResponse.json({ error: 'Failed to create decision' }, { status: 500 });
 
     await broadcastPlayEvent(sessionId, {
       type: 'decision_update',
@@ -153,7 +153,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   const decisionId = typeof body.decisionId === 'string' ? body.decisionId : null;
-  if (!decisionId) return jsonError('Missing decisionId', 400);
+  if (!decisionId) return NextResponse.json({ error: 'Missing decisionId' }, { status: 400 });
 
   const { data: existing, error: eErr } = await service
     .from('session_decisions')
@@ -162,7 +162,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     .eq('session_id', sessionId)
     .single();
 
-  if (eErr || !existing) return jsonError('Decision not found', 404);
+  if (eErr || !existing) return NextResponse.json({ error: 'Decision not found' }, { status: 404 });
 
   if (action === 'update') {
     const patch: Record<string, unknown> = {};
@@ -170,7 +170,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     if (typeof body.prompt === 'string') patch.prompt = body.prompt.trim();
     if (body.options !== undefined) {
       const options = parseOptions(body.options);
-      if (!options || options.length < 2) return jsonError('Invalid options', 400);
+      if (!options || options.length < 2) return NextResponse.json({ error: 'Invalid options' }, { status: 400 });
       patch.options = options;
     }
     if (typeof body.allow_anonymous === 'boolean') patch.allow_anonymous = body.allow_anonymous;
@@ -182,7 +182,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .eq('id', decisionId)
       .eq('session_id', sessionId);
 
-    if (error) return jsonError('Failed to update decision', 500);
+    if (error) return NextResponse.json({ error: 'Failed to update decision' }, { status: 500 });
 
     await broadcastPlayEvent(sessionId, {
       type: 'decision_update',
@@ -200,7 +200,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .eq('id', decisionId)
       .eq('session_id', sessionId);
 
-    if (error) return jsonError('Failed to open decision', 500);
+    if (error) return NextResponse.json({ error: 'Failed to open decision' }, { status: 500 });
 
     await broadcastPlayEvent(sessionId, {
       type: 'decision_update',
@@ -218,7 +218,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .eq('id', decisionId)
       .eq('session_id', sessionId);
 
-    if (error) return jsonError('Failed to close decision', 500);
+    if (error) return NextResponse.json({ error: 'Failed to close decision' }, { status: 500 });
 
     await broadcastPlayEvent(sessionId, {
       type: 'decision_update',
@@ -236,7 +236,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .eq('id', decisionId)
       .eq('session_id', sessionId);
 
-    if (error) return jsonError('Failed to reveal decision', 500);
+    if (error) return NextResponse.json({ error: 'Failed to reveal decision' }, { status: 500 });
 
     await broadcastPlayEvent(sessionId, {
       type: 'decision_update',
@@ -247,5 +247,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ success: true }, { status: 200 });
   }
 
-  return jsonError('Unknown action', 400);
-}
+  return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+  },
+});

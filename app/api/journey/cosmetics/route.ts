@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { CosmeticSlot, CosmeticRarity, RenderConfig, UnlockType, UnlockRequirement } from '@/features/journey/cosmetic-types';
 
 export const dynamic = 'force-dynamic';
@@ -29,15 +30,11 @@ function toRenderConfig(renderType: string, raw: unknown): RenderConfig {
   }
 }
 
-export async function GET() {
-  const supabase = await createServerRlsClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const userId = user.id;
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth }) => {
+    const userId = auth!.user!.id;
+    const supabase = await createServerRlsClient();
 
   // Parallel fetches — all reads, no writes
   const [catalogRes, grantsRes, loadoutRes, rulesRes, levelRes] = await Promise.all([
@@ -151,4 +148,5 @@ export async function GET() {
   }
 
   return NextResponse.json({ catalog, loadout, userLevel }, { status: 200 });
-}
+  },
+})

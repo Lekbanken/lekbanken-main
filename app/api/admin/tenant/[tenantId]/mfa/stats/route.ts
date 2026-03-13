@@ -5,27 +5,20 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { getServerAuthContext } from '@/lib/auth/server-context';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { SupabaseClient } from '@supabase/supabase-js';
-
-interface RouteContext {
-  params: Promise<{ tenantId: string }>;
-}
 
 /**
  * GET /api/admin/tenant/[tenantId]/mfa/stats
  * Get MFA statistics for tenant
  */
-export async function GET(request: Request, context: RouteContext) {
-  const { tenantId } = await context.params;
-  
-  const authContext = await getServerAuthContext('/admin');
-  if (!authContext.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const tenantId = params.tenantId;
 
-  const isSystemAdmin = authContext.effectiveGlobalRole === 'system_admin';
-  const membership = authContext.memberships?.find(m => m.tenant_id === tenantId);
+  const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin';
+  const membership = auth!.memberships?.find(m => m.tenant_id === tenantId);
   const tenantRole = membership?.role as string | null;
   
   // Check access
@@ -108,4 +101,5 @@ export async function GET(request: Request, context: RouteContext) {
     console.error('[MFA Stats] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+});

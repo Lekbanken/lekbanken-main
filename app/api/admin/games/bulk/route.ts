@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { apiHandler } from '@/lib/api/route-handler';
 import { createServerRlsClient, supabaseAdmin, createServiceRoleClient } from '@/lib/supabase/server';
 import { assignCoverFromTemplates } from '@/lib/import/assignCoverFromTemplates';
 import type { BulkOperationResult } from '@/features/admin/games/v2/types';
@@ -381,38 +382,15 @@ async function handleRemovePurposes(ctx: OperationContext): Promise<BulkOperatio
 // MAIN ROUTE HANDLER
 // ============================================================================
 
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient();
-
-  // Auth check
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const role = (user.app_metadata as { role?: string } | undefined)?.role ?? null;
-  const isAdmin = role === 'system_admin' || role === 'superadmin';
-
-  if (!isAdmin) {
-    return NextResponse.json({ error: 'Forbidden - admin access required' }, { status: 403 });
-  }
-
+export const POST = apiHandler({
+  auth: 'system_admin',
+  input: bulkOperationSchema,
+  handler: async ({ body }) => {
   // This is an admin-only endpoint. Use service role to avoid RLS blocking
   // legitimate system admin operations (e.g. deleting global games).
   const opSupabase = supabaseAdmin;
 
-  // Parse and validate body
-  const body = await request.json().catch(() => ({}));
-  const parsed = bulkOperationSchema.safeParse(body);
-
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid request', details: parsed.error.flatten() },
-      { status: 400 }
-    );
-  }
-
-  const { operation, gameIds, params } = parsed.data;
+  const { operation, gameIds, params } = body;
   const ctx: OperationContext = { supabase: opSupabase, gameIds, params };
 
   let result: BulkOperationResult;
@@ -463,4 +441,5 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-}
+  },
+});

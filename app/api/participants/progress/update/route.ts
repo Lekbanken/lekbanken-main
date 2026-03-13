@@ -5,14 +5,12 @@
  * Updates or creates game progress for a participant
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { Database, Json } from '@/types/supabase';
 
-interface UpdateProgressRequest {
-  participant_token: string;
+interface UpdateProgressBody {
   game_id: string;
   status?: 'not_started' | 'in_progress' | 'completed' | 'failed';
   score?: number;
@@ -24,55 +22,32 @@ interface UpdateProgressRequest {
   game_data?: Record<string, unknown>;
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const body: UpdateProgressRequest = await request.json();
-    const { participant_token, game_id, ...updates } = body;
+export const POST = apiHandler({
+  auth: 'participant',
+  handler: async ({ req, participant: p }) => {
+    let body: UpdateProgressBody;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-    if (!participant_token || !game_id) {
+    const { game_id, ...updates } = body;
+
+    if (!game_id) {
       return NextResponse.json(
-        { error: 'participant_token and game_id are required' },
+        { error: 'game_id is required' },
         { status: 400 }
       );
     }
 
     const supabase = createServiceRoleClient();
 
-    // Get participant by token
-    const { data: participant, error: participantError } = await supabase
-      .from('participants')
-      .select('id, session_id, status, token_expires_at')
-      .eq('participant_token', participant_token)
-      .single();
-
-    if (participantError || !participant) {
-      return NextResponse.json(
-        { error: 'Invalid participant token' },
-        { status: 401 }
-      );
-    }
-
-    // Check participant status
-    if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
-      return NextResponse.json(
-        { error: 'Participant is blocked or kicked' },
-        { status: 403 }
-      );
-    }
-
-    // Check token expiry
-    if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) {
-      return NextResponse.json(
-        { error: 'Token expired' },
-        { status: 401 }
-      );
-    }
-
     // Get session to resolve tenant
     const { data: session, error: sessionError } = await supabase
       .from('participant_sessions')
       .select('id, tenant_id')
-      .eq('id', participant.session_id)
+      .eq('id', p!.sessionId)
       .single();
 
     if (sessionError || !session) {
@@ -100,7 +75,7 @@ export async function POST(request: NextRequest) {
     const { data: existingProgress } = await supabase
       .from('participant_game_progress')
       .select('*')
-      .eq('participant_id', participant.id)
+      .eq('participant_id', p!.participantId)
       .eq('game_id', game_id)
       .single();
 
@@ -148,8 +123,8 @@ export async function POST(request: NextRequest) {
       // Create new progress record
       const insertData: Database['public']['Tables']['participant_game_progress']['Insert'] = {
         tenant_id: session.tenant_id,
-        session_id: participant.session_id,
-        participant_id: participant.id,
+        session_id: p!.sessionId,
+        participant_id: p!.participantId,
         game_id,
         ...progressUpdates,
         game_data: parsedGameData,
@@ -176,12 +151,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Broadcast progress update to session channel
-    const channel = supabase.channel(`session:${participant.session_id}`);
+    const channel = supabase.channel(`session:${p!.sessionId}`);
     await channel.send({
       type: 'broadcast',
       event: 'progress_updated',
       payload: {
-        participant_id: participant.id,
+        participant_id: p!.participantId,
         game_id,
         status: progressData.status,
         score: progressData.score,
@@ -192,8 +167,8 @@ export async function POST(request: NextRequest) {
 
     // Log activity
     await supabase.from('participant_activity_log').insert({
-      session_id: participant.session_id,
-      participant_id: participant.id,
+      session_id: p!.sessionId,
+      participant_id: p!.participantId,
       event_type: 'progress_update',
       event_data: {
         game_id,
@@ -208,12 +183,5 @@ export async function POST(request: NextRequest) {
       progress: progressData,
       message: 'Progress updated successfully',
     });
-
-  } catch (error) {
-    console.error('Error in progress update:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

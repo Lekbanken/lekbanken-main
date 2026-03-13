@@ -1,9 +1,9 @@
 # Planner v2.0 — Komplett Implementeringsplan
 
-> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-05  
+> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-13  
 > **Status:** MS0–MS11 ✅ KLARA. PlanSnapshot Pipeline ✅ KLAR. 0 TS-errors.  
 > **Förutsättning:** Denna plan bygger på `planner-audit.md`. Se även `planner-architecture.md` för systemdesign.  
-> **Nästa:** Polish & edge cases (host_event log, multi-tab sync-check, unit tests)  
+> **Nästa:** Post-launch Priority 1 — Tenant-Custom Planner Blocks (se `launch-control.md` §11)  
 > **Kvarvarande:** Supabase type regeneration (TEMP casts → compile-time `RunSessionStatus` union hela vägen)
 
 ### Låsta beslut (godkänns 2026-03-04)

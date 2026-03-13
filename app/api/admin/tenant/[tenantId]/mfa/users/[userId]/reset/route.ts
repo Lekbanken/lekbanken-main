@@ -5,29 +5,23 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { getServerAuthContext } from '@/lib/auth/server-context';
+import { apiHandler } from '@/lib/api/route-handler';
 import { logMFADisabledByAdmin } from '@/lib/services/mfa/mfaAudit.server';
 import type { SupabaseClient } from '@supabase/supabase-js';
-
-interface RouteContext {
-  params: Promise<{ tenantId: string; userId: string }>;
-}
 
 /**
  * POST /api/admin/tenant/[tenantId]/mfa/users/[userId]/reset
  * Reset MFA for a user - clears enrollment but keeps grace period if applicable
  */
-export async function POST(request: Request, context: RouteContext) {
-  const { tenantId, userId } = await context.params;
-  
-  const authContext = await getServerAuthContext('/admin');
-  if (!authContext.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params, req }) => {
+  const tenantId = params.tenantId;
+  const userId = params.userId;
 
-  const adminUserId = authContext.user.id;
-  const isSystemAdmin = authContext.effectiveGlobalRole === 'system_admin';
-  const membership = authContext.memberships?.find(m => m.tenant_id === tenantId);
+  const adminUserId = auth!.user!.id;
+  const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin';
+  const membership = auth!.memberships?.find(m => m.tenant_id === tenantId);
   const tenantRole = membership?.role as string | null;
   
   // Only owner/admin can reset MFA for users
@@ -65,7 +59,7 @@ export async function POST(request: Request, context: RouteContext) {
     // Get optional reason from request body (for future logging enhancement)
     let _reason = 'Admin-initiated reset';
     try {
-      const body = await request.json();
+      const body = await req.json();
       if (body.reason && typeof body.reason === 'string') {
         _reason = body.reason;
       }
@@ -155,4 +149,5 @@ export async function POST(request: Request, context: RouteContext) {
       { status: 500 }
     );
   }
-}
+  },
+});

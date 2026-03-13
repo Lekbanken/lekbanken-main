@@ -7,49 +7,20 @@
  * Prices are synced to Stripe automatically when created.
  */
 
-import { type NextRequest, NextResponse } from 'next/server'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe/config'
 import { logPriceEvent } from '@/lib/services/productAudit.server'
-
-// =============================================================================
-// AUTH HELPER
-// =============================================================================
-
-async function isSystemAdmin(): Promise<boolean> {
-  const supabase = await createServerRlsClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) return false
-  
-  const appMetadataRole = user.app_metadata?.role as string | undefined
-  const appMetadataGlobalRole = user.app_metadata?.global_role as string | undefined
-  const userMetadataGlobalRole = user.user_metadata?.global_role as string | undefined
-  
-  const effectiveRole = appMetadataRole || appMetadataGlobalRole || userMetadataGlobalRole
-  
-  return effectiveRole === 'system_admin' || 
-         effectiveRole === 'superadmin' || 
-         effectiveRole === 'admin'
-}
 
 // =============================================================================
 // GET - List prices for product
 // =============================================================================
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ productId: string }> }
-) {
-  try {
-    if (!await isSystemAdmin()) {
-      return NextResponse.json(
-        { error: 'Forbidden - system_admin required' },
-        { status: 403 }
-      )
-    }
-    
-    const { productId } = await params
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params }) => {
+    const productId = params.productId
     // Use service role client for admin operations (bypasses RLS)
     const supabase = createServiceRoleClient()
     
@@ -72,15 +43,8 @@ export async function GET(
       success: true,
       data: prices,
     })
-    
-  } catch (error) {
-    console.error('Error fetching prices:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})
 
 // =============================================================================
 // POST - Create new price
@@ -99,23 +63,11 @@ interface CreatePriceBody {
   syncToStripe?: boolean   // Default true
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ productId: string }> }
-) {
-  try {
-    const rlsClient = await createServerRlsClient()
-    const { data: { user } } = await rlsClient.auth.getUser()
-    
-    if (!await isSystemAdmin()) {
-      return NextResponse.json(
-        { error: 'Forbidden - system_admin required' },
-        { status: 403 }
-      )
-    }
-    
-    const { productId } = await params
-    const body: CreatePriceBody = await request.json()
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ auth, params, req }) => {
+    const productId = params.productId
+    const body: CreatePriceBody = await req.json()
     
     // Validate required fields
     if (!body.amount || !body.currency || !body.interval) {
@@ -262,7 +214,7 @@ export async function POST(
       currency: body.currency,
       interval: body.interval,
       stripePriceId: stripePriceId,
-    }, user?.id)
+    }, auth!.user!.id)
     
     return NextResponse.json({
       success: true,
@@ -272,15 +224,5 @@ export async function POST(
       },
       synced: !!stripePriceId,
     })
-    
-  } catch (error) {
-    console.error('Error creating price:', error)
-    return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

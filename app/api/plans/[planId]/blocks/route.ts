@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validatePlanBlockPayload } from '@/lib/validation/plans'
 import { mapBlockToPlanner } from '@/lib/services/planner.server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requirePlanEditAccess } from '@/lib/planner/require-plan-access'
 import type { Json } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
@@ -9,25 +11,22 @@ function normalizeId(value: string | string[] | undefined) {
   return id?.trim() || null
 }
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ planId: string }> }
-) {
-  const params = await context.params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
   const planId = normalizeId(params?.planId)
   if (!planId) {
     return NextResponse.json({ error: 'Invalid plan id' }, { status: 400 })
   }
+  const user = auth!.user!
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // Capability check: user must be able to edit this plan
+  const access = await requirePlanEditAccess(supabase, user, planId)
+  if (!access.allowed) return access.response
 
-  const body = (await request.json().catch(() => ({}))) as {
+  const userId = user.id
+  const body = (await req.json().catch(() => ({}))) as {
     block_type?: 'game' | 'pause' | 'preparation' | 'custom'
     game_id?: string | null
     duration_minutes?: number | null
@@ -92,8 +91,8 @@ export async function POST(
         position: insertPosition,
         metadata: (body.metadata ?? {}) as Json,
         is_optional: body.is_optional ?? false,
-        created_by: user.id,
-        updated_by: user.id,
+        created_by: userId,
+        updated_by: userId,
       }
     )
     .select()
@@ -166,4 +165,5 @@ export async function POST(
 
   const mappedBlock = mapBlockToPlanner(createdBlock as unknown as Parameters<typeof mapBlockToPlanner>[0])
   return NextResponse.json({ block: mappedBlock }, { status: 201 })
-}
+  },
+})

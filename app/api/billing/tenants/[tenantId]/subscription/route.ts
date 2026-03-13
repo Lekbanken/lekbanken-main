@@ -1,22 +1,13 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
-async function requireUser() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { supabase, user: null }
-  return { supabase, user }
-}
-
-async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string) {
+async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string, userId: string) {
   const { data, error } = await supabase
     .from('user_tenant_memberships')
     .select('role')
     .eq('tenant_id', tenantId)
-    .eq('user_id', (await supabase.auth.getUser()).data.user?.id || '')
+    .eq('user_id', userId)
     .maybeSingle()
   if (error) {
     console.warn('[billing/subscription] role lookup error', error)
@@ -25,12 +16,14 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
-  const { tenantId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { tenantId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data, error } = await supabase
@@ -47,17 +40,20 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ tenant
   }
 
   return NextResponse.json({ subscription: data })
-}
+  },
+})
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
-  const { tenantId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { tenantId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     billing_product_id: string
     seats_purchased?: number
     start_date?: string
@@ -66,6 +62,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   if (!body.billing_product_id) return NextResponse.json({ error: 'billing_product_id is required' }, { status: 400 })
+
+  // Tenant admins cannot set subscription to active — only webhook/system_admin can activate
+  const TENANT_ALLOWED_STATUSES = ['canceled', 'paused'] as const
+  if (body.status && !TENANT_ALLOWED_STATUSES.includes(body.status as typeof TENANT_ALLOWED_STATUSES[number])) {
+    return NextResponse.json({ error: 'Cannot set subscription status to ' + body.status + ' — only cancel or pause is allowed' }, { status: 403 })
+  }
 
   const { data: existing } = await supabase
     .from('tenant_subscriptions')
@@ -111,16 +113,19 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   return NextResponse.json({ subscription: result })
-}
+  },
+})
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
-  const { tenantId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const role = await userTenantRole(supabase, tenantId)
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { tenantId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     subscription_id?: string
     status?: 'trial' | 'active' | 'paused' | 'canceled'
     seats_purchased?: number
@@ -130,6 +135,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const subscriptionId = body.subscription_id
   if (!subscriptionId) return NextResponse.json({ error: 'subscription_id is required' }, { status: 400 })
+
+  // Tenant admins can only cancel or pause — activation comes from Stripe webhook
+  const TENANT_ALLOWED_STATUSES = ['canceled', 'paused'] as const
+  if (body.status && !TENANT_ALLOWED_STATUSES.includes(body.status as typeof TENANT_ALLOWED_STATUSES[number])) {
+    return NextResponse.json({ error: 'Cannot set subscription status to ' + body.status + ' — only cancel or pause is allowed' }, { status: 403 })
+  }
 
   const updates: Record<string, unknown> = {}
   if (body.status) updates.status = body.status
@@ -151,4 +162,5 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   return NextResponse.json({ subscription: data })
-}
+  },
+})

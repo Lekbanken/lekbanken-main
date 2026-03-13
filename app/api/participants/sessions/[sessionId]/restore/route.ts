@@ -5,17 +5,15 @@
  * Restores an archived session back to its original status
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { requireSessionHost, AuthError } from '@/lib/api/auth-guard';
+import { requireSessionHost } from '@/lib/api/auth-guard';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ sessionId: string }> }
-) {
-  try {
-    const { sessionId } = await params;
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ params }) => {
+    const { sessionId } = params;
 
     if (!sessionId) {
       return NextResponse.json(
@@ -24,7 +22,7 @@ export async function POST(
       );
     }
 
-    // Auth: session host or system_admin
+    // Auth: session host or system_admin (wrapper already verified user, this checks host ownership)
     await requireSessionHost(sessionId);
 
     const supabase = createServiceRoleClient();
@@ -94,15 +92,5 @@ export async function POST(
       restored_status: restoreStatus,
       message: 'Session restored successfully',
     });
-
-  } catch (error) {
-    if (error instanceof AuthError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
-    }
-    console.error('Error in session restore:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

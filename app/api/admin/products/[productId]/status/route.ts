@@ -6,29 +6,19 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { apiHandler } from '@/lib/api/route-handler';
 import { logStatusChange } from '@/lib/services/productAudit.server';
-
-type RouteParams = {
-  params: Promise<{ productId: string }>;
-};
 
 const VALID_STATUSES = ['draft', 'active', 'archived'];
 
-export async function PATCH(request: Request, { params }: RouteParams) {
-  const { productId } = await params;
+export const PATCH = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req, params, auth }) => {
+  const { productId } = params;
   const supabase = await createServerRlsClient();
+  const userId = auth!.user!.id;
 
-  // Auth check
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
-  }
-
-  const body = await request.json().catch(() => ({}));
+  const body = await req.json().catch(() => ({}));
   const newStatus = body.status;
 
   if (!newStatus || !VALID_STATUSES.includes(newStatus)) {
@@ -97,7 +87,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   }
 
   // Log audit event for status change
-  await logStatusChange(productId, currentStatus, newStatus, user.id);
+  await logStatusChange(productId, currentStatus, newStatus, userId);
 
   return NextResponse.json({ product: data, previousStatus: currentStatus });
-}
+  },
+});

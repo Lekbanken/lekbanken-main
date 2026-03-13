@@ -39,11 +39,11 @@ export function useParticipantProgress({
     try {
       const response = await fetch('/api/participants/progress/update', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          participant_token: participantToken,
-          ...updates,
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-participant-token': participantToken,
+        },
+        body: JSON.stringify(updates),
       });
 
       const data = await response.json();

@@ -9,7 +9,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui";
 import { useToast } from "@/components/ui/toast";
-import { supabase } from "@/lib/supabase/client";
+import { toggleTenantFeature } from "../../organisationMutations.server";
 import type { TenantFeature } from "../../types";
 import { FEATURE_KEYS, featureLabels, type FeatureKey } from "../../types";
 
@@ -48,33 +48,14 @@ export function OrganisationFeaturesSection({
     try {
       const existing = featureMap.get(featureKey);
       
-      if (existing) {
-        // Update existing
-        const { error } = await supabase
-          .from('tenant_features')
-          .update({ enabled, updated_at: new Date().toISOString() })
-          .eq('id', existing.id);
-        
-        if (error) throw error;
-      } else {
-        // Insert new
-        const { error } = await supabase
-          .from('tenant_features')
-          .insert({
-            tenant_id: tenantId,
-            feature_key: featureKey,
-            enabled,
-          });
-        
-        if (error) throw error;
-      }
+      const result = await toggleTenantFeature(
+        tenantId,
+        featureKey,
+        enabled,
+        existing?.id
+      );
       
-      // Log audit event
-      await supabase.from('tenant_audit_logs').insert({
-        tenant_id: tenantId,
-        event_type: 'feature_toggled',
-        payload: { feature_key: featureKey, enabled },
-      });
+      if (result.error) throw new Error(result.error);
       
       success(`${featureLabels[featureKey as FeatureKey] ?? featureKey} ${enabled ? 'aktiverad' : 'inaktiverad'}`);
       onRefresh();

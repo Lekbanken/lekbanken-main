@@ -1,7 +1,8 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
-import { AuthError, requireAuth, requireTenantRole } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { parseCSV } from '@/lib/utils/csv'
 import { CONVERSATION_CARDS_CSV_HEADERS, type ConversationCardsCsvRow } from '@/features/conversation-cards/csv-format'
@@ -59,17 +60,12 @@ async function resolvePurposeId(
   return null
 }
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ collectionId: string }> }) {
-  try {
-    const ctx = await requireAuth()
-    const collectionId = (await params).collectionId
-    const isSystemAdmin = ctx.effectiveGlobalRole === 'system_admin'
-
-    const body = await req.json().catch(() => ({}))
-    const parsedBody = importSchema.safeParse(body)
-    if (!parsedBody.success) {
-      return jsonError(400, 'Invalid payload', parsedBody.error.flatten())
-    }
+export const POST = apiHandler({
+  auth: 'user',
+  input: importSchema,
+  handler: async ({ auth, body, params }) => {
+    const collectionId = params.collectionId
+    const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin'
 
     const admin = createServiceRoleClient()
 
@@ -93,7 +89,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ col
       await requireTenantRole(['owner', 'admin'], collection.tenant_id)
     }
 
-    const csv = parsedBody.data.csv
+    const csv = body.csv
 
     const parsed = parseCSV<ConversationCardsCsvRow>(csv, { delimiter: ',', hasHeaders: true, skipEmpty: true, trimValues: true })
 
@@ -250,9 +246,5 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ col
       ok: true,
       imported: rows.length,
     })
-  } catch (e) {
-    if (e instanceof AuthError) return jsonError(e.status, e.message)
-    console.error('[admin/conversation-cards] import unexpected error', e)
-    return jsonError(500, 'Unexpected error')
-  }
-}
+  },
+})

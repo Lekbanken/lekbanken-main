@@ -14,8 +14,9 @@
 
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { isSystemAdmin, assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { requireTenantRole } from '@/lib/api/auth-guard';
 import { parseCsvGames } from '@/features/admin/games/utils/csv-parser';
 import { parseGamesFromJsonPayload } from '@/features/admin/games/utils/json-game-import';
 import { validateGames } from '@/features/admin/games/utils/game-validator';
@@ -258,30 +259,21 @@ function normalizeLegacyArtifactTypesForImport(games: ParsedGame[]): {
   return { games: normalized, warnings };
 }
 
-export async function POST(request: Request) {
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
   // Generate request-scoped import run ID for observability
   const importRunId = randomUUID();
   console.log(`[csv-import] import.start run=${importRunId}`);
 
   try {
-    // Authentication check
-    const authClient = await createServerRlsClient();
-    const { data: { user }, error: userError } = await authClient.auth.getUser();
-    
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = (await request.json()) as ImportPayload;
+    const body = (await req.json()) as ImportPayload;
     const { data, format, dry_run = false, upsert = true, tenant_id, product_id: overrideProductId } = body;
 
     // Authorization: system_admin for global, tenant_admin for tenant-scoped
     if (tenant_id) {
-      const hasAccess = await assertTenantAdminOrSystem(tenant_id, user);
-      if (!hasAccess) {
-        return NextResponse.json({ error: 'Forbidden - tenant admin required' }, { status: 403 });
-      }
-    } else if (!isSystemAdmin(user)) {
+      await requireTenantRole(['admin', 'owner'], tenant_id);
+    } else if (auth!.effectiveGlobalRole !== 'system_admin') {
       return NextResponse.json({ error: 'Forbidden - system_admin required for global import' }, { status: 403 });
     }
 
@@ -691,7 +683,8 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-}
+},
+})
 
 /**
  * Import related data for a game (steps, materials, phases, roles, boardConfig)

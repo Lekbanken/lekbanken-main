@@ -1,7 +1,8 @@
 # Planner v2.0 — Arkitektur & Systemöversikt
 
-> **Senast uppdaterad:** 2026-03-04 (MS10 KLAR: Director Realtime State — timer/board seq-guard, gap detection, on-SUBSCRIBED sync)
+> **Senast uppdaterad:** 2026-03-13 (Post-launch roadmap: tenant-custom block types planeras — se `launch-control.md` §11, ADR-K1)
 > **Syfte:** Stabil referens för systemdesign. Ändras sällan — bara vid arkitekturella förändringar.
+> **Arkitektur-guardrails:** (ADR-K1) `plan_blocks.metadata` (JSONB) ska hållas flexibelt. Nya blocktyper ska bli tenant-definierade via metadata, inte fler hardcoded enum-värden. (ADR-K2) Framtida kursförbättringar ska konvergera mot block-modell, inte fördjupa JSON-mönstret.
 
 ---
 

@@ -1,73 +1,70 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createServerRlsClient, getRequestTenantId } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
-import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
 import type { CreateSessionOptions } from '@/lib/services/participants/session-service';
 
-export async function GET() {
-  const supabase = await createServerRlsClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth }) => {
+    const userId = auth!.user!.id
+    const supabase = await createServerRlsClient();
 
-  const { data, error } = await supabase
-    .from('participant_sessions')
-    .select('*')
-    .eq('host_user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(50);
+    const { data, error } = await supabase
+      .from('participant_sessions')
+      .select('*')
+      .eq('host_user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(50);
 
-  if (error) {
-    return NextResponse.json({ error: 'Failed to fetch sessions', details: error.message }, { status: 500 });
-  }
+    if (error) {
+      return NextResponse.json({ error: 'Failed to fetch sessions', details: error.message }, { status: 500 });
+    }
 
-  return NextResponse.json({
-    sessions: (data || []).map((s) => ({
-      id: s.id,
-      sessionCode: s.session_code,
-      displayName: s.display_name,
-      status: s.status,
-      participantCount: s.participant_count,
-      createdAt: s.created_at,
-      updatedAt: s.updated_at,
-      expiresAt: s.expires_at,
-      gameId: s.game_id,
-      planId: s.plan_id,
-    })),
-  });
-}
+    return NextResponse.json({
+      sessions: (data || []).map((s) => ({
+        id: s.id,
+        sessionCode: s.session_code,
+        displayName: s.display_name,
+        status: s.status,
+        participantCount: s.participant_count,
+        createdAt: s.created_at,
+        updatedAt: s.updated_at,
+        expiresAt: s.expires_at,
+        gameId: s.game_id,
+        planId: s.plan_id,
+      })),
+    });
+  },
+})
 
-export async function POST(request: NextRequest) {
-  const rate = applyRateLimitMiddleware(request, 'api');
-  if (rate) return rate;
+export const POST = apiHandler({
+  auth: 'user',
+  rateLimit: 'api',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
+    const supabase = await createServerRlsClient();
 
-  const supabase = await createServerRlsClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    // Get tenant ID from header (set by proxy) or fall back to membership lookup
+    let tenantId = await getRequestTenantId();
 
-  // Get tenant ID from header (set by proxy) or fall back to membership lookup
-  let tenantId = await getRequestTenantId();
-  
-  if (!tenantId) {
-    // Fall back to user's membership (use limit 1 to handle multiple memberships)
-    const { data: membership } = await supabase
-      .from('user_tenant_memberships')
-      .select('tenant_id')
-      .eq('user_id', user.id)
-      .limit(1)
-      .maybeSingle();
-    
-    tenantId = membership?.tenant_id ?? null;
-  }
+    if (!tenantId) {
+      // Fall back to user's membership (use limit 1 to handle multiple memberships)
+      const { data: membership } = await supabase
+        .from('user_tenant_memberships')
+        .select('tenant_id')
+        .eq('user_id', userId)
+        .limit(1)
+        .maybeSingle();
 
-  if (!tenantId) {
-    return NextResponse.json({ error: 'No tenant membership' }, { status: 403 });
-  }
+      tenantId = membership?.tenant_id ?? null;
+    }
 
-  const body = await request.json().catch(() => ({}));
+    if (!tenantId) {
+      return NextResponse.json({ error: 'No tenant membership' }, { status: 403 });
+    }
+
+    const body = await req.json().catch(() => ({}));;
   const {
     displayName,
     description,
@@ -96,7 +93,7 @@ export async function POST(request: NextRequest) {
 
   const session = await ParticipantSessionService.createSession({
     tenantId,
-    hostUserId: user.id,
+    hostUserId: userId,
     displayName: displayName.trim(),
     description: description?.trim(),
     gameId,
@@ -115,4 +112,5 @@ export async function POST(request: NextRequest) {
       expiresAt: session.expires_at,
     },
   });
-}
+  },
+})

@@ -1,15 +1,13 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseAny = any;
-
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
-}
 
 const ApplyDeltaSchema = z.object({
   deltaSeconds: z.number().int().min(-3600).max(3600),
@@ -23,19 +21,15 @@ const ApplyDeltaSchema = z.object({
  * GET /api/play/sessions/[id]/time-bank
  * Host-only: Returns current balance + recent ledger rows.
  */
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401);
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { id: sessionId } = params;
+  const userId = auth!.user!.id;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can view time bank', 403);
+  if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+  if (session.host_user_id !== userId) return NextResponse.json({ error: 'Only host can view time bank' }, { status: 403 });
 
   const service = (await createServiceRoleClient()) as SupabaseAny;
 
@@ -47,7 +41,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   if (bankErr) {
     console.error('[time-bank] select bank failed', bankErr);
-    return jsonError('Failed to load time bank', 500);
+    return NextResponse.json({ error: 'Failed to load time bank' }, { status: 500 });
   }
 
   const { data: ledger, error: ledgerErr } = await service
@@ -59,7 +53,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   if (ledgerErr) {
     console.error('[time-bank] select ledger failed', ledgerErr);
-    return jsonError('Failed to load time bank ledger', 500);
+    return NextResponse.json({ error: 'Failed to load time bank ledger' }, { status: 500 });
   }
 
   return NextResponse.json(
@@ -73,27 +67,27 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     },
     { status: 200 }
   );
-}
+  },
+});
 
 /**
  * POST /api/play/sessions/[id]/time-bank
- * Host-only (initially): Calls public.time_bank_apply_delta via service role + broadcast.
+ * Host-only: Calls public.time_bank_apply_delta via service role + broadcast.
  */
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401);
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { id: sessionId } = params;
+  const userId = auth!.user!.id;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can update time bank', 403);
+  if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+  if (session.host_user_id !== userId) return NextResponse.json({ error: 'Only host can update time bank' }, { status: 403 });
 
-  const body = await request.json().catch(() => ({}));
+  const statusError = assertSessionStatus(session.status, 'time-bank');
+  if (statusError) return statusError;
+
+  const body = await req.json().catch(() => ({}));
   const parsed = ApplyDeltaSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
@@ -112,7 +106,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     p_reason: reason,
     p_metadata: metadata ?? null,
     p_event_id: null,
-    p_actor_user_id: user.id,
+    p_actor_user_id: userId,
     p_actor_participant_id: null,
     p_min_balance: minBalanceSeconds ?? null,
     p_max_balance: maxBalanceSeconds ?? null,
@@ -120,7 +114,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   if (error) {
     console.error('[time-bank] rpc failed', error);
-    return jsonError('Failed to apply time bank delta', 500);
+    return NextResponse.json({ error: 'Failed to apply time bank delta' }, { status: 500 });
   }
 
   // Audit: insert session_events row (best-effort)
@@ -133,7 +127,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         reason,
         result,
       },
-      actor_user_id: user.id,
+      actor_user_id: userId,
       actor_participant_id: null,
     });
   } catch (e) {
@@ -150,4 +144,5 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   });
 
   return NextResponse.json({ success: true, result }, { status: 200 });
-}
+  },
+});

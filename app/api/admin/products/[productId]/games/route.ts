@@ -7,11 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
-
-type RouteParams = {
-  params: Promise<{ productId: string }>;
-};
+import { apiHandler } from '@/lib/api/route-handler';
 
 export type LinkedGame = {
   id: string;
@@ -29,18 +25,11 @@ export type LinkedGamesResponse = {
   total: number;
 };
 
-export async function GET(request: Request, { params }: RouteParams) {
-  const { productId } = await params;
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params }) => {
+  const { productId } = params;
   const supabase = await createServerRlsClient();
-
-  // Auth check
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
-  }
 
   // Verify product exists
   const { data: product, error: productError } = await supabase
@@ -92,4 +81,5 @@ export async function GET(request: Request, { params }: RouteParams) {
   };
 
   return NextResponse.json(response);
-}
+  },
+});

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -23,26 +24,15 @@ type PlanVersionRow = {
  * 
  * Returns all published versions of a plan, ordered by version number descending.
  */
-export async function GET(
-  _request: Request,
-  context: { params: Promise<{ planId: string }> }
-) {
-  const params = await context.params
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ params }) => {
   const planId = normalizeId(params?.planId)
   if (!planId) {
     return NextResponse.json({ error: { code: 'INVALID_ID', message: 'Invalid plan id' } }, { status: 400 })
   }
 
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
-  }
-
-  // Verify plan exists and user has access (RLS handles this)
   const { data: plan, error: planError } = await supabase
     .from('plans')
     .select('id, name, current_version_id')
@@ -97,4 +87,5 @@ export async function GET(
     })),
     currentVersionId: plan.current_version_id,
   })
-}
+  },
+})

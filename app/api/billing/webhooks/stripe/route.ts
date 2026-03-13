@@ -49,26 +49,42 @@ async function provisionFromPurchaseIntent(params: {
     return
   }
 
+  // Idempotency guard: atomically claim the intent to prevent duplicate provisioning
+  // on Stripe webhook retries. Only one concurrent handler can move status to 'provisioning'.
+  const { data: claimed, error: claimError } = await supabaseAdmin
+    .from('purchase_intents')
+    .update({ status: 'provisioning' as never })
+    .eq('id', intent.id)
+    .in('status', ['draft', 'awaiting_payment', 'paid'])
+    .select('id')
+    .maybeSingle()
+
+  if (claimError) {
+    console.error('[stripe-webhook] purchase_intent claim error', claimError)
+    return
+  }
+  if (!claimed) {
+    // Another handler already claimed this intent — skip
+    console.log('[stripe-webhook] purchase_intent already claimed or provisioned', intent.id)
+    return
+  }
+
   const stripeCustomerId = typeof stripeSession.customer === 'string' ? stripeSession.customer : null
   const stripeSubscriptionId = typeof stripeSession.subscription === 'string' ? stripeSession.subscription : null
   const stripeCheckoutSessionId = stripeSession.id
 
-  const nextPaidStatus =
-    intent.status === 'draft' || intent.status === 'awaiting_payment' ? 'paid' : intent.status
-
-  // Mark paid (best-effort) before provisioning
-  const { error: paidUpdateError } = await supabaseAdmin
+  // Update Stripe IDs on the claimed intent (best-effort)
+  const { error: stripeIdUpdateError } = await supabaseAdmin
     .from('purchase_intents')
     .update({
-      status: nextPaidStatus,
       stripe_customer_id: stripeCustomerId ?? intent.stripe_customer_id,
       stripe_subscription_id: stripeSubscriptionId ?? intent.stripe_subscription_id,
       stripe_checkout_session_id: stripeCheckoutSessionId ?? intent.stripe_checkout_session_id,
     })
     .eq('id', intent.id)
 
-  if (paidUpdateError) {
-    console.error('[stripe-webhook] purchase_intent paid update error', paidUpdateError)
+  if (stripeIdUpdateError) {
+    console.error('[stripe-webhook] purchase_intent stripe ID update error', stripeIdUpdateError)
   }
 
   if (!intent.user_id) {

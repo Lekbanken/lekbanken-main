@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { SessionAnalytics, TimelineEvent, TimeBankEntry, SessionAnalyticsResponse } from '@/types/analytics';
 
 export const dynamic = 'force-dynamic';
@@ -24,27 +24,13 @@ type TimeBankLedgerRow = {
  * 
  * @requires system_admin role
  */
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ sessionId: string }> }
-) {
-  const { sessionId } = await params;
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params }) => {
+  const { sessionId } = params;
 
   if (!sessionId) {
     return NextResponse.json({ error: 'Session ID required' }, { status: 400 });
-  }
-
-  // Authentication check
-  const authClient = await createServerRlsClient();
-  const { data: { user }, error: userError } = await authClient.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  // Authorization check - only system_admin can view session analytics
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
   }
 
   // Use service role for data access
@@ -226,7 +212,8 @@ export async function GET(
   };
 
   return NextResponse.json(response);
-}
+  },
+});
 
 /** Generate human-readable event description */
 function getEventDescription(eventType: string, data: Record<string, unknown> | null): string {

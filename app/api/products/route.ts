@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validateProductPayload } from '@/lib/validation/products'
-import { isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { Database } from '@/types/supabase'
 import { TimeoutError } from '@/lib/utils/withTimeout'
 
 type ProductRow = Database['public']['Tables']['products']['Row']
 
-export async function GET() {
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async () => {
   try {
     const supabase = await createServerRlsClient()
 
@@ -28,21 +30,15 @@ export async function GET() {
     console.error('[api/products] unhandled error', err)
     return NextResponse.json({ error: 'Failed to load products', details: message }, { status })
   }
-}
+  },
+})
 
-export async function POST(request: Request) {
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient()
 
-  // Authentication: only system_admin can create products
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 })
-  }
-
-  const body = (await request.json().catch(() => ({}))) as Partial<ProductRow>
+  const body = (await req.json().catch(() => ({}))) as Partial<ProductRow>
 
   const validation = validateProductPayload(body, { mode: 'create' })
   if (!validation.ok) {
@@ -84,4 +80,5 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ product: data }, { status: 201 })
-}
+  },
+})

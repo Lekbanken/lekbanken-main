@@ -21,9 +21,12 @@ export type LeaderboardPeriod = 'all_time' | 'monthly' | 'weekly' | 'daily'
 
 export interface LeaderboardEntry {
   rank: number
-  userId: string
   displayName: string
   avatarUrl: string | null
+
+  // SECURITY: userId intentionally omitted to prevent cross-endpoint correlation.
+  // See TI-002 in tenant-isolation-audit.md.
+
   value: number
   level?: number
   isCurrentUser: boolean
@@ -163,8 +166,7 @@ async function getLeaderboardAllTime(
   // Transform entries
   const leaderboardEntries: LeaderboardEntry[] = validEntries.map((entry, index: number) => ({
     rank: index + 1,
-    userId: entry.user_id,
-    displayName: profiles.get(entry.user_id)?.displayName ?? maskEmail(entry.email),
+    displayName: profiles.get(entry.user_id)?.displayName ?? 'Anonymous',
     avatarUrl: profiles.get(entry.user_id)?.avatarUrl ?? null,
     value: getValueForType(entry, type),
     level: entry.level ?? 1,
@@ -185,7 +187,6 @@ async function getLeaderboardAllTime(
       userRankOutsideTop = userRank.rank
       userEntryOutsideTop = {
         rank: userRank.rank,
-        userId: currentUserId,
         displayName: profiles.get(currentUserId)?.displayName ?? 'You',
         avatarUrl: profiles.get(currentUserId)?.avatarUrl ?? null,
         value: userRank.value,
@@ -305,8 +306,7 @@ async function getLeaderboardByPeriod(
 
   const leaderboardEntries: LeaderboardEntry[] = sortedEntries.map(([userId, value], index) => ({
     rank: index + 1,
-    userId,
-    displayName: profiles.get(userId)?.displayName ?? 'User',
+    displayName: profiles.get(userId)?.displayName ?? 'Anonymous',
     avatarUrl: profiles.get(userId)?.avatarUrl ?? null,
     value,
     isCurrentUser: userId === currentUserId,
@@ -560,26 +560,18 @@ async function getUserProfiles(
   const supabase = await createServerRlsClient()
   const { data } = await supabase
     .from('users')
-    .select('id, full_name, avatar_url, email')
+    .select('id, full_name, avatar_url')
     .in('id', userIds)
 
   const profiles = new Map<string, { displayName: string; avatarUrl: string | null }>()
   for (const user of data ?? []) {
     profiles.set(user.id, {
-      displayName: user.full_name || maskEmail(user.email),
+      displayName: user.full_name || 'Anonymous',
       avatarUrl: user.avatar_url,
     })
   }
 
   return profiles
-}
-
-function maskEmail(email: string | null): string {
-  if (!email) return 'User'
-  const [local, domain] = email.split('@')
-  if (!domain) return 'User'
-  if (local.length <= 2) return `${local[0]}***@${domain}`
-  return `${local.slice(0, 2)}***@${domain}`
 }
 
 function emptyResult(

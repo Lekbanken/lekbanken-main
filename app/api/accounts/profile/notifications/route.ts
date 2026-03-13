@@ -1,19 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { Database } from '@/types/supabase'
 
 type NotificationPreferenceRow = Database['public']['Tables']['notification_preferences']['Row']
 type NotificationPreferenceInsert = Database['public']['Tables']['notification_preferences']['Insert']
 type NotificationPreferenceUpdate = Database['public']['Tables']['notification_preferences']['Update']
-
-async function getAuthedUserId() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  return user?.id ?? null
-}
 
 function mapRowToSettings(data: NotificationPreferenceRow | null) {
   if (!data) return null
@@ -52,14 +44,13 @@ function mapRowToSettings(data: NotificationPreferenceRow | null) {
   }
 }
 
-export async function GET() {
-  const userId = await getAuthedUserId()
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth }) => {
+    const userId = auth!.user!.id
 
-  const admin = createServiceRoleClient()
-  const { data, error } = await admin
+    const admin = createServiceRoleClient()
+    const { data, error } = await admin
     .from('notification_preferences')
     .select('*')
     .eq('user_id', userId)
@@ -74,15 +65,15 @@ export async function GET() {
   }
 
   return NextResponse.json({ settings: mapRowToSettings(data ?? null) })
-}
+  },
+})
 
-export async function PATCH(request: NextRequest) {
-  const userId = await getAuthedUserId()
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
 
-  const body = (await request.json().catch(() => null)) as {
+    const body = (await req.json().catch(() => null)) as {
     settings?: Record<string, unknown>
   } | null
 
@@ -147,4 +138,5 @@ export async function PATCH(request: NextRequest) {
   }
 
   return NextResponse.json({ settings: mapRowToSettings(result.data) })
-}
+  },
+})

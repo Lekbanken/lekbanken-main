@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient, getRequestTenantId } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import { validatePlanPayload } from '@/lib/validation/plans'
 import { fetchPlanWithRelations } from '@/lib/services/planner.server'
@@ -11,25 +12,17 @@ function normalizeId(value: string | string[] | undefined) {
   return id?.trim() || null
 }
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ planId: string }> }
-) {
-  const params = await context.params
-  const planId = normalizeId(params?.planId)
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const user = auth!.user!
+  const planId = normalizeId((params as { planId: string }).planId)
   if (!planId) {
     return NextResponse.json({ error: 'Invalid plan id' }, { status: 400 })
   }
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     visibility?: 'private' | 'tenant' | 'public'
     owner_tenant_id?: string | null
   }
@@ -50,6 +43,19 @@ export async function POST(
 
   const targetVisibility = body.visibility ?? plan.visibility
   const targetTenant = body.owner_tenant_id ?? plan.ownerTenantId ?? headerTenant ?? null
+
+  // Validate tenant membership — never trust client tenant input
+  if (targetTenant && !isSystemAdmin) {
+    const { data: membership } = await supabase
+      .from('user_tenant_memberships')
+      .select('tenant_id')
+      .eq('user_id', user.id)
+      .eq('tenant_id', targetTenant)
+      .maybeSingle()
+    if (!membership) {
+      return NextResponse.json({ error: 'Invalid tenant' }, { status: 403 })
+    }
+  }
 
   const validation = validatePlanPayload(
     { name: plan.name, visibility: targetVisibility, owner_tenant_id: targetTenant },
@@ -97,4 +103,5 @@ export async function POST(
 
   const refreshed = await fetchPlanWithRelations(planId)
   return NextResponse.json({ plan: refreshed.plan })
-}
+  },
+})

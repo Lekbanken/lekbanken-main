@@ -40,6 +40,7 @@ export interface ResolvedParticipant {
   sessionId: string
   role: string
   status: string
+  expiresAt: string | null
 }
 
 // ---------------------------------------------------------------------------
@@ -152,5 +153,6 @@ export async function resolveParticipant(
     sessionId: participant.session_id,
     role: participant.role ?? 'player',
     status: participant.status ?? 'active',
+    expiresAt: participant.token_expires_at ?? null,
   }
 }

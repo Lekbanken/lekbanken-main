@@ -1,8 +1,8 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { stripe } from '@/lib/stripe/config'
-import { supabaseAdmin, createServerRlsClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 const subscriptionUpdateSchema = z.object({
   tenantId: z.string().uuid(),
@@ -16,17 +16,15 @@ const subscriptionUpdateSchema = z.object({
  * Updates an existing subscription to a new price (upgrade/downgrade).
  * Handles Stripe proration automatically.
  */
-export async function POST(request: NextRequest) {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  rateLimit: 'strict',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
 
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  let body: unknown
-  try {
-    body = await request.json()
+    let body: unknown
+    try {
+      body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
@@ -43,7 +41,7 @@ export async function POST(request: NextRequest) {
     .from('user_tenant_memberships')
     .select('role')
     .eq('tenant_id', tenantId)
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('status', 'active')
     .single()
 
@@ -155,22 +153,21 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+  },
+})
 
 /**
  * GET /api/billing/subscription/update?tenantId=xxx&newPriceId=yyy
  * 
  * Preview proration for a subscription change without applying it.
  */
-export async function GET(request: NextRequest) {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  rateLimit: 'strict',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
 
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const { searchParams } = new URL(request.url)
+    const { searchParams } = new URL(req.url)
   const tenantId = searchParams.get('tenantId')
   const newPriceId = searchParams.get('newPriceId')
 
@@ -183,7 +180,7 @@ export async function GET(request: NextRequest) {
     .from('user_tenant_memberships')
     .select('role')
     .eq('tenant_id', tenantId)
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('status', 'active')
     .single()
 
@@ -266,4 +263,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+  },
+})

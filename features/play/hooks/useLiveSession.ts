@@ -34,6 +34,8 @@ import type {
   SignalReceivedBroadcast,
   TimeBankChangedBroadcast,
   PuzzleBroadcast,
+  ParticipantsChangedBroadcast,
+  AssignmentsChangedBroadcast,
   SessionRuntimeState,
   TimerState,
   TimerDisplay,
@@ -75,6 +77,10 @@ export interface UseLiveSessionOptions {
   onTimeBankChanged?: (payload: TimeBankChangedBroadcast['payload']) => void;
   /** Called when puzzle state changes */
   onPuzzleUpdate?: (payload: PuzzleBroadcast['payload']) => void;
+  /** Called when participants are kicked/blocked/approved or readiness changes */
+  onParticipantsChanged?: (payload: ParticipantsChangedBroadcast['payload']) => void;
+  /** Called when role assignments change */
+  onAssignmentsChanged?: (payload: AssignmentsChangedBroadcast['payload']) => void;
   /** Called after the channel recovers from CHANNEL_ERROR / TIMED_OUT.
    *  Use this to re-fetch authoritative state from the server so any
    *  broadcasts missed during the outage window are reconciled. */
@@ -130,6 +136,8 @@ export function useLiveSession({
   onSignalReceived,
   onTimeBankChanged,
   onPuzzleUpdate,
+  onParticipantsChanged,
+  onAssignmentsChanged,
   onReconnect,
   enabled = true,
   timerTickInterval = 1000,
@@ -178,6 +186,8 @@ export function useLiveSession({
   const onSignalReceivedRef = useLatestRef(onSignalReceived);
   const onTimeBankChangedRef = useLatestRef(onTimeBankChanged);
   const onPuzzleUpdateRef = useLatestRef(onPuzzleUpdate);
+  const onParticipantsChangedRef = useLatestRef(onParticipantsChanged);
+  const onAssignmentsChangedRef = useLatestRef(onAssignmentsChanged);
   const onReconnectRef = useLatestRef(onReconnect);
   
   // Track whether we've been in an error state so we can fire onReconnect
@@ -379,6 +389,18 @@ export function useLiveSession({
       case 'puzzle_update': {
         const payload = (event as PuzzleBroadcast).payload;
         onPuzzleUpdateRef.current?.(payload);
+        break;
+      }
+
+      case 'participants_changed': {
+        const payload = (event as ParticipantsChangedBroadcast).payload;
+        onParticipantsChangedRef.current?.(payload);
+        break;
+      }
+
+      case 'assignments_changed': {
+        const payload = (event as AssignmentsChangedBroadcast).payload;
+        onAssignmentsChangedRef.current?.(payload);
         break;
       }
     }

@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { supabaseAdmin, getAuthUser } from '@/lib/supabase/server'
+import { timingSafeEqual } from 'crypto'
+import { supabaseAdmin, createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireAuth } from '@/lib/api/auth-guard'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -14,43 +17,26 @@ const recordUsageSchema = z.object({
 })
 
 // POST: Record usage
-export async function POST(request: Request) {
-  // Check for API key or authenticated user
-  const apiKey = request.headers.get('x-api-key')
-  const internalSecret = process.env.INTERNAL_API_SECRET
+export const POST = apiHandler({
+  auth: 'public',
+  input: recordUsageSchema,
+  handler: async ({ req, body }) => {
+    // Dual auth: API key (internal services) OR system_admin (UI)
+    const apiKey = req.headers.get('x-api-key')
+    const internalSecret = process.env.INTERNAL_API_SECRET
 
-  let isAuthorized = false
-
-  if (apiKey && internalSecret && apiKey === internalSecret) {
-    isAuthorized = true
-  } else {
-    const user = await getAuthUser()
-    if (user) {
-      // Check if user is system admin using RPC function
-      const { data: isAdmin } = await supabaseAdmin.rpc('is_system_admin')
-      isAuthorized = isAdmin === true
+    const keyValid = apiKey && internalSecret &&
+      apiKey.length === internalSecret.length &&
+      timingSafeEqual(Buffer.from(apiKey), Buffer.from(internalSecret))
+    if (!keyValid) {
+      const ctx = await requireAuth()
+      if (ctx.effectiveGlobalRole !== 'system_admin') {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
     }
-  }
 
-  if (!isAuthorized) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    const { tenantId, meterSlug, quantity, idempotencyKey, metadata } = body
 
-  let body: unknown
-  try {
-    body = await request.json()
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
-  }
-
-  const parsed = recordUsageSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 })
-  }
-
-  const { tenantId, meterSlug, quantity, idempotencyKey, metadata } = parsed.data
-
-  try {
     // Call record_usage RPC (using type assertion since function may not be in generated types yet)
     const { data, error } = await supabaseAdmin.rpc('record_usage' as never, {
       p_tenant_id: tenantId,
@@ -66,51 +52,46 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ record_id: data })
-  } catch (error) {
-    console.error('[usage API] Error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
-  }
-}
+  },
+})
 
 // GET: Get usage summary for a tenant
-export async function GET(request: Request) {
-  const user = await getAuthUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-  }
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const url = new URL(req.url)
+    const tenantId = url.searchParams.get('tenantId')
+    const meterSlug = url.searchParams.get('meter')
+    const periodStart = url.searchParams.get('periodStart')
+    const periodEnd = url.searchParams.get('periodEnd')
 
-  const url = new URL(request.url)
-  const tenantId = url.searchParams.get('tenantId')
-  const meterSlug = url.searchParams.get('meter')
-  const periodStart = url.searchParams.get('periodStart')
-  const periodEnd = url.searchParams.get('periodEnd')
+    if (!tenantId) {
+      return NextResponse.json({ error: 'tenantId required' }, { status: 400 })
+    }
 
-  if (!tenantId) {
-    return NextResponse.json({ error: 'tenantId required' }, { status: 400 })
-  }
+    const supabase = await createServerRlsClient()
 
-  // Check user has access to tenant
-  const { data: membership } = await supabaseAdmin
-    .from('user_tenant_memberships')
-    .select('role')
-    .eq('tenant_id', tenantId)
-    .eq('user_id', user.id)
-    .eq('status', 'active')
-    .single()
+    // Check user has access to tenant
+    const { data: membership } = await supabase
+      .from('user_tenant_memberships')
+      .select('role')
+      .eq('tenant_id', tenantId)
+      .eq('user_id', auth!.user!.id)
+      .eq('status', 'active')
+      .single()
 
-  if (!membership || !['owner', 'admin'].includes(membership.role)) {
-    return NextResponse.json({ error: 'Access denied' }, { status: 403 })
-  }
+    if (!membership || !['owner', 'admin'].includes(membership.role)) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
+    }
 
-  try {
     // Get meters
-    const { data: meters } = await supabaseAdmin
+    const { data: meters } = await supabase
       .from('usage_meters')
       .select('*')
       .eq('status', 'active')
 
     // Get usage summaries
-    let summaryQuery = supabaseAdmin
+    let summaryQuery = supabase
       .from('usage_summaries')
       .select(`
         *,
@@ -146,7 +127,7 @@ export async function GET(request: Request) {
     currentPeriodStart.setDate(1)
     currentPeriodStart.setHours(0, 0, 0, 0)
 
-    const { data: currentRecords } = await supabaseAdmin
+    const { data: currentRecords } = await supabase
       .from('usage_records')
       .select(`
         meter_id,
@@ -169,8 +150,5 @@ export async function GET(request: Request) {
       summaries: summaries || [],
       currentUsage,
     })
-  } catch (error) {
-    console.error('[usage API] Error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
-  }
-}
+  },
+})

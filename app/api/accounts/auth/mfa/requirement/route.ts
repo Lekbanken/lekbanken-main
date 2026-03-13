@@ -6,21 +6,13 @@
  */
 
 import { NextResponse } from 'next/server'
-import { createServerRlsClient } from '@/lib/supabase/server'
 import { getMFAStatus } from '@/lib/services/mfa/mfaService.server'
+import { apiHandler } from '@/lib/api/route-handler'
 
-export async function GET() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  try {
-    const status = await getMFAStatus(user.id)
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth }) => {
+    const status = await getMFAStatus(auth!.user!.id)
 
     return NextResponse.json({
       is_enabled: status.is_enabled,
@@ -36,8 +28,5 @@ export async function GET() {
       needs_enrollment: status.is_required && !status.is_enabled,
       can_disable: !status.is_required, // Cannot disable if MFA is required
     })
-  } catch (error) {
-    console.error('[MFA Requirement] Error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
+  },
+})

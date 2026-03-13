@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient, getRequestTenantId } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { validatePlanPayload } from '@/lib/validation/plans'
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import { fetchPlanWithRelations } from '@/lib/services/planner.server'
@@ -7,17 +8,12 @@ import { logGamificationEventV1 } from '@/lib/services/gamification-events.serve
 import type { Json } from '@/types/supabase'
 import type { UserProfile } from '@/types/auth'
 
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+  const user = auth!.user!
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     name?: string
     description?: string | null
     visibility?: 'private' | 'tenant' | 'public'
@@ -25,6 +21,7 @@ export async function POST(request: Request) {
     metadata?: Record<string, unknown>
   }
 
+  const supabase = await createServerRlsClient()
   const headerTenant = await getRequestTenantId()
   const { data: profile } = await supabase
     .from('users')
@@ -35,6 +32,19 @@ export async function POST(request: Request) {
   const visibility = body.visibility ?? 'private'
   const effectiveGlobalRole = deriveEffectiveGlobalRole((profile as UserProfile | null) ?? null, user)
   const isSystemAdmin = effectiveGlobalRole === 'system_admin'
+
+  // Validate tenant membership — never trust client tenant input
+  if (tenantId && !isSystemAdmin) {
+    const { data: membership } = await supabase
+      .from('user_tenant_memberships')
+      .select('tenant_id')
+      .eq('user_id', user.id)
+      .eq('tenant_id', tenantId)
+      .maybeSingle()
+    if (!membership) {
+      return NextResponse.json({ error: 'Invalid tenant' }, { status: 403 })
+    }
+  }
 
   const validation = validatePlanPayload(
     {
@@ -87,4 +97,5 @@ export async function POST(request: Request) {
   const { plan } = await fetchPlanWithRelations(data.id)
 
   return NextResponse.json({ plan }, { status: 201 })
-}
+  },
+})

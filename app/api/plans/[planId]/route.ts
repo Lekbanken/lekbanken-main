@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { validatePlanPayload } from '@/lib/validation/plans'
 import { fetchPlanWithRelations } from '@/lib/services/planner.server'
 import {
@@ -16,24 +17,16 @@ function normalizeId(value: string | string[] | undefined) {
   return id?.trim() || null
 }
 
-export async function GET(
-  _request: Request,
-  context: { params: Promise<{ planId: string }> }
-) {
-  const params = await context.params
-  const planId = normalizeId(params?.planId)
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const user = auth!.user!
+  const planId = normalizeId((params as { planId: string }).planId)
   if (!planId) {
     return NextResponse.json({ error: { code: 'INVALID_ID', message: 'Invalid plan id' } }, { status: 400 })
   }
 
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
-  }
 
   const { plan, raw } = await fetchPlanWithRelations(planId)
   if (!plan || !raw) {
@@ -69,26 +62,19 @@ export async function GET(
     plan,
     _capabilities: capabilitiesToObject(caps),
   })
-}
+  },
+});
 
-export async function PATCH(
-  request: Request,
-  context: { params: Promise<{ planId: string }> }
-) {
-  const params = await context.params
-  const planId = normalizeId(params?.planId)
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth, params }) => {
+  const user = auth!.user!
+  const planId = normalizeId((params as { planId: string }).planId)
   if (!planId) {
     return NextResponse.json({ error: { code: 'INVALID_ID', message: 'Invalid plan id' } }, { status: 400 })
   }
 
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
-  }
 
   // Fetch plan first to check capabilities
   const { raw: existingPlan } = await fetchPlanWithRelations(planId)
@@ -128,7 +114,7 @@ export async function PATCH(
     )
   }
 
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     name?: string
     description?: string | null
     metadata?: Record<string, unknown> | null
@@ -180,26 +166,19 @@ export async function PATCH(
   }))
 
   return NextResponse.json({ plan, _capabilities: capabilitiesToObject(caps) })
-}
+  },
+});
 
-export async function DELETE(
-  _request: Request,
-  context: { params: Promise<{ planId: string }> }
-) {
-  const params = await context.params
-  const planId = normalizeId(params?.planId)
+export const DELETE = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const user = auth!.user!
+  const planId = normalizeId((params as { planId: string }).planId)
   if (!planId) {
     return NextResponse.json({ error: { code: 'INVALID_ID', message: 'Invalid plan id' } }, { status: 400 })
   }
 
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
-  }
 
   // Fetch plan first to check capabilities
   const { raw: existingPlan } = await fetchPlanWithRelations(planId)
@@ -252,4 +231,5 @@ export async function DELETE(
   }
 
   return NextResponse.json({ deleted: true, id: planId })
-}
+  },
+});

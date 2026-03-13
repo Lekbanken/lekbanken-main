@@ -8,23 +8,23 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
-import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function GET(request: Request) {
-  try {
-    const token = request.headers.get('x-participant-token');
-    const url = new URL(request.url);
+export const GET = apiHandler({
+  auth: 'participant',
+  handler: async ({ req, participant: p }) => {
+    const url = new URL(req.url);
     const sessionCode = url.searchParams.get('session_code');
 
-    if (!token || !sessionCode) {
+    if (!sessionCode) {
       return NextResponse.json(
-        { error: 'Missing participant token or session_code' },
+        { error: 'Missing session_code' },
         { status: 400 }
       );
     }
 
     const normalizedCode = normalizeSessionCode(sessionCode);
-    const supabase = await createServiceRoleClient();
+    const supabase = createServiceRoleClient();
 
     const { data: session, error: sessionError } = await supabase
       .from('participant_sessions')
@@ -36,23 +36,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
-    const { data: participant, error: participantError } = await supabase
-      .from('participants')
-      .select('id, token_expires_at, status')
-      .eq('participant_token', token)
-      .eq('session_id', session.id)
-      .single();
-
-    if (participantError || !participant) {
-      return NextResponse.json({ error: 'Participant not found' }, { status: 404 });
-    }
-
-    if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
-      return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
-    }
-
-    if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) {
-      return NextResponse.json({ error: 'Token expired' }, { status: 401 });
+    // Verify participant belongs to this session
+    if (p!.sessionId !== session.id) {
+      return NextResponse.json({ error: 'Session mismatch' }, { status: 403 });
     }
 
     // SECURITY: Select only participant-safe role fields.
@@ -76,7 +62,7 @@ export async function GET(request: Request) {
       `
       )
       .eq('session_id', session.id)
-      .eq('participant_id', participant.id)
+      .eq('participant_id', p!.participantId)
       .limit(1)
       .maybeSingle();
 
@@ -106,11 +92,5 @@ export async function GET(request: Request) {
       secretRevealedAt:
         (assignment as unknown as Record<string, unknown> | null)?.secret_instructions_revealed_at ?? null,
     });
-  } catch (error) {
-    console.error('Error fetching participant role:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch participant role' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

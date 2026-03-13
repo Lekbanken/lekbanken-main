@@ -8,32 +8,20 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { apiHandler } from '@/lib/api/route-handler';
 import { pushProductToStripe } from '@/lib/stripe/product-sync';
 import { logStripeSync } from '@/lib/services/productAudit.server';
 
-type RouteParams = {
-  params: Promise<{ productId: string }>;
-};
-
-export async function POST(request: Request, { params }: RouteParams) {
-  const { productId } = await params;
-  const supabase = await createServerRlsClient();
-
-  // Auth check
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
-  }
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req, params, auth }) => {
+  const { productId } = params;
+  const userId = auth!.user!.id;
 
   // Parse options from request body (optional)
   let options: { force?: boolean; dryRun?: boolean } = {};
   try {
-    const body = await request.json();
+    const body = await req.json();
     options = {
       force: body?.force ?? true, // Default to force sync from UI
       dryRun: body?.dryRun ?? false,
@@ -53,7 +41,7 @@ export async function POST(request: Request, { params }: RouteParams) {
       result.stripeProductId || '', 
       false, 
       result.error || 'Unknown error', 
-      user.id
+      userId
     );
     
     return NextResponse.json(
@@ -67,7 +55,7 @@ export async function POST(request: Request, { params }: RouteParams) {
 
   // Log successful sync
   if (result.operation !== 'skipped') {
-    await logStripeSync(productId, result.stripeProductId || '', true, undefined, user.id);
+    await logStripeSync(productId, result.stripeProductId || '', true, undefined, userId);
   }
 
   // Return sync result
@@ -80,4 +68,5 @@ export async function POST(request: Request, { params }: RouteParams) {
       ? 'Product already synced (use force: true to re-sync)'
       : `Product ${result.operation} successfully`,
   });
-}
+  },
+});

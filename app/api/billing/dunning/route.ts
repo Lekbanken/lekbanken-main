@@ -1,24 +1,16 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
-import { requireSystemAdmin, AuthError } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: Request) {
-  try {
-    await requireSystemAdmin()
-  } catch (e) {
-    if (e instanceof AuthError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
-    }
-    throw e
-  }
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const url = new URL(req.url)
+    const status = url.searchParams.get('status') // pending, retrying, recovered, failed, canceled
 
-  const url = new URL(request.url)
-  const status = url.searchParams.get('status') // pending, retrying, recovered, failed, canceled
-
-  try {
     let query = supabaseAdmin
       .from('payment_failures')
       .select(`
@@ -40,8 +32,5 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({ failures: failures || [] })
-  } catch (error) {
-    console.error('[dunning API] Error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
-  }
-}
+  },
+})

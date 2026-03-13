@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
@@ -24,24 +26,22 @@ function parseOptions(value: unknown): DecisionOption[] | null {
   return options;
 }
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string; decisionId: string }> }
-) {
-  const { id: sessionId, decisionId } = await params;
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { id: sessionId, decisionId } = params;
 
+  const userId = auth!.user!.id;
   const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401);
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can manage decisions', 403);
+  if (session.host_user_id !== userId) return jsonError('Only host can manage decisions', 403);
 
-  const rawBody = (await request.json().catch(() => null)) as Record<string, unknown> | null;
+  const statusError = assertSessionStatus(session.status, 'decision-update');
+  if (statusError) return statusError;
+
+  const rawBody = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   if (!rawBody || typeof rawBody !== 'object') return jsonError('Invalid body', 400);
 
   const action = typeof rawBody.action === 'string' ? rawBody.action : null;
@@ -152,4 +152,5 @@ export async function PATCH(
   });
 
   return NextResponse.json({ success: true }, { status: 200 });
-}
+  },
+})

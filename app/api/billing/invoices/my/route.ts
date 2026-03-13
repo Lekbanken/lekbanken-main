@@ -1,31 +1,28 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
-import { supabaseAdmin, createServerRlsClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 /**
  * GET /api/billing/invoices/my
  * 
  * Get invoices for the current user's tenant(s).
  */
-export async function GET(request: NextRequest) {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
 
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    const { searchParams } = new URL(req.url)
+    const tenantId = searchParams.get('tenantId')
+    const limit = Math.min(parseInt(searchParams.get('limit') || '25'), 100)
 
-  const { searchParams } = new URL(request.url)
-  const tenantId = searchParams.get('tenantId')
-  const limit = Math.min(parseInt(searchParams.get('limit') || '25'), 100)
-
-  // Get user's tenant memberships
-  const { data: memberships, error: membershipError } = await supabaseAdmin
-    .from('user_tenant_memberships')
-    .select('tenant_id, role')
-    .eq('user_id', user.id)
-    .eq('status', 'active')
+    // Get user's tenant memberships
+    const { data: memberships, error: membershipError } = await supabaseAdmin
+      .from('user_tenant_memberships')
+      .select('tenant_id, role')
+      .eq('user_id', userId)
+      .eq('status', 'active')
 
   if (membershipError) {
     console.error('[invoices-my] membership error:', membershipError)
@@ -131,4 +128,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+  },
+})

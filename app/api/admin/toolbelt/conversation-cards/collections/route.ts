@@ -1,7 +1,8 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
-import { requireAuth, AuthError, requireTenantRole } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -26,13 +27,9 @@ const createCollectionSchema = z.object({
   status: z.enum(['draft', 'published']).optional(),
 })
 
-function jsonError(status: number, message: string, details?: unknown) {
-  return NextResponse.json({ error: message, details }, { status })
-}
-
-export async function GET(req: NextRequest) {
-  try {
-    const ctx = await requireAuth()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
     const url = new URL(req.url)
 
     const parsed = scopeQuerySchema.safeParse({
@@ -44,12 +41,12 @@ export async function GET(req: NextRequest) {
     })
 
     if (!parsed.success) {
-      return jsonError(400, 'Invalid query', parsed.error.flatten())
+      return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
     }
 
     const { scopeType, tenantId: tenantIdParam, status, mainPurposeId, subPurposeId } = parsed.data
 
-    const isSystemAdmin = ctx.effectiveGlobalRole === 'system_admin'
+    const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin'
 
     const admin = createServiceRoleClient()
 
@@ -79,7 +76,7 @@ export async function GET(req: NextRequest) {
 
         if (linkError) {
           console.error('[admin/conversation-cards] secondary purposes query error', linkError)
-          return jsonError(500, 'Failed to load collections')
+          return NextResponse.json({ error: 'Failed to load collections' }, { status: 500 })
         }
 
         const ids = (links ?? []).map((l) => l.collection_id)
@@ -90,22 +87,22 @@ export async function GET(req: NextRequest) {
       const { data, error } = await query
       if (error) {
         console.error('[admin/conversation-cards] list global error', error)
-        return jsonError(500, 'Failed to load collections')
+        return NextResponse.json({ error: 'Failed to load collections' }, { status: 500 })
       }
 
       return NextResponse.json({ collections: data ?? [] })
     }
 
     // tenant scope
-    const resolvedTenantId = tenantIdParam ?? ctx.activeTenant?.id ?? ctx.memberships[0]?.tenant_id ?? null
+    const resolvedTenantId = tenantIdParam ?? auth!.activeTenant?.id ?? auth!.memberships[0]?.tenant_id ?? null
     if (!resolvedTenantId) {
-      return jsonError(400, 'tenantId required for tenant scope')
+      return NextResponse.json({ error: 'tenantId required for tenant scope' }, { status: 400 })
     }
 
     // Read access: any tenant member can list; writes are enforced elsewhere.
-    const isMember = ctx.memberships.some((m) => m.tenant_id === resolvedTenantId && m.status === 'active')
+    const isMember = auth!.memberships.some((m) => m.tenant_id === resolvedTenantId && m.status === 'active')
     if (!isSystemAdmin && !isMember) {
-      return jsonError(403, 'Forbidden')
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     let query = admin
@@ -128,7 +125,7 @@ export async function GET(req: NextRequest) {
 
       if (linkError) {
         console.error('[admin/conversation-cards] secondary purposes query error', linkError)
-        return jsonError(500, 'Failed to load collections')
+        return NextResponse.json({ error: 'Failed to load collections' }, { status: 500 })
       }
 
       const ids = (links ?? []).map((l) => l.collection_id)
@@ -139,36 +136,24 @@ export async function GET(req: NextRequest) {
     const { data, error } = await query
     if (error) {
       console.error('[admin/conversation-cards] list tenant error', error)
-      return jsonError(500, 'Failed to load collections')
+      return NextResponse.json({ error: 'Failed to load collections' }, { status: 500 })
     }
 
     return NextResponse.json({ collections: data ?? [] })
-  } catch (e) {
-    if (e instanceof AuthError) return jsonError(e.status, e.message)
-    console.error('[admin/conversation-cards] GET unexpected error', e)
-    return jsonError(500, 'Unexpected error')
-  }
-}
+  },
+})
 
-export async function POST(req: NextRequest) {
-  try {
-    const ctx = await requireAuth()
-    if (!ctx.user) return jsonError(401, 'Unauthorized')
-    const isSystemAdmin = ctx.effectiveGlobalRole === 'system_admin'
-
-    const body = await req.json().catch(() => ({}))
-    const parsed = createCollectionSchema.safeParse(body)
-    if (!parsed.success) {
-      return jsonError(400, 'Invalid payload', parsed.error.flatten())
-    }
-
-    const input = parsed.data
+export const POST = apiHandler({
+  auth: 'user',
+  input: createCollectionSchema,
+  handler: async ({ auth, body: input }) => {
+    const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin'
 
     if (input.scope_type === 'global') {
-      if (!isSystemAdmin) return jsonError(403, 'Forbidden')
+      if (!isSystemAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     } else {
-      const tenantId = input.tenant_id ?? ctx.activeTenant?.id ?? null
-      if (!tenantId) return jsonError(400, 'tenant_id required for tenant scope')
+      const tenantId = input.tenant_id ?? auth!.activeTenant?.id ?? null
+      if (!tenantId) return NextResponse.json({ error: 'tenant_id required for tenant scope' }, { status: 400 })
 
       // Require tenant admin (owner/admin)
       await requireTenantRole(['owner', 'admin'], tenantId)
@@ -188,14 +173,14 @@ export async function POST(req: NextRequest) {
         language: input.language?.trim() ?? null,
         main_purpose_id: input.main_purpose_id ?? null,
         status: input.status ?? 'draft',
-        created_by_user_id: ctx.user.id,
+        created_by_user_id: auth!.user!.id,
       })
       .select('id,scope_type,tenant_id,title,description,audience,language,main_purpose_id,status,created_at,updated_at')
       .single()
 
     if (insertError || !collection) {
       console.error('[admin/conversation-cards] create collection error', insertError)
-      return jsonError(500, 'Failed to create collection')
+      return NextResponse.json({ error: 'Failed to create collection' }, { status: 500 })
     }
 
     const ids = input.secondary_purpose_ids ?? []
@@ -211,9 +196,5 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ collection }, { status: 201 })
-  } catch (e) {
-    if (e instanceof AuthError) return jsonError(e.status, e.message)
-    console.error('[admin/conversation-cards] POST unexpected error', e)
-    return jsonError(500, 'Unexpected error')
-  }
-}
+  },
+})

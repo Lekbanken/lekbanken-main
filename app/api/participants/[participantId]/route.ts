@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { Database } from '@/types/supabase';
 
 type ParticipantDetail = {
@@ -12,24 +13,10 @@ type ParticipantDetail = {
   notes?: string | null;
 };
 
-const mockParticipant: ParticipantDetail = {
-  id: 'p-1',
-  name: 'Nora Nilsson',
-  email: 'nora@example.com',
-  tenantName: 'Lekbanken',
-  lastActive: '2025-12-12T09:05:00Z',
-  risk: 'none',
-  notes: 'Mockdata',
-};
-
-const mockLog = [
-  { id: 'p-log-1', at: '2025-12-12T09:02:00Z', actor: 'Anna', action: 'Lades till i session' },
-  { id: 'p-log-2', at: '2025-12-12T09:05:00Z', actor: 'System', action: 'Risknivå: låg' },
-];
-
-export async function GET(_: Request, { params }: { params: Promise<{ participantId: string }> }) {
-  const { participantId } = await params;
-  try {
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ params }) => {
+    const { participantId } = params;
     const supabase = await createServerRlsClient();
     type ParticipantRow = Database['public']['Tables']['participants']['Row'] & {
       session?: { tenant?: { id: string; name: string | null } | null } | null;
@@ -55,7 +42,9 @@ export async function GET(_: Request, { params }: { params: Promise<{ participan
       .eq('id', participantId)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      return NextResponse.json({ error: 'Participant not found' }, { status: 404 });
+    }
 
     const r = data as ParticipantRow;
     const status = (r.status as Database['public']['Enums']['participant_status'] | null) ?? 'active';
@@ -73,8 +62,5 @@ export async function GET(_: Request, { params }: { params: Promise<{ participan
     };
 
     return NextResponse.json({ participant, log: [] });
-  } catch (err) {
-    console.warn('[api/participants/:id] fallback to mock', err);
-    return NextResponse.json({ participant: mockParticipant, log: mockLog });
-  }
-}
+  },
+});

@@ -5,10 +5,10 @@
  * Revokes a participant token immediately (sets expiry to now)
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { requireSessionHost, AuthError } from '@/lib/api/auth-guard';
+import { requireSessionHost } from '@/lib/api/auth-guard';
+import { apiHandler } from '@/lib/api/route-handler';
 
 interface RevokeTokenRequest {
   participant_token?: string;
@@ -17,9 +17,10 @@ interface RevokeTokenRequest {
   reason?: string;
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const body: RevokeTokenRequest = await request.json();
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ req }) => {
+    const body: RevokeTokenRequest = await req.json();
     const { participant_token, participant_id, session_id, reason = 'Token revoked by host' } = body;
 
     if (!participant_token && !participant_id) {
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Auth: session host or system_admin
+    // Auth: session host or system_admin (wrapper already verified user, this checks host ownership)
     await requireSessionHost(participant.session_id);
 
     // Extract tenant_id from joined session data
@@ -101,15 +102,5 @@ export async function POST(request: NextRequest) {
       revoked_at: revokedAt,
       message: 'Token revoked successfully',
     });
-
-  } catch (error) {
-    if (error instanceof AuthError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
-    }
-    console.error('Error in token revocation:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

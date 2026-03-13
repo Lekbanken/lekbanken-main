@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { JourneyActivity, JourneyFeed } from '@/features/journey/types';
 
 export const dynamic = 'force-dynamic';
@@ -17,22 +18,16 @@ function asIso(value: unknown): string | null {
   return date.toISOString();
 }
 
-export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const cursor = url.searchParams.get('cursor');
-  const limit = parseLimit(url.searchParams.get('limit'));
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id;
 
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+    const url = new URL(req.url);
+    const cursor = url.searchParams.get('cursor');
+    const limit = parseLimit(url.searchParams.get('limit'));
 
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const userId = user.id;
+    const supabase = await createServerRlsClient();
 
   // Query a little more than limit per source then merge-sort.
   const perSource = Math.min(50, Math.max(10, limit));
@@ -166,4 +161,5 @@ export async function GET(req: Request) {
   const payload: JourneyFeed = { items: sliced, nextCursor };
 
   return NextResponse.json(payload, { status: 200 });
-}
+  },
+})

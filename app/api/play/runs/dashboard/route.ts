@@ -10,27 +10,21 @@
  * Response: { rows: DashboardRunRow[], count: number }
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { DashboardRunRow, DashboardSessionInfo, RunStatus, RunSessionStatus } from '@/features/play/types'
 
 /** Runs without a heartbeat in this many hours are considered stale. */
 const STALE_THRESHOLD_HOURS = 24
 
-export async function GET(request: NextRequest) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
+    const supabase = await createServerRlsClient()
 
-  if (!user) {
-    return NextResponse.json(
-      { error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
-      { status: 401 }
-    )
-  }
-
-  const scope = request.nextUrl.searchParams.get('scope') ?? 'active'
+    const scope = new URL(req.url).searchParams.get('scope') ?? 'active'
   const staleThreshold = new Date(
     Date.now() - STALE_THRESHOLD_HOURS * 60 * 60 * 1000
   ).toISOString()
@@ -48,7 +42,7 @@ export async function GET(request: NextRequest) {
       metadata,
       plan_versions(plan_id, name, plans(name))
     `)
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .order('started_at', { ascending: false })
     .limit(50)
 
@@ -180,4 +174,5 @@ export async function GET(request: NextRequest) {
     .filter((r): r is DashboardRunRow => r !== null)
 
   return NextResponse.json({ rows, count: rows.length })
-}
+  },
+})

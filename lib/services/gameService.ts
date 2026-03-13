@@ -67,9 +67,12 @@ export async function searchGames(
     query = query.is('owner_tenant_id', null)
   }
 
-  // Add search filter across name + description
+  // Add search filter across name + description (strip PostgREST DSL metacharacters)
   if (search) {
-    query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`)
+    const s = search.replace(/[,()]/g, '')
+    if (s) {
+      query = query.or(`name.ilike.%${s}%,description.ilike.%${s}%`)
+    }
   }
 
   // Add category filter
@@ -144,9 +147,12 @@ export async function getTenantGames(
     query = query.eq('status', status)
   }
 
-  // Add search filter
+  // Add search filter (strip PostgREST DSL metacharacters)
   if (search) {
-    query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`)
+    const s = search.replace(/[,()]/g, '')
+    if (s) {
+      query = query.or(`name.ilike.%${s}%,description.ilike.%${s}%`)
+    }
   }
 
   // Add energy level filter

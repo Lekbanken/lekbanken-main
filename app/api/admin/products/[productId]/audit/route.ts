@@ -5,13 +5,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { ProductAuditEvent, ProductAuditEventType } from '@/features/admin/products/v2/types';
-
-type RouteParams = {
-  params: Promise<{ productId: string }>;
-};
 
 // Type for raw audit log row (since not in generated types yet)
 type AuditLogRow = {
@@ -24,21 +20,13 @@ type AuditLogRow = {
   created_at: string;
 };
 
-export async function GET(request: Request, { params }: RouteParams) {
-  const { productId } = await params;
-  const supabase = await createServerRlsClient();
-
-  // Auth check
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
-  }
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req, params }) => {
+  const { productId } = params;
 
   // Parse query params
-  const { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(req.url);
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '50', 10), 100);
   const offset = parseInt(searchParams.get('offset') ?? '0', 10);
   const eventType = searchParams.get('event_type');
@@ -86,4 +74,5 @@ export async function GET(request: Request, { params }: RouteParams) {
     limit,
     offset,
   });
-}
+  },
+});

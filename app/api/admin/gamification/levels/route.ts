@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,89 +23,64 @@ const postSchema = z.object({
  * GET /api/admin/gamification/levels?tenantId=<uuid>
  * Returns effective level definitions (tenant override if present, else global).
  */
-export async function GET(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req }) => {
+    const url = new URL(req.url)
+    const tenantId = url.searchParams.get('tenantId')
+    if (!tenantId || !z.string().uuid().safeParse(tenantId).success) {
+      return NextResponse.json({ error: 'Invalid tenantId' }, { status: 400 })
+    }
 
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    await requireTenantRole(['admin', 'owner'], tenantId)
 
-  const url = new URL(request.url)
-  const tenantId = url.searchParams.get('tenantId')
-  if (!tenantId || !z.string().uuid().safeParse(tenantId).success) {
-    return NextResponse.json({ error: 'Invalid tenantId' }, { status: 400 })
-  }
+    const admin = createServiceRoleClient()
+    const { data, error } = await admin.rpc('get_gamification_level_definitions_v1', { p_tenant_id: tenantId })
+    if (error) {
+      const msg = typeof error?.message === 'string' ? error.message : 'Unknown error'
+      return NextResponse.json({ error: 'Failed to load levels', details: msg }, { status: 500 })
+    }
 
-  const allowed = await assertTenantAdminOrSystem(tenantId, user)
-  if (!allowed) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  const { data, error } = await supabase.rpc('get_gamification_level_definitions_v1', { p_tenant_id: tenantId })
-  if (error) {
-    const msg = typeof error?.message === 'string' ? error.message : 'Unknown error'
-    return NextResponse.json({ error: 'Failed to load levels', details: msg }, { status: 500 })
-  }
-
-  return NextResponse.json({ tenantId, levels: data ?? [] }, { status: 200 })
-}
+    return NextResponse.json({ tenantId, levels: data ?? [] }, { status: 200 })
+  },
+})
 
 /**
  * POST /api/admin/gamification/levels
  * Replaces tenant-scoped definitions for a tenant.
  */
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  input: postSchema,
+  handler: async ({ auth, body }) => {
+    const { tenantId, levels } = body
+    await requireTenantRole(['admin', 'owner'], tenantId)
 
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    const admin = createServiceRoleClient()
 
-  const body = await request.json().catch(() => ({}))
-  const parsed = postSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
+    // Transform to DB-friendly keys.
+    const payload = levels.map((l) => ({
+      level: l.level,
+      name: l.name ?? null,
+      nextLevelXp: l.nextLevelXp,
+      nextReward: l.nextReward ?? null,
+      rewardAssetKey: l.rewardAssetKey ?? null,
+    }))
 
-  const { tenantId, levels } = parsed.data
+    const { data, error } = await admin.rpc('replace_gamification_level_definitions_v1', {
+      p_tenant_id: tenantId,
+      p_levels: payload,
+      p_actor_user_id: auth!.user!.id,
+    })
 
-  const allowed = await assertTenantAdminOrSystem(tenantId, user)
-  if (!allowed) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+    if (error) {
+      const msg = typeof error?.message === 'string' ? error.message : 'Unknown error'
+      return NextResponse.json({ error: 'Save failed', details: msg }, { status: 500 })
+    }
 
-  const admin = createServiceRoleClient()
+    const rows = Array.isArray(data) ? data : []
+    const replacedCount = rows[0]?.replaced_count ?? payload.length
 
-  // Transform to DB-friendly keys.
-  const payload = levels.map((l) => ({
-    level: l.level,
-    name: l.name ?? null,
-    nextLevelXp: l.nextLevelXp,
-    nextReward: l.nextReward ?? null,
-    rewardAssetKey: l.rewardAssetKey ?? null,
-  }))
-
-  const { data, error } = await admin.rpc('replace_gamification_level_definitions_v1', {
-    p_tenant_id: tenantId,
-    p_levels: payload,
-    p_actor_user_id: user.id,
-  })
-
-  if (error) {
-    const msg = typeof error?.message === 'string' ? error.message : 'Unknown error'
-    return NextResponse.json({ error: 'Save failed', details: msg }, { status: 500 })
-  }
-
-  const rows = Array.isArray(data) ? data : []
-  const replacedCount = rows[0]?.replaced_count ?? payload.length
-
-  return NextResponse.json({ tenantId, replacedCount }, { status: 200 })
-}
+    return NextResponse.json({ tenantId, replacedCount }, { status: 200 })
+  },
+})

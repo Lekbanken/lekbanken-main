@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast";
-import { supabase } from "@/lib/supabase/client";
+import { updateTenantLocale } from "../../organisationMutations.server";
 import type { OrganisationDetail } from "../../types";
 import type { Database } from "@/types/supabase";
 
@@ -59,28 +59,13 @@ export function OrganisationLocaleSection({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const { error: updateError } = await supabase
-        .from('tenants')
-        .update({
-          main_language: mainLanguage as LanguageCode,
-          default_language: defaultLanguage,
-          default_theme: defaultTheme,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', tenantId);
-      
-      if (updateError) throw updateError;
-      
-      // Log audit event
-      await supabase.from('tenant_audit_logs').insert({
-        tenant_id: tenantId,
-        event_type: 'locale_updated',
-        payload: {
-          mainLanguage,
-          defaultLanguage,
-          defaultTheme,
-        },
+      const result = await updateTenantLocale(tenantId, {
+        mainLanguage,
+        defaultLanguage,
+        defaultTheme,
       });
+      
+      if (result.error) throw new Error(result.error);
       
       success("Språkinställningar uppdaterade");
       onRefresh();

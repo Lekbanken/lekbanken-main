@@ -7,21 +7,14 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function GET(request: Request) {
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient();
 
-  // Auth check
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
-  const url = new URL(request.url);
+  const url = new URL(req.url);
   const productKey = url.searchParams.get('product_key')?.trim().toLowerCase();
 
   if (!productKey) {
@@ -43,4 +36,5 @@ export async function GET(request: Request) {
     exists: !!data,
     product: data ?? null,
   });
-}
+  },
+});

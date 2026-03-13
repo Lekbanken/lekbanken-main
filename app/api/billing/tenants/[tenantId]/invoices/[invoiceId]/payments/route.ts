@@ -1,24 +1,15 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 type PaymentStatus = 'pending' | 'confirmed' | 'failed' | 'refunded'
 
-async function requireUser() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { supabase, user: null }
-  return { supabase, user }
-}
-
-async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string) {
+async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string, userId: string) {
   const { data, error } = await supabase
     .from('user_tenant_memberships')
     .select('role')
     .eq('tenant_id', tenantId)
-    .eq('user_id', (await supabase.auth.getUser()).data.user?.id || '')
+    .eq('user_id', userId)
     .maybeSingle()
   if (error) {
     console.warn('[billing/payments] role lookup error', error)
@@ -46,15 +37,14 @@ async function fetchInvoice(
   return data
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ tenantId: string; invoiceId: string }> }
-) {
-  const { tenantId, invoiceId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { tenantId, invoiceId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   let invoice
@@ -77,17 +67,17 @@ export async function GET(
   }
 
   return NextResponse.json({ invoice, payments: data ?? [] })
-}
+  },
+})
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ tenantId: string; invoiceId: string }> }
-) {
-  const { tenantId, invoiceId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { tenantId, invoiceId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   let invoice
@@ -98,7 +88,7 @@ export async function POST(
   }
   if (!invoice) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     name?: string
     amount?: number
     currency?: string
@@ -112,6 +102,12 @@ export async function POST(
     return NextResponse.json({ error: 'name and amount are required' }, { status: 400 })
   }
 
+  // Tenant admins cannot create confirmed payments — only webhook/system_admin can
+  const TENANT_BLOCKED_STATUSES: PaymentStatus[] = ['confirmed']
+  if (body.status && TENANT_BLOCKED_STATUSES.includes(body.status)) {
+    return NextResponse.json({ error: 'Cannot create payment with confirmed status — this is managed by payment processing' }, { status: 403 })
+  }
+
   const payload = {
     invoice_id: invoiceId,
     name: body.name,
@@ -120,11 +116,7 @@ export async function POST(
     status: body.status ?? 'pending',
     provider: body.provider ?? null,
     transaction_reference: body.transaction_reference ?? null,
-    paid_at: body.paid_at ?? null,
-  }
-
-  if (payload.status === 'confirmed' && !payload.paid_at) {
-    payload.paid_at = new Date().toISOString()
+    paid_at: null as string | null,
   }
 
   const { data, error } = await supabase.from('payments').insert(payload).select('*').maybeSingle()
@@ -135,4 +127,5 @@ export async function POST(
   }
 
   return NextResponse.json({ payment: data })
-}
+  },
+})

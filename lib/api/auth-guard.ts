@@ -32,6 +32,16 @@ export async function requireTenantRole(roles: TenantRole[], tenantId?: string |
   // (app/actions/tenant.ts) to ensure identical rules. Currently this function
   // has its own fallback chain: param → header → ctx.activeTenant → first membership.
   const ctx = await requireAuth()
+
+  // System admins bypass tenant role checks (mirrors requireSessionHost)
+  if (ctx.effectiveGlobalRole === 'system_admin') {
+    return {
+      ...ctx,
+      activeTenantRole: 'admin' as TenantRole,
+      activeTenant: ctx.activeTenant,
+    }
+  }
+
   const headerStore = await headers()
   const headerTenantId = headerStore.get('x-tenant-id')
   const resolvedTenantId =

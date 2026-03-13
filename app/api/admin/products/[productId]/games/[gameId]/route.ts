@@ -7,24 +7,13 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { apiHandler } from '@/lib/api/route-handler';
 
-type RouteParams = {
-  params: Promise<{ productId: string; gameId: string }>;
-};
-
-export async function DELETE(request: Request, { params }: RouteParams) {
-  const { productId, gameId } = await params;
+export const DELETE = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params }) => {
+  const { productId, gameId } = params;
   const supabase = await createServerRlsClient();
-
-  // Auth check
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
-  }
 
   // Verify game exists and belongs to this product
   const { data: game, error: gameError } = await supabase
@@ -59,4 +48,5 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     success: true,
     message: `Game "${game.name}" unlinked from product`
   });
-}
+  },
+});

@@ -20,7 +20,11 @@ import {
 } from "@/components/admin/shared";
 import { Button, Card, CardContent, EmptyState, useToast } from "@/components/ui";
 import { useRbac } from "@/features/admin/shared/hooks/useRbac";
-import { supabase } from "@/lib/supabase/client";
+import {
+  createTenant,
+  deleteTenant,
+  updateTenantStatus,
+} from "./organisationMutations.server";
 import type {
   AdminOrganisationListItem,
   OrganisationCreatePayload,
@@ -56,16 +60,6 @@ const statusOrder: OrganisationListStatus[] = [
   "archived",
   "anonymized",
 ];
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 export function OrganisationAdminPage({
   initialOrganisations,
@@ -125,45 +119,30 @@ export function OrganisationAdminPage({
 
   const handleCreate = async (payload: OrganisationCreatePayload) => {
     try {
-      const slug = payload.slug?.trim() || slugify(payload.name);
-      const { data, error: insertError } = await supabase
-        .from("tenants")
-        .insert({
-          name: payload.name,
-          status: payload.status,
-          type: "organisation",
-          slug: slug || null,
-          contact_name: payload.contactName,
-          contact_email: payload.contactEmail,
-          contact_phone: payload.contactPhone,
-        })
-        .select(
-          "id, name, slug, status, contact_name, contact_email, contact_phone, created_at, updated_at, default_language, main_language, logo_url"
-        )
-        .single();
+      const result = await createTenant(payload);
 
-      if (insertError) {
-        throw insertError;
+      if (result.error) {
+        throw new Error(result.error);
       }
 
-      if (!data) {
+      if (!result.data) {
         throw new Error("Supabase returned no data for tenant insert");
       }
 
       const newItem: AdminOrganisationListItem = {
-        id: data.id,
-        name: data.name,
-        slug: data.slug,
+        id: result.data.id,
+        name: result.data.name,
+        slug: result.data.slug,
         status: payload.status,
-        contactName: data.contact_name,
-        contactEmail: data.contact_email,
-        contactPhone: data.contact_phone,
+        contactName: result.data.contact_name,
+        contactEmail: result.data.contact_email,
+        contactPhone: result.data.contact_phone,
         membersCount: 0,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
-        language: data.default_language ?? data.main_language ?? null,
+        createdAt: result.data.created_at,
+        updatedAt: result.data.updated_at,
+        language: result.data.default_language ?? result.data.main_language ?? null,
         branding: {
-          logoUrl: data.logo_url,
+          logoUrl: result.data.logo_url,
         },
         billing: {
           status: null,
@@ -176,7 +155,6 @@ export function OrganisationAdminPage({
       };
 
       setOrganisations((prev) => [newItem, ...prev]);
-      void supabase.rpc("add_initial_tenant_owner", { target_tenant: data.id });
       success("Organisation skapad.");
       handleRefresh();
     } catch (err) {
@@ -189,13 +167,10 @@ export function OrganisationAdminPage({
 
   const handleStatusChange = async (orgId: string, status: OrganisationListStatus) => {
     try {
-      const { error: updateError } = await supabase
-        .from("tenants")
-        .update({ status, updated_at: new Date().toISOString() })
-        .eq("id", orgId);
+      const result = await updateTenantStatus(orgId, status);
 
-      if (updateError) {
-        throw updateError;
+      if (result.error) {
+        throw new Error(result.error);
       }
 
       setOrganisations((prev) =>
@@ -213,27 +188,10 @@ export function OrganisationAdminPage({
 
   const handleRemove = async (orgId: string) => {
     try {
-      const { data, error: deleteError } = await supabase
-        .from("tenants")
-        .delete()
-        .eq("id", orgId)
-        .select("id")
-        .maybeSingle();
+      const result = await deleteTenant(orgId);
 
-      if (deleteError) {
-        // Surface FK-violation errors with a user-friendly message
-        if (deleteError.code === "23503") {
-          throw new Error(
-            "Organisationen kan inte tas bort eftersom den har kopplad data (medlemmar, innehåll, etc). Arkivera den istället, eller ta bort kopplad data först."
-          );
-        }
-        throw deleteError;
-      }
-
-      if (!data) {
-        throw new Error(
-          "Organisationen kunde inte tas bort. Kontrollera att du har rätt behörighet (system_admin)."
-        );
+      if (result.error) {
+        throw new Error(result.error);
       }
 
       setOrganisations((prev) => prev.filter((org) => org.id !== orgId));

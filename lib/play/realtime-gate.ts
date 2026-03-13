@@ -23,6 +23,48 @@
  *   paused  → true   (still connected, awaiting resume)
  *   locked  → true   (connected but locked)
  *   ended   → false  (session over, teardown channels)
+ *
+ * ─── Push-vs-Poll Ownership Contract (2026-03-13) ───────────────────
+ *
+ * This contract defines which data is authoritative via broadcast (push)
+ * and which requires polling. The goal: no UI element should be updated
+ * by both push AND poll for the same data.
+ *
+ * PUSH (authoritative via Supabase broadcast on `play:{sessionId}`):
+ *   - Session status transitions   → state_change event
+ *   - Step/phase navigation        → state_change event
+ *   - Timer start/pause/resume     → timer_update event
+ *   - Board message changes        → board_update event
+ *   - Artifact reveal/highlight    → artifact_update event
+ *   - Decision lifecycle           → decision_update event
+ *   - Outcome lifecycle            → outcome_update event
+ *   - Trigger fire/disable/rearm   → trigger_update event
+ *   - Signal send                  → signal_received event
+ *   - Time bank changes            → time_bank_changed event
+ *   - Kick/block/approve           → participants_changed event
+ *   - Readiness toggle             → participants_changed event
+ *   - Role assignments             → assignments_changed event
+ *   - Puzzle state (client-side)   → puzzle_update event
+ *
+ * POLL (authoritative, no push equivalent):
+ *   - Participant list (full data) → useSessionState every 3s
+ *   - Participant presence/online  → derived from last_seen_at via poll
+ *   - Chat messages                → useSessionChat (no realtime channel)
+ *   - Artifact state (external)    → useSessionState every 15s
+ *
+ * POLL AS FALLBACK (push is primary, poll catches missed events):
+ *   - Session runtime state        → useSessionState polls as reconciliation
+ *     (step, phase, status, timer)   after realtime reconnect only
+ *
+ * NOT POLLED, NOT PUSHED (loaded once or on-demand):
+ *   - Game definition / snapshot   → loaded at session start
+ *   - Role definitions             → loaded at session start
+ *   - Session metadata             → loaded at session start
+ *
+ * Scaling note: When consolidating host polling (scaling-analysis.md §90-day),
+ * keep push items push-only and remove redundant poll-reads for pushed data.
+ * Chat is the candidate for push migration (currently poll-only).
+ * ─────────────────────────────────────────────────────────────────────
  */
 
 import type { SessionCockpitStatus } from '@/types/session-cockpit';

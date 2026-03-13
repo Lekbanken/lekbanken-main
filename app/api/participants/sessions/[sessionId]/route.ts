@@ -9,19 +9,21 @@
  * WARNING: This action cannot be undone!
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
-import { requireSessionHost, AuthError } from '@/lib/api/auth-guard';
+import { requireSessionHost } from '@/lib/api/auth-guard';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ sessionId: string }> }
-) {
-  try {
-    const { sessionId } = await params;
+// Intentionally public endpoint.
+// Used by the participant join flow (enter session code → preview session).
+// Only non-sensitive metadata must be returned here.
+// Do NOT add host_user_id, participant lists, or emails to the response.
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ params }) => {
+    const { sessionId } = params;
     
     // Check if it's a 6-character code (session code) or UUID (session ID)
     let session;
@@ -63,21 +65,13 @@ export async function GET(
         endedAt: session.ended_at,
       },
     });
-    
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch session', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+})
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ sessionId: string }> }
-) {
-  try {
-    const { sessionId } = await params;
+export const DELETE = apiHandler({
+  auth: { sessionHost: (params) => params.sessionId },
+  handler: async ({ params }) => {
+    const { sessionId } = params;
 
     if (!sessionId) {
       return NextResponse.json(
@@ -86,7 +80,7 @@ export async function DELETE(
       );
     }
 
-    // Auth: session host or system_admin
+    // sessionHost auth mode only guarantees requireAuth() — validate ownership inline
     await requireSessionHost(sessionId);
 
     const supabase = createServiceRoleClient();
@@ -186,15 +180,5 @@ export async function DELETE(
       message: 'Session permanently deleted',
       note: 'Activity logs have been preserved for audit trail',
     });
-
-  } catch (error) {
-    if (error instanceof AuthError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
-    }
-    console.error('Error in session deletion:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+})

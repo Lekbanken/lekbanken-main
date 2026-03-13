@@ -1,19 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { logGamificationEventV1 } from '@/lib/services/gamification-events.server';
-import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { applySessionCommand, type SessionCommandType } from '@/lib/play/session-command';
 
-type SessionStatus = 'draft' | 'lobby' | 'active' | 'paused' | 'locked' | 'ended' | 'archived' | 'cancelled';
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { id } = params;
+  const userId = auth!.user!.id;
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
   const supabase = await createServerRlsClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   const { data: session, error } = await supabase
     .from('participant_sessions')
     .select('*')
@@ -21,7 +17,7 @@ export async function GET(
     .single();
 
   if (error || !session) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  if (session.host_user_id !== user.id) {
+  if (session.host_user_id !== userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -42,85 +38,53 @@ export async function GET(
       settings: session.settings,
     },
   });
-}
+  },
+});
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { id } = params;
+  const userId = auth!.user!.id;
+
   const supabase = await createServerRlsClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const body = await request.json().catch(() => ({}));
+  const body = await req.json().catch(() => ({}));
   const action = (body?.action || '').toString();
 
+  // Verify host ownership before delegating to pipeline
   const { data: session, error } = await supabase
     .from('participant_sessions')
-    .select('id, host_user_id, status, tenant_id, game_id, plan_id, started_at')
+    .select('id, host_user_id')
     .eq('id', id)
     .single();
 
   if (error || !session) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  if (session.host_user_id !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (session.host_user_id !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  let nextStatus: SessionStatus | null = null;
-  if (action === 'publish') nextStatus = 'lobby';  // draft → lobby (open for participants)
-  if (action === 'unpublish') nextStatus = 'draft'; // lobby → draft (take offline)
-  if (action === 'start' || action === 'resume') nextStatus = 'active';
-  if (action === 'pause') nextStatus = 'paused';
-  if (action === 'end') nextStatus = 'ended';
-  if (action === 'lock') nextStatus = 'locked';
-  if (action === 'unlock') nextStatus = 'active';
-
-  if (!nextStatus) {
+  // Map legacy action to command type — 'resume' maps to 'resume' in the pipeline
+  const validActions = new Set(['publish', 'unpublish', 'start', 'pause', 'resume', 'end', 'lock', 'unlock']);
+  if (!validActions.has(action)) {
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   }
 
-  const shouldSetStartedAt = action === 'start' && !session.started_at;
-  const { error: updateError } = await supabase
-    .from('participant_sessions')
-    .update({
-      status: nextStatus,
-      started_at: shouldSetStartedAt ? new Date().toISOString() : session.started_at,
-      paused_at: nextStatus === 'paused' ? new Date().toISOString() : null,
-      ended_at: nextStatus === 'ended' ? new Date().toISOString() : null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id);
-
-  if (updateError) {
-    return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
-  }
-
-  if (nextStatus === 'ended') {
-    try {
-      await logGamificationEventV1({
-        tenantId: (session.tenant_id as string | null) ?? null,
-        actorUserId: user.id,
-        eventType: 'session_completed',
-        source: 'play',
-        idempotencyKey: `participant_session:${id}:ended`,
-        metadata: {
-          participantSessionId: id,
-          gameId: (session.game_id as string | null) ?? null,
-          planId: (session.plan_id as string | null) ?? null,
-        },
-      })
-    } catch (e) {
-      console.warn('[play/sessions/[id]] gamification event log failed', e)
-    }
-  }
-
-  // Broadcast status change for immediate participant UI updates.
-  await broadcastPlayEvent(id, {
-    type: 'state_change',
-    payload: {
-      status: nextStatus,
-    },
-    timestamp: new Date().toISOString(),
+  // Delegate to the command pipeline (state machine + side effects + broadcast)
+  const result = await applySessionCommand({
+    sessionId: id,
+    issuedBy: userId,
+    commandType: action as SessionCommandType,
+    payload: {},
+    clientId: 'legacy-patch',
+    clientSeq: Date.now(),
   });
 
-  return NextResponse.json({ success: true, status: nextStatus });
-}
+  if (!result.success) {
+    // State machine rejection → 409 Conflict
+    if (result.error?.startsWith('Cannot ') || result.error?.startsWith('Conflict:')) {
+      return NextResponse.json({ error: result.error }, { status: 409 });
+    }
+    return NextResponse.json({ error: result.error || 'Failed to update status' }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true, status: result.state?.status ?? action });
+  },
+});

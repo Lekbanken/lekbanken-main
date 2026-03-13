@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { requireAuth, AuthError } from '@/lib/api/auth-guard';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { Database, Json } from '@/types/supabase';
 import { TOOL_REGISTRY } from '@/features/tools/registry';
 
@@ -259,13 +259,11 @@ function normalizeToolScope(value: unknown): 'host' | 'participants' | 'both' {
   return 'both';
 }
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-  await requireAuth();
-  const { id } = await params;
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const ctx = auth!;
+  const { id } = params;
   const supabase = createServiceRoleClient();
 
   const { data: game, error } = await supabase
@@ -276,6 +274,16 @@ export async function GET(
 
   if (error || !game) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
+  // TI-001: Validate caller is a tenant member or system admin
+  if (game.owner_tenant_id) {
+    const membership = ctx.memberships.find(m => m.tenant_id === game.owner_tenant_id);
+    if (!membership && ctx.effectiveGlobalRole !== 'system_admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  } else if (ctx.effectiveGlobalRole !== 'system_admin') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { data: steps } = await supabase
@@ -432,25 +440,53 @@ export async function GET(
     artifacts: artifactsWithVariants,
     triggers: triggers || [],
   });
-  } catch (err) {
-    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
-    throw err;
-  }
-}
+  },
+})
 
-export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-  await requireAuth();
-  const { id } = await params;
+export const PUT = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth, params }) => {
+  const ctx = auth!;
+  const { id } = params;
   const supabase = createServiceRoleClient();
-  const body = (await request.json().catch(() => ({}))) as BuilderBody;
+  const body = (await req.json().catch(() => ({}))) as BuilderBody;
 
   const core = body.core;
   if (!core?.name?.trim() || !core.short_description?.trim()) {
     return NextResponse.json({ error: 'name and short_description are required' }, { status: 400 });
+  }
+
+  // TI-001: Verify game exists and caller has editor/admin/owner role in owning tenant
+  const { data: existingGame } = await supabase
+    .from('games')
+    .select('owner_tenant_id')
+    .eq('id', id)
+    .single();
+  if (!existingGame) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
+  const currentOwner = existingGame.owner_tenant_id;
+  if (currentOwner) {
+    const membership = ctx.memberships.find(m => m.tenant_id === currentOwner);
+    const role = membership?.role;
+    const hasEditRole = role === 'editor' || role === 'admin' || role === 'owner';
+    if (!hasEditRole && ctx.effectiveGlobalRole !== 'system_admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  } else if (ctx.effectiveGlobalRole !== 'system_admin') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  // If changing owner_tenant_id, validate access to new tenant too
+  const newOwner = core.owner_tenant_id ?? null;
+  if (newOwner && newOwner !== currentOwner) {
+    const newMembership = ctx.memberships.find(m => m.tenant_id === newOwner);
+    const newRole = newMembership?.role;
+    const hasNewEditRole = newRole === 'editor' || newRole === 'admin' || newRole === 'owner';
+    if (!hasNewEditRole && ctx.effectiveGlobalRole !== 'system_admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
   }
 
   const updateGame = {
@@ -489,6 +525,9 @@ export async function PUT(
     return NextResponse.json({ error: 'Failed to update game', details: updateError.message }, { status: 500 });
   }
 
+  // GAME-009: collect non-fatal save warnings instead of silently ignoring errors
+  const warnings: string[] = [];
+
   const rawStepRefs = (body.steps ?? [])
     .map((s) => s.media_ref)
     .filter((v): v is string => typeof v === 'string' && v.length > 0);
@@ -511,9 +550,11 @@ export async function PUT(
   
   // Delete steps that are no longer present
   if (stepIdsToKeep.length > 0) {
-    await supabase.from('game_steps').delete().eq('game_id', id).not('id', 'in', `(${stepIdsToKeep.join(',')})`);
+    const { error: stepDelErr } = await supabase.from('game_steps').delete().eq('game_id', id).not('id', 'in', `(${stepIdsToKeep.join(',')})`);
+    if (stepDelErr) warnings.push(`steps delete: ${stepDelErr.message}`);
   } else {
-    await supabase.from('game_steps').delete().eq('game_id', id);
+    const { error: stepDelErr } = await supabase.from('game_steps').delete().eq('game_id', id);
+    if (stepDelErr) warnings.push(`steps delete: ${stepDelErr.message}`);
   }
   
   if (steps.length > 0) {
@@ -532,7 +573,8 @@ export async function PUT(
       optional: s.optional ?? false,
       conditional: s.conditional ?? null,
     }));
-    await supabase.from('game_steps').upsert(rows, { onConflict: 'id' });
+    const { error: stepUpsErr } = await supabase.from('game_steps').upsert(rows, { onConflict: 'id' });
+    if (stepUpsErr) warnings.push(`steps upsert: ${stepUpsErr.message}`);
   }
 
   if (body.materials) {
@@ -547,29 +589,34 @@ export async function PUT(
     
     // Use .is() for null, .eq() for string values
     if (materialLocale === null) {
-      await deleteQuery.is('locale', null);
+      const { error: matDelErr } = await deleteQuery.is('locale', null);
+      if (matDelErr) warnings.push(`materials delete: ${matDelErr.message}`);
     } else {
-      await deleteQuery.eq('locale', materialLocale);
+      const { error: matDelErr } = await deleteQuery.eq('locale', materialLocale);
+      if (matDelErr) warnings.push(`materials delete: ${matDelErr.message}`);
     }
     
-    await supabase.from('game_materials').insert({
+    const { error: matInsErr } = await supabase.from('game_materials').insert({
       game_id: id,
       locale: materialLocale,
       items: m.items ?? [],
       safety_notes: m.safety_notes ?? null,
       preparation: m.preparation ?? null,
     });
+    if (matInsErr) warnings.push(`materials insert: ${matInsErr.message}`);
   }
 
   // Replace secondary purposes
-  await supabase.from('game_secondary_purposes').delete().eq('game_id', id);
+  const { error: secPurpDelErr } = await supabase.from('game_secondary_purposes').delete().eq('game_id', id);
+  if (secPurpDelErr) warnings.push(`secondary_purposes delete: ${secPurpDelErr.message}`);
   const secondaryPurposes = body.secondaryPurposes ?? [];
   if (secondaryPurposes.length > 0) {
     const purposeRows = secondaryPurposes.map((purposeId: string) => ({
       game_id: id,
       purpose_id: purposeId,
     }));
-    await supabase.from('game_secondary_purposes').insert(purposeRows);
+    const { error: secPurpInsErr } = await supabase.from('game_secondary_purposes').insert(purposeRows);
+    if (secPurpInsErr) warnings.push(`secondary_purposes insert: ${secPurpInsErr.message}`);
   }
 
   // Replace toolbelt configuration (optional)
@@ -621,9 +668,11 @@ export async function PUT(
   const phaseIdsToKeep = phases.filter((p) => isUuid(p.id)).map((p) => p.id as string);
   
   if (phaseIdsToKeep.length > 0) {
-    await supabase.from('game_phases').delete().eq('game_id', id).not('id', 'in', `(${phaseIdsToKeep.join(',')})`);
+    const { error: phaseDelErr } = await supabase.from('game_phases').delete().eq('game_id', id).not('id', 'in', `(${phaseIdsToKeep.join(',')})`);
+    if (phaseDelErr) warnings.push(`phases delete: ${phaseDelErr.message}`);
   } else {
-    await supabase.from('game_phases').delete().eq('game_id', id);
+    const { error: phaseDelErr } = await supabase.from('game_phases').delete().eq('game_id', id);
+    if (phaseDelErr) warnings.push(`phases delete: ${phaseDelErr.message}`);
   }
   
   if (phases.length > 0) {
@@ -641,7 +690,8 @@ export async function PUT(
       board_message: p.board_message ?? null,
       auto_advance: p.auto_advance ?? false,
     }));
-    await supabase.from('game_phases').upsert(phaseRows, { onConflict: 'id' });
+    const { error: phaseUpsErr } = await supabase.from('game_phases').upsert(phaseRows, { onConflict: 'id' });
+    if (phaseUpsErr) warnings.push(`phases upsert: ${phaseUpsErr.message}`);
   }
 
   // Update roles - preserve IDs for existing roles
@@ -649,9 +699,11 @@ export async function PUT(
   const roleIdsToKeep = roles.filter((r) => isUuid(r.id)).map((r) => r.id as string);
   
   if (roleIdsToKeep.length > 0) {
-    await supabase.from('game_roles').delete().eq('game_id', id).not('id', 'in', `(${roleIdsToKeep.join(',')})`);
+    const { error: roleDelErr } = await supabase.from('game_roles').delete().eq('game_id', id).not('id', 'in', `(${roleIdsToKeep.join(',')})`);
+    if (roleDelErr) warnings.push(`roles delete: ${roleDelErr.message}`);
   } else {
-    await supabase.from('game_roles').delete().eq('game_id', id);
+    const { error: roleDelErr } = await supabase.from('game_roles').delete().eq('game_id', id);
+    if (roleDelErr) warnings.push(`roles delete: ${roleDelErr.message}`);
   }
   
   if (roles.length > 0) {
@@ -672,7 +724,8 @@ export async function PUT(
       scaling_rules: r.scaling_rules ?? null,
       conflicts_with: r.conflicts_with ?? null,
     }));
-    await supabase.from('game_roles').upsert(roleRows, { onConflict: 'id' });
+    const { error: roleUpsErr } = await supabase.from('game_roles').upsert(roleRows, { onConflict: 'id' });
+    if (roleUpsErr) warnings.push(`roles upsert: ${roleUpsErr.message}`);
   }
 
   // Update board config (upsert pattern)
@@ -684,7 +737,7 @@ export async function PUT(
       bc.show_leaderboard || bc.show_qr_code || bc.welcome_message?.trim();
     
     if (hasContent) {
-      await supabase.from('game_board_config').upsert({
+      const { error: bcUpsErr } = await supabase.from('game_board_config').upsert({
         game_id: id,
         locale: bc.locale ?? null,
         show_game_name: bc.show_game_name ?? true,
@@ -700,22 +753,26 @@ export async function PUT(
         background_color: bc.background_color ?? null,
         layout_variant: bc.layout_variant ?? 'standard',
       }, { onConflict: 'game_id,locale', ignoreDuplicates: false });
+      if (bcUpsErr) warnings.push(`board_config upsert: ${bcUpsErr.message}`);
     } else {
       // No content - remove any existing board config
-      await supabase.from('game_board_config').delete().eq('game_id', id);
+      const { error: bcDelErr } = await supabase.from('game_board_config').delete().eq('game_id', id);
+      if (bcDelErr) warnings.push(`board_config delete: ${bcDelErr.message}`);
     }
   }
 
   // Replace cover media
-  await supabase.from('game_media').delete().eq('game_id', id).eq('kind', 'cover');
+  const { error: coverDelErr } = await supabase.from('game_media').delete().eq('game_id', id).eq('kind', 'cover');
+  if (coverDelErr) warnings.push(`cover_media delete: ${coverDelErr.message}`);
   if (body.coverMediaId) {
-    await supabase.from('game_media').insert({
+    const { error: coverInsErr } = await supabase.from('game_media').insert({
       game_id: id,
       media_id: body.coverMediaId,
       kind: 'cover',
       position: 0,
       tenant_id: core.owner_tenant_id ?? null,
     });
+    if (coverInsErr) warnings.push(`cover_media insert: ${coverInsErr.message}`);
   }
 
   // Update artifacts and variants - preserve IDs for existing artifacts
@@ -723,23 +780,27 @@ export async function PUT(
   const artifactIdsToKeep = artifacts.filter((a) => isUuid(a.id)).map((a) => a.id as string);
   
   // Get existing artifact IDs to clean up orphaned variants
-  const { data: existingArtifacts } = await supabase
+  const { data: existingArtifacts, error: artReadErr } = await supabase
     .from('game_artifacts')
     .select('id')
     .eq('game_id', id);
+  if (artReadErr) warnings.push(`artifacts read: ${artReadErr.message}`);
 
   const existingArtifactIds = (existingArtifacts ?? []).map((a: { id: string }) => a.id as string);
   const artifactIdsToDelete = existingArtifactIds.filter((eId) => !artifactIdsToKeep.includes(eId));
   
   // Delete variants for artifacts that will be removed
   if (artifactIdsToDelete.length > 0) {
-    await supabase.from('game_artifact_variants').delete().in('artifact_id', artifactIdsToDelete);
-    await supabase.from('game_artifacts').delete().in('id', artifactIdsToDelete);
+    const { error: varDelErr } = await supabase.from('game_artifact_variants').delete().in('artifact_id', artifactIdsToDelete);
+    if (varDelErr) warnings.push(`artifact_variants delete (orphans): ${varDelErr.message}`);
+    const { error: artDelErr } = await supabase.from('game_artifacts').delete().in('id', artifactIdsToDelete);
+    if (artDelErr) warnings.push(`artifacts delete (orphans): ${artDelErr.message}`);
   }
   
   // Also delete all variants for artifacts we're keeping (we'll re-insert them)
   if (artifactIdsToKeep.length > 0) {
-    await supabase.from('game_artifact_variants').delete().in('artifact_id', artifactIdsToKeep);
+    const { error: varDelErr } = await supabase.from('game_artifact_variants').delete().in('artifact_id', artifactIdsToKeep);
+    if (varDelErr) warnings.push(`artifact_variants delete (kept): ${varDelErr.message}`);
   }
 
   if (artifacts.length > 0) {
@@ -812,9 +873,11 @@ export async function PUT(
   const triggerIdsToKeep = triggers.filter((t) => isUuid(t.id)).map((t) => t.id as string);
   
   if (triggerIdsToKeep.length > 0) {
-    await supabase.from('game_triggers').delete().eq('game_id', id).not('id', 'in', `(${triggerIdsToKeep.join(',')})`);
+    const { error: trigDelErr } = await supabase.from('game_triggers').delete().eq('game_id', id).not('id', 'in', `(${triggerIdsToKeep.join(',')})`);
+    if (trigDelErr) warnings.push(`triggers delete: ${trigDelErr.message}`);
   } else {
-    await supabase.from('game_triggers').delete().eq('game_id', id);
+    const { error: trigDelErr } = await supabase.from('game_triggers').delete().eq('game_id', id);
+    if (trigDelErr) warnings.push(`triggers delete: ${trigDelErr.message}`);
   }
   
   if (triggers.length > 0) {
@@ -836,9 +899,11 @@ export async function PUT(
     }
   }
 
-  return NextResponse.json({ success: true });
-  } catch (err) {
-    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
-    throw err;
+  if (warnings.length > 0) {
+    console.warn(`[builder/${id}] partial save warnings:`, warnings);
+    return NextResponse.json({ success: true, warnings });
   }
-}
+
+  return NextResponse.json({ success: true });
+  },
+})

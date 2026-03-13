@@ -1,8 +1,19 @@
 /**
- * In-Memory Rate Limiting for Vercel Edge
+ * Rate Limiting for Vercel
  * 
- * Provides simple IP-based rate limiting without external dependencies.
- * For production, consider Vercel Edge Config or Supabase Edge Functions.
+ * Current: In-memory IP-based rate limiting (per-instance).
+ * Production upgrade: Replace checkRateLimit() internals with Upstash Redis
+ * for global multi-instance rate limiting.
+ * 
+ * Migration path (SEC-002b):
+ *   1. npm install @upstash/ratelimit @upstash/redis
+ *   2. Set UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN in Vercel env
+ *   3. Replace checkRateLimit() body with:
+ *      const redis = Redis.fromEnv()
+ *      const ratelimit = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(limit, `${windowMs}ms`) })
+ *      const { success, remaining, reset } = await ratelimit.limit(clientId)
+ *      return { allowed: success, remaining, resetAt: reset }
+ *   4. Remove in-memory Map + cleanup interval
  */
 
 import type { NextRequest } from 'next/server';
@@ -31,6 +42,10 @@ export const RATE_LIMITS = {
   strict: {
     limit: 5,
     windowMs: 60 * 1000, // 1 minute (for sensitive operations)
+  },
+  participant: {
+    limit: 60,
+    windowMs: 60 * 1000, // 1 minute (auto-applied for auth: 'participant')
   },
 } as const;
 

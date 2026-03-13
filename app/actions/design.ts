@@ -409,6 +409,18 @@ export async function uploadTenantAsset(
     return { success: false, error: 'Organisationsbranding är inte aktiverad.' }
   }
   
+  // Verify user is a member of this tenant
+  const { data: membership } = await supabase
+    .from('user_tenant_memberships')
+    .select('tenant_id')
+    .eq('user_id', user.id)
+    .eq('tenant_id', tenantId)
+    .maybeSingle()
+  
+  if (!membership) {
+    return { success: false, error: 'Du saknar behörighet för denna organisation.' }
+  }
+  
   const file = formData.get('file') as File | null
   if (!file) {
     return { success: false, error: 'Ingen fil vald.' }

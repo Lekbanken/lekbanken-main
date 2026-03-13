@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -12,24 +13,17 @@ const quoteRequestSchema = z.object({
   phone: z.string().max(50).optional(),
   teamSize: z.string().min(1),
   message: z.string().max(1000).optional(),
+  // Honeypot field — must be empty. Bots filling hidden fields get rejected.
+  website: z.string().max(0).optional(),
 })
 
-export async function POST(request: Request) {
-  let body: unknown
-  try {
-    body = await request.json()
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
-  }
+export const POST = apiHandler({
+  auth: 'public',
+  rateLimit: 'strict',
+  input: quoteRequestSchema,
+  handler: async ({ body }) => {
+    const { companyName, contactName, email, phone, teamSize, message } = body
 
-  const parsed = quoteRequestSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 })
-  }
-
-  const { companyName, contactName, email, phone, teamSize, message } = parsed.data
-
-  try {
     // Store the quote request in the database
     // Note: Using type assertion since table may not exist in generated types yet
     const { error: insertError } = await (supabaseAdmin as unknown as { 
@@ -64,11 +58,5 @@ export async function POST(request: Request) {
       success: true,
       message: 'Quote request submitted successfully',
     })
-  } catch (error) {
-    console.error('[enterprise-quote] Error:', error)
-    return NextResponse.json(
-      { error: 'Failed to submit quote request' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

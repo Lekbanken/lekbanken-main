@@ -1,28 +1,25 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import { COSMETIC_SLOTS, type CosmeticSlot } from '@/features/journey/cosmetic-types';
 
 export const dynamic = 'force-dynamic';
 
 const VALID_SLOTS = new Set<string>(COSMETIC_SLOTS);
 
-export async function POST(request: NextRequest) {
-  const supabase = await createServerRlsClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id;
+    const supabase = await createServerRlsClient();
 
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const userId = user.id;
-
-  // Parse and validate request body
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-  }
+    // Parse and validate request body
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    }
 
   const { slot, cosmeticId } = body as { slot?: string; cosmeticId?: string | null };
 
@@ -116,4 +113,5 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ success: true, slot: typedSlot, cosmeticId }, { status: 200 });
-}
+  },
+})

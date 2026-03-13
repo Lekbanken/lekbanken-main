@@ -2,18 +2,21 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { getAllowedProductIds } from '@/app/api/games/utils'
+import { apiHandler } from '@/lib/api/route-handler'
 
 const querySchema = z.object({
   tenantId: z.string().uuid().optional().nullable(),
   limit: z.coerce.number().int().min(1).max(50).default(8),
 })
 
-export async function GET(request: Request) {
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(req.url)
   const parsed = querySchema.safeParse({
     tenantId: searchParams.get('tenantId'),
     limit: searchParams.get('limit'),
@@ -70,4 +73,5 @@ export async function GET(request: Request) {
       allowedProducts: allowedProductIds,
     },
   })
-}
+},
+})

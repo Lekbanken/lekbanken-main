@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import type { Json } from '@/types/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -51,42 +52,20 @@ const patchSchema = z.object({
   updates: baseItemSchema.partial(),
 })
 
-async function requireAdmin(tenantId: string) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  input: createSchema,
+  handler: async ({ auth, body }) => {
+    const { tenantId, item } = body
+    await requireTenantRole(['admin', 'owner'], tenantId)
 
-  if (!user) return { ok: false as const, status: 401 as const }
-
-  const allowed = await assertTenantAdminOrSystem(tenantId, user)
-  if (!allowed) return { ok: false as const, status: 403 as const }
-
-  return { ok: true as const, user }
-}
-
-export async function POST(request: Request) {
-  try {
-    const body = await request.json().catch(() => ({}))
-    const parsed = createSchema.safeParse(body)
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-    }
-
-    const { tenantId, item } = parsed.data
-    const auth = await requireAdmin(tenantId)
-    if (!auth.ok) {
-      return NextResponse.json({ error: auth.status === 401 ? 'Unauthorized' : 'Forbidden' }, { status: auth.status })
-    }
-
-    // Server-only write
     const admin = createServiceRoleClient()
 
     const { data, error } = await admin
       .from('shop_items')
       .insert({
         tenant_id: tenantId,
-        created_by_user_id: auth.user.id,
+        created_by_user_id: auth!.user!.id,
         name: item.name,
         description: item.description ?? null,
         category: item.category,
@@ -108,25 +87,15 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ item: data as ShopItemRow }, { status: 200 })
-  } catch (e) {
-    const message = e instanceof Error ? e.message : 'Unknown error'
-    return NextResponse.json({ error: 'Server error', details: message }, { status: 500 })
-  }
-}
+  },
+})
 
-export async function PATCH(request: Request) {
-  try {
-    const body = await request.json().catch(() => ({}))
-    const parsed = patchSchema.safeParse(body)
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-    }
-
-    const { tenantId, itemId, updates } = parsed.data
-    const auth = await requireAdmin(tenantId)
-    if (!auth.ok) {
-      return NextResponse.json({ error: auth.status === 401 ? 'Unauthorized' : 'Forbidden' }, { status: auth.status })
-    }
+export const PATCH = apiHandler({
+  auth: 'user',
+  input: patchSchema,
+  handler: async ({ body }) => {
+    const { tenantId, itemId, updates } = body
+    await requireTenantRole(['admin', 'owner'], tenantId)
 
     const admin = createServiceRoleClient()
 
@@ -148,8 +117,5 @@ export async function PATCH(request: Request) {
     }
 
     return NextResponse.json({ item: data as ShopItemRow }, { status: 200 })
-  } catch (e) {
-    const message = e instanceof Error ? e.message : 'Unknown error'
-    return NextResponse.json({ error: 'Server error', details: message }, { status: 500 })
-  }
-}
+  },
+})

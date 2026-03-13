@@ -15,9 +15,11 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 function jsonError(message: string, status: number, errorCode?: string) {
   return NextResponse.json({ ok: false, error: message, errorCode: errorCode ?? 'UNKNOWN_ERROR' }, { status });
@@ -47,19 +49,15 @@ interface TriggerStateRow {
  * GET /api/play/sessions/[id]/triggers
  * V2: Returns triggers with config from game_triggers + state from session_trigger_state
  */
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401);
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const sessionId = params.id;
+  const userId = auth!.user!.id;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can view triggers', 403);
+  if (session.host_user_id !== userId) return jsonError('Only host can view triggers', 403);
   if (!session.game_id) return jsonError('Session has no associated game', 400);
 
   const service = createServiceRoleClient();
@@ -116,14 +114,17 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   });
 
   return NextResponse.json({ triggers });
-}
+  },
+});
 
 /**
  * POST /api/play/sessions/[id]/triggers
  * V2: DEPRECATED - Snapshot is no longer needed.
  * Triggers are read directly from game_triggers with state from session_trigger_state.
  */
-export async function POST(_request: Request, { params: _params }: { params: Promise<{ id: string }> }) {
+export const POST = apiHandler({
+  auth: 'public',
+  handler: async () => {
   return NextResponse.json(
     {
       deprecated: true,
@@ -132,7 +133,8 @@ export async function POST(_request: Request, { params: _params }: { params: Pro
     },
     { status: 410 }
   );
-}
+  },
+});
 
 /**
  * RPC result type for fire_trigger_v2_safe
@@ -157,21 +159,20 @@ interface FireTriggerRpcResult {
  * 
  * Body: { triggerId: string, action: 'fire' | 'disable' | 'arm' }
  */
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401, 'AUTH_REQUIRED');
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth, params }) => {
+  const sessionId = params.id;
+  const userId = auth!.user!.id;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404, 'SESSION_NOT_FOUND');
-  if (session.host_user_id !== user.id) return jsonError('Only host can update triggers', 403, 'RLS_DENIED');
+  if (session.host_user_id !== userId) return jsonError('Only host can update triggers', 403, 'RLS_DENIED');
 
-  const body = await request.json().catch(() => ({}));
+  const statusError = assertSessionStatus(session.status, 'triggers');
+  if (statusError) return statusError;
+
+  const body = await req.json().catch(() => ({}));
   const triggerId = body?.triggerId as string | undefined;
   const action = body?.action as 'fire' | 'disable' | 'arm' | undefined;
 
@@ -185,7 +186,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   // V2.1: For fire action, require idempotency key (C2.1)
   // Treat empty/whitespace-only key as missing
-  const rawIdempotencyKey = request.headers.get('X-Idempotency-Key');
+  const rawIdempotencyKey = req.headers.get('X-Idempotency-Key');
   const idempotencyKey = rawIdempotencyKey?.trim() || null;
   if (action === 'fire' && !idempotencyKey) {
     return NextResponse.json(
@@ -214,7 +215,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         p_session_id: sessionId,
         p_game_trigger_id: triggerId,
         p_idempotency_key: idempotencyKey!,
-        p_actor_user_id: user.id,
+        p_actor_user_id: userId,
       }
     );
 
@@ -328,4 +329,5 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       firedCount: currentState?.fired_count ?? 0,
     },
   });
-}
+  },
+});

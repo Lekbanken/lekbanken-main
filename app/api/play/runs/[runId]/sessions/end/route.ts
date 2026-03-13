@@ -17,31 +17,22 @@
  * 409 → session already ended / completed
  */
 
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logGamificationEventV1 } from '@/lib/services/gamification-events.server'
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server'
 import { isTerminalRunSessionStatus } from '@/features/play/types'
+import { apiHandler } from '@/lib/api/route-handler'
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ runId: string }> }
-) {
-  const { runId } = await params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { runId } = params
+  const userId = auth!.user!.id
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json(
-      { error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
-      { status: 401 }
-    )
-  }
 
   // Parse body
-  const body = await request.json().catch(() => ({}))
+  const body = await req.json().catch(() => ({}))
   const stepIndex = (body as { stepIndex?: number }).stepIndex
 
   if (typeof stepIndex !== 'number' || stepIndex < 0) {
@@ -118,7 +109,7 @@ export async function POST(
         try {
           await logGamificationEventV1({
             tenantId: (ps.tenant_id as string | null) ?? null,
-            actorUserId: user.id,
+            actorUserId: userId,
             eventType: 'session_completed',
             source: 'play',
             idempotencyKey: `participant_session:${ps.id}:ended`,
@@ -167,4 +158,5 @@ export async function POST(
     runSessionStatus: 'ended',
     participantSessionStatus,
   })
-}
+  },
+})

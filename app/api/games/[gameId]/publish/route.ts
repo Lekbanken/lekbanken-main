@@ -1,28 +1,21 @@
-import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validateGamePayload } from '@/lib/validation/games'
+import { apiHandler } from '@/lib/api/route-handler'
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ gameId: string }> }
-) {
-  const { gameId } = await params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { gameId } = params
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const user = auth!.user!
 
   // Basic role gate: require admin/owner for publish
   const role = (user.app_metadata as { role?: string })?.role || null
   if (role !== 'admin' && role !== 'owner') {
     return NextResponse.json({ error: 'Forbidden: publish requires admin/owner' }, { status: 403 })
   }
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     hasCoverImage?: boolean
     force?: boolean
   }
@@ -61,4 +54,5 @@ export async function POST(
   }
 
   return NextResponse.json({ game: data })
-}
+},
+})

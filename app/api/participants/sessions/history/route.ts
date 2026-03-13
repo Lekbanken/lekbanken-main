@@ -5,37 +5,33 @@
  * Fetches all sessions for the authenticated user with filtering and pagination
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function GET(request: NextRequest) {
-  try {
-    const supabase = await createServerRlsClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
 
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    try {
+      const supabase = await createServerRlsClient();
 
-    const searchParams = request.nextUrl.searchParams;
-    const status = searchParams.get('status'); // active, paused, locked, ended, cancelled, archived
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
-    const sortBy = searchParams.get('sortBy') || 'created_at'; // created_at, ended_at, participant_count
-    const sortOrder = searchParams.get('sortOrder') || 'desc'; // asc, desc
+      const searchParams = new URL(req.url).searchParams;
+      const status = searchParams.get('status'); // active, paused, locked, ended, cancelled, archived
+      const limit = parseInt(searchParams.get('limit') || '50');
+      const offset = parseInt(searchParams.get('offset') || '0');
+      const sortBy = searchParams.get('sortBy') || 'created_at'; // created_at, ended_at, participant_count
+      const sortOrder = searchParams.get('sortOrder') || 'desc'; // asc, desc
 
-    // Build query
-    let query = supabase
-      .from('participant_sessions')
-      .select(`
-        *,
-        participants:participants(count)
-      `, { count: 'exact' })
-      .eq('host_user_id', user.id);
+      // Build query
+      let query = supabase
+        .from('participant_sessions')
+        .select(`
+          *,
+          participants:participants(count)
+        `, { count: 'exact' })
+        .eq('host_user_id', userId);
 
     // Filter by status
     if (status && ['active', 'paused', 'locked', 'ended', 'cancelled', 'archived'].includes(status)) {
@@ -105,11 +101,12 @@ export async function GET(request: NextRequest) {
       offset,
     });
 
-  } catch (error) {
-    console.error('Error in session history:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+    } catch (error) {
+      console.error('Error in session history:', error);
+      return NextResponse.json(
+        { error: 'Internal server error' },
+        { status: 500 }
+      );
+    }
+  },
+})

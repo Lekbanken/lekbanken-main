@@ -4,6 +4,8 @@ import { getAvailableSinks } from '@/lib/services/gamification-burn.server'
 
 export const dynamic = 'force-dynamic'
 
+// Intentionally public: catalog data with no security impact. See DD-4 in security-auth-remediation.md.
+
 /**
  * GET /api/gamification/sinks
  * 

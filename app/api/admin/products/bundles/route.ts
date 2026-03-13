@@ -7,7 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { apiHandler } from '@/lib/api/route-handler';
 
 export type BundleOption = {
   id: string;
@@ -16,16 +16,10 @@ export type BundleOption = {
   yearlyPriceFormatted: string | null;
 };
 
-export async function GET() {
-  // ── Auth ──────────────────────────────────────────────────────────────────
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async () => {
   const supabase = await createServerRlsClient();
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
 
   // ── Fetch bundle products ────────────────────────────────────────────────
   const { data: bundles, error: bundleErr } = await supabase
@@ -83,4 +77,5 @@ export async function GET() {
   });
 
   return NextResponse.json({ bundles: result });
-}
+  },
+});

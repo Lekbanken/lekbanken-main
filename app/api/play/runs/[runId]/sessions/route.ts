@@ -8,23 +8,19 @@
  *   Returns the run_session record for a given step (with participant_session data).
  */
 
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createServerRlsClient, getRequestTenantId } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import type { CreateSessionOptions } from '@/lib/services/participants/session-service';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ runId: string }> }
-) {
-  const { runId } = await params;
-  const stepIndex = Number(request.nextUrl.searchParams.get('stepIndex') ?? '0');
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req, params }) => {
+  const { runId } = params;
+  const stepIndex = Number(req.nextUrl.searchParams.get('stepIndex') ?? '0');
 
   const supabase = await createServerRlsClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
 
   // Verify run ownership via RLS (runs table has RLS)
   const { data: run, error: runError } = await supabase
@@ -86,20 +82,17 @@ export async function GET(
       participantSession,
     },
   });
-}
+  },
+});
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ runId: string }> }
-) {
-  const { runId } = await params;
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { runId } = params;
+  const userId = auth!.user!.id;
   const supabase = await createServerRlsClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
 
-  const body = await request.json().catch(() => ({}));
+  const body = await req.json().catch(() => ({}));
   const { stepIndex, gameId, displayName } = body as {
     stepIndex: number;
     gameId: string;
@@ -167,7 +160,7 @@ export async function POST(
     const { data: membership } = await supabase
       .from('user_tenant_memberships')
       .select('tenant_id')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .limit(1)
       .maybeSingle();
     tenantId = membership?.tenant_id ?? null;
@@ -181,7 +174,7 @@ export async function POST(
   const sessionName = displayName?.trim() || `Session – Steg ${stepIndex + 1}`;
   const session = await ParticipantSessionService.createSession({
     tenantId,
-    hostUserId: user.id,
+    hostUserId: userId,
     displayName: sessionName,
     gameId,
     planId,
@@ -249,4 +242,5 @@ export async function POST(
       },
     },
   });
-}
+  },
+});

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { createServerRlsClient, supabaseAdmin } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 
@@ -6,13 +7,11 @@ type PurposeRow = Database['public']['Tables']['purposes']['Row']
 
 type PurposeInput = Partial<PurposeRow> & { tenant_id?: string | null; is_standard?: boolean }
 
-function isSystemAdmin(role: string | null) {
-  return role === 'system_admin' || role === 'superadmin'
-}
-
-export async function GET(request: Request) {
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient()
-  const { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(req.url)
   const tenantId = searchParams.get('tenantId')
   const includeStandard = searchParams.get('includeStandard') !== 'false'
 
@@ -35,19 +34,13 @@ export async function GET(request: Request) {
 
   const items: PurposeRow[] = data ?? []
   return NextResponse.json({ purposes: items })
-}
+  },
+})
 
-export async function POST(request: Request) {
-  const rlsClient = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await rlsClient.auth.getUser()
-  const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
-  if (!isSystemAdmin(role)) {
-    return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
-  }
-
-  const body = (await request.json().catch(() => ({}))) as PurposeInput
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+  const body = (await req.json().catch(() => ({}))) as PurposeInput
   if (!body.name || !body.purpose_key || !body.type) {
     return NextResponse.json({ error: 'name, purpose_key and type are required' }, { status: 400 })
   }
@@ -77,4 +70,5 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ purpose: data }, { status: 201 })
-}
+  },
+})

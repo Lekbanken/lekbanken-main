@@ -1,23 +1,14 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe/config'
+import { apiHandler } from '@/lib/api/route-handler'
 
-async function requireUser() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { supabase, user: null }
-  return { supabase, user }
-}
-
-async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string) {
+async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string, userId: string) {
   const { data, error } = await supabase
      .from('user_tenant_memberships')
     .select('role')
     .eq('tenant_id', tenantId)
-    .eq('user_id', (await supabase.auth.getUser()).data.user?.id || '')
+    .eq('user_id', userId)
     .maybeSingle()
   if (error) {
     console.warn('[billing/stripe-customer] role lookup error', error)
@@ -26,16 +17,18 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
-  const { tenantId } = await params
+export const POST = apiHandler({
+  auth: 'user',
+  rateLimit: 'strict',
+  handler: async ({ auth, req, params }) => {
+  const { tenantId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     name?: string
     email?: string
   }
@@ -74,4 +67,5 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   return NextResponse.json({ customer_id: customer.id })
-}
+  },
+})

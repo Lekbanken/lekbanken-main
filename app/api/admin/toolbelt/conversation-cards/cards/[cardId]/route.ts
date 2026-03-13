@@ -1,8 +1,10 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
-import { requireAuth, AuthError, requireTenantRole } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import type { AuthContext } from '@/types/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,13 +19,9 @@ const updateCardSchema = z.object({
   metadata: z.record(z.unknown()).nullable().optional(),
 })
 
-function jsonError(status: number, message: string, details?: unknown) {
-  return NextResponse.json({ error: message, details }, { status })
-}
-
 async function requireWriteAccessForCard(
   admin: ReturnType<typeof createServiceRoleClient>,
-  ctx: Awaited<ReturnType<typeof requireAuth>>,
+  ctx: AuthContext,
   cardId: string
 ) {
   const isSystemAdmin = ctx.effectiveGlobalRole === 'system_admin'
@@ -56,22 +54,17 @@ async function requireWriteAccessForCard(
   return { card, collection }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ cardId: string }> }) {
-  try {
-    const ctx = await requireAuth()
-    const cardId = (await params).cardId
-
-    const body = await req.json().catch(() => ({}))
-    const parsed = updateCardSchema.safeParse(body)
-    if (!parsed.success) return jsonError(400, 'Invalid payload', parsed.error.flatten())
+export const PATCH = apiHandler({
+  auth: 'user',
+  input: updateCardSchema,
+  handler: async ({ auth, body: input, params }) => {
+    const cardId = params.cardId
 
     const admin = createServiceRoleClient()
 
-    const access = await requireWriteAccessForCard(admin, ctx, cardId)
-    if ((access as { forbidden?: true }).forbidden) return jsonError(403, 'Forbidden')
-    if (!access.card) return jsonError(404, 'Not found')
-
-    const input = parsed.data
+    const access = await requireWriteAccessForCard(admin, auth!, cardId)
+    if ((access as { forbidden?: true }).forbidden) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (!access.card) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     const updates: Record<string, unknown> = {}
     if (input.sort_order !== undefined) updates.sort_order = input.sort_order
@@ -92,38 +85,30 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ca
 
     if (error || !card) {
       console.error('[admin/conversation-cards] update card error', error)
-      return jsonError(500, 'Failed to update card')
+      return NextResponse.json({ error: 'Failed to update card' }, { status: 500 })
     }
 
     return NextResponse.json({ card })
-  } catch (e) {
-    if (e instanceof AuthError) return jsonError(e.status, e.message)
-    console.error('[admin/conversation-cards] PATCH card unexpected error', e)
-    return jsonError(500, 'Unexpected error')
-  }
-}
+  },
+})
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ cardId: string }> }) {
-  try {
-    const ctx = await requireAuth()
-    const cardId = (await params).cardId
+export const DELETE = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+    const cardId = params.cardId
 
     const admin = createServiceRoleClient()
 
-    const access = await requireWriteAccessForCard(admin, ctx, cardId)
-    if ((access as { forbidden?: true }).forbidden) return jsonError(403, 'Forbidden')
+    const access = await requireWriteAccessForCard(admin, auth!, cardId)
+    if ((access as { forbidden?: true }).forbidden) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     if (!access.card) return NextResponse.json({ ok: true, missing: true })
 
     const { error } = await admin.from('conversation_cards').delete().eq('id', cardId)
     if (error) {
       console.error('[admin/conversation-cards] delete card error', error)
-      return jsonError(500, 'Failed to delete card')
+      return NextResponse.json({ error: 'Failed to delete card' }, { status: 500 })
     }
 
     return NextResponse.json({ ok: true })
-  } catch (e) {
-    if (e instanceof AuthError) return jsonError(e.status, e.message)
-    console.error('[admin/conversation-cards] DELETE card unexpected error', e)
-    return jsonError(500, 'Unexpected error')
-  }
-}
+  },
+})

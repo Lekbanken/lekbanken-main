@@ -1,7 +1,8 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
-import { requireAuth, AuthError, requireTenantRole } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -15,10 +16,6 @@ const updateCollectionSchema = z.object({
   secondary_purpose_ids: z.array(z.string().uuid()).optional(),
   status: z.enum(['draft', 'published']).optional(),
 })
-
-function jsonError(status: number, message: string, details?: unknown) {
-  return NextResponse.json({ error: message, details }, { status })
-}
 
 async function loadCollection(
   admin: ReturnType<typeof createServiceRoleClient>,
@@ -34,23 +31,23 @@ async function loadCollection(
   return data
 }
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ collectionId: string }> }) {
-  try {
-    const ctx = await requireAuth()
-    const collectionId = (await params).collectionId
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+    const collectionId = params.collectionId
 
-    const isSystemAdmin = ctx.effectiveGlobalRole === 'system_admin'
+    const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin'
     const admin = createServiceRoleClient()
 
     const collection = await loadCollection(admin, collectionId)
-    if (!collection) return jsonError(404, 'Not found')
+    if (!collection) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     if (!isSystemAdmin) {
       if (collection.scope_type === 'global') {
-        if (collection.status !== 'published') return jsonError(403, 'Forbidden')
+        if (collection.status !== 'published') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
       } else {
-        const isMember = ctx.memberships.some((m) => m.tenant_id === collection.tenant_id && m.status === 'active')
-        if (!isMember) return jsonError(403, 'Forbidden')
+        const isMember = auth!.memberships.some((m) => m.tenant_id === collection.tenant_id && m.status === 'active')
+        if (!isMember) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
       }
     }
 
@@ -70,12 +67,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ col
 
     if (cardsError) {
       console.error('[admin/conversation-cards] cards load error', cardsError)
-      return jsonError(500, 'Failed to load cards')
+      return NextResponse.json({ error: 'Failed to load cards' }, { status: 500 })
     }
 
     if (secondaryError) {
       console.error('[admin/conversation-cards] secondary purposes load error', secondaryError)
-      return jsonError(500, 'Failed to load secondary purposes')
+      return NextResponse.json({ error: 'Failed to load secondary purposes' }, { status: 500 })
     }
 
     return NextResponse.json({
@@ -83,38 +80,27 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ col
       cards: cards ?? [],
       secondary_purpose_ids: (secondary ?? []).map((r) => r.purpose_id),
     })
-  } catch (e) {
-    if (e instanceof AuthError) return jsonError(e.status, e.message)
-    console.error('[admin/conversation-cards] GET unexpected error', e)
-    return jsonError(500, 'Unexpected error')
-  }
-}
+  },
+})
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ collectionId: string }> }) {
-  try {
-    const ctx = await requireAuth()
-    const collectionId = (await params).collectionId
+export const PATCH = apiHandler({
+  auth: 'user',
+  input: updateCollectionSchema,
+  handler: async ({ auth, body: input, params }) => {
+    const collectionId = params.collectionId
 
-    const isSystemAdmin = ctx.effectiveGlobalRole === 'system_admin'
+    const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin'
     const admin = createServiceRoleClient()
 
     const existing = await loadCollection(admin, collectionId)
-    if (!existing) return jsonError(404, 'Not found')
+    if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     if (existing.scope_type === 'global') {
-      if (!isSystemAdmin) return jsonError(403, 'Forbidden')
+      if (!isSystemAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     } else {
-      if (!existing.tenant_id) return jsonError(500, 'Invalid collection scope')
+      if (!existing.tenant_id) return NextResponse.json({ error: 'Invalid collection scope' }, { status: 500 })
       await requireTenantRole(['owner', 'admin'], existing.tenant_id)
     }
-
-    const body = await req.json().catch(() => ({}))
-    const parsed = updateCollectionSchema.safeParse(body)
-    if (!parsed.success) {
-      return jsonError(400, 'Invalid payload', parsed.error.flatten())
-    }
-
-    const input = parsed.data
 
     const updates: Record<string, unknown> = {}
     if (input.title !== undefined) updates.title = input.title.trim()
@@ -133,7 +119,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ co
 
     if (updateError || !collection) {
       console.error('[admin/conversation-cards] update collection error', updateError)
-      return jsonError(500, 'Failed to update collection')
+      return NextResponse.json({ error: 'Failed to update collection' }, { status: 500 })
     }
 
     if (input.secondary_purpose_ids) {
@@ -152,41 +138,33 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ co
     }
 
     return NextResponse.json({ collection })
-  } catch (e) {
-    if (e instanceof AuthError) return jsonError(e.status, e.message)
-    console.error('[admin/conversation-cards] PATCH unexpected error', e)
-    return jsonError(500, 'Unexpected error')
-  }
-}
+  },
+})
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ collectionId: string }> }) {
-  try {
-    const ctx = await requireAuth()
-    const collectionId = (await params).collectionId
+export const DELETE = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+    const collectionId = params.collectionId
 
-    const isSystemAdmin = ctx.effectiveGlobalRole === 'system_admin'
+    const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin'
     const admin = createServiceRoleClient()
 
     const existing = await loadCollection(admin, collectionId)
     if (!existing) return NextResponse.json({ ok: true, missing: true })
 
     if (existing.scope_type === 'global') {
-      if (!isSystemAdmin) return jsonError(403, 'Forbidden')
+      if (!isSystemAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     } else {
-      if (!existing.tenant_id) return jsonError(500, 'Invalid collection scope')
+      if (!existing.tenant_id) return NextResponse.json({ error: 'Invalid collection scope' }, { status: 500 })
       await requireTenantRole(['owner', 'admin'], existing.tenant_id)
     }
 
     const { error } = await admin.from('conversation_card_collections').delete().eq('id', collectionId)
     if (error) {
       console.error('[admin/conversation-cards] delete collection error', error)
-      return jsonError(500, 'Failed to delete collection')
+      return NextResponse.json({ error: 'Failed to delete collection' }, { status: 500 })
     }
 
     return NextResponse.json({ ok: true })
-  } catch (e) {
-    if (e instanceof AuthError) return jsonError(e.status, e.message)
-    console.error('[admin/conversation-cards] DELETE unexpected error', e)
-    return jsonError(500, 'Unexpected error')
-  }
-}
+  },
+})

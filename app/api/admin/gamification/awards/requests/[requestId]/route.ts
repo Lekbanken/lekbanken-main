@@ -1,7 +1,7 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter'
 
 export const dynamic = 'force-dynamic'
@@ -17,27 +17,16 @@ const schema = z.object({
  * - Requires system_admin
  * - Uses service role + DB function for atomicity & idempotency
  */
-export async function PATCH(request: NextRequest, context: { params: Promise<{ requestId: string }> }) {
-  const rate = applyRateLimitMiddleware(request, 'strict')
+export const PATCH = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req, params, auth }) => {
+  const rate = applyRateLimitMiddleware(req, 'strict')
   if (rate) return rate
 
-  const { requestId } = await context.params
+  const { requestId } = params
+  const userId = auth!.user!.id
 
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  const body = await request.json().catch(() => ({}))
+  const body = await req.json().catch(() => ({}))
   const parsed = schema.safeParse(body)
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
@@ -47,7 +36,7 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ r
 
   const { data, error } = await admin.rpc('admin_decide_award_request_v1', {
     p_request_id: requestId,
-    p_decider_user_id: user.id,
+    p_decider_user_id: userId,
     p_action: parsed.data.action,
   })
 
@@ -68,4 +57,5 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ r
     },
     { status: 200 },
   )
-}
+  },
+})

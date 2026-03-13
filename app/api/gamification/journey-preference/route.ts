@@ -1,22 +1,18 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createServerRlsClient } from "@/lib/supabase/server";
+import { apiHandler } from "@/lib/api/route-handler";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req: NextRequest) {
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const supabase = await createServerRlsClient();
+    const userId = auth!.user!.id;
 
-  if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  let body: unknown;
-  try {
-    body = await req.json();
+    let body: unknown;
+    try {
+      body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
@@ -40,7 +36,7 @@ export async function POST(req: NextRequest) {
     }
   )
     .select("journey_decision_at")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   const existingDecisionAt = (existingRes.data as PrefsRow | null)?.journey_decision_at ?? null;
@@ -58,7 +54,7 @@ export async function POST(req: NextRequest) {
   )
     .upsert(
       {
-        user_id: user.id,
+        user_id: userId,
         journey_enabled: enabled,
         journey_decision_at: decisionAt,
         updated_at: now,
@@ -74,4 +70,5 @@ export async function POST(req: NextRequest) {
     enabled,
     decisionAt,
   });
-}
+  },
+})

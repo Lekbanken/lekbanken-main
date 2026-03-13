@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { adminSearchSchema, buildSortClause, computeValidationState } from './helpers';
 import type { GameAdminRow, GameListResponse, PlayMode } from '@/features/admin/games/v2/types';
@@ -11,32 +12,11 @@ import type { GameAdminRow, GameListResponse, PlayMode } from '@/features/admin/
  * 
  * Requires system_admin or higher role.
  */
-export async function POST(request: Request) {
+export const POST = apiHandler({
+  auth: 'system_admin',
+  input: adminSearchSchema,
+  handler: async ({ body }) => {
   const supabase = await createServerRlsClient();
-  
-  // Auth check
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  
-  const role = (user.app_metadata as { role?: string } | undefined)?.role ?? null;
-  const isAdmin = role === 'system_admin' || role === 'superadmin';
-  
-  if (!isAdmin) {
-    return NextResponse.json({ error: 'Forbidden - admin access required' }, { status: 403 });
-  }
-  
-  // Parse and validate body
-  const body = await request.json().catch(() => ({}));
-  const parsed = adminSearchSchema.safeParse(body);
-  
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid request', details: parsed.error.flatten() },
-      { status: 400 }
-    );
-  }
   
   const {
     search,
@@ -49,7 +29,7 @@ export async function POST(request: Request) {
     sortOrder = 'desc',
     page = 1,
     pageSize = 25,
-  } = parsed.data;
+  } = body;
   
   const offset = (page - 1) * pageSize;
   
@@ -77,12 +57,14 @@ export async function POST(request: Request) {
         { count: 'exact' }
       );
     
-    // Apply text search
+    // Apply text search (strip PostgREST DSL metacharacters)
     if (search && search.trim()) {
-      const term = search.trim();
-      query = query.or(
-        `name.ilike.%${term}%,short_description.ilike.%${term}%,description.ilike.%${term}%,game_key.ilike.%${term}%`
-      );
+      const term = search.trim().replace(/[,()]/g, '');
+      if (term) {
+        query = query.or(
+          `name.ilike.%${term}%,short_description.ilike.%${term}%,description.ilike.%${term}%,game_key.ilike.%${term}%`
+        );
+      }
     }
     
     // Apply classification filters
@@ -249,7 +231,7 @@ export async function POST(request: Request) {
         withErrors: errorCount.count ?? 0,
       },
       metadata: {
-        appliedFilters: parsed.data,
+        appliedFilters: body,
       },
     };
     
@@ -261,4 +243,5 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-}
+  },
+});

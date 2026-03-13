@@ -11,6 +11,8 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 type SecretsAction = 'unlock' | 'relock';
 
@@ -40,25 +42,20 @@ async function getSecretsStats(sessionId: string) {
   };
 }
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
   try {
-    const { id: sessionId } = await params;
+    const sessionId = params.id;
+    const userId = auth!.user!.id;
     const supabase = await createServerRlsClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const session = await ParticipantSessionService.getSessionById(sessionId);
     if (!session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -94,31 +91,30 @@ export async function GET(
     console.error('[secrets] GET failed:', error);
     return NextResponse.json({ error: 'Failed to get secret instruction status' }, { status: 500 });
   }
-}
+  },
+});
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
   try {
-    const { id: sessionId } = await params;
+    const sessionId = params.id;
+    const userId = auth!.user!.id;
     const supabase = await createServerRlsClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const session = await ParticipantSessionService.getSessionById(sessionId);
     if (!session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const body = (await request.json().catch(() => ({}))) as { action?: SecretsAction };
+    const statusError = assertSessionStatus(session.status, 'secrets');
+    if (statusError) return statusError;
+
+    const body = (await req.json().catch(() => ({}))) as { action?: SecretsAction };
     const action = body.action;
     if (action !== 'unlock' && action !== 'relock') {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
@@ -153,7 +149,7 @@ export async function POST(
         // Supabase generated types may not include freshly migrated columns yet.
         .update({
           secret_instructions_unlocked_at: now,
-          secret_instructions_unlocked_by: user.id,
+          secret_instructions_unlocked_by: userId,
         } as Record<string, unknown>)
         .eq('id', sessionId);
 
@@ -166,7 +162,7 @@ export async function POST(
         type: 'state_change',
         payload: {
           secret_instructions_unlocked_at: now,
-          secret_instructions_unlocked_by: user.id,
+          secret_instructions_unlocked_by: userId,
         },
         timestamp: now,
       });
@@ -175,7 +171,7 @@ export async function POST(
         session_id: sessionId,
         event_type: 'secret_instructions_unlocked',
         event_data: {},
-        actor_user_id: user.id,
+        actor_user_id: userId,
       });
 
       return NextResponse.json({
@@ -183,7 +179,7 @@ export async function POST(
         session: {
           id: sessionId,
           secret_instructions_unlocked_at: now,
-          secret_instructions_unlocked_by: user.id,
+          secret_instructions_unlocked_by: userId,
         },
         stats: await getSecretsStats(sessionId),
       });
@@ -235,7 +231,7 @@ export async function POST(
       session_id: sessionId,
       event_type: 'secret_instructions_relocked',
       event_data: {},
-      actor_user_id: user.id,
+      actor_user_id: userId,
     });
 
     return NextResponse.json({
@@ -243,7 +239,7 @@ export async function POST(
       session: {
         id: sessionId,
         secret_instructions_unlocked_at: null,
-        secret_instructions_unlocked_by: null,
+        secret_instructions_unlocked_by: userId,
       },
       stats: await getSecretsStats(sessionId),
     });
@@ -251,4 +247,5 @@ export async function POST(
     console.error('[secrets] POST failed:', error);
     return NextResponse.json({ error: 'Failed to update secret instructions' }, { status: 500 });
   }
-}
+  },
+});

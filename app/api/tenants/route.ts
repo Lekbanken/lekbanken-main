@@ -2,20 +2,16 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
-import { isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { apiHandler } from '@/lib/api/route-handler'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 
-export async function GET() {
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth }) => {
   const supabase = await createServerRlsClient()
   const cookieStore = await cookies()
   const activeTenantId = await readTenantIdFromCookies(cookieStore)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const user = auth!.user!
 
   const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
   const isSysAdmin = role === 'system_admin'
@@ -36,19 +32,16 @@ export async function GET() {
   }
 
   return NextResponse.json({ tenants: data ?? [] })
-}
+  },
+})
 
-export async function POST(request: Request) {
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req, auth }) => {
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const userId = auth!.user!.id
 
-  if (!user || !isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     name?: string
     type?: string
     status?: string
@@ -70,8 +63,8 @@ export async function POST(request: Request) {
       default_language: body.default_language,
       default_theme: body.default_theme,
       demo_flag: body.demo_flag ?? false,
-      created_by: user.id,
-      updated_by: user.id,
+      created_by: userId,
+      updated_by: userId,
     })
     .select()
     .single()
@@ -83,10 +76,11 @@ export async function POST(request: Request) {
 
   await logTenantAuditEvent({
     tenantId: data.id,
-    actorUserId: user.id,
+    actorUserId: userId,
     eventType: 'tenant_created',
     payload: body,
   })
 
   return NextResponse.json({ tenant: data }, { status: 201 })
-}
+  },
+})

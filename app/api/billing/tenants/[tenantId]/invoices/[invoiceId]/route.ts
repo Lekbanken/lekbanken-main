@@ -1,24 +1,15 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 type InvoiceStatus = 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'canceled'
 
-async function requireUser() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { supabase, user: null }
-  return { supabase, user }
-}
-
-async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string) {
+async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string, userId: string) {
   const { data, error } = await supabase
     .from('user_tenant_memberships')
     .select('role')
     .eq('tenant_id', tenantId)
-    .eq('user_id', (await supabase.auth.getUser()).data.user?.id || '')
+    .eq('user_id', userId)
     .maybeSingle()
   if (error) {
     console.warn('[billing/invoice] role lookup error', error)
@@ -27,15 +18,14 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ tenantId: string; invoiceId: string }> }
-) {
-  const { tenantId, invoiceId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { tenantId, invoiceId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data, error } = await supabase
@@ -52,20 +42,20 @@ export async function GET(
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   return NextResponse.json({ invoice: data })
-}
+  },
+})
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ tenantId: string; invoiceId: string }> }
-) {
-  const { tenantId, invoiceId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { tenantId, invoiceId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     name?: string
     amount?: number
     currency?: string
@@ -84,6 +74,12 @@ export async function PATCH(
     stripe_invoice_id?: string | null
   }
 
+  // Tenant admins cannot set terminal statuses — only webhook/system_admin can mark as paid
+  const TENANT_BLOCKED_STATUSES: InvoiceStatus[] = ['paid']
+  if (body.status && TENANT_BLOCKED_STATUSES.includes(body.status)) {
+    return NextResponse.json({ error: 'Cannot set invoice status to paid — this is managed by payment processing' }, { status: 403 })
+  }
+
   const updates: Record<string, unknown> = {}
   if (body.name !== undefined) updates.name = body.name
   if (typeof body.amount === 'number') updates.amount = body.amount
@@ -96,13 +92,15 @@ export async function PATCH(
   if (body.pdf_url !== undefined) updates.pdf_url = body.pdf_url
   if (body.invoice_number !== undefined) updates.invoice_number = body.invoice_number
   if (body.issued_at !== undefined) updates.issued_at = body.issued_at
-  if (body.paid_at !== undefined) updates.paid_at = body.paid_at
+  // paid_at is server-managed — tenant admins cannot set it directly
   if (body.amount_subtotal !== undefined) updates.amount_subtotal = body.amount_subtotal
   if (body.amount_tax !== undefined) updates.amount_tax = body.amount_tax
   if (body.amount_total !== undefined) updates.amount_total = body.amount_total
-  if (body.stripe_invoice_id !== undefined) updates.stripe_invoice_id = body.stripe_invoice_id
+  // stripe_invoice_id is server-managed — tenant admins cannot set it directly
 
   if (body.status === 'paid' && updates.paid_at === undefined) {
+    // paid_at is only set when status transitions to paid via webhook/admin
+    // This path is blocked above for tenant admins, but kept for future system_admin usage
     updates.paid_at = new Date().toISOString()
   }
 
@@ -125,4 +123,5 @@ export async function PATCH(
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   return NextResponse.json({ invoice: data })
-}
+  },
+})

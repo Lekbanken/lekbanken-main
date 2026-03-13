@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { supabaseAdmin } from '@/lib/supabase/server'
-import { requireSystemAdmin, AuthError } from '@/lib/api/auth-guard'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -19,24 +19,14 @@ const updateQuoteSchema = z.object({
   assignedTo: z.string().uuid().nullable().optional(),
 })
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    await requireSystemAdmin()
-  } catch (e) {
-    if (e instanceof AuthError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
-    }
-    throw e
-  }
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params }) => {
+    const { id } = params
+    const client = createServiceRoleClient()
 
-  const { id } = await params
-
-  try {
     // Get quote with line items
-    const { data: quote, error: quoteError } = await supabaseAdmin
+    const { data: quote, error: quoteError } = await client
       .from('quotes')
       .select(`
         *,
@@ -52,7 +42,7 @@ export async function GET(
     }
 
     // Get line items
-    const { data: lineItems, error: lineItemsError } = await supabaseAdmin
+    const { data: lineItems, error: lineItemsError } = await client
       .from('quote_line_items')
       .select(`
         *,
@@ -66,7 +56,7 @@ export async function GET(
     }
 
     // Get activities
-    const { data: activities, error: activitiesError } = await supabaseAdmin
+    const { data: activities, error: activitiesError } = await client
       .from('quote_activities')
       .select(`
         *,
@@ -85,42 +75,16 @@ export async function GET(
       lineItems: lineItems || [],
       activities: activities || [],
     })
-  } catch (error) {
-    console.error('[quote API] Error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
-  }
-}
+  },
+})
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    await requireSystemAdmin()
-  } catch (e) {
-    if (e instanceof AuthError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
-    }
-    throw e
-  }
+export const PATCH = apiHandler({
+  auth: 'system_admin',
+  input: updateQuoteSchema,
+  handler: async ({ params, body: updates }) => {
+    const { id } = params
+    const client = createServiceRoleClient()
 
-  const { id } = await params
-
-  let body: unknown
-  try {
-    body = await request.json()
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
-  }
-
-  const parsed = updateQuoteSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 })
-  }
-
-  const updates = parsed.data
-
-  try {
     // Build update object
     const dbUpdates: Record<string, unknown> = {}
     if (updates.status) dbUpdates.status = updates.status
@@ -139,7 +103,7 @@ export async function PATCH(
       dbUpdates.accepted_at = new Date().toISOString()
     }
 
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await client
       .from('quotes')
       .update(dbUpdates)
       .eq('id', id)
@@ -150,37 +114,24 @@ export async function PATCH(
     }
 
     // Log activity
-    await supabaseAdmin.rpc('log_quote_activity', {
+    await client.rpc('log_quote_activity', {
       p_quote_id: id,
       p_activity_type: 'updated',
       p_activity_data: { changes: Object.keys(updates) },
     })
 
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('[quote API] Error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
-  }
-}
+  },
+})
 
-export async function DELETE(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    await requireSystemAdmin()
-  } catch (e) {
-    if (e instanceof AuthError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
-    }
-    throw e
-  }
+export const DELETE = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params }) => {
+    const { id } = params
+    const client = createServiceRoleClient()
 
-  const { id } = await params
-
-  try {
     // Only allow deleting draft quotes
-    const { data: quote } = await supabaseAdmin
+    const { data: quote } = await client
       .from('quotes')
       .select('status')
       .eq('id', id)
@@ -197,7 +148,7 @@ export async function DELETE(
       )
     }
 
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await client
       .from('quotes')
       .delete()
       .eq('id', id)
@@ -208,8 +159,5 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('[quote API] Error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
-  }
-}
+  },
+})

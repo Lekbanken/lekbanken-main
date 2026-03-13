@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { assertTenantAdminOrSystem, isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import { awardBuilderExportSchemaV1 } from '@/lib/validation/awardBuilderExportSchemaV1'
 import { 
   validateBadgeForPublish, 
@@ -140,45 +141,32 @@ function updateExportWithServerId(
   return updated
 }
 
-async function requireAuth() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+    const url = new URL(req.url)
+    const scopeTypeRaw = url.searchParams.get('scopeType')
+    const tenantIdRaw = url.searchParams.get('tenantId')
 
-  if (error || !user) return { user: null, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
-  return { user, response: null }
-}
+    const parsedScope = scopeSchema.safeParse({
+      scopeType: scopeTypeRaw ?? 'tenant',
+      tenantId: tenantIdRaw ? tenantIdRaw : null,
+    })
 
-export async function GET(req: NextRequest) {
-  const { user, response } = await requireAuth()
-  if (response) return response
-
-  const url = new URL(req.url)
-  const scopeTypeRaw = url.searchParams.get('scopeType')
-  const tenantIdRaw = url.searchParams.get('tenantId')
-
-  const parsedScope = scopeSchema.safeParse({
-    scopeType: scopeTypeRaw ?? 'tenant',
-    tenantId: tenantIdRaw ? tenantIdRaw : null,
-  })
-
-  if (!parsedScope.success) {
-    return NextResponse.json({ error: 'Invalid query', details: parsedScope.error.flatten() }, { status: 400 })
-  }
-
-  const { scopeType, tenantId } = parsedScope.data
-
-  if (scopeType === 'global') {
-    if (!isSystemAdmin(user)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  } else {
-    if (!tenantId) {
-      return NextResponse.json({ error: 'Invalid query', details: { tenantId: ['Required for tenant scope'] } }, { status: 400 })
+    if (!parsedScope.success) {
+      return NextResponse.json({ error: 'Invalid query', details: parsedScope.error.flatten() }, { status: 400 })
     }
-    const allowed = await assertTenantAdminOrSystem(tenantId, user)
-    if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+
+    const { scopeType, tenantId } = parsedScope.data
+
+    if (scopeType === 'global') {
+      if (auth!.effectiveGlobalRole !== 'system_admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    } else {
+      if (!tenantId) {
+        return NextResponse.json({ error: 'Invalid query', details: { tenantId: ['Required for tenant scope'] } }, { status: 400 })
+      }
+      await requireTenantRole(['admin', 'owner'], tenantId)
+    }
 
   // This table is introduced via migration and may not yet exist in generated Database types.
   // Locally we augment the Database type to avoid `any` while keeping query typing usable.
@@ -206,14 +194,16 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({ exports: (data ?? []) as AwardBuilderExportListRow[] }, { status: 200 })
-}
+  },
+})
 
-export async function POST(req: NextRequest) {
-  const { user, response } = await requireAuth()
-  if (response) return response
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+    const userId = auth!.user!.id
 
-  const body = await req.json().catch(() => ({}))
-  const parsed = exportSchema.safeParse(body)
+    const body = await req.json().catch(() => ({}))
+    const parsed = exportSchema.safeParse(body)
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
   }
@@ -269,7 +259,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Ensure the export claims match the authenticated actor.
-  if (canonical.exported_by.user_id !== user.id) {
+  if (canonical.exported_by.user_id !== userId) {
     return NextResponse.json(
       { error: 'Invalid payload', details: { export: { exported_by: { user_id: ['Must match authenticated user'] } } } },
       { status: 400 },
@@ -309,13 +299,12 @@ export async function POST(req: NextRequest) {
     if (tenantId !== null) {
       return NextResponse.json({ error: 'Invalid payload', details: { tenantId: ['Must be null for global scope'] } }, { status: 400 })
     }
-    if (!isSystemAdmin(user)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (auth!.effectiveGlobalRole !== 'system_admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   } else {
     if (!tenantId) {
       return NextResponse.json({ error: 'Invalid payload', details: { tenantId: ['Required for tenant scope'] } }, { status: 400 })
     }
-    const allowed = await assertTenantAdminOrSystem(tenantId, user)
-    if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    await requireTenantRole(['admin', 'owner'], tenantId)
   }
 
   // This table is introduced via migration and may not yet exist in generated Database types.
@@ -364,4 +353,5 @@ export async function POST(req: NextRequest) {
     id: serverId, 
     export: updatedExport 
   }, { status: 200 })
-}
+  },
+})

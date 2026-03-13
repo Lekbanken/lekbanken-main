@@ -6,23 +6,14 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function POST(request: Request) {
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
-  const body = await request.json().catch(() => null);
+  const body = await req.json().catch(() => null);
   const slug = typeof body?.slug === 'string' ? body.slug.trim() : '';
   if (!slug) {
     return NextResponse.json({ error: 'Missing category slug' }, { status: 400 });
@@ -51,4 +42,5 @@ export async function POST(request: Request) {
   const result = Array.isArray(data) ? data[0] : data;
 
   return NextResponse.json({ result });
-}
+  },
+});

@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { z } from 'zod'
 import { createServerRlsClient } from '@/lib/supabase/server'
-import { assertTenantAdminOrSystem, isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import type { Json } from '@/types/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -48,43 +49,32 @@ type BadgePresetRow = {
   updated_at: string
 }
 
-async function requireAuth() {
-  const supabase = await createServerRlsClient() as SupabaseClientWithPresets
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
-
-  if (error || !user) return { user: null, supabase: null, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
-  return { user, supabase, response: null }
-}
-
 /**
  * GET /api/admin/award-builder/presets
  * List presets for a tenant (+ optional global presets)
  */
-export async function GET(req: NextRequest) {
-  const { user, supabase, response } = await requireAuth()
-  if (response) return response
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req }) => {
+    const supabase = await createServerRlsClient() as SupabaseClientWithPresets
 
-  const url = new URL(req.url)
-  const parsed = listQuerySchema.safeParse({
-    tenantId: url.searchParams.get('tenantId'),
-    category: url.searchParams.get('category') || undefined,
-    includeGlobal: url.searchParams.get('includeGlobal') ?? 'true',
-  })
+    const url = new URL(req.url)
+    const parsed = listQuerySchema.safeParse({
+      tenantId: url.searchParams.get('tenantId'),
+      category: url.searchParams.get('category') || undefined,
+      includeGlobal: url.searchParams.get('includeGlobal') ?? 'true',
+    })
 
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
-  }
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
+    }
 
-  const { tenantId, category, includeGlobal } = parsed.data
+    const { tenantId, category, includeGlobal } = parsed.data
 
-  // Tenant-scoped queries require membership check
-  if (tenantId) {
-    const allowed = await assertTenantAdminOrSystem(tenantId, user)
-    if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+    // Tenant-scoped queries require membership check
+    if (tenantId) {
+      await requireTenantRole(['admin', 'owner'], tenantId)
+    }
   
   // Build query - RLS will handle visibility
   // Table may not exist in generated types until migration runs
@@ -118,57 +108,58 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({ presets: (data ?? []) as BadgePresetRow[] }, { status: 200 })
-}
+  },
+})
 
 /**
  * POST /api/admin/award-builder/presets
  * Create a new preset
  */
-export async function POST(req: NextRequest) {
-  const { user, supabase, response } = await requireAuth()
-  if (response) return response
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+    const supabase = await createServerRlsClient() as SupabaseClientWithPresets
+    const userId = auth!.user!.id
 
-  const body = await req.json().catch(() => ({}))
-  const parsed = createPresetSchema.safeParse(body)
-  
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
-
-  const { name, description, iconConfig, category, tags, tenantId } = parsed.data
-
-  // Authorization
-  if (tenantId === null) {
-    // Global preset - system admin only
-    if (!isSystemAdmin(user)) {
-      return NextResponse.json({ error: 'Forbidden: System admin required for global presets' }, { status: 403 })
+    const body = await req.json().catch(() => ({}))
+    const parsed = createPresetSchema.safeParse(body)
+    
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
     }
-  } else if (tenantId) {
-    // Tenant preset - tenant admin or system admin
-    const allowed = await assertTenantAdminOrSystem(tenantId, user)
-    if (!allowed) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+    const { name, description, iconConfig, category, tags, tenantId } = parsed.data
+
+    // Authorization
+    if (tenantId === null) {
+      // Global preset - system admin only
+      if (auth!.effectiveGlobalRole !== 'system_admin') {
+        return NextResponse.json({ error: 'Forbidden: System admin required for global presets' }, { status: 403 })
+      }
+    } else if (tenantId) {
+      // Tenant preset - tenant admin or system admin
+      await requireTenantRole(['admin', 'owner'], tenantId)
     }
-  }
-  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
-    .from('badge_presets')
-    .insert({
-      tenant_id: tenantId ?? null,
-      name,
-      description: description ?? null,
-      icon_config: iconConfig as unknown as Json,
-      category,
-      tags,
-      created_by_user_id: user.id,
-    })
-    .select('id')
-    .single()
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from('badge_presets')
+      .insert({
+        tenant_id: tenantId ?? null,
+        name,
+        description: description ?? null,
+        icon_config: iconConfig as unknown as Json,
+        category,
+        tags,
+        created_by_user_id: userId,
+      })
+      .select('id')
+      .single()
 
-  if (error) {
-    return NextResponse.json({ error: 'Failed to create preset', details: error.message }, { status: 500 })
-  }
+    if (error) {
+      return NextResponse.json({ error: 'Failed to create preset', details: error.message }, { status: 500 })
+    }
 
-  return NextResponse.json({ id: data?.id }, { status: 201 })
-}
+    return NextResponse.json({ id: data?.id }, { status: 201 })
+  },
+})

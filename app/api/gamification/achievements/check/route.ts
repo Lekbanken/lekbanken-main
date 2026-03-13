@@ -21,6 +21,7 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { checkAndUnlockAchievements } from '@/lib/services/achievementService';
+import { applyRateLimit } from '@/lib/utils/rate-limiter';
 
 // Environment detection
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
@@ -84,6 +85,9 @@ async function resolveUserTenant(
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitResponse = applyRateLimit(request, 'api');
+    if (rateLimitResponse) return rateLimitResponse;
+
     // RLS client for auth check
     const rlsClient = await createServerRlsClient();
     // Service role for DB operations

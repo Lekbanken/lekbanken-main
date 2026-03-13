@@ -5,10 +5,10 @@
  * Extends token expiry for a participant
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { requireSessionHost, AuthError } from '@/lib/api/auth-guard';
+import { requireSessionHost } from '@/lib/api/auth-guard';
+import { apiHandler } from '@/lib/api/route-handler';
 import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
 
 interface ExtendTokenRequest {
@@ -16,9 +16,10 @@ interface ExtendTokenRequest {
   extension_hours?: number; // Default: 24 hours
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const body: ExtendTokenRequest = await request.json();
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ req }) => {
+    const body: ExtendTokenRequest = await req.json();
     const { participant_token, extension_hours = 24 } = body;
 
     if (!participant_token) {
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Auth: session host or system_admin
+    // Auth: session host or system_admin (wrapper already verified user, this checks host ownership)
     await requireSessionHost(participant.session_id);
 
     // Extract tenant_id from joined session data
@@ -107,15 +108,5 @@ export async function POST(request: NextRequest) {
       new_expiry: newExpiryTime.toISOString(),
       message: `Token extended by ${extension_hours} hours`,
     });
-
-  } catch (error) {
-    if (error instanceof AuthError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
-    }
-    console.error('Error in token extension:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

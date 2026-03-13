@@ -1,8 +1,8 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { assertTenantAdminOrSystem, isSystemAdmin } from '@/lib/utils/tenantAuth'
-import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,41 +23,24 @@ const schema = z.object({
  * - Requires tenant_admin or system_admin
  * - Uses service role + DB function for atomicity & idempotency
  */
-export async function POST(request: NextRequest) {
-  const rate = applyRateLimitMiddleware(request, 'strict')
-  if (rate) return rate
+export const POST = apiHandler({
+  auth: 'user',
+  rateLimit: 'strict',
+  input: schema,
+  handler: async ({ auth, body }) => {
+    const { tenantId, targetUserIds, amount, message, idempotencyKey } = body
 
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
+    // Tenant admin or system admin required
+    await requireTenantRole(['admin', 'owner'], tenantId)
 
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = await request.json().catch(() => ({}))
-  const parsed = schema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
-
-  const { tenantId, targetUserIds, amount, message, idempotencyKey } = parsed.data
-
-  const allowed = await assertTenantAdminOrSystem(tenantId, user)
-  if (!allowed) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  try {
     const admin = createServiceRoleClient()
+    const userId = auth!.user!.id
 
     // Large awards require explicit approval unless actor is system_admin.
-    if (Number.isFinite(APPROVAL_THRESHOLD) && amount >= APPROVAL_THRESHOLD && !isSystemAdmin(user)) {
+    if (Number.isFinite(APPROVAL_THRESHOLD) && amount >= APPROVAL_THRESHOLD && auth!.effectiveGlobalRole !== 'system_admin') {
       const { data, error } = await admin.rpc('admin_request_award_coins_v1', {
         p_tenant_id: tenantId,
-        p_actor_user_id: user.id,
+        p_actor_user_id: userId,
         p_target_user_ids: targetUserIds,
         p_amount: amount,
         p_message: message ?? '',
@@ -85,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     const { data, error } = await admin.rpc('admin_award_coins_v1', {
       p_tenant_id: tenantId,
-      p_actor_user_id: user.id,
+      p_actor_user_id: userId,
       p_target_user_ids: targetUserIds,
       p_amount: amount,
       p_message: message ?? '',
@@ -110,8 +93,5 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 },
     )
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : 'Unknown error'
-    return NextResponse.json({ error: 'Server error', details: msg }, { status: 500 })
-  }
-}
+  },
+})

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { getAllowedProductIds } from '@/app/api/games/utils'
 import { DEMO_TENANT_ID } from '@/lib/auth/ephemeral-users'
+import { apiHandler } from '@/lib/api/route-handler'
 
 type Purpose = { id: string; name?: string | null; type?: string | null; parent_id?: string | null }
 type ProductPurposeRow = { product_id: string; purpose: Purpose | null }
@@ -47,12 +48,14 @@ function setCachedFilters(key: string, value: CachedFilters) {
   filterCache.set(key, { expires: Date.now() + CACHE_TTL_MS, value })
 }
 
-export async function GET(request: Request) {
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(req.url)
   const tenantId = searchParams.get('tenantId')
 
   const userId = user?.id ?? null
@@ -336,4 +339,5 @@ export async function GET(request: Request) {
 
   setCachedFilters(cacheId, payload)
   return NextResponse.json(payload)
-}
+},
+})

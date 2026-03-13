@@ -1,18 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { Database } from '@/types/supabase'
 
 type PreferenceRow = Database['public']['Tables']['user_preferences']['Row']
 type PreferenceInsert = Database['public']['Tables']['user_preferences']['Insert']
-
-async function getAuthedUserId() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  return user?.id ?? null
-}
 
 async function assertTenantAccess(userId: string, tenantId: string) {
   const admin = createServiceRoleClient()
@@ -47,13 +39,12 @@ function normalizeTheme<T extends PreferenceRow | null>(preferences: T): T {
   return preferences
 }
 
-export async function GET(request: NextRequest) {
-  const userId = await getAuthedUserId()
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
 
-  const tenantId = request.nextUrl.searchParams.get('tenantId')
+    const tenantId = new URL(req.url).searchParams.get('tenantId')
   if (!tenantId) {
     return NextResponse.json({ error: 'Missing tenantId' }, { status: 400 })
   }
@@ -77,15 +68,15 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({ preferences: normalizeTheme(data ?? null) })
-}
+  },
+})
 
-export async function PATCH(request: NextRequest) {
-  const userId = await getAuthedUserId()
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
 
-  const body = (await request.json().catch(() => null)) as {
+    const body = (await req.json().catch(() => null)) as {
     tenantId?: string
     preferences?: Partial<PreferenceRow>
   } | null
@@ -127,4 +118,5 @@ export async function PATCH(request: NextRequest) {
   }
 
   return NextResponse.json({ preferences: normalizeTheme(data) })
-}
+  },
+})

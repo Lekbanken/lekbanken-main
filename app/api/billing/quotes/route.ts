@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { supabaseAdmin } from '@/lib/supabase/server'
-import { requireSystemAdmin, AuthError } from '@/lib/api/auth-guard'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -35,22 +35,16 @@ const createQuoteSchema = z.object({
   lineItems: z.array(lineItemSchema).min(1),
 })
 
-export async function GET(request: Request) {
-  try {
-    await requireSystemAdmin()
-  } catch (e) {
-    if (e instanceof AuthError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
-    }
-    throw e
-  }
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const url = new URL(req.url)
+    const status = url.searchParams.get('status')
+    const tenantId = url.searchParams.get('tenantId')
 
-  const url = new URL(request.url)
-  const status = url.searchParams.get('status')
-  const tenantId = url.searchParams.get('tenantId')
+    const client = createServiceRoleClient()
 
-  try {
-    let query = supabaseAdmin
+    let query = client
       .from('quotes')
       .select(`
         *,
@@ -76,45 +70,20 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({ quotes: quotes || [] })
-  } catch (error) {
-    console.error('[quotes API] Error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
-  }
-}
+  },
+})
 
-export async function POST(request: Request) {
-  let userId: string
-  try {
-    const adminCtx = await requireSystemAdmin()
-    // After requireSystemAdmin, user is guaranteed to exist
-    if (!adminCtx.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-    userId = adminCtx.user.id
-  } catch (e) {
-    if (e instanceof AuthError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
-    }
-    throw e
-  }
+export const POST = apiHandler({
+  auth: 'system_admin',
+  input: createQuoteSchema,
+  handler: async ({ auth, body }) => {
+    const userId = auth!.user!.id
+    const { lineItems, validDays = 30, ...quoteData } = body
 
-  let body: unknown
-  try {
-    body = await request.json()
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
-  }
+    const client = createServiceRoleClient()
 
-  const parsed = createQuoteSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 })
-  }
-
-  const { lineItems, validDays, ...quoteData } = parsed.data
-
-  try {
     // Generate quote number
-    const { data: quoteNumberData, error: quoteNumberError } = await supabaseAdmin
+    const { data: quoteNumberData, error: quoteNumberError } = await client
       .rpc('generate_quote_number')
 
     if (quoteNumberError) {
@@ -143,8 +112,8 @@ export async function POST(request: Request) {
 
     const totalAmount = subtotal - discountAmount
 
-    // Create quote (adminUser.id comes from requireSystemAdmin)
-    const { data: quote, error: quoteError } = await supabaseAdmin
+    // Create quote
+    const { data: quote, error: quoteError } = await client
       .from('quotes')
       .insert({
         quote_number: quoteNumber,
@@ -190,7 +159,7 @@ export async function POST(request: Request) {
       position: index,
     }))
 
-    const { error: lineItemsError } = await supabaseAdmin
+    const { error: lineItemsError } = await client
       .from('quote_line_items')
       .insert(lineItemsToInsert)
 
@@ -200,7 +169,7 @@ export async function POST(request: Request) {
     }
 
     // Log activity
-    await supabaseAdmin.rpc('log_quote_activity', {
+    await client.rpc('log_quote_activity', {
       p_quote_id: quote.id,
       p_activity_type: 'created',
       p_activity_data: { items_count: lineItems.length },
@@ -210,8 +179,5 @@ export async function POST(request: Request) {
       quote_id: quote.id,
       quote_number: quoteNumber,
     })
-  } catch (error) {
-    console.error('[quotes API] Error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
-  }
-}
+  },
+})

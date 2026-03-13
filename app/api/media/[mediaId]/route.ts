@@ -1,8 +1,9 @@
-import { type NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import type { Json } from '@/types/supabase'
 import { logger } from '@/lib/utils/logger'
+import { apiHandler } from '@/lib/api/route-handler'
 
 const updateSchema = z.object({
   name: z.string().min(1).max(255).optional(),
@@ -10,11 +11,11 @@ const updateSchema = z.object({
   metadata: z.record(z.unknown()).optional(),
 })
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ mediaId: string }> }
-) {
-  const { mediaId } = await params
+// GET is intentionally public — RLS controls access
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ params }) => {
+  const { mediaId } = params
   const supabase = await createServerRlsClient()
 
   const { data, error } = await supabase
@@ -33,23 +34,17 @@ export async function GET(
   }
 
   return NextResponse.json({ media: data })
-}
+  },
+})
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ mediaId: string }> }
-) {
-  const { mediaId } = await params
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { mediaId } = params
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const userId = auth!.user!.id
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = await request.json().catch(() => ({}))
+  const body = await req.json().catch(() => ({}))
   const parsed = updateSchema.safeParse(body)
 
   if (!parsed.success) {
@@ -76,27 +71,21 @@ export async function PATCH(
       endpoint: '/api/media/[mediaId]',
       method: 'PATCH',
       mediaId,
-      userId: user.id
+      userId
     })
     return NextResponse.json({ error: 'Failed to update media' }, { status: 500 })
   }
 
   return NextResponse.json({ media: data })
-}
+  },
+})
 
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ mediaId: string }> }
-) {
-  const { mediaId } = await params
+export const DELETE = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { mediaId } = params
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const userId = auth!.user!.id
 
   const { error } = await supabase.from('media').delete().eq('id', mediaId)
 
@@ -105,10 +94,11 @@ export async function DELETE(
       endpoint: '/api/media/[mediaId]',
       method: 'DELETE',
       mediaId,
-      userId: user.id
+      userId
     })
     return NextResponse.json({ error: 'Failed to delete media' }, { status: 500 })
   }
 
   return NextResponse.json({ success: true }, { status: 200 })
-}
+  },
+})

@@ -3,6 +3,7 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 import type { RunStatus } from '@/features/play/types'
 import { logGamificationEventV1 } from '@/lib/services/gamification-events.server'
 import type { Json } from '@/types/supabase'
+import { apiHandler } from '@/lib/api/route-handler'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -23,28 +24,20 @@ type ProgressPayload = {
  * Updates progress for an active run.
  * Used for saving current step, timer state, etc.
  */
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ runId: string }> }
-) {
-  const params = await context.params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
   const runId = normalizeId(params?.runId)
   if (!runId) {
     return NextResponse.json({ error: { code: 'INVALID_ID', message: 'Invalid run id' } }, { status: 400 })
   }
 
+  const userId = auth!.user!.id
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
-  }
 
   let payload: ProgressPayload
   try {
-    payload = await request.json()
+    payload = await req.json()
   } catch {
     return NextResponse.json({ error: { code: 'INVALID_BODY', message: 'Invalid request body' } }, { status: 400 })
   }
@@ -101,7 +94,7 @@ export async function POST(
     .from('runs')
     .update(updatePayload)
     .eq('id', runId)
-    .eq('user_id', user.id) // Ensure user owns the run
+    .eq('user_id', userId) // Ensure user owns the run
     .select('id, tenant_id, plan_version_id, current_step, status, metadata, completed_at, created_at')
     .single()
 
@@ -134,7 +127,7 @@ export async function POST(
     try {
       await logGamificationEventV1({
         tenantId: (run.tenant_id as string | null) ?? null,
-        actorUserId: user.id,
+        actorUserId: userId,
         eventType: 'run_completed',
         source: 'play',
         idempotencyKey: `run:${run.id}:completed`,
@@ -162,31 +155,24 @@ export async function POST(
       updatedAt: new Date().toISOString(),
     },
   })
-}
+  },
+})
 
 /**
  * GET /api/play/runs/[runId]/progress
  * 
  * Fetches current progress for a run.
  */
-export async function GET(
-  _request: Request,
-  context: { params: Promise<{ runId: string }> }
-) {
-  const params = await context.params
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
   const runId = normalizeId(params?.runId)
   if (!runId) {
     return NextResponse.json({ error: { code: 'INVALID_ID', message: 'Invalid run id' } }, { status: 400 })
   }
 
+  const userId = auth!.user!.id
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
-  }
 
   // Virtual runs have no persisted progress
   if (runId.startsWith('draft-') || runId.startsWith('virtual-')) {
@@ -197,7 +183,7 @@ export async function GET(
     .from('runs')
     .select('id, current_step, status, metadata, created_at')
     .eq('id', runId)
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .single()
 
   if (error || !run) {
@@ -221,4 +207,5 @@ export async function GET(
       updatedAt: run.created_at ?? new Date().toISOString(),
     },
   })
-}
+  },
+})

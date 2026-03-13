@@ -33,11 +33,11 @@ export function useAchievementUnlock({
     try {
       const response = await fetch('/api/participants/progress/unlock-achievement', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          participant_token: participantToken,
-          ...options,
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-participant-token': participantToken,
+        },
+        body: JSON.stringify(options),
       });
 
       const data = await response.json();

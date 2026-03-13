@@ -1,34 +1,37 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logUserAuditEvent } from '@/lib/services/userAudit.server'
+import { apiHandler } from '@/lib/api/route-handler'
 
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+const removeDeviceSchema = z.object({
+  device_id: z.string().min(1),
+})
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const POST = apiHandler({
+  auth: 'user',
+  input: removeDeviceSchema,
+  handler: async ({ auth, body }) => {
+    const user = auth!.user!
+    const supabase = await createServerRlsClient()
 
-  const body = (await request.json().catch(() => ({}))) as { device_id?: string }
-  if (!body.device_id) return NextResponse.json({ errors: ['device_id is required'] }, { status: 400 })
+    const { error } = await supabase
+      .from('user_devices')
+      .delete()
+      .eq('id', body.device_id)
+      .eq('user_id', user.id)
+    if (error) {
+      console.error('[accounts/devices/remove] delete error', error)
+      return NextResponse.json({ error: 'Failed to remove device' }, { status: 500 })
+    }
 
-  const { error } = await supabase
-    .from('user_devices')
-    .delete()
-    .eq('id', body.device_id)
-    .eq('user_id', user.id)
-  if (error) {
-    console.error('[accounts/devices/remove] delete error', error)
-    return NextResponse.json({ error: 'Failed to remove device' }, { status: 500 })
-  }
+    await logUserAuditEvent({
+      userId: user.id,
+      actorUserId: user.id,
+      eventType: 'device_removed',
+      payload: { device_id: body.device_id },
+    })
 
-  await logUserAuditEvent({
-    userId: user.id,
-    actorUserId: user.id,
-    eventType: 'device_removed',
-    payload: { device_id: body.device_id },
-  })
-
-  return NextResponse.json({ success: true })
-}
+    return NextResponse.json({ success: true })
+  },
+})

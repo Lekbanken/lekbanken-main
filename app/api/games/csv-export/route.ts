@@ -12,8 +12,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { isSystemAdmin, assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { requireTenantRole } from '@/lib/api/auth-guard';
 import { generateGamesCsv, generateGamesJson } from '@/features/admin/games/utils/csv-generator';
 import { actionIdsToOrderAliases, conditionIdsToOrderAliases } from '@/lib/games/trigger-order-alias';
 import type { ExportableGame, ExportOptions, ParsedArtifactVisibility, ParsedTriggerAction, ParsedTriggerCondition } from '@/types/csv-import';
@@ -26,36 +27,29 @@ function asParsedVisibility(value: string | null | undefined): ParsedArtifactVis
   return 'public';
 }
 
-export async function GET(request: Request) {
-  // Authentication check
-  const authClient = await createServerRlsClient();
-  const { data: { user }, error: userError } = await authClient.auth.getUser();
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+    const { searchParams } = new URL(req.url);
   
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    // Parse query parameters
+    const idsParam = searchParams.get('ids');
+    const format = (searchParams.get('format') || 'csv') as 'csv' | 'json';
+    const includeSteps = searchParams.get('includeSteps') !== 'false';
+    const includeMaterials = searchParams.get('includeMaterials') !== 'false';
+    const includePhases = searchParams.get('includePhases') !== 'false';
+    const includeRoles = searchParams.get('includeRoles') !== 'false';
+    const includeBoardConfig = searchParams.get('includeBoardConfig') !== 'false';
+    const tenantId = searchParams.get('tenantId');
 
-  const { searchParams } = new URL(request.url);
-  
-  // Parse query parameters
-  const idsParam = searchParams.get('ids');
-  const format = (searchParams.get('format') || 'csv') as 'csv' | 'json';
-  const includeSteps = searchParams.get('includeSteps') !== 'false';
-  const includeMaterials = searchParams.get('includeMaterials') !== 'false';
-  const includePhases = searchParams.get('includePhases') !== 'false';
-  const includeRoles = searchParams.get('includeRoles') !== 'false';
-  const includeBoardConfig = searchParams.get('includeBoardConfig') !== 'false';
-  const tenantId = searchParams.get('tenantId');
-
-  // Authorization: system_admin for global, tenant_admin for tenant-scoped
-  if (tenantId && tenantId !== 'global') {
-    const hasAccess = await assertTenantAdminOrSystem(tenantId, user);
-    if (!hasAccess) {
-      return NextResponse.json({ error: 'Forbidden - tenant admin required' }, { status: 403 });
+    // Authorization: system_admin for global, tenant_admin for tenant-scoped
+    if (tenantId && tenantId !== 'global') {
+      await requireTenantRole(['admin', 'owner'], tenantId);
+    } else {
+      if (auth!.effectiveGlobalRole !== 'system_admin') {
+        return NextResponse.json({ error: 'Forbidden - system_admin required for global export' }, { status: 403 });
+      }
     }
-  } else if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required for global export' }, { status: 403 });
-  }
   
   // Parse game IDs if provided
   const gameIds = idsParam ? idsParam.split(',').filter(Boolean) : null;
@@ -413,4 +407,5 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
-}
+},
+})

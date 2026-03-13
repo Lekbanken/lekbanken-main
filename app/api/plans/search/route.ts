@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { toPlannerPlan, DEFAULT_LOCALE_ORDER } from '@/lib/services/planner.server'
 import type { Tables } from '@/types/supabase'
 import {
@@ -28,26 +29,23 @@ type SearchBody = {
   pageSize?: number
 }
 
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const user = auth!.user!
+    const userId = user.id
+    const supabase = await createServerRlsClient()
 
-  if (!user) {
-    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
-  }
-
-  const {
-    search,
-    tenantId = null,
-    visibility,
-    scope,
-    status,
-    statuses,
-    page = 1,
-    pageSize = 20,
-  } = (await request.json().catch(() => ({}))) as SearchBody
+    const {
+      search,
+      tenantId = null,
+      visibility,
+      scope,
+      status,
+      statuses,
+      page = 1,
+      pageSize = 20,
+    } = (await req.json().catch(() => ({}))) as SearchBody
 
   // Clamp pageSize to reasonable limits
   const safePageSize = Math.min(Math.max(pageSize, 1), 100)
@@ -82,7 +80,7 @@ export async function POST(request: Request) {
   //   org    → tenant-visible plans (optionally filtered by tenantId)
   //   global → public-visibility plans
   if (scope === 'mine') {
-    query = query.eq('owner_user_id', user.id)
+    query = query.eq('owner_user_id', userId)
   } else if (scope === 'org') {
     query = query.eq('visibility', 'tenant')
     if (tenantId) {
@@ -115,8 +113,8 @@ export async function POST(request: Request) {
 
   // Get user context for capabilities
   const [profileResult, membershipsResult] = await Promise.all([
-    supabase.from('users').select('global_role').eq('id', user.id).single(),
-    supabase.from('user_tenant_memberships').select('tenant_id, role').eq('user_id', user.id),
+    supabase.from('users').select('global_role').eq('id', userId).single(),
+    supabase.from('user_tenant_memberships').select('tenant_id, role').eq('user_id', userId),
   ])
 
   const globalRole = deriveEffectiveGlobalRole(profileResult.data, user)
@@ -125,7 +123,7 @@ export async function POST(request: Request) {
     .map((m) => ({ tenant_id: m.tenant_id as string, role: m.role as string }))
 
   const capabilityCtx = buildCapabilityContextFromMemberships({
-    userId: user.id,
+    userId,
     globalRole,
     memberships,
   })
@@ -155,4 +153,5 @@ export async function POST(request: Request) {
       hasMore,
     },
   })
-}
+  },
+})

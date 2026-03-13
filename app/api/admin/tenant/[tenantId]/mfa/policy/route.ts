@@ -6,28 +6,21 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { getServerAuthContext } from '@/lib/auth/server-context';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { TenantMFAPolicy } from '@/types/mfa';
-
-interface RouteContext {
-  params: Promise<{ tenantId: string }>;
-}
 
 /**
  * GET /api/admin/tenant/[tenantId]/mfa/policy
  * Get tenant MFA policy
  */
-export async function GET(request: Request, context: RouteContext) {
-  const { tenantId } = await context.params;
-  
-  const authContext = await getServerAuthContext('/admin');
-  if (!authContext.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const tenantId = params.tenantId;
 
-  const isSystemAdmin = authContext.effectiveGlobalRole === 'system_admin';
-  const membership = authContext.memberships?.find(m => m.tenant_id === tenantId);
+  const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin';
+  const membership = auth!.memberships?.find(m => m.tenant_id === tenantId);
   const tenantRole = membership?.role as string | null;
   
   // Check access
@@ -75,22 +68,20 @@ export async function GET(request: Request, context: RouteContext) {
     console.error('[MFA Policy] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+});
 
 /**
  * PUT /api/admin/tenant/[tenantId]/mfa/policy
  * Update tenant MFA policy
  */
-export async function PUT(request: Request, context: RouteContext) {
-  const { tenantId } = await context.params;
-  
-  const authContext = await getServerAuthContext('/admin');
-  if (!authContext.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const PUT = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params, req }) => {
+  const tenantId = params.tenantId;
 
-  const isSystemAdmin = authContext.effectiveGlobalRole === 'system_admin';
-  const membership = authContext.memberships?.find(m => m.tenant_id === tenantId);
+  const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin';
+  const membership = auth!.memberships?.find(m => m.tenant_id === tenantId);
   const tenantRole = membership?.role as string | null;
   
   // Only owner and admin can modify policy
@@ -103,7 +94,7 @@ export async function PUT(request: Request, context: RouteContext) {
   const db = supabase as unknown as SupabaseClient;
 
   try {
-    const body = await request.json();
+    const body = await req.json();
     
     // Validate input
     const {
@@ -138,7 +129,7 @@ export async function PUT(request: Request, context: RouteContext) {
       // Set enforced_at and enforced_by if enabling enforcement
       if (is_enforced) {
         updateData.enforced_at = new Date().toISOString();
-        updateData.enforced_by = authContext.user.id;
+        updateData.enforced_by = auth!.user!.id;
       } else {
         updateData.enforced_at = null;
         updateData.enforced_by = null;
@@ -181,4 +172,5 @@ export async function PUT(request: Request, context: RouteContext) {
     console.error('[MFA Policy] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+});

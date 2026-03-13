@@ -1,19 +1,15 @@
-import { type NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ courseId: string }> }
-) {
-  const { courseId } = await params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const courseId = params.courseId
+  const userId = auth!.user!.id
   const supabase = await createServerRlsClient()
-  
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
 
-  const body = await request.json()
+  const body = await req.json()
   const { tenantId, answers } = body as {
     tenantId: string
     answers: Array<{ questionId: string; selectedOptionIds: string[] }>
@@ -76,7 +72,7 @@ export async function POST(
   const { data: attempt, error: attemptError } = await supabase
     .from('learning_course_attempts')
     .insert({
-      user_id: user.id,
+      user_id: userId,
       tenant_id: tenantId,
       course_id: courseId,
       started_at: new Date().toISOString(),
@@ -98,7 +94,7 @@ export async function POST(
   const { error: progressError } = await supabase
     .from('learning_user_progress')
     .upsert({
-      user_id: user.id,
+      user_id: userId,
       tenant_id: tenantId,
       course_id: courseId,
       status: progressStatus,
@@ -119,7 +115,7 @@ export async function POST(
   if (passed) {
     const { data: rewardResult, error: rewardError } = await supabase
       .rpc('learning_grant_course_rewards_v1', {
-        p_user_id: user.id,
+        p_user_id: userId,
         p_tenant_id: tenantId,
         p_course_id: courseId,
         p_attempt_id: attempt.id,
@@ -146,21 +142,17 @@ export async function POST(
     attemptId: attempt.id,
     courseTitle: course.title,
   })
-}
+  },
+})
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ courseId: string }> }
-) {
-  const { courseId } = await params
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const courseId = params.courseId
+  const userId = auth!.user!.id
   const supabase = await createServerRlsClient()
-  
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
 
-  const tenantId = request.nextUrl.searchParams.get('tenantId')
+  const tenantId = req.nextUrl.searchParams.get('tenantId')
   if (!tenantId) {
     return NextResponse.json({ error: 'Missing tenantId' }, { status: 400 })
   }
@@ -169,7 +161,7 @@ export async function GET(
   const { data: progress } = await supabase
     .from('learning_user_progress')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('tenant_id', tenantId)
     .eq('course_id', courseId)
     .single()
@@ -178,7 +170,7 @@ export async function GET(
   const { data: attempts } = await supabase
     .from('learning_course_attempts')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('tenant_id', tenantId)
     .eq('course_id', courseId)
     .order('created_at', { ascending: false })
@@ -188,4 +180,5 @@ export async function GET(
     progress,
     attempts: attempts || [],
   })
-}
+  },
+})

@@ -5,27 +5,20 @@
  * Exports session data as CSV
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ sessionId: string }> }
-) {
+export const GET = apiHandler({
+  auth: 'user',
+  rateLimit: 'api',
+  handler: async ({ auth, req, params }) => {
   try {
-    const { sessionId } = await context.params;
+    const { sessionId } = params;
+    const userId = auth!.user!.id;
     const supabase = await createServerRlsClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const exportType = request.nextUrl.searchParams.get('type') || 'participants';
+    const exportType = req.nextUrl.searchParams.get('type') || 'participants';
 
     // Get session and verify ownership
     const { data: session, error: sessionError } = await supabase
@@ -41,7 +34,7 @@ export async function GET(
       );
     }
 
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       return NextResponse.json(
         { error: 'Forbidden' },
         { status: 403 }
@@ -139,4 +132,5 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+  },
+})

@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { id } = params;
+  const userId = auth!.user!.id;
   const supabase = await createServerRlsClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { data: session } = await supabase
     .from('participant_sessions')
@@ -16,7 +15,7 @@ export async function GET(
     .eq('id', id)
     .single();
 
-  if (!session || session.host_user_id !== user.id) {
+  if (!session || session.host_user_id !== userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -46,4 +45,5 @@ export async function GET(
   });
 
   return NextResponse.json({ participants: transformed });
-}
+  },
+})

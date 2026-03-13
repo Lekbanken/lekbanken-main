@@ -14973,7 +14973,11 @@
         "waitingForHost": "Venter på spillederen...",
         "waitingDescription": "Spillederen har ikke startet spillet ennå. Bli med oss, vi begynner snart!",
         "ended": "Økten er avsluttet",
-        "thanksForParticipating": "Takk for at du deltok!"
+        "thanksForParticipating": "Takk for at du deltok!",
+        "removedTitle": "Du har blitt fjernet",
+        "removedKicked": "Spillederen har fjernet deg fra økten.",
+        "removedBlocked": "Spillederen har blokkert deg fra økten.",
+        "removedBackToStart": "Tilbake til start"
       },
       "lobby": {
         "couldNotGetSession": "Kunne ikke hente økt",

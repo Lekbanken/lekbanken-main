@@ -1,26 +1,15 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
-import { requireSystemAdmin, AuthError } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-export async function POST(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    await requireSystemAdmin()
-  } catch (e) {
-    if (e instanceof AuthError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
-    }
-    throw e
-  }
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params }) => {
+    const { id } = params
 
-  const { id } = await params
-
-  try {
     // Get the payment failure
     const { data: failure, error: failureError } = await supabaseAdmin
       .from('payment_failures')
@@ -57,8 +46,5 @@ export async function POST(
     })
 
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('[dunning cancel API] Error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
-  }
-}
+  },
+})

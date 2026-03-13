@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { getPlanSnapshot } from '@/lib/planner/server/snapshot'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requirePlanStartAccess } from '@/lib/planner/require-plan-access'
 import type { Run, RunStep, RunStatus } from '@/features/play/types'
 import type { Json } from '@/types/supabase'
 
@@ -37,24 +39,20 @@ async function upsertRunSession(supabase: any, runId: string, stepIndex: number)
  * Creates a new Run from the plan's current published version (or draft fallback).
  * Uses PlanSnapshot pipeline as the Single Source of Truth for block→step generation.
  */
-export async function POST(
-  _request: Request,
-  context: { params: Promise<{ planId: string }> }
-) {
-  const params = await context.params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
   const planId = normalizeId(params?.planId)
   if (!planId) {
     return NextResponse.json({ error: { code: 'INVALID_ID', message: 'Invalid plan id' } }, { status: 400 })
   }
 
+  const userId = auth!.user!.id
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
 
-  if (!user) {
-    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
-  }
+  // Capability check: user must be able to start runs on this plan
+  const access = await requirePlanStartAccess(supabase, auth!.user!, planId)
+  if (!access.allowed) return access.response
 
   // ── Get snapshot (published → draft fallback) ─────────────────────
   const result = await getPlanSnapshot(planId, 'auto', supabase)
@@ -102,7 +100,7 @@ export async function POST(
     .from('runs')
     .select('*')
     .eq('plan_version_id', snapshot.version.id)
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('status', 'in_progress')
     .maybeSingle()
 
@@ -148,7 +146,7 @@ export async function POST(
   // ── Create new run ────────────────────────────────────────────────
   const runPayload = {
     plan_version_id: snapshot.version.id,
-    user_id: user.id,
+    user_id: userId,
     tenant_id: snapshot.plan.ownerTenantId ?? null,
     status: 'in_progress' as RunStatus,
     current_step: 0,
@@ -213,4 +211,5 @@ export async function POST(
     run,
     ...(newRunSession ? { runSession: newRunSession } : {}),
   })
-}
+  },
+})

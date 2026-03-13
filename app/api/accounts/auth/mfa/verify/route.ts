@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { logUserAuditEvent } from '@/lib/services/userAudit.server'
 import {
   logEnrollmentCompleted,
@@ -23,21 +24,19 @@ interface VerifyRequestBody {
   device_name?: string
 }
 
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const supabase = await createServerRlsClient()
+    const userId = auth!.user!.id
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const body = (await request.json().catch(() => ({}))) as VerifyRequestBody
+    const body = (await req.json().catch(() => ({}))) as VerifyRequestBody
   if (!body.factor_id || !body.code) {
     return NextResponse.json({ errors: ['factor_id and code are required'] }, { status: 400 })
   }
 
   // Rate limiting check
-  const failedAttempts = await getRecentFailedAttempts(user.id, LOCKOUT_WINDOW_MINUTES)
+  const failedAttempts = await getRecentFailedAttempts(userId, LOCKOUT_WINDOW_MINUTES)
   if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
     return NextResponse.json(
       { error: 'Too many failed attempts. Please try again later.' },
@@ -54,7 +53,7 @@ export async function POST(request: Request) {
     console.error('[mfa/verify] verify error', error)
     
     // Log failed attempt
-    await logVerificationFailed(user.id, null, 'totp', error.message, failedAttempts + 1)
+    await logVerificationFailed(userId, null, 'totp', error.message, failedAttempts + 1)
     
     return NextResponse.json({ error: 'Invalid or expired code' }, { status: 400 })
   }
@@ -64,17 +63,17 @@ export async function POST(request: Request) {
 
   if (isEnrollment) {
     // Get requirement reason for audit
-    const requirement = await checkMFARequirement(user.id)
-    await markMFAEnrolled(user.id, requirement.reason)
-    await logEnrollmentCompleted(user.id, null, 'totp')
+    const requirement = await checkMFARequirement(userId)
+    await markMFAEnrolled(userId, requirement.reason)
+    await logEnrollmentCompleted(userId, null, 'totp')
   } else {
-    await updateLastMFAVerification(user.id)
-    await logVerificationSuccess(user.id, null, 'totp')
+    await updateLastMFAVerification(userId)
+    await logVerificationSuccess(userId, null, 'totp')
   }
 
   await logUserAuditEvent({
-    userId: user.id,
-    actorUserId: user.id,
+    userId: userId,
+    actorUserId: userId,
     eventType: isEnrollment ? 'mfa_enrolled' : 'mfa_verified',
     payload: { factor_id: body.factor_id },
   })
@@ -90,7 +89,7 @@ export async function POST(request: Request) {
         undefined
       const userAgent = headersList.get('user-agent') || undefined
 
-      const result = await trustDevice(user.id, {
+      const result = await trustDevice(userId, {
         device_fingerprint: body.device_fingerprint,
         device_name: body.device_name,
         user_agent: userAgent,
@@ -107,4 +106,5 @@ export async function POST(request: Request) {
     success: true,
     trust_token: trustToken,
   })
-}
+  },
+})

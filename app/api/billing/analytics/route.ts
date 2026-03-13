@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
 import { supabaseAdmin } from '@/lib/supabase/server'
-import { requireSystemAdmin, AuthError } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -31,20 +31,13 @@ interface RevenueMetrics {
   }>
 }
 
-export async function GET(request: Request) {
-  try {
-    await requireSystemAdmin()
-  } catch (e) {
-    if (e instanceof AuthError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
-    }
-    throw e
-  }
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const url = new URL(req.url)
+    const period = url.searchParams.get('period') || '30d' // 7d, 30d, 90d, 12m
 
-  const url = new URL(request.url)
-  const period = url.searchParams.get('period') || '30d' // 7d, 30d, 90d, 12m
-
-  try {
+    try {
     // Calculate date range based on period
     const now = new Date()
     let startDate: Date
@@ -194,4 +187,5 @@ export async function GET(request: Request) {
       { status: 500 }
     )
   }
-}
+  },
+})

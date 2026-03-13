@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { stripe } from '@/lib/stripe/config'
 import { getAuthUser, supabaseAdmin } from '@/lib/supabase/server'
+import { applyRateLimit } from '@/lib/utils/rate-limiter'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -15,7 +16,10 @@ const portalSchema = z.object({
  * Task 1.6: Create Stripe Customer Portal session
  * Allows users to manage their subscriptions (cancel, update payment, view invoices)
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const rateLimitResponse = await applyRateLimit(request, 'strict')
+  if (rateLimitResponse) return rateLimitResponse
+
   const user = await getAuthUser()
   if (!user) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })

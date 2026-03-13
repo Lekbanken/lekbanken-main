@@ -1,22 +1,13 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
-async function requireUser() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { supabase, user: null }
-  return { supabase, user }
-}
-
-async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string) {
+async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string, userId: string) {
   const { data, error } = await supabase
     .from('user_tenant_memberships')
     .select('role')
     .eq('tenant_id', tenantId)
-    .eq('user_id', (await supabase.auth.getUser()).data.user?.id || '')
+    .eq('user_id', userId)
     .maybeSingle()
   if (error) {
     console.warn('[billing/seats] role lookup error', error)
@@ -25,12 +16,14 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
-  const { tenantId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { tenantId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data, error } = await supabase
@@ -45,17 +38,20 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ tenant
   }
 
   return NextResponse.json({ seats: data ?? [] })
-}
+  },
+})
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
-  const { tenantId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { tenantId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     user_id: string
     subscription_id: string
     billing_product_id: string
@@ -116,4 +112,5 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   return NextResponse.json({ seat: data })
-}
+  },
+})

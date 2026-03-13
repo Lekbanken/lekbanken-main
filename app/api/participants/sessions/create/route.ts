@@ -5,78 +5,61 @@
  * Requires authentication (host must be logged in).
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { ApiError } from '@/lib/api/errors';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { logger } from '@/lib/utils/logger';
-import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
 import { errorTracker } from '@/lib/utils/error-tracker';
+import { z } from 'zod';
 
-interface CreateSessionRequest {
-  displayName: string;
-  description?: string;
-  planId?: string;
-  gameId?: string;
-  settings?: {
-    allowRejoin?: boolean;
-    maxParticipants?: number;
-    requireApproval?: boolean;
-    tokenExpiryHours?: number | null; // null = no expiry
-    enableChat?: boolean;
-    enableProgressTracking?: boolean;
-  };
-  expiresInHours?: number; // Auto-close session after X hours
-}
+const createSessionSchema = z.object({
+  displayName: z.string().min(1, 'Display name is required').max(100, 'Display name must be 100 characters or less').trim(),
+  description: z.string().max(500).trim().optional(),
+  planId: z.string().optional(),
+  gameId: z.string().optional(),
+  settings: z.object({
+    allowRejoin: z.boolean().optional(),
+    maxParticipants: z.number().int().min(1).max(1000).optional(),
+    requireApproval: z.boolean().optional(),
+    tokenExpiryHours: z.number().min(0.5).max(720).nullable().optional(),
+    enableChat: z.boolean().optional(),
+    enableProgressTracking: z.boolean().optional(),
+  }).optional(),
+  expiresInHours: z.number().min(0.5).max(720).optional(),
+});
 
-export async function POST(request: NextRequest) {
-  // Apply rate limiting for session creation
-  const rateLimitResponse = applyRateLimitMiddleware(request, 'api');
-  if (rateLimitResponse) return rateLimitResponse;
+export const POST = apiHandler({
+  auth: 'user',
+  rateLimit: 'api',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
 
-  try {
-    // Authenticate user
-    const supabase = await createServerRlsClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized - please log in' },
-        { status: 401 }
-      );
-    }
-    
-    // Get user's tenant
-    const { data: membership } = await supabase
-      .from('user_tenant_memberships')
-      .select('tenant_id, role')
-      .eq('user_id', user.id)
-      .single();
-    
-    if (!membership || !membership.tenant_id) {
-      return NextResponse.json(
-        { error: 'No tenant membership found' },
-        { status: 403 }
-      );
-    }
-    
-    // Parse request body
-    const body: CreateSessionRequest = await request.json();
-    
-    // Validate required fields
-    if (!body.displayName || body.displayName.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Display name is required' },
-        { status: 400 }
-      );
-    }
-    
-    if (body.displayName.length > 100) {
-      return NextResponse.json(
-        { error: 'Display name must be 100 characters or less' },
-        { status: 400 }
-      );
-    }
+    try {
+      const supabase = await createServerRlsClient();
+
+      // Get user's tenant
+      const { data: membership } = await supabase
+        .from('user_tenant_memberships')
+        .select('tenant_id, role')
+        .eq('user_id', userId)
+        .single();
+
+      if (!membership || !membership.tenant_id) {
+        return NextResponse.json(
+          { error: 'No tenant membership found' },
+          { status: 403 }
+        );
+      }
+
+      // Parse and validate request body
+      const rawBody = await req.json();
+      const parsed = createSessionSchema.safeParse(rawBody);
+      if (!parsed.success) {
+        throw ApiError.badRequest('Invalid payload', 'VALIDATION_ERROR', parsed.error.flatten());
+      }
+      const body = parsed.data;
     
     // Calculate expiry if provided
     let expiresAt: Date | undefined;
@@ -88,7 +71,7 @@ export async function POST(request: NextRequest) {
     // Create session
     const session = await ParticipantSessionService.createSession({
       tenantId: membership.tenant_id,
-      hostUserId: user.id,
+      hostUserId: userId,
       displayName: body.displayName.trim(),
       description: body.description?.trim(),
       planId: body.planId,
@@ -100,7 +83,7 @@ export async function POST(request: NextRequest) {
     logger.info('Participant session created', {
       sessionId: session.id,
       sessionCode: session.session_code,
-      userId: user.id,
+      userId: userId,
       tenantId: membership.tenant_id,
     });
     
@@ -119,30 +102,31 @@ export async function POST(request: NextRequest) {
       },
     });
     
-  } catch (error) {
-    // Track error to Supabase
-    await errorTracker.api(
-      '/api/participants/sessions/create',
-      'POST',
-      error
-    );
-    
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
-    // Check for quota error
-    if (errorMessage.includes('quota exceeded')) {
+    } catch (error) {
+      // Track error to Supabase
+      await errorTracker.api(
+        '/api/participants/sessions/create',
+        'POST',
+        error
+      );
+
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+      // Check for quota error
+      if (errorMessage.includes('quota exceeded')) {
+        return NextResponse.json(
+          { 
+            error: 'No-expiry token quota exceeded',
+            details: 'Your tenant has reached the limit of no-expiry sessions. Use 24h expiry or contact support.',
+          },
+          { status: 403 }
+        );
+      }
+
       return NextResponse.json(
-        { 
-          error: 'No-expiry token quota exceeded',
-          details: 'Your tenant has reached the limit of no-expiry sessions. Use 24h expiry or contact support.',
-        },
-        { status: 403 }
+        { error: 'Failed to create session', details: errorMessage },
+        { status: 500 }
       );
     }
-    
-    return NextResponse.json(
-      { error: 'Failed to create session', details: errorMessage },
-      { status: 500 }
-    );
-  }
-}
+  },
+})

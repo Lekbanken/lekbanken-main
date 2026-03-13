@@ -1,8 +1,9 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { assertTenantAdminOrSystem, isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { AuthError, requireTenantRole } from '@/lib/api/auth-guard'
 import { awardBuilderExportSchemaV1 } from '@/lib/validation/awardBuilderExportSchemaV1'
 import { 
   validateBadgeForPublish, 
@@ -10,6 +11,7 @@ import {
   extractBadgeFromExport 
 } from '@/lib/validation/badgeValidation'
 import type { Database, Json } from '@/types/supabase'
+import type { AuthContext } from '@/types/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -81,17 +83,6 @@ const updateSchema = z.object({
   export: z.unknown().optional(),
 })
 
-async function requireAuth() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
-
-  if (error || !user) return { user: null, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
-  return { user, response: null }
-}
-
 async function getExportOr404(exportId: string) {
   // This table is introduced via migration and may not yet exist in generated Database types.
   const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithAwardBuilderExports>
@@ -106,48 +97,41 @@ async function getExportOr404(exportId: string) {
   return { row: data as AwardBuilderExportRow, response: null }
 }
 
-async function authorize(
-  user: { id: string; app_metadata?: Record<string, unknown> },
+async function authorizeScope(
+  auth: AuthContext,
   row: { tenant_id: string | null; scope_type: string },
 ) {
   if (row.scope_type === 'global' || row.tenant_id === null) {
-    return isSystemAdmin(user)
+    if (auth.effectiveGlobalRole !== 'system_admin') {
+      throw new AuthError('Forbidden', 403)
+    }
+  } else {
+    await requireTenantRole(['admin', 'owner'], row.tenant_id)
   }
-  return assertTenantAdminOrSystem(row.tenant_id, user)
 }
 
-export async function GET(_req: NextRequest, context: { params: Promise<{ exportId: string }> }) {
-  const { user, response } = await requireAuth()
-  if (response) return response
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+    const { row, response } = await getExportOr404(params.exportId)
+    if (response) return response
 
-  const { exportId } = await context.params
-  const { row, response: rowResp } = await getExportOr404(exportId)
-  if (rowResp) return rowResp
+    await authorizeScope(auth!, row)
 
-  const allowed = await authorize(user, row)
-  if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    return NextResponse.json({ export: row }, { status: 200 })
+  },
+})
 
-  return NextResponse.json({ export: row }, { status: 200 })
-}
+export const PUT = apiHandler({
+  auth: 'user',
+  input: updateSchema,
+  handler: async ({ auth, params, body: patch }) => {
+    const { row, response } = await getExportOr404(params.exportId)
+    if (response) return response
 
-export async function PUT(req: NextRequest, context: { params: Promise<{ exportId: string }> }) {
-  const { user, response } = await requireAuth()
-  if (response) return response
+    await authorizeScope(auth!, row)
 
-  const { exportId } = await context.params
-  const { row, response: rowResp } = await getExportOr404(exportId)
-  if (rowResp) return rowResp
-
-  const allowed = await authorize(user, row)
-  if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-
-  const body = await req.json().catch(() => ({}))
-  const parsed = updateSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
-
-  const patch = parsed.data
+    const userId = auth!.user!.id
   const updatePayload: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
   }
@@ -181,7 +165,7 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ exportI
       }
     }
 
-    if (canonical.exported_by.user_id !== user.id) {
+    if (canonical.exported_by.user_id !== userId) {
       return NextResponse.json(
         { error: 'Invalid payload', details: { export: { exported_by: { user_id: ['Must match authenticated user'] } } } },
         { status: 400 },
@@ -239,40 +223,39 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ exportI
     if (typeof patch.exportedByTool === 'string') updatePayload.exported_by_tool = patch.exportedByTool
   }
 
-  // This table is introduced via migration and may not yet exist in generated Database types.
-  const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithAwardBuilderExports>
-  const { data, error } = await admin
-    .from('award_builder_exports')
-    .update(updatePayload)
-    .eq('id', exportId)
-    .select('id')
-    .maybeSingle()
+    // This table is introduced via migration and may not yet exist in generated Database types.
+    const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithAwardBuilderExports>
+    const { data, error } = await admin
+      .from('award_builder_exports')
+      .update(updatePayload)
+      .eq('id', params.exportId)
+      .select('id')
+      .maybeSingle()
 
-  if (error) {
-    return NextResponse.json({ error: 'Failed to update export', details: error.message ?? 'Unknown error' }, { status: 500 })
-  }
+    if (error) {
+      return NextResponse.json({ error: 'Failed to update export', details: error.message ?? 'Unknown error' }, { status: 500 })
+    }
 
-  return NextResponse.json({ id: (data?.id as string | undefined) ?? exportId }, { status: 200 })
-}
+    return NextResponse.json({ id: (data?.id as string | undefined) ?? params.exportId }, { status: 200 })
+  },
+})
 
-export async function DELETE(_req: NextRequest, context: { params: Promise<{ exportId: string }> }) {
-  const { user, response } = await requireAuth()
-  if (response) return response
+export const DELETE = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+    const { row, response } = await getExportOr404(params.exportId)
+    if (response) return response
 
-  const { exportId } = await context.params
-  const { row, response: rowResp } = await getExportOr404(exportId)
-  if (rowResp) return rowResp
+    await authorizeScope(auth!, row)
 
-  const allowed = await authorize(user, row)
-  if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    // This table is introduced via migration and may not yet exist in generated Database types.
+    const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithAwardBuilderExports>
+    const { error } = await admin.from('award_builder_exports').delete().eq('id', params.exportId)
 
-  // This table is introduced via migration and may not yet exist in generated Database types.
-  const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithAwardBuilderExports>
-  const { error } = await admin.from('award_builder_exports').delete().eq('id', exportId)
+    if (error) {
+      return NextResponse.json({ error: 'Failed to delete export', details: error.message ?? 'Unknown error' }, { status: 500 })
+    }
 
-  if (error) {
-    return NextResponse.json({ error: 'Failed to delete export', details: error.message ?? 'Unknown error' }, { status: 500 })
-  }
-
-  return NextResponse.json({ ok: true }, { status: 200 })
-}
+    return NextResponse.json({ ok: true }, { status: 200 })
+  },
+})

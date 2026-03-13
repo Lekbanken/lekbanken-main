@@ -8,6 +8,7 @@ import {
   buildCapabilityContextFromMemberships,
 } from '@/lib/auth/capabilities'
 import { logGamificationEventV1 } from '@/lib/services/gamification-events.server'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { GlobalRole } from '@/types/auth'
 import type { Json } from '@/types/supabase'
 
@@ -36,24 +37,16 @@ type PlanVersionRow = {
  * Copies all blocks with game data frozen at publish time.
  * Updates plan status to 'published' and sets current_version_id.
  */
-export async function POST(
-  _request: Request,
-  context: { params: Promise<{ planId: string }> }
-) {
-  const params = await context.params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
   const planId = normalizeId(params?.planId)
   if (!planId) {
     return NextResponse.json({ error: { code: 'INVALID_ID', message: 'Invalid plan id' } }, { status: 400 })
   }
 
+  const user = auth!.user!
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
-  }
 
   // Fetch plan with all relations
   const { plan, raw, error } = await fetchPlanWithRelations(planId)
@@ -227,4 +220,5 @@ export async function POST(
       currentVersionId: version.id,
     },
   })
-}
+  },
+})

@@ -1,7 +1,8 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
-import { requireAuth, AuthError, requireTenantRole } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import type { Json } from '@/types/supabase'
 
@@ -18,19 +19,12 @@ const createCardSchema = z.object({
   metadata: z.record(z.unknown()).nullable().optional(),
 })
 
-function jsonError(status: number, message: string, details?: unknown) {
-  return NextResponse.json({ error: message, details }, { status })
-}
-
-export async function POST(req: NextRequest, { params }: { params: Promise<{ collectionId: string }> }) {
-  try {
-    const ctx = await requireAuth()
-    const collectionId = (await params).collectionId
-    const isSystemAdmin = ctx.effectiveGlobalRole === 'system_admin'
-
-    const body = await req.json().catch(() => ({}))
-    const parsed = createCardSchema.safeParse(body)
-    if (!parsed.success) return jsonError(400, 'Invalid payload', parsed.error.flatten())
+export const POST = apiHandler({
+  auth: 'user',
+  input: createCardSchema,
+  handler: async ({ auth, body: input, params }) => {
+    const collectionId = params.collectionId
+    const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin'
 
     const admin = createServiceRoleClient()
 
@@ -42,19 +36,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ col
 
     if (colError) {
       console.error('[admin/conversation-cards] create card collection load error', colError)
-      return jsonError(500, 'Failed to load collection')
+      return NextResponse.json({ error: 'Failed to load collection' }, { status: 500 })
     }
 
-    if (!collection) return jsonError(404, 'Not found')
+    if (!collection) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     if (collection.scope_type === 'global') {
-      if (!isSystemAdmin) return jsonError(403, 'Forbidden')
+      if (!isSystemAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     } else {
-      if (!collection.tenant_id) return jsonError(500, 'Invalid collection scope')
+      if (!collection.tenant_id) return NextResponse.json({ error: 'Invalid collection scope' }, { status: 500 })
       await requireTenantRole(['owner', 'admin'], collection.tenant_id)
     }
-
-    const input = parsed.data
 
     const { data: card, error } = await admin
       .from('conversation_cards')
@@ -74,13 +66,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ col
 
     if (error || !card) {
       console.error('[admin/conversation-cards] create card error', error)
-      return jsonError(500, 'Failed to create card')
+      return NextResponse.json({ error: 'Failed to create card' }, { status: 500 })
     }
 
     return NextResponse.json({ card }, { status: 201 })
-  } catch (e) {
-    if (e instanceof AuthError) return jsonError(e.status, e.message)
-    console.error('[admin/conversation-cards] POST card unexpected error', e)
-    return jsonError(500, 'Unexpected error')
-  }
-}
+  },
+})

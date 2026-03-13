@@ -9,11 +9,11 @@
  * - Runtime state (puzzleState) stored in session_artifact_state.state
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import type { Json } from '@/types/supabase';
+import { apiHandler } from '@/lib/api/route-handler';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseAny = any;
@@ -36,23 +36,15 @@ interface ParticipantRow {
   team: { id: string; name: string } | null;
 }
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-
-  // Verify host access
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { id: sessionId } = params;
+  const userId = auth!.user!.id;
 
   // Check if user is host of this session
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session || session.host_user_id !== user.id) {
+  if (!session || session.host_user_id !== userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -157,25 +149,18 @@ export async function GET(
     requests,
     timestamp: new Date().toISOString(),
   });
-}
+  },
+});
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-
-  // Verify host access
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { id: sessionId } = params;
+  const userId = auth!.user!.id;
 
   // Check if user is host of this session
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session || session.host_user_id !== user.id) {
+  if (!session || session.host_user_id !== userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -224,7 +209,7 @@ export async function PATCH(
     confirmed: action === 'confirm',
     pending: false,
     confirmedAt: action === 'confirm' ? new Date().toISOString() : undefined,
-    confirmedBy: action === 'confirm' ? user.id : undefined,
+    confirmedBy: action === 'confirm' ? userId : undefined,
     rejectedAt: action === 'reject' ? new Date().toISOString() : undefined,
     hostNotes,
   };
@@ -253,4 +238,5 @@ export async function PATCH(
     action,
     timestamp: new Date().toISOString(),
   });
-}
+  },
+});

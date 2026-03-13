@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { randomBytes, createHash } from 'crypto'
 import { logRecoveryCodesGenerated } from '@/lib/services/mfa/mfaAudit.server'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -26,15 +27,14 @@ function hashCodes(codes: string[]): string[] {
   })
 }
 
-export async function POST() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  rateLimit: 'strict',
+  handler: async ({ auth }) => {
+    const supabase = await createServerRlsClient()
+    const userId = auth!.user!.id
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const codes = generateCodes()
+    const codes = generateCodes()
   const hashed = hashCodes(codes)
 
   // Get user's tenant for audit logging (cast to bypass type issues until regenerated)
@@ -42,7 +42,7 @@ export async function POST() {
   const { data: userMfa } = await db
     .from('user_mfa')
     .select('tenant_id')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .maybeSingle()
 
   const tenantId = (userMfa as { tenant_id?: string } | null)?.tenant_id
@@ -51,7 +51,7 @@ export async function POST() {
     .from('user_mfa')
     .upsert(
       {
-        user_id: user.id,
+        user_id: userId,
         recovery_codes_hashed: hashed,
         recovery_codes_count: RECOVERY_CODE_COUNT,
         recovery_codes_used: 0,
@@ -67,11 +67,12 @@ export async function POST() {
   }
 
   // Log the generation
-  await logRecoveryCodesGenerated(user.id, RECOVERY_CODE_COUNT, tenantId)
+  await logRecoveryCodesGenerated(userId, RECOVERY_CODE_COUNT, tenantId)
 
   return NextResponse.json({
     recovery_codes: codes,
     count: codes.length,
     message: 'Store these codes securely. Each code can only be used once.',
   })
-}
+  },
+})

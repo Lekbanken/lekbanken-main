@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import type { Json } from '@/types/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -24,150 +25,108 @@ const toggleSchema = z.object({
   isActive: z.boolean(),
 })
 
-export async function GET(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req }) => {
+    const url = new URL(req.url)
+    const parsed = listSchema.safeParse({ tenantId: url.searchParams.get('tenantId') })
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
+    }
 
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    const { tenantId } = parsed.data
+    await requireTenantRole(['admin', 'owner'], tenantId)
 
-  const url = new URL(request.url)
-  const parsed = listSchema.safeParse({ tenantId: url.searchParams.get('tenantId') })
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
-  }
+    const admin = createServiceRoleClient()
+    const { data, error } = await admin
+      .from('gamification_automation_rules')
+      .select('*')
+      .eq('tenant_id', tenantId)
+      .order('created_at', { ascending: false })
+      .limit(200)
 
-  const { tenantId } = parsed.data
-  const allowed = await assertTenantAdminOrSystem(tenantId, user)
-  if (!allowed) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+    if (error) {
+      return NextResponse.json({ error: 'Failed to load rules', details: error.message }, { status: 500 })
+    }
 
-  const admin = createServiceRoleClient()
-  const { data, error } = await admin
-    .from('gamification_automation_rules')
-    .select('*')
-    .eq('tenant_id', tenantId)
-    .order('created_at', { ascending: false })
-    .limit(200)
+    return NextResponse.json({ rules: data ?? [] }, { status: 200 })
+  },
+})
 
-  if (error) {
-    return NextResponse.json({ error: 'Failed to load rules', details: error.message }, { status: 500 })
-  }
+export const POST = apiHandler({
+  auth: 'user',
+  input: createSchema,
+  handler: async ({ auth, body }) => {
+    const { tenantId, name, eventType, rewardAmount, isActive } = body
+    await requireTenantRole(['admin', 'owner'], tenantId)
 
-  return NextResponse.json({ rules: data ?? [] }, { status: 200 })
-}
+    const admin = createServiceRoleClient()
 
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = await request.json().catch(() => ({}))
-  const parsed = createSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
-
-  const { tenantId, name, eventType, rewardAmount, isActive } = parsed.data
-
-  const allowed = await assertTenantAdminOrSystem(tenantId, user)
-  if (!allowed) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  const admin = createServiceRoleClient()
-
-  const insertPayload = {
-    tenant_id: tenantId,
-    name,
-    event_type: eventType,
-    reward_amount: rewardAmount,
-    is_active: isActive ?? true,
-    created_by_user_id: user.id,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }
-
-  const { data, error } = await admin.from('gamification_automation_rules').insert(insertPayload).select('*').maybeSingle()
-  if (error) {
-    return NextResponse.json({ error: 'Failed to create rule', details: error.message }, { status: 500 })
-  }
-
-  try {
-    await admin.from('tenant_audit_logs').insert({
+    const insertPayload = {
       tenant_id: tenantId,
-      actor_user_id: user.id,
-      event_type: 'gamification.automation_rule.created.v1',
-      payload: ({ ruleId: data?.id, ...insertPayload } as unknown) as Json,
+      name,
+      event_type: eventType,
+      reward_amount: rewardAmount,
+      is_active: isActive ?? true,
+      created_by_user_id: auth!.user!.id,
       created_at: new Date().toISOString(),
-    })
-  } catch {
-    // best-effort
-  }
+      updated_at: new Date().toISOString(),
+    }
 
-  return NextResponse.json({ rule: data }, { status: 200 })
-}
+    const { data, error } = await admin.from('gamification_automation_rules').insert(insertPayload).select('*').maybeSingle()
+    if (error) {
+      return NextResponse.json({ error: 'Failed to create rule', details: error.message }, { status: 500 })
+    }
 
-export async function PATCH(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
+    try {
+      await admin.from('tenant_audit_logs').insert({
+        tenant_id: tenantId,
+        actor_user_id: auth!.user!.id,
+        event_type: 'gamification.automation_rule.created.v1',
+        payload: ({ ruleId: data?.id, ...insertPayload } as unknown) as Json,
+        created_at: new Date().toISOString(),
+      })
+    } catch {
+      // best-effort
+    }
 
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    return NextResponse.json({ rule: data }, { status: 200 })
+  },
+})
 
-  const body = await request.json().catch(() => ({}))
-  const parsed = toggleSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
+export const PATCH = apiHandler({
+  auth: 'user',
+  input: toggleSchema,
+  handler: async ({ auth, body }) => {
+    const { tenantId, ruleId, isActive } = body
+    await requireTenantRole(['admin', 'owner'], tenantId)
 
-  const { tenantId, ruleId, isActive } = parsed.data
+    const admin = createServiceRoleClient()
 
-  const allowed = await assertTenantAdminOrSystem(tenantId, user)
-  if (!allowed) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+    const { data, error } = await admin
+      .from('gamification_automation_rules')
+      .update({ is_active: isActive, updated_at: new Date().toISOString() })
+      .eq('tenant_id', tenantId)
+      .eq('id', ruleId)
+      .select('*')
+      .maybeSingle()
 
-  const admin = createServiceRoleClient()
+    if (error) {
+      return NextResponse.json({ error: 'Failed to update rule', details: error.message }, { status: 500 })
+    }
 
-  const { data, error } = await admin
-    .from('gamification_automation_rules')
-    .update({ is_active: isActive, updated_at: new Date().toISOString() })
-    .eq('tenant_id', tenantId)
-    .eq('id', ruleId)
-    .select('*')
-    .maybeSingle()
+    try {
+      await admin.from('tenant_audit_logs').insert({
+        tenant_id: tenantId,
+        actor_user_id: auth!.user!.id,
+        event_type: 'gamification.automation_rule.updated.v1',
+        payload: ({ ruleId, isActive } as unknown) as Json,
+        created_at: new Date().toISOString(),
+      })
+    } catch {
+      // best-effort
+    }
 
-  if (error) {
-    return NextResponse.json({ error: 'Failed to update rule', details: error.message }, { status: 500 })
-  }
-
-  try {
-    await admin.from('tenant_audit_logs').insert({
-      tenant_id: tenantId,
-      actor_user_id: user.id,
-      event_type: 'gamification.automation_rule.updated.v1',
-      payload: ({ ruleId, isActive } as unknown) as Json,
-      created_at: new Date().toISOString(),
-    })
-  } catch {
-    // best-effort
-  }
-
-  return NextResponse.json({ rule: data }, { status: 200 })
-}
+    return NextResponse.json({ rule: data }, { status: 200 })
+  },
+})

@@ -1,27 +1,43 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import {
   getLeaderboardPreferences,
   setLeaderboardVisibility,
 } from '@/lib/services/gamification-leaderboard.server'
+import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { assertTenantMembership } from '@/lib/planner/require-plan-access'
 
 export const dynamic = 'force-dynamic'
 
+const postSchema = z.object({
+  tenantId: z.string().uuid(),
+  visible: z.boolean(),
+})
+
 /**
  * GET /api/gamification/leaderboard/preferences
- * 
+ *
  * Get current user's leaderboard preferences for a tenant.
- * 
- * Query params:
- * - tenantId: UUID (required)
+ * Query params: tenantId (UUID, required)
  */
-export async function GET(req: NextRequest): Promise<NextResponse> {
-  try {
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
     const tenantId = req.nextUrl.searchParams.get('tenantId')
-    
-    if (!tenantId) {
-      return NextResponse.json({ error: 'tenantId is required' }, { status: 400 })
+
+    if (!tenantId || !UUID_RE.test(tenantId)) {
+      return NextResponse.json(
+        { error: { code: 'VALIDATION_ERROR', message: 'tenantId must be a valid UUID' } },
+        { status: 400 },
+      )
     }
+
+    const supabase = await createServerRlsClient()
+    const tenantCheck = await assertTenantMembership(supabase, auth!.user!, tenantId)
+    if (!tenantCheck.allowed) return tenantCheck.response
 
     const prefs = await getLeaderboardPreferences(tenantId)
 
@@ -30,56 +46,38 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       optedOutAt: prefs.optedOutAt,
       notificationsEnabled: prefs.notificationsEnabled,
     })
-  } catch (error) {
-    console.error('[GET /api/gamification/leaderboard/preferences] Error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch preferences' },
-      { status: 500 }
-    )
-  }
-}
-
-interface UpdatePreferencesBody {
-  tenantId: string
-  visible: boolean
-}
+  },
+})
 
 /**
  * POST /api/gamification/leaderboard/preferences
- * 
+ *
  * Update current user's leaderboard visibility.
- * 
- * Body:
- * - tenantId: UUID (required)
- * - visible: boolean (required)
+ * Body: { tenantId: UUID, visible: boolean }
  */
-export async function POST(req: NextRequest): Promise<NextResponse> {
-  try {
-    const body: UpdatePreferencesBody = await req.json()
+export const POST = apiHandler({
+  auth: 'user',
+  input: postSchema,
+  handler: async ({ auth, body }) => {
+    const { tenantId, visible } = body!
 
-    if (!body.tenantId) {
-      return NextResponse.json({ error: 'tenantId is required' }, { status: 400 })
-    }
+    // Validate tenant membership — never trust client tenant input
+    const supabase = await createServerRlsClient()
+    const tenantCheck = await assertTenantMembership(supabase, auth!.user!, tenantId)
+    if (!tenantCheck.allowed) return tenantCheck.response
 
-    if (typeof body.visible !== 'boolean') {
-      return NextResponse.json({ error: 'visible must be a boolean' }, { status: 400 })
-    }
-
-    const result = await setLeaderboardVisibility(body.tenantId, body.visible)
+    const result = await setLeaderboardVisibility(tenantId, visible)
 
     if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 400 })
+      return NextResponse.json(
+        { error: { code: 'UPDATE_FAILED', message: result.error ?? 'Failed to update preferences' } },
+        { status: 400 },
+      )
     }
 
     return NextResponse.json({
       success: true,
-      visible: body.visible,
+      visible,
     })
-  } catch (error) {
-    console.error('[POST /api/gamification/leaderboard/preferences] Error:', error)
-    return NextResponse.json(
-      { error: 'Failed to update preferences' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

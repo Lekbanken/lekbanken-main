@@ -7,7 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { apiHandler } from '@/lib/api/route-handler';
 import type {
   ProductFilters,
   ProductAdminRow,
@@ -30,21 +30,14 @@ function effectiveUpdatedAt(updatedAt: string, syncedAt: string | null | undefin
   return new Date(syncedAt) > new Date(updatedAt) ? syncedAt : updatedAt;
 }
 
-export async function POST(request: Request) {
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient();
   const adminClient = createServiceRoleClient();
 
-  // Auth check
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
-  }
-
   // Parse filters
-  const filters: ProductFilters = await request.json().catch(() => ({
+  const filters: ProductFilters = await req.json().catch(() => ({
     page: 1,
     pageSize: 25,
     sortBy: 'updated_at',
@@ -326,4 +319,5 @@ export async function POST(request: Request) {
   };
 
   return NextResponse.json(response);
-}
+  },
+});

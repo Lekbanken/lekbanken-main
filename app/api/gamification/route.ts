@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createServerRlsClient } from "@/lib/supabase/server";
+import { apiHandler } from "@/lib/api/route-handler";
 import type {
   Achievement,
   AchievementStatus,
@@ -177,17 +178,11 @@ function applyLevelDefinitions(progress: ProgressSnapshot, levelDefs: LevelDefin
   };
 }
 
-export async function GET() {
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth }) => {
   const supabase = (await createServerRlsClient()) as unknown as GamificationClient;
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+  const user = auth!.user!;
   const userId = user.id;
 
   // First get progress to know tenant context
@@ -397,4 +392,5 @@ export async function GET() {
   };
 
   return NextResponse.json(payload, { status: 200 });
-}
+  },
+})

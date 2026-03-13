@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { z } from 'zod'
 import type Stripe from 'stripe'
 
 import { stripe } from '@/lib/stripe/config'
 import { getAuthUser, supabaseAdmin } from '@/lib/supabase/server'
+import { applyRateLimit } from '@/lib/utils/rate-limiter'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -38,7 +40,10 @@ function generateGiftCode(): string {
   return code
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const rateLimitResponse = applyRateLimit(request, 'strict')
+  if (rateLimitResponse) return rateLimitResponse
+
   const user = await getAuthUser()
   if (!user) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })

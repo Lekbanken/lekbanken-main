@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import type { Json } from '@/types/supabase'
+import { apiHandler } from '@/lib/api/route-handler'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -9,27 +10,22 @@ function normalizeId(value: string | string[] | undefined) {
 
 type ProgressStatus = 'not_started' | 'in_progress' | 'completed' | 'abandoned'
 
-export async function GET(_request: Request, context: { params: Promise<{ planId: string }> }) {
-  const params = await context.params
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
   const planId = normalizeId(params?.planId)
   if (!planId) {
     return NextResponse.json({ error: 'Invalid plan id' }, { status: 400 })
   }
 
+  const userId = auth!.user!.id
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
 
   const { data, error } = await supabase
     .from('plan_play_progress')
     .select('*')
     .eq('plan_id', planId)
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .maybeSingle()
 
   if (error) {
@@ -38,25 +34,21 @@ export async function GET(_request: Request, context: { params: Promise<{ planId
   }
 
   return NextResponse.json({ progress: data ?? null })
-}
+  },
+})
 
-export async function POST(request: Request, context: { params: Promise<{ planId: string }> }) {
-  const params = await context.params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
   const planId = normalizeId(params?.planId)
   if (!planId) {
     return NextResponse.json({ error: 'Invalid plan id' }, { status: 400 })
   }
 
+  const userId = auth!.user!.id
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     current_block_id?: string | null
     status?: ProgressStatus
     metadata?: Record<string, unknown> | null
@@ -92,7 +84,7 @@ export async function POST(request: Request, context: { params: Promise<{ planId
     .upsert(
       {
         plan_id: planId,
-        user_id: user.id,
+        user_id: userId,
         current_block_id: body.current_block_id ?? null,
         current_position: currentPosition,
         status,
@@ -111,4 +103,5 @@ export async function POST(request: Request, context: { params: Promise<{ planId
   }
 
   return NextResponse.json({ progress: data })
-}
+  },
+})

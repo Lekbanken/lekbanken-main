@@ -6,8 +6,8 @@
  * Syncs a single product to Stripe. Supports force sync and drift detection.
  */
 
-import { type NextRequest, NextResponse } from 'next/server'
-import { createServerRlsClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { 
   pushProductToStripe, 
   detectDrift, 
@@ -15,27 +15,6 @@ import {
   archiveProduct,
 } from '@/lib/stripe/product-sync'
 import { type SyncOptions } from '@/lib/stripe/product-sync-types'
-
-// =============================================================================
-// AUTH HELPER
-// =============================================================================
-
-async function isSystemAdmin(): Promise<boolean> {
-  const supabase = await createServerRlsClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) return false
-  
-  const appMetadataRole = user.app_metadata?.role as string | undefined
-  const appMetadataGlobalRole = user.app_metadata?.global_role as string | undefined
-  const userMetadataGlobalRole = user.user_metadata?.global_role as string | undefined
-  
-  const effectiveRole = appMetadataRole || appMetadataGlobalRole || userMetadataGlobalRole
-  
-  return effectiveRole === 'system_admin' || 
-         effectiveRole === 'superadmin' || 
-         effectiveRole === 'admin'
-}
 
 // =============================================================================
 // POST - Sync product
@@ -47,19 +26,13 @@ interface SyncProductBody {
   options?: SyncOptions
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    if (!await isSystemAdmin()) {
-      return NextResponse.json(
-        { error: 'Forbidden - system_admin required' },
-        { status: 403 }
-      )
-    }
-    
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
     // Parse request body
     let body: SyncProductBody
     try {
-      body = await request.json()
+      body = await req.json()
     } catch {
       return NextResponse.json(
         { error: 'Invalid request body' },
@@ -113,33 +86,17 @@ export async function POST(request: NextRequest) {
       success: result.success,
       data: result,
     })
-    
-  } catch (error) {
-    console.error('Error syncing product:', error)
-    return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    )
-  }
-}
+  },
+})
 
 // =============================================================================
 // GET - Get drift status for a product
 // =============================================================================
 
-export async function GET(request: NextRequest) {
-  try {
-    if (!await isSystemAdmin()) {
-      return NextResponse.json(
-        { error: 'Forbidden - system_admin required' },
-        { status: 403 }
-      )
-    }
-    
-    const searchParams = request.nextUrl.searchParams
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const searchParams = req.nextUrl.searchParams
     const productId = searchParams.get('productId')
     
     if (!productId) {
@@ -155,15 +112,5 @@ export async function GET(request: NextRequest) {
       success: true,
       data: driftResult,
     })
-    
-  } catch (error) {
-    console.error('Error detecting drift:', error)
-    return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

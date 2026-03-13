@@ -1,77 +1,60 @@
 /**
- * Participant Achievement Unlock API
- * 
+ * Participant Achievement Unlock API — ADMIN/SYSTEM ONLY
+ *
  * POST /api/participants/progress/unlock-achievement
- * Records achievement unlock for a participant
+ * Records achievement unlock for a participant.
+ *
+ * SECURITY HARDENING (launch-scope, 2026-03-14):
+ * - Changed from participant-callable to cron_or_admin only.
+ * - Participant tokens can no longer directly unlock achievements
+ *   without server-side condition verification.
+ * - See GAM-001 in launch-control.md.
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { Database, Json } from '@/types/supabase';
 
-interface UnlockAchievementRequest {
-  participant_token: string;
+interface UnlockAchievementBody {
   achievement_id: string;
+  session_id: string;
+  participant_id: string;
   game_id?: string;
   unlock_context?: Record<string, unknown>;
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const body: UnlockAchievementRequest = await request.json();
-    const { participant_token, achievement_id, game_id, unlock_context } = body;
+export const POST = apiHandler({
+  auth: 'cron_or_admin',
+  handler: async ({ req }) => {
+    let body: UnlockAchievementBody;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-    if (!participant_token || !achievement_id) {
+    const { achievement_id, session_id, participant_id, game_id, unlock_context } = body;
+
+    if (!achievement_id || !session_id || !participant_id) {
       return NextResponse.json(
-        { error: 'participant_token and achievement_id are required' },
+        { error: 'achievement_id, session_id, and participant_id are required' },
         { status: 400 }
       );
     }
 
     const supabase = createServiceRoleClient();
 
-    // Get participant by token
-    const { data: participant, error: participantError } = await supabase
-      .from('participants')
-      .select('id, session_id, status, token_expires_at')
-      .eq('participant_token', participant_token)
-      .single();
-
-    if (participantError || !participant) {
-      return NextResponse.json(
-        { error: 'Invalid participant token' },
-        { status: 401 }
-      );
-    }
-
-    // Check participant status
-    if (REJECTED_PARTICIPANT_STATUSES.has(participant.status ?? '')) {
-      return NextResponse.json(
-        { error: 'Participant is blocked or kicked' },
-        { status: 403 }
-      );
-    }
-
-    // Check token expiry
-    if (participant.token_expires_at && new Date(participant.token_expires_at) < new Date()) {
-      return NextResponse.json(
-        { error: 'Token expired' },
-        { status: 401 }
-      );
-    }
-
     // Get session to resolve tenant
     const { data: session, error: sessionError } = await supabase
       .from('participant_sessions')
       .select('id, tenant_id')
-      .eq('id', participant.session_id)
+      .eq('id', session_id)
       .single();
 
     if (sessionError || !session) {
       return NextResponse.json(
-        { error: 'Session not found for participant' },
+        { error: 'Session not found' },
         { status: 404 }
       );
     }
@@ -98,7 +81,7 @@ export async function POST(request: NextRequest) {
     const { data: existingUnlock } = await supabase
       .from('participant_achievement_unlocks')
       .select('id')
-      .eq('participant_id', participant.id)
+      .eq('participant_id', participant_id)
       .eq('achievement_id', achievement_id)
       .single();
 
@@ -115,7 +98,7 @@ export async function POST(request: NextRequest) {
       const { data: gameProgress } = await supabase
         .from('participant_game_progress')
         .select('id')
-        .eq('participant_id', participant.id)
+        .eq('participant_id', participant_id)
         .eq('game_id', game_id)
         .single();
 
@@ -125,8 +108,8 @@ export async function POST(request: NextRequest) {
     // Create unlock record
     const unlockInsert: Database['public']['Tables']['participant_achievement_unlocks']['Insert'] = {
       tenant_id: session.tenant_id,
-      session_id: participant.session_id,
-      participant_id: participant.id,
+      session_id: session_id,
+      participant_id: participant_id,
       game_progress_id: gameProgressId,
       achievement_id,
       achievement_name: achievement.name,
@@ -175,12 +158,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Broadcast achievement unlock to session
-    const channel = supabase.channel(`session:${participant.session_id}`);
+    const channel = supabase.channel(`session:${session_id}`);
     await channel.send({
       type: 'broadcast',
       event: 'achievement_unlocked',
       payload: {
-        participant_id: participant.id,
+        participant_id: participant_id,
         achievement_id,
         achievement_name: achievement.name,
         points: achievementPoints,
@@ -191,8 +174,8 @@ export async function POST(request: NextRequest) {
 
     // Log activity
     await supabase.from('participant_activity_log').insert({
-      session_id: participant.session_id,
-      participant_id: participant.id,
+      session_id: session_id,
+      participant_id: participant_id,
       event_type: 'achievement_unlock',
       event_data: {
         achievement_id,
@@ -213,12 +196,5 @@ export async function POST(request: NextRequest) {
       },
       message: 'Achievement unlocked successfully',
     });
-
-  } catch (error) {
-    console.error('Error in achievement unlock:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import {
   buildCapabilityContextFromMemberships,
@@ -22,20 +23,14 @@ type BulkResult = {
   error?: string
 }
 
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const user = auth!.user!
+    const userId = user.id
+    const supabase = await createServerRlsClient()
 
-  if (!user) {
-    return NextResponse.json(
-      { error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
-      { status: 401 }
-    )
-  }
-
-  const body = await request.json().catch(() => null) as BulkRequestBody | null
+    const body = await req.json().catch(() => null) as BulkRequestBody | null
 
   if (!body?.planIds?.length || !body?.action) {
     return NextResponse.json(
@@ -78,8 +73,8 @@ export async function POST(request: Request) {
 
   // Build capability context
   const [profileResult, membershipsResult] = await Promise.all([
-    supabase.from('users').select('global_role').eq('id', user.id).single(),
-    supabase.from('user_tenant_memberships').select('tenant_id, role').eq('user_id', user.id),
+    supabase.from('users').select('global_role').eq('id', userId).single(),
+    supabase.from('user_tenant_memberships').select('tenant_id, role').eq('user_id', userId),
   ])
 
   const globalRole = deriveEffectiveGlobalRole(profileResult.data, user)
@@ -88,7 +83,7 @@ export async function POST(request: Request) {
     .map((m) => ({ tenant_id: m.tenant_id as string, role: m.role as string }))
 
   const capabilityCtx = buildCapabilityContextFromMemberships({
-    userId: user.id,
+    userId,
     globalRole,
     memberships,
   })
@@ -116,7 +111,7 @@ export async function POST(request: Request) {
           }
           const { error } = await supabase
             .from('plans')
-            .update({ status: 'archived', updated_by: user.id })
+            .update({ status: 'archived', updated_by: userId })
             .eq('id', plan.id)
           if (error) throw error
           result.success = true
@@ -134,7 +129,7 @@ export async function POST(request: Request) {
           }
           const { error } = await supabase
             .from('plans')
-            .update({ status: 'draft', updated_by: user.id })
+            .update({ status: 'draft', updated_by: userId })
             .eq('id', plan.id)
           if (error) throw error
           result.success = true
@@ -164,7 +159,7 @@ export async function POST(request: Request) {
           // Just update status - version creation would need more logic
           const { error } = await supabase
             .from('plans')
-            .update({ status: 'published', updated_by: user.id })
+            .update({ status: 'published', updated_by: userId })
             .eq('id', plan.id)
           if (error) throw error
           result.success = true
@@ -198,4 +193,5 @@ export async function POST(request: Request) {
       failed: failureCount,
     },
   })
-}
+  },
+})

@@ -1,20 +1,13 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin';
+import { NextResponse } from 'next/server';
 import { fetchLicenses } from '@/features/admin/licenses';
 import type { LicenseFilters, LicenseFilterType } from '@/features/admin/licenses';
+import { apiHandler } from '@/lib/api/route-handler';
 
-/**
- * GET /api/admin/licenses
- * 
- * List licenses with filters (system admin only)
- */
-export async function GET(request: NextRequest) {
-  const adminCheck = await requireSystemAdmin();
-  if (adminCheck instanceof NextResponse) return adminCheck;
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const { searchParams } = new URL(req.url);
 
-  try {
-    const { searchParams } = new URL(request.url);
-    
     const filters: LicenseFilters = {
       search: searchParams.get('search') || '',
       type: (searchParams.get('type') || 'all') as LicenseFilterType,
@@ -28,11 +21,5 @@ export async function GET(request: NextRequest) {
     const result = await fetchLicenses(filters, page, pageSize);
 
     return NextResponse.json(result);
-  } catch (error) {
-    console.error('[GET /api/admin/licenses] Error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

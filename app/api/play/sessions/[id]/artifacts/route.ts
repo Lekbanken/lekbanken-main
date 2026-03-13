@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { resolveSessionViewer } from '@/lib/api/play-auth';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 import type { Json } from '@/types/supabase';
+import { apiHandler } from '@/lib/api/route-handler';
 
 // =============================================================================
 // Artifacts V2: Read config from game_artifacts, state from session_*_state
@@ -114,8 +115,10 @@ function sanitizeMetadataForParticipant(
 // GET: Read artifacts from game_artifacts + state from session_*_state
 // =============================================================================
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ req, params }) => {
+  const sessionId = params.id;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
@@ -123,7 +126,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   const current = getCurrentStepPhase(session);
 
-  const viewer = await resolveSessionViewer(sessionId, request);
+  const viewer = await resolveSessionViewer(sessionId, req);
   if (!viewer) return jsonError('Unauthorized', 401);
 
   const service = await createServiceRoleClient();
@@ -429,25 +432,22 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     },
     { status: 200 }
   );
-}
+  },
+});
 
 // =============================================================================
 // POST: Deprecated snapshot endpoint - now returns deprecation notice
 // =============================================================================
 
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401);
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const sessionId = params.id;
+  const userId = auth!.user!.id;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can manage artifacts', 403);
+  if (session.host_user_id !== userId) return jsonError('Only host can manage artifacts', 403);
 
   // V2: Snapshot is no longer needed - artifacts are read directly from game_*
   // Return success with deprecation notice for backward compatibility
@@ -467,4 +467,5 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     },
     { status: 200 }
   );
-}
+  },
+});

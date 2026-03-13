@@ -6,19 +6,19 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 /**
  * GET - List session roles
  */
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ auth, params }) => {
   try {
-    const { id: sessionId } = await params;
+    const { id: sessionId } = params;
     
     const session = await ParticipantSessionService.getSessionById(sessionId);
     
@@ -26,11 +26,7 @@ export async function GET(
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
     
-    // Check if requester is host (for full role info) or participant (limited info)
-    const supabase = await createServerRlsClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const isHost = user?.id === session.host_user_id;
+    const isHost = auth?.user?.id === session.host_user_id;
 
     let roles = await ParticipantSessionService.getSessionRoles(sessionId);
 
@@ -75,25 +71,18 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+  },
+});
 
 /**
  * POST - Snapshot roles from game to session
  */
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
   try {
-    const { id: sessionId } = await params;
-    
-    // Verify authentication
-    const supabase = await createServerRlsClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { id: sessionId } = params;
+    const userId = auth!.user!.id;
     
     // Get session and verify host
     const session = await ParticipantSessionService.getSessionById(sessionId);
@@ -102,9 +91,12 @@ export async function POST(
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
     
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       return NextResponse.json({ error: 'Only host can snapshot roles' }, { status: 403 });
     }
+
+    const statusError = assertSessionStatus(session.status, 'roles');
+    if (statusError) return statusError;
     
     if (!session.game_id) {
       return NextResponse.json({ error: 'Session has no associated game' }, { status: 400 });
@@ -120,7 +112,7 @@ export async function POST(
     }
     
     // Parse optional locale from body
-    const body = await request.json().catch(() => ({}));
+    const body = await req.json().catch(() => ({}));
     const locale = body.locale as string | undefined;
     
     // Snapshot roles
@@ -143,25 +135,18 @@ export async function POST(
       { status: 500 }
     );
   }
-}
+  },
+});
 
 /**
  * PATCH - Update session roles (session-local, host only)
  */
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
   try {
-    const { id: sessionId } = await params;
-
-    // Verify authentication
-    const supabaseRls = await createServerRlsClient();
-    const { data: { user } } = await supabaseRls.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { id: sessionId } = params;
+    const userId = auth!.user!.id;
 
     // Get session and verify host
     const session = await ParticipantSessionService.getSessionById(sessionId);
@@ -170,11 +155,11 @@ export async function PATCH(
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       return NextResponse.json({ error: 'Only host can update roles' }, { status: 403 });
     }
 
-    const body = await request.json().catch(() => ({}));
+    const body = await req.json().catch(() => ({}));
     const roles = Array.isArray((body as { roles?: unknown }).roles) ? (body as { roles: unknown[] }).roles : [];
 
     if (roles.length === 0) {
@@ -232,4 +217,5 @@ export async function PATCH(
       { status: 500 }
     );
   }
-}
+  },
+});

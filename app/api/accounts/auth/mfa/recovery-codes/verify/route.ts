@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { createHash } from 'crypto'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import {
@@ -26,17 +27,13 @@ interface UserMFARow {
  * Verify a recovery code during MFA challenge.
  * This allows users who have lost their authenticator app to still log in.
  */
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const supabase = await createServerRlsClient()
+    const userId = auth!.user!.id
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = (await request.json().catch(() => ({}))) as { code?: string }
+    const body = (await req.json().catch(() => ({}))) as { code?: string }
 
   if (!body.code) {
     return NextResponse.json(
@@ -46,7 +43,7 @@ export async function POST(request: Request) {
   }
 
   // Rate limiting check
-  const failedAttempts = await getRecentFailedAttempts(user.id, LOCKOUT_WINDOW_MINUTES)
+  const failedAttempts = await getRecentFailedAttempts(userId, LOCKOUT_WINDOW_MINUTES)
   if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
     return NextResponse.json(
       { error: 'Too many failed attempts. Please try again later.' },
@@ -60,13 +57,13 @@ export async function POST(request: Request) {
   const { data, error: fetchError } = await db
     .from('user_mfa')
     .select('recovery_codes_hashed, recovery_codes_count, recovery_codes_used, tenant_id')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .single()
 
   const userMfa = data as UserMFARow | null
 
   if (fetchError || !userMfa?.recovery_codes_hashed) {
-    await logVerificationFailed(user.id, null, 'recovery_code', 'No recovery codes found')
+    await logVerificationFailed(userId, null, 'recovery_code', 'No recovery codes found')
     return NextResponse.json(
       { error: 'No recovery codes found. Please contact support.' },
       { status: 400 }
@@ -85,7 +82,7 @@ export async function POST(request: Request) {
 
   if (codeIndex === -1) {
     await logVerificationFailed(
-      user.id,
+      userId,
       userMfa.tenant_id,
       'recovery_code',
       'Invalid recovery code',
@@ -113,7 +110,7 @@ export async function POST(request: Request) {
       last_verified_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
 
   if (updateError) {
     console.error('[mfa/recovery-codes/verify] Update error:', updateError)
@@ -124,10 +121,10 @@ export async function POST(request: Request) {
   }
 
   // Update last verification time
-  await updateLastMFAVerification(user.id)
+  await updateLastMFAVerification(userId)
 
   // Log successful usage
-  await logRecoveryCodeUsed(user.id, remaining, userMfa.tenant_id)
+  await logRecoveryCodeUsed(userId, remaining, userMfa.tenant_id)
 
   // Return success with warning if running low on codes
   const response: {
@@ -144,4 +141,5 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json(response)
-}
+  },
+})

@@ -1,19 +1,18 @@
 /**
  * Token Cleanup API
  * 
- * POST /api/participants/tokens/cleanup
- * Background job to clean up expired tokens and disconnect inactive participants
+ * GET  /api/participants/tokens/cleanup — Vercel Cron (daily 04:00 UTC)
+ * POST /api/participants/tokens/cleanup — Manual/admin trigger
+ * 
+ * Background job to clean up expired tokens and disconnect inactive participants.
+ * Archives ended/cancelled sessions older than 90 days.
  */
 
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { requireCronOrAdmin, AuthError } from '@/lib/api/auth-guard';
+import { apiHandler } from '@/lib/api/route-handler';
 
-export async function POST() {
-  try {
-    // Auth: cron secret or system_admin
-    await requireCronOrAdmin();
-
+const cleanupHandler = async () => {
     const supabase = createServiceRoleClient();
     const now = new Date().toISOString();
 
@@ -106,15 +105,9 @@ export async function POST() {
       archived_sessions: oldSessions?.length || 0,
       cleaned_at: now,
     });
+};
 
-  } catch (error) {
-    if (error instanceof AuthError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
-    }
-    console.error('Error in token cleanup:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+// GET for Vercel Cron, POST for manual/admin trigger
+const handler = apiHandler({ auth: 'cron_or_admin', handler: cleanupHandler });
+export const GET = handler;
+export const POST = handler;

@@ -1,17 +1,15 @@
-import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validateProductPayload } from '@/lib/validation/products'
-import { isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { Database } from '@/types/supabase'
 
 type ProductRow = Database['public']['Tables']['products']['Row']
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ productId: string }> }
-) {
-  const { productId } = await params
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ params }) => {
+  const { productId } = params
   const supabase = await createServerRlsClient()
   const { data, error } = await supabase
     .from('products')
@@ -25,25 +23,16 @@ export async function GET(
   }
 
   return NextResponse.json({ product: data })
-}
+  },
+})
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ productId: string }> }
-) {
-  const { productId } = await params
+export const PATCH = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req, params }) => {
+  const { productId } = params
   const supabase = await createServerRlsClient()
 
-  // Authentication: only system_admin can update products
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 })
-  }
-
-  const body = (await request.json().catch(() => ({}))) as Partial<ProductRow>
+  const body = (await req.json().catch(() => ({}))) as Partial<ProductRow>
 
   const validation = validateProductPayload(body, { mode: 'update' })
   if (!validation.ok) {
@@ -85,23 +74,14 @@ export async function PATCH(
   }
 
   return NextResponse.json({ product: data })
-}
+  },
+})
 
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ productId: string }> }
-) {
-  const { productId } = await params
+export const DELETE = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params }) => {
+  const { productId } = params
   const supabase = await createServerRlsClient()
-
-  // Authentication: only system_admin can delete products
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 })
-  }
 
   const { error } = await supabase.from('products').delete().eq('id', productId)
 
@@ -111,4 +91,5 @@ export async function DELETE(
   }
 
   return NextResponse.json({ success: true })
-}
+  },
+})

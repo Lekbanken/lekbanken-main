@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { logger } from '@/lib/utils/logger'
-import { requireSystemAdmin, AuthError } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const dynamic = 'force-dynamic'
 
@@ -141,11 +140,9 @@ async function getDatabaseStats(supabase: any) {
   }
 }
 
-export async function GET() {
-  try {
-    // --- Auth: system_admin only ---
-    await requireSystemAdmin()
-
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async () => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
@@ -176,16 +173,5 @@ export async function GET() {
     }
 
     return NextResponse.json(metrics)
-  } catch (error) {
-    if (error instanceof AuthError) {
-      return NextResponse.json({ error: error.message }, { status: error.status })
-    }
-    logger.error('Failed to fetch system metrics', error instanceof Error ? error : undefined, {
-      endpoint: '/api/system/metrics'
-    })
-    return NextResponse.json(
-      { error: 'Failed to fetch system metrics' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

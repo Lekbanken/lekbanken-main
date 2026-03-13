@@ -1,16 +1,14 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { resolveSessionViewer } from '@/lib/api/play-auth';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseAny = any;
-
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
-}
 
 const SendSignalSchema = z
   .object({
@@ -26,19 +24,15 @@ const SendSignalSchema = z
  * GET /api/play/sessions/[id]/signals
  * Host-only: Returns recent session signals.
  */
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401);
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+  const { id: sessionId } = params;
+  const userId = auth!.user!.id;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can view signals', 403);
+  if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+  if (session.host_user_id !== userId) return NextResponse.json({ error: 'Only host can view signals' }, { status: 403 });
 
   const service = (await createServiceRoleClient()) as SupabaseAny;
 
@@ -51,26 +45,32 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   if (error) {
     console.error('[signals] select failed', error);
-    return jsonError('Failed to load signals', 500);
+    return NextResponse.json({ error: 'Failed to load signals' }, { status: 500 });
   }
 
   return NextResponse.json({ success: true, signals: signals ?? [] }, { status: 200 });
-}
+  },
+});
 
 /**
  * POST /api/play/sessions/[id]/signals
- * Host-only (initially): Insert into session_signals + broadcast play_event.
+ * Host or participant: Insert into session_signals + broadcast play_event.
  */
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
+export const POST = apiHandler({
+  auth: 'public',
+  handler: async ({ req, params }) => {
+  const { id: sessionId } = params;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
+  if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
 
-  const sender = await resolveSessionViewer(sessionId, request);
-  if (!sender) return jsonError('Unauthorized', 401);
+  const statusError = assertSessionStatus(session.status, 'signals');
+  if (statusError) return statusError;
 
-  const body = await request.json().catch(() => ({}));
+  const sender = await resolveSessionViewer(sessionId, req);
+  if (!sender) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const body = await req.json().catch(() => ({}));
   const parsed = SendSignalSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
@@ -104,7 +104,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     if (lastRow?.created_at) {
       const lastMs = new Date(lastRow.created_at as string).getTime();
       if (Number.isFinite(lastMs) && Date.now() - lastMs < 1000) {
-        return jsonError('Too many signals, try again shortly', 429);
+        return NextResponse.json({ error: 'Too many signals, try again shortly' }, { status: 429 });
       }
     }
   } catch {
@@ -125,7 +125,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   if (error || !inserted) {
     console.error('[signals] insert failed', error);
-    return jsonError('Failed to send signal', 500);
+    return NextResponse.json({ error: 'Failed to send signal' }, { status: 500 });
   }
 
   // Audit: insert session_events row (best-effort, V2 schema)
@@ -164,4 +164,5 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   });
 
   return NextResponse.json({ success: true, signal: inserted }, { status: 201 });
-}
+  },
+});

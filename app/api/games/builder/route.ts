@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { requireAuth, AuthError } from '@/lib/api/auth-guard';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { Database, Json } from '@/types/supabase';
 import { TOOL_REGISTRY } from '@/features/tools/registry';
 
@@ -190,15 +190,29 @@ function normalizeToolScope(value: unknown): 'host' | 'participants' | 'both' {
   return 'both';
 }
 
-export async function POST(request: Request) {
-  try {
-  await requireAuth();
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+  const ctx = auth!;
   const supabase = createServiceRoleClient();
-  const body = (await request.json().catch(() => ({}))) as BuilderBody;
+  const body = (await req.json().catch(() => ({}))) as BuilderBody;
 
   const core = body.core;
   if (!core || !core.name?.trim() || !core.short_description?.trim()) {
     return NextResponse.json({ error: 'name and short_description are required' }, { status: 400 });
+  }
+
+  // TI-001: Validate caller has editor/admin/owner role in target tenant
+  const ownerTenantId = core.owner_tenant_id ?? null;
+  if (ownerTenantId) {
+    const membership = ctx.memberships.find(m => m.tenant_id === ownerTenantId);
+    const role = membership?.role;
+    const hasEditRole = role === 'editor' || role === 'admin' || role === 'owner';
+    if (!hasEditRole && ctx.effectiveGlobalRole !== 'system_admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  } else if (ctx.effectiveGlobalRole !== 'system_admin') {
+    return NextResponse.json({ error: 'owner_tenant_id is required' }, { status: 400 });
   }
 
   const insertGame = {
@@ -391,8 +405,5 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ gameId: game.id, session: game });
-  } catch (err) {
-    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
-    throw err;
-  }
-}
+  },
+})

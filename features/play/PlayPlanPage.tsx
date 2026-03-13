@@ -321,17 +321,43 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
   // ── Heartbeat (MS4.8) ─────────────────────────────────────────────
   // Send a periodic heartbeat so the active-runs endpoint knows this
   // run is still being used (prevents stale-run filtering).
+  // Pauses when tab is hidden to reduce serverless invocations.
   useEffect(() => {
     const runId = run?.id;
     if (!runId || runId.startsWith('draft-') || runId.startsWith('virtual-') || runId.startsWith('legacy-')) {
       return;
     }
-    // Fire one immediately, then every HEARTBEAT_INTERVAL_MS
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const schedule = () => {
+      if (stopped) return;
+      const ms = document.hidden ? HEARTBEAT_INTERVAL_MS * 2 : HEARTBEAT_INTERVAL_MS;
+      timer = setTimeout(() => {
+        timer = null;
+        if (stopped) return;
+        sendRunHeartbeat(runId);
+        schedule();
+      }, ms);
+    };
+
+    // Fire one immediately, then start chain
     sendRunHeartbeat(runId);
-    const interval = window.setInterval(() => {
-      sendRunHeartbeat(runId);
-    }, HEARTBEAT_INTERVAL_MS);
-    return () => window.clearInterval(interval);
+    schedule();
+
+    const handleVisibility = () => {
+      if (stopped) return;
+      if (timer !== null) { clearTimeout(timer); timer = null; }
+      if (!document.hidden) sendRunHeartbeat(runId); // immediate on tab focus
+      schedule();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      stopped = true;
+      if (timer !== null) clearTimeout(timer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [run?.id]);
 
   const gotoPrev = () => {

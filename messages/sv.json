@@ -15124,7 +15124,11 @@
         "waitingForHost": "Väntar på lekledaren...",
         "waitingDescription": "Lekledaren har inte startat spelet ännu. Häng kvar så börjar vi snart!",
         "ended": "Sessionen är avslutad",
-        "thanksForParticipating": "Tack för att du deltog!"
+        "thanksForParticipating": "Tack för att du deltog!",
+        "removedTitle": "Du har tagits bort",
+        "removedKicked": "Lekledaren har tagit bort dig från sessionen.",
+        "removedBlocked": "Lekledaren har blockerat dig från sessionen.",
+        "removedBackToStart": "Tillbaka till start"
       },
       "lobby": {
         "couldNotGetSession": "Kunde inte hämta session",

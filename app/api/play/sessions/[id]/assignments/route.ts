@@ -6,13 +6,11 @@
  * GET: List assignments for a session
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-
-interface RouteContext {
-  params: Promise<{ id: string }>;
-}
+import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 // =============================================================================
 // POST: Assign roles
@@ -25,16 +23,13 @@ interface AssignmentRequest {
   }>;
 }
 
-export async function POST(request: NextRequest, context: RouteContext) {
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth, params }) => {
   try {
-    const { id: sessionId } = await context.params;
+    const sessionId = params.id;
+    const userId = auth!.user!.id;
     const supabase = await createServerRlsClient();
-    
-    // Verify authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     
     // Verify user is host of this session
     const { data: session, error: sessionError } = await supabase
@@ -47,12 +42,12 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
     
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     
     // Parse request body
-    const body: AssignmentRequest = await request.json();
+    const body: AssignmentRequest = await req.json();
     
     if (!body.assignments || !Array.isArray(body.assignments)) {
       return NextResponse.json(
@@ -125,7 +120,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       session_id: sessionId,
       participant_id: a.participantId,
       session_role_id: a.roleId,
-      assigned_by: user.id,
+      assigned_by: userId,
       assigned_at: new Date().toISOString(),
     }));
     
@@ -182,9 +177,22 @@ export async function POST(request: NextRequest, context: RouteContext) {
           assignments: body.assignments,
           count: body.assignments.length,
         },
-        actor_user_id: user.id,
+        actor_user_id: userId,
       });
     
+    await broadcastPlayEvent(sessionId, {
+      type: 'assignments_changed',
+      payload: {
+        action: 'assigned',
+        count: inserted?.length ?? 0,
+        assignments: body.assignments.map((a) => ({
+          participant_id: a.participantId,
+          role_id: a.roleId,
+        })),
+      },
+      timestamp: new Date().toISOString(),
+    });
+
     return NextResponse.json({
       success: true,
       count: inserted?.length || 0,
@@ -194,7 +202,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
     console.error('[Assignments API] Unexpected error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+});
 
 // =============================================================================
 // DELETE: Remove assignment
@@ -205,16 +214,13 @@ interface UnassignRequest {
   roleId: string;
 }
 
-export async function DELETE(request: NextRequest, context: RouteContext) {
+export const DELETE = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth, params }) => {
   try {
-    const { id: sessionId } = await context.params;
+    const sessionId = params.id;
+    const userId = auth!.user!.id;
     const supabase = await createServerRlsClient();
-    
-    // Verify authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     
     // Verify user is host of this session
     const { data: session, error: sessionError } = await supabase
@@ -227,12 +233,12 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
     
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     
     // Parse request body
-    const body: UnassignRequest = await request.json();
+    const body: UnassignRequest = await req.json();
     
     if (!body.participantId || !body.roleId) {
       return NextResponse.json(
@@ -279,30 +285,38 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
           participantId: body.participantId,
           roleId: body.roleId,
         },
-        actor_user_id: user.id,
+        actor_user_id: userId,
       });
     
+    await broadcastPlayEvent(sessionId, {
+      type: 'assignments_changed',
+      payload: {
+        action: 'unassigned',
+        count: 1,
+        assignments: [{ participant_id: body.participantId, role_id: body.roleId }],
+      },
+      timestamp: new Date().toISOString(),
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[Assignments API] Unexpected error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+});
 
 // =============================================================================
 // GET: List assignments
 // =============================================================================
 
-export async function GET(request: NextRequest, context: RouteContext) {
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
   try {
-    const { id: sessionId } = await context.params;
+    const sessionId = params.id;
+    const userId = auth!.user!.id;
     const supabase = await createServerRlsClient();
-    
-    // Verify authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     
     // Verify user is host of this session
     const { data: session, error: sessionError } = await supabase
@@ -315,7 +329,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
     
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     
@@ -343,4 +357,5 @@ export async function GET(request: NextRequest, context: RouteContext) {
     console.error('[Assignments API] Unexpected error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+});

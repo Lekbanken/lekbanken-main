@@ -1,37 +1,30 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validateGamePayload } from '@/lib/validation/games'
-import { isSystemAdmin } from '@/lib/utils/tenantAuth'
-import { assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import type { Database } from '@/types/supabase'
 
 type GameInsert = Database['public']['Tables']['games']['Insert']
 
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+    const supabase = await createServerRlsClient()
 
-  // Authentication: require system_admin or tenant_admin for the target tenant
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = (await request.json().catch(() => ({}))) as Partial<GameInsert> & {
-    hasCoverImage?: boolean
-  }
-
-  // If creating a tenant-scoped game, verify user has tenant admin access
-  if (body.owner_tenant_id) {
-    const hasAccess = await assertTenantAdminOrSystem(body.owner_tenant_id, user)
-    if (!hasAccess) {
-      return NextResponse.json({ error: 'Forbidden - tenant admin required' }, { status: 403 })
+    const body = (await req.json().catch(() => ({}))) as Partial<GameInsert> & {
+      hasCoverImage?: boolean
     }
-  } else {
-    // Global games require system_admin
-    if (!isSystemAdmin(user)) {
-      return NextResponse.json({ error: 'Forbidden - system_admin required for global games' }, { status: 403 })
+
+    // If creating a tenant-scoped game, verify user has tenant admin access
+    if (body.owner_tenant_id) {
+      await requireTenantRole(['admin', 'owner'], body.owner_tenant_id)
+    } else {
+      // Global games require system_admin
+      if (auth!.effectiveGlobalRole !== 'system_admin') {
+        return NextResponse.json({ error: 'Forbidden - system_admin required for global games' }, { status: 403 })
+      }
     }
-  }
 
   const validation = validateGamePayload(body, { mode: 'create' })
   if (!validation.ok) {
@@ -68,4 +61,5 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ game: data }, { status: 201 })
-}
+  },
+})

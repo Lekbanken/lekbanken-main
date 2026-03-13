@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServerRlsClient } from '@/lib/supabase/server'
-import { isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,106 +26,99 @@ async function requireTenantMembership(supabase: Awaited<ReturnType<typeof creat
   return Boolean(membership)
 }
 
-export async function GET(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+    const supabase = await createServerRlsClient()
+    const userId = auth!.user!.id
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { searchParams } = new URL(req.url)
+    const parsed = getSchema.safeParse({ tenantId: searchParams.get('tenantId') })
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
+    }
 
-  const { searchParams } = new URL(request.url)
-  const parsed = getSchema.safeParse({ tenantId: searchParams.get('tenantId') })
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
-  }
+    const { tenantId } = parsed.data
 
-  const { tenantId } = parsed.data
+    if (auth!.effectiveGlobalRole !== 'system_admin') {
+      const ok = await requireTenantMembership(supabase, tenantId, userId)
+      if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
-  if (!isSystemAdmin(user)) {
-    const ok = await requireTenantMembership(supabase, tenantId, user.id)
-    if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+    const { data: profile, error: profileError } = await supabase
+      .from('leader_profile')
+      .select('display_achievement_ids')
+      .eq('user_id', userId)
+      .eq('tenant_id', tenantId)
+      .maybeSingle()
 
-  const { data: profile, error: profileError } = await supabase
-    .from('leader_profile')
-    .select('display_achievement_ids')
-    .eq('user_id', user.id)
-    .eq('tenant_id', tenantId)
-    .maybeSingle()
+    if (profileError) {
+      console.error('[api/gamification/pins] load profile error', profileError)
+      return NextResponse.json({ error: 'Failed to load pins' }, { status: 500 })
+    }
 
-  if (profileError) {
-    console.error('[api/gamification/pins] load profile error', profileError)
-    return NextResponse.json({ error: 'Failed to load pins' }, { status: 500 })
-  }
+    const pinnedIds = ((profile?.display_achievement_ids ?? []) as unknown as string[]).filter(Boolean)
 
-  const pinnedIds = ((profile?.display_achievement_ids ?? []) as unknown as string[]).filter(Boolean)
+    if (pinnedIds.length === 0) {
+      return NextResponse.json({ tenantId, pinnedIds: [], achievements: [] }, { status: 200 })
+    }
 
-  if (pinnedIds.length === 0) {
-    return NextResponse.json({ tenantId, pinnedIds: [], achievements: [] }, { status: 200 })
-  }
+    const { data: achievements, error: achievementsError } = await supabase
+      .from('achievements')
+      .select('id,name,description,icon_url,icon_config')
+      .in('id', pinnedIds)
 
-  const { data: achievements, error: achievementsError } = await supabase
-    .from('achievements')
-    .select('id,name,description,icon_url,icon_config')
-    .in('id', pinnedIds)
+    if (achievementsError) {
+      console.error('[api/gamification/pins] load achievements error', achievementsError)
+      return NextResponse.json({ error: 'Failed to load pinned achievements' }, { status: 500 })
+    }
 
-  if (achievementsError) {
-    console.error('[api/gamification/pins] load achievements error', achievementsError)
-    return NextResponse.json({ error: 'Failed to load pinned achievements' }, { status: 500 })
-  }
+    const byId = new Map((achievements ?? []).map((a) => [a.id as string, a]))
+    const ordered = pinnedIds.map((id) => byId.get(id)).filter(Boolean)
 
-  const byId = new Map((achievements ?? []).map((a) => [a.id as string, a]))
-  const ordered = pinnedIds.map((id) => byId.get(id)).filter(Boolean)
-
-  return NextResponse.json(
-    {
-      tenantId,
-      pinnedIds,
-      achievements: ordered,
-    },
-    { status: 200 }
-  )
-}
-
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const body = await request.json().catch(() => ({}))
-  const parsed = postSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
-
-  const { tenantId, achievementIds } = parsed.data
-  const uniqueIds = Array.from(new Set(achievementIds))
-
-  if (!isSystemAdmin(user)) {
-    const ok = await requireTenantMembership(supabase, tenantId, user.id)
-    if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  const { error: upsertError } = await supabase
-    .from('leader_profile')
-    .upsert(
+    return NextResponse.json(
       {
-        user_id: user.id,
-        tenant_id: tenantId,
-        display_achievement_ids: uniqueIds,
-        updated_at: new Date().toISOString(),
+        tenantId,
+        pinnedIds,
+        achievements: ordered,
       },
-      { onConflict: 'user_id,tenant_id' }
+      { status: 200 }
     )
+  },
+})
 
-  if (upsertError) {
-    console.error('[api/gamification/pins] save error', upsertError)
-    return NextResponse.json({ error: 'Failed to save pins' }, { status: 500 })
-  }
+export const POST = apiHandler({
+  auth: 'user',
+  input: postSchema,
+  handler: async ({ auth, body }) => {
+    const { tenantId, achievementIds } = body
+    const uniqueIds = Array.from(new Set(achievementIds))
 
-  return NextResponse.json({ tenantId, pinnedIds: uniqueIds }, { status: 200 })
-}
+    const supabase = await createServerRlsClient()
+    const userId = auth!.user!.id
+
+    if (auth!.effectiveGlobalRole !== 'system_admin') {
+      const ok = await requireTenantMembership(supabase, tenantId, userId)
+      if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const { error: upsertError } = await supabase
+      .from('leader_profile')
+      .upsert(
+        {
+          user_id: userId,
+          tenant_id: tenantId,
+          display_achievement_ids: uniqueIds,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,tenant_id' }
+      )
+
+    if (upsertError) {
+      console.error('[api/gamification/pins] save error', upsertError)
+      return NextResponse.json({ error: 'Failed to save pins' }, { status: 500 })
+    }
+
+    return NextResponse.json({ tenantId, pinnedIds: uniqueIds }, { status: 200 })
+  },
+})

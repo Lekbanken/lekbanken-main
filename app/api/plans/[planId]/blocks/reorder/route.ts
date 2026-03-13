@@ -1,23 +1,23 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { fetchPlanWithRelations, recalcPlanDuration } from '@/lib/services/planner.server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requirePlanEditAccess } from '@/lib/planner/require-plan-access'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
   return id?.trim() || null
 }
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ planId: string }> }
-) {
-  const params = await context.params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
   const planId = normalizeId(params?.planId)
   if (!planId) {
     return NextResponse.json({ error: 'Invalid plan id' }, { status: 400 })
   }
 
-  const { blockIds } = (await request.json().catch(() => ({}))) as {
+  const { blockIds } = (await req.json().catch(() => ({}))) as {
     blockIds?: string[]
   }
 
@@ -25,15 +25,14 @@ export async function POST(
     return NextResponse.json({ error: 'blockIds is required' }, { status: 400 })
   }
 
+  const user = auth!.user!
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // Capability check: user must be able to edit this plan
+  const access = await requirePlanEditAccess(supabase, user, planId)
+  if (!access.allowed) return access.response
 
+  const userId = user.id
   // Load existing block ids for the plan to validate the reorder request
   const { data: existingBlocks, error: loadError } = await supabase
     .from('plan_blocks')
@@ -81,11 +80,12 @@ export async function POST(
       .update({
         total_time_minutes: totalTime,
         updated_at: new Date().toISOString(),
-        updated_by: user.id,
+        updated_by: userId,
       })
       .eq('id', planId)
   }
 
   const refreshed = await fetchPlanWithRelations(planId)
   return NextResponse.json({ plan: refreshed.plan })
-}
+  },
+})

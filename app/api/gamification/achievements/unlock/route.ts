@@ -1,27 +1,31 @@
 /**
- * Achievement Unlock API for Authenticated Users
- * 
+ * Achievement Unlock API — ADMIN/SYSTEM ONLY
+ *
  * POST /api/gamification/achievements/unlock
- * 
- * Programmatically unlock achievements for the current user.
- * Used by game completion logic to award achievements.
- * 
- * SECURITY NOTES:
- * - Uses RLS client for reads, service role for inserts (matches RLS policies)
- * - Tenant resolved from user_tenant_memberships, not user_progress
- * - tenant_id on insert is set server-side, never from client
+ *
+ * Directly unlock an achievement for a target user.
+ * Restricted to system_admin to prevent condition-bypass exploits.
+ *
+ * SECURITY HARDENING (launch-scope, 2026-03-14):
+ * - Changed from user-callable to system_admin-only.
+ * - Regular users must go through `/api/gamification/achievements/check`,
+ *   which evaluates conditions server-side before unlocking.
+ * - This prevents users from unlocking arbitrary achievements by ID
+ *   without meeting the achievement's conditions.
+ * - See GAM-001 in launch-control.md.
+ *
+ * PRESERVED:
  * - Race-safe idempotency via unique constraint + duplicate handling
- * 
- * HARDENED in Phase 4.1:
+ * - tenant_id resolved server-side, never from client
  * - Metadata size limits enforced
- * - Insert-first pattern with duplicate violation handling
+ * - Cosmetic grants on unlock
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { checkAndGrantCosmetics } from '@/lib/journey/cosmetic-grants';
 import { z } from 'zod';
+import { apiHandler } from '@/lib/api/route-handler';
 
 // Constants for metadata limits
 const MAX_METADATA_KEYS = 25;
@@ -58,12 +62,11 @@ function validateMetadata(metadata: Record<string, unknown> | undefined):
 
 const unlockRequestSchema = z.object({
   achievementId: z.string().uuid('Achievement ID must be a valid UUID'),
-  // Context is for audit only - ignored for security-sensitive fields
+  targetUserId: z.string().uuid('Target user ID must be a valid UUID'),
   context: z
     .object({
       gameId: z.string().uuid().optional(),
       sessionId: z.string().uuid().optional(),
-      // Metadata validated separately for size limits
       metadata: z.record(z.unknown()).optional(),
     })
     .optional(),
@@ -102,38 +105,14 @@ async function resolveUserTenant(
   return memberships[0].tenant_id;
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    // RLS client for auth check and reads
-    const rlsClient = await createServerRlsClient();
-    // Service role client for inserts (RLS blocks user inserts)
+export const POST = apiHandler({
+  auth: 'system_admin',
+  rateLimit: 'api',
+  input: unlockRequestSchema,
+  handler: async ({ body }) => {
     const serviceClient = createServiceRoleClient();
 
-    // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await rlsClient.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Parse and validate request body
-    const body = await request.json();
-    const parsed = unlockRequestSchema.safeParse(body);
-
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Invalid request', details: parsed.error.flatten() },
-        { status: 400 }
-      );
-    }
-
-    const { achievementId, context } = parsed.data;
+    const { achievementId, targetUserId, context } = body;
 
     // Validate metadata size limits (P1.2 hardening)
     if (context?.metadata) {
@@ -146,11 +125,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Resolve user's tenant from memberships (not user_progress)
-    const userTenantId = await resolveUserTenant(serviceClient, user.id);
+    // Resolve target user's tenant from memberships
+    const userTenantId = await resolveUserTenant(serviceClient, targetUserId);
 
     // Check if achievement exists and is active
-    const { data: achievement, error: achievementError } = await rlsClient
+    const { data: achievement, error: achievementError } = await serviceClient
       .from('achievements')
       .select('id, name, description, icon_url, condition_type, condition_value, status, tenant_id')
       .eq('id', achievementId)
@@ -170,10 +149,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify user can access this achievement (global or their tenant)
+    // Verify target user can access this achievement (global or their tenant)
     if (achievement.tenant_id !== null && achievement.tenant_id !== userTenantId) {
       return NextResponse.json(
-        { error: 'Achievement not available for your account' },
+        { error: 'Achievement not available for target user' },
         { status: 403 }
       );
     }
@@ -184,9 +163,8 @@ export async function POST(request: NextRequest) {
     const { data: unlock, error: unlockError } = await serviceClient
       .from('user_achievements')
       .insert({
-        user_id: user.id,
+        user_id: targetUserId,
         achievement_id: achievementId,
-        // Server-side tenant binding - never from client
         tenant_id: userTenantId,
       })
       .select('id, unlocked_at')
@@ -204,7 +182,7 @@ export async function POST(request: NextRequest) {
         const { data: existingUnlock } = await serviceClient
           .from('user_achievements')
           .select('id, unlocked_at')
-          .eq('user_id', user.id)
+          .eq('user_id', targetUserId)
           .eq('achievement_id', achievementId)
           .single();
 
@@ -229,16 +207,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log context for audit (do not trust for security decisions)
+    // Log context for audit
     if (context) {
-      console.log(`[AUDIT] Achievement ${achievementId} unlocked for user ${user.id}`, {
+      console.log(`[AUDIT] Achievement ${achievementId} unlocked for user ${targetUserId}`, {
         tenantId: userTenantId,
         context,
       });
     }
 
     // Journey v2.0 — grant cosmetics linked to this achievement
-    await checkAndGrantCosmetics(serviceClient, user.id, {
+    await checkAndGrantCosmetics(serviceClient, targetUserId, {
       type: 'achievement',
       achievementId,
     });
@@ -255,11 +233,5 @@ export async function POST(request: NextRequest) {
       },
       unlockedAt: unlock.unlocked_at,
     });
-  } catch (err) {
-    console.error('Error in achievement unlock API:', err);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

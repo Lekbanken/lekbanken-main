@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { resolveSessionViewer } from '@/lib/api/play-auth';
-
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
-}
+import { apiHandler } from '@/lib/api/route-handler';
 
 function getCurrentStepPhase(session: {
   current_step_index?: number | null;
@@ -28,77 +25,77 @@ function isUnlockedForPosition(
   return current.currentPhase >= itemPhase;
 }
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string; decisionId: string }> }
-) {
-  const { id: sessionId, decisionId } = await params;
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ req, params }) => {
+    const { id: sessionId, decisionId } = params;
 
-  const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
+    const session = await ParticipantSessionService.getSessionById(sessionId);
+    if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
 
-  const current = getCurrentStepPhase(session);
+    const current = getCurrentStepPhase(session);
 
-  const viewer = await resolveSessionViewer(sessionId, request);
-  if (!viewer) return jsonError('Unauthorized', 401);
+    const viewer = await resolveSessionViewer(sessionId, req);
+    if (!viewer) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const service = await createServiceRoleClient();
+    const service = await createServiceRoleClient();
 
-  const { data: decision, error: dErr } = await service
-    .from('session_decisions')
-    .select('id, session_id, title, status, options, revealed_at, step_index, phase_index')
-    .eq('id', decisionId)
-    .eq('session_id', sessionId)
-    .single();
+    const { data: decision, error: dErr } = await service
+      .from('session_decisions')
+      .select('id, session_id, title, status, options, revealed_at, step_index, phase_index')
+      .eq('id', decisionId)
+      .eq('session_id', sessionId)
+      .single();
 
-  if (dErr || !decision) return jsonError('Decision not found', 404);
+    if (dErr || !decision) return NextResponse.json({ error: 'Decision not found' }, { status: 404 });
 
-  if (viewer.type === 'participant') {
-    if (!decision.revealed_at && (decision.status as string) !== 'revealed') {
-      return jsonError('Results not revealed', 403);
+    if (viewer.type === 'participant') {
+      if (!decision.revealed_at && (decision.status as string) !== 'revealed') {
+        return NextResponse.json({ error: 'Results not revealed' }, { status: 403 });
+      }
+
+      const stepIndex = (decision.step_index as number | null) ?? null;
+      const phaseIndex = (decision.phase_index as number | null) ?? null;
+      if (!isUnlockedForPosition(stepIndex, phaseIndex, current)) {
+        return NextResponse.json({ error: 'Results not available yet' }, { status: 403 });
+      }
     }
 
-    const stepIndex = (decision.step_index as number | null) ?? null;
-    const phaseIndex = (decision.phase_index as number | null) ?? null;
-    if (!isUnlockedForPosition(stepIndex, phaseIndex, current)) {
-      return jsonError('Results not available yet', 403);
+    const options = (decision.options as Array<{ key?: string; label?: string }> | null) ?? [];
+    const counts: Record<string, number> = {};
+    for (const opt of options) {
+      if (opt?.key) counts[opt.key] = 0;
     }
-  }
 
-  const options = (decision.options as Array<{ key?: string; label?: string }> | null) ?? [];
-  const counts: Record<string, number> = {};
-  for (const opt of options) {
-    if (opt?.key) counts[opt.key] = 0;
-  }
+    const { data: votes, error: vErr } = await service
+      .from('session_votes')
+      .select('option_key')
+      .eq('decision_id', decisionId);
 
-  const { data: votes, error: vErr } = await service
-    .from('session_votes')
-    .select('option_key')
-    .eq('decision_id', decisionId);
+    if (vErr) return NextResponse.json({ error: 'Failed to load votes' }, { status: 500 });
 
-  if (vErr) return jsonError('Failed to load votes', 500);
+    for (const v of votes ?? []) {
+      const key = v.option_key as string;
+      if (counts[key] !== undefined) counts[key] += 1;
+    }
 
-  for (const v of votes ?? []) {
-    const key = v.option_key as string;
-    if (counts[key] !== undefined) counts[key] += 1;
-  }
+    const results = options.map((o) => ({
+      key: o.key,
+      label: o.label,
+      count: counts[o.key ?? ''] ?? 0,
+    }));
 
-  const results = options.map((o) => ({
-    key: o.key,
-    label: o.label,
-    count: counts[o.key ?? ''] ?? 0,
-  }));
-
-  return NextResponse.json(
-    {
-      decision: {
-        id: decision.id,
-        title: decision.title,
-        status: decision.status,
-        revealed_at: decision.revealed_at,
+    return NextResponse.json(
+      {
+        decision: {
+          id: decision.id,
+          title: decision.title,
+          status: decision.status,
+          revealed_at: decision.revealed_at,
+        },
+        results,
       },
-      results,
-    },
-    { status: 200 }
-  );
-}
+      { status: 200 }
+    );
+  },
+});

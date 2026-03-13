@@ -10,6 +10,7 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { Json } from '@/types/supabase';
 import {
   applySessionCommand,
@@ -24,20 +25,12 @@ interface CommandRequestBody {
   client_seq: number;
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
   try {
-    const { id: sessionId } = await params;
-
-    // ── Auth ──────────────────────────────────────────────────
-    const supabase = await createServerRlsClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { id: sessionId } = params;
+    const userId = auth!.user!.id;
 
     // ── Host or admin check ──────────────────────────────────
     const session = await ParticipantSessionService.getSessionById(sessionId);
@@ -46,12 +39,13 @@ export async function POST(
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       // Allow system_admin override
+      const supabase = await createServerRlsClient();
       const { data: userData } = await supabase
         .from('users')
         .select('global_role')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
 
       if (userData?.global_role !== 'system_admin') {
@@ -60,7 +54,7 @@ export async function POST(
     }
 
     // ── Parse + validate body ────────────────────────────────
-    const body: CommandRequestBody = await request.json();
+    const body: CommandRequestBody = await req.json();
 
     if (!body.command_type || !SESSION_COMMAND_TYPES.includes(body.command_type)) {
       return NextResponse.json(
@@ -80,7 +74,7 @@ export async function POST(
     // ── Execute ──────────────────────────────────────────────
     const result = await applySessionCommand({
       sessionId,
-      issuedBy: user.id,
+      issuedBy: userId,
       commandType: body.command_type,
       payload: (body.payload ?? {}) as Record<string, Json>,
       clientId: body.client_id,
@@ -106,4 +100,5 @@ export async function POST(
     console.error('[command route] Unhandled error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+})

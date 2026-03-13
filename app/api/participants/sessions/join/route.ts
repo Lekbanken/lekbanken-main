@@ -1,113 +1,89 @@
 /**
  * POST /api/participants/sessions/join
- * 
+ *
  * Join a participant session using a 6-character code.
- * No authentication required - anonymous participation.
+ * No authentication required — anonymous participation.
+ *
+ * Batch 6c: Wrapped with apiHandler (auth: 'public', rateLimit: 'strict').
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { z } from 'zod';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
-import { 
-  generateParticipantToken, 
-  calculateTokenExpiry 
+import {
+  generateParticipantToken,
+  calculateTokenExpiry,
 } from '@/lib/services/participants/participant-token';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
 import { logger } from '@/lib/utils/logger';
-import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
-import { errorTracker } from '@/lib/utils/error-tracker';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 
-interface JoinSessionRequest {
-  sessionCode: string;
-  displayName: string;
-  avatarUrl?: string;
-}
+const joinSchema = z.object({
+  // Codes are 6 chars (e.g. "H3K9QF"), max 10 allows formatted input like "H3K-9QF"
+  sessionCode: z.string().min(1, 'Session code is required').max(10),
+  displayName: z.string().min(1, 'Display name is required').max(50, 'Display name must be 50 characters or less').trim(),
+  avatarUrl: z.string().url('Invalid avatar URL').max(2048).refine(
+    url => /^https?:\/\//i.test(url),
+    'Avatar URL must use HTTP or HTTPS'
+  ).optional(),
+});
 
-export async function POST(request: NextRequest) {
-  // Apply strict rate limiting for join endpoint (prevent abuse)
-  const rateLimitResponse = applyRateLimitMiddleware(request, 'strict');
-  if (rateLimitResponse) return rateLimitResponse;
+export const POST = apiHandler({
+  auth: 'public',
+  rateLimit: 'strict',
+  input: joinSchema,
+  handler: async ({ req, body }) => {
+    const { sessionCode, displayName, avatarUrl } = body;
 
-  try {
-    // Parse request body
-    const body: JoinSessionRequest = await request.json();
-    
-    // Validate required fields
-    if (!body.sessionCode || body.sessionCode.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Session code is required' },
-        { status: 400 }
-      );
-    }
-    
-    if (!body.displayName || body.displayName.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Display name is required' },
-        { status: 400 }
-      );
-    }
-    
-    if (body.displayName.length > 50) {
-      return NextResponse.json(
-        { error: 'Display name must be 50 characters or less' },
-        { status: 400 }
-      );
-    }
-    
     // Normalize and find session
-    const normalizedCode = normalizeSessionCode(body.sessionCode);
+    const normalizedCode = normalizeSessionCode(sessionCode);
     const session = await ParticipantSessionService.getSessionByCode(normalizedCode);
-    
+
     if (!session) {
       return NextResponse.json(
         { error: 'Session not found', details: 'Invalid session code or session has ended' },
-        { status: 404 }
+        { status: 404 },
       );
     }
-    
+
     // Check session status
     if (session.status === 'draft') {
       return NextResponse.json(
         { error: 'Session not available', details: 'Session is not open for participants yet.', code: 'SESSION_OFFLINE' },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
     if (session.status === 'locked') {
       return NextResponse.json(
         { error: 'Session is locked', details: 'Session is locked. No new participants can join.' },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
     if (session.status === 'ended' || session.status === 'cancelled' || session.status === 'archived') {
       return NextResponse.json(
         { error: 'Session ended', details: 'Session has ended.' },
-        { status: 410 }
+        { status: 410 },
       );
     }
 
     // Allow joining during: lobby (waiting), active (running), paused (temporarily stopped)
     if (session.status !== 'lobby' && session.status !== 'active' && session.status !== 'paused') {
       return NextResponse.json(
-        { 
-          error: 'Session not available',
-          details: `Session is ${session.status}.`,
-        },
-        { status: 403 }
+        { error: 'Session not available', details: `Session is ${session.status}.` },
+        { status: 403 },
       );
     }
-    
+
     // Check if session has expired
     if (session.expires_at && new Date(session.expires_at) < new Date()) {
       return NextResponse.json(
         { error: 'Session has expired' },
-        { status: 410 } // Gone
+        { status: 410 },
       );
     }
-    
+
     // Check max participants limit
     const settings = session.settings as {
       max_participants?: number;
@@ -119,34 +95,34 @@ export async function POST(request: NextRequest) {
     if (maxParticipants && session.participant_count >= maxParticipants) {
       return NextResponse.json(
         { error: 'Session is full', details: `Maximum ${maxParticipants} participants reached` },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     const requireApproval = Boolean(settings.require_approval ?? settings.requireApproval);
-    
+
     // Generate participant token
     const participantToken = generateParticipantToken();
-    
+
     // Calculate token expiry based on session settings
     const tokenExpiryHours = (session.settings as { token_expiry_hours?: number | null }).token_expiry_hours ?? 24;
     const tokenExpiresAt = calculateTokenExpiry(tokenExpiryHours);
-    
+
     // Get client IP for security/moderation
-    const ip = request.headers.get('x-forwarded-for') || 
-                request.headers.get('x-real-ip') || 
-                'unknown';
-    const userAgent = request.headers.get('user-agent') || 'unknown';
-    
+    const ip = req.headers.get('x-forwarded-for') ||
+               req.headers.get('x-real-ip') ||
+               'unknown';
+    const userAgent = req.headers.get('user-agent') || 'unknown';
+
     // Create participant
-    const supabase = await createServiceRoleClient();
+    const supabase = createServiceRoleClient();
     const { data: participant, error: createError } = await supabase
       .from('participants')
       .insert({
         session_id: session.id,
-        display_name: body.displayName.trim(),
+        display_name: displayName.trim(),
         participant_token: participantToken,
-        avatar_url: body.avatarUrl,
+        avatar_url: avatarUrl,
         // NOTE: DB enum does not include 'pending' (use 'idle' to represent awaiting approval)
         status: requireApproval ? 'idle' : 'active',
         token_expires_at: tokenExpiresAt?.toISOString(),
@@ -155,19 +131,18 @@ export async function POST(request: NextRequest) {
       })
       .select()
       .single();
-    
+
     if (createError || !participant) {
       logger.error('Failed to create participant', createError, {
         sessionId: session.id,
-        displayName: body.displayName,
+        displayName,
       });
-      
       return NextResponse.json(
         { error: 'Failed to join session', details: createError?.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
-    
+
     // Log activity
     await supabase
       .from('participant_activity_log')
@@ -180,20 +155,20 @@ export async function POST(request: NextRequest) {
           ip_address: ip,
         },
       });
-    
+
     logger.info('Participant joined session', {
       sessionId: session.id,
       participantId: participant.id,
       displayName: participant.display_name,
     });
-    
+
     // Broadcast participants_changed so hosts get live count updates (MS9)
     void broadcastPlayEvent(session.id, {
       type: 'participants_changed',
       payload: { sessionId: session.id },
       timestamp: new Date().toISOString(),
     });
-    
+
     return NextResponse.json({
       success: true,
       participant: {
@@ -210,22 +185,9 @@ export async function POST(request: NextRequest) {
         id: session.id,
         displayName: session.display_name,
         description: session.description,
-        participantCount: session.participant_count + 1, // Updated count
+        participantCount: session.participant_count + 1,
         settings: session.settings,
       },
     });
-    
-  } catch (error) {
-    // Track error to Supabase error_tracking table
-    await errorTracker.api(
-      '/api/participants/sessions/join',
-      'POST',
-      error
-    );
-    
-    return NextResponse.json(
-      { error: 'Failed to join session', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

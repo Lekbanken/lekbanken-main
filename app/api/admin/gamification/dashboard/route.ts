@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import {
   getDashboardSnapshot,
   getEconomyMetrics,
@@ -19,45 +20,14 @@ import {
  * - topN: number (for earners, default: 10)
  * - riskThreshold: number (for suspicious, default: 50)
  */
-export async function GET(request: Request) {
-  try {
-    // Verify admin access
-    const supabase = await createServerRlsClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Check if system admin (for now, simple check)
-    const { data: isAdmin } = await supabase.rpc('is_system_admin')
-    if (!isAdmin) {
-      // Check tenant admin if tenantId provided
-      const url = new URL(request.url)
-      const tenantId = url.searchParams.get('tenantId')
-      
-      if (tenantId) {
-        // Check owner role first, then admin
-        const { data: isOwner } = await supabase.rpc('has_tenant_role', {
-          p_tenant_id: tenantId,
-          required_role: 'owner',
-        })
-        const { data: isAdminRole } = await supabase.rpc('has_tenant_role', {
-          p_tenant_id: tenantId,
-          required_role: 'admin',
-        })
-        
-        if (!isOwner && !isAdminRole) {
-          return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-        }
-      } else {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-      }
-    }
-
-    // Parse query params
-    const url = new URL(request.url)
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req }) => {
+    const url = new URL(req.url)
     const tenantId = url.searchParams.get('tenantId') || null
+
+    await requireTenantRole(['owner', 'admin'], tenantId)
+
     const section = url.searchParams.get('section') || 'full'
     const topN = parseInt(url.searchParams.get('topN') || '10', 10)
     const riskThreshold = parseInt(url.searchParams.get('riskThreshold') || '50', 10)
@@ -86,11 +56,5 @@ export async function GET(request: Request) {
         const snapshot = await getDashboardSnapshot(filters)
         return NextResponse.json(snapshot)
     }
-  } catch (error) {
-    console.error('[GET /api/admin/gamification/dashboard] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

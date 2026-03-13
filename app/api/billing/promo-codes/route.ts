@@ -1,8 +1,7 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { stripe } from '@/lib/stripe/config'
-import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 const createPromoSchema = z.object({
   code: z.string().min(3).max(50).regex(/^[A-Z0-9_-]+$/i, 'Code must be alphanumeric with dashes/underscores'),
@@ -23,21 +22,9 @@ const createPromoSchema = z.object({
  * 
  * List all promotion codes from Stripe.
  */
-export async function GET(_request: NextRequest) {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // Verify user is system admin using RPC
-  const { data: isAdmin } = await supabase.rpc('is_system_admin')
-  if (!isAdmin) {
-    return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
-  }
-
-  try {
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async () => {
     // Fetch promo codes from Stripe
     const promoCodes = await stripe.promotionCodes.list({
       limit: 100,
@@ -62,53 +49,24 @@ export async function GET(_request: NextRequest) {
     }))
 
     return NextResponse.json({ promoCodes: formattedCodes })
-  } catch (error) {
-    console.error('[promo-codes] Stripe error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch promo codes' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})
 
 /**
  * POST /api/billing/promo-codes
  * 
  * Create a new promotion code in Stripe.
  */
-export async function POST(request: NextRequest) {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'system_admin',
+  input: createPromoSchema,
+  handler: async ({ auth, body }) => {
+    const { code, percentOff, amountOff, currency, maxRedemptions, expiresAt, firstTimeTransaction, minimumAmount, appliesTo } = body
 
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    if (!percentOff && !amountOff) {
+      return NextResponse.json({ error: 'Either percentOff or amountOff is required' }, { status: 400 })
+    }
 
-  // Verify user is system admin using RPC
-  const { data: isAdminPost } = await supabase.rpc('is_system_admin')
-  if (!isAdminPost) {
-    return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
-  }
-
-  let body: unknown
-  try {
-    body = await request.json()
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
-  }
-
-  const parsed = createPromoSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 })
-  }
-
-  const { code, percentOff, amountOff, currency, maxRedemptions, expiresAt, firstTimeTransaction, minimumAmount, appliesTo } = parsed.data
-
-  if (!percentOff && !amountOff) {
-    return NextResponse.json({ error: 'Either percentOff or amountOff is required' }, { status: 400 })
-  }
-
-  try {
     // First create a coupon
     const couponData: Record<string, unknown> = {
       duration: 'once',
@@ -118,7 +76,7 @@ export async function POST(request: NextRequest) {
       couponData.percent_off = percentOff
     } else if (amountOff) {
       couponData.amount_off = Math.round(amountOff * 100)
-      couponData.currency = currency.toLowerCase()
+      couponData.currency = (currency ?? 'sek').toLowerCase()
     }
 
     if (appliesTo?.products && appliesTo.products.length > 0) {
@@ -135,7 +93,7 @@ export async function POST(request: NextRequest) {
         first_time_transaction: firstTimeTransaction,
       },
       metadata: {
-        created_by: user.id,
+        created_by: auth!.user!.id,
         created_at: new Date().toISOString(),
       },
     }
@@ -150,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     if (minimumAmount) {
       promoData.restrictions!.minimum_amount = Math.round(minimumAmount * 100)
-      promoData.restrictions!.minimum_amount_currency = currency.toLowerCase()
+      promoData.restrictions!.minimum_amount_currency = (currency ?? 'sek').toLowerCase()
     }
 
     const promoCode = await stripe.promotionCodes.create(promoData)
@@ -166,62 +124,29 @@ export async function POST(request: NextRequest) {
         currency: coupon.currency,
       },
     })
-  } catch (error) {
-    console.error('[promo-codes] Stripe error:', error)
-    
-    if (error instanceof Error && 'type' in error) {
-      const stripeError = error as { type: string; message: string }
-      return NextResponse.json(
-        { error: stripeError.message, code: 'STRIPE_ERROR' },
-        { status: 400 }
-      )
-    }
-
-    return NextResponse.json(
-      { error: 'Failed to create promo code' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})
 
 /**
  * DELETE /api/billing/promo-codes?id=xxx
  * 
  * Deactivate a promotion code in Stripe.
  */
-export async function DELETE(request: NextRequest) {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+export const DELETE = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const { searchParams } = new URL(req.url)
+    const promoCodeId = searchParams.get('id')
 
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    if (!promoCodeId) {
+      return NextResponse.json({ error: 'Missing promo code ID' }, { status: 400 })
+    }
 
-  // Verify user is system admin using RPC
-  const { data: isAdminDelete } = await supabase.rpc('is_system_admin')
-  if (!isAdminDelete) {
-    return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
-  }
-
-  const { searchParams } = new URL(request.url)
-  const promoCodeId = searchParams.get('id')
-
-  if (!promoCodeId) {
-    return NextResponse.json({ error: 'Missing promo code ID' }, { status: 400 })
-  }
-
-  try {
     // Deactivate the promo code
     await stripe.promotionCodes.update(promoCodeId, {
       active: false,
     })
 
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('[promo-codes] Stripe error:', error)
-    return NextResponse.json(
-      { error: 'Failed to deactivate promo code' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

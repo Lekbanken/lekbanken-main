@@ -32,21 +32,6 @@ type ActionLogEntry = {
   action: string;
 };
 
-const mockParticipant: Participant = {
-  id: 'p-1',
-  name: 'Nora Nilsson',
-  email: 'nora@example.com',
-  tenantName: 'Lekbanken',
-  lastActive: '2025-12-12T09:05:00Z',
-  risk: 'none',
-  notes: 'Mockprofil tills backend kopplas.',
-};
-
-const mockLog: ActionLogEntry[] = [
-  { id: 'p-log-1', at: '2025-12-12T09:02:00Z', actor: 'Anna', action: 'Lades till i session' },
-  { id: 'p-log-2', at: '2025-12-12T09:05:00Z', actor: 'System', action: 'Risknivå: låg' },
-];
-
 type Props = {
   participantId: string;
 };
@@ -70,14 +55,15 @@ export function ParticipantDetailPage({ participantId }: Props) {
           setParticipant(json.participant || null);
           setLog(json.log || []);
         } else {
-          throw new Error(`API ${res.status}`);
+          const json = await res.json().catch(() => ({}));
+          throw new Error((json as { error?: string }).error || `API ${res.status}`);
         }
       } catch (err) {
-        console.warn('[admin/participant detail] fallback till mock', err);
+        console.warn('[admin/participant detail] load failed', err);
         if (!active) return;
-        setParticipant(mockParticipant);
-        setLog(mockLog);
-        setError(t('showingMockData'));
+        setParticipant(null);
+        setLog([]);
+        setError(err instanceof Error ? err.message : t('loadError'));
       }
     };
     void load();
@@ -110,7 +96,7 @@ export function ParticipantDetailPage({ participantId }: Props) {
     return (
       <AdminPageLayout>
         <AdminEmptyState
-          title={t('notFound')}
+          title={error || t('notFound')}
           description={t('checkLinkOrGoBack')}
         />
       </AdminPageLayout>

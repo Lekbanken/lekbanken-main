@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { apiHandler } from '@/lib/api/route-handler';
 import { slugify } from '@/lib/media/templateKey';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -59,19 +59,10 @@ async function validateBundleProductId(
 // GET — list all categories with product counts
 // ---------------------------------------------------------------------------
 
-export async function GET() {
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async () => {
   const supabase = await createServerRlsClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
 
   // Fetch all categories (including non-public) + product counts
   const { data: categories, error } = await supabase
@@ -104,27 +95,19 @@ export async function GET() {
   }));
 
   return NextResponse.json({ categories: result });
-}
+  },
+});
 
 // ---------------------------------------------------------------------------
 // POST — create a new category
 // ---------------------------------------------------------------------------
 
-export async function POST(request: Request) {
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
-  const body = await request.json().catch(() => null);
+  const body = await req.json().catch(() => null);
   if (!body) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
@@ -217,27 +200,19 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ category: data }, { status: 201 });
-}
+  },
+});
 
 // ---------------------------------------------------------------------------
 // PATCH — update a single category
 // ---------------------------------------------------------------------------
 
-export async function PATCH(request: Request) {
+export const PATCH = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
-  const body = await request.json().catch(() => null);
+  const body = await req.json().catch(() => null);
   if (!body || !body.id) {
     return NextResponse.json({ error: 'Missing category id' }, { status: 400 });
   }
@@ -304,4 +279,5 @@ export async function PATCH(request: Request) {
   }
 
   return NextResponse.json({ category: data });
-}
+  },
+});

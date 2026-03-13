@@ -2,8 +2,9 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { assertTenantAdminOrSystem, isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { requireTenantRole } from '@/lib/api/auth-guard';
 import type { Database, Json } from '@/types/supabase';
 import { coachDiagramDocumentSchemaV1 } from '@/lib/validation/coachDiagramSchemaV1';
 
@@ -92,52 +93,32 @@ const createSchema = z.object({
   svg: z.string().min(1),
 });
 
-async function requireAuth() {
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+    const url = new URL(req.url);
+    const scopeTypeRaw = url.searchParams.get('scopeType');
+    const tenantIdRaw = url.searchParams.get('tenantId');
 
-  if (error || !user) return { user: null, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
-  return { user, response: null };
-}
+    const parsedScope = scopeSchema.safeParse({
+      scopeType: scopeTypeRaw ?? 'tenant',
+      tenantId: tenantIdRaw ? tenantIdRaw : null,
+    });
 
-function getAppUrlFromRequest(req: NextRequest): string {
-  const url = process.env.NEXT_PUBLIC_APP_URL;
-  if (url) return url.replace(/\/$/, '');
-  // Fallback: derive from incoming request (works in local dev without extra env).
-  return new URL(req.url).origin;
-}
-
-export async function GET(req: NextRequest) {
-  const { user, response } = await requireAuth();
-  if (response) return response;
-
-  const url = new URL(req.url);
-  const scopeTypeRaw = url.searchParams.get('scopeType');
-  const tenantIdRaw = url.searchParams.get('tenantId');
-
-  const parsedScope = scopeSchema.safeParse({
-    scopeType: scopeTypeRaw ?? 'tenant',
-    tenantId: tenantIdRaw ? tenantIdRaw : null,
-  });
-
-  if (!parsedScope.success) {
-    return NextResponse.json({ error: 'Invalid query', details: parsedScope.error.flatten() }, { status: 400 });
-  }
-
-  const { scopeType, tenantId } = parsedScope.data;
-
-  if (scopeType === 'global') {
-    if (!isSystemAdmin(user)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  } else {
-    if (!tenantId) {
-      return NextResponse.json({ error: 'Invalid query', details: { tenantId: ['Required for tenant scope'] } }, { status: 400 });
+    if (!parsedScope.success) {
+      return NextResponse.json({ error: 'Invalid query', details: parsedScope.error.flatten() }, { status: 400 });
     }
-    const allowed = await assertTenantAdminOrSystem(tenantId, user);
-    if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+
+    const { scopeType, tenantId } = parsedScope.data;
+
+    if (scopeType === 'global') {
+      if (auth!.effectiveGlobalRole !== 'system_admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    } else {
+      if (!tenantId) {
+        return NextResponse.json({ error: 'Invalid query', details: { tenantId: ['Required for tenant scope'] } }, { status: 400 });
+      }
+      await requireTenantRole(['admin', 'owner'], tenantId);
+    }
 
   const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithCoachDiagramExports>;
 
@@ -163,40 +144,48 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({ diagrams: (data ?? []) as DiagramListRow[] }, { status: 200 });
+  },
+});
+
+function getAppUrlFromRequest(req: NextRequest): string {
+  const url = process.env.NEXT_PUBLIC_APP_URL;
+  if (url) return url.replace(/\/$/, '');
+  // Fallback: derive from incoming request (works in local dev without extra env).
+  return new URL(req.url).origin;
 }
 
-export async function POST(req: NextRequest) {
-  const { user, response } = await requireAuth();
-  if (response) return response;
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+    const userId = auth!.user!.id;
 
-  const body = await req.json().catch(() => ({}));
-  const parsed = createSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 });
-  }
-
-  const { tenantId: tenantIdRaw, scopeType, exportedByTool, document, svg } = parsed.data;
-  const tenantId = tenantIdRaw ?? null;
-
-  const docParsed = coachDiagramDocumentSchemaV1.safeParse(document);
-  if (!docParsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: { document: docParsed.error.flatten() } }, { status: 400 });
-  }
-
-  const canonical = docParsed.data;
-
-  if (scopeType === 'global') {
-    if (tenantId !== null) {
-      return NextResponse.json({ error: 'Invalid payload', details: { tenantId: ['Must be null for global scope'] } }, { status: 400 });
+    const body = await req.json().catch(() => ({}));
+    const parsed = createSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 });
     }
-    if (!isSystemAdmin(user)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  } else {
-    if (!tenantId) {
-      return NextResponse.json({ error: 'Invalid payload', details: { tenantId: ['Required for tenant scope'] } }, { status: 400 });
+
+    const { tenantId: tenantIdRaw, scopeType, exportedByTool, document, svg } = parsed.data;
+    const tenantId = tenantIdRaw ?? null;
+
+    const docParsed = coachDiagramDocumentSchemaV1.safeParse(document);
+    if (!docParsed.success) {
+      return NextResponse.json({ error: 'Invalid payload', details: { document: docParsed.error.flatten() } }, { status: 400 });
     }
-    const allowed = await assertTenantAdminOrSystem(tenantId, user);
-    if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+
+    const canonical = docParsed.data;
+
+    if (scopeType === 'global') {
+      if (tenantId !== null) {
+        return NextResponse.json({ error: 'Invalid payload', details: { tenantId: ['Must be null for global scope'] } }, { status: 400 });
+      }
+      if (auth!.effectiveGlobalRole !== 'system_admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    } else {
+      if (!tenantId) {
+        return NextResponse.json({ error: 'Invalid payload', details: { tenantId: ['Required for tenant scope'] } }, { status: 400 });
+      }
+      await requireTenantRole(['admin', 'owner'], tenantId);
+    }
 
   const appUrl = getAppUrlFromRequest(req);
 
@@ -220,7 +209,7 @@ export async function POST(req: NextRequest) {
         sport_type: canonical.sportType,
         field_template_id: canonical.fieldTemplateId,
         exported_at: nowIso,
-        exported_by_user_id: user.id,
+        exported_by_user_id: userId,
         exported_by_tool: exportedByTool ?? 'coach-diagram-builder',
         document: canonical as unknown as Json,
         svg,
@@ -256,4 +245,5 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ id: diagramId }, { status: 201 });
-}
+  },
+});

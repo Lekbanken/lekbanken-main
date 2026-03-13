@@ -23,7 +23,11 @@ import {
   DialogTitle,
 } from "@/components/ui";
 import { useToast } from "@/components/ui/toast";
-import { supabase } from "@/lib/supabase/client";
+import {
+  addTenantDomain,
+  removeTenantDomain,
+  updateTenantDomainStatus,
+} from "../../organisationMutations.server";
 import type { TenantDomain } from "../../types";
 
 type OrganisationDomainsSectionProps = {
@@ -59,23 +63,9 @@ export function OrganisationDomainsSection({
     
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from('tenant_domains')
-        .insert({
-          tenant_id: tenantId,
-          hostname: newHostname.toLowerCase().trim(),
-          kind: newKind,
-          status: 'pending',
-        });
+      const result = await addTenantDomain(tenantId, newHostname, newKind);
       
-      if (error) throw error;
-      
-      // Log audit event
-      await supabase.from('tenant_audit_logs').insert({
-        tenant_id: tenantId,
-        event_type: 'domain_added',
-        payload: { hostname: newHostname },
-      });
+      if (result.error) throw new Error(result.error);
       
       success('Domän tillagd');
       setIsAddDialogOpen(false);
@@ -93,19 +83,9 @@ export function OrganisationDomainsSection({
     if (!confirm(`Är du säker på att du vill ta bort ${domain.hostname}?`)) return;
     
     try {
-      const { error } = await supabase
-        .from('tenant_domains')
-        .delete()
-        .eq('id', domain.id);
+      const result = await removeTenantDomain(tenantId, domain.id, domain.hostname);
       
-      if (error) throw error;
-      
-      // Log audit event
-      await supabase.from('tenant_audit_logs').insert({
-        tenant_id: tenantId,
-        event_type: 'domain_removed',
-        payload: { hostname: domain.hostname },
-      });
+      if (result.error) throw new Error(result.error);
       
       success('Domän borttagen');
       onRefresh();
@@ -117,24 +97,18 @@ export function OrganisationDomainsSection({
 
   const handleStatusChange = async (domain: TenantDomain, newStatus: TenantDomain['status']) => {
     try {
-      const updates: Record<string, unknown> = { status: newStatus };
-      if (newStatus === 'active' && !domain.verifiedAt) {
-        updates.verified_at = new Date().toISOString();
-      }
+      const needsVerifiedAt = newStatus === 'active' && !domain.verifiedAt;
       
-      const { error } = await supabase
-        .from('tenant_domains')
-        .update(updates)
-        .eq('id', domain.id);
+      const result = await updateTenantDomainStatus(
+        tenantId,
+        domain.id,
+        newStatus,
+        domain.hostname,
+        domain.status,
+        needsVerifiedAt
+      );
       
-      if (error) throw error;
-      
-      // Log audit event
-      await supabase.from('tenant_audit_logs').insert({
-        tenant_id: tenantId,
-        event_type: 'domain_status_changed',
-        payload: { hostname: domain.hostname, from: domain.status, to: newStatus },
-      });
+      if (result.error) throw new Error(result.error);
       
       success('Status uppdaterad');
       onRefresh();

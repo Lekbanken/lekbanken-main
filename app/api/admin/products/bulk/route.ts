@@ -6,24 +6,17 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { BulkOperationPayload, BulkOperationResult } from '@/features/admin/products/v2/types';
 
 const VALID_OPERATIONS = ['activate', 'archive', 'set_availability', 'export', 'sync_stripe', 'validate'];
 
-export async function POST(request: Request) {
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
   const supabase = await createServerRlsClient();
 
-  // Auth check
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
-  }
-
-  const payload: BulkOperationPayload = await request.json().catch(() => ({
+  const payload: BulkOperationPayload = await req.json().catch(() => ({
     operation: '',
     product_ids: [],
   }));
@@ -113,4 +106,5 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json(result);
-}
+  },
+});

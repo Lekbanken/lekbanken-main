@@ -1,7 +1,7 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerRlsClient, supabaseAdmin } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 import { getAllowedProductIds } from '@/app/api/games/utils'
 import { validateGamePayload } from '@/lib/validation/games'
@@ -9,11 +9,10 @@ import type { Database } from '@/types/supabase'
 
 type GameUpdate = Database['public']['Tables']['games']['Update']
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ gameId: string }> }
-) {
-  const { gameId } = await params
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ params }) => {
+  const gameId = params.gameId
   const rlsClient = await createServerRlsClient()
   const cookieStore = await cookies()
   const {
@@ -73,13 +72,12 @@ export async function GET(
   }
 
   return NextResponse.json({ game: data })
-}
+} })
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ gameId: string }> }
-) {
-  const { gameId } = await params
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ req, params }) => {
+  const gameId = params.gameId
   const rlsClient = await createServerRlsClient()
   const cookieStore = await cookies()
   const {
@@ -96,8 +94,9 @@ export async function PATCH(
   }
 
   const activeTenantId = isSystemAdmin ? null : await readTenantIdFromCookies(cookieStore)
-  const supabase = supabaseAdmin
-  const body = (await request.json().catch(() => ({}))) as Partial<GameUpdate> & {
+  // GAME-001c: use RLS client for non-system-admin callers
+  const supabase = isSystemAdmin ? supabaseAdmin : rlsClient
+  const body = (await req.json().catch(() => ({}))) as Partial<GameUpdate> & {
     hasCoverImage?: boolean
   }
 
@@ -148,13 +147,12 @@ export async function PATCH(
   }
 
   return NextResponse.json({ game: data })
-}
+} })
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ gameId: string }> }
-) {
-  const { gameId } = await params
+export const DELETE = apiHandler({
+  auth: 'user',
+  handler: async ({ req, params }) => {
+  const gameId = params.gameId
   const rlsClient = await createServerRlsClient()
   const {
     data: { user },
@@ -163,6 +161,12 @@ export async function DELETE(
   const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
   const isSuperAdmin = role === 'superadmin'
   const isSystemAdmin = role === 'system_admin' || isSuperAdmin
+
+  // GAME-001a: explicit app-level role gate (defense-in-depth over RLS)
+  const isTenantElevated = role === 'admin' || role === 'owner'
+  if (!isSystemAdmin && !isTenantElevated) {
+    return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+  }
 
   // System admins can delete any game, others go through RLS
   const supabase = isSystemAdmin ? supabaseAdmin : rlsClient
@@ -184,8 +188,16 @@ export async function DELETE(
   const totalActiveSessions = (activeSessionCount ?? 0) + (activeParticipantSessionCount ?? 0)
 
   // Check if force delete is requested
-  const { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(req.url)
   const forceDelete = searchParams.get('force') === 'true'
+
+  // GAME-001b: force delete is a destructive override — system_admin only
+  if (forceDelete && !isSystemAdmin) {
+    return NextResponse.json(
+      { error: 'Force delete requires system_admin' },
+      { status: 403 }
+    )
+  }
 
   if (totalActiveSessions > 0 && !forceDelete) {
     return NextResponse.json(
@@ -224,4 +236,4 @@ export async function DELETE(
   }
 
   return NextResponse.json({ ok: true })
-}
+} })

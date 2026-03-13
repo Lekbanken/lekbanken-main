@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { getServerAuthContext } from '@/lib/auth/server-context'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,17 +10,9 @@ export const dynamic = 'force-dynamic'
  * Hämtar status för schemalagda jobb.
  * Endast tillgängligt för system_admin.
  */
-export async function GET() {
-  try {
-    const auth = await getServerAuthContext()
-    
-    if (auth.effectiveGlobalRole !== 'system_admin') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 403 }
-      )
-    }
-
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async () => {
     // Use request-scoped client so the RPC can evaluate auth context (auth.uid())
     // for `public.is_system_admin()` checks inside the function.
     const supabase = await createServerRlsClient()
@@ -44,14 +36,8 @@ export async function GET() {
     }
 
     return NextResponse.json(data)
-  } catch (error) {
-    console.error('[scheduled-jobs] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})
 
 /**
  * POST /api/admin/scheduled-jobs/run
@@ -59,18 +45,10 @@ export async function GET() {
  * Kör ett schemalagt jobb manuellt.
  * Endast tillgängligt för system_admin.
  */
-export async function POST(request: Request) {
-  try {
-    const auth = await getServerAuthContext()
-    
-    if (auth.effectiveGlobalRole !== 'system_admin') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 403 }
-      )
-    }
-
-    const body = await request.json().catch(() => ({}))
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const body = await req.json().catch(() => ({}))
     const { jobName } = body
 
     if (!jobName) {
@@ -107,11 +85,5 @@ export async function POST(request: Request) {
       success: true,
       result: data,
     })
-  } catch (error) {
-    console.error('[scheduled-jobs] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

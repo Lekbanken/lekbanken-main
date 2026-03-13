@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { resolveParticipant } from '@/lib/api/play-auth';
-import type { Json } from '@/types/supabase';
+import { apiHandler } from '@/lib/api/route-handler';
+import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 import {
   normalizeRiddleAnswer,
   checkRiddleAnswer,
@@ -40,9 +41,15 @@ type PuzzleSubmitResponse = {
 // Helpers
 // =============================================================================
 
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
-}
+// Puzzle RPCs are defined in migration 20260311000001_atomic_puzzle_rpcs.sql.
+// Until the migration is deployed and `supabase gen types` regenerates the TS
+// types, we call `.rpc()` through this typed wrapper to avoid TS2345 errors.
+// Remove this wrapper once the generated types include the new RPCs.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const callRpc = async (supabase: Awaited<ReturnType<typeof createServiceRoleClient>>, fn: string, params: Record<string, unknown>) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (supabase.rpc as any)(fn, params) as Promise<{ data: unknown; error: { message: string } | null }>;
+};
 
 // =============================================================================
 // V2 State Helpers
@@ -81,410 +88,192 @@ async function getPuzzleState(
   return (data.state as Record<string, unknown>) || {};
 }
 
-async function updatePuzzleState(
-  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
-  sessionId: string,
-  gameArtifactId: string,
-  puzzleState: Record<string, unknown>
-): Promise<void> {
-  // Upsert state record
-  await supabase
-    .from('session_artifact_state')
-    .upsert(
-      {
-        session_id: sessionId,
-        game_artifact_id: gameArtifactId,
-        state: { puzzleState } as unknown as Json,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'session_id,game_artifact_id' }
-    );
-}
-
 // =============================================================================
-// Riddle Logic (V2)
+// RPC Result Type
 // =============================================================================
 
-async function handleRiddleSubmit(
-  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
-  sessionId: string,
-  gameArtifactId: string,
-  answer: string,
-  participantId: string
-): Promise<PuzzleSubmitResponse> {
-  // V2: Get config from game_artifacts
-  const config = await getArtifactConfig(supabase, gameArtifactId);
-  if (!config) {
-    return { status: 'error', message: 'Artefakt hittades inte' };
-  }
+type PuzzleRpcResult = {
+  status: string;
+  message: string;
+  solved?: boolean;
+  locked?: boolean;
+  attempts_left?: number | null;
+  state?: Record<string, unknown>;
+};
 
-  const { metadata } = config;
-  const correctAnswers = (metadata.correctAnswers || []) as string[];
-  const normalizeMode = (metadata.normalizeMode || 'fuzzy') as RiddleNormalizeMode;
-  const maxAttempts = typeof metadata.maxAttempts === 'number' ? metadata.maxAttempts : null;
-
-  // V2: Get runtime state from session_artifact_state
-  const stateData = await getPuzzleState(supabase, sessionId, gameArtifactId);
-  const puzzleState = (stateData.puzzleState || {
-    solved: false,
-    locked: false,
-    attempts: [],
-  }) as {
-    solved: boolean;
-    locked: boolean;
-    attempts: Array<{ answer: string; timestamp: string; participantId: string }>;
-  };
-
-  // Already solved?
-  if (puzzleState.solved) {
-    return { status: 'already_solved', message: 'Redan löst!', solved: true };
-  }
-
-  // Locked?
-  if (puzzleState.locked) {
-    return { status: 'locked', message: 'Låst - för många försök' };
-  }
-
-  // Check answer
-  const isCorrect = checkRiddleAnswer(answer, correctAnswers, normalizeMode);
-
-  // Record attempt
-  puzzleState.attempts.push({
-    answer: normalizeRiddleAnswer(answer, normalizeMode),
-    timestamp: new Date().toISOString(),
-    participantId,
-  });
-
-  const attemptsLeft = maxAttempts !== null ? maxAttempts - puzzleState.attempts.length : null;
-
-  if (isCorrect) {
-    puzzleState.solved = true;
-
-    // V2: Update state in session_artifact_state
-    await updatePuzzleState(supabase, sessionId, gameArtifactId, puzzleState);
-
-    return {
-      status: 'success',
-      message: (metadata.successMessage as string) || '✅ Rätt svar!',
-      solved: true,
-      state: puzzleState,
-    };
-  }
-
-  // Wrong answer
-  if (attemptsLeft !== null && attemptsLeft <= 0) {
-    puzzleState.locked = true;
-  }
-
-  // V2: Update state in session_artifact_state
-  await updatePuzzleState(supabase, sessionId, gameArtifactId, puzzleState);
-
+function mapRpcResult(result: PuzzleRpcResult): PuzzleSubmitResponse {
   return {
-    status: puzzleState.locked ? 'locked' : 'fail',
-    message: puzzleState.locked
-      ? (metadata.lockedMessage as string) || '🚫 Låst - för många försök'
-      : (metadata.failMessage as string) || '❌ Fel svar. Försök igen!',
-    solved: false,
-    attemptsLeft,
-    state: puzzleState,
+    status: result.status as PuzzleSubmitResponse['status'],
+    message: result.message,
+    solved: result.solved,
+    attemptsLeft: result.attempts_left,
+    state: result.state,
   };
 }
 
 // =============================================================================
-// Counter Logic
+// POST Handler (V2 — Atomic RPCs)
 // =============================================================================
-// Counter Logic (V2)
-// =============================================================================
+// All state mutations now use atomic Postgres RPCs with FOR UPDATE row locking.
+// This eliminates the JSONB read-modify-write race condition (PLAY-002 P0).
+// Answer validation for riddle stays in TypeScript (fuzzy normalization).
 
-async function handleCounterAction(
-  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
-  sessionId: string,
-  gameArtifactId: string,
-  action: 'increment' | 'decrement',
-  participantId: string
-): Promise<PuzzleSubmitResponse> {
-  // V2: Get config from game_artifacts
-  const config = await getArtifactConfig(supabase, gameArtifactId);
-  if (!config) {
-    return { status: 'error', message: 'Artefakt hittades inte' };
-  }
+export const POST = apiHandler({
+  auth: 'participant',
+  handler: async ({ params, participant: p, req }) => {
+    const sessionId = params.id;
+    const gameArtifactId = params.artifactId;
 
-  const { metadata } = config;
-  const target = typeof metadata.target === 'number' ? metadata.target : null;
-  const step = typeof metadata.step === 'number' ? metadata.step : 1;
-  const initialValue = typeof metadata.initialValue === 'number' ? metadata.initialValue : 0;
-
-  // V2: Get runtime state from session_artifact_state
-  const stateData = await getPuzzleState(supabase, sessionId, gameArtifactId);
-  const puzzleState = (stateData.puzzleState || {
-    currentValue: initialValue,
-    completed: false,
-    history: [],
-  }) as {
-    currentValue: number;
-    completed: boolean;
-    history: Array<{ action: string; timestamp: string; participantId: string }>;
-  };
-
-  if (puzzleState.completed) {
-    return { status: 'already_solved', message: 'Räknaren är redan klar!', solved: true };
-  }
-
-  // Apply action
-  if (action === 'increment') {
-    puzzleState.currentValue += step;
-  } else {
-    puzzleState.currentValue = Math.max(0, puzzleState.currentValue - step);
-  }
-
-  puzzleState.history.push({
-    action,
-    timestamp: new Date().toISOString(),
-    participantId,
-  });
-
-  // Check if target reached
-  if (target !== null && puzzleState.currentValue >= target) {
-    puzzleState.completed = true;
-  }
-
-  // V2: Update state in session_artifact_state
-  await updatePuzzleState(supabase, sessionId, gameArtifactId, puzzleState);
-
-  return {
-    status: puzzleState.completed ? 'success' : 'fail',
-    message: puzzleState.completed
-      ? `🎉 Klart! ${puzzleState.currentValue}/${target}`
-      : `${puzzleState.currentValue}${target ? `/${target}` : ''}`,
-    solved: puzzleState.completed,
-    state: puzzleState,
-  };
-}
-
-// =============================================================================
-// Multi-Answer Logic (V2)
-// =============================================================================
-
-async function handleMultiAnswerCheck(
-  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
-  sessionId: string,
-  gameArtifactId: string,
-  itemId: string,
-  _participantId: string
-): Promise<PuzzleSubmitResponse> {
-  // V2: Get config from game_artifacts
-  const config = await getArtifactConfig(supabase, gameArtifactId);
-  if (!config) {
-    return { status: 'error', message: 'Artefakt hittades inte' };
-  }
-
-  const { metadata } = config;
-  const items = (metadata.items || []) as string[];
-  const requiredCount = typeof metadata.requiredCount === 'number' ? metadata.requiredCount : items.length;
-
-  // V2: Get runtime state from session_artifact_state
-  const stateData = await getPuzzleState(supabase, sessionId, gameArtifactId);
-  const puzzleState = (stateData.puzzleState || {
-    checked: [] as string[],
-    completed: false,
-  }) as {
-    checked: string[];
-    completed: boolean;
-  };
-
-  if (puzzleState.completed) {
-    return { status: 'already_solved', message: 'Redan klart!', solved: true };
-  }
-
-  // Toggle item
-  const itemIndex = puzzleState.checked.indexOf(itemId);
-  if (itemIndex >= 0) {
-    puzzleState.checked.splice(itemIndex, 1);
-  } else {
-    puzzleState.checked.push(itemId);
-  }
-
-  // Check completion
-  if (puzzleState.checked.length >= requiredCount) {
-    puzzleState.completed = true;
-  }
-
-  // V2: Update state in session_artifact_state
-  await updatePuzzleState(supabase, sessionId, gameArtifactId, puzzleState);
-
-  return {
-    status: puzzleState.completed ? 'success' : 'fail',
-    message: puzzleState.completed
-      ? '✅ Alla klara!'
-      : `${puzzleState.checked.length}/${requiredCount} klara`,
-    solved: puzzleState.completed,
-    state: puzzleState,
-  };
-}
-
-// =============================================================================
-// QR Gate Logic (V2)
-// =============================================================================
-
-async function handleQRVerify(
-  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
-  sessionId: string,
-  gameArtifactId: string,
-  scannedValue: string,
-  _participantId: string
-): Promise<PuzzleSubmitResponse> {
-  // V2: Get config from game_artifacts
-  const config = await getArtifactConfig(supabase, gameArtifactId);
-  if (!config) {
-    return { status: 'error', message: 'Artefakt hittades inte' };
-  }
-
-  const { metadata } = config;
-  const expectedValue = (metadata.expectedValue || '') as string;
-
-  // V2: Get runtime state from session_artifact_state
-  const stateData = await getPuzzleState(supabase, sessionId, gameArtifactId);
-  const puzzleState = (stateData.puzzleState || {
-    verified: false,
-    scannedAt: null,
-  }) as {
-    verified: boolean;
-    scannedAt: string | null;
-  };
-
-  if (puzzleState.verified) {
-    return { status: 'already_solved', message: 'Redan verifierad!', solved: true };
-  }
-
-  const isMatch = scannedValue.trim().toLowerCase() === expectedValue.trim().toLowerCase();
-
-  if (isMatch) {
-    puzzleState.verified = true;
-    puzzleState.scannedAt = new Date().toISOString();
-
-    // V2: Update state in session_artifact_state
-    await updatePuzzleState(supabase, sessionId, gameArtifactId, puzzleState);
-
-    return {
-      status: 'success',
-      message: (metadata.successMessage as string) || '✅ Verifierad!',
-      solved: true,
-      state: puzzleState,
-    };
-  }
-
-  return {
-    status: 'fail',
-    message: '❌ Fel QR-kod. Sök efter rätt kod.',
-    solved: false,
-    state: puzzleState,
-  };
-}
-
-// =============================================================================
-// POST Handler (V2)
-// =============================================================================
-// NOTE: artifactId is now game_artifact_id (not session_artifact_id)
-
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string; artifactId: string }> }
-) {
-  try {
-    const { id: sessionId, artifactId: gameArtifactId } = await params;
-
-    // Resolve participant
-    const participant = await resolveParticipant(request, sessionId);
-    if (!participant) {
-      return jsonError('Unauthorized', 401);
+    // Verify participant belongs to this session
+    if (p!.sessionId !== sessionId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const body = (await request.json()) as PuzzleSubmitRequest;
+    // Verify session status allows puzzle submissions
+    const session = await ParticipantSessionService.getSessionById(sessionId);
+    if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+
+    const statusError = assertSessionStatus(session.status, 'puzzle');
+    if (statusError) return statusError;
+
+    const body = (await req.json()) as PuzzleSubmitRequest;
     const { puzzleType, answer, action, itemId } = body;
 
     const supabase = await createServiceRoleClient();
 
-    let response: PuzzleSubmitResponse;
-
     switch (puzzleType) {
-      case 'riddle':
+      case 'riddle': {
         if (!answer) {
-          return jsonError('answer required for riddle', 400);
+          return NextResponse.json({ error: 'answer required for riddle' }, { status: 400 });
         }
-        response = await handleRiddleSubmit(
-          supabase,
-          sessionId,
-          gameArtifactId,
-          answer,
-          participant.participantId
-        );
-        break;
 
-      case 'counter':
+        // Validate answer in TypeScript (complex normalization stays here)
+        const config = await getArtifactConfig(supabase, gameArtifactId);
+        if (!config) return NextResponse.json({ error: 'Artefakt hittades inte' }, { status: 404 });
+
+        const correctAnswers = (config.metadata.correctAnswers || []) as string[];
+        const normalizeMode = (config.metadata.normalizeMode || 'fuzzy') as RiddleNormalizeMode;
+        const maxAttempts = typeof config.metadata.maxAttempts === 'number' ? config.metadata.maxAttempts : null;
+        const { isCorrect } = checkRiddleAnswer(answer, correctAnswers, normalizeMode);
+
+        // Atomic RPC — state mutation with FOR UPDATE row lock
+        const { data, error } = await callRpc(supabase, 'attempt_puzzle_riddle_v2', {
+          p_session_id: sessionId,
+          p_game_artifact_id: gameArtifactId,
+          p_normalized_answer: normalizeRiddleAnswer(answer, normalizeMode),
+          p_is_correct: isCorrect,
+          p_participant_id: p!.participantId,
+        });
+
+        if (error) {
+          console.error('[Puzzle Riddle RPC] Error:', error);
+          return NextResponse.json({ error: 'Failed to process puzzle attempt' }, { status: 500 });
+        }
+
+        // Override message with config messages (RPC uses defaults, but config
+        // may have been updated since migration — TypeScript has latest config)
+        const result = data as PuzzleRpcResult;
+        if (result.status === 'success') {
+          result.message = (config.metadata.successMessage as string) || result.message;
+        } else if (result.status === 'locked') {
+          result.message = (config.metadata.lockedMessage as string) || result.message;
+        } else if (result.status === 'fail') {
+          result.message = (config.metadata.failMessage as string) || result.message;
+        }
+
+        // Ensure attemptsLeft uses TypeScript-computed maxAttempts for consistency
+        if (maxAttempts !== null && result.state) {
+          const attempts = (result.state as Record<string, unknown>).attempts;
+          const attemptCount = Array.isArray(attempts) ? attempts.length : 0;
+          result.attempts_left = Math.max(0, maxAttempts - attemptCount);
+        }
+
+        return NextResponse.json(mapRpcResult(result));
+      }
+
+      case 'counter': {
         if (!action || !['increment', 'decrement'].includes(action)) {
-          return jsonError('action must be increment or decrement', 400);
+          return NextResponse.json({ error: 'action must be increment or decrement' }, { status: 400 });
         }
-        response = await handleCounterAction(
-          supabase,
-          sessionId,
-          gameArtifactId,
-          action as 'increment' | 'decrement',
-          participant.participantId
-        );
-        break;
 
-      case 'multi_answer':
+        // Atomic RPC — state mutation with FOR UPDATE row lock
+        const { data, error } = await callRpc(supabase, 'attempt_puzzle_counter_v2', {
+          p_session_id: sessionId,
+          p_game_artifact_id: gameArtifactId,
+          p_action: action,
+          p_participant_id: p!.participantId,
+        });
+
+        if (error) {
+          console.error('[Puzzle Counter RPC] Error:', error);
+          return NextResponse.json({ error: 'Failed to process puzzle attempt' }, { status: 500 });
+        }
+
+        return NextResponse.json(mapRpcResult(data as PuzzleRpcResult));
+      }
+
+      case 'multi_answer': {
         if (!itemId) {
-          return jsonError('itemId required for multi_answer', 400);
+          return NextResponse.json({ error: 'itemId required for multi_answer' }, { status: 400 });
         }
-        response = await handleMultiAnswerCheck(
-          supabase,
-          sessionId,
-          gameArtifactId,
-          itemId,
-          participant.participantId
-        );
-        break;
 
-      case 'qr_gate':
-        if (!answer) {
-          return jsonError('answer (scanned value) required for qr_gate', 400);
+        // Atomic RPC — state mutation with FOR UPDATE row lock
+        const { data, error } = await callRpc(supabase, 'attempt_puzzle_multi_answer_v2', {
+          p_session_id: sessionId,
+          p_game_artifact_id: gameArtifactId,
+          p_item_id: itemId,
+          p_participant_id: p!.participantId,
+        });
+
+        if (error) {
+          console.error('[Puzzle MultiAnswer RPC] Error:', error);
+          return NextResponse.json({ error: 'Failed to process puzzle attempt' }, { status: 500 });
         }
-        response = await handleQRVerify(
-          supabase,
-          sessionId,
-          gameArtifactId,
-          answer,
-          participant.participantId
-        );
-        break;
+
+        return NextResponse.json(mapRpcResult(data as PuzzleRpcResult));
+      }
+
+      case 'qr_gate': {
+        if (!answer) {
+          return NextResponse.json({ error: 'answer (scanned value) required for qr_gate' }, { status: 400 });
+        }
+
+        // Atomic RPC — state mutation with FOR UPDATE row lock
+        const { data, error } = await callRpc(supabase, 'attempt_puzzle_qr_gate_v2', {
+          p_session_id: sessionId,
+          p_game_artifact_id: gameArtifactId,
+          p_scanned_value: answer,
+          p_participant_id: p!.participantId,
+        });
+
+        if (error) {
+          console.error('[Puzzle QR Gate RPC] Error:', error);
+          return NextResponse.json({ error: 'Failed to process puzzle attempt' }, { status: 500 });
+        }
+
+        return NextResponse.json(mapRpcResult(data as PuzzleRpcResult));
+      }
 
       default:
-        return jsonError(`Unsupported puzzle type: ${puzzleType}`, 400);
+        return NextResponse.json({ error: `Unsupported puzzle type: ${puzzleType}` }, { status: 400 });
     }
-
-    return NextResponse.json(response);
-  } catch (error) {
-    console.error('[Puzzle Submit] Error:', error);
-    return jsonError('Internal server error', 500);
-  }
-}
+  },
+});
 
 // =============================================================================
 // GET Handler - Get puzzle state (V2)
 // =============================================================================
 // NOTE: artifactId is now game_artifact_id (not session_artifact_id)
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string; artifactId: string }> }
-) {
-  try {
-    const { id: sessionId, artifactId: gameArtifactId } = await params;
+export const GET = apiHandler({
+  auth: 'participant',
+  handler: async ({ params, participant: p }) => {
+    const sessionId = params.id;
+    const gameArtifactId = params.artifactId;
 
-    const participant = await resolveParticipant(request, sessionId);
-    if (!participant) {
-      return jsonError('Unauthorized', 401);
+    // Verify participant belongs to this session
+    if (p!.sessionId !== sessionId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const supabase = await createServiceRoleClient();
@@ -492,7 +281,7 @@ export async function GET(
     // V2: Get config from game_artifacts
     const config = await getArtifactConfig(supabase, gameArtifactId);
     if (!config) {
-      return jsonError('Artifact not found', 404);
+      return NextResponse.json({ error: 'Artifact not found' }, { status: 404 });
     }
 
     // V2: Get runtime state from session_artifact_state
@@ -505,8 +294,5 @@ export async function GET(
       artifactType: config.artifact_type,
       state: puzzleState,
     });
-  } catch (error) {
-    console.error('[Puzzle State] Error:', error);
-    return jsonError('Internal server error', 500);
-  }
-}
+  },
+});

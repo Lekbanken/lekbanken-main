@@ -7,9 +7,9 @@
  * Requires authentication (host only).
  */
 
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { Database } from '@/types/supabase';
 
 type ParticipantRole = Database['public']['Enums']['participant_role'];
@@ -19,25 +19,16 @@ interface UpdateRoleRequest {
   sessionId: string; // For verification that host owns this session
 }
 
-export async function POST(
-  request: NextRequest,
-  context: { params: Promise<{ participantId: string }> }
-) {
-  const { participantId } = await context.params;
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { participantId } = params;
   
   try {
+    const userId = auth!.user!.id;
     const supabase = await createServerRlsClient();
     
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    
-    const body = await request.json() as UpdateRoleRequest;
+    const body = await req.json() as UpdateRoleRequest;
     const { role, sessionId } = body;
     
     // Validate role
@@ -63,7 +54,7 @@ export async function POST(
       );
     }
     
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       return NextResponse.json(
         { error: 'Only the session host can change participant roles' },
         { status: 403 }
@@ -117,7 +108,7 @@ export async function POST(
         event_data: {
           old_role: participant.role,
           new_role: role,
-          changed_by: user.id,
+          changed_by: userId,
         },
       });
     
@@ -153,4 +144,5 @@ export async function POST(
       { status: 500 }
     );
   }
-}
+  },
+})

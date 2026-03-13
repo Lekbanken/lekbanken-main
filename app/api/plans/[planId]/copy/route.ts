@@ -9,6 +9,7 @@ import {
   capabilitiesToObject,
 } from '@/lib/auth/capabilities'
 import { fetchPlanWithRelations } from '@/lib/services/planner.server'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { PlannerVisibility } from '@/types/planner'
 import type { Json } from '@/types/supabase'
 
@@ -18,25 +19,15 @@ type RequestBody = {
   owner_tenant_id?: string | null
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ planId: string }> }
-) {
-  const { planId } = await params
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { planId } = params
+  const user = auth!.user!
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json(
-      { error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
-      { status: 401 }
-    )
-  }
 
   // Parse request body
-  const body = (await request.json().catch(() => ({}))) as RequestBody
+  const body = (await req.json().catch(() => ({}))) as RequestBody
 
   // Fetch source plan with blocks
   const { data: sourcePlan, error: planError } = await supabase
@@ -85,6 +76,17 @@ export async function POST(
   // Determine target visibility and tenant
   const targetVisibility = body.visibility ?? 'private'
   const targetTenantId = body.owner_tenant_id ?? null
+
+  // Validate tenant membership — never trust client tenant input
+  if (targetTenantId) {
+    const isMember = memberships.some(m => m.tenant_id === targetTenantId)
+    if (!isMember && globalRole !== 'system_admin') {
+      return NextResponse.json(
+        { error: { code: 'INVALID_TENANT', message: 'Invalid tenant' } },
+        { status: 403 }
+      )
+    }
+  }
 
   // If trying to copy as public, need system_admin
   if (targetVisibility === 'public' && globalRole !== 'system_admin') {
@@ -177,4 +179,5 @@ export async function POST(
       name: sourcePlan.name,
     },
   }, { status: 201 })
-}
+  },
+})

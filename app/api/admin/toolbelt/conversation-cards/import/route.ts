@@ -1,7 +1,8 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
-import { AuthError, requireAuth, requireTenantRole } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { parseCSV } from '@/lib/utils/csv'
 import { CONVERSATION_CARDS_CSV_HEADERS, type ConversationCardsCsvRow } from '@/features/conversation-cards/csv-format'
@@ -72,18 +73,13 @@ async function resolvePurposeId(
   return null
 }
 
-export async function POST(req: NextRequest) {
-  try {
-    const ctx = await requireAuth()
-    const isSystemAdmin = ctx.effectiveGlobalRole === 'system_admin'
+export const POST = apiHandler({
+  auth: 'user',
+  input: importSchema,
+  handler: async ({ auth, body }) => {
+    const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin'
 
-    const body = await req.json().catch(() => ({}))
-    const parsedBody = importSchema.safeParse(body)
-    if (!parsedBody.success) {
-      return jsonError(400, 'Invalid payload', parsedBody.error.flatten())
-    }
-
-    const { csv, scope_type, tenant_id, dry_run } = parsedBody.data
+    const { csv, scope_type, tenant_id, dry_run } = body
 
     // Authorization check
     if (scope_type === 'global') {
@@ -335,11 +331,5 @@ export async function POST(req: NextRequest) {
       imported: cardsToInsert.length,
       created_collection: willCreateCollection,
     })
-  } catch (e) {
-    if (e instanceof AuthError) {
-      return jsonError(e.status, e.message)
-    }
-    console.error('[conversation-cards/import] unexpected error', e)
-    return jsonError(500, 'Ett oväntat fel uppstod')
-  }
-}
+  },
+})

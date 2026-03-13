@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,78 +49,76 @@ function toNumberPrice(price: unknown): number {
   return 0
 }
 
-export async function GET(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+    const supabase = await createServerRlsClient()
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { searchParams } = new URL(req.url)
+    const parsed = getSchema.safeParse({ tenantId: searchParams.get('tenantId') })
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
+    }
 
-  const { searchParams } = new URL(request.url)
-  const parsed = getSchema.safeParse({ tenantId: searchParams.get('tenantId') })
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
-  }
+    const { tenantId } = parsed.data
 
-  const { tenantId } = parsed.data
+    if (auth!.effectiveGlobalRole !== 'system_admin') {
+      const ok = await requireTenantMembership(supabase, tenantId, auth!.user!.id)
+      if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
-  if (!isSystemAdmin(user)) {
-    const ok = await requireTenantMembership(supabase, tenantId, user.id)
-    if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+    const userId = auth!.user!.id
+    const nowIso = new Date().toISOString()
 
-  const nowIso = new Date().toISOString()
-
-  const [coinsRes, itemsRes, ownedRes, purchasesRes, powerupsRes, boostRes, progressRes] = await Promise.all([
-    supabase
-      .from('user_coins')
-      .select('balance')
-      .eq('user_id', user.id)
-      .eq('tenant_id', tenantId)
-      .limit(1)
-      .maybeSingle(),
-    supabase
-      .from('shop_items')
-      .select('id,name,description,category,image_url,price,is_featured,metadata,virtual_currencies(code)')
-      .eq('tenant_id', tenantId)
-      .eq('is_available', true)
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('player_cosmetics')
-      .select('shop_item_id')
-      .eq('tenant_id', tenantId)
-      .eq('user_id', user.id),
-    supabase
-      .from('user_purchases')
-      .select('shop_item_id,quantity')
-      .eq('tenant_id', tenantId)
-      .eq('user_id', user.id),
-    supabase
-      .from('user_powerup_inventory')
-      .select('shop_item_id,quantity')
-      .eq('tenant_id', tenantId)
-      .eq('user_id', user.id),
-    supabase
-      .from('user_powerup_effects')
-      .select('multiplier,expires_at')
-      .eq('tenant_id', tenantId)
-      .eq('user_id', user.id)
-      .eq('effect_type', 'coin_multiplier')
-      .lte('starts_at', nowIso)
-      .gt('expires_at', nowIso)
-      .order('multiplier', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    supabase
-      .from('user_progress')
-      .select('level')
-      .eq('tenant_id', tenantId)
-      .eq('user_id', user.id)
-      .limit(1)
-      .maybeSingle(),
-  ])
+    const [coinsRes, itemsRes, ownedRes, purchasesRes, powerupsRes, boostRes, progressRes] = await Promise.all([
+      supabase
+        .from('user_coins')
+        .select('balance')
+        .eq('user_id', userId)
+        .eq('tenant_id', tenantId)
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from('shop_items')
+        .select('id,name,description,category,image_url,price,is_featured,metadata,virtual_currencies(code)')
+        .eq('tenant_id', tenantId)
+        .eq('is_available', true)
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('player_cosmetics')
+        .select('shop_item_id')
+        .eq('tenant_id', tenantId)
+        .eq('user_id', userId),
+      supabase
+        .from('user_purchases')
+        .select('shop_item_id,quantity')
+        .eq('tenant_id', tenantId)
+        .eq('user_id', userId),
+      supabase
+        .from('user_powerup_inventory')
+        .select('shop_item_id,quantity')
+        .eq('tenant_id', tenantId)
+        .eq('user_id', userId),
+      supabase
+        .from('user_powerup_effects')
+        .select('multiplier,expires_at')
+        .eq('tenant_id', tenantId)
+        .eq('user_id', userId)
+        .eq('effect_type', 'coin_multiplier')
+        .lte('starts_at', nowIso)
+        .gt('expires_at', nowIso)
+        .order('multiplier', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from('user_progress')
+        .select('level')
+        .eq('tenant_id', tenantId)
+        .eq('user_id', userId)
+        .limit(1)
+        .maybeSingle(),
+    ])
 
   if (coinsRes.error) {
     return NextResponse.json({ error: 'Failed to load balance' }, { status: 500 })
@@ -229,34 +227,29 @@ export async function GET(request: Request) {
     },
     { status: 200 }
   )
-}
+  },
+})
 
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  input: postSchema,
+  handler: async ({ auth, body }) => {
+    const { tenantId, itemId, idempotencyKey } = body
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const supabase = await createServerRlsClient()
 
-  const body = await request.json().catch(() => ({}))
-  const parsed = postSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
+    if (auth!.effectiveGlobalRole !== 'system_admin') {
+      const ok = await requireTenantMembership(supabase, tenantId, auth!.user!.id)
+      if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
-  const { tenantId, itemId, idempotencyKey } = parsed.data
+    const userId = auth!.user!.id
 
-  if (!isSystemAdmin(user)) {
-    const ok = await requireTenantMembership(supabase, tenantId, user.id)
-    if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+    try {
+      const admin = createServiceRoleClient()
 
-  try {
-    const admin = createServiceRoleClient()
-
-    const { data, error } = await admin.rpc('purchase_shop_item_v1', {
-      p_user_id: user.id,
+      const { data, error } = await admin.rpc('purchase_shop_item_v1', {
+        p_user_id: userId,
       p_tenant_id: tenantId,
       p_shop_item_id: itemId,
       p_idempotency_key: idempotencyKey,
@@ -294,7 +287,7 @@ export async function POST(request: Request) {
         await admin
           .from('user_cosmetics')
           .upsert(
-            { user_id: user.id, cosmetic_id: cosmeticId, unlock_type: 'shop' },
+            { user_id: userId, cosmetic_id: cosmeticId, unlock_type: 'shop' },
             { onConflict: 'user_id,cosmetic_id' }
           )
       }
@@ -314,5 +307,6 @@ export async function POST(request: Request) {
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown error'
     return NextResponse.json({ error: 'Server error', details: message }, { status: 500 })
-  }
-}
+    }
+  },
+})

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,35 +19,22 @@ const querySchema = z.object({
  * - Reads via service role
  * - Computes top lists from a capped sample (for safety)
  */
-export async function GET(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req }) => {
+    const url = new URL(req.url)
+    const parsed = querySchema.safeParse({
+      tenantId: url.searchParams.get('tenantId'),
+      windowDays: url.searchParams.get('windowDays') ?? undefined,
+    })
 
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
+    }
 
-  const url = new URL(request.url)
-  const parsed = querySchema.safeParse({
-    tenantId: url.searchParams.get('tenantId'),
-    windowDays: url.searchParams.get('windowDays') ?? undefined,
-  })
+    const { tenantId, windowDays } = parsed.data
+    await requireTenantRole(['admin', 'owner'], tenantId)
 
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
-  }
-
-  const { tenantId, windowDays } = parsed.data
-
-  const allowed = await assertTenantAdminOrSystem(tenantId, user)
-  if (!allowed) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  try {
     const admin = createServiceRoleClient()
 
     const { data, error } = await admin.rpc('admin_get_gamification_analytics_v5', {
@@ -136,8 +124,5 @@ export async function GET(request: Request) {
       },
       { status: 200 },
     )
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : 'Unknown error'
-    return NextResponse.json({ error: 'Server error', details: msg }, { status: 500 })
-  }
-}
+  },
+})

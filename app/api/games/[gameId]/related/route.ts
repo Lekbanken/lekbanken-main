@@ -1,8 +1,8 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { getAllowedProductIds } from '@/app/api/games/utils'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { Database } from '@/types/supabase'
 
 type GameRow = Pick<Database['public']['Tables']['games']['Row'], 'id' | 'product_id' | 'main_purpose_id' | 'owner_tenant_id' | 'status'> & {
@@ -35,13 +35,15 @@ function scoreGame(
   return score
 }
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ gameId: string }> }) {
-  const { gameId } = await params
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ req, params }) => {
+  const { gameId } = params
   const supabase = await createServerRlsClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(req.url)
   const parsed = querySchema.safeParse({
     tenantId: searchParams.get('tenantId'),
     limit: searchParams.get('limit'),
@@ -149,4 +151,5 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       baseGameId: baseGame.id,
     },
   })
-}
+},
+})

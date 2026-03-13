@@ -1,5 +1,6 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { createServerRlsClient } from "@/lib/supabase/server";
+import { apiHandler } from "@/lib/api/route-handler";
 
 /**
  * POST /api/gamification/showcase
@@ -9,21 +10,15 @@ import { createServerRlsClient } from "@/lib/supabase/server";
  * Max 4 slots, no duplicate achievement IDs.
  * Empty array = clear showcase.
  */
-export async function POST(request: NextRequest) {
-  const supabase = await createServerRlsClient();
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const supabase = await createServerRlsClient();
+    const userId = auth!.user!.id;
 
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  let body: { slots?: Array<{ slot: number; achievementId: string }> };
-  try {
-    body = await request.json();
+    let body: { slots?: Array<{ slot: number; achievementId: string }> };
+    try {
+      body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
@@ -63,7 +58,7 @@ export async function POST(request: NextRequest) {
   const { error: deleteError } = await (db as any) // eslint-disable-line @typescript-eslint/no-explicit-any
     .from("user_achievement_showcase")
     .delete()
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   if (deleteError) {
     return NextResponse.json({ error: "Failed to clear showcase" }, { status: 500 });
@@ -72,7 +67,7 @@ export async function POST(request: NextRequest) {
   // Insert new rows
   if (slots.length > 0) {
     const rows = slots.map((s) => ({
-      user_id: user.id,
+      user_id: userId,
       slot: s.slot,
       achievement_id: s.achievementId,
       pinned_at: new Date().toISOString(),
@@ -90,4 +85,5 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     slots: slots.map((s) => ({ slot: s.slot, achievementId: s.achievementId })),
   });
-}
+  },
+})

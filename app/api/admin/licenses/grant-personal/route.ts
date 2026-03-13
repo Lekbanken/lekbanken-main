@@ -1,6 +1,6 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin';
+import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { GrantPersonalLicensePayload, GrantPersonalLicenseResponse } from '@/features/admin/licenses';
 
 /**
@@ -9,12 +9,10 @@ import type { GrantPersonalLicensePayload, GrantPersonalLicenseResponse } from '
  * Grant a personal license to a user.
  * Creates: private tenant + membership + entitlement + seat assignment
  */
-export async function POST(request: NextRequest) {
-  const adminCheck = await requireSystemAdmin();
-  if (adminCheck instanceof NextResponse) return adminCheck;
-
-  try {
-    const body = await request.json() as GrantPersonalLicensePayload;
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const body = await req.json() as GrantPersonalLicensePayload;
     const { userEmail, productId, quantitySeats = 1, validUntil = null, notes = '' } = body;
 
     // Validate required fields
@@ -206,11 +204,5 @@ export async function POST(request: NextRequest) {
     };
 
     return NextResponse.json(response);
-  } catch (error) {
-    console.error('[POST /api/admin/licenses/grant-personal] Error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+  },
+})

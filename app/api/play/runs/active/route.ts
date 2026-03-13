@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 /**
  * GET /api/play/runs/active
@@ -30,18 +31,11 @@ type ActiveRun = {
   startedAt: string
 }
 
-export async function GET() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json(
-      { error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
-      { status: 401 }
-    )
-  }
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth }) => {
+    const userId = auth!.user!.id
+    const supabase = await createServerRlsClient()
 
   // Stale threshold: runs older than this are filtered out
   const staleThreshold = new Date(
@@ -66,7 +60,7 @@ export async function GET() {
       last_heartbeat_at,
       plan_versions(plan_id)
     `)
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('status', 'in_progress')
     .or(`last_heartbeat_at.gte.${staleThreshold},last_heartbeat_at.is.null`)
     .order('started_at', { ascending: false })
@@ -102,7 +96,8 @@ export async function GET() {
     })
     .filter((r): r is ActiveRun => r !== null)
 
-  console.info('[runs/active]', { user: user.id, count: activeRuns.length })
+  console.info('[runs/active]', { user: userId, count: activeRuns.length })
 
   return NextResponse.json({ runs: activeRuns, count: activeRuns.length })
-}
+  },
+})

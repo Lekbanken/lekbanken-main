@@ -15,14 +15,12 @@ interface RouteParams {
  * Query params:
  * - tenant_id: Required for authorization
  * - include_events: Include timeline events (default: false)
- * - include_participants: Include participant list (default: false)
  */
 export async function GET(request: Request, { params }: RouteParams) {
   const { id } = await params;
   const { searchParams } = new URL(request.url);
   const tenantId = searchParams.get('tenant_id');
   const includeEvents = searchParams.get('include_events') === 'true';
-  const includeParticipants = searchParams.get('include_participants') === 'true';
 
   if (!tenantId) {
     const error: ApiResponse<never> = {
@@ -69,21 +67,6 @@ export async function GET(request: Request, { params }: RouteParams) {
 
   const gameInfo = session.games as { id: string; name: string } | null;
 
-  // Fetch participants if requested
-  let participants: { id: string; display_name: string; joined_at: string }[] | undefined;
-  if (includeParticipants) {
-    const { data: participantData } = await supabase
-      .from('participants')
-      .select('id, display_name, joined_at')
-      .eq('session_id', id);
-    
-    participants = (participantData || []).map((p) => ({
-      id: p.id,
-      display_name: p.display_name,
-      joined_at: p.joined_at,
-    }));
-  }
-
   // Calculate duration
   let duration_seconds: number | null = null;
   if (session.started_at && session.ended_at) {
@@ -110,14 +93,6 @@ export async function GET(request: Request, { params }: RouteParams) {
     ended_at: session.ended_at,
     participant_count: session.participant_count,
     duration_seconds,
-    participants: includeParticipants && participants
-      ? participants.map((p) => ({
-          id: p.id,
-          team_name: null,
-          display_name: p.display_name,
-          joined_at: p.joined_at,
-        }))
-      : undefined,
     events: undefined,
   };
 

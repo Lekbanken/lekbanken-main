@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 // =============================================================================
 // Artifacts V2: State management using session_*_state tables
@@ -42,22 +44,23 @@ function isArtifactStateRequest(value: unknown): value is ArtifactStateRequest {
   return false;
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { id: sessionId } = params;
 
+  const userId = auth!.user!.id;
   const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401);
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can modify artifacts', 403);
+  if (session.host_user_id !== userId) return jsonError('Only host can modify artifacts', 403);
   if (!session.game_id) return jsonError('Session has no associated game', 400);
 
-  const rawBody = await request.json().catch(() => null);
+  const statusError = assertSessionStatus(session.status, 'artifacts-state');
+  if (statusError) return statusError;
+
+  const rawBody = await req.json().catch(() => null);
   if (!isArtifactStateRequest(rawBody)) {
     return jsonError('Invalid body', 400);
   }
@@ -175,7 +178,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
           session_id: sessionId,
           participant_id: body.participantId,
           game_artifact_variant_id: body.variantId,
-          assigned_by: user.id,
+          assigned_by: userId,
         });
 
       if (error) return jsonError('Failed to assign variant', 500);
@@ -320,4 +323,5 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     default:
       return jsonError('Unknown action', 400);
   }
-}
+  },
+})

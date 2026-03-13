@@ -1,24 +1,15 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 type InvoiceStatus = 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'canceled'
 
-async function requireUser() {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { supabase, user: null }
-  return { supabase, user }
-}
-
-async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string) {
+async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string, userId: string) {
   const { data, error } = await supabase
     .from('user_tenant_memberships')
     .select('role')
     .eq('tenant_id', tenantId)
-    .eq('user_id', (await supabase.auth.getUser()).data.user?.id || '')
+    .eq('user_id', userId)
     .maybeSingle()
   if (error) {
     console.warn('[billing/invoices] role lookup error', error)
@@ -27,18 +18,17 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ tenantId: string }> }
-) {
-  const { tenantId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { tenantId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(req.url)
   const statusParam = searchParams.get('status')
   const status = (statusParam && ['draft', 'issued', 'sent', 'paid', 'overdue', 'canceled'].includes(statusParam)
     ? (statusParam as InvoiceStatus)
@@ -64,20 +54,20 @@ export async function GET(
   }
 
   return NextResponse.json({ invoices: data ?? [] })
-}
+  },
+})
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ tenantId: string }> }
-) {
-  const { tenantId } = await params
-  const { supabase, user } = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { tenantId } = params
+  const userId = auth!.user!.id
+  const supabase = await createServerRlsClient()
 
-  const role = await userTenantRole(supabase, tenantId)
+  const role = await userTenantRole(supabase, tenantId, userId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     name?: string
     amount?: number
     currency?: string
@@ -100,6 +90,12 @@ export async function POST(
     return NextResponse.json({ error: 'name, amount and due_date are required' }, { status: 400 })
   }
 
+  // Tenant admins cannot create invoices with terminal statuses
+  const TENANT_BLOCKED_STATUSES: InvoiceStatus[] = ['paid']
+  if (body.status && TENANT_BLOCKED_STATUSES.includes(body.status)) {
+    return NextResponse.json({ error: 'Cannot create invoice with paid status — this is managed by payment processing' }, { status: 403 })
+  }
+
   const payload = {
     tenant_id: tenantId,
     name: body.name,
@@ -116,8 +112,8 @@ export async function POST(
     pdf_url: body.pdf_url ?? null,
     invoice_number: body.invoice_number ?? null,
     issued_at: body.issued_at ?? null,
-    paid_at: body.paid_at ?? null,
-    stripe_invoice_id: body.stripe_invoice_id ?? null,
+    paid_at: null,
+    stripe_invoice_id: null,
   }
 
   const { data, error } = await supabase
@@ -132,4 +128,5 @@ export async function POST(
   }
 
   return NextResponse.json({ invoice: data })
-}
+  },
+})

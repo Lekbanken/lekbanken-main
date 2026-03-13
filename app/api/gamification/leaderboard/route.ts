@@ -8,6 +8,11 @@ import {
 
 export const dynamic = 'force-dynamic'
 
+// Intentionally public: leaderboard data is used for social proof on public-facing pages.
+// Returns display names and scores only — no PII. See DD-4 in security-auth-remediation.md.
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 /**
  * GET /api/gamification/leaderboard
  * 
@@ -24,8 +29,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const tenantId = req.nextUrl.searchParams.get('tenantId')
     
-    if (!tenantId) {
-      return NextResponse.json({ error: 'tenantId is required' }, { status: 400 })
+    if (!tenantId || !UUID_RE.test(tenantId)) {
+      return NextResponse.json({ error: 'tenantId must be a valid UUID' }, { status: 400 })
     }
 
     const typeParam = req.nextUrl.searchParams.get('type') ?? 'coins_earned'

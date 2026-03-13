@@ -208,7 +208,9 @@ export interface PlayBroadcastEvent {
     | 'story_overlay'
     | 'signal_received'
     | 'time_bank_changed'
-    | 'puzzle_update';
+    | 'puzzle_update'
+    | 'participants_changed'
+    | 'assignments_changed';
   payload: unknown;
   timestamp: string;
   /** Server-monotonic sequence number from `increment_broadcast_seq`.
@@ -375,6 +377,31 @@ export interface PuzzleBroadcast extends PlayBroadcastEvent {
     state?: Record<string, unknown>;
     /** Optional message to display */
     message?: string;
+  };
+}
+
+// =============================================================================
+// Participant & Assignment Broadcasts (M4 — Broadcast Completeness)
+// =============================================================================
+
+export interface ParticipantsChangedBroadcast extends PlayBroadcastEvent {
+  type: 'participants_changed';
+  payload: {
+    action: 'kicked' | 'blocked' | 'approved' | 'readiness_changed';
+    participant_id: string;
+    /** Present for readiness_changed */
+    is_ready?: boolean;
+  };
+}
+
+export interface AssignmentsChangedBroadcast extends PlayBroadcastEvent {
+  type: 'assignments_changed';
+  payload: {
+    action: 'assigned' | 'unassigned';
+    /** Number of assignments affected */
+    count: number;
+    /** Affected participant-role pairs */
+    assignments: Array<{ participant_id: string; role_id: string }>;
   };
 }
 

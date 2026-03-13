@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServerRlsClient } from '@/lib/supabase/server'
-import { isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,161 +36,153 @@ function toUserLevel(level: unknown): number {
   return typeof level === 'number' && Number.isFinite(level) && level >= 1 ? Math.floor(level) : 1
 }
 
-export async function GET(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req, auth }) => {
+    const supabase = await createServerRlsClient()
+    const userId = auth!.user!.id
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { searchParams } = new URL(req.url)
+    const parsed = getSchema.safeParse({ tenantId: searchParams.get('tenantId') })
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
+    }
 
-  const { searchParams } = new URL(request.url)
-  const parsed = getSchema.safeParse({ tenantId: searchParams.get('tenantId') })
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid query', details: parsed.error.flatten() }, { status: 400 })
-  }
+    const { tenantId } = parsed.data
 
-  const { tenantId } = parsed.data
+    if (auth!.effectiveGlobalRole !== 'system_admin') {
+      const ok = await requireTenantMembership(supabase, tenantId, userId)
+      if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
-  if (!isSystemAdmin(user)) {
-    const ok = await requireTenantMembership(supabase, tenantId, user.id)
-    if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+    const [cosmeticsRes, progressRes] = await Promise.all([
+      supabase
+        .from('player_cosmetics')
+        .select('shop_item_id,is_equipped,shop_items(id,name,image_url,category)')
+        .eq('tenant_id', tenantId)
+        .eq('user_id', userId)
+        .order('acquired_at', { ascending: false }),
+      supabase
+        .from('user_progress')
+        .select('level')
+        .eq('tenant_id', tenantId)
+        .eq('user_id', userId)
+        .limit(1)
+        .maybeSingle(),
+    ])
 
-  const [cosmeticsRes, progressRes] = await Promise.all([
-    supabase
-      .from('player_cosmetics')
-      .select('shop_item_id,is_equipped,shop_items(id,name,image_url,category)')
-      .eq('tenant_id', tenantId)
-      .eq('user_id', user.id)
-      .order('acquired_at', { ascending: false }),
-    supabase
+    if (cosmeticsRes.error) {
+      return NextResponse.json({ error: 'Failed to load cosmetics' }, { status: 500 })
+    }
+
+    if (progressRes.error) {
+      return NextResponse.json({ error: 'Failed to load progress' }, { status: 500 })
+    }
+
+    const userLevel = toUserLevel((progressRes.data as { level?: unknown } | null)?.level)
+
+    const items = (cosmeticsRes.data ?? [])
+      .map((row) => {
+        const shop = (row as { shop_items?: unknown }).shop_items
+        const shopObj = shop && typeof shop === 'object' ? (shop as Record<string, unknown>) : null
+        return {
+          itemId: String((row as { shop_item_id?: unknown }).shop_item_id ?? ''),
+          name: String(shopObj?.name ?? ''),
+          imageUrl: (shopObj?.image_url as string | null | undefined) ?? null,
+          category: String(shopObj?.category ?? ''),
+          isEquipped: Boolean((row as { is_equipped?: unknown }).is_equipped ?? false),
+        }
+      })
+      .filter((x) => x.itemId && x.category === 'cosmetic')
+
+    const equippedItemId = items.find((i) => i.isEquipped)?.itemId ?? null
+
+    return NextResponse.json(
+      {
+        tenantId,
+        requiredLevel: REQUIRED_LEVEL,
+        userLevel,
+        equippedItemId,
+        items: items.map(({ category: _category, ...rest }) => rest),
+      },
+      { status: 200 }
+    )
+  },
+})
+
+export const POST = apiHandler({
+  auth: 'user',
+  input: postSchema,
+  handler: async ({ auth, body }) => {
+    const { tenantId, itemId } = body
+    const supabase = await createServerRlsClient()
+    const userId = auth!.user!.id
+
+    if (auth!.effectiveGlobalRole !== 'system_admin') {
+      const ok = await requireTenantMembership(supabase, tenantId, userId)
+      if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const { data: progress, error: progressError } = await supabase
       .from('user_progress')
       .select('level')
       .eq('tenant_id', tenantId)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .limit(1)
-      .maybeSingle(),
-  ])
+      .maybeSingle()
 
-  if (cosmeticsRes.error) {
-    return NextResponse.json({ error: 'Failed to load cosmetics' }, { status: 500 })
-  }
+    if (progressError) {
+      return NextResponse.json({ error: 'Failed to load progress' }, { status: 500 })
+    }
 
-  if (progressRes.error) {
-    return NextResponse.json({ error: 'Failed to load progress' }, { status: 500 })
-  }
+    const userLevel = toUserLevel((progress as { level?: unknown } | null)?.level)
 
-  const userLevel = toUserLevel((progressRes.data as { level?: unknown } | null)?.level)
+    if (userLevel < REQUIRED_LEVEL) {
+      return NextResponse.json({ code: 'LEVEL_LOCKED', requiredLevel: REQUIRED_LEVEL }, { status: 403 })
+    }
 
-  const items = (cosmeticsRes.data ?? [])
-    .map((row) => {
-      const shop = (row as { shop_items?: unknown }).shop_items
-      const shopObj = shop && typeof shop === 'object' ? (shop as Record<string, unknown>) : null
-      return {
-        itemId: String((row as { shop_item_id?: unknown }).shop_item_id ?? ''),
-        name: String(shopObj?.name ?? ''),
-        imageUrl: (shopObj?.image_url as string | null | undefined) ?? null,
-        category: String(shopObj?.category ?? ''),
-        isEquipped: Boolean((row as { is_equipped?: unknown }).is_equipped ?? false),
-      }
-    })
-    .filter((x) => x.itemId && x.category === 'cosmetic')
+    const { data: owned } = await supabase
+      .from('player_cosmetics')
+      .select('id')
+      .eq('tenant_id', tenantId)
+      .eq('user_id', userId)
+      .eq('shop_item_id', itemId)
+      .limit(1)
+      .maybeSingle()
 
-  const equippedItemId = items.find((i) => i.isEquipped)?.itemId ?? null
+    if (!owned) {
+      return NextResponse.json({ error: 'Not owned' }, { status: 404 })
+    }
 
-  return NextResponse.json(
-    {
-      tenantId,
-      requiredLevel: REQUIRED_LEVEL,
-      userLevel,
-      equippedItemId,
-      items: items.map(({ category: _category, ...rest }) => rest),
-    },
-    { status: 200 }
-  )
-}
+    const nowIso = new Date().toISOString()
 
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    const { error: resetError } = await supabase
+      .from('player_cosmetics')
+      .update({ is_equipped: false })
+      .eq('tenant_id', tenantId)
+      .eq('user_id', userId)
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (resetError) {
+      return NextResponse.json({ error: 'Failed to update loadout' }, { status: 500 })
+    }
 
-  const body = await request.json().catch(() => ({}))
-  const parsed = postSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
+    const { data: updated, error: equipError } = await supabase
+      .from('player_cosmetics')
+      .update({ is_equipped: true, equipped_at: nowIso })
+      .eq('tenant_id', tenantId)
+      .eq('user_id', userId)
+      .eq('shop_item_id', itemId)
+      .select('shop_item_id')
 
-  const { tenantId, itemId } = parsed.data
+    if (equipError) {
+      return NextResponse.json({ error: 'Failed to equip' }, { status: 500 })
+    }
 
-  if (!isSystemAdmin(user)) {
-    const ok = await requireTenantMembership(supabase, tenantId, user.id)
-    if (!ok) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+    const didUpdate = (updated ?? []).length > 0
+    if (!didUpdate) {
+      return NextResponse.json({ error: 'Not owned' }, { status: 404 })
+    }
 
-  const { data: progress, error: progressError } = await supabase
-    .from('user_progress')
-    .select('level')
-    .eq('tenant_id', tenantId)
-    .eq('user_id', user.id)
-    .limit(1)
-    .maybeSingle()
-
-  if (progressError) {
-    return NextResponse.json({ error: 'Failed to load progress' }, { status: 500 })
-  }
-
-  const userLevel = toUserLevel((progress as { level?: unknown } | null)?.level)
-
-  if (userLevel < REQUIRED_LEVEL) {
-    return NextResponse.json({ code: 'LEVEL_LOCKED', requiredLevel: REQUIRED_LEVEL }, { status: 403 })
-  }
-
-  const { data: owned } = await supabase
-    .from('player_cosmetics')
-    .select('id')
-    .eq('tenant_id', tenantId)
-    .eq('user_id', user.id)
-    .eq('shop_item_id', itemId)
-    .limit(1)
-    .maybeSingle()
-
-  if (!owned) {
-    return NextResponse.json({ error: 'Not owned' }, { status: 404 })
-  }
-
-  const nowIso = new Date().toISOString()
-
-  const { error: resetError } = await supabase
-    .from('player_cosmetics')
-    .update({ is_equipped: false })
-    .eq('tenant_id', tenantId)
-    .eq('user_id', user.id)
-
-  if (resetError) {
-    return NextResponse.json({ error: 'Failed to update loadout' }, { status: 500 })
-  }
-
-  const { data: updated, error: equipError } = await supabase
-    .from('player_cosmetics')
-    .update({ is_equipped: true, equipped_at: nowIso })
-    .eq('tenant_id', tenantId)
-    .eq('user_id', user.id)
-    .eq('shop_item_id', itemId)
-    .select('shop_item_id')
-
-  if (equipError) {
-    return NextResponse.json({ error: 'Failed to equip' }, { status: 500 })
-  }
-
-  const didUpdate = (updated ?? []).length > 0
-  if (!didUpdate) {
-    return NextResponse.json({ error: 'Not owned' }, { status: 404 })
-  }
-
-  return NextResponse.json({ ok: true, equippedItemId: itemId }, { status: 200 })
-}
+    return NextResponse.json({ ok: true, equippedItemId: itemId }, { status: 200 })
+  },
+})

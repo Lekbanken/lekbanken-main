@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
-import { createServerRlsClient, supabaseAdmin } from '@/lib/supabase/server'
+import { createServerRlsClient } from '@/lib/supabase/server'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 import { cookies } from 'next/headers'
+import { apiHandler } from '@/lib/api/route-handler'
 
 type SessionRow = {
   id: string
@@ -14,14 +15,15 @@ type SessionRow = {
   status: 'active' | 'completed' | 'flagged'
 }
 
-export async function GET(request: Request) {
-  const supabase = await createServerRlsClient()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ req }) => {
   const cookieStore = await cookies()
   const activeTenantId = await readTenantIdFromCookies(cookieStore)
-  const { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(req.url)
   const tenantId = searchParams.get('tenantId') || activeTenantId || null
 
-  const client = supabaseAdmin ?? supabase
+  const client = await createServerRlsClient()
 
   const { data, error } = await client
     .from('participant_sessions')
@@ -69,4 +71,5 @@ export async function GET(request: Request) {
     })
 
   return NextResponse.json({ sessions: mapped })
-}
+  },
+})

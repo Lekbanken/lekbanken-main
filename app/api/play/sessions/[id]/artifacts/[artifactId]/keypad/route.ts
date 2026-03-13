@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
-import { resolveParticipant } from '@/lib/api/play-auth';
 import type { Json } from '@/types/supabase';
+import { assertSessionStatus } from '@/lib/play/session-guards';
+import { apiHandler } from '@/lib/api/route-handler';
 
 /**
  * POST /api/play/sessions/[id]/artifacts/[artifactId]/keypad
@@ -44,10 +45,6 @@ type KeypadAttemptResponse = {
     attemptCount: number;
   };
 };
-
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
-}
 
 function parseKeypadConfig(metadata: Json | null): KeypadConfig {
   if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
@@ -106,37 +103,40 @@ async function broadcastKeypadEvent(
   }
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string; artifactId: string }> }
-) {
-  const { id: sessionId, artifactId: gameArtifactId } = await params;
+export const POST = apiHandler({
+  auth: 'participant',
+  handler: async ({ req, participant: p, params }) => {
+    const sessionId = params.id;
+    const gameArtifactId = params.artifactId;
 
-  // Parse request body
-  let enteredCode: string;
-  try {
-    const body = await request.json();
-    enteredCode = typeof body.enteredCode === 'string' ? body.enteredCode : '';
-  } catch {
-    return jsonError('Invalid request body', 400);
-  }
+    // Verify participant belongs to this session
+    if (p!.sessionId !== sessionId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  if (!enteredCode) {
-    return jsonError('enteredCode is required', 400);
-  }
+    // Parse request body
+    let enteredCode: string;
+    try {
+      const body = await req.json();
+      enteredCode = typeof body.enteredCode === 'string' ? body.enteredCode : '';
+    } catch {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    }
 
-  // Resolve participant (only participants can attempt keypad)
-  const participant = await resolveParticipant(request, sessionId);
-  if (!participant) {
-    return jsonError('Unauthorized - participant token required', 401);
-  }
+    if (!enteredCode) {
+      return NextResponse.json({ error: 'enteredCode is required' }, { status: 400 });
+    }
 
-  // V2: Verify session and that artifact belongs to session's game
-  const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
-  if (!session.game_id) return jsonError('Session has no associated game', 400);
+    // V2: Verify session and that artifact belongs to session's game
+    const session = await ParticipantSessionService.getSessionById(sessionId);
+    if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
 
-  const supabase = await createServiceRoleClient();
+    const statusError = assertSessionStatus(session.status, 'keypad');
+    if (statusError) return statusError;
+
+    if (!session.game_id) return NextResponse.json({ error: 'Session has no associated game' }, { status: 400 });
+
+    const supabase = await createServiceRoleClient();
 
   // V2: Check game_artifacts instead of session_artifacts
   const { data: artifact, error: artifactErr } = await supabase
@@ -146,15 +146,15 @@ export async function POST(
     .single();
 
   if (artifactErr || !artifact) {
-    return jsonError('Artifact not found', 404);
+    return NextResponse.json({ error: 'Artifact not found' }, { status: 404 });
   }
 
   if (artifact.game_id !== session.game_id) {
-    return jsonError('Artifact does not belong to session game', 400);
+    return NextResponse.json({ error: 'Artifact does not belong to session game' }, { status: 400 });
   }
 
   if (artifact.artifact_type !== 'keypad') {
-    return jsonError('Artifact is not a keypad', 400);
+    return NextResponse.json({ error: 'Artifact is not a keypad' }, { status: 400 });
   }
 
   // V2: Use the new RPC function that works with game_artifacts + session_artifact_state
@@ -162,13 +162,13 @@ export async function POST(
     p_session_id: sessionId,
     p_game_artifact_id: gameArtifactId,
     p_entered_code: enteredCode,
-    p_participant_id: participant.participantId,
-    p_participant_name: participant.displayName,
+    p_participant_id: p!.participantId,
+    p_participant_name: p!.displayName,
   });
 
   if (rpcError) {
     console.error('[keypad/route] RPC error:', rpcError);
-    return jsonError('Failed to process keypad attempt', 500);
+    return NextResponse.json({ error: 'Failed to process keypad attempt' }, { status: 500 });
   }
 
   const result = rpcResult as {
@@ -236,31 +236,32 @@ export async function POST(
 
     // Broadcast unlock event (no enteredCode or correctCode!)
     await broadcastKeypadEvent(sessionId, gameArtifactId, 'keypad_unlocked', {
-      unlockedBy: participant.displayName,
-      participantId: participant.participantId,
+      unlockedBy: p!.displayName,
+      participantId: p!.participantId,
       revealedVariants: variantsToReveal.length,
     });
 
   } else if (result.status === 'locked') {
     // Broadcast lockout event
     await broadcastKeypadEvent(sessionId, gameArtifactId, 'keypad_locked_out', {
-      lockedBy: participant.displayName,
-      participantId: participant.participantId,
+      lockedBy: p!.displayName,
+      participantId: p!.participantId,
       totalAttempts: result.attempt_count,
     });
 
   } else if (result.status === 'fail') {
     // Broadcast failed attempt (no enteredCode!)
     await broadcastKeypadEvent(sessionId, gameArtifactId, 'keypad_attempt_failed', {
-      attemptBy: participant.displayName,
-      participantId: participant.participantId,
+      attemptBy: p!.displayName,
+      participantId: p!.participantId,
       attemptCount: result.attempt_count,
       attemptsLeft: result.attempts_left,
     });
   }
 
   return NextResponse.json(response, { status: 200 });
-}
+  },
+});
 
 /**
  * GET /api/play/sessions/[id]/artifacts/[artifactId]/keypad
@@ -268,73 +269,74 @@ export async function POST(
  * V2: Returns current keypad state (without correctCode).
  * Reads config from game_artifacts, state from session_artifact_state.
  */
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string; artifactId: string }> }
-) {
-  const { id: sessionId, artifactId: gameArtifactId } = await params;
+export const GET = apiHandler({
+  auth: 'participant',
+  handler: async ({ params, participant: p }) => {
+    const sessionId = params.id;
+    const gameArtifactId = params.artifactId;
 
-  const participant = await resolveParticipant(request, sessionId);
-  if (!participant) {
-    return jsonError('Unauthorized - participant token required', 401);
-  }
+    // Verify participant belongs to this session
+    if (p!.sessionId !== sessionId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-  // V2: Verify session and artifact belong together
-  const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
-  if (!session.game_id) return jsonError('Session has no associated game', 400);
+    // V2: Verify session and artifact belong together
+    const session = await ParticipantSessionService.getSessionById(sessionId);
+    if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    if (!session.game_id) return NextResponse.json({ error: 'Session has no associated game' }, { status: 400 });
 
-  const supabase = await createServiceRoleClient();
+    const supabase = await createServiceRoleClient();
 
-  // V2: Get config from game_artifacts
-  const { data: artifact, error } = await supabase
-    .from('game_artifacts')
-    .select('id, title, game_id, artifact_type, metadata')
-    .eq('id', gameArtifactId)
-    .single();
+    // V2: Get config from game_artifacts
+    const { data: artifact, error } = await supabase
+      .from('game_artifacts')
+      .select('id, title, game_id, artifact_type, metadata')
+      .eq('id', gameArtifactId)
+      .single();
 
-  if (error || !artifact) {
-    return jsonError('Artifact not found', 404);
-  }
+    if (error || !artifact) {
+      return NextResponse.json({ error: 'Artifact not found' }, { status: 404 });
+    }
 
-  if (artifact.game_id !== session.game_id) {
-    return jsonError('Artifact does not belong to session game', 400);
-  }
+    if (artifact.game_id !== session.game_id) {
+      return NextResponse.json({ error: 'Artifact does not belong to session game' }, { status: 400 });
+    }
 
-  if (artifact.artifact_type !== 'keypad') {
-    return jsonError('Artifact is not a keypad', 400);
-  }
+    if (artifact.artifact_type !== 'keypad') {
+      return NextResponse.json({ error: 'Artifact is not a keypad' }, { status: 400 });
+    }
 
-  // V2: Get state from session_artifact_state
-  const { data: stateRow } = await supabase
-    .from('session_artifact_state')
-    .select('state')
-    .eq('session_id', sessionId)
-    .eq('game_artifact_id', gameArtifactId)
-    .single();
+    // V2: Get state from session_artifact_state
+    const { data: stateRow } = await supabase
+      .from('session_artifact_state')
+      .select('state')
+      .eq('session_id', sessionId)
+      .eq('game_artifact_id', gameArtifactId)
+      .single();
 
-  const config = parseKeypadConfig(artifact.metadata);
-  const state = parseKeypadStateFromState(stateRow?.state as Json | null);
+    const config = parseKeypadConfig(artifact.metadata);
+    const state = parseKeypadStateFromState(stateRow?.state as Json | null);
 
-  // Calculate attempts left (without exposing correctCode)
-  const attemptsLeft = config.maxAttempts 
-    ? Math.max(0, config.maxAttempts - state.attemptCount) 
-    : null;
+    // Calculate attempts left (without exposing correctCode)
+    const attemptsLeft = config.maxAttempts 
+      ? Math.max(0, config.maxAttempts - state.attemptCount) 
+      : null;
 
-  return NextResponse.json({
-    artifactId: artifact.id,
-    title: artifact.title,
-    codeLength: config.codeLength || 4,
-    maxAttempts: config.maxAttempts,
-    attemptsLeft,
-    successMessage: config.successMessage,
-    failMessage: config.failMessage,
-    lockedMessage: config.lockedMessage,
-    keypadState: {
-      isUnlocked: state.isUnlocked,
-      isLockedOut: state.isLockedOut,
-      attemptCount: state.attemptCount,
-      unlockedAt: state.unlockedAt,
-    },
-  }, { status: 200 });
-}
+    return NextResponse.json({
+      artifactId: artifact.id,
+      title: artifact.title,
+      codeLength: config.codeLength || 4,
+      maxAttempts: config.maxAttempts,
+      attemptsLeft,
+      successMessage: config.successMessage,
+      failMessage: config.failMessage,
+      lockedMessage: config.lockedMessage,
+      keypadState: {
+        isUnlocked: state.isUnlocked,
+        isLockedOut: state.isLockedOut,
+        attemptCount: state.attemptCount,
+        unlockedAt: state.unlockedAt,
+      },
+    }, { status: 200 });
+  },
+});

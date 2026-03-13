@@ -7,28 +7,43 @@
  * Until then, we use eslint-disable to bypass type checking on these operations.
  */
 
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
-import type { ConsentAuditEvent } from '@/lib/consent/types'
+import { apiHandler } from '@/lib/api/route-handler'
+import { z } from 'zod'
 
-export async function POST(request: NextRequest) {
-  try {
-    const event: ConsentAuditEvent = await request.json()
+const cookieConsentStateSchema = z.object({
+  necessary: z.boolean(),
+  functional: z.boolean(),
+  analytics: z.boolean(),
+  marketing: z.boolean(),
+})
 
-    // Validate required fields
-    if (!event.consentId || !event.eventType || !event.newState || !event.consentVersion) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
-    }
+const consentLogSchema = z.object({
+  consentId: z.string().min(1).max(100),
+  eventType: z.enum(['granted', 'updated', 'withdrawn', 'expired', 'reprompted']),
+  newState: cookieConsentStateSchema,
+  consentVersion: z.string().min(1).max(20),
+  userId: z.string().uuid().optional(),
+  previousState: cookieConsentStateSchema.optional(),
+  locale: z.string().max(10),
+  dntEnabled: z.boolean(),
+  gpcEnabled: z.boolean(),
+  pageUrl: z.string().max(2000),
+  referrer: z.string().max(2000),
+  userAgent: z.string().max(500),
+})
 
+export const POST = apiHandler({
+  auth: 'public',
+  rateLimit: 'strict',
+  input: consentLogSchema,
+  handler: async ({ body, req }) => {
     // Get client IP (for audit purposes)
-    const forwardedFor = request.headers.get('x-forwarded-for')
+    const forwardedFor = req.headers.get('x-forwarded-for')
     const ipAddress = forwardedFor?.split(',')[0]?.trim() || null
 
-    // Use service role client to insert audit log (bypasses RLS)
+    // Use service role client to insert audit log (bypasses RLS — anonymous users don't have RLS sessions)
     const supabase = await createServiceRoleClient()
     
     // Cast to any to bypass type checking until migration is applied and types regenerated
@@ -39,19 +54,19 @@ export async function POST(request: NextRequest) {
     const { error: auditError } = await db
       .from('cookie_consent_audit')
       .insert({
-        consent_id: event.consentId,
-        user_id: event.userId || null,
-        event_type: event.eventType,
-        previous_state: event.previousState || null,
-        new_state: event.newState,
-        consent_version: event.consentVersion,
+        consent_id: body.consentId,
+        user_id: body.userId || null,
+        event_type: body.eventType,
+        previous_state: body.previousState || null,
+        new_state: body.newState,
+        consent_version: body.consentVersion,
         ip_address: ipAddress,
-        user_agent: event.userAgent || null,
-        page_url: event.pageUrl || null,
-        referrer: event.referrer || null,
-        locale: event.locale || null,
-        dnt_enabled: event.dntEnabled ?? false,
-        gpc_enabled: event.gpcEnabled ?? false,
+        user_agent: body.userAgent || null,
+        page_url: body.pageUrl || null,
+        referrer: body.referrer || null,
+        locale: body.locale || null,
+        dnt_enabled: body.dntEnabled ?? false,
+        gpc_enabled: body.gpcEnabled ?? false,
       })
 
     if (auditError) {
@@ -60,21 +75,21 @@ export async function POST(request: NextRequest) {
     }
 
     // For anonymous users, also store/update their consent state
-    if (!event.userId && (event.eventType === 'granted' || event.eventType === 'updated')) {
+    if (!body.userId && (body.eventType === 'granted' || body.eventType === 'updated')) {
       const { error: consentError } = await db
         .from('anonymous_cookie_consents')
         .upsert({
-          consent_id: event.consentId,
-          necessary: event.newState.necessary ?? true,
-          functional: event.newState.functional ?? false,
-          analytics: event.newState.analytics ?? false,
-          marketing: event.newState.marketing ?? false,
-          consent_version: event.consentVersion,
-          locale: event.locale || 'en',
+          consent_id: body.consentId,
+          necessary: body.newState.necessary ?? true,
+          functional: body.newState.functional ?? false,
+          analytics: body.newState.analytics ?? false,
+          marketing: body.newState.marketing ?? false,
+          consent_version: body.consentVersion,
+          locale: body.locale || 'en',
           ip_address: ipAddress,
-          user_agent: event.userAgent || null,
-          dnt_enabled: event.dntEnabled ?? false,
-          gpc_enabled: event.gpcEnabled ?? false,
+          user_agent: body.userAgent || null,
+          dnt_enabled: body.dntEnabled ?? false,
+          gpc_enabled: body.gpcEnabled ?? false,
           updated_at: new Date().toISOString(),
         }, { 
           onConflict: 'consent_id',
@@ -87,12 +102,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('[consent/log] Unexpected error:', error)
-    // Return success anyway - consent logging shouldn't block UX
-    return NextResponse.json({ success: true })
-  }
-}
+  },
+})
 
 // Prevent caching
 export const dynamic = 'force-dynamic'

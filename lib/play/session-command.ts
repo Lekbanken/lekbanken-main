@@ -15,6 +15,7 @@ import { ParticipantSessionService } from '@/lib/services/participants/session-s
 import type { ParticipantSessionWithRuntime } from '@/types/participant-session-extended';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { logGamificationEventV1 } from '@/lib/services/gamification-events.server';
 import type { Json } from '@/types/supabase';
 
 // ─── Command types ─────────────────────────────────────────────
@@ -179,10 +180,13 @@ async function executeMutation(cmd: SessionCommand, supabase: ServiceClient): Pr
   if (STATUS_ACTIONS.has(commandType)) {
     const transition = STATUS_TRANSITIONS[commandType as StatusAction];
 
-    // Fetch current status for state-machine guard
+    // Atomic status transition — WHERE guards against concurrent races (TOCTOU fix)
+    const now = new Date().toISOString();
+
+    // Fetch session for started_at check and context for side effects
     const { data: session, error } = await supabase
       .from('participant_sessions')
-      .select('id, status, started_at')
+      .select('id, status, started_at, tenant_id, game_id, plan_id, host_user_id')
       .eq('id', sessionId)
       .single();
 
@@ -193,10 +197,10 @@ async function executeMutation(cmd: SessionCommand, supabase: ServiceClient): Pr
       throw new Error(`Cannot ${commandType}: session is '${currentStatus}', expected one of [${[...transition.from].join(', ')}]`);
     }
 
-    const now = new Date().toISOString();
     const shouldSetStartedAt = commandType === 'start' && !session.started_at;
 
-    const { error: updateError } = await supabase
+    // Atomic update with status guard — prevents TOCTOU race
+    const { data: updated, error: updateError } = await supabase
       .from('participant_sessions')
       .update({
         status: transition.to,
@@ -205,9 +209,44 @@ async function executeMutation(cmd: SessionCommand, supabase: ServiceClient): Pr
         ended_at: transition.to === 'ended' ? now : null,
         updated_at: now,
       })
-      .eq('id', sessionId);
+      .eq('id', sessionId)
+      .in('status', [...transition.from])
+      .select('id')
+      .maybeSingle();
 
     if (updateError) throw new Error(`Status update failed: ${updateError.message}`);
+    if (!updated) throw new Error(`Conflict: session status changed concurrently (expected one of [${[...transition.from].join(', ')}])`);
+
+    // ── Side effects on 'end' ─────────────────────────────────
+    if (commandType === 'end') {
+      // Disconnect all active/idle participants
+      await supabase
+        .from('participants')
+        .update({
+          status: 'disconnected',
+          disconnected_at: now,
+        })
+        .eq('session_id', sessionId)
+        .in('status', ['active', 'idle']);
+
+      // Log gamification event
+      try {
+        await logGamificationEventV1({
+          tenantId: (session.tenant_id as string | null) ?? null,
+          actorUserId: cmd.issuedBy,
+          eventType: 'session_completed',
+          source: 'play',
+          idempotencyKey: `participant_session:${sessionId}:ended`,
+          metadata: {
+            participantSessionId: sessionId,
+            gameId: (session.game_id as string | null) ?? null,
+            planId: (session.plan_id as string | null) ?? null,
+          },
+        });
+      } catch (e) {
+        console.warn('[session-command] gamification event log failed', e);
+      }
+    }
 
     return {
       type: 'state_change',

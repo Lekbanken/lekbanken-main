@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { z } from 'zod'
 import type { Database, Json } from '@/types/supabase'
 import { logger } from '@/lib/utils/logger'
@@ -101,18 +102,14 @@ export async function GET(request: NextRequest) {
   })
 }
 
-export async function POST(request: NextRequest) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
+    const supabase = await createServerRlsClient()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = await request.json().catch(() => ({}))
-  const parsed = mediaSchema.safeParse(body)
+    const body = await req.json().catch(() => ({}))
+    const parsed = mediaSchema.safeParse(body)
 
   if (!parsed.success) {
     return NextResponse.json(
@@ -143,11 +140,12 @@ export async function POST(request: NextRequest) {
     logger.error('Failed to create media', error, {
       endpoint: '/api/media',
       method: 'POST',
-      userId: user.id,
+      userId,
       mediaType: parsed.data.type
     })
     return NextResponse.json({ error: 'Failed to create media' }, { status: 500 })
   }
 
   return NextResponse.json({ media: data }, { status: 201 })
-}
+  },
+})

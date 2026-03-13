@@ -1,21 +1,20 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logUserAuditEvent } from '@/lib/services/userAudit.server'
+import { apiHandler } from '@/lib/api/route-handler'
 
-export async function GET() {
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth }) => {
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const userId = auth!.user!.id
 
   const { data: userRow, error: userError } = await supabase
     .from('users')
     .select(
       'id,email,full_name,language,avatar_url,avatar_config,avatar_updated_at,preferred_theme,show_theme_toggle_in_header,global_role,role'
     )
-    .eq('id', user.id)
+    .eq('id', userId)
     .maybeSingle()
 
   if (userError) {
@@ -26,21 +25,20 @@ export async function GET() {
   const { data: profileRow } = await supabase
     .from('user_profiles')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .maybeSingle()
 
   return NextResponse.json({ user: userRow, profile: profileRow ?? null })
-}
+  },
+})
 
-export async function PATCH(request: Request) {
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const userId = auth!.user!.id
 
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const body = (await request.json().catch(() => ({}))) as {
+  const body = (await req.json().catch(() => ({}))) as {
     full_name?: string
     language?: string
     avatar_url?: string | null
@@ -100,27 +98,27 @@ export async function PATCH(request: Request) {
     const { data, error } = await supabase
       .from('users')
       .update(userUpdate)
-      .eq('id', user.id)
+      .eq('id', userId)
       .select()
       .maybeSingle()
     if (error) {
       console.error('[accounts/profile] users update error', { 
         error, 
-        userId: user.id, 
+        userId: userId, 
         updates: userUpdate,
-        email: user.email 
+        email: auth!.user!.email 
       })
       return NextResponse.json({ error: 'Failed to update user', details: error.message }, { status: 500 })
     }
     if (!data) {
-      console.warn('[accounts/profile] users update returned no data - row may not exist', { userId: user.id })
+      console.warn('[accounts/profile] users update returned no data - row may not exist', { userId: userId })
     }
   }
 
   if (Object.keys(profileUpdate).length > 0) {
     const { error } = await supabase
       .from('user_profiles')
-      .upsert({ user_id: user.id, ...profileUpdate }, { onConflict: 'user_id' })
+      .upsert({ user_id: userId, ...profileUpdate }, { onConflict: 'user_id' })
     if (error) {
       console.error('[accounts/profile] profiles upsert error', error)
       return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
@@ -140,7 +138,7 @@ export async function PATCH(request: Request) {
     .select(
       'id,email,full_name,language,avatar_url,avatar_config,avatar_updated_at,preferred_theme,show_theme_toggle_in_header,global_role,role'
     )
-    .eq('id', user.id)
+    .eq('id', userId)
     .maybeSingle()
 
   if (userError || !userRow) {
@@ -151,7 +149,7 @@ export async function PATCH(request: Request) {
   const { data: profileRow, error: profileError } = await supabase
     .from('user_profiles')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .maybeSingle()
 
   if (profileError) {
@@ -159,11 +157,12 @@ export async function PATCH(request: Request) {
   }
 
   await logUserAuditEvent({
-    userId: user.id,
-    actorUserId: user.id,
+    userId: userId,
+    actorUserId: userId,
     eventType: 'profile_updated',
     payload: { userUpdate, profileUpdate, authMetadata },
   })
 
   return NextResponse.json({ user: userRow, profile: profileRow ?? null })
-}
+  },
+})

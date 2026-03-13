@@ -10,6 +10,8 @@ import { createServerRlsClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import type { ParticipantSessionWithRuntime } from '@/types/participant-session-extended';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 interface StateUpdateRequest {
   action: 'set_step' | 'set_phase' | 'timer_start' | 'timer_pause' | 'timer_resume' | 'timer_reset' | 'set_board_message';
@@ -20,20 +22,13 @@ interface StateUpdateRequest {
   overrides?: Record<string, boolean>;
 }
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
   try {
-    const { id: sessionId } = await params;
-    
-    // Verify authentication
+    const sessionId = params.id;
+    const userId = auth!.user!.id;
     const supabase = await createServerRlsClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     
     // Get session and verify host
     const session = await ParticipantSessionService.getSessionById(sessionId);
@@ -41,13 +36,16 @@ export async function PATCH(
     if (!session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
+
+    const statusError = assertSessionStatus(session.status, 'state');
+    if (statusError) return statusError;
     
-    if (session.host_user_id !== user.id) {
+    if (session.host_user_id !== userId) {
       // Check if global admin via user table
       const { data: userData } = await supabase
         .from('users')
         .select('global_role')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
         
       if (userData?.global_role !== 'system_admin') {
@@ -56,7 +54,7 @@ export async function PATCH(
     }
     
     // Parse request
-    const body: StateUpdateRequest = await request.json();
+    const body: StateUpdateRequest = await req.json();
 
     // Track which broadcast to emit (best-effort)
     let broadcastEvent: Record<string, unknown> | null = null;
@@ -174,7 +172,8 @@ export async function PATCH(
       { status: 500 }
     );
   }
-}
+  },
+});
 
 /**
  * GET /api/play/sessions/[id]/state
@@ -182,12 +181,11 @@ export async function PATCH(
  * Get current session runtime state.
  * Accessible by host and participants (limited view).
  */
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ params }) => {
   try {
-    const { id: sessionId } = await params;
+    const sessionId = params.id;
     
     const session = await ParticipantSessionService.getSessionById(sessionId) as ParticipantSessionWithRuntime | null;
     
@@ -216,4 +214,5 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+  },
+});

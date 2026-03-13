@@ -1,20 +1,17 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 type ParticipantAction = 'kick' | 'block' | 'approve' | 'setNextStarter' | 'setPosition';
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string; participantId: string }> }
-) {
-  const { id: sessionId, participantId } = await params;
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { id: sessionId, participantId } = params;
+  const userId = auth!.user!.id;
   const supabase = await createServerRlsClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
 
   // Verify user is the host of this session
   const { data: session } = await supabase
@@ -23,11 +20,14 @@ export async function PATCH(
     .eq('id', sessionId)
     .single();
 
-  if (!session || session.host_user_id !== user.id) {
+  if (!session || session.host_user_id !== userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const body = await request.json();
+  const statusError = assertSessionStatus(session.status, 'kick-block');
+  if (statusError) return statusError;
+
+  const body = await req.json();
   const action = body.action as ParticipantAction;
 
   if (!action) {
@@ -44,6 +44,13 @@ export async function PATCH(
           .eq('session_id', sessionId);
 
         if (error) throw error;
+
+        await broadcastPlayEvent(sessionId, {
+          type: 'participants_changed',
+          payload: { action: 'approved', participant_id: participantId },
+          timestamp: new Date().toISOString(),
+        });
+
         return NextResponse.json({ success: true, message: 'Participant approved' });
       }
       case 'kick': {
@@ -54,6 +61,13 @@ export async function PATCH(
           .eq('session_id', sessionId);
 
         if (error) throw error;
+
+        await broadcastPlayEvent(sessionId, {
+          type: 'participants_changed',
+          payload: { action: 'kicked', participant_id: participantId },
+          timestamp: new Date().toISOString(),
+        });
+
         return NextResponse.json({ success: true, message: 'Participant kicked' });
       }
 
@@ -65,6 +79,13 @@ export async function PATCH(
           .eq('session_id', sessionId);
 
         if (error) throw error;
+
+        await broadcastPlayEvent(sessionId, {
+          type: 'participants_changed',
+          payload: { action: 'blocked', participant_id: participantId },
+          timestamp: new Date().toISOString(),
+        });
+
         return NextResponse.json({ success: true, message: 'Participant blocked' });
       }
 
@@ -154,4 +175,5 @@ export async function PATCH(
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json({ error: 'Action failed', details: message }, { status: 500 });
   }
-}
+  },
+})

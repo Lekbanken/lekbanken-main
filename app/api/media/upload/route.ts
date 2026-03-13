@@ -1,7 +1,9 @@
-import { type NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { z } from 'zod'
 import { logger } from '@/lib/utils/logger'
+import { assertTenantMembership } from '@/lib/planner/require-plan-access'
 
 const uploadSchema = z.object({
   fileName: z.string().min(1).max(255),
@@ -13,18 +15,15 @@ const uploadSchema = z.object({
     .default('tenant-media'),
 })
 
-export async function POST(request: NextRequest) {
-  const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  rateLimit: 'api',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
+    const supabase = await createServerRlsClient()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = await request.json().catch(() => ({}))
-  const parsed = uploadSchema.safeParse(body)
+    const body = await req.json().catch(() => ({}))
+    const parsed = uploadSchema.safeParse(body)
 
   if (!parsed.success) {
     return NextResponse.json(
@@ -34,6 +33,12 @@ export async function POST(request: NextRequest) {
   }
 
   const { fileName, fileType, tenantId, bucket } = parsed.data
+
+  // Verify tenant membership when tenant-scoped upload
+  if (tenantId) {
+    const tenantCheck = await assertTenantMembership(supabase, auth!.user!, tenantId)
+    if (!tenantCheck.allowed) return tenantCheck.response
+  }
 
   // Generate unique file path
   const timestamp = Date.now()
@@ -52,7 +57,7 @@ export async function POST(request: NextRequest) {
       endpoint: '/api/media/upload',
       bucket,
       filePath,
-      userId: user.id
+      userId
     })
 
     const debug = process.env.NODE_ENV !== 'production'
@@ -85,4 +90,5 @@ export async function POST(request: NextRequest) {
       },
     },
   })
-}
+  },
+})

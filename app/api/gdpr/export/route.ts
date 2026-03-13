@@ -3,79 +3,32 @@
  *
  * Implements GDPR Article 15 (Right of Access) and Article 20 (Data Portability)
  *
- * POST /api/gdpr/export
- * - Creates a data export request and returns the export data
- * - Requires authenticated user
- * - Logs the access for accountability
+ * DISABLED: Self-service export is temporarily disabled while the
+ * implementation is being expanded to cover all user data categories.
+ * Users should contact privacy@lekbanken.se for data access requests (DSAR).
+ *
+ * POST /api/gdpr/export — Returns 503 with DSAR instructions
  */
 
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { createServerRlsClient } from '@/lib/supabase/server'
-import { exportUserData, createGDPRRequest } from '@/lib/gdpr/user-rights'
+import { apiHandler } from '@/lib/api/route-handler'
 
-export async function POST(request: NextRequest) {
-  try {
-    const supabase = await createServerRlsClient()
-
-    // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized', message: 'You must be logged in to export your data' },
-        { status: 401 }
-      )
-    }
-
-    // Parse request body (optional format preference)
-    let format: 'json' | 'csv' = 'json'
-    try {
-      const body = await request.json()
-      if (body.format === 'csv') {
-        format = 'csv'
-      }
-    } catch {
-      // Default to JSON if no body
-    }
-
-    // Create GDPR request record for audit trail
-    await createGDPRRequest(user.id, 'access', {
-      format,
-      requestedAt: new Date().toISOString(),
-      source: 'self_service',
-    })
-
-    // Export user data
-    const exportData = await exportUserData(user.id)
-
-    // Return as JSON (can be extended for CSV)
-    if (format === 'json') {
-      return NextResponse.json(exportData, {
-        headers: {
-          'Content-Disposition': `attachment; filename="lekbanken-data-export-${new Date().toISOString().split('T')[0]}.json"`,
-        },
-      })
-    }
-
-    // For CSV, we'd need to flatten the data structure
-    // This is a placeholder for future CSV support
-    return NextResponse.json(exportData)
-  } catch (error) {
-    console.error('[GDPR Export] Error:', error)
-
+export const POST = apiHandler({
+  auth: 'user',
+  rateLimit: 'auth',
+  handler: async () => {
     return NextResponse.json(
       {
-        error: 'Export failed',
-        message: error instanceof Error ? error.message : 'An error occurred during data export',
+        status: 'service_unavailable',
+        message:
+          'Self-service data export is temporarily unavailable. Please contact our data protection officer to exercise your right of access.',
+        contact: 'privacy@lekbanken.se',
+        sla: 'We will process your request within 30 days as required by GDPR Article 12(3).',
       },
-      { status: 500 }
+      { status: 503 }
     )
-  }
-}
+  },
+})
 
 export async function GET() {
   return NextResponse.json(

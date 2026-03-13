@@ -1,5 +1,7 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { requirePlanEditAccess } from '@/lib/planner/require-plan-access';
 import type { PlanSchedule, CreateScheduleInput } from '@/features/planner/calendar/types';
 
 /**
@@ -7,19 +9,16 @@ import type { PlanSchedule, CreateScheduleInput } from '@/features/planner/calen
  * 
  * Fetch schedules for a date range, optionally filtered by planId and status.
  */
-export async function GET(request: NextRequest) {
-  const supabase = await createServerRlsClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const supabase = await createServerRlsClient();
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const searchParams = request.nextUrl.searchParams;
-  const from = searchParams.get('from');
-  const to = searchParams.get('to');
-  const planId = searchParams.get('planId');
-  const status = searchParams.get('status');
+    const searchParams = new URL(req.url).searchParams;
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    const planId = searchParams.get('planId');
+    const status = searchParams.get('status');
 
   if (!from || !to) {
     return NextResponse.json(
@@ -114,23 +113,22 @@ export async function GET(request: NextRequest) {
     console.error('[schedules] unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+})
 
 /**
  * POST /api/plans/schedules
  * 
  * Create a new schedule.
  */
-export async function POST(request: NextRequest) {
-  const supabase = await createServerRlsClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id;
+    const supabase = await createServerRlsClient();
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  try {
-    const body = await request.json() as CreateScheduleInput;
+    try {
+      const body = await req.json() as CreateScheduleInput;
 
     if (!body.planId || !body.scheduledDate) {
       return NextResponse.json(
@@ -138,6 +136,10 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Capability check: user must be able to edit this plan to schedule it
+    const access = await requirePlanEditAccess(supabase, auth!.user!, body.planId);
+    if (!access.allowed) return access.response;
 
     // Get plan details
     const { data: plan } = await supabase
@@ -164,7 +166,7 @@ export async function POST(request: NextRequest) {
         recurrence_rule: body.recurrence ? JSON.stringify(body.recurrence) : null,
         notes: body.notes ?? null,
         status: 'scheduled',
-        created_by: user.id,
+        created_by: userId,
       })
       .select()
       .single();
@@ -197,7 +199,8 @@ export async function POST(request: NextRequest) {
     console.error('[schedules] unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+})
 
 // =============================================================================
 // Helpers

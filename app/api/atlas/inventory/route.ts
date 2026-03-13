@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import type { InventoryData } from '@/app/sandbox/atlas/lib/inventory-types';
+import { apiHandler } from '@/lib/api/route-handler';
 
 /**
  * Remove BOM (Byte Order Mark) from file content if present.
@@ -37,10 +38,12 @@ interface Partition {
  * - domain: Filter to specific domain (marketing, app, admin, etc.)
  * - partitioned: Set to 'false' to force legacy mode
  */
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const domain = searchParams.get('domain');
-  const usePartitioned = searchParams.get('partitioned') !== 'false';
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const { searchParams } = new URL(req.url);
+    const domain = searchParams.get('domain');
+    const usePartitioned = searchParams.get('partitioned') !== 'false';
 
   try {
     const inventoryDir = path.resolve(process.cwd(), '.inventory');
@@ -64,7 +67,8 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
-}
+  },
+});
 
 /**
  * Load inventory from partitioned files in .inventory/ directory

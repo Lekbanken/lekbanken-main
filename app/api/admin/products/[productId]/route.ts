@@ -10,7 +10,7 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { apiHandler } from '@/lib/api/route-handler';
 import { logFieldUpdates, getRecentAuditEvents } from '@/lib/services/productAudit.server';
 import type {
   ProductDetail,
@@ -26,28 +26,17 @@ import type {
   TaxBehavior,
 } from '@/features/admin/products/v2/types';
 
-type RouteParams = {
-  params: Promise<{ productId: string }>;
-};
-
 /** Return the most recent of updated_at and stripe_last_synced_at */
 function effectiveUpdatedAt(updatedAt: string, syncedAt: string | null | undefined): string {
   if (!syncedAt) return updatedAt;
   return new Date(syncedAt) > new Date(updatedAt) ? syncedAt : updatedAt;
 }
 
-export async function GET(request: Request, { params }: RouteParams) {
-  const { productId } = await params;
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params }) => {
+  const { productId } = params;
   const supabase = await createServerRlsClient();
-
-  // Auth check
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
-  }
 
   // Fetch product with relations
   // Current schema: id, product_key, name, category, description, capabilities, created_at, updated_at
@@ -226,22 +215,16 @@ export async function GET(request: Request, { params }: RouteParams) {
   };
 
   return NextResponse.json({ product });
-}
+  },
+});
 
-export async function PATCH(request: Request, { params }: RouteParams) {
-  const { productId } = await params;
-  const supabase = await createServerRlsClient();
+export const PATCH = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req, params, auth }) => {
+  const { productId } = params;
+  const userId = auth!.user!.id;
 
-  // Auth check
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
-  }
-
-  const body = await request.json().catch(() => ({}));
+  const body = await req.json().catch(() => ({}));
 
   // Use service role client to bypass RLS for admin operations
   const adminClient = createServiceRoleClient();
@@ -381,8 +364,9 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
   // Log audit event for field changes
   if (Object.keys(changes).length > 0) {
-    await logFieldUpdates(productId, changes, user.id);
+    await logFieldUpdates(productId, changes, userId);
   }
 
   return NextResponse.json({ product: data });
-}
+  },
+});

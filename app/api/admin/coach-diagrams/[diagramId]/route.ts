@@ -1,11 +1,13 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { assertTenantAdminOrSystem, isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
+import { AuthError, requireTenantRole } from '@/lib/api/auth-guard';
 import type { Database, Json } from '@/types/supabase';
 import { coachDiagramDocumentSchemaV1 } from '@/lib/validation/coachDiagramSchemaV1';
+import type { AuthContext } from '@/types/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,15 +92,21 @@ const updateSchema = z.object({
   svg: z.string().min(1).optional(),
 });
 
-async function requireAuth() {
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+async function authorizeScope(
+  auth: AuthContext,
+  row: { tenant_id: string | null; scope_type: string },
+) {
+  const scopeType = (row.scope_type as string) === 'global' ? 'global' : 'tenant';
+  const tenantId = (row.tenant_id as string | null) ?? null;
 
-  if (error || !user) return { user: null, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
-  return { user, response: null };
+  if (scopeType === 'global') {
+    if (auth.effectiveGlobalRole !== 'system_admin') {
+      throw new AuthError('Forbidden', 403);
+    }
+  } else {
+    if (!tenantId) throw new AuthError('Forbidden', 403);
+    await requireTenantRole(['admin', 'owner'], tenantId);
+  }
 }
 
 function getAppUrl(): string | null {
@@ -107,169 +115,132 @@ function getAppUrl(): string | null {
   return url.replace(/\/$/, '');
 }
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ diagramId: string }> }) {
-  const { user, response } = await requireAuth();
-  if (response) return response;
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+    const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithCoachDiagramExports>;
 
-  const { diagramId } = await params;
+    const { data, error } = await admin
+      .from('coach_diagram_exports')
+      .select('*')
+      .eq('id', params.diagramId)
+      .single();
 
-  const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithCoachDiagramExports>;
+    if (error || !data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  const { data, error } = await admin
-    .from('coach_diagram_exports')
-    .select('*')
-    .eq('id', diagramId)
-    .single();
+    await authorizeScope(auth!, data);
 
-  if (error || !data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ diagram: data }, { status: 200 });
+  },
+});
 
-  const scopeType = (data.scope_type as string) === 'global' ? 'global' : 'tenant';
-  const tenantId = (data.tenant_id as string | null) ?? null;
+export const PUT = apiHandler({
+  auth: 'user',
+  input: updateSchema,
+  handler: async ({ auth, params, body: parsed }) => {
+    const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithMediaAndCoachDiagrams>;
+    const userId = auth!.user!.id;
 
-  if (scopeType === 'global') {
-    if (!isSystemAdmin(user)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  } else {
-    if (!tenantId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    const allowed = await assertTenantAdminOrSystem(tenantId, user);
-    if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+    const { data: existing, error: getErr } = await admin
+      .from('coach_diagram_exports')
+      .select('id, tenant_id, scope_type')
+      .eq('id', params.diagramId)
+      .single();
 
-  return NextResponse.json({ diagram: data }, { status: 200 });
-}
+    if (getErr || !existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ diagramId: string }> }) {
-  const { user, response } = await requireAuth();
-  if (response) return response;
+    // Authorization based on existing row (no scope escalations via PUT)
+    await authorizeScope(auth!, existing);
 
-  const { diagramId } = await params;
+    const nextDocument = parsed.document;
+    const nextSvg = parsed.svg;
 
-  const body = await req.json().catch(() => ({}));
-  const parsed = updateSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 });
-  }
-
-  const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithMediaAndCoachDiagrams>;
-
-  const { data: existing, error: getErr } = await admin
-    .from('coach_diagram_exports')
-    .select('id, tenant_id, scope_type')
-    .eq('id', diagramId)
-    .single();
-
-  if (getErr || !existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-  const existingScopeType = (existing.scope_type as string) === 'global' ? 'global' : 'tenant';
-  const existingTenantId = (existing.tenant_id as string | null) ?? null;
-
-  // Authorization based on existing row (no scope escalations via PUT)
-  if (existingScopeType === 'global') {
-    if (!isSystemAdmin(user)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  } else {
-    if (!existingTenantId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    const allowed = await assertTenantAdminOrSystem(existingTenantId, user);
-    if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
-  const nextDocument = parsed.data.document;
-  const nextSvg = parsed.data.svg;
-
-  let canonicalDoc: CoachDiagramDocumentV1 | null = null;
-  if (nextDocument !== undefined) {
-    const docParsed = coachDiagramDocumentSchemaV1.safeParse(nextDocument);
-    if (!docParsed.success) {
-      return NextResponse.json({ error: 'Invalid payload', details: { document: docParsed.error.flatten() } }, { status: 400 });
+    let canonicalDoc: CoachDiagramDocumentV1 | null = null;
+    if (nextDocument !== undefined) {
+      const docParsed = coachDiagramDocumentSchemaV1.safeParse(nextDocument);
+      if (!docParsed.success) {
+        return NextResponse.json({ error: 'Invalid payload', details: { document: docParsed.error.flatten() } }, { status: 400 });
+      }
+      if (docParsed.data.id !== params.diagramId) {
+        return NextResponse.json({ error: 'Invalid payload', details: { document: { id: ['Must match diagramId'] } } }, { status: 400 });
+      }
+      canonicalDoc = docParsed.data;
     }
-    if (docParsed.data.id !== diagramId) {
-      return NextResponse.json({ error: 'Invalid payload', details: { document: { id: ['Must match diagramId'] } } }, { status: 400 });
-    }
-    canonicalDoc = docParsed.data;
-  }
 
-  const nowIso = new Date().toISOString();
+    const nowIso = new Date().toISOString();
 
-  const patch: CoachDiagramExportsTable['Update'] = {
-    exported_at: nowIso,
-    exported_by_user_id: user.id,
-    exported_by_tool: parsed.data.exportedByTool ?? 'coach-diagram-builder',
-    updated_at: nowIso,
-  };
-
-  if (canonicalDoc) {
-    patch.schema_version = String(canonicalDoc.schemaVersion);
-    patch.title = String(canonicalDoc.title ?? '');
-    patch.sport_type = String(canonicalDoc.sportType ?? 'custom');
-    patch.field_template_id = String(canonicalDoc.fieldTemplateId ?? '');
-    patch.document = canonicalDoc as unknown as Json;
-  }
-  if (nextSvg !== undefined) patch.svg = nextSvg;
-
-  const { error: updErr } = await admin
-    .from('coach_diagram_exports')
-    .update(patch)
-    .eq('id', diagramId);
-
-  if (updErr) {
-    return NextResponse.json({ error: 'Failed to update diagram', details: updErr.message ?? 'Unknown error' }, { status: 500 });
-  }
-
-  // Keep media row in sync (title + url)
-  const appUrl = getAppUrl();
-  if (appUrl) {
-    const mediaUrl = `${appUrl}/api/coach-diagrams/${diagramId}/svg`;
-    const title = canonicalDoc ? String(canonicalDoc.title ?? '') : undefined;
-
-    type MediaUpdate = Omit<MediaTable['Update'], 'type'> & { type?: MediaType };
-    const mediaUpdate: MediaUpdate = {
-      name: title,
-      alt_text: title,
-      url: mediaUrl,
-      type: 'diagram',
+    const patch: CoachDiagramExportsTable['Update'] = {
+      exported_at: nowIso,
+      exported_by_user_id: userId,
+      exported_by_tool: parsed.exportedByTool ?? 'coach-diagram-builder',
+      updated_at: nowIso,
     };
 
-    await admin
-      .from('media')
-      .update(mediaUpdate as unknown as MediaTable['Update'])
-      .eq('id', diagramId);
-  }
+    if (canonicalDoc) {
+      patch.schema_version = String(canonicalDoc.schemaVersion);
+      patch.title = String(canonicalDoc.title ?? '');
+      patch.sport_type = String(canonicalDoc.sportType ?? 'custom');
+      patch.field_template_id = String(canonicalDoc.fieldTemplateId ?? '');
+      patch.document = canonicalDoc as unknown as Json;
+    }
+    if (nextSvg !== undefined) patch.svg = nextSvg;
 
-  return NextResponse.json({ ok: true }, { status: 200 });
-}
+    const { error: updErr } = await admin
+      .from('coach_diagram_exports')
+      .update(patch)
+      .eq('id', params.diagramId);
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ diagramId: string }> }) {
-  const { user, response } = await requireAuth();
-  if (response) return response;
+    if (updErr) {
+      return NextResponse.json({ error: 'Failed to update diagram', details: updErr.message ?? 'Unknown error' }, { status: 500 });
+    }
 
-  const { diagramId } = await params;
+    // Keep media row in sync (title + url)
+    const appUrl = getAppUrl();
+    if (appUrl) {
+      const mediaUrl = `${appUrl}/api/coach-diagrams/${params.diagramId}/svg`;
+      const title = canonicalDoc ? String(canonicalDoc.title ?? '') : undefined;
 
-  const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithMediaAndCoachDiagrams>;
+      type MediaUpdate = Omit<MediaTable['Update'], 'type'> & { type?: MediaType };
+      const mediaUpdate: MediaUpdate = {
+        name: title,
+        alt_text: title,
+        url: mediaUrl,
+        type: 'diagram',
+      };
 
-  const { data: existing, error: getErr } = await admin
-    .from('coach_diagram_exports')
-    .select('id, tenant_id, scope_type')
-    .eq('id', diagramId)
-    .single();
+      await admin
+        .from('media')
+        .update(mediaUpdate as unknown as MediaTable['Update'])
+        .eq('id', params.diagramId);
+    }
 
-  if (getErr || !existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ ok: true }, { status: 200 });
+  },
+});
 
-  const scopeType = (existing.scope_type as string) === 'global' ? 'global' : 'tenant';
-  const tenantId = (existing.tenant_id as string | null) ?? null;
+export const DELETE = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
+    const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithMediaAndCoachDiagrams>;
 
-  if (scopeType === 'global') {
-    if (!isSystemAdmin(user)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  } else {
-    if (!tenantId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    const allowed = await assertTenantAdminOrSystem(tenantId, user);
-    if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+    const { data: existing, error: getErr } = await admin
+      .from('coach_diagram_exports')
+      .select('id, tenant_id, scope_type')
+      .eq('id', params.diagramId)
+      .single();
 
-  // Best-effort: delete media row too. (FKs via game_media may prevent deletion.)
-  await admin.from('media').delete().eq('id', diagramId);
+    if (getErr || !existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  const { error: delErr } = await admin.from('coach_diagram_exports').delete().eq('id', diagramId);
-  if (delErr) {
-    return NextResponse.json({ error: 'Failed to delete diagram', details: delErr.message ?? 'Unknown error' }, { status: 500 });
-  }
+    await authorizeScope(auth!, existing);
 
-  return NextResponse.json({ ok: true }, { status: 200 });
-}
+    // Best-effort: delete media row too. (FKs via game_media may prevent deletion.)
+    await admin.from('media').delete().eq('id', params.diagramId);
+
+    const { error: delErr } = await admin.from('coach_diagram_exports').delete().eq('id', params.diagramId);
+    if (delErr) {
+      return NextResponse.json({ error: 'Failed to delete diagram', details: delErr.message ?? 'Unknown error' }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true }, { status: 200 });
+  },
+});

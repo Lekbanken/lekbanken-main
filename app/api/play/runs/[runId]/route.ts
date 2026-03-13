@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { generateStepsFromBlocks } from '@/lib/planner/server/snapshot'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { NormalizedBlock } from '@/lib/planner/server/snapshot'
 import type { Run, RunStep } from '@/features/play/types'
 
@@ -14,24 +15,16 @@ function normalizeId(value: string | string[] | undefined) {
  * 
  * Fetches a run with its steps and current progress.
  */
-export async function GET(
-  _request: Request,
-  context: { params: Promise<{ runId: string }> }
-) {
-  const params = await context.params
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
   const runId = normalizeId(params?.runId)
   if (!runId) {
     return NextResponse.json({ error: { code: 'INVALID_ID', message: 'Invalid run id' } }, { status: 400 })
   }
 
+  const userId = auth!.user!.id
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
-  }
 
   // Virtual runs can't be fetched (they're ephemeral)
   if (runId.startsWith('draft-') || runId.startsWith('virtual-')) {
@@ -46,7 +39,7 @@ export async function GET(
     .from('runs')
     .select('*')
     .eq('id', runId)
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .single()
 
   if (runError || !run) {
@@ -117,7 +110,8 @@ export async function GET(
   }
 
   return NextResponse.json({ run: runResponse, progress })
-}
+  },
+})
 
 // ── Helper: normalise raw game_snapshot JSON to typed object ──────────
 function normalizeGameSnapshot(raw: unknown): NormalizedBlock['gameSnapshot'] {

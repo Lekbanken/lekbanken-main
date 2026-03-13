@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { resolveSessionViewer } from '@/lib/api/play-auth';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
-
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
-}
+import { apiHandler } from '@/lib/api/route-handler';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 
 function getCurrentStepPhase(session: {
   current_step_index?: number | null;
@@ -34,16 +32,18 @@ type OutcomeBody =
   | { action: 'reveal'; outcomeId: string }
   | { action: 'hide'; outcomeId: string };
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ req, params }) => {
+  const { id: sessionId } = params;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
+  if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
 
   const current = getCurrentStepPhase(session);
 
-  const viewer = await resolveSessionViewer(sessionId, request);
-  if (!viewer) return jsonError('Unauthorized', 401);
+  const viewer = await resolveSessionViewer(sessionId, req);
+  if (!viewer) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const service = await createServiceRoleClient();
   const { data: outcomes, error } = await service
@@ -54,7 +54,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     .eq('session_id', sessionId)
     .order('created_at', { ascending: true });
 
-  if (error) return jsonError('Failed to load outcomes', 500);
+  if (error) return NextResponse.json({ error: 'Failed to load outcomes' }, { status: 500 });
 
   if (viewer.type === 'host') {
     return NextResponse.json({ outcomes: outcomes ?? [] }, { status: 200 });
@@ -67,32 +67,32 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return isUnlockedForPosition(stepIndex, phaseIndex, current);
   });
   return NextResponse.json({ outcomes: visible }, { status: 200 });
-}
+  },
+});
 
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401);
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { id: sessionId } = params;
+  const userId = auth!.user!.id;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can manage outcomes', 403);
+  if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+  if (session.host_user_id !== userId) return NextResponse.json({ error: 'Only host can manage outcomes' }, { status: 403 });
+
+  const statusError = assertSessionStatus(session.status, 'outcome');
+  if (statusError) return statusError;
 
   const current = getCurrentStepPhase(session);
 
-  const body = (await request.json().catch(() => null)) as OutcomeBody | null;
-  if (!body || typeof body !== 'object') return jsonError('Invalid body', 400);
+  const body = (await req.json().catch(() => null)) as OutcomeBody | null;
+  if (!body || typeof body !== 'object') return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
 
   const service = await createServiceRoleClient();
 
   if (body.action === 'set') {
     const title = typeof body.title === 'string' ? body.title.trim() : '';
-    if (!title) return jsonError('Missing title', 400);
+    if (!title) return NextResponse.json({ error: 'Missing title' }, { status: 400 });
 
     const outcomeType = typeof body.outcome_type === 'string' ? body.outcome_type : 'text';
     const outcomeBody = typeof body.body === 'string' ? body.body : null;
@@ -107,12 +107,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         related_decision_id: body.related_decision_id ?? null,
         step_index: current.currentStep,
         phase_index: current.currentPhase,
-        created_by: user.id,
+        created_by: userId,
       })
       .select('id')
       .single();
 
-    if (error || !data) return jsonError('Failed to create outcome', 500);
+    if (error || !data) return NextResponse.json({ error: 'Failed to create outcome' }, { status: 500 });
 
     await broadcastPlayEvent(sessionId, {
       type: 'outcome_update',
@@ -130,7 +130,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .eq('id', body.outcomeId)
       .eq('session_id', sessionId);
 
-    if (error) return jsonError('Failed to reveal outcome', 500);
+    if (error) return NextResponse.json({ error: 'Failed to reveal outcome' }, { status: 500 });
 
     await broadcastPlayEvent(sessionId, {
       type: 'outcome_update',
@@ -148,7 +148,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .eq('id', body.outcomeId)
       .eq('session_id', sessionId);
 
-    if (error) return jsonError('Failed to hide outcome', 500);
+    if (error) return NextResponse.json({ error: 'Failed to hide outcome' }, { status: 500 });
 
     await broadcastPlayEvent(sessionId, {
       type: 'outcome_update',
@@ -159,8 +159,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ success: true }, { status: 200 });
   }
 
-  return jsonError('Unknown action', 400);
-}
+  return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+  },
+});
 
 type OutcomePutBody = {
   id?: string;
@@ -171,27 +172,23 @@ type OutcomePutBody = {
   revealed?: boolean;
 };
 
-export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: sessionId } = await params;
-
-  const supabase = await createServerRlsClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return jsonError('Unauthorized', 401);
+export const PUT = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
+  const { id: sessionId } = params;
+  const userId = auth!.user!.id;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
-  if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can manage outcomes', 403);
+  if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+  if (session.host_user_id !== userId) return NextResponse.json({ error: 'Only host can manage outcomes' }, { status: 403 });
 
   const current = getCurrentStepPhase(session);
 
-  const raw = (await request.json().catch(() => null)) as OutcomePutBody | null;
-  if (!raw || typeof raw !== 'object') return jsonError('Invalid body', 400);
+  const raw = (await req.json().catch(() => null)) as OutcomePutBody | null;
+  if (!raw || typeof raw !== 'object') return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
 
   const title = typeof raw.title === 'string' ? raw.title.trim() : '';
-  if (!title) return jsonError('Missing title', 400);
+  if (!title) return NextResponse.json({ error: 'Missing title' }, { status: 400 });
 
   const outcomeType = typeof raw.outcome_type === 'string' ? raw.outcome_type : 'text';
   const outcomeBody = typeof raw.body === 'string' ? raw.body : null;
@@ -212,7 +209,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       .eq('id', raw.id)
       .eq('session_id', sessionId);
 
-    if (error) return jsonError('Failed to update outcome', 500);
+    if (error) return NextResponse.json({ error: 'Failed to update outcome' }, { status: 500 });
 
     await broadcastPlayEvent(sessionId, {
       type: 'outcome_update',
@@ -234,12 +231,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       revealed_at: revealedAt,
       step_index: current.currentStep,
       phase_index: current.currentPhase,
-      created_by: user.id,
+      created_by: userId,
     })
     .select('id')
     .single();
 
-  if (error || !data) return jsonError('Failed to create outcome', 500);
+  if (error || !data) return NextResponse.json({ error: 'Failed to create outcome' }, { status: 500 });
 
   await broadcastPlayEvent(sessionId, {
     type: 'outcome_update',
@@ -248,4 +245,5 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   });
 
   return NextResponse.json({ success: true, id: data.id }, { status: 201 });
-}
+  },
+});

@@ -16,8 +16,11 @@ import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
-import { supabase } from "@/lib/supabase/client";
 import { setTenantBrandingEnabled } from "@/app/actions/design";
+import {
+  saveTenantBranding,
+  uploadTenantLogo,
+} from "../../organisationMutations.server";
 import type { TenantBranding } from "../../types";
 
 type OrganisationBrandingSectionProps = {
@@ -157,49 +160,16 @@ export function OrganisationBrandingSection({
     
     setIsUploading(true);
     try {
-      // Upload to storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${tenantId}/logo.${fileExt}`;
+      const formData = new FormData();
+      formData.append("file", file);
       
-      const { error: uploadError } = await supabase.storage
-        .from('tenant-assets')
-        .upload(fileName, file, { upsert: true });
+      const result = await uploadTenantLogo(
+        tenantId,
+        branding?.id ?? null,
+        formData
+      );
       
-      if (uploadError) throw uploadError;
-      
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('tenant-assets')
-        .getPublicUrl(fileName);
-      
-      // Update or insert branding record
-      if (branding?.id) {
-        const { error: updateError } = await supabase
-          .from('tenant_branding')
-          .update({ 
-            logo_url: urlData.publicUrl,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', branding.id);
-        
-        if (updateError) throw updateError;
-      } else {
-        const { error: insertError } = await supabase
-          .from('tenant_branding')
-          .insert({
-            tenant_id: tenantId,
-            logo_url: urlData.publicUrl,
-          });
-        
-        if (insertError) throw insertError;
-      }
-      
-      // Log audit event
-      await supabase.from('tenant_audit_logs').insert({
-        tenant_id: tenantId,
-        event_type: 'branding_logo_updated',
-        payload: { fileName },
-      });
+      if (result.error) throw new Error(result.error);
       
       success("Logo uppladdad");
       onRefresh();
@@ -218,45 +188,19 @@ export function OrganisationBrandingSection({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const brandingData = {
-        brand_name_override: brandNameOverride || null,
-        primary_color: primaryColor,
-        secondary_color: secondaryColor,
-        accent_color: accentColor,
-        theme: theme as 'light' | 'dark' | 'auto',
-        updated_at: new Date().toISOString(),
-      };
-      
-      if (branding?.id) {
-        const { error: updateError } = await supabase
-          .from('tenant_branding')
-          .update(brandingData)
-          .eq('id', branding.id);
-        
-        if (updateError) throw updateError;
-      } else {
-        const { error: insertError } = await supabase
-          .from('tenant_branding')
-          .insert({
-            tenant_id: tenantId,
-            ...brandingData,
-          });
-        
-        if (insertError) throw insertError;
-      }
-      
-      // Log audit event
-      await supabase.from('tenant_audit_logs').insert({
-        tenant_id: tenantId,
-        event_type: 'branding_updated',
-        payload: { 
-          brandNameOverride,
+      const result = await saveTenantBranding(
+        tenantId,
+        branding?.id ?? null,
+        {
+          brandNameOverride: brandNameOverride || null,
           primaryColor,
           secondaryColor,
           accentColor,
-          theme,
-        },
-      });
+          theme: theme as 'light' | 'dark' | 'auto',
+        }
+      );
+      
+      if (result.error) throw new Error(result.error);
       
       success("Branding uppdaterad");
       onRefresh();

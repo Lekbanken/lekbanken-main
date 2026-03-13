@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server';
 import { getDemoSession } from '@/lib/utils/demo-detection';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 
 /**
  * GET /api/demo/status
@@ -23,8 +24,9 @@ import { createServerRlsClient } from '@/lib/supabase/server';
  *   userName?: string;
  * }
  */
-export async function GET() {
-  try {
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async () => {
     const supabase = await createServerRlsClient();
 
     // Get current user
@@ -70,15 +72,5 @@ export async function GET() {
       userName: profile?.full_name || profile?.email || 'Demo User',
       sessionId: demoSession.id,
     });
-  } catch (error) {
-    console.error('[GET /api/demo/status] Error:', error);
-
-    return NextResponse.json(
-      {
-        isDemoMode: false,
-        error: 'Failed to get demo status',
-      },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

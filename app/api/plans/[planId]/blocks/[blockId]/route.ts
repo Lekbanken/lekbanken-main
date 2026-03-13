@@ -2,32 +2,31 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validatePlanBlockPayload } from '@/lib/validation/plans'
 import { mapBlockToPlanner } from '@/lib/services/planner.server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requirePlanEditAccess } from '@/lib/planner/require-plan-access'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
   return id?.trim() || null
 }
 
-export async function PATCH(
-  request: Request,
-  context: { params: Promise<{ planId: string; blockId: string }> }
-) {
-  const params = await context.params
+export const PATCH = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req, params }) => {
   const planId = normalizeId(params?.planId)
   const blockId = normalizeId(params?.blockId)
   if (!planId || !blockId) {
     return NextResponse.json({ error: 'Invalid plan or block id' }, { status: 400 })
   }
+  const user = auth!.user!
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // Capability check: user must be able to edit this plan
+  const access = await requirePlanEditAccess(supabase, user, planId)
+  if (!access.allowed) return access.response
 
-  const body = (await request.json().catch(() => ({}))) as {
+  const userId = user.id
+  const body = (await req.json().catch(() => ({}))) as {
     block_type?: 'game' | 'pause' | 'preparation' | 'custom'
     game_id?: string | null
     duration_minutes?: number | null
@@ -80,7 +79,7 @@ export async function PATCH(
 
   const updates: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
-    updated_by: user.id,
+    updated_by: userId,
   }
 
   if (body.block_type) updates.block_type = body.block_type
@@ -160,26 +159,22 @@ export async function PATCH(
 
   const mappedBlock = mapBlockToPlanner(updatedBlock as unknown as Parameters<typeof mapBlockToPlanner>[0])
   return NextResponse.json({ block: mappedBlock })
-}
+  },
+})
 
-export async function DELETE(
-  _request: Request,
-  context: { params: Promise<{ planId: string; blockId: string }> }
-) {
-  const params = await context.params
+export const DELETE = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params }) => {
   const planId = normalizeId(params?.planId)
   const blockId = normalizeId(params?.blockId)
   if (!planId || !blockId) {
     return NextResponse.json({ error: 'Invalid plan or block id' }, { status: 400 })
   }
   const supabase = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // Capability check: user must be able to edit this plan
+  const access = await requirePlanEditAccess(supabase, auth!.user!, planId)
+  if (!access.allowed) return access.response
 
   const { data: existingBlocks, error: loadError } = await supabase
     .from('plan_blocks')
@@ -221,4 +216,5 @@ export async function DELETE(
   }
 
   return NextResponse.json({ deleted: true, id: blockId })
-}
+  },
+})

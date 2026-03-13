@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { DashboardOverview, SessionSummary } from '@/types/analytics';
 
 export const dynamic = 'force-dynamic';
@@ -11,20 +11,9 @@ export const dynamic = 'force-dynamic';
  * 
  * @requires system_admin role
  */
-export async function GET() {
-  // Authentication check
-  const authClient = await createServerRlsClient();
-  const { data: { user }, error: userError } = await authClient.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  // Authorization check - only system_admin can view global analytics
-  if (!isSystemAdmin(user)) {
-    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
-  }
-
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async () => {
   // Use service role for cross-tenant queries
   const supabase = createServiceRoleClient();
 
@@ -113,4 +102,5 @@ export async function GET() {
   };
 
   return NextResponse.json(overview);
-}
+  },
+});

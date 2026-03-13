@@ -44,9 +44,19 @@ import {
 
 const SESSION_STORAGE_KEY = 'lekbanken_participant_token';
 const ACTIVE_JOIN_PREF_KEY = 'lekbanken_active_join_pref';
-const HEARTBEAT_INTERVAL = 10000; // 10 seconds
+const HEARTBEAT_ACTIVE_MS = 10_000;  // 10s during active play
+const HEARTBEAT_IDLE_MS   = 30_000;  // 30s in lobby/paused/locked
 const POLL_INTERVAL = 3000; // 3 seconds
 const MAX_BACKOFF = 30000; // 30 seconds max between retries
+
+const TERMINAL_STATUSES = new Set(['ended', 'archived', 'cancelled']);
+
+/** Return the heartbeat interval based on session status + tab visibility. */
+function getHeartbeatInterval(status: string | undefined): number | null {
+  if (!status || TERMINAL_STATUSES.has(status)) return null; // stop heartbeat
+  if (status === 'active') return document.hidden ? HEARTBEAT_IDLE_MS : HEARTBEAT_ACTIVE_MS;
+  return HEARTBEAT_IDLE_MS; // lobby, paused, locked, draft
+}
 
 type ParticipantSessionWithPlayProps = {
   code: string;
@@ -316,7 +326,21 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       if (!stopped) schedulePoll();
     });
 
-    const heartbeatTimer = setInterval(() => void sendHeartbeat(), HEARTBEAT_INTERVAL);
+    // Adaptive heartbeat — interval depends on session status + tab visibility
+    let hbTimer: ReturnType<typeof setTimeout> | null = null;
+    const scheduleHeartbeat = () => {
+      if (stopped) return;
+      const interval = getHeartbeatInterval(sessionRef.current?.status);
+      if (interval === null) { hbTimer = null; return; } // terminal → stop
+      hbTimer = setTimeout(async () => {
+        hbTimer = null;
+        if (stopped) return;
+        await sendHeartbeat();
+        scheduleHeartbeat();
+      }, interval);
+    };
+    // Fire one immediately, then schedule adaptive chain
+    void sendHeartbeat().then(() => { if (!stopped) scheduleHeartbeat(); });
 
     // Pause polling when tab is hidden, resume immediately when visible.
     // Guard: only resume if no timer is already pending and no request in-flight.
@@ -331,6 +355,9 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
           if (!stopped) schedulePoll();
         });
       }
+      // Re-schedule heartbeat at new interval (active tab = faster)
+      if (hbTimer !== null) { clearTimeout(hbTimer); hbTimer = null; }
+      scheduleHeartbeat();
     };
     document.addEventListener('visibilitychange', handleVisibility);
 
@@ -338,7 +365,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       stopped = true;
       mountedRef.current = false;
       clearPollTimer();
-      clearInterval(heartbeatTimer);
+      if (hbTimer !== null) clearTimeout(hbTimer);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [code, loadData, sendHeartbeat]); // loadData is stable (deps: code, getToken, t)

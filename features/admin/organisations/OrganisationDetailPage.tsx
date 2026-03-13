@@ -16,8 +16,11 @@ import {
 } from "@/components/admin/shared";
 import { Button, Tabs, TabPanel } from "@/components/ui";
 import { useToast } from "@/components/ui/toast";
-import { supabase } from "@/lib/supabase/client";
 import { getOrganisationDetail } from "./organisationDetail.server";
+import {
+  updateTenantStatus,
+  updateTenantDetails,
+} from "./organisationMutations.server";
 
 import type {
   OrganisationDetail,
@@ -157,19 +160,9 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
     if (!organisation) return;
     
     try {
-      const { error: updateError } = await supabase
-        .from("tenants")
-        .update({ status: newStatus, updated_at: new Date().toISOString() })
-        .eq("id", tenantId);
+      const result = await updateTenantStatus(tenantId, newStatus, organisation.status);
       
-      if (updateError) throw updateError;
-      
-      // Log audit event
-      await supabase.from("tenant_audit_logs").insert({
-        tenant_id: tenantId,
-        event_type: "status_changed",
-        payload: { from: organisation.status, to: newStatus },
-      });
+      if (result.error) throw new Error(result.error);
       
       success(`Status ändrad till ${tenantStatusLabels[newStatus]}`);
       loadOrganisation();
@@ -184,20 +177,16 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
     if (!organisation) return;
     
     try {
-      const { error: updateError } = await supabase
-        .from("tenants")
-        .update({
-          name: updates.name ?? organisation.name,
-          contact_name: updates.contactName,
-          contact_email: updates.contactEmail,
-          contact_phone: updates.contactPhone,
-          default_language: updates.defaultLanguage,
-          default_theme: updates.defaultTheme,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", tenantId);
+      const result = await updateTenantDetails(tenantId, {
+        name: updates.name ?? organisation.name,
+        contactName: updates.contactName,
+        contactEmail: updates.contactEmail,
+        contactPhone: updates.contactPhone,
+        defaultLanguage: updates.defaultLanguage,
+        defaultTheme: updates.defaultTheme,
+      });
       
-      if (updateError) throw updateError;
+      if (result.error) throw new Error(result.error);
       
       success("Organisation uppdaterad");
       loadOrganisation();

@@ -5,12 +5,8 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { getServerAuthContext } from '@/lib/auth/server-context';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { SupabaseClient } from '@supabase/supabase-js';
-
-interface RouteContext {
-  params: Promise<{ tenantId: string }>;
-}
 
 interface MFAUserRow {
   user_id: string;
@@ -35,16 +31,13 @@ function getProfile(profiles: MFAUserRow['profiles']): { email: string; display_
  * GET /api/admin/tenant/[tenantId]/mfa/users
  * Get paginated list of users with MFA status
  */
-export async function GET(request: Request, context: RouteContext) {
-  const { tenantId } = await context.params;
-  
-  const authContext = await getServerAuthContext('/admin');
-  if (!authContext.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, params, req }) => {
+  const tenantId = params.tenantId;
 
-  const isSystemAdmin = authContext.effectiveGlobalRole === 'system_admin';
-  const membership = authContext.memberships?.find(m => m.tenant_id === tenantId);
+  const isSystemAdmin = auth!.effectiveGlobalRole === 'system_admin';
+  const membership = auth!.memberships?.find(m => m.tenant_id === tenantId);
   const tenantRole = membership?.role as string | null;
   
   // Check access
@@ -57,7 +50,7 @@ export async function GET(request: Request, context: RouteContext) {
   const db = supabase as unknown as SupabaseClient;
 
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
     const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get('pageSize') ?? '10', 10)));
     const search = searchParams.get('search') ?? '';
@@ -209,4 +202,5 @@ export async function GET(request: Request, context: RouteContext) {
     console.error('[MFA Users] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+  },
+});

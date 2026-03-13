@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { requireTenantRole } from '@/lib/api/auth-guard'
 import type { Json } from '@/types/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -24,28 +25,13 @@ const schema = z.object({
  * - Requires tenant_admin or system_admin
  * - Uses service role + DB function for atomicity & idempotency
  */
-export async function POST(request: Request) {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
+export const POST = apiHandler({
+  auth: 'user',
+  input: schema,
+  handler: async ({ body }) => {
+    const { tenantId, targetUserId, type, amount, reasonCode, idempotencyKey, description, metadata } = body
+    await requireTenantRole(['admin', 'owner'], tenantId)
 
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = await request.json().catch(() => ({}))
-  const parsed = schema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
-  }
-
-  const { tenantId, targetUserId, type, amount, reasonCode, idempotencyKey, description, metadata } = parsed.data
-
-  const allowed = await assertTenantAdminOrSystem(tenantId, user)
-  if (!allowed) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
-  try {
     const admin = createServiceRoleClient()
 
     const { data, error } = await admin.rpc('apply_coin_transaction_v1', {
@@ -68,8 +54,5 @@ export async function POST(request: Request) {
 
     const row = Array.isArray(data) ? data[0] : data
     return NextResponse.json({ transactionId: row?.transaction_id ?? null, balance: row?.balance ?? null }, { status: 200 })
-  } catch (e) {
-    const message = e instanceof Error ? e.message : 'Unknown error'
-    return NextResponse.json({ error: 'Server error', details: message }, { status: 500 })
-  }
-}
+  },
+})

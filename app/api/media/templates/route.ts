@@ -1,6 +1,6 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
@@ -9,16 +9,14 @@ export const dynamic = 'force-dynamic'
  * GET /api/media/templates
  * List all media template mappings
  */
-export async function GET(_request: NextRequest) {
-  const supabase = await createServerRlsClient()
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ auth }) => {
+    const userId = auth!.user!.id
+    const supabase = await createServerRlsClient()
 
-  try {
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { data: templates, error } = await supabase.from('media_templates').select(`
+    try {
+      const { data: templates, error } = await supabase.from('media_templates').select(`
         id,
         template_key,
         name,
@@ -55,35 +53,34 @@ export async function GET(_request: NextRequest) {
       logger.error('Failed to fetch media templates', error, {
         endpoint: '/api/media/templates',
         method: 'GET',
-        userId: user.id
+        userId
       })
       return NextResponse.json({ error: 'Failed to fetch templates' }, { status: 500 })
     }
 
     return NextResponse.json({ templates })
-  } catch (error) {
-    logger.error('Unexpected error in GET /api/media/templates', error instanceof Error ? error : undefined, {
-      endpoint: '/api/media/templates',
-      method: 'GET'
-    })
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
+    } catch (error) {
+      logger.error('Unexpected error in GET /api/media/templates', error instanceof Error ? error : undefined, {
+        endpoint: '/api/media/templates',
+        method: 'GET'
+      })
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+  },
+})
 
 /**
  * POST /api/media/templates
  * Create a new media template mapping
  */
-export async function POST(request: NextRequest) {
-  const supabase = await createServerRlsClient()
+export const POST = apiHandler({
+  auth: 'user',
+  handler: async ({ auth, req }) => {
+    const userId = auth!.user!.id
+    const supabase = await createServerRlsClient()
 
-  try {
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const body = await request.json()
+    try {
+      const body = await req.json()
     const { productId, mainPurposeId, subPurposeId, mediaId, templateKey, name, description, priority, isDefault } = body
 
     if (!mainPurposeId || !mediaId || !templateKey || !name) {
@@ -148,17 +145,18 @@ export async function POST(request: NextRequest) {
         endpoint: '/api/media/templates',
         method: 'POST',
         templateKey,
-        userId: user.id
+        userId
       })
       return NextResponse.json({ error: 'Failed to create template' }, { status: 500 })
     }
 
     return NextResponse.json({ template }, { status: 201 })
-  } catch (error) {
-    logger.error('Unexpected error in POST /api/media/templates', error instanceof Error ? error : undefined, {
-      endpoint: '/api/media/templates',
-      method: 'POST'
-    })
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
+    } catch (error) {
+      logger.error('Unexpected error in POST /api/media/templates', error instanceof Error ? error : undefined, {
+        endpoint: '/api/media/templates',
+        method: 'POST'
+      })
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+  },
+})

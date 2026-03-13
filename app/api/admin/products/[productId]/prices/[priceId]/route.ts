@@ -7,31 +7,11 @@
  * Note: Stripe prices are immutable. Changes create new prices and archive old ones.
  */
 
-import { type NextRequest, NextResponse } from 'next/server'
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe/config'
 import { logPriceEvent } from '@/lib/services/productAudit.server'
-
-// =============================================================================
-// AUTH HELPER
-// =============================================================================
-
-async function isSystemAdmin(): Promise<boolean> {
-  const supabase = await createServerRlsClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) return false
-  
-  const appMetadataRole = user.app_metadata?.role as string | undefined
-  const appMetadataGlobalRole = user.app_metadata?.global_role as string | undefined
-  const userMetadataGlobalRole = user.user_metadata?.global_role as string | undefined
-  
-  const effectiveRole = appMetadataRole || appMetadataGlobalRole || userMetadataGlobalRole
-  
-  return effectiveRole === 'system_admin' || 
-         effectiveRole === 'superadmin' || 
-         effectiveRole === 'admin'
-}
 
 // =============================================================================
 // PATCH - Update price (creates new Stripe price if amount changed)
@@ -44,23 +24,12 @@ interface UpdatePriceBody {
   active?: boolean
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ productId: string; priceId: string }> }
-) {
-  try {
-    const rlsClient = await createServerRlsClient()
-    const { data: { user } } = await rlsClient.auth.getUser()
-    
-    if (!await isSystemAdmin()) {
-      return NextResponse.json(
-        { error: 'Forbidden - system_admin required' },
-        { status: 403 }
-      )
-    }
-    
-    const { productId, priceId } = await params
-    const body: UpdatePriceBody = await request.json()
+export const PATCH = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ auth, params, req }) => {
+    const productId = params.productId
+    const priceId = params.priceId
+    const body: UpdatePriceBody = await req.json()
     // Use service role client for admin operations (bypasses RLS)
     const supabase = createServiceRoleClient()
     
@@ -150,7 +119,7 @@ export async function PATCH(
         currency: currentPrice.currency,
         interval: currentPrice.interval,
         stripePriceId: newStripePrice.id,
-      }, user?.id)
+      }, auth!.user!.id)
       
       return NextResponse.json({
         success: true,
@@ -215,7 +184,7 @@ export async function PATCH(
         newDefault: priceId,
         currency: currentPrice.currency,
         interval: currentPrice.interval,
-      }, user?.id)
+      }, auth!.user!.id)
     } else if (Object.keys(updateData).length > 0) {
       // For other updates, use logProductEvent directly for flexibility
       const { logProductEvent } = await import('@/lib/services/productAudit.server')
@@ -227,7 +196,7 @@ export async function PATCH(
           updated_fields: Object.keys(updateData),
           ...updateData,
         },
-        actorId: user?.id,
+        actorId: auth!.user!.id,
       })
     }
     
@@ -235,39 +204,18 @@ export async function PATCH(
       success: true,
       message: 'Price updated',
     })
-    
-  } catch (error) {
-    console.error('Error updating price:', error)
-    return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    )
-  }
-}
+  },
+})
 
 // =============================================================================
 // DELETE - Archive price (sets active=false)
 // =============================================================================
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ productId: string; priceId: string }> }
-) {
-  try {
-    const rlsClient = await createServerRlsClient()
-    const { data: { user } } = await rlsClient.auth.getUser()
-    
-    if (!await isSystemAdmin()) {
-      return NextResponse.json(
-        { error: 'Forbidden - system_admin required' },
-        { status: 403 }
-      )
-    }
-    
-    const { productId, priceId } = await params
+export const DELETE = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ auth, params }) => {
+    const productId = params.productId
+    const priceId = params.priceId
     // Use service role client for admin operations (bypasses RLS)
     const supabase = createServiceRoleClient()
     
@@ -313,21 +261,11 @@ export async function DELETE(
       currency: price.currency,
       interval: price.interval,
       stripePriceId: price.stripe_price_id,
-    }, user?.id)
+    }, auth!.user!.id)
     
     return NextResponse.json({
       success: true,
       message: 'Price archived',
     })
-    
-  } catch (error) {
-    console.error('Error archiving price:', error)
-    return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

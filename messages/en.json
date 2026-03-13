@@ -14484,7 +14484,11 @@
         "waitingForHost": "Waiting for the host...",
         "waitingDescription": "The host hasn't started the game yet. Hang tight, we'll begin soon!",
         "ended": "Session has ended",
-        "thanksForParticipating": "Thanks for participating!"
+        "thanksForParticipating": "Thanks for participating!",
+        "removedTitle": "You have been removed",
+        "removedKicked": "The host has removed you from the session.",
+        "removedBlocked": "The host has blocked you from the session.",
+        "removedBackToStart": "Back to start"
       },
       "lobby": {
         "couldNotGetSession": "Could not fetch session",

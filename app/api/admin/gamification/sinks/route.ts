@@ -1,7 +1,6 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createBurnSink, updateBurnSink, type CreateSinkInput, type UpdateSinkInput, type SinkType } from '@/lib/services/gamification-burn.server'
-import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,22 +10,9 @@ export const dynamic = 'force-dynamic'
  * Create a new burn sink (shop item, boost, cosmetic, etc.)
  * Admin only.
  */
-export async function POST(req: NextRequest): Promise<NextResponse> {
-  try {
-    // Verify admin authorization
-    const supabase = await createServerRlsClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Check admin role (simplified - should use proper RLS check)
-    const { data: isAdmin } = await supabase.rpc('is_system_admin')
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
-    }
-
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
     const body = await req.json()
 
     // Validate required fields
@@ -66,14 +52,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     return NextResponse.json({ id: result.id }, { status: 201 })
-  } catch (error) {
-    console.error('[POST /api/admin/gamification/sinks] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})
 
 /**
  * PATCH /api/admin/gamification/sinks
@@ -81,21 +61,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
  * Update an existing burn sink.
  * Admin only.
  */
-export async function PATCH(req: NextRequest): Promise<NextResponse> {
-  try {
-    // Verify admin authorization
-    const supabase = await createServerRlsClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { data: isAdmin } = await supabase.rpc('is_system_admin')
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
-    }
-
+export const PATCH = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
     const body = await req.json()
 
     if (!body.id) {
@@ -122,11 +90,5 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
     }
 
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('[PATCH /api/admin/gamification/sinks] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

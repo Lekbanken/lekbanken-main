@@ -1,27 +1,16 @@
-import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { createServerRlsClient, supabaseAdmin } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
+import { supabaseAdmin } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 
 type PurposeRow = Database['public']['Tables']['purposes']['Row']
 
 type PurposeInput = Partial<PurposeRow> & { tenant_id?: string | null; is_standard?: boolean }
 
-async function requireSystemAdmin() {
-  const rls = await createServerRlsClient()
-  const {
-    data: { user },
-  } = await rls.auth.getUser()
-  const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
-  const isSystemAdmin = role === 'system_admin' || role === 'superadmin'
-  return isSystemAdmin
-}
-
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ purposeId: string }> }
-) {
-  const purposeId = (await params).purposeId
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ params }) => {
+  const purposeId = params.purposeId
 
   const [
     { count: gamesMain },
@@ -52,17 +41,15 @@ export async function GET(
       childSubs: childSubs ?? 0,
     },
   })
-}
+  },
+})
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ purposeId: string }> }
-) {
-  const purposeId = (await params).purposeId
-  const allowed = await requireSystemAdmin()
-  if (!allowed) return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+export const PATCH = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params, req }) => {
+  const purposeId = params.purposeId
 
-  const body = (await request.json().catch(() => ({}))) as PurposeInput
+  const body = (await req.json().catch(() => ({}))) as PurposeInput
 
   const { data: existing, error: getError } = await supabaseAdmin.from('purposes').select('*').eq('id', purposeId).maybeSingle()
   if (getError) {
@@ -95,15 +82,13 @@ export async function PATCH(
   }
 
   return NextResponse.json({ purpose: data })
-}
+  },
+})
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ purposeId: string }> }
-) {
-  const purposeId = (await params).purposeId
-  const allowed = await requireSystemAdmin()
-  if (!allowed) return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+export const DELETE = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ params, req }) => {
+  const purposeId = params.purposeId
 
   const { data: existing, error: getError } = await supabaseAdmin.from('purposes').select('is_standard').eq('id', purposeId).single()
   if (getError || !existing) {
@@ -113,7 +98,7 @@ export async function DELETE(
     return NextResponse.json({ error: 'Standard purposes are read-only' }, { status: 403 })
   }
 
-  const { searchParams } = new URL(request.url)
+  const { searchParams } = new URL(req.url)
   const detach = searchParams.get('detach') === 'true'
 
   if (detach) {
@@ -132,4 +117,5 @@ export async function DELETE(
   }
 
   return NextResponse.json({ ok: true })
-}
+  },
+})

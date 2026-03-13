@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
-import { requireSystemAdmin, AuthError } from '@/lib/api/auth-guard'
+import { apiHandler } from '@/lib/api/route-handler'
 import type { Database } from '@/types/supabase'
 
 type AutomationRuleRow = Database['public']['Tables']['gamification_automation_rules']['Row']
@@ -186,10 +186,10 @@ const DEFAULT_RULES = [
 ]
 
 // GET: Fetch existing rules and compare with defaults
-export async function GET(request: Request) {
-  try {
-    await requireSystemAdmin()
-    const { searchParams } = new URL(request.url)
+export const GET = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const { searchParams } = new URL(req.url)
     const tenantId = searchParams.get('tenantId')
     
     const admin = createServiceRoleClient()
@@ -253,21 +253,14 @@ export async function GET(request: Request) {
         custom: customRules.length,
       }
     })
-  } catch (err) {
-    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status })
-    console.error('Error fetching rules:', err)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})
 
 // POST: Seed missing rules or update existing
-export async function POST(request: Request) {
-  try {
-    await requireSystemAdmin()
-    const body = await request.json()
+export const POST = apiHandler({
+  auth: 'system_admin',
+  handler: async ({ req }) => {
+    const body = await req.json()
     const { tenantId, mode = 'missing', userId } = body as {
       tenantId?: string | null
       mode: 'missing' | 'all' | 'reset'
@@ -345,12 +338,5 @@ export async function POST(request: Request) {
       rules: inserted,
       message: `${inserted?.length || 0} regler har lagts till`,
     })
-  } catch (err) {
-    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status })
-    console.error('Error seeding rules:', err)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
+  },
+})

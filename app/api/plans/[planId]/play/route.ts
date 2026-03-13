@@ -1,6 +1,6 @@
-import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { apiHandler } from '@/lib/api/route-handler'
 import { buildPlayView, DEFAULT_LOCALE_ORDER } from '@/lib/services/planner.server'
 import type { Tables } from '@/types/supabase'
 
@@ -9,12 +9,10 @@ function normalizeId(value: string | string[] | undefined) {
   return id?.trim() || null
 }
 
-export async function GET(
-  _request: NextRequest,
-  context: { params: Promise<{ planId: string }> }
-) {
-  const params = await context.params
-  const planId = normalizeId(params?.planId)
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ params }) => {
+  const planId = normalizeId((params as { planId: string }).planId)
   if (!planId) {
     return NextResponse.json({ error: 'Invalid plan id' }, { status: 400 })
   }
@@ -55,4 +53,5 @@ export async function GET(
 
   const play = buildPlayView(data as PlanWithRelations, DEFAULT_LOCALE_ORDER)
   return NextResponse.json({ play })
-}
+  },
+})

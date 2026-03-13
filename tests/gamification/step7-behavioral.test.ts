@@ -1,14 +1,14 @@
 /**
- * Step 7 — Behavioral Verification Tests
+ * Step 7 â€” Behavioral Verification Tests
  *
  * Deep behavioral tests covering:
  *   1. Admin auth/access control (system-admin vs non-admin vs tenant-admin)
  *   2. Admin API CRUD behavior (actual DB effects via mocked Supabase)
- *   3. Render config roundtrip (create → validate → update → validate)
+ *   3. Render config roundtrip (create â†’ validate â†’ update â†’ validate)
  *   4. Unlock rule CRUD against DB
  *   5. Admin UI structural verification
  *
- * Environment: vitest `node` — route handlers tested via direct import with
+ * Environment: vitest `node` â€” route handlers tested via direct import with
  * mocked auth-guard and Supabase client.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -50,7 +50,7 @@ function createMockSupabase(tableResults: Record<string, MockChainResult> = {}) 
       const result = tableResults[table] ?? defaultResult;
       const chain = createSelectChain(result);
 
-      // Track calls for assertions — wrap each mutating method
+      // Track calls for assertions â€” wrap each mutating method
       const wrapMethod = (method: string) => {
         const original = chain[method] as (...a: unknown[]) => unknown;
         chain[method] = vi.fn((...args: unknown[]) => {
@@ -133,8 +133,10 @@ function mockRouteContext(id: string) {
   return { params: Promise.resolve({ id }) };
 }
 
+const emptyContext = { params: Promise.resolve({}) };
+
 // ---------------------------------------------------------------------------
-// Imports — must come AFTER vi.mock declarations
+// Imports â€” must come AFTER vi.mock declarations
 // ---------------------------------------------------------------------------
 
 // These are dynamically imported to ensure mocks are applied
@@ -146,7 +148,7 @@ const grantRoute = await import('@/app/api/admin/cosmetics/grant/route');
 // =============================================================================
 // 1. AUTH / ACCESS CONTROL
 // =============================================================================
-describe('Step 7 Behavioral — Auth / Access Control', () => {
+describe('Step 7 Behavioral â€” Auth / Access Control', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAuthBehavior = 'system_admin';
@@ -158,7 +160,7 @@ describe('Step 7 Behavioral — Auth / Access Control', () => {
     it('returns 403 when user is not system_admin', async () => {
       mockAuthBehavior = 'forbidden';
       const req = mockRequest('/api/admin/cosmetics');
-      const res = await cosmeticsRoute.GET(req);
+      const res = await cosmeticsRoute.GET(req, emptyContext);
       expect(res.status).toBe(403);
       const json = await res.json();
       expect(json.error).toBe('Forbidden');
@@ -167,7 +169,7 @@ describe('Step 7 Behavioral — Auth / Access Control', () => {
     it('returns 401 when user is unauthenticated', async () => {
       mockAuthBehavior = 'unauthorized';
       const req = mockRequest('/api/admin/cosmetics');
-      const res = await cosmeticsRoute.GET(req);
+      const res = await cosmeticsRoute.GET(req, emptyContext);
       expect(res.status).toBe(401);
       const json = await res.json();
       expect(json.error).toBe('Unauthorized');
@@ -179,7 +181,7 @@ describe('Step 7 Behavioral — Auth / Access Control', () => {
         cosmetics: { data: [], error: null },
       });
       const req = mockRequest('/api/admin/cosmetics');
-      const res = await cosmeticsRoute.GET(req);
+      const res = await cosmeticsRoute.GET(req, emptyContext);
       expect(res.status).toBe(200);
     });
   });
@@ -192,7 +194,7 @@ describe('Step 7 Behavioral — Auth / Access Control', () => {
         method: 'POST',
         body: {},
       });
-      const res = await cosmeticsRoute.POST(req);
+      const res = await cosmeticsRoute.POST(req, emptyContext);
       expect(res.status).toBe(403);
     });
   });
@@ -260,7 +262,7 @@ describe('Step 7 Behavioral — Auth / Access Control', () => {
         method: 'POST',
         body: {},
       });
-      const res = await grantRoute.POST(req);
+      const res = await grantRoute.POST(req, emptyContext);
       expect(res.status).toBe(403);
     });
 
@@ -270,7 +272,7 @@ describe('Step 7 Behavioral — Auth / Access Control', () => {
         method: 'POST',
         body: {},
       });
-      const res = await grantRoute.POST(req);
+      const res = await grantRoute.POST(req, emptyContext);
       expect(res.status).toBe(401);
     });
   });
@@ -279,7 +281,7 @@ describe('Step 7 Behavioral — Auth / Access Control', () => {
 // =============================================================================
 // 2. API CRUD BEHAVIOR
 // =============================================================================
-describe('Step 7 Behavioral — API CRUD Behavior', () => {
+describe('Step 7 Behavioral â€” API CRUD Behavior', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAuthBehavior = 'system_admin';
@@ -299,13 +301,13 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
   };
 
   // ---- GET list with filters ----
-  describe('GET /api/admin/cosmetics — list with filters', () => {
+  describe('GET /api/admin/cosmetics â€” list with filters', () => {
     it('passes category filter to Supabase query', async () => {
       mockSupabase = createMockSupabase({
         cosmetics: { data: [{ id: '1' }], error: null },
       });
       const req = mockRequest('/api/admin/cosmetics?category=avatar_frame');
-      const res = await cosmeticsRoute.GET(req);
+      const res = await cosmeticsRoute.GET(req, emptyContext);
       expect(res.status).toBe(200);
       const json = await res.json();
       expect(json.cosmetics).toEqual([{ id: '1' }]);
@@ -318,7 +320,7 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
         cosmetics: { data: [], error: null },
       });
       const req = mockRequest('/api/admin/cosmetics?search=glow');
-      const res = await cosmeticsRoute.GET(req);
+      const res = await cosmeticsRoute.GET(req, emptyContext);
       expect(res.status).toBe(200);
       // Verify ilike was called on the chain
       const chain = mockSupabase.from('cosmetics');
@@ -330,7 +332,7 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
         cosmetics: { data: null, error: { message: 'DB error' } },
       });
       const req = mockRequest('/api/admin/cosmetics');
-      const res = await cosmeticsRoute.GET(req);
+      const res = await cosmeticsRoute.GET(req, emptyContext);
       expect(res.status).toBe(500);
       const json = await res.json();
       expect(json.error).toBe('DB error');
@@ -338,7 +340,7 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
   });
 
   // ---- POST create cosmetic ----
-  describe('POST /api/admin/cosmetics — create', () => {
+  describe('POST /api/admin/cosmetics â€” create', () => {
     it('creates a cosmetic row with correct DB fields', async () => {
       const createdRow = { id: 'new-id', ...VALID_CREATE_BODY };
       mockSupabase = createMockSupabase({
@@ -349,7 +351,7 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
         method: 'POST',
         body: VALID_CREATE_BODY,
       });
-      const res = await cosmeticsRoute.POST(req);
+      const res = await cosmeticsRoute.POST(req, emptyContext);
       expect(res.status).toBe(201);
       const json = await res.json();
       expect(json.cosmetic).toBeDefined();
@@ -376,7 +378,7 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
         method: 'POST',
         body: { key: '' },
       });
-      const res = await cosmeticsRoute.POST(req);
+      const res = await cosmeticsRoute.POST(req, emptyContext);
       expect(res.status).toBe(400);
       const json = await res.json();
       expect(json.error).toContain('Validation');
@@ -390,7 +392,7 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
           renderConfig: { wrongField: true }, // svg_frame requires 'variant'
         },
       });
-      const res = await cosmeticsRoute.POST(req);
+      const res = await cosmeticsRoute.POST(req, emptyContext);
       expect(res.status).toBe(400);
       const json = await res.json();
       expect(json.error).toContain('render_config');
@@ -404,7 +406,7 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
         method: 'POST',
         body: VALID_CREATE_BODY,
       });
-      const res = await cosmeticsRoute.POST(req);
+      const res = await cosmeticsRoute.POST(req, emptyContext);
       expect(res.status).toBe(409);
       const json = await res.json();
       expect(json.error).toContain('already exists');
@@ -412,7 +414,7 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
   });
 
   // ---- PUT update cosmetic ----
-  describe('PUT /api/admin/cosmetics/:id — update', () => {
+  describe('PUT /api/admin/cosmetics/:id â€” update', () => {
     it('updates specific fields without touching others', async () => {
       const updatedRow = { id: 'c-1', rarity: 'epic' };
       mockSupabase = createMockSupabase({
@@ -470,7 +472,7 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
   });
 
   // ---- DELETE soft-delete cosmetic ----
-  describe('DELETE /api/admin/cosmetics/:id — soft delete', () => {
+  describe('DELETE /api/admin/cosmetics/:id â€” soft delete', () => {
     it('sets is_active = false (soft-delete)', async () => {
       mockSupabase = createMockSupabase({
         cosmetics: { data: { id: 'c-1', is_active: false }, error: null },
@@ -507,7 +509,7 @@ describe('Step 7 Behavioral — API CRUD Behavior', () => {
 // =============================================================================
 // 3. RENDER CONFIG ROUNDTRIP
 // =============================================================================
-describe('Step 7 Behavioral — Render Config Roundtrip', () => {
+describe('Step 7 Behavioral â€” Render Config Roundtrip', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAuthBehavior = 'system_admin';
@@ -543,7 +545,7 @@ describe('Step 7 Behavioral — Render Config Roundtrip', () => {
 
   for (const { renderType, validConfig, invalidConfig } of CONFIGS) {
     describe(`${renderType} roundtrip`, () => {
-      it(`creates cosmetic with valid ${renderType} config → 201`, async () => {
+      it(`creates cosmetic with valid ${renderType} config â†’ 201`, async () => {
         mockSupabase = createMockSupabase({
           cosmetics: {
             data: {
@@ -570,7 +572,7 @@ describe('Step 7 Behavioral — Render Config Roundtrip', () => {
             renderConfig: validConfig,
           },
         });
-        const res = await cosmeticsRoute.POST(req);
+        const res = await cosmeticsRoute.POST(req, emptyContext);
         expect(res.status).toBe(201);
 
         const json = await res.json();
@@ -578,7 +580,7 @@ describe('Step 7 Behavioral — Render Config Roundtrip', () => {
         expect(json.cosmetic.render_config).toEqual(validConfig);
       });
 
-      it(`rejects invalid ${renderType} config → 400`, async () => {
+      it(`rejects invalid ${renderType} config â†’ 400`, async () => {
         const req = mockRequest('/api/admin/cosmetics', {
           method: 'POST',
           body: {
@@ -594,13 +596,13 @@ describe('Step 7 Behavioral — Render Config Roundtrip', () => {
             renderConfig: invalidConfig,
           },
         });
-        const res = await cosmeticsRoute.POST(req);
+        const res = await cosmeticsRoute.POST(req, emptyContext);
         expect(res.status).toBe(400);
         const json = await res.json();
         expect(json.error).toContain('render_config');
       });
 
-      it(`updates with valid ${renderType} config → 200`, async () => {
+      it(`updates with valid ${renderType} config â†’ 200`, async () => {
         mockSupabase = createMockSupabase({
           cosmetics: {
             data: { id: 'rt-id', render_type: renderType, render_config: validConfig },
@@ -616,7 +618,7 @@ describe('Step 7 Behavioral — Render Config Roundtrip', () => {
         expect(res.status).toBe(200);
       });
 
-      it(`rejects update with invalid ${renderType} config → 400`, async () => {
+      it(`rejects update with invalid ${renderType} config â†’ 400`, async () => {
         const req = mockRequest('/api/admin/cosmetics/rt-id', {
           method: 'PUT',
           body: { renderType, renderConfig: invalidConfig },
@@ -639,7 +641,7 @@ describe('Step 7 Behavioral — Render Config Roundtrip', () => {
         renderConfig: { variant: 'x' },
       },
     });
-    const res = await cosmeticsRoute.POST(req);
+    const res = await cosmeticsRoute.POST(req, emptyContext);
     expect(res.status).toBe(400);
   });
 });
@@ -647,7 +649,7 @@ describe('Step 7 Behavioral — Render Config Roundtrip', () => {
 // =============================================================================
 // 4. UNLOCK RULE CRUD
 // =============================================================================
-describe('Step 7 Behavioral — Unlock Rule CRUD', () => {
+describe('Step 7 Behavioral â€” Unlock Rule CRUD', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAuthBehavior = 'system_admin';
@@ -656,7 +658,7 @@ describe('Step 7 Behavioral — Unlock Rule CRUD', () => {
   const COSMETIC_ID = '00000000-0000-0000-0000-000000000001';
   const RULE_ID = '00000000-0000-0000-0000-000000000002';
 
-  describe('GET /api/admin/cosmetics/:id/rules — list', () => {
+  describe('GET /api/admin/cosmetics/:id/rules â€” list', () => {
     it('returns rules for a cosmetic', async () => {
       const rules = [
         { id: RULE_ID, unlock_type: 'level', unlock_config: { minLevel: 5 }, priority: 1 },
@@ -674,7 +676,7 @@ describe('Step 7 Behavioral — Unlock Rule CRUD', () => {
     });
   });
 
-  describe('POST /api/admin/cosmetics/:id/rules — add rule', () => {
+  describe('POST /api/admin/cosmetics/:id/rules â€” add rule', () => {
     it('creates a rule with correct DB fields', async () => {
       // Mock: cosmetic exists + rule insert succeeds
       const cosmeticResult = { data: { id: COSMETIC_ID }, error: null };
@@ -741,7 +743,7 @@ describe('Step 7 Behavioral — Unlock Rule CRUD', () => {
     });
   });
 
-  describe('DELETE /api/admin/cosmetics/:id/rules — remove rule', () => {
+  describe('DELETE /api/admin/cosmetics/:id/rules â€” remove rule', () => {
     it('deletes the specified rule', async () => {
       mockSupabase = createMockSupabase({
         cosmetic_unlock_rules: { data: null, error: null },
@@ -778,7 +780,7 @@ describe('Step 7 Behavioral — Unlock Rule CRUD', () => {
 // =============================================================================
 // 5. GRANT BEHAVIOR
 // =============================================================================
-describe('Step 7 Behavioral — Grant', () => {
+describe('Step 7 Behavioral â€” Grant', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAuthBehavior = 'system_admin';
@@ -805,7 +807,7 @@ describe('Step 7 Behavioral — Grant', () => {
         reason: 'Manual test grant',
       },
     });
-    const res = await grantRoute.POST(req);
+    const res = await grantRoute.POST(req, emptyContext);
     expect(res.status).toBe(201);
 
     const json = await res.json();
@@ -837,7 +839,7 @@ describe('Step 7 Behavioral — Grant', () => {
         reason: 'Test',
       },
     });
-    const res = await grantRoute.POST(req);
+    const res = await grantRoute.POST(req, emptyContext);
     expect(res.status).toBe(404);
     const json = await res.json();
     expect(json.error).toContain('Cosmetic not found');
@@ -856,7 +858,7 @@ describe('Step 7 Behavioral — Grant', () => {
         reason: 'Test',
       },
     });
-    const res = await grantRoute.POST(req);
+    const res = await grantRoute.POST(req, emptyContext);
     expect(res.status).toBe(404);
     const json = await res.json();
     expect(json.error).toContain('User not found');
@@ -871,7 +873,7 @@ describe('Step 7 Behavioral — Grant', () => {
         // reason missing
       },
     });
-    const res = await grantRoute.POST(req);
+    const res = await grantRoute.POST(req, emptyContext);
     expect(res.status).toBe(400);
   });
 
@@ -884,7 +886,7 @@ describe('Step 7 Behavioral — Grant', () => {
         reason: 'Test',
       },
     });
-    const res = await grantRoute.POST(req);
+    const res = await grantRoute.POST(req, emptyContext);
     expect(res.status).toBe(400);
   });
 });
@@ -892,7 +894,7 @@ describe('Step 7 Behavioral — Grant', () => {
 // =============================================================================
 // 6. ADMIN UI STRUCTURAL VERIFICATION
 // =============================================================================
-describe('Step 7 Behavioral — UI Structural Verification', () => {
+describe('Step 7 Behavioral â€” UI Structural Verification', () => {
   it('page.tsx exports metadata and default function (source check)', async () => {
     const { readFileSync } = await import('fs');
     const { resolve } = await import('path');

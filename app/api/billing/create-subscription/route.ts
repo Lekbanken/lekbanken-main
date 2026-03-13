@@ -1,5 +1,6 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { stripe, isStripeError, getStripeErrorMessage } from '@/lib/stripe/config';
+import { apiHandler } from '@/lib/api/route-handler';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import type Stripe from 'stripe';
 
@@ -25,22 +26,17 @@ import type Stripe from 'stripe';
  *   status: string;             // Subscription status
  * }
  */
-export async function POST(request: NextRequest) {
+export const POST = apiHandler({
+  auth: 'user',
+  rateLimit: 'auth',
+  handler: async ({ auth, req }) => {
   try {
     const supabase = await createServerRlsClient();
-    
-    // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    const userId = auth!.user!.id;
 
     // Parse request body
-    const body = await request.json();
-    const { tenantId, priceId, quantity = 1, customerId, paymentMethodId } = body;
+    const body = await req.json();
+    const { tenantId, priceId, quantity = 1, paymentMethodId } = body;
 
     if (!tenantId || !priceId) {
       return NextResponse.json(
@@ -54,7 +50,7 @@ export async function POST(request: NextRequest) {
       .from('user_tenant_memberships')
       .select('role')
       .eq('tenant_id', tenantId)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     const membershipRole = membership?.role ?? null
@@ -72,41 +68,39 @@ export async function POST(request: NextRequest) {
       .eq('id', tenantId)
       .single();
 
-    let stripeCustomerId = customerId;
+    // Always resolve Stripe customer from DB — never trust client-supplied customerId
+    let stripeCustomerId: string | undefined;
 
-    // Create or retrieve Stripe customer
-    if (!stripeCustomerId) {
-      // Check if customer already exists in billing_accounts
-      const { data: billingAccount } = await supabase
+    // Check if customer already exists in billing_accounts
+    const { data: billingAccount } = await supabase
+      .from('billing_accounts')
+      .select('provider_customer_id')
+      .eq('tenant_id', tenantId)
+      .eq('provider', 'stripe')
+      .maybeSingle();
+
+    if (billingAccount) {
+      stripeCustomerId = billingAccount.provider_customer_id;
+    } else {
+      // Create new Stripe customer
+      const customer = await stripe.customers.create({
+        name: tenant?.name || 'Unknown Tenant',
+        metadata: {
+          tenant_id: tenantId,
+        },
+      });
+
+      stripeCustomerId = customer.id;
+
+      // Save to billing_accounts
+      await supabase
         .from('billing_accounts')
-        .select('provider_customer_id')
-        .eq('tenant_id', tenantId)
-        .eq('provider', 'stripe')
-        .maybeSingle();
-
-      if (billingAccount) {
-        stripeCustomerId = billingAccount.provider_customer_id;
-      } else {
-        // Create new Stripe customer
-        const customer = await stripe.customers.create({
-          name: tenant?.name || 'Unknown Tenant',
-          metadata: {
-            tenant_id: tenantId,
-          },
+        .insert({
+          tenant_id: tenantId,
+          provider: 'stripe',
+          provider_customer_id: stripeCustomerId,
+          metadata: {},
         });
-
-        stripeCustomerId = customer.id;
-
-        // Save to billing_accounts
-        await supabase
-          .from('billing_accounts')
-          .insert({
-            tenant_id: tenantId,
-            provider: 'stripe',
-            provider_customer_id: stripeCustomerId,
-            metadata: {},
-          });
-      }
     }
 
     // Create subscription with automatic tax
@@ -129,7 +123,7 @@ export async function POST(request: NextRequest) {
       },
       metadata: {
         tenant_id: tenantId,
-        created_by_user_id: user.id,
+        created_by_user_id: userId,
       },
     };
 
@@ -198,4 +192,5 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+  },
+})

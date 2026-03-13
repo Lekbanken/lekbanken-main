@@ -7,6 +7,7 @@ type Size = "sm" | "md" | "lg";
 
 type ButtonProps = {
   href?: string;
+  prefetch?: boolean;
   children: ReactNode;
   className?: string;
   variant?: Variant;
@@ -64,6 +65,7 @@ function Spinner({ className }: { className?: string }) {
 
 export function Button({
   href,
+  prefetch,
   children,
   className = "",
   variant = "default",
@@ -95,7 +97,7 @@ export function Button({
 
   if (href && !isDisabled) {
     return (
-      <Link href={href} prefetch={false} className={classes} {...props}>
+      <Link href={href} prefetch={prefetch} className={classes} {...props}>
         {content}
       </Link>
     );

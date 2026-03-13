@@ -281,7 +281,7 @@ export default function GeneralSettingsPage() {
               <div className="flex-1 px-3 py-2 rounded-lg border border-border bg-muted text-muted-foreground text-sm">
                 {email}
               </div>
-              <Button variant="outline" href="/app/profile/account">
+              <Button variant="outline" href="/app/profile/account" prefetch={false}>
                 {t('sections.general.personalInfo.emailChange')}
               </Button>
             </div>

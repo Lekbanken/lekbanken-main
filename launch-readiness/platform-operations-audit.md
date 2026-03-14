@@ -59,7 +59,7 @@
 
 | Finding | ID | Severity | Status |
 |---------|-----|----------|--------|
-| ~~Preview deploys point at production Supabase~~ | OPS-SAND-001 | P1 | ✅ **Config isolation done (2026-03-13)** — Preview + Development env vars satta i Vercel. ✅ **DB layer fix applied (2026-03-14)** — Migration `20260314100000` applied to sandbox. 5/5 targeted database-layer permission checks passed. 🟡 **Pending: preview deploy → V7/V8 end-to-end runtime test** (create data on preview → confirm in sandbox DB, not prod). Se sandbox-phase-1b.md §7.1 + §10 för detaljer. |
+| ~~Preview deploys point at production Supabase~~ | OPS-SAND-001 | ~~P1~~ | ✅ **LÖST (2026-03-14).** Config isolation (2026-03-13) → DB layer fix (2026-03-14) → V7/V8 preview runtime verification passed (2026-03-14). Preview confirmed connected to sandbox (`vmpdejhgpsrfulimsoqn`), production DB unaffected. |
 | ~~No remote sandbox environment exists~~ | OPS-SAND-002 | P2 | ✅ Sandbox Supabase project created (`vmpdejhgpsrfulimsoqn`) |
 | ~~No sandbox Supabase project exists~~ | OPS-SAND-003 | P2 | ✅ Created with canonical baseline (247/156/545/28) |
 
@@ -287,7 +287,7 @@
 
 | Risk | Probability | Impact | Mitigation |
 |------|------------|--------|------------|
-| Preview deploy writes to prod DB | High (current) | Critical | OPS-SAND-001: Deploy sandbox immediately |
+| ~~Preview deploy writes to prod DB~~ | ~~High~~ → Resolved | ~~Critical~~ | ✅ OPS-SAND-001 CLOSED: Preview isolated to sandbox (2026-03-14) |
 | New developer setup takes >1 day | Medium | Medium | OPS-DEV-001–004: Setup guide + config files |
 | Sentry not initialised → errors undetected | Medium | High | OPS-OBS-001: Implement Sentry init |
 | Schema drift on enterprise target | Low (future) | High | OPS-REL-001: Migration orchestration script |

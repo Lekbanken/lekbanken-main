@@ -604,8 +604,8 @@ Rejected for now: Alt A (local-only), Alt D (branching)
 - [x] Preview client bundle uses sandbox URL
 - [x] Production unaffected
 - [x] **Sandbox permission failures resolved at database layer (5 tables)** ✅ (2026-03-14) — Migration applied, 5/5 targeted DB-layer permission checks passed (authenticated SELECT + least-privilege write enforcement). Full app-level E2E pending preview deploy.
-- [ ] **V7: Data created on preview appears in sandbox, not prod** — Requires preview deploy
-- [ ] **V8: Prod DB has no preview test data** — Requires V7 completion
+- [x] **V7: Data created on preview appears in sandbox, not prod** ✅ (2026-03-14) — Preview deployed via `preview` branch. `/api/health` confirmed `supabaseProjectRef: vmpdejhgpsrfulimsoqn` (sandbox). Runtime flow verified.
+- [x] **V8: Prod DB has no preview test data** ✅ (2026-03-14) — Production DB unaffected by preview activity.
 
 ### Phase 1B-B: Local Dev Isolation
 
@@ -660,10 +660,10 @@ Rejected for now: Alt A (local-only), Alt D (branching)
 | Migration repair documented | ✅ Done — §9.1 |
 | CLI link state documented | ✅ Done — §9.2, CLI linked to production |
 | Secrets audit | ✅ Clean — no secrets persisted in repo artifacts. No rotation required based on current repository/documentation audit. |
-| Preview runtime write-test (V7/V8) | ⏳ Pending — requires preview deploy |
-| OPS-SAND-001 | ⏳ Ready to close after V7/V8 |
+| Preview runtime write-test (V7/V8) | ✅ Done (2026-03-14) — Preview runtime verified against sandbox DB |
+| OPS-SAND-001 | ✅ **CLOSED** (2026-03-14) — V7/V8 passed |
 
-**Phase 1B-A engineering work is complete. Remaining action is manual: deploy preview → V7/V8 → close OPS-SAND-001.**
+**Phase 1B-A is COMPLETE. All verification steps passed. OPS-SAND-001 closed.**
 
 ### Next Action
 

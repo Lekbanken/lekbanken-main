@@ -13,6 +13,7 @@ import {
   getExportFilename,
   type ExportColumn,
 } from '@/lib/utils/export';
+import { DemoButtonGate } from '@/components/demo/DemoFeatureGate';
 
 interface AdminExportButtonProps<T> {
   /** Data to export */
@@ -68,6 +69,7 @@ export function AdminExportButton<T>({
 
   if (!showFormatOptions) {
     return (
+      <DemoButtonGate feature="export_data">
       <Button
         variant={variant}
         size={size}
@@ -78,10 +80,12 @@ export function AdminExportButton<T>({
         <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
         Exportera
       </Button>
+      </DemoButtonGate>
     );
   }
 
   return (
+    <DemoButtonGate feature="export_data">
     <div className="relative">
       <Button
         variant={variant}
@@ -128,5 +132,6 @@ export function AdminExportButton<T>({
         </>
       )}
     </div>
+    </DemoButtonGate>
   );
 }

@@ -8,6 +8,7 @@ import { CartProvider } from "@/lib/cart";
 import { AppShell as Shell } from "@/components/app/AppShell";
 import { AppTopbar } from "./components/app-topbar";
 import { ToastProvider } from "@/components/ui/toast";
+import { DemoBanner } from "@/components/demo/DemoBanner";
 
 /**
  * Root routes where back navigation should NOT be shown
@@ -53,6 +54,7 @@ export default function AppShellContent({ children }: { children: ReactNode }) {
   return (
     <CartProvider>
       <ToastProvider>
+        <DemoBanner />
         {/* Main App Shell */}
         <Shell header={<AppTopbar canGoBack={canGoBack} />}>{children}</Shell>
       </ToastProvider>

@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
+import { DemoFeatureGate } from '@/components/demo/DemoFeatureGate';
 import { getBillingStats } from '@/lib/services/billingService';
 import {
   AdminPageHeader,
@@ -120,6 +121,7 @@ export default function BillingAdminPage() {
 
   return (
     <SystemAdminClientGuard>
+    <DemoFeatureGate feature="access_billing">
     <AdminPageLayout>
       <AdminPageHeader
         title={t('pageTitle')}
@@ -219,6 +221,7 @@ export default function BillingAdminPage() {
         </CardContent>
       </Card>
     </AdminPageLayout>
+    </DemoFeatureGate>
     </SystemAdminClientGuard>
   );
 }

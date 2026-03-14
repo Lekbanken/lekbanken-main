@@ -349,3 +349,62 @@ No regressions. All remain at original severity.
 The demo domain is **secure and functionally correct**. All security properties verified: session ownership, tenant isolation, checkout blocking, rate limiting, and cookie security.
 
 The significant finding is that the **feature gate system is fully built but never wired into the app**. This is a funnel/UX gap, not a security issue. The demo works as a time-limited sandbox — users can explore freely for 2 hours, see only demo content, and are blocked from purchasing. However, the designed tier differentiation (free vs premium) and the upgrade friction (locked features → contact sales CTAs) are inoperative. When the demo launches for external users, wiring up the gates (L2-DEMO-001) and banner (L2-DEMO-002) should be prioritized to activate the conversion funnel.
+
+---
+
+## 10. Demo Funnel Activation M1 — Remediation Log
+
+**Date:** 2025-01-20  
+**Scope:** Wire dead demo infrastructure into live surfaces; eliminate feature definition fragmentation.
+
+### Changes Made
+
+#### 10.1 Canonical Feature Map (L2-DEMO-004 → ✅ LÖST)
+
+Created `lib/demo/feature-config.ts` — single source of truth for `FREE_TIER_DISABLED_FEATURES`.
+- Exports: `FREE_TIER_DISABLED_FEATURES` (7-item const array), `DisabledDemoFeature` type, `isFreeTierLocked()` helper
+- Eliminated 4 duplicate inline arrays:
+  - `components/demo/DemoFeatureGate.tsx` × 3 (DemoFeatureGate, DemoButtonGate, DemoFeatureBadge)
+  - `lib/utils/demo-detection.ts` × 1 (isDemoFeatureAvailable)
+- All consumers now import from canonical source
+
+#### 10.2 DemoBanner Wired into App Layout (L2-DEMO-002 → ✅ LÖST)
+
+- `app/app/layout-client.tsx`: Added `<DemoBanner />` above `<Shell>` inside `<ToastProvider>`
+- Banner auto-hides when `isDemoMode === false` — zero impact on non-demo users
+- Demo users now see: tier indicator, time remaining, upgrade CTA, timeout warning
+
+#### 10.3 DemoFeatureGate Wired into 5 Surfaces (L2-DEMO-001 → ✅ LÖST)
+
+| Surface | File | Gate Component | Feature Key |
+|---------|------|---------------|-------------|
+| Tenant Settings | `app/admin/tenant/[tenantId]/settings/page.tsx` | `DemoFeatureGate` | `modify_tenant_settings` |
+| User Invite/Create | `features/admin/users/UserAdminPage.tsx` | `DemoButtonGate` | `invite_users` |
+| Admin Export | `components/admin/shared/AdminExportButton.tsx` | `DemoButtonGate` | `export_data` |
+| Billing | `app/admin/billing/page.tsx` | `DemoFeatureGate` | `access_billing` |
+| Analytics | `app/admin/analytics/page.tsx` | `DemoFeatureGate` | `advanced_analytics` |
+
+All gates are transparent passthrough when `isDemoMode === false` or `tier !== 'free'`.
+
+### Updated Finding Status
+
+| ID | Title | Original | New Status |
+|----|-------|----------|------------|
+| L2-DEMO-001 | Feature gate components dead code | P2 | ✅ **LÖST** — wired into 5 surfaces |
+| L2-DEMO-002 | DemoBanner never rendered | P2 | ✅ **LÖST** — wired into app layout |
+| L2-DEMO-003 | Server-side gate functions never called | P3 | Unchanged |
+| L2-DEMO-004 | Feature definition fragmentation | P3 | ✅ **LÖST** — canonical `feature-config.ts` |
+| L2-DEMO-005 | Game detail no demo content check | P3 | Unchanged |
+| L2-DEMO-006 | FeatureGateMap entirely unused | P3 | Unchanged |
+| L2-DEMO-007 | Premium code in query string | P3 | Unchanged |
+
+### Verification
+
+- `npx tsc --noEmit`: 0 errors
+- `FREE_TIER_DISABLED_FEATURES` exists only in `lib/demo/feature-config.ts` (grep verified)
+- All 5 surface files import and render gate components (grep verified)
+- DemoBanner imported and rendered in app layout (grep verified)
+
+### Updated Verdict
+
+**PASS** — 0 P0, 0 P1, ~~2 P2~~ → 0 P2, ~~5 P3~~ → 3 P3 (2 P3 + 1 P3 resolved)

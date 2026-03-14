@@ -7,6 +7,7 @@
 'use client';
 
 import { useIsDemo, useDemoTier, useConvertDemo } from '@/hooks/useIsDemo';
+import { isFreeTierLocked } from '@/lib/demo/feature-config';
 import { LockClosedIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import type { ReactNode } from 'react';
 
@@ -47,18 +48,7 @@ export function DemoFeatureGate({
     return <>{children}</>;
   }
 
-  // Free tier restrictions
-  const FREE_TIER_DISABLED_FEATURES = [
-    'export_data',
-    'invite_users',
-    'modify_tenant_settings',
-    'access_billing',
-    'create_public_sessions',
-    'advanced_analytics',
-    'custom_branding',
-  ];
-
-  const isLocked = tier === 'free' && FREE_TIER_DISABLED_FEATURES.includes(feature);
+  const isLocked = tier === 'free' && isFreeTierLocked(feature);
 
   if (!isLocked) {
     return <>{children}</>;
@@ -134,18 +124,7 @@ export function DemoButtonGate({ children, feature, tooltip }: DemoButtonGatePro
     return <>{children}</>;
   }
 
-  // Check if feature is disabled
-  const FREE_TIER_DISABLED_FEATURES = [
-    'export_data',
-    'invite_users',
-    'modify_tenant_settings',
-    'access_billing',
-    'create_public_sessions',
-    'advanced_analytics',
-    'custom_branding',
-  ];
-
-  const isLocked = FREE_TIER_DISABLED_FEATURES.includes(feature);
+  const isLocked = isFreeTierLocked(feature);
 
   if (!isLocked) {
     return <>{children}</>;
@@ -200,17 +179,7 @@ export function DemoFeatureBadge({ feature, className = '' }: DemoFeatureBadgePr
     return null;
   }
 
-  const FREE_TIER_DISABLED_FEATURES = [
-    'export_data',
-    'invite_users',
-    'modify_tenant_settings',
-    'access_billing',
-    'create_public_sessions',
-    'advanced_analytics',
-    'custom_branding',
-  ];
-
-  const isPremium = FREE_TIER_DISABLED_FEATURES.includes(feature);
+  const isPremium = isFreeTierLocked(feature);
 
   return (
     <span

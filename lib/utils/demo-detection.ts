@@ -6,6 +6,7 @@
 
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { cookies, headers } from 'next/headers';
+import { isFreeTierLocked } from '@/lib/demo/feature-config';
 import type { DemoTier } from '@/lib/auth/ephemeral-users';
 
 /**
@@ -180,19 +181,8 @@ export async function isDemoFeatureAvailable(feature: string): Promise<boolean> 
     return true;
   }
 
-  // Free tier restrictions (from Decision 1: Hybrid model)
-  const FREE_TIER_DISABLED_FEATURES = [
-    'export_data',
-    'invite_users',
-    'modify_tenant_settings',
-    'access_billing',
-    'create_public_sessions',
-    'advanced_analytics',
-    'custom_branding',
-  ];
-
   if (tier === 'free') {
-    return !FREE_TIER_DISABLED_FEATURES.includes(feature);
+    return !isFreeTierLocked(feature);
   }
 
   // Premium tier - all features available

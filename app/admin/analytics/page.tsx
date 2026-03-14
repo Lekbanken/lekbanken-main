@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
+import { DemoFeatureGate } from '@/components/demo/DemoFeatureGate';
 import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 import {
@@ -404,5 +405,5 @@ export default function AnalyticsPage() {
     </div>
   );
 
-  return <SystemAdminClientGuard>{content}</SystemAdminClientGuard>;
+  return <SystemAdminClientGuard><DemoFeatureGate feature="advanced_analytics">{content}</DemoFeatureGate></SystemAdminClientGuard>;
 }

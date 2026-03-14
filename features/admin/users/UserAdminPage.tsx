@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from 'next-intl';
+import { DemoButtonGate } from '@/components/demo/DemoFeatureGate';
 import {
   UserPlusIcon,
   UsersIcon,
@@ -352,7 +353,7 @@ export function UserAdminPage({
               {t('actions.refresh')}
             </Button>
             {canInviteUser && (
-              <>
+              <DemoButtonGate feature="invite_users">
                 <Button variant="outline" onClick={() => setInviteOpen(true)} className="gap-2">
                   <EnvelopeIcon className="h-4 w-4" />
                   {t('actions.invite')}
@@ -361,7 +362,7 @@ export function UserAdminPage({
                   <UserPlusIcon className="h-4 w-4" />
                   {t('actions.createUser')}
                 </Button>
-              </>
+              </DemoButtonGate>
             )}
           </div>
         }

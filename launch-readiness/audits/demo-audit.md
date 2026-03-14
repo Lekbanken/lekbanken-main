@@ -48,7 +48,8 @@ The Demo domain is a comprehensive system supporting anonymous/ephemeral access 
 **File:** `lib/rate-limit/demo-rate-limit.ts`  
 **Issue:** Rate limiter uses `new Map()` — per-instance in serverless. Each cold start gets a fresh store. Vercel runs many concurrent instances.  
 **Impact:** Rate limit effectively useless in production. Attacker can create unlimited demo accounts by hitting different instances.  
-**Fix:** Replaced with Supabase-backed rate limiting. Counts `demo_sessions` created in the last hour with matching `metadata->>'client_ip'`. Cross-instance persistent. Client IP stored in session metadata on creation.
+**Fix:** Replaced with Supabase-backed rate limiting (launch-sufficient). Counts `demo_sessions` created in the last hour with matching `metadata->>'client_ip'`. Cross-instance persistent without new dependencies. Client IP stored in session metadata on creation.  
+**Note:** This is a launch-sufficient persistent rate limiter, not a full platform-wide rate-limit solution. Sufficient for current demo scope. Platform-wide rate limiting (e.g. Upstash) remains deferred per SEC-002b.
 
 ### DEMO-002 — Premium access code hardcoded (P1) ✅ **FIXAD (2026-03-14)**
 

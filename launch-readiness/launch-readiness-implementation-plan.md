@@ -277,6 +277,25 @@ Domäner auditeras i prioritetsordning. Varje audit producerar en fil i `/launch
 | 5.2 | Regression audit — cross-cutting | ⬜ |
 | 5.3 | Fix eventuella nya P0/P1 | ⬜ |
 | 5.4 | Re-regression om P0/P1 hittades | ⬜ |
+| 5.5 | Level 2 building-block audits — selektivt vid behov | ⬜ |
+
+### Level 2 — Critical Building Block Audits (selektiv)
+
+> **Tillagd:** 2026-03-14 (GPT-direktiv)
+
+Programmet omfattar nu **två nivåer**:
+
+- **Level 1 = Domain audits** — systematisk per-domän-granskning (Play, Sessions, Games, Planner, Demo, etc.)
+- **Level 2 = Critical building-block audits** — selektiv fördjupning i komponenter, hooks, helpers, mappers och andra byggstenar med hög blast radius
+
+Level 2 audits **aktiveras selektivt** — inte som en komplett backlog:
+
+1. **Efter domänaudit** — när en finding berör en bredare byggsten som används i flera domäner
+2. **Vid regression** — när samma building block dyker upp i flera domäners findings
+3. **Cross-domain** — när samma byggsten används i flera domäner med olika krav
+4. **Vid misstanke** — när ett fynd verkar "lokalt" men sannolikt är systemiskt
+
+Full metodik: se `launch-readiness-audit-program.md` §7.
 
 ### Gate-kriterier
 - [ ] Alla domäner passerar regression (inga nya P0/P1)

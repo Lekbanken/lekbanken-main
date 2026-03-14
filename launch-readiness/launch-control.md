@@ -1,7 +1,7 @@
 # Lekbanken Launch Control
 
 > **Status:** LAUNCH READY — Post-launch operational phase  
-> **Last updated:** 2026-03-13  
+> **Last updated:** 2026-03-14  
 > **Current Phase:** Phase 3+4 COMPLETE. Scaling hardening done. Ready for production traffic.  
 
 ---
@@ -250,6 +250,12 @@ For each audit in queue:
 ### Remaining Domain Audits (not started)
 
 *All domain audits complete.*
+
+### Level 2 — Critical Building Block Audits (selektiv)
+
+> **Tillagd:** 2026-03-14
+
+Audit-programmet omfattar nu **två nivåer**: Level 1 (domain audits, alla genomförda) och Level 2 (critical building block audits — selektiv fördjupning i komponenter, hooks, helpers och mappers med hög blast radius). Level 2 aktiveras selektivt — inte som komplett backlog — vid domänregression, cross-domain-findings, eller när ett fynd verkar systemiskt. Full metodik: `launch-readiness-audit-program.md` §7.
 
 ### Completed Cross-Cutting Audits
 
@@ -1268,6 +1274,7 @@ Before any production deploy, verify:
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-03-14 | Claude | **v2.51 — LEVEL 2 BUILDING BLOCK AUDIT METHODOLOGY.** Per GPT-direktiv: audit-programmet utökat med Level 2 — Critical Building Block Audits. Formaliserar metodik för selektiv fördjupning i komponenter, hooks, helpers, mappers och andra byggstenar med hög blast radius. 9-stegs standardprocedur (definition → ingress → egress → call-site inventory → behavior matrix → state/logic audit → end-to-end proof → regression check → finding classification). Chain rule: "auditera kontraktet, inte bara filen". Aktiveras selektivt: efter domänaudit, vid regression, cross-domain, vid misstanke. 7 prioritetskluster definierade. Uppdaterade dokument: `launch-readiness-audit-program.md` (ny §7), `launch-readiness-implementation-plan.md` (item 5.5 + Level 2 sektion i Phase 5), `launch-control.md` (scope note under Phase 3+4). Inga nya audit-filer skapade — metodik formaliserad för selektiv användning. |
 | 2026-03-14 | Claude | **v2.50 — GAMES REGRESSION AUDIT (Phase 2).** Full regression audit of Games / Library domain. 8 regression areas verified: (1) Snapshot auth + ownership (GAME-002 M1) — `verifySnapshotAccess()` with tenant role check intact, (2) DELETE gate + force-delete (GAME-001a/b M1+M2) — explicit role check + `system_admin`-only force-delete intact, (3) PATCH service-role fix (GAME-001c M3) — RLS client for non-system-admin callers intact, (4) Search sanitization (GAME-004 M2) — `.replace(/[,()]/g, '')` at both search sites + UUID validation on tenantId, (5) Reactions batch cap (GAME-005 M1) — Zod max(100) + rateLimit intact, (6) Builder error handling (GAME-009 M3) — all 20+ operations check `{ error }` → `warnings[]` intact, (7) Auth/wrapper coverage — 15/18 apiHandler + 3 requireGameAuth (known GAME-012 P3), (8) Tenant boundary — TI-001 membership checks, `requireTenantRole`, `allowedProductIds`, artifact `correctCode` stripping, trigger content stripping all intact. **0 new findings.** 7 known M4 deferrals unchanged (GAME-003/006/007/008/010/011/012). Games is test-group-ready for current scope. Report: `audits/games-regression-audit.md`. |
 | 2026-03-14 | Claude | **v2.49 — DEMO M2 REMEDIATION (3 regression findings fixed).** Per GPT calibration: REG-DEMO-002 (RLS overly permissive) too serious for external demo domain — Demo NOT test-group-ready until fixed. All 3 findings fixed: (1) **REG-DEMO-001** — `demo-expired/page.tsx` form POST replaced with `<Button href="/demo">` (proper client-side flow). (2) **REG-DEMO-002** — migration `20260314200000`: dropped `service_role_full_demo_sessions_access` (no `TO` clause → all authenticated users had full CRUD), replaced with `users_update_own_demo_sessions` (FOR UPDATE, user_id=auth.uid()) + `system_admin_full_demo_sessions_access` (is_system_admin()). (3) **REG-DEMO-003** — same migration: both RPCs (`add_demo_feature_usage`, `mark_demo_session_converted`) now include `AND user_id = auth.uid()` ownership check. Baseline updated to match. `tsc --noEmit` = 0 errors. **Re-regression passed (10 checks):** demo-expired link, RLS policies, RPC ownership, session creation (supabaseAdmin), rate limit (supabaseAdmin), track route (RLS client), convert route (RLS client), admin dashboard (system_admin policy), cleanup function (service_role), tsc. Deploy order: migration `20260314200000` before app deploy. Demo is now test-group-ready. |
 | 2026-03-14 | Claude | **v2.48 — DEMO REGRESSION AUDIT (Phase 2).** Full regression per GPT-defined scope (8 areas): auth/demo (normal + premium + missing-env + rate-limit), demo/status (session resolution + expiry), demo/track (feature tracking + no cross-session leakage), demo/convert (convert path + state persistence), feature gates (no broken click paths), cleanup/expiry (graceful degradation, no zombie state), multi-tab/refresh (single session via cookie), telemetry/funnel (full PostHog+Plausible funnel intact). **All 3 M1 fixes verified intact.** Premium 503 UX verified: users never hit premium API from standard UI — "Upgrade to Premium" links to contact sales form, not premium API. **3 new findings:** REG-DEMO-001 (P2) — demo-expired "Start Another Demo" uses plain HTML form POST but route returns JSON → user sees raw JSON (UX dead-end); REG-DEMO-002 (P2) — `service_role_full_demo_sessions_access` RLS policy has no `TO` clause → grants full access to all authenticated users (defense-in-depth gap, demo data is ephemeral); REG-DEMO-003 (P3) — `add_demo_feature_usage()` and `mark_demo_session_converted()` RPCs lack `AND user_id = auth.uid()` ownership check. **0 P0/P1 regressions.** GPT calibration applied: DEMO-001 described as "launch-sufficient persistent rate limiting". Demo is test-group-ready. Report: `audits/demo-regression-audit.md`. |

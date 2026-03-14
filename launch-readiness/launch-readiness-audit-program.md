@@ -198,6 +198,164 @@ Följ data genom hela stacken:
 5. **Cosmetic unlock → purchase → equip → display** (gamification loop)
 6. **Notification trigger → delivery → read status** (notification pipeline)
 
+---
+
+## 7. Level 2 — Critical Building Block Audits
+
+> **Tillagd:** 2026-03-14 (GPT-direktiv)  
+> **Syfte:** Hitta djupare fel som domänaudits missar — hårdkodning, kontraktsdrift, roll-/visibility-fel, inkonsekvent auth, trasiga end-to-end-kedjor, döda fallbackar, splittrad logik mellan UI/hook/action/route/DB.
+
+### 7.1 Definition — vad är en "kritisk byggsten"?
+
+En byggsten ska granskas med samma noggrannhet som en domän om den uppfyller **ett eller flera** av dessa kriterier:
+
+- Används i **flera domäner**
+- Påverkar **auth, roller, capability eller tenant-scope**
+- Används i **kritiska användarflöden** (play, session, planner, billing)
+- Används i **flera kontexter** (admin, preview, play, participant, demo)
+- Ansvarar för **dataformning, state transition eller rendering** av säkerhets-/produktkritisk information
+- Har **hög återanvändning** eller **hög blast radius** (en bugg påverkar många ställen)
+- Är känd att vara **AI-genererad, polymorf eller historiskt omarbetad** flera gånger
+
+### 7.2 Typer som kan auditeras
+
+| Typ | Beskrivning |
+|-----|-------------|
+| **Components** | React-komponenter med komplex logik, rollbaserad rendering eller cross-domain användning |
+| **Hooks** | Custom hooks som hanterar data, auth, state eller side effects |
+| **Server actions** | Next.js server actions med mutations eller auth-beroende logik |
+| **Shared route helpers** | Funktioner som `apiHandler`, `requireTenantRole`, `requireGameAuth` etc. |
+| **Capability/auth helpers** | Allt som fattar beslut om vad en användare får göra |
+| **Mappers / adapters / transformers** | Funktioner som transformerar data mellan lager (DB → API → UI) |
+| **State helpers / command layers** | State-maskineri, reducers, command patterns |
+| **Feature gates / demo gates / upgrade gates** | Kod som styr vad som visas baserat på feature-flaggor, demo-status, licensnivå |
+| **Constants / policy maps / config contracts** | Enums, policy-maps, konfigurationslager som styr systembeteende |
+
+### 7.3 Standardprocedur — Building Block Audit
+
+> **Hård regel:** En building-block audit måste alltid vara **kodbevisad**. Spekulativa findings är inte tillåtna. Claude ska alltid följa verkliga call-sites, läsa aktuell kod, och tydligt skilja på: **verifierat i kod** / **infererat** / **ej verifierat**.
+
+För varje kritisk funktion/komponent/hook:
+
+#### Steg 1 — Definition
+
+- Vad är byggstenen?
+- Vilket ansvar ska den ha?
+- Vilken domän/del av systemet använder den?
+
+#### Steg 2 — Ingress
+
+- Vilka props/params/context/session/input tar den?
+- Vilka invariants förutsätts?
+- Finns implicit beroende av auth, tenant, locale, feature flag, role?
+
+#### Steg 3 — Egress
+
+- Vad returnerar/renderar/skriver den?
+- Vilka side effects uppstår?
+- Vilka beroenden anropas vidare?
+
+#### Steg 4 — Call-site inventory
+
+- Lista **alla verkliga call-sites** (grep/search, inte gissning)
+- Gruppera efter användningskontext:
+  - admin
+  - user
+  - participant
+  - public
+  - preview/demo
+  - play runtime
+  - mobile/touch
+  - server/client
+
+#### Steg 5 — Behavior matrix
+
+- Beter sig byggstenen rätt i **alla** call-site-kategorier?
+- Visar den rätt data för rätt roll?
+- Används den felaktigt som om den vore generell trots att den är kontextbunden?
+
+#### Steg 6 — State / logic audit
+
+- Finns dold hårdkodning?
+- Finns fallbackar som maskerar fel?
+- Finns dead code?
+- Finns race/rerender/double-fire-risk?
+- Finns splittrad logik mellan hook, component, route, server action?
+
+#### Steg 7 — End-to-end proof
+
+- Följ minst ett riktigt flöde: **UI → hook/action/route → DB → tillbaka**
+- Bevisa att byggstenen faktiskt håller ihop i verklig användning
+
+#### Steg 8 — Regression check
+
+Om byggstenen tidigare varit remediated:
+- Är fixen fortfarande intakt?
+- Har nya call-sites tillkommit?
+- Har kontraktet driftat?
+
+#### Steg 9 — Finding classification
+
+- P0/P1/P2/P3 eller "no finding"
+- Tydlig skillnad mellan:
+  - **lokal bugg** — isolerat i byggstenen
+  - **systemic pattern** — samma fel upprepas på andra ställen
+  - **docs drift** — byggstenen fungerar men dokumentation stämmer inte
+  - **unused/dead path** — kod som aldrig exekveras
+  - **product decision** — beteendet kanske är avsiktligt
+
+### 7.4 Kedjeregel — auditera kontraktet, inte bara filen
+
+> **Kritisk regel:** Claude **får inte auditera en komponent isolerat om dess verkliga risk ligger i kedjan.**
+
+En komponent kan se korrekt ut lokalt men vara fel i kontext:
+- Hooken ger fel shape
+- Server action returnerar annan struktur
+- Route filtrerar fel fält
+- Rollen som använder komponenten borde inte se samma data
+- Samma komponent används i preview och live med olika krav
+
+**Princip:** Auditera inte bara filen — auditera **kontraktet och användningen**.
+
+### 7.5 När ska building-block audits användas?
+
+Building-block audits öppnas selektivt:
+
+1. **Efter domänaudit** — när en finding verkar beröra en bredare byggsten
+2. **Vid regression** — när samma building block dyker upp i flera domäners findings
+3. **Cross-domain** — när samma byggsten används i flera domäner med olika krav
+4. **Vid misstanke** — när ett fynd verkar "lokalt" men sannolikt är systemiskt
+
+De ska **inte** generera en stor backlog av småaudits. Syftet är selektiv fördjupning med hög blast-radius-medvetenhet.
+
+### 7.6 Prioriterade byggstens-kluster (för framtida audit)
+
+Dessa kluster har identifierats som högst prioritet baserat på blast radius och cross-domain-användning. **Ingen exekvering planerad i nuvarande fas** — listan är referens för när Level 2 audits aktiveras.
+
+| Kluster | Blast radius | Motivering |
+|---------|-------------|------------|
+| Auth / role / tenant / capability helper stack | Kritisk | Används av alla autentiserade routes |
+| Play/session visibility-komponenter | Hög | Påverkar vad deltagare/ledare ser i realtid |
+| Demo / feature gate / upgrade gate-komponenter | Hög | Externt exponerad, rollberoende rendering |
+| Planner shared capability helpers + publishing UI | Hög | Styr vem som får redigera/publicera/starta |
+| Game builder shared mappers / serializers | Medium | Komplex dataformning, AI-genererad |
+| Journey/gamification rendering chain | Medium | Polymorf, historiskt omarbetad |
+| Shared UI across admin + user + participant | Medium | Rollbaserade renderingsskillnader |
+
+### 7.7 Output-format
+
+Building-block audit-rapporter sparas i `/launch-readiness/audits/` med namnkonventionen:
+
+```
+building-block-{name}-audit.md
+```
+
+Rapporten följer samma finding-format som domänaudits (§3), med tillägg av:
+- **Call-site inventory** (alla kända användare)
+- **Behavior matrix** (kontext × beteende)
+- **End-to-end proof** (minst ett fullständigt flöde)
+
+
 ### B. UI Consistency
 
 - Design system adherence (shadcn/ui patterns)
@@ -243,7 +401,7 @@ Verifiera att varje vy korrekt visar/döljer element baserat på roll:
 
 ---
 
-## 7. Audit Output Format
+## 8. Audit Output Format
 
 Varje domänaudit producerar **en Markdown-fil** i `/launch-readiness/audits/`:
 
@@ -308,7 +466,7 @@ Prioriterad lista med rekommenderade åtgärder.
 
 ---
 
-## 8. Remediation Output Format
+## 9. Remediation Output Format
 
 Varje implementation-fas producerar en fil i `/launch-readiness/implementation/`:
 
@@ -352,7 +510,7 @@ Filnamn: `{domain}-remediation.md`
 
 ---
 
-## 9. Regression Protocol
+## 10. Regression Protocol
 
 ### När körs regression?
 
@@ -388,7 +546,7 @@ Sparas i samma audit-fil med nytt pass-nummer:
 
 ---
 
-## 10. Claude Instructions — Audit Execution
+## 11. Claude Instructions — Audit Execution
 
 ### Prompt-strategi för domänaudits
 
@@ -424,7 +582,7 @@ Producera en komplett audit — inte bara ytliga observationer.
 
 ---
 
-## 11. Atlas Integration Protocol
+## 12. Atlas Integration Protocol
 
 ### Under audit
 
@@ -445,7 +603,7 @@ Producera en komplett audit — inte bara ytliga observationer.
 
 ---
 
-## 12. Arbetssätt — Steg för steg
+## 13. Arbetssätt — Steg för steg
 
 ```
 ┌─────────────────┐

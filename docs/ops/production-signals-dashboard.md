@@ -127,6 +127,23 @@ GROUP BY hour
 ORDER BY hour DESC;
 ```
 
+**Top 10 sessions by participants (last 24h):**
+```sql
+SELECT
+  ps.id,
+  ps.display_name,
+  ps.status,
+  ps.participant_count,
+  ps.created_at,
+  ps.started_at,
+  ps.ended_at
+FROM participant_sessions ps
+WHERE ps.created_at >= now() - interval '24 hours'
+ORDER BY ps.participant_count DESC
+LIMIT 10;
+```
+> Catches: bot joins, classroom-scale sessions, abuse patterns, unexpected stress scenarios.
+
 **Join errors (from error tracking):**
 ```sql
 SELECT
@@ -435,7 +452,8 @@ Platform team. Escalation: Vercel/Supabase support for infrastructure issues.
 2. GET /api/system/metrics → error rates normal?
 3. SQL: session count today vs yesterday
 4. SQL: gamification daily summary — economy stable?
-5. Visual scan: anything unusual?
+5. SQL: top sessions by participants — outliers?
+6. Visual scan: anything unusual?
 ```
 
 ### Weekly Review (30 min — Mondays)

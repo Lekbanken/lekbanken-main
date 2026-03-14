@@ -65,3 +65,9 @@ Supabase Realtime can become overloaded if clients open too many channels.
 - Define exact Slack channel and PagerDuty service IDs.
 - Add rate-limit alerts per endpoint group if/when rate limiting is implemented.
 - Hook alerts to runbooks (link to incident_response/backup_dr) in tooling.
+
+## Related Documents
+
+- [Launch Telemetry Pack](../../launch-readiness/launch-telemetry-pack.md) — 5 signals + 3 alerts for first 30 days
+- [Production Signals Dashboard](production-signals-dashboard.md) — SQL queries, thresholds, review cadence
+- [Anomaly Detection Playbook](anomaly-detection-playbook.md) — per-alert response procedures

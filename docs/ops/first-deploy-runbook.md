@@ -64,8 +64,46 @@ Run these checks immediately after deploy completes:
 | Check | Command / URL | Expected |
 |-------|--------------|----------|
 | App reachable | `curl https://app.lekbanken.no` | 200 OK, page loads |
-| Health endpoint | `curl https://app.lekbanken.no/api/health` | `{ "status": "ok" }` |
-| Readiness endpoint | `curl -H "Authorization: Bearer <admin-token>" https://app.lekbanken.no/api/readiness` | All checks pass |
+| Health endpoint | `curl https://app.lekbanken.no/api/health` | `{ "status": "ok" }` — verifies DB connectivity |
+| Readiness endpoint | `curl -H "Authorization: Bearer <admin-token>" https://app.lekbanken.no/api/readiness` | All checks pass (db, stripe, auth, encryption, rateLimiter) |
+| Smoke test | Run RLS verification (§3 below) + functional smoke tests (§3 below) | All pass |
+
+### RLS verification
+
+RLS misconfiguration is the **#1 most common Supabase incident** post-launch. Verify policy access for each critical context:
+
+```sql
+-- 1. Authenticated user context (normal app flow)
+SET role authenticated;
+SELECT * FROM plans LIMIT 1;
+SELECT * FROM games LIMIT 1;
+SELECT * FROM user_sessions LIMIT 1;
+
+-- 2. Service role context (server actions, cron, webhooks)
+-- These must NOT rely on auth.uid() — use is_system_admin() bypass
+SELECT * FROM legal_documents LIMIT 1;  -- service role only
+
+-- 3. Verify health endpoint exercises DB access
+curl https://app.lekbanken.no/api/health/db-access
+```
+
+**Common RLS failure pattern:** Policy uses `auth.uid() = user_id` but the request runs via service role, server action, cron, or webhook — where `auth.uid()` is NULL. Fix: add `OR is_system_admin()` to policies that must allow system access.
+
+### Environment variable validator
+
+The app validates environment variables at boot via `lib/config/env.ts`:
+
+- **Throws** on critical missing vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- **Warns** on production-critical missing: `SUPABASE_SERVICE_ROLE_KEY`, Stripe keys, `APP_ENV`
+- **Bypass** for build-only pipelines: set `SKIP_ENV_VALIDATION=true`
+- **Log output:** `✅ Environment variables validated successfully` on successful boot
+
+**Common mismatch:** An env var exists in `.env.local` but not in Vercel Production — especially after adding new vars. Always verify Vercel Dashboard → Settings → Environment Variables.
+
+Full critical env var list: see `launch-readiness/incident-playbook.md` §8.
+```
+
+**Common mismatch:** An env var exists in `.env.local` but not in Vercel Production. Always verify Vercel Dashboard → Settings → Environment Variables after adding new vars locally.
 
 ### Functional smoke tests (manual)
 
@@ -78,6 +116,7 @@ Run these checks immediately after deploy completes:
 | 5 | **Join session** | On separate device/browser: enter join code | Participant joins lobby |
 | 6 | **Stripe checkout** | If billing active: initiate checkout flow | Stripe checkout page loads |
 | 7 | **Profile** | Navigate to profile → update setting | Setting saved, page reloads correctly |
+| 8 | **Tenant isolation** | Query games without tenant filter — should return only current tenant's data | No cross-tenant data leakage |
 
 ### Monitoring baseline
 
@@ -161,7 +200,16 @@ During the first hour, actively monitor:
 3. Verify `NEXT_PUBLIC_SUPABASE_URL` matches the project auth is configured on
 
 **Fix:** Ensure redirect URLs in Supabase Auth config include `https://app.lekbanken.no`.
+### 5f. Cookie / auth domain mismatch
 
+**Symptoms:** Login works but session disappears on page reload, or redirect loops on preview deployments.
+
+**Diagnosis:**
+1. Check cookie domain — should be `.lekbanken.app` (or `.lekbanken.no`), not `localhost` or `*.vercel.app`
+2. Check Supabase Auth → URL Configuration → Site URL matches production domain
+3. On preview deploys: cookies may be scoped to the preview `.vercel.app` domain — this is expected and correct for sandbox isolation
+
+**Fix:** Set cookie domain explicitly in auth config, or let Supabase handle domain via `siteUrl`. For preview deployments, ensure `NEXT_PUBLIC_SUPABASE_URL` points to sandbox (not production).
 ### 5e. Missing or stale tenant cookie
 
 **Symptoms:** Users see wrong tenant or get "no tenant" errors.

@@ -1244,6 +1244,23 @@ Before any production deploy, verify:
 
 ---
 
+## 16. Production Risk Register
+
+> **Purpose:** Quick-scan of the most likely post-launch incidents and where to find prevention/detection.  
+> **Last updated:** 2026-03-14
+
+| Risk | Impact | Prevention | Detection | Runbook |
+|------|--------|------------|-----------|--------|
+| RLS misconfiguration | Data inaccessible (403 / empty results) | RLS test suite, `is_system_admin()` bypass | `GET /api/health`, DB smoke test | `first-deploy-runbook.md` §3 RLS verification |
+| Environment vars mismatch | Auth failure, redirect loops, silent billing failure | Boot-time validator (`lib/config/env.ts`), Vercel env audit | `GET /api/readiness` (checks db, stripe, auth, encryption) | `first-deploy-runbook.md` §3 Env validator |
+| Stripe webhook failure | Payment succeeds but user gets no access | Idempotency guard (`billing_events.event_key`), atomic status claim | Stripe Dashboard → Failed events, `billing_events` query | `incident-playbook.md` §5b |
+| Migration to wrong environment | Schema corruption in production | Promotion flow (local→sandbox→prod), `--dry-run`, project-ref check | `supabase migration list`, schema count diff | `prod-migration-workflow.md` §6 |
+| Realtime channel overload | Play sessions degrade, WebSocket reconnect loops | Tenant-scoped channels, max ~3 channels/session | Supabase Dashboard → Realtime, reconnect rate | `alerting.md` Realtime Overload |
+| Unbounded queries | DB latency spike, API timeouts | Mandatory `LIMIT`, pagination, `tenant_id` indexes | Supabase → Query Performance, `/api/system/metrics` p95 | `prod-migration-workflow.md` §9 |
+| Tenant data leakage | Cross-tenant data exposure (security incident) | `tenant_id NOT NULL` constraint, RLS `tenant_id = current_tenant()` | Tenant isolation smoke test, audit logs | `incident-playbook.md` §5a, `first-deploy-runbook.md` §3 |
+
+---
+
 ## Changelog
 
 | Date | Author | Change |

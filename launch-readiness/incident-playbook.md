@@ -165,9 +165,29 @@ The rate limiter is in-memory and resets on deploy. A fresh deploy clears all ra
 2. Verify webhook secrets match: `STRIPE_TEST_WEBHOOK_SECRET` / `STRIPE_LIVE_WEBHOOK_SECRET`
 3. Check `STRIPE_USE_LIVE_KEYS` flag (should be unset in production — uses live keys by default)
 4. Check `purchase_intents` table for stuck items (status should progress: `draft` → `awaiting_payment` → `paid`)
+5. Check `billing_events` table for processed events:
+   ```sql
+   -- Recent events and their status
+   SELECT event_key, event_type, status, created_at
+   FROM billing_events
+   ORDER BY created_at DESC
+   LIMIT 20;
+   
+   -- Find failed or stuck events
+   SELECT * FROM billing_events
+   WHERE status != 'received'
+   ORDER BY created_at DESC;
+   ```
 
-**Webhook endpoint:** `POST /api/billing/webhooks/stripe`  
-**Idempotency:** Atomic status claim prevents double-provisioning.
+**Webhook endpoint:** `POST /api/billing/webhooks/stripe`
+
+**Idempotency (two layers):**
+- **Event-level:** `billing_events.event_key` has UNIQUE constraint — duplicate Stripe events are upserted (no double processing)
+- **Intent-level:** Atomic status claim on `purchase_intents` — only the first concurrent handler transitions status to `provisioning`
+
+**Handled events:** `checkout.session.completed`, `customer.subscription.created/updated/deleted`, `invoice.paid`, `invoice.payment_failed`, `charge.refunded`
+
+**Webhook replay after fix:** Stripe Dashboard → Developers → Webhooks → Failed events → Retry. Safe due to idempotency guards.
 
 ### 5c. Play Session Crashes
 

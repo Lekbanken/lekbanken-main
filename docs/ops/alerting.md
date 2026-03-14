@@ -37,6 +37,30 @@ Last validated: 2025-12-17
 - Prefer provider-native alerts (Supabase monitoring, hosting analytics) where available; supplement with app-level metrics/logging.
 - Tag alerts with tenant when possible to reduce noise.
 
+## Realtime Overload
+
+Supabase Realtime can become overloaded if clients open too many channels.
+
+**Symptoms:**
+- WebSocket reconnect loops in browser console
+- Realtime updates stop working (play sessions, live dashboards)
+- Latency spikes on Supabase Dashboard → Realtime
+
+**Signals:**
+- Realtime reconnect rate > 10/min per client → channel strategy issue
+- Active channel count > 100 → review channel-per-table vs channel-per-row
+- WebSocket errors in Vercel function logs
+
+**Prevention:**
+- Use **one channel per table** or **one channel per tenant** — never one channel per row
+- Pattern: `realtime:tenant:{tenantId}` for tenant-scoped updates
+- Play sessions: max ~3 channels per session (host, participants, game state)
+- Monitor: Supabase Dashboard → Realtime → connected clients vs channel count
+
+**Threshold:** If peak concurrent sessions × 3 channels/session > Supabase plan limit → upgrade plan or reduce channel granularity.
+
+---
+
 ## Open Items
 - Define exact Slack channel and PagerDuty service IDs.
 - Add rate-limit alerts per endpoint group if/when rate limiting is implemented.

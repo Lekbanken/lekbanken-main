@@ -164,6 +164,24 @@ supabase projects list
 
 If accidentally applied to production when intended for sandbox: assess impact. If the migration is safe (additive, idempotent), it may be acceptable. If destructive, use PITR.
 
+### Production guard
+
+Before running `supabase db push` against production, always verify the linked project:
+
+```bash
+# 1. Check which project is currently linked
+cat .supabase/project-ref
+# Expected: qohhnufxididbmzqnjwg (production) or vmpdejhgpsrfulimsoqn (sandbox)
+
+# 2. Always use --dry-run first
+supabase db push --dry-run
+
+# 3. Manual confirmation before production apply
+echo "Applying to $(cat .supabase/project-ref). Type YES to continue:"
+```
+
+**Rule:** Never run `supabase db push` directly from local → production. Always go through the promotion flow (§2): local → sandbox → production.
+
 ---
 
 ## 7. Drift Prevention
@@ -211,3 +229,55 @@ supabase db push
 | Deploy order (APC-003/011) | Migration `20260314000000` must be applied before deploying session route change. Session admin list breaks without RLS policy. |
 | Only 3/307 migrations have rollback scripts | For destructive changes, prefer PITR over manual reversal. |
 | `gen types` drift check in CI | CI compares generated types to committed `types/supabase.ts`. Keep them in sync. |
+
+---
+
+## 9. Query Safety
+
+All new queries in migrations or application code must follow these rules:
+
+### Pagination
+
+Never write unbounded queries. Always include `LIMIT`:
+
+```sql
+-- ❌ Bad: unbounded
+SELECT * FROM games;
+
+-- ✅ Good: bounded
+SELECT * FROM games LIMIT 100;
+SELECT * FROM games LIMIT $1 OFFSET $2; -- pagination
+```
+
+In application code, always pass `.limit()` to Supabase queries. The codebase has 231 known `select('*')` instances — new code must not add more.
+
+### Indexes
+
+For tenant-scoped tables, ensure `tenant_id` is indexed:
+
+```sql
+-- Verify indexes exist for critical tables
+SELECT tablename, indexname FROM pg_indexes
+WHERE schemaname = 'public'
+AND indexname LIKE '%tenant%';
+```
+
+For new tables, always create an index on `tenant_id`:
+
+```sql
+CREATE INDEX CONCURRENTLY ON new_table (tenant_id);
+```
+
+### Tenant isolation in queries
+
+Every query on a tenant-scoped table **must** include a tenant filter. RLS provides the safety net, but application code should also filter explicitly:
+
+```sql
+-- ❌ Bad: relies entirely on RLS
+SELECT * FROM games;
+
+-- ✅ Good: explicit tenant filter + RLS as safety net
+SELECT * FROM games WHERE tenant_id = current_tenant();
+```
+
+**Constraint:** All tenant-scoped tables have `tenant_id NOT NULL`. This prevents accidental rows without tenant association.

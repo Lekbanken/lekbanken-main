@@ -8,9 +8,16 @@
 -- =============================================================================
 
 -- =============================================================================
--- 1. Drop the conflicting view (session_artifact_state was a VIEW, not TABLE)
+-- 1. Drop the conflicting view ONLY if it is actually a view (not a table)
 -- =============================================================================
-DROP VIEW IF EXISTS public.session_artifact_state CASCADE;
+DO $$ BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.views
+    WHERE table_schema = 'public' AND table_name = 'session_artifact_state'
+  ) THEN
+    DROP VIEW public.session_artifact_state CASCADE;
+  END IF;
+END $$;
 
 -- =============================================================================
 -- 2. Create session_artifact_state TABLE (was blocked by view)

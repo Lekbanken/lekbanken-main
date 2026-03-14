@@ -4,6 +4,6 @@
 # Also runs quick typecheck on the full project.
 # Bypass: git commit --no-verify
 
-npx lint-staged
+npx lint-staged --allow-empty
 
 npm run type-check

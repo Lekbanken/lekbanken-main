@@ -1,18 +1,19 @@
 -- Tenant RLS hardening: enforce admin/system on membership management, invites, audit logs
 -- and admin-level updates on tenants.
 
--- tenant_memberships: stricter manage (admin/system), select for own tenant
-DROP POLICY IF EXISTS tenant_memberships_select ON public.tenant_memberships;
-CREATE POLICY tenant_memberships_select ON public.tenant_memberships
+-- tenant_memberships is a view over user_tenant_memberships (security_invoker=on).
+-- RLS policies must be on the underlying table, not the view.
+DROP POLICY IF EXISTS tenant_memberships_select ON public.user_tenant_memberships;
+CREATE POLICY tenant_memberships_select ON public.user_tenant_memberships
 FOR SELECT USING (is_system_admin() OR tenant_id = ANY(get_user_tenant_ids()));
 
-DROP POLICY IF EXISTS tenant_memberships_manage ON public.tenant_memberships;
-CREATE POLICY tenant_memberships_manage ON public.tenant_memberships
+DROP POLICY IF EXISTS tenant_memberships_manage ON public.user_tenant_memberships;
+CREATE POLICY tenant_memberships_manage ON public.user_tenant_memberships
 FOR ALL USING (
   is_system_admin() OR (
     tenant_id = ANY(get_user_tenant_ids()) AND EXISTS (
       SELECT 1 FROM tenant_memberships tm
-      WHERE tm.tenant_id = tenant_memberships.tenant_id
+      WHERE tm.tenant_id = user_tenant_memberships.tenant_id
         AND tm.user_id = auth.uid()
         AND tm.role IN ('owner','admin')
     )
@@ -21,7 +22,7 @@ FOR ALL USING (
   is_system_admin() OR (
     tenant_id = ANY(get_user_tenant_ids()) AND EXISTS (
       SELECT 1 FROM tenant_memberships tm
-      WHERE tm.tenant_id = tenant_memberships.tenant_id
+      WHERE tm.tenant_id = user_tenant_memberships.tenant_id
         AND tm.user_id = auth.uid()
         AND tm.role IN ('owner','admin')
     )

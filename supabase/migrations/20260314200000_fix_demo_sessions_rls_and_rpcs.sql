@@ -33,6 +33,7 @@ DROP POLICY IF EXISTS "service_role_full_demo_sessions_access" ON public.demo_se
 -- (Replaces the existing users_view_own_demo_sessions with same logic — keep it)
 
 -- Users can UPDATE their own demo sessions (for feature tracking, conversion)
+DROP POLICY IF EXISTS "users_update_own_demo_sessions" ON public.demo_sessions;
 CREATE POLICY "users_update_own_demo_sessions" ON public.demo_sessions
   FOR UPDATE
   TO authenticated
@@ -40,6 +41,7 @@ CREATE POLICY "users_update_own_demo_sessions" ON public.demo_sessions
   WITH CHECK (user_id = auth.uid());
 
 -- System admins get full access (admin dashboard, cleanup)
+DROP POLICY IF EXISTS "system_admin_full_demo_sessions_access" ON public.demo_sessions;
 CREATE POLICY "system_admin_full_demo_sessions_access" ON public.demo_sessions
   TO authenticated
   USING (public.is_system_admin())

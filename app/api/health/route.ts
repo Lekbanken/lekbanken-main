@@ -27,7 +27,16 @@ export const GET = apiHandler({
         return NextResponse.json({ status: 'error' }, { status: 503 })
       }
 
-      return NextResponse.json({ status: 'ok' })
+      return NextResponse.json({
+        status: 'ok',
+        // Deployment identity — safe to expose publicly.
+        // supabaseProjectRef is derived from NEXT_PUBLIC_SUPABASE_URL (already in client bundle).
+        environment: {
+          deployTarget: process.env.DEPLOY_TARGET || 'development',
+          appEnv: process.env.APP_ENV || 'local',
+          supabaseProjectRef: supabaseUrl.match(/\/\/([^.]+)\./)?.[1] ?? 'unknown',
+        },
+      })
     } catch {
       return NextResponse.json({ status: 'error' }, { status: 503 })
     }

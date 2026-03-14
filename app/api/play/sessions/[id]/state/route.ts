@@ -6,7 +6,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient } from '@/lib/supabase/server';
+import { requireSessionHost } from '@/lib/api/auth-guard';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import type { ParticipantSessionWithRuntime } from '@/types/participant-session-extended';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
@@ -25,33 +25,20 @@ interface StateUpdateRequest {
 export const PATCH = apiHandler({
   auth: 'user',
   handler: async ({ auth, req, params }) => {
-  try {
     const sessionId = params.id;
-    const userId = auth!.user!.id;
-    const supabase = await createServerRlsClient();
-    
-    // Get session and verify host
+
+    // ── Host or admin check (canonical) ──────────────────────
+    await requireSessionHost(sessionId);
+
+    // Get session for status check + operations
     const session = await ParticipantSessionService.getSessionById(sessionId);
-    
+
     if (!session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
     const statusError = assertSessionStatus(session.status, 'state');
     if (statusError) return statusError;
-    
-    if (session.host_user_id !== userId) {
-      // Check if global admin via user table
-      const { data: userData } = await supabase
-        .from('users')
-        .select('global_role')
-        .eq('id', userId)
-        .single();
-        
-      if (userData?.global_role !== 'system_admin') {
-        return NextResponse.json({ error: 'Not authorized to modify this session' }, { status: 403 });
-      }
-    }
     
     // Parse request
     const body: StateUpdateRequest = await req.json();
@@ -164,14 +151,6 @@ export const PATCH = apiHandler({
         status: updatedSession?.status,
       },
     });
-    
-  } catch (error) {
-    console.error('Error updating session state:', error);
-    return NextResponse.json(
-      { error: 'Failed to update session state' },
-      { status: 500 }
-    );
-  }
   },
 });
 
@@ -184,7 +163,6 @@ export const PATCH = apiHandler({
 export const GET = apiHandler({
   auth: 'public',
   handler: async ({ params }) => {
-  try {
     const sessionId = params.id;
     
     const session = await ParticipantSessionService.getSessionById(sessionId) as ParticipantSessionWithRuntime | null;
@@ -206,13 +184,5 @@ export const GET = apiHandler({
         participant_count: session.participant_count,
       },
     });
-    
-  } catch (error) {
-    console.error('Error getting session state:', error);
-    return NextResponse.json(
-      { error: 'Failed to get session state' },
-      { status: 500 }
-    );
-  }
   },
 });

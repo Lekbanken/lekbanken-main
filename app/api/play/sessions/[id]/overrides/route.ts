@@ -11,181 +11,114 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { requireSessionHost } from '@/lib/api/auth-guard';
+import { apiHandler } from '@/lib/api/route-handler';
+import { z } from 'zod';
 import type { Json } from '@/types/supabase';
 
-type StepOverride = {
-  id: string;
-  title?: string;
-  description?: string;
-  durationMinutes?: number;
-  order?: number;
-  display_mode?: 'instant' | 'typewriter' | 'dramatic' | null;
-};
+// ── Zod schemas for admin overrides ──────────────────────────────
 
-type PhaseOverride = {
-  id: string;
-  name?: string;
-  description?: string;
-  duration?: number | null;
-  order?: number;
-};
+const stepOverrideSchema = z.object({
+  id: z.string(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  durationMinutes: z.number().optional(),
+  order: z.number().optional(),
+  display_mode: z.enum(['instant', 'typewriter', 'dramatic']).nullable().optional(),
+});
 
-type SafetyOverride = {
-  safetyNotes?: string;
-  accessibilityNotes?: string;
-  spaceRequirements?: string;
-  leaderTips?: string;
-};
+const phaseOverrideSchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  duration: z.number().nullable().optional(),
+  order: z.number().optional(),
+});
 
-type AdminOverrides = {
-  steps?: StepOverride[];
-  phases?: PhaseOverride[];
-  safety?: SafetyOverride;
-};
+const safetyOverrideSchema = z.object({
+  safetyNotes: z.string().optional(),
+  accessibilityNotes: z.string().optional(),
+  spaceRequirements: z.string().optional(),
+  leaderTips: z.string().optional(),
+});
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+const adminOverridesSchema = z.object({
+  steps: z.array(stepOverrideSchema).optional(),
+  phases: z.array(phaseOverrideSchema).optional(),
+  safety: safetyOverrideSchema.optional(),
+});
 
-const DISPLAY_MODES = new Set(['instant', 'typewriter', 'dramatic']);
+type AdminOverrides = z.infer<typeof adminOverridesSchema>;
 
-function sanitizeOverrides(payload: unknown): AdminOverrides {
-  if (!isObject(payload)) return {};
+// ── GET: fetch overrides ─────────────────────────────────────────
 
-  const steps = Array.isArray(payload.steps)
-    ? (payload.steps
-        .map((s) =>
-          isObject(s) && typeof s.id === 'string'
-            ? ({
-                id: s.id,
-                title: typeof s.title === 'string' ? s.title : undefined,
-                description: typeof s.description === 'string' ? s.description : undefined,
-                durationMinutes:
-                  typeof (s as { durationMinutes?: unknown }).durationMinutes === 'number'
-                    ? (s as { durationMinutes: number }).durationMinutes
-                    : undefined,
-                order: typeof (s as { order?: unknown }).order === 'number'
-                  ? (s as { order: number }).order
-                  : undefined,
-                display_mode: DISPLAY_MODES.has((s as { display_mode?: unknown }).display_mode as string)
-                  ? ((s as { display_mode: 'instant' | 'typewriter' | 'dramatic' }).display_mode ?? null)
-                  : undefined,
-              } satisfies StepOverride)
-            : null
-        )
-        .filter(Boolean) as StepOverride[])
-    : undefined;
+export const GET = apiHandler({
+  auth: 'user',
+  handler: async ({ params }) => {
+    const sessionId = params.id;
+    await requireSessionHost(sessionId);
 
-  const phases = Array.isArray(payload.phases)
-    ? (payload.phases
-        .map((p) =>
-          isObject(p) && typeof p.id === 'string'
-            ? ({
-                id: p.id,
-                name: typeof p.name === 'string' ? p.name : undefined,
-                description: typeof p.description === 'string' ? p.description : undefined,
-                duration:
-                  typeof (p as { duration?: unknown }).duration === 'number' || (p as { duration?: unknown }).duration === null
-                    ? (p as { duration: number | null }).duration
-                    : undefined,
-                order: typeof (p as { order?: unknown }).order === 'number'
-                  ? (p as { order: number }).order
-                  : undefined,
-              } satisfies PhaseOverride)
-            : null
-        )
-        .filter(Boolean) as PhaseOverride[])
-    : undefined;
+    const supabaseAdmin = await createServiceRoleClient();
+    const { data: session } = await supabaseAdmin
+      .from('participant_sessions')
+      .select('settings')
+      .eq('id', sessionId)
+      .single();
 
-  const safetyPayload = isObject(payload.safety) ? payload.safety : undefined;
-  const safety = safetyPayload
-    ? {
-        safetyNotes: typeof safetyPayload.safetyNotes === 'string' ? safetyPayload.safetyNotes : undefined,
-        accessibilityNotes:
-          typeof safetyPayload.accessibilityNotes === 'string' ? safetyPayload.accessibilityNotes : undefined,
-        spaceRequirements:
-          typeof safetyPayload.spaceRequirements === 'string' ? safetyPayload.spaceRequirements : undefined,
-        leaderTips: typeof safetyPayload.leaderTips === 'string' ? safetyPayload.leaderTips : undefined,
-      }
-    : undefined;
+    if (!session) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
 
-  return { steps, phases, safety };
-}
+    const settings = (session.settings as Record<string, unknown> | null) ?? {};
+    const adminOverrides = (settings.admin_overrides as AdminOverrides | undefined) ?? {};
 
-async function getSessionAndAssertHost(sessionId: string) {
-  const supabaseRls = await createServerRlsClient();
-  const { data: auth } = await supabaseRls.auth.getUser();
-  const user = auth.user;
+    return NextResponse.json({ overrides: adminOverrides }, { status: 200 });
+  },
+});
 
-  if (!user) return { status: 401 as const, error: 'Unauthorized', session: null };
+// ── PATCH: replace overrides ─────────────────────────────────────
 
-  const supabaseAdmin = await createServiceRoleClient();
-  const { data: session, error } = await supabaseAdmin
-    .from('participant_sessions')
-    .select('id, host_user_id, settings')
-    .eq('id', sessionId)
-    .single();
+export const PATCH = apiHandler({
+  auth: 'user',
+  input: adminOverridesSchema,
+  handler: async ({ params, body }) => {
+    const sessionId = params.id;
+    await requireSessionHost(sessionId);
 
-  if (error || !session) {
-    return { status: 404 as const, error: 'Session not found', session: null };
-  }
+    const supabaseAdmin = await createServiceRoleClient();
 
-  if (session.host_user_id !== user.id) {
-    return { status: 403 as const, error: 'Only host can manage overrides', session: null };
-  }
+    // Fetch current settings to merge
+    const { data: session } = await supabaseAdmin
+      .from('participant_sessions')
+      .select('settings')
+      .eq('id', sessionId)
+      .single();
 
-  return { status: 200 as const, error: null, session };
-}
+    if (!session) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id: sessionId } = await params;
+    const rawSettings = (session.settings as unknown) ?? {};
+    const baseSettings =
+      typeof rawSettings === 'object' && rawSettings !== null
+        ? (rawSettings as Record<string, unknown>)
+        : {};
 
-  const { status, error, session } = await getSessionAndAssertHost(sessionId);
-  if (!session) {
-    return NextResponse.json({ error }, { status });
-  }
+    const nextSettings: Record<string, unknown> = {
+      ...baseSettings,
+      admin_overrides: body,
+    };
 
-  const settings = (session.settings as Record<string, unknown> | null) ?? {};
-  const adminOverrides = (settings.admin_overrides as AdminOverrides | undefined) ?? {};
+    const { error: updateError } = await supabaseAdmin
+      .from('participant_sessions')
+      .update({ settings: nextSettings as unknown as Json })
+      .eq('id', sessionId);
 
-  return NextResponse.json({ overrides: adminOverrides }, { status: 200 });
-}
+    if (updateError) {
+      return NextResponse.json({ error: 'Failed to save overrides' }, { status: 500 });
+    }
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id: sessionId } = await params;
-  const { status, error, session } = await getSessionAndAssertHost(sessionId);
-  if (!session) {
-    return NextResponse.json({ error }, { status });
-  }
-
-  const body = await request.json().catch(() => ({}));
-  const sanitized = sanitizeOverrides(body);
-
-  const supabaseAdmin = await createServiceRoleClient();
-
-  const rawSettings = (session.settings as unknown) ?? {};
-  const baseSettings = typeof rawSettings === 'object' && rawSettings !== null ? (rawSettings as Record<string, unknown>) : {};
-
-  const nextSettings: Record<string, unknown> = {
-    ...baseSettings,
-    admin_overrides: sanitized,
-  };
-
-  const { error: updateError } = await supabaseAdmin
-    .from('participant_sessions')
-    .update({ settings: nextSettings as unknown as Json })
-    .eq('id', sessionId);
-
-  if (updateError) {
-    return NextResponse.json({ error: 'Failed to save overrides' }, { status: 500 });
-  }
-
-  return NextResponse.json({ success: true, overrides: sanitized });
-}
+    return NextResponse.json({ success: true, overrides: body });
+  },
+});

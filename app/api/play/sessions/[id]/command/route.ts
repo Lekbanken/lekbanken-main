@@ -8,8 +8,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient } from '@/lib/supabase/server';
-import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { requireSessionHost } from '@/lib/api/auth-guard';
 import { apiHandler } from '@/lib/api/route-handler';
 import type { Json } from '@/types/supabase';
 import {
@@ -28,30 +27,11 @@ interface CommandRequestBody {
 export const POST = apiHandler({
   auth: 'user',
   handler: async ({ auth, req, params }) => {
-  try {
     const { id: sessionId } = params;
     const userId = auth!.user!.id;
 
-    // ── Host or admin check ──────────────────────────────────
-    const session = await ParticipantSessionService.getSessionById(sessionId);
-
-    if (!session) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-    }
-
-    if (session.host_user_id !== userId) {
-      // Allow system_admin override
-      const supabase = await createServerRlsClient();
-      const { data: userData } = await supabase
-        .from('users')
-        .select('global_role')
-        .eq('id', userId)
-        .single();
-
-      if (userData?.global_role !== 'system_admin') {
-        return NextResponse.json({ error: 'Not authorized to modify this session' }, { status: 403 });
-      }
-    }
+    // ── Host or admin check (canonical) ──────────────────────
+    await requireSessionHost(sessionId);
 
     // ── Parse + validate body ────────────────────────────────
     const body: CommandRequestBody = await req.json();
@@ -96,9 +76,5 @@ export const POST = apiHandler({
       duplicate: result.duplicate ?? false,
       state: result.state ?? null,
     });
-  } catch (err) {
-    console.error('[command route] Unhandled error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
   },
-})
+});

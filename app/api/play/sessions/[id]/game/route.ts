@@ -9,8 +9,10 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { REJECTED_PARTICIPANT_STATUSES } from '@/lib/api/play-auth';
+import { requireSessionHost } from '@/lib/api/auth-guard';
+import { apiHandler } from '@/lib/api/route-handler';
 import type { Database } from '@/types/supabase';
 import type { BoardTheme } from '@/types/games';
 
@@ -167,16 +169,14 @@ function pickLocalizedByOrder<T extends { step_order?: number; phase_order?: num
     .map(([, row]) => row);
 }
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id: sessionId } = await params;
-    const url = new URL(request.url);
+export const GET = apiHandler({
+  auth: 'public',
+  handler: async ({ req, params }) => {
+    const { id: sessionId } = params;
+    const url = new URL(req.url);
     const locale = url.searchParams.get('locale') || null;
 
-    const participantToken = request.headers.get('x-participant-token');
+    const participantToken = req.headers.get('x-participant-token');
 
     const supabaseAdmin = await createServiceRoleClient();
 
@@ -200,34 +200,7 @@ export async function GET(
     // Do NOT gate this behind `!authorized`. See auth-overlap regression test.
     const isParticipant = Boolean(participantToken);
 
-    // 1) Host auth via request-scoped RLS client
-    const supabaseRls = await createServerRlsClient();
-    const { data: authData } = await supabaseRls.auth.getUser();
-    const user = authData.user;
-
-    if (user) {
-      if (session.host_user_id === user.id) {
-        authorized = true;
-      } else {
-        const { data: userData } = await supabaseRls
-          .from('users')
-          .select('global_role')
-          .eq('id', user.id)
-          .single();
-
-        if (userData?.global_role === 'system_admin') {
-          authorized = true;
-        }
-      }
-    }
-
-    // 2) Participant auth via token (also needed when host is testing their own game)
-    if (isParticipant && authorized && process.env.NODE_ENV !== 'production') {
-      console.info(
-        '[SECURITY] dual-auth request; forcing participant response shape',
-        { sessionId, userId: user?.id },
-      );
-    }
+    // 1) Participant auth via token
     if (participantToken) {
       const { data: participant } = await supabaseAdmin
         .from('participants')
@@ -246,8 +219,24 @@ export async function GET(
         }
 
         authorized = true;
-        // isParticipant already true from above
       }
+    }
+
+    // 2) Host / system_admin auth via canonical helper
+    if (!authorized) {
+      try {
+        await requireSessionHost(sessionId);
+        authorized = true;
+      } catch {
+        // Not host or admin — fall through
+      }
+    }
+
+    if (isParticipant && authorized && process.env.NODE_ENV !== 'production') {
+      console.info(
+        '[SECURITY] dual-auth request; forcing participant response shape',
+        { sessionId },
+      );
     }
 
     if (!authorized) {
@@ -501,11 +490,5 @@ export async function GET(
       tools: (tools ?? []) as ToolInfo[],
       safety: responseSafety,
     });
-  } catch (error) {
-    console.error('Error fetching session game content:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch session game content' },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

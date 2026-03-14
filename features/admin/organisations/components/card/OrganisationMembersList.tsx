@@ -435,9 +435,11 @@ function AssignSeatDialog({
   const [selectedEntitlementId, setSelectedEntitlementId] = useState('');
 
   // Reset when dialog closes
+  /* eslint-disable react-hooks/set-state-in-effect -- intentional reset on dialog close */
   useEffect(() => {
     if (!open) setSelectedEntitlementId('');
   }, [open]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Filter to active entitlements that have available seats and aren't already assigned
   const availableEntitlements = useMemo(() => {

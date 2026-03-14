@@ -102,7 +102,7 @@ export default function PlanWizardPage({ params }: PageProps) {
     };
 
     void loadPlan();
-  }, [planId, router]);
+  }, [planId, router, t]);
 
   const handlePlanUpdate = (updatedPlan: PlannerPlan) => {
     setPlan(updatedPlan);

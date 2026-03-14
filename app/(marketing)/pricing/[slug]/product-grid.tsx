@@ -23,7 +23,7 @@ type ProductGridProps = {
 export default function ProductGrid({
   products,
   hasBundleOption,
-  iconKey,
+  iconKey: _iconKey,
 }: ProductGridProps) {
   const t = useTranslations("marketing.pricing.categoryPage");
   const [selectedProduct, setSelectedProduct] = useState<ProductCard | null>(

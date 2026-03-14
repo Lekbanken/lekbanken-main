@@ -1,0 +1,87 @@
+name: Validate
+
+# Unified validation gate — runs on all PRs to main/develop.
+# This is the single source of truth for "is this merge-safe?"
+# Mirrors `npm run verify` locally.
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate:
+    name: Lint + Typecheck + Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: TypeScript type check
+        run: npm run type-check
+
+      - name: Workflow validation
+        run: npm run check:workflows
+
+      - name: i18n validation
+        run: npm run validate:i18n
+
+      - name: Unit tests (vitest)
+        run: npx vitest run --reporter=verbose
+
+      - name: Integration tests
+        run: npm test
+
+      - name: Check for new 'as any' in production code
+        run: |
+          set -euo pipefail
+
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "ℹ️  No base SHA available; skipping 'as any' check"
+            exit 0
+          fi
+
+          echo "Diff range: $BASE_SHA..${{ github.sha }}"
+          changed_files=$(git diff --name-only "$BASE_SHA" "${{ github.sha }}" -- app/ lib/ | grep -E '\.(ts|tsx)$' || true)
+
+          if [ -z "$changed_files" ]; then
+            echo "✅ No changed TS/TSX files under app/ or lib/"
+            exit 0
+          fi
+
+          found=0
+          while IFS= read -r file; do
+            if [ ! -f "$file" ]; then continue; fi
+            if grep -n "as any" "$file" >/dev/null 2>&1; then
+              echo "❌ Found 'as any' in $file:"
+              grep -n "as any" "$file" || true
+              echo ""
+              found=1
+            fi
+          done <<< "$changed_files"
+
+          if [ "$found" -ne 0 ]; then
+            echo "⚠️  Please remove newly introduced 'as any' casts and use proper types"
+            exit 1
+          fi
+
+          echo "✅ No new 'as any' casts found in changed production code"
+
+      - name: Build check
+        run: npm run build
+        env:
+          SKIP_ENV_VALIDATION: true

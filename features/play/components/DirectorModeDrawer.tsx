@@ -32,7 +32,7 @@
 
 'use client';
 
-import { useEffect, useState, useCallback, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo, useSyncExternalStore } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { hapticTap } from '../haptics';
@@ -259,7 +259,11 @@ export function DirectorModeDrawer(props: DirectorModeDrawerProps) {
   const currentPhaseIndex = isSession ? props.currentPhaseIndex : 0;
   const recentSignals = isSession ? props.recentSignals : [];
   const signalPresets = isSession ? props.signalPresets : undefined;
-  const events: SessionEvent[] = isSession ? props.events : [];
+  const events = useMemo<SessionEvent[]>(
+    () => (isSession ? props.events : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isSession, isSession ? props.events : null]
+  );
   const timeBankBalance = isSession ? props.timeBankBalance : 0;
   const timeBankPaused = isSession ? props.timeBankPaused : false;
   const participantCount = isSession ? props.participantCount : 0;

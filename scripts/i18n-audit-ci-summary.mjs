@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Writes a compact i18n audit summary to GitHub Actions job summary (if available).
  *

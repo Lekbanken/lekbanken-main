@@ -1,4 +1,5 @@
 import type { AchievementIconConfig } from "@/features/admin/achievements/types";
+import type { ActiveLoadout } from '@/features/journey/cosmetic-types';
 
 export type AchievementStatus = "unlocked" | "locked" | "in_progress";
 
@@ -72,7 +73,7 @@ export type JourneyPreference = {
 };
 
 export type CosmeticsSnapshot = {
-  loadout: import('@/features/journey/cosmetic-types').ActiveLoadout;
+  loadout: ActiveLoadout;
   unlockedCount: number;
   recentUnlocks: { cosmeticKey: string; unlockedAt: string }[];
 };

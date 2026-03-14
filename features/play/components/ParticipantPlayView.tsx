@@ -16,6 +16,7 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useLiveSession } from '@/features/play/hooks/useLiveSession';
 import { isFeatureEnabled } from '@/lib/config/env';
@@ -717,12 +718,12 @@ export function ParticipantPlayView({
                 ? t('session.removedBlocked')
                 : t('session.removedKicked')}
             </p>
-            <a
+            <Link
               href="/"
               className="inline-block rounded-lg bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
               {t('session.removedBackToStart')}
-            </a>
+            </Link>
           </div>
         </div>
       )}

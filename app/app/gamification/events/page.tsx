@@ -6,7 +6,6 @@ import { createServerRlsClient } from "@/lib/supabase/server";
 import {
   PlayIcon,
   CalendarDaysIcon,
-  CogIcon,
   CheckCircleIcon,
   TrophyIcon,
   DocumentPlusIcon,

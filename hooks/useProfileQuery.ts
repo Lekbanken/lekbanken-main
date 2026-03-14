@@ -381,6 +381,7 @@ export function useProfileQuery<T>(
     void executeQuery()
   }, [requestKey, executeQuery])
 
+  /* eslint-disable react-hooks/set-state-in-effect -- intentional early-return guard */
   useEffect(() => {
     if (skip) {
       setStatus('idle')
@@ -425,6 +426,7 @@ export function useProfileQuery<T>(
       }
     }
   }, [skip, executeQuery, requestKey])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   return {
     data,

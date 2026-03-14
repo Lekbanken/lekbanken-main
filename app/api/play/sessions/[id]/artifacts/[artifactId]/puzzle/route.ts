@@ -45,7 +45,6 @@ type PuzzleSubmitResponse = {
 // Until the migration is deployed and `supabase gen types` regenerates the TS
 // types, we call `.rpc()` through this typed wrapper to avoid TS2345 errors.
 // Remove this wrapper once the generated types include the new RPCs.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const callRpc = async (supabase: Awaited<ReturnType<typeof createServiceRoleClient>>, fn: string, params: Record<string, unknown>) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (supabase.rpc as any)(fn, params) as Promise<{ data: unknown; error: { message: string } | null }>;

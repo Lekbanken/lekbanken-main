@@ -152,12 +152,14 @@ export function BlockRow({
   const titleInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-start inline title editing (e.g. after section creation)
+  /* eslint-disable react-hooks/set-state-in-effect -- intentional sync from prop to local state */
   useEffect(() => {
     if (isAutoEditingTitle && isSection && !isOptimistic) {
       setIsEditingTitle(true);
       setEditTitleValue(block.title ?? '');
     }
   }, [isAutoEditingTitle, isSection, isOptimistic, block.title]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (isEditingTitle && titleInputRef.current) {

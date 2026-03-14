@@ -127,7 +127,7 @@ export const POST = apiHandler({
   // ---------------------------------------------------------------------------
   // 3. Fetch live entitlement counts (unique tenants per product)
   // ---------------------------------------------------------------------------
-  let tenantCounts: Record<string, number> = {};
+  const tenantCounts: Record<string, number> = {};
 
   if (productIds.length > 0) {
     const { data: entData, error: entError } = await adminClient

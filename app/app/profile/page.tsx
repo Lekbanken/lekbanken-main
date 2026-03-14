@@ -11,7 +11,6 @@ import {
   UserIcon,
   AtSymbolIcon,
   ShieldCheckIcon,
-  LockClosedIcon,
   Cog6ToothIcon,
   BuildingOfficeIcon,
   ChevronRightIcon,

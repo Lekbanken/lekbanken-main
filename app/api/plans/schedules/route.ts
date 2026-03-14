@@ -11,7 +11,7 @@ import type { PlanSchedule, CreateScheduleInput } from '@/features/planner/calen
  */
 export const GET = apiHandler({
   auth: 'user',
-  handler: async ({ auth, req }) => {
+  handler: async ({ req }) => {
     const supabase = await createServerRlsClient();
 
     const searchParams = new URL(req.url).searchParams;

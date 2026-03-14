@@ -133,6 +133,7 @@ export async function getReactionCountsForGame(
 
   // RPC defined in migration 20260309000000_game_reaction_counts_rpc.sql
   // Type assertion needed until Supabase types are regenerated
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type -- RPC type not yet in generated types
   const { data, error } = await (supabase.rpc as Function)('get_game_reaction_counts', {
     p_game_ids: [gameId],
   });

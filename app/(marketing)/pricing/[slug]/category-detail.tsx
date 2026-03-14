@@ -278,7 +278,7 @@ export default async function CategoryDetail({
       ? individualSum.sum - bundlePrice!.amount
       : null;
 
-  const { Icon, gradient, iconColor, iconBg } = getCategoryVisuals(category.icon_key);
+  const { Icon, gradient: _gradient, iconColor, iconBg } = getCategoryVisuals(category.icon_key);
 
   return (
     <div className="bg-background">

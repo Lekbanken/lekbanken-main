@@ -54,9 +54,9 @@ export function PlanListPanel({
   isLoading,
   onSelectPlan,
   onEditPlan,
-  onCreatePlan,
+  onCreatePlan: _onCreatePlan,
   onScopeChange,
-  isCreating = false,
+  isCreating: _isCreating = false,
 }: PlanListPanelProps) {
   const t = useTranslations('planner');
   const router = useRouter();

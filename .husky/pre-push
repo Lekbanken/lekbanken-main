@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Husky pre-push — Nivå B (full verify before push)
+# Runs the same checks GitHub Actions will require.
+# Bypass: git push --no-verify
+
+npm run verify

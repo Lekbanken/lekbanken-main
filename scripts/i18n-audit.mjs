@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Lekbanken i18n audit (next-intl).
  *

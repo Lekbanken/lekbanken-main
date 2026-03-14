@@ -81,7 +81,7 @@ export function VersionsDialog({
     return () => {
       cancelled = true;
     };
-  }, [open, planId, versionsOverride]);
+  }, [open, planId, versionsOverride, t]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

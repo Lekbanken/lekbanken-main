@@ -21,7 +21,8 @@ describe('Supabase internal API stability', () => {
     })
     // Verify the property exists AND is settable (not just present)
     expect('suppressGetSessionWarning' in client).toBe(true)
-    ;(client as any).suppressGetSessionWarning = true
-    expect((client as any).suppressGetSessionWarning).toBe(true)
+    const typed = client as unknown as Record<string, boolean>;
+    typed.suppressGetSessionWarning = true
+    expect(typed.suppressGetSessionWarning).toBe(true)
   })
 })

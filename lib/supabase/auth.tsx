@@ -319,6 +319,7 @@ export function AuthProvider({
       // never cause state loss.
       if (event === 'TOKEN_REFRESHED') {
         if (isMountedRef.current) {
+          // eslint-disable-next-line no-restricted-properties -- TOKEN_REFRESHED: session.user is authoritative here (see comment above)
           const refreshedUser = session.user
           setUser((prev) => {
             if (!prev) return refreshedUser
@@ -334,6 +335,7 @@ export function AuthProvider({
 
       // SIGNED_IN, USER_UPDATED, PASSWORD_RECOVERY, MFA_CHALLENGE_VERIFIED:
       // Validate with auth server via getUser()
+      // eslint-disable-next-line no-restricted-properties -- SIGNED_IN/USER_UPDATED: need session.user to pass to refreshAuthData
       const sessionUser = session.user
       if (sessionUser) {
         try {

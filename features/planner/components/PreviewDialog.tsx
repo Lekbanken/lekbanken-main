@@ -18,23 +18,6 @@ type PreviewDialogProps = {
   plan: PlannerPlan;
 };
 
-function getBlockTypeLabel(type: PlannerBlock["blockType"]): string {
-  switch (type) {
-    case "game":
-      return "Lek";
-    case "pause":
-      return "Paus";
-    case "preparation":
-      return "Förberedelse";
-    case "section":
-      return "Sektion";
-    case "custom":
-      return "Notis";
-    default:
-      return "Block";
-  }
-}
-
 function getBlockTypeIcon(type: PlannerBlock["blockType"]) {
   switch (type) {
     case "game":

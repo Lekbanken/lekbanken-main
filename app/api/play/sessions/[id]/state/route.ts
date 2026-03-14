@@ -24,7 +24,7 @@ interface StateUpdateRequest {
 
 export const PATCH = apiHandler({
   auth: 'user',
-  handler: async ({ auth, req, params }) => {
+  handler: async ({ req, params }) => {
     const sessionId = params.id;
 
     // ── Host or admin check (canonical) ──────────────────────

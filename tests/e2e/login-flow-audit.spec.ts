@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import { createHmac } from 'node:crypto'
 
 type Phase = 'login' | 'app' | 'organizations' | 'preferences'
@@ -11,7 +11,7 @@ type Sample = {
   url: string
 }
 
-type PageLike = import('@playwright/test').Page
+type PageLike = Page
 
 function decodeBase32(secret: string): Buffer {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
@@ -147,7 +147,7 @@ function normalizeUrl(url: string): string {
   }
 }
 
-async function handleLegalAcceptance(page: import('@playwright/test').Page) {
+async function handleLegalAcceptance(page: Page) {
   if (!page.url().includes('/legal/accept')) return
 
   await page.waitForTimeout(1000)

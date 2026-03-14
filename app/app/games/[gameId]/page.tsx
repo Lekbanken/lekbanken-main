@@ -105,7 +105,7 @@ export default async function GameDetailPage({ params }: Props) {
   const game = {
     ...fullGame,
     leaderTips: undefined,
-    steps: fullGame.steps?.map(({ leaderScript, boardText, participantPrompt, ...publicStep }) => publicStep),
+    steps: fullGame.steps?.map(({ leaderScript: _leaderScript, boardText: _boardText, participantPrompt: _participantPrompt, ...publicStep }) => publicStep),
   }
   
   // User-specific reaction + aggregate like count (parallel)

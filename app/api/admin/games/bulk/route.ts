@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { apiHandler } from '@/lib/api/route-handler';
-import { createServerRlsClient, supabaseAdmin, createServiceRoleClient } from '@/lib/supabase/server';
+import { type createServerRlsClient, supabaseAdmin, createServiceRoleClient } from '@/lib/supabase/server';
 import { assignCoverFromTemplates } from '@/lib/import/assignCoverFromTemplates';
 import type { BulkOperationResult } from '@/features/admin/games/v2/types';
 

@@ -1,9 +1,8 @@
-name: Unit Tests
+name: Unit Tests (post-merge)
 
+# Post-merge safety net. PR validation is handled by validate.yml.
 "on":
   push:
-    branches: [main, develop]
-  pull_request:
     branches: [main, develop]
 
 jobs:

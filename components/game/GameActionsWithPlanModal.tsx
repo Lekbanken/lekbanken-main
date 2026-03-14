@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { GameStartActions, type GameStartActionsProps } from '@/components/game/GameStartActions';
 import { AddToPlanModal } from '@/features/planner/components/AddToPlanModal';
 
-interface GameActionsWithPlanModalProps extends GameStartActionsProps {}
+type GameActionsWithPlanModalProps = GameStartActionsProps;
 
 export function GameActionsWithPlanModal(props: GameActionsWithPlanModalProps) {
   const [modalOpen, setModalOpen] = useState(false);

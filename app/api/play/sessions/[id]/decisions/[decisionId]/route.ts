@@ -32,7 +32,7 @@ export const PATCH = apiHandler({
   const { id: sessionId, decisionId } = params;
 
   const userId = auth!.user!.id;
-  const supabase = await createServerRlsClient();
+  const _supabase = await createServerRlsClient();
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);

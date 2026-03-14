@@ -3,7 +3,7 @@
 **Domain:** Demo (ephemeral users, demo sessions, feature gating, conversion tracking)  
 **Scope:** Full regression — verify M1 remediation, all demo flows, session lifecycle, feature gates, telemetry  
 **Date:** 2026-03-14  
-**Verdict:** PASS — 0 new P0/P1. 2 new P2 + 1 new P3 found. Demo flow is test-group-ready.
+**Verdict:** PASS — 0 new P0/P1. 3 findings found + all 3 fixed (M2). Demo is test-group-ready.
 
 ---
 
@@ -233,68 +233,37 @@ No zombie demo state possible — expired sessions return `isDemoMode: false`.
 
 ## 10. New Findings
 
-### REG-DEMO-001 — demo-expired "Start Another Demo" renders raw JSON (P2)
+### REG-DEMO-001 — demo-expired "Start Another Demo" renders raw JSON (P2) ✅ **FIXAD (2026-03-14)**
 
 **File:** `app/demo-expired/page.tsx` (L61–L70)  
-**Issue:** The "Start Another Demo" button uses a plain HTML form:
-```tsx
-<form action="/auth/demo" method="POST">
-  <Button type="submit">Start Another</Button>
-</form>
-```
-But `POST /auth/demo` returns JSON (`{success: true, redirectUrl: "..."}`) — not an HTTP redirect. When the browser submits this form, it displays raw JSON instead of redirecting the user.
+**Issue:** The "Start Another Demo" button used a plain HTML form `<form action="/auth/demo" method="POST">`. But `POST /auth/demo` returns JSON — not an HTTP redirect. Users saw raw JSON text.
 
-**Impact:** UX dead-end on the demo-expired page. Users who click "Start Another Demo" see raw JSON text. They must manually navigate back to `/demo` to start a new session.
+**Impact:** UX dead-end on the demo-expired page.
 
-**Severity:** P2 — externally visible UX dead-end, but users have alternative paths (manual navigation, "Create Account" button, "Back to Home" link).
+**Fix:** Replaced `<form>` with `<Button href="/demo">`. Users now navigate to the demo landing page which handles the POST via fetch + `window.location.href` redirect.
 
-**Fix:** Either:
-- (a) Change `POST /auth/demo` to return an HTTP redirect instead of JSON (would break the fetch-based flow on `/demo/page.tsx`), or
-- (b) Add client-side JavaScript handler on the form (like `/demo/page.tsx` does — fetch + `window.location.href = redirectUrl`), or
-- (c) Change the button to link to `/demo` (the landing page that handles the flow correctly)
-
-**Recommendation:** Option (c) is simplest — change the form to a link: `<Button href="/demo">Start Another</Button>`. Users go back to the demo landing page and click "Start Demo" with proper JavaScript handling.
-
-### REG-DEMO-002 — demo_sessions RLS overly permissive (P2)
+### REG-DEMO-002 — demo_sessions RLS overly permissive (P2) ✅ **FIXAD (2026-03-14)**
 
 **File:** `supabase/migrations/00000000000000_baseline.sql` (L15926–L15928)  
-**Issue:** The `service_role_full_demo_sessions_access` policy has no `TO` clause:
-```sql
-CREATE POLICY "service_role_full_demo_sessions_access" ON public.demo_sessions
-  USING (true) WITH CHECK (true);
-```
-Without `TO service_role`, this policy applies to ALL roles (including `authenticated`). Since service_role bypasses RLS entirely, this policy is meaningless for service_role but grants full read/write/delete access to ALL authenticated users on ALL demo sessions.
+**Issue:** The `service_role_full_demo_sessions_access` policy had no `TO` clause — applied to ALL roles, granting full CRUD on all demo sessions to any authenticated user.
 
-**Impact:** Any authenticated user can read, update, or delete any demo session. Combined with SECURITY DEFINER RPCs (`add_demo_feature_usage`, `mark_demo_session_converted`) that also lack ownership verification, the entire demo_sessions surface is open to any authenticated user.
+**Impact:** Any authenticated user could read, update, or delete any demo session. Security/integrity gap on an externally-exposed domain.
 
-**Mitigations:** Demo sessions contain non-sensitive data (feature usage, conversion intent). Data is ephemeral (24h cleanup). Session IDs are UUIDs (unguessable without cookie access). Practical exploitability is very low.
+**Fix:** Migration `20260314200000_fix_demo_sessions_rls_and_rpcs.sql`:
+1. Dropped overly permissive policy
+2. Added `users_update_own_demo_sessions` (FOR UPDATE, TO authenticated, user_id = auth.uid())
+3. Added `system_admin_full_demo_sessions_access` (TO authenticated, is_system_admin())
+4. Kept existing `users_view_own_demo_sessions` (FOR SELECT)
+5. Baseline updated to match
 
-**Severity:** P2 — defense-in-depth gap on demo analytics data. No auth escalation possible.
-
-**Fix:** Add `TO service_role` to the policy, or replace with authenticated-scoped policies:
-```sql
--- Fix: restrict to service_role only
-CREATE POLICY "service_role_full_demo_sessions_access" ON public.demo_sessions
-  TO service_role USING (true) WITH CHECK (true);
-```
-
-### REG-DEMO-003 — Demo RPC functions lack ownership verification (P3)
+### REG-DEMO-003 — Demo RPC functions lack ownership verification (P3 → fixed with REG-DEMO-002) ✅ **FIXAD (2026-03-14)**
 
 **File:** `supabase/migrations/00000000000000_baseline.sql` (L5856, L12746)  
-**Issue:** Both `add_demo_feature_usage()` and `mark_demo_session_converted()` are `SECURITY DEFINER` and accept `session_id` without verifying `auth.uid()` matches the session's `user_id`:
-```sql
-UPDATE public.demo_sessions SET ... WHERE id = session_id;
--- No: AND user_id = auth.uid()
-```
+**Issue:** Both `add_demo_feature_usage()` and `mark_demo_session_converted()` were SECURITY DEFINER and accepted `session_id` without verifying ownership.
 
-**Impact:** Any authenticated user who knows a valid session UUID can modify that session's feature usage or conversion state. Practical exploitability is very low (UUIDs are 128-bit random, session ID comes from httpOnly cookie).
+**Impact:** Per GPT: compound risk with REG-DEMO-002 — should not be left open when RLS is also weak.
 
-**Severity:** P3 — theoretical defense-in-depth gap. Compounded by REG-DEMO-002 (permissive RLS), but practical risk is negligible.
-
-**Fix:** Add ownership check:
-```sql
-WHERE id = session_id AND user_id = auth.uid()
-```
+**Fix:** Added `AND user_id = auth.uid()` to both RPCs in migration `20260314200000`. Baseline updated to match. Re-regression verified: `createServerRlsClient()` provides correct auth.uid() for demo users; `supabaseAdmin` paths (creation, rate limiting) bypass RLS entirely.
 
 ---
 
@@ -341,21 +310,45 @@ All 15 previously known P2/P3 findings (DEMO-004 through DEMO-018) **confirmed s
 | Multi-tab / refresh | ✅ Pass | Single session via cookie, no duplication |
 | Telemetry / funnel | ✅ Pass | Full funnel intact, privacy-preserving |
 
-### New Findings
+### New Findings — All Fixed (M2)
 
-| Finding | Severity | Description |
-|---------|----------|-------------|
-| REG-DEMO-001 | P2 | demo-expired "Start Another Demo" renders raw JSON (UX dead-end) |
-| REG-DEMO-002 | P2 | demo_sessions RLS overly permissive (all authenticated users have full access) |
-| REG-DEMO-003 | P3 | Demo RPC functions lack auth.uid() ownership check |
+| Finding | Severity | Status | Fix |
+|---------|----------|--------|-----|
+| REG-DEMO-001 | P2 | ✅ FIXAD | Replaced form with link to `/demo` |
+| REG-DEMO-002 | P2 | ✅ FIXAD | Migration: proper RLS policies with ownership scoping |
+| REG-DEMO-003 | P3 | ✅ FIXAD | Migration: added `AND user_id = auth.uid()` to RPCs |
 
-### Final Verdict
+---
+
+## 13. M2 Re-Regression
+
+After fixing all 3 findings, a short re-regression was performed:
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| demo-expired "Start Another" | ✅ | Now links to `/demo` — proper JS-based flow |
+| RLS policies | ✅ | Overly permissive policy dropped. Replaced with 3 scoped policies |
+| RPC ownership | ✅ | Both RPCs now require `user_id = auth.uid()` |
+| Session creation (supabaseAdmin) | ✅ | Not affected — service_role bypasses RLS |
+| Rate limit check (supabaseAdmin) | ✅ | Not affected — service_role bypasses RLS |
+| Track route (RLS client) | ✅ | RPC passes — demo user owns their session, auth.uid() matches |
+| Convert route (RLS client) | ✅ | RPC passes — same ownership guarantee |
+| Admin dashboard (system_admin) | ✅ | `system_admin_full_demo_sessions_access` policy grants access |
+| Cleanup function (service_role) | ✅ | Uses `createClient` with service role key — bypasses RLS |
+| `tsc --noEmit` | ✅ | 0 errors |
+
+**⚠️ Deploy order:** Migration `20260314200000` must be applied before deploying the code. If the route deploys first, the overly permissive policy remains in place (no worse than current state but not ideal).
+
+---
+
+## 14. Final Verdict
 
 **PASS** — Demo domain is test-group-ready.
 
-- 0 new P0 or P1
+- 0 P0 or P1
 - 3 M1 fixes verified intact
 - All 8 GPT-defined regression areas pass
-- 2 new P2 + 1 new P3 found (defense-in-depth + UX polish)
+- 3 findings found during regression → all 3 fixed (M2)
+- M2 re-regression passed (10 checks)
 - 15 previously known P2/P3 confirmed unchanged
-- Demo flow is functional and safe for external test group use
+- Demo flow is functional, secure, and safe for external test group use

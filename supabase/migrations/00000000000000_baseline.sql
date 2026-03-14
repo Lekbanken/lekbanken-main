@@ -5868,7 +5868,8 @@ BEGIN
       'iso_timestamp', to_char(now(), 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
     ),
     updated_at = now()
-  WHERE id = session_id;
+  WHERE id = session_id
+    AND user_id = auth.uid();
 END;
 $function$
 ;
@@ -12757,7 +12758,8 @@ BEGIN
     conversion_plan = conversion_plan_param,
     ended_at = COALESCE(ended_at, now()),
     updated_at = now()
-  WHERE id = session_id;
+  WHERE id = session_id
+    AND user_id = auth.uid();
 END;
 $function$
 ;
@@ -15923,9 +15925,15 @@ CREATE POLICY "data_breach_notifications_admin" ON public.data_breach_notificati
 CREATE POLICY "data_retention_policies_admin" ON public.data_retention_policies
   USING (public.is_system_admin())
   WITH CHECK (public.is_system_admin());
-CREATE POLICY "service_role_full_demo_sessions_access" ON public.demo_sessions
-  USING (true)
-  WITH CHECK (true);
+CREATE POLICY "system_admin_full_demo_sessions_access" ON public.demo_sessions
+  TO authenticated
+  USING (public.is_system_admin())
+  WITH CHECK (public.is_system_admin());
+CREATE POLICY "users_update_own_demo_sessions" ON public.demo_sessions
+  FOR UPDATE
+  TO authenticated
+  USING ((user_id = ( SELECT auth.uid() AS uid)))
+  WITH CHECK ((user_id = ( SELECT auth.uid() AS uid)));
 CREATE POLICY "users_view_own_demo_sessions" ON public.demo_sessions FOR SELECT
   USING ((user_id = ( SELECT auth.uid() AS uid)));
 CREATE POLICY "dunning_actions_admin_all" ON public.dunning_actions

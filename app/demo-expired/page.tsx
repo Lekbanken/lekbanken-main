@@ -58,17 +58,15 @@ export default function DemoExpiredPage() {
           </Button>
 
           {/* Secondary CTA: Start Another Demo */}
-          <form action="/auth/demo" method="POST" className="w-full">
-            <Button
-              type="submit"
-              variant="outline"
-              className="w-full gap-2"
-              size="lg"
-            >
-              <ArrowPathIcon className="h-5 w-5" />
-              {t('startAnother')}
-            </Button>
-          </form>
+          <Button
+            href="/demo"
+            variant="outline"
+            className="w-full gap-2"
+            size="lg"
+          >
+            <ArrowPathIcon className="h-5 w-5" />
+            {t('startAnother')}
+          </Button>
 
           {/* Premium Demo Option */}
           <div className="pt-4 border-t border-border">

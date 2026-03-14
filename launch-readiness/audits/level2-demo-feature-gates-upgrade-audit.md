@@ -408,3 +408,59 @@ All gates are transparent passthrough when `isDemoMode === false` or `tier !== '
 ### Updated Verdict
 
 **PASS** — 0 P0, 0 P1, ~~2 P2~~ → 0 P2, ~~5 P3~~ → 3 P3 (2 P3 + 1 P3 resolved)
+
+---
+
+## 11. Demo Funnel Re-Regression — Post-M1 Verification
+
+**Date:** 2026-03-14  
+**Scope:** Prove 4 properties after M1 wiring. Code-level trace, not runtime E2E.
+
+### Proof 1: Demo user sees banner — ✅ PASS
+
+| Step | Expected | Actual | Status |
+|------|----------|--------|--------|
+| `layout-client.tsx` renders `<DemoBanner />` | Banner component mounted | Line 57: `<DemoBanner />` above `<Shell>` inside `<ToastProvider>` | ✅ |
+| `DemoBanner` reads `useIsDemo()` | Gets `isDemoMode`, `tier`, `timeRemaining`, `showTimeoutWarning` | Line 17: destructures all 5 fields from hook | ✅ |
+| `isDemoMode === true` | Banner visible with tier + time + CTA | Lines 55–95: colored banner, icon, time remaining, "Create Account" / "Contact Sales" button | ✅ |
+| `isDemoMode === false` | Returns null | Line 29: `if (!isDemoMode || dismissed || isLoading) return null;` | ✅ |
+| CSS offset for SideNav | Banner height communicated | `useEffect` sets `--demo-banner-height` CSS var, cleans up on unmount | ✅ |
+
+### Proof 2: Demo user blocked in all 5 surfaces — ✅ PASS
+
+**Gate logic** (`DemoFeatureGate`): When `isDemoMode && tier === 'free' && isFreeTierLocked(feature)` → renders lock overlay with "Premium Feature" message + "Contact Sales to Unlock" CTA. Otherwise renders `<>{children}</>`.
+
+**Gate logic** (`DemoButtonGate`): When `isDemoMode && tier !== 'premium' && isFreeTierLocked(feature)` → renders children with lock icon overlay + disabled interaction. Otherwise renders `<>{children}</>`.
+
+**Canonical feature list** (`lib/demo/feature-config.ts`): `['export_data', 'invite_users', 'modify_tenant_settings', 'access_billing', 'create_public_sessions', 'advanced_analytics', 'custom_branding']`
+
+| Surface | Feature Key | In canonical list? | Gate wraps correct content? | Status |
+|---------|-------------|--------------------|-----------------------------|--------|
+| Settings | `modify_tenant_settings` | ✅ | Wraps `<AdminPageLayout>` (entire page) | ✅ |
+| Invite/Create | `invite_users` | ✅ | Wraps invite + create buttons | ✅ |
+| Export | `export_data` | ✅ | Wraps both render paths (simple + dropdown) | ✅ |
+| Billing | `access_billing` | ✅ | Wraps `<AdminPageLayout>` inside `<SystemAdminClientGuard>` | ✅ |
+| Analytics | `advanced_analytics` | ✅ | Wraps `{content}` inside `<SystemAdminClientGuard>` | ✅ |
+
+### Proof 3: Non-demo user not affected — ✅ PASS
+
+| Component | Condition | Behavior | Status |
+|-----------|-----------|----------|--------|
+| `DemoBanner` | `isDemoMode === false` | Returns `null` — no DOM output | ✅ |
+| `DemoFeatureGate` | `isDemoMode === false` | Returns `<>{children}</>` — transparent passthrough | ✅ |
+| `DemoButtonGate` | `isDemoMode === false` | Returns `<>{children}</>` — transparent passthrough | ✅ |
+| `DemoButtonGate` | `tier === 'premium'` | Returns `<>{children}</>` — premium bypasses gate | ✅ |
+| CSS offset | `isDemoMode === false` | `--demo-banner-height: 0px` — no layout shift | ✅ |
+
+### Proof 4: Upgrade CTA behaves correctly — ✅ PASS
+
+| CTA Location | Trigger | Action | Destination |
+|-------------|---------|--------|-------------|
+| DemoBanner button | Click | `convertDemo('contact_sales', undefined, { source: 'demo_banner' })` | `/auth/signup?source=demo` (free) or `/contact` (premium) |
+| DemoFeatureGate overlay | Click "Contact Sales to Unlock" | `convertDemo('contact_sales', undefined, { source: 'feature_gate', feature })` | `/contact` |
+| DemoButtonGate | Lock icon overlay | No direct CTA — visual lock indicator, parent gate handles conversion | N/A |
+| `useConvertDemo()` | All CTAs | POSTs to `/api/demo/convert` with type + metadata for funnel tracking | Server logs conversion event |
+
+### Re-Regression Verdict
+
+**PASS** — 4/4 proofs verified. M1 wiring is correct and non-regressive. Demo funnel loop closed.

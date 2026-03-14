@@ -8,8 +8,8 @@ import {
   buildCapabilityContextFromMemberships,
 } from '@/lib/auth/capabilities'
 import { logGamificationEventV1 } from '@/lib/services/gamification-events.server'
+import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import { apiHandler } from '@/lib/api/route-handler'
-import type { GlobalRole } from '@/types/auth'
 import type { Json } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
@@ -55,14 +55,15 @@ export const POST = apiHandler({
   }
 
   // Check capabilities
-  const { data: memberships } = await supabase
-    .from('user_tenant_memberships')
-    .select('tenant_id, role')
-    .eq('user_id', user.id)
+  const [{ data: profile }, { data: memberships }] = await Promise.all([
+    supabase.from('users').select('global_role').eq('id', user.id).single(),
+    supabase.from('user_tenant_memberships').select('tenant_id, role').eq('user_id', user.id),
+  ])
 
+  const globalRole = deriveEffectiveGlobalRole(profile, user)
   const capabilityContext = buildCapabilityContextFromMemberships({
     userId: user.id,
-    globalRole: (user.app_metadata?.global_role as GlobalRole) ?? null,
+    globalRole,
     memberships: memberships || [],
   })
   const resource = planToResource(raw)

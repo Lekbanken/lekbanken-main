@@ -103,7 +103,7 @@ export function derivePlanCapabilities(
     caps.add('play.run.read')
   }
 
-  // UPDATE/DELETE/PUBLISH access
+  // UPDATE/PUBLISH access
   // Owner can always update their own plans
   // Tenant admin can update tenant-visible plans (not private)
   // System admin can update any plan
@@ -114,8 +114,12 @@ export function derivePlanCapabilities(
 
   if (canWrite) {
     caps.add('planner.plan.update')
-    caps.add('planner.plan.delete')
     caps.add('planner.plan.publish')
+  }
+
+  // DELETE access — owner or system_admin only (destructive operation)
+  if (isOwner || isSystemAdmin) {
+    caps.add('planner.plan.delete')
   }
 
   // PUBLIC VISIBILITY - only system_admin

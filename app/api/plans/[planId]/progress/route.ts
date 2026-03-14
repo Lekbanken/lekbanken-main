@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { requirePlanReadAccess } from '@/lib/planner/require-plan-access'
 import type { Json } from '@/types/supabase'
 import { apiHandler } from '@/lib/api/route-handler'
 
@@ -18,14 +19,18 @@ export const GET = apiHandler({
     return NextResponse.json({ error: 'Invalid plan id' }, { status: 400 })
   }
 
-  const userId = auth!.user!.id
+  const user = auth!.user!
   const supabase = await createServerRlsClient()
+
+  // Defense-in-depth: verify user can read this plan
+  const access = await requirePlanReadAccess(supabase, user, planId)
+  if (!access.allowed) return access.response
 
   const { data, error } = await supabase
     .from('plan_play_progress')
     .select('*')
     .eq('plan_id', planId)
-    .eq('user_id', userId)
+    .eq('user_id', user.id)
     .maybeSingle()
 
   if (error) {
@@ -45,8 +50,12 @@ export const POST = apiHandler({
     return NextResponse.json({ error: 'Invalid plan id' }, { status: 400 })
   }
 
-  const userId = auth!.user!.id
+  const user = auth!.user!
   const supabase = await createServerRlsClient()
+
+  // Defense-in-depth: verify user can read this plan
+  const access = await requirePlanReadAccess(supabase, user, planId)
+  if (!access.allowed) return access.response
 
   const body = (await req.json().catch(() => ({}))) as {
     current_block_id?: string | null
@@ -84,7 +93,7 @@ export const POST = apiHandler({
     .upsert(
       {
         plan_id: planId,
-        user_id: userId,
+        user_id: user.id,
         current_block_id: body.current_block_id ?? null,
         current_position: currentPosition,
         status,

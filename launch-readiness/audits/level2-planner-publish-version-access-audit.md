@@ -4,7 +4,9 @@
 > **Date:** 2026-03-15  
 > **Auditor:** Claude  
 > **Status:** ✅ COMPLETE  
-> **Result:** 0 P0, 1 P1, 3 P2, 5 P3 — **PASS (launch-safe with caveats)**
+> **Result:** 0 P0, 0 P1, 1 P2, 5 P3 — **PASS (launch-safe)**
+>
+> **Remediation:** L2-PLAN-001 (P1→✅), L2-PLAN-002 (P2→✅), L2-PLAN-003 (P2→✅) fixed 2026-03-15
 
 ---
 
@@ -283,39 +285,35 @@ This directly addresses the GPT directive: *"difference between RLS saves and ap
 
 ## 10. Findings
 
-### L2-PLAN-001 — Tenant-admin sub-table RLS mismatch (P1)
+### L2-PLAN-001 — ~~Tenant-admin sub-table RLS mismatch~~ ✅ **LÖST** (2026-03-15)
 
 | Field | Value |
 |-------|-------|
-| **Severity** | P1 (functional breakage in multi-tenant collaboration) |
-| **Security breach?** | ❌ No — RLS is stricter, not weaker |
+| **Severity** | ~~P1~~ → ✅ Fixed |
+| **Security breach?** | ❌ No — RLS was stricter, not weaker |
 | **Affected routes** | blocks/ (POST, PATCH, DELETE, reorder), publish/ POST — 5 routes |
-| **Root cause** | `plan_blocks`, `plan_versions`, `plan_version_blocks` RLS write policies require `owner_user_id = auth.uid() OR is_system_admin()` — no `has_tenant_role()` clause. Meanwhile, capability system grants `planner.plan.update` and `planner.plan.publish` to tenant admins on tenant-visible plans. |
-| **Impact** | Tenant admins see "edit" and "publish" UI controls (capabilities say allowed) but operations fail at RLS level. Plan metadata (name, description, visibility, status) CAN be updated (plans_update allows tenant admins), but blocks and versions cannot. |
-| **Fix** | Update `plan_blocks_insert/update/delete` and `plan_versions_insert` and `plan_version_blocks_insert` RLS policies to add `OR (has_tenant_role(..., 'admin') AND visibility = 'tenant')` condition, matching `plans_update` pattern |
-| **Workaround** | Tenant admins can only update plan metadata, not blocks or versions. This may be acceptable for MVP if tenant admin block editing is not a launch feature. |
+| **Root cause** | `plan_blocks`, `plan_versions`, `plan_version_blocks` RLS write policies required `owner_user_id = auth.uid() OR is_system_admin()` — no `has_tenant_role()` clause. Meanwhile, capability system granted `planner.plan.update` and `planner.plan.publish` to tenant admins on tenant-visible plans. |
+| **Fix applied** | Migration `20260315100000_planner_subtable_rls_tenant_admin.sql` — updated 5 RLS policies (`plan_blocks_insert/update/delete`, `plan_versions_insert`, `plan_version_blocks_insert`) to add `OR (visibility = 'tenant' AND has_tenant_role(owner_tenant_id, 'admin'))`, matching the `plans_update` policy pattern. Additionally, `derivePlanCapabilities()` updated to not grant `planner.plan.delete` to tenant admins (delete = owner/sysadmin only, intentionally stricter). |
+| **Product decision** | **Option A confirmed:** tenant admins SHALL edit blocks and publish tenant-visible plans. Delete remains owner/sysadmin only (destructive operation). Evidence: `plans_update` RLS already included tenant admin, capability system was deliberately designed for this, `has_tenant_role('admin')` used across 20+ codebase policies. |
 
-### L2-PLAN-002 — Progress route has no plan access check (P2)
+### L2-PLAN-002 — ~~Progress route has no plan access check~~ ✅ **LÖST** (2026-03-15)
 
 | Field | Value |
 |-------|-------|
-| **Severity** | P2 (defense-in-depth gap, mitigated by RLS) |
+| **Severity** | ~~P2~~ → ✅ Fixed |
 | **Affected routes** | progress/ GET and POST |
-| **Root cause** | Route performs no plan visibility/capability check. Any authenticated user who knows a plan UUID can create/read their own progress for that plan. |
-| **Mitigation** | RLS `plan_play_progress_manage` scopes data to `user_id = auth.uid()` — user can never see other users' progress. Block validation (when `current_block_id` provided) indirectly checks plan visibility via `plan_blocks_select` RLS. |
-| **Impact** | A user can confirm a plan UUID exists and track progress on an invisible plan. Low exploitability — plan UUIDs are not enumerable (UUIDv4). |
-| **Fix** | Add `requirePlanReadAccess(supabase, user, planId)` before progress read/write |
+| **Root cause** | Route performed no plan visibility/capability check. Any authenticated user who knew a plan UUID could create/read their own progress for that plan. |
+| **Fix applied** | Added `requirePlanReadAccess(supabase, user, planId)` to both GET and POST handlers. Now requires `planner.plan.read` capability before progress read/write. |
 | **Cross-ref** | Previously tracked as REG-PLAN-001 (P2) in planner regression |
 
-### L2-PLAN-003 — Publish route uses `app_metadata.global_role` directly (P2)
+### L2-PLAN-003 — ~~Publish route uses `app_metadata.global_role` directly~~ ✅ **LÖST** (2026-03-15)
 
 | Field | Value |
 |-------|-------|
-| **Severity** | P2 (consistency issue, mitigated by RLS) |
+| **Severity** | ~~P2~~ → ✅ Fixed |
 | **Affected routes** | publish/ POST |
-| **Root cause** | Publish route reads `user.app_metadata?.global_role` directly when building capability context, instead of using `deriveEffectiveGlobalRole(profile, user)` which cross-references the users table. All other planner routes (status, copy, [planId] CRUD, visibility) correctly use `deriveEffectiveGlobalRole()`. |
-| **Impact** | If `app_metadata.global_role` differs from `users.global_role`, the publish route's capability derivation may differ from other routes. Currently no known scenario where they diverge, but inconsistency creates maintenance risk. |
-| **Fix** | Replace `(user.app_metadata?.global_role as GlobalRole) ?? null` with profile fetch + `deriveEffectiveGlobalRole()` pattern used by sibling routes |
+| **Root cause** | Publish route read `user.app_metadata?.global_role` directly when building capability context, instead of using `deriveEffectiveGlobalRole(profile, user)` which cross-references the users table. |
+| **Fix applied** | Replaced inline `app_metadata.global_role` cast with `Promise.all` profile+memberships fetch and canonical `deriveEffectiveGlobalRole(profile, user)` call, matching the pattern used by sibling routes (status, copy, [planId] CRUD, visibility). |
 | **Cross-ref** | Same root cause as L2-AUTH-005 (P2) from L2-1 audit |
 
 ### L2-PLAN-004 — No rate limiting on any planner route (P2)
@@ -383,22 +381,21 @@ This directly addresses the GPT directive: *"difference between RLS saves and ap
 
 ## 11. Summary
 
-### Verdict: **PASS (launch-safe with caveats)**
+### Verdict: **PASS (launch-safe)**
 
 | Severity | Count | Finding IDs |
 |----------|-------|-------------|
 | P0 | 0 | — |
-| P1 | 1 | L2-PLAN-001 (tenant-admin RLS mismatch on sub-tables) |
-| P2 | 3 | L2-PLAN-002 (progress no plan check), L2-PLAN-003 (publish inline global_role), L2-PLAN-004 (no rate limiting) |
+| P1 | 0 | ~~L2-PLAN-001~~ ✅ Fixed |
+| P2 | 1 | L2-PLAN-004 (no rate limiting) |
 | P3 | 5 | L2-PLAN-005 thru L2-PLAN-009 |
+| ✅ Fixed | 3 | L2-PLAN-001, L2-PLAN-002, L2-PLAN-003 |
 
 ### Launch Safety Assessment
 
 **No security breaches found.** In all 4 mismatch cases (L2-PLAN-001, L2-PLAN-006), RLS is **stricter** than the capability system — meaning users are denied operations they should arguably be allowed, not granted operations they shouldn't have. This is the safe direction of mismatch.
 
-**The P1 (L2-PLAN-001) is a functional issue, not a security issue.** It means tenant admin plan collaboration (block editing, publishing) is broken. Whether this blocks launch depends on whether multi-tenant admin editing is a launch requirement:
-- **If tenant admin collaboration IS required:** Fix RLS policies on `plan_blocks`, `plan_versions`, `plan_version_blocks` before launch
-- **If only plan owners edit/publish:** No fix needed — current behavior is correct for single-user editing
+**The P1 (L2-PLAN-001) has been fixed.** Migration `20260315100000` updates 5 RLS policies on sub-tables to allow tenant admin writes, and `derivePlanCapabilities()` now correctly withholds `planner.plan.delete` from tenant admins (delete = owner/sysadmin only).
 
 **All 5 "RLS-only" routes are safe.** The RLS policies correctly scope data access. The progress route (L2-PLAN-002) is the weakest — it allows progress tracking on invisible plans — but the practical impact is negligible (user-scoped data, non-enumerable UUIDs).
 

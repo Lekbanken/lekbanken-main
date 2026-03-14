@@ -408,3 +408,85 @@ This directly addresses the GPT directive: *"difference between RLS saves and ap
 | L2-PLAN-003 | L2-AUTH-005 (P2) from L2-1 audit |
 | L2-PLAN-004 | *New finding* — systemic across 18 routes |
 | L2-PLAN-005–009 | *New findings* — architectural debt |
+
+---
+
+## 12. Post-Remediation Re-Regression (2026-03-15)
+
+Proof pass after `de61c8a` — 5 RLS policies updated, capability model changed, 2 routes modified.
+
+### Proof 1: Tenant admin CAN block-edit + publish
+
+**Scenario:** User is `tenant_admin` for tenant T. Plan P owned by user X, `owner_tenant_id = T`, `visibility = 'tenant'`.
+
+| Step | Guard | Trace | Result |
+|------|-------|-------|--------|
+| POST blocks/ | `requirePlanEditAccess` → `requirePlanAccess('planner.plan.update')` | `derivePlanCapabilities`: `isTenantAdmin=true`, `visibility≠private` → `canWrite=true` → `planner.plan.update` ✅ | App: ✅ |
+| | RLS `plan_blocks_insert` | `visibility='tenant' AND has_tenant_role(owner_tenant_id, 'admin')` → ✅ | RLS: ✅ |
+| POST publish/ | inline `derivePlanCapabilities` → `canPublish` | Same capability path → `planner.plan.publish` ✅ | App: ✅ |
+| | RLS `plan_versions_insert` | `visibility='tenant' AND has_tenant_role(...)` → ✅ | RLS: ✅ |
+| | RLS `plan_version_blocks_insert` | JOIN chain → same condition → ✅ | RLS: ✅ |
+| | RLS `plans_update` (status→published) | `has_tenant_role(owner_tenant_id, 'admin')` → ✅ (baseline, unchanged) | RLS: ✅ |
+
+**Verdict: ✅ PASS — Tenant admin can now edit blocks and publish. Capability + RLS aligned on all 5 updated policies.**
+
+### Proof 2: Tenant admin CANNOT delete
+
+**Scenario:** Same user/plan as Proof 1.
+
+| Step | Guard | Trace | Result |
+|------|-------|-------|--------|
+| DELETE [planId]/ | inline `requireCapability('planner.plan.delete')` | `derivePlanCapabilities`: `isOwner=false`, `isSystemAdmin=false` → `planner.plan.delete` NOT granted (now owner/sysadmin only) | App: ❌ 403 |
+| | RLS `plans_delete` (if reached) | `owner_user_id = auth.uid() OR is_system_admin()` — no tenant admin clause (baseline, unchanged) | RLS: ❌ |
+| | UI `_capabilities.canDelete` | `caps.has('planner.plan.delete')` → `false` → UI hides delete button | UI: ✅ |
+
+**Verdict: ✅ PASS — Tenant admin is denied at app-layer (403) before RLS is reached. UI correctly hides delete. Both layers agree.**
+
+### Proof 3: Owner + sysadmin unchanged
+
+**Scenario A — Owner:** User owns plan P.
+
+| Operation | Capability | RLS | Changed? |
+|-----------|-----------|-----|----------|
+| Block edit | `planner.plan.update` (via `isOwner`) | `owner_user_id = auth.uid()` (first OR branch, unchanged) | ✅ No regression |
+| Publish | `planner.plan.publish` (via `isOwner`) | Same owner branch | ✅ No regression |
+| Delete | `planner.plan.delete` (via `isOwner`) | `plans_delete` owner branch | ✅ No regression |
+
+**Scenario B — System admin:** User has `global_role = 'system_admin'`.
+
+| Operation | Capability | RLS | Changed? |
+|-----------|-----------|-----|----------|
+| Block edit | `planner.plan.update` (via `isSystemAdmin`) | `is_system_admin()` (third OR branch, unchanged) | ✅ No regression |
+| Publish | `planner.plan.publish` (via `isSystemAdmin`) | Same sysadmin branch | ✅ No regression |
+| Delete | `planner.plan.delete` (via `isSystemAdmin`) | `plans_delete` sysadmin branch | ✅ No regression |
+
+**Verdict: ✅ PASS — Neither owner nor sysadmin flows touched the code paths tested. New RLS policies add tenant admin as additional OR branch — existing owner/sysadmin branches remain first and unchanged.**
+
+### Proof 4: Progress route denies invisible plans
+
+**Scenario:** User A tries to read/write progress for plan P owned by user B, `visibility = 'private'`.
+
+| Step | Guard | Trace | Result |
+|------|-------|-------|--------|
+| GET progress/ | `requirePlanReadAccess(supabase, user, planId)` | → `requirePlanAccess('planner.plan.read')` → fetches plan via RLS → `plans_select` requires `owner=auth.uid()` or `tenant_member` or `public` or `sysadmin` → private plan, user A is none of these → plan query returns null | App: ❌ 404 |
+| POST progress/ | Same `requirePlanReadAccess` gate | Same trace → 404 | App: ❌ 404 |
+
+**Cross-check — visible plan:** User A has read access (e.g. public plan or tenant member):
+
+| Step | Guard | Result |
+|------|-------|--------|
+| GET progress/ | `requirePlanReadAccess` → plan visible → `planner.plan.read` ✅ | App: ✅ 200 |
+| POST progress/ | Same → ✅ | App: ✅ 200 |
+
+**Verdict: ✅ PASS — Progress route now correctly gates on plan visibility. Invisible plans return 404. Visible plans work as before.**
+
+### Re-Regression Summary
+
+| Proof | Scenario | Result |
+|-------|----------|--------|
+| 1 | Tenant admin block-edit + publish | ✅ PASS |
+| 2 | Tenant admin delete denied | ✅ PASS |
+| 3 | Owner/sysadmin unchanged | ✅ PASS |
+| 4 | Progress denies invisible plans | ✅ PASS |
+
+**All four proof paths verified. No regressions. Capability model, RLS, and UI intention are now fully aligned across the planner chain.**

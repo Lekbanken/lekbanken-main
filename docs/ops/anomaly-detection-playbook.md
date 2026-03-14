@@ -400,3 +400,100 @@ Every anomaly — whether real incident or false positive — gets logged:
 ```
 
 Add to `launch-control.md` changelog.
+
+---
+
+## Prevention Controls
+
+Three proactive controls to reduce incident probability during the first 30 days.
+
+### PC-1 — Deploy Guard (prevents: join funnel breakage, session create failure)
+
+**What:** Verify core flows still work after every deploy before promoting to production.
+
+**Pre-deploy checklist:**
+```
+1. GET /api/health          → status: ok?
+2. GET /api/readiness       → status: ready? (all 6 checks pass?)
+3. Manual: create session   → session appears in lobby?
+4. Manual: join with code   → participant joins, host sees count update?
+5. Manual: start session    → status transitions to active?
+```
+
+**When to run:** After every deploy to production. Takes ~2 min.
+
+**Why:** The #1 launch incident (join funnel breakage) is almost always caused by a bad deploy. This simple gate catches it before users do.
+
+**Status:** Manual process. Automated smoke test is a post-launch P2 item.
+
+### PC-2 — Realtime Watchdog (prevents: "appen laggar" incidents)
+
+**What:** Detect stalled realtime broadcasts on active sessions.
+
+**Detection query (run during daily check):**
+```sql
+SELECT
+  ps.id,
+  ps.display_name,
+  ps.status,
+  ps.broadcast_seq,
+  ps.participant_count,
+  EXTRACT(EPOCH FROM (now() - ps.updated_at))::int AS seconds_since_update
+FROM participant_sessions ps
+WHERE ps.status = 'active'
+  AND ps.participant_count > 0
+  AND ps.updated_at < now() - interval '5 minutes'
+ORDER BY seconds_since_update DESC;
+```
+
+**If stalled sessions found:**
+1. Check Supabase Dashboard → Realtime status
+2. Check if `broadcastPlayEvent()` is being called (Vercel function logs)
+3. If provider-side: wait for resolution, notify affected hosts
+4. If code-side: rollback deploy
+
+**Status:** Manual check. Automated cron watchdog is a post-launch P2 item.
+
+### PC-3 — Economy Kill Switch (prevents: reward inflation)
+
+**What:** Emergency procedure to freeze the gamification economy if Alert B fires and the root cause isn't immediately clear.
+
+**Freeze steps (in order):**
+```sql
+-- 1. Disable all automation rules (stops new automatic rewards)
+UPDATE gamification_automation_rules SET is_active = false;
+
+-- 2. Verify freeze
+SELECT COUNT(*) AS active_rules FROM gamification_automation_rules WHERE is_active = true;
+-- Should return 0
+```
+
+**Unfreeze steps:**
+```sql
+-- Re-enable rules one at a time, monitoring coin_transactions between each
+UPDATE gamification_automation_rules SET is_active = true WHERE id = '<rule_id>';
+
+-- Monitor after each re-enable
+SELECT COUNT(*), SUM(amount) FROM coin_transactions
+WHERE type = 'earn' AND created_at >= now() - interval '5 minutes';
+```
+
+**When to use:** Only when Alert B fires AND the root cause is not obvious within 15 minutes. This is a circuit breaker, not a first response.
+
+**Status:** SQL-based manual procedure. Feature flag integration is a post-launch P3 item.
+
+---
+
+## Incident Coverage Map
+
+All 7 statistically common first-30-day incidents mapped to signals and prevention:
+
+| # | Incident | Signal | Alert | Prevention |
+|---|----------|--------|-------|------------|
+| 1 | Join funnel breakage | S2 | A | PC-1 |
+| 2 | Realtime instability | S3 | C | PC-2 |
+| 3 | Silent error pressure | S5 | — | Daily review |
+| 4 | Session creation failure | S1 | — | PC-1 |
+| 5 | Economy drift | S4 | B | PC-3 |
+| 6 | Unexpected usage pattern | S2 | — | Top-10 query |
+| 7 | Rate limit / abuse | S5 | — | Rate limiter tiers |

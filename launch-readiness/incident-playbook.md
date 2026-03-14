@@ -123,7 +123,23 @@ Controlled via environment variables in Vercel:
 
 **To disable a feature:** Set the env var to `false` in Vercel → redeploy.
 
-### 4c. Rate Limiter Emergency Bypass
+### 4c. Economy Kill Switch
+
+**When:** Gamification reward anomaly (Alert B) and root cause unclear within 15 minutes.
+
+**Freeze:**
+```sql
+UPDATE gamification_automation_rules SET is_active = false;
+```
+
+**Unfreeze (one at a time, monitor between each):**
+```sql
+UPDATE gamification_automation_rules SET is_active = true WHERE id = '<rule_id>';
+```
+
+→ Full procedure: [anomaly-detection-playbook.md — PC-3](../docs/ops/anomaly-detection-playbook.md#pc-3--economy-kill-switch-prevents-reward-inflation)
+
+### 4d. Rate Limiter Emergency Bypass
 
 **If rate limiter is blocking legitimate users:**
 

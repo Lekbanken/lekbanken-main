@@ -64,10 +64,20 @@ export const GET = apiHandler({
       allOk = false
     }
 
+    // Deployment identity — safe to expose behind system_admin auth.
+    // Enables V7/V8 verification: confirm which infrastructure a deployment is connected to.
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+    const environment = {
+      deployTarget: process.env.DEPLOY_TARGET || 'development',
+      appEnv: process.env.APP_ENV || 'local',
+      supabaseProjectRef: supabaseUrl.match(/\/\/([^.]+)\./)?.[1] ?? 'unknown',
+    }
+
     return NextResponse.json(
       {
         status: allOk ? 'ready' : 'degraded',
         checks,
+        environment,
         timestamp: new Date().toISOString(),
       },
       { status: allOk ? 200 : 503 }

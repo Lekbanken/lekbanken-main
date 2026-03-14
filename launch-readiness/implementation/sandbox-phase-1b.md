@@ -673,3 +673,87 @@ Reference commit: `86ea5ed` (main).
 2. On the preview URL, run **V7**: register user, create data → confirm it appears in sandbox DB (`vmpdejhgpsrfulimsoqn`), not prod
 3. Run **V8**: verify production DB (`qohhnufxididbmzqnjwg`) has no preview test data
 4. If V7 + V8 pass → update `platform-operations-audit.md`: `OPS-SAND-001 → ✅ LÖST`
+
+---
+
+## V7/V8 — Preview Runtime Verification Procedure
+
+> Run this after creating a preview deployment from a branch/PR.
+
+### Prerequisites
+
+- A Vercel preview URL (from a branch/PR, NOT a production deploy from `main`)
+- A system_admin account (for `/api/readiness`)
+- Access to Supabase Dashboard for both projects
+
+### V7-1: Infrastructure Identity Check
+
+```
+GET {preview-url}/api/health
+→ Expect: 200, { "status": "ok" }
+
+GET {preview-url}/api/readiness   (requires system_admin auth)
+→ Expect: 200, {
+    "status": "ready",
+    "environment": {
+      "deployTarget": "preview",
+      "appEnv": "sandbox",
+      "supabaseProjectRef": "vmpdejhgpsrfulimsoqn"
+    }
+  }
+```
+
+**Pass criteria:** `supabaseProjectRef` is `vmpdejhgpsrfulimsoqn` (sandbox), NOT `qohhnufxididbmzqnjwg` (prod).
+
+### V7-2: Auth Flow
+
+1. Open preview URL in browser
+2. Sign up or log in with a test account
+3. Verify: login succeeds, redirects to app
+
+**Pass criteria:** Auth works with sandbox JWT secrets.
+
+### V7-3: Data Isolation
+
+1. Create a tenant (e.g., "V7 Preview Test")
+2. Create a plan inside the tenant
+3. Open Supabase Dashboard → **sandbox** project (`vmpdejhgpsrfulimsoqn`)
+4. Query: `SELECT * FROM tenants WHERE name = 'V7 Preview Test'`
+5. Verify: tenant exists in sandbox
+
+**Pass criteria:** Data appears in sandbox DB.
+
+### V7-4: Play Runtime Smoke Test
+
+1. Create a session from the plan
+2. Copy session code
+3. Open a second browser/incognito → join as participant using the code
+4. As host: start session
+5. As participant: verify heartbeat updates (`participant_sessions.last_seen_at` in sandbox DB)
+6. As host: end session
+
+**Pass criteria:** Full play loop works on preview with sandbox DB.
+
+### V7-5: Realtime Verification
+
+During V7-4, verify:
+- Host sees participant join in real-time (no full page refresh needed)
+- Participant sees session state changes (start/end) in real-time
+
+**Pass criteria:** Realtime channels connect to sandbox Supabase.
+
+### V8: Production Isolation Confirmation
+
+1. Open Supabase Dashboard → **production** project (`qohhnufxididbmzqnjwg`)
+2. Query: `SELECT * FROM tenants WHERE name = 'V7 Preview Test'`
+3. Verify: **no results**
+
+**Pass criteria:** Zero preview test data in production DB.
+
+### Closure
+
+If all V7 + V8 steps pass:
+
+1. Update `sandbox-phase-1b.md`: mark V7 and V8 as ✅
+2. Update `platform-operations-audit.md`: `OPS-SAND-001 → ✅ LÖST`
+3. Update `launch-control.md`: Sandbox isolation gate → 🟢, remove from Active Blockers

@@ -3,23 +3,16 @@
  * 
  * Limits demo session creation to prevent abuse:
  * - 3 demo sessions per IP per hour
- * - Uses in-memory rate limiting for development
+ * - Uses Supabase (demo_sessions table) for cross-instance persistence
  * 
- * For production with multiple server instances, install Upstash:
- * 1. npm install @upstash/ratelimit @upstash/redis
- * 2. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN to .env
- * 3. The system will automatically use Upstash when packages are available
- * 
- * Note: In-memory rate limiting is per-server-instance only.
- * It works for development but in production with multiple instances,
- * users could bypass limits by hitting different instances.
+ * The rate limit is enforced by counting recent demo_sessions with matching
+ * client_ip in metadata. This works across all serverless instances.
  */
 
-// In-memory fallback for development/when Upstash not configured
-const inMemoryStore = new Map<string, { count: number; resetAt: number }>();
+import { supabaseAdmin } from '@/lib/supabase/server';
 
 const DEMO_RATE_LIMIT = {
-  maxRequests: 3,     // Max demo sessions
+  maxRequests: 3,     // Max demo sessions per IP per window
   windowMs: 60 * 60 * 1000, // 1 hour in milliseconds
 };
 
@@ -31,75 +24,59 @@ interface RateLimitResult {
 }
 
 /**
- * Check rate limit using in-memory storage
+ * Check rate limit by counting recent demo_sessions with matching IP
  * 
- * For distributed rate limiting across multiple servers,
- * install @upstash/ratelimit and @upstash/redis packages.
+ * Queries the demo_sessions table for sessions created in the last hour
+ * where metadata->>'client_ip' matches the given identifier.
+ * This is cross-instance persistent (backed by Supabase/Postgres).
  */
 export async function checkDemoRateLimit(identifier: string): Promise<RateLimitResult> {
-  // Use in-memory rate limiting
-  // This works for development and single-server production
-  return checkInMemoryRateLimit(identifier);
-}
-
-/**
- * In-memory rate limiting (for development or single-server production)
- */
-function checkInMemoryRateLimit(identifier: string): RateLimitResult {
   const now = Date.now();
-  const key = `demo:${identifier}`;
-  
-  // Clean up expired entries periodically
-  if (Math.random() < 0.1) {
-    cleanupExpiredEntries();
-  }
+  const windowStart = new Date(now - DEMO_RATE_LIMIT.windowMs).toISOString();
+  const resetTimestamp = Math.floor((now + DEMO_RATE_LIMIT.windowMs) / 1000);
 
-  const existing = inMemoryStore.get(key);
-  
-  if (!existing || existing.resetAt <= now) {
-    // First request or window expired - reset
-    inMemoryStore.set(key, {
-      count: 1,
-      resetAt: now + DEMO_RATE_LIMIT.windowMs,
-    });
-    
+  try {
+    const { count, error } = await supabaseAdmin
+      .from('demo_sessions')
+      .select('id', { count: 'exact', head: true })
+      .gte('started_at', windowStart)
+      .eq('metadata->>client_ip' as never, identifier);
+
+    if (error) {
+      // On DB error, allow the request (fail-open for availability)
+      // but log the error for monitoring
+      console.error('[checkDemoRateLimit] DB query failed, failing open:', error.message);
+      return {
+        success: true,
+        remaining: 0,
+        reset: resetTimestamp,
+      };
+    }
+
+    const sessionCount = count ?? 0;
+
+    if (sessionCount >= DEMO_RATE_LIMIT.maxRequests) {
+      return {
+        success: false,
+        remaining: 0,
+        reset: resetTimestamp,
+        error: `Du har nått gränsen på ${DEMO_RATE_LIMIT.maxRequests} demo-sessioner per timme. Försök igen senare.`,
+      };
+    }
+
     return {
       success: true,
-      remaining: DEMO_RATE_LIMIT.maxRequests - 1,
-      reset: Math.floor((now + DEMO_RATE_LIMIT.windowMs) / 1000),
+      remaining: DEMO_RATE_LIMIT.maxRequests - sessionCount,
+      reset: resetTimestamp,
     };
-  }
-
-  if (existing.count >= DEMO_RATE_LIMIT.maxRequests) {
-    // Rate limited
+  } catch {
+    // On unexpected error, fail open
+    console.error('[checkDemoRateLimit] Unexpected error, failing open');
     return {
-      success: false,
+      success: true,
       remaining: 0,
-      reset: Math.floor(existing.resetAt / 1000),
-      error: `Du har nått gränsen på ${DEMO_RATE_LIMIT.maxRequests} demo-sessioner per timme. Försök igen senare.`,
+      reset: resetTimestamp,
     };
-  }
-
-  // Increment count
-  existing.count += 1;
-  inMemoryStore.set(key, existing);
-
-  return {
-    success: true,
-    remaining: DEMO_RATE_LIMIT.maxRequests - existing.count,
-    reset: Math.floor(existing.resetAt / 1000),
-  };
-}
-
-/**
- * Clean up expired entries from in-memory store
- */
-function cleanupExpiredEntries(): void {
-  const now = Date.now();
-  for (const [key, value] of inMemoryStore.entries()) {
-    if (value.resetAt <= now) {
-      inMemoryStore.delete(key);
-    }
   }
 }
 

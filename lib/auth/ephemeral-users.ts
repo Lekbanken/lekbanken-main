@@ -197,9 +197,10 @@ export async function signInAsEphemeralUser(email: string, password: string) {
  *
  * @param userId - User ID
  * @param tier - Demo tier
+ * @param clientIP - Client IP address for rate limiting
  * @returns Demo session or error
  */
-export async function createDemoSession(userId: string, tier: DemoTier = 'free') {
+export async function createDemoSession(userId: string, tier: DemoTier = 'free', clientIP?: string) {
   // Use admin client to bypass RLS - demo_sessions table may have restrictive policies
   try {
     const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
@@ -212,6 +213,7 @@ export async function createDemoSession(userId: string, tier: DemoTier = 'free')
         demo_tier: tier,
         expires_at: expiresAt.toISOString(),
         started_at: new Date().toISOString(),
+        ...(clientIP ? { metadata: { client_ip: clientIP } } : {}),
       })
       .select('id, expires_at')
       .single();
@@ -243,9 +245,10 @@ export async function createDemoSession(userId: string, tier: DemoTier = 'free')
  * Complete demo flow: Create user → Sign in → Create session
  *
  * @param tier - Demo tier ('free' or 'premium')
+ * @param clientIP - Client IP address for rate limiting
  * @returns Complete demo setup or error
  */
-export async function setupDemoUser(tier: DemoTier = 'free') {
+export async function setupDemoUser(tier: DemoTier = 'free', clientIP?: string) {
   // Step 1: Create ephemeral user
   const { user, password, error: userError } = await createEphemeralDemoUser(tier);
 
@@ -271,7 +274,7 @@ export async function setupDemoUser(tier: DemoTier = 'free') {
   }
 
   // Step 3: Create demo session tracking
-  const { session: demoSession, error: sessionError } = await createDemoSession(user.id, tier);
+  const { session: demoSession, error: sessionError } = await createDemoSession(user.id, tier, clientIP);
 
   if (sessionError) {
     // Non-critical - user is still signed in

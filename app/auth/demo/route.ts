@@ -97,7 +97,17 @@ export async function POST(request: Request) {
     // Security: Premium tier requires special access code (for sales use)
     if (tier === 'premium') {
       const accessCode = url.searchParams.get('code');
-      const validCode = process.env.DEMO_PREMIUM_ACCESS_CODE || 'DEMO_PREMIUM_2024';
+      const validCode = process.env.DEMO_PREMIUM_ACCESS_CODE;
+
+      if (!validCode) {
+        return NextResponse.json(
+          {
+            error: 'Premium demo is not configured',
+            code: 'PREMIUM_NOT_CONFIGURED',
+          },
+          { status: 503 }
+        );
+      }
 
       if (accessCode !== validCode) {
         return NextResponse.json(
@@ -113,7 +123,7 @@ export async function POST(request: Request) {
     console.log(`[POST /auth/demo] Starting demo session (tier: ${tier})`);
 
     // Step 1-3: Create ephemeral user, sign in, create demo session
-    const { user, session, demoSession, error } = await setupDemoUser(tier);
+    const { user, session, demoSession, error } = await setupDemoUser(tier, clientIP);
 
     if (error || !user || !session) {
       console.error('[POST /auth/demo] Demo setup failed:', error);
@@ -133,7 +143,6 @@ export async function POST(request: Request) {
         {
           error: 'Failed to start demo session. Please try again.',
           code: 'DEMO_SETUP_FAILED',
-          details: error?.message,
         },
         { status: 500 }
       );

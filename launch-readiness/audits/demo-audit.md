@@ -43,27 +43,26 @@ The Demo domain is a comprehensive system supporting anonymous/ephemeral access 
 
 ## Findings
 
-### DEMO-001 — Rate limiting is in-memory only (P1)
+### DEMO-001 — Rate limiting is in-memory only (P1) ✅ **FIXAD (2026-03-14)**
 
 **File:** `lib/rate-limit/demo-rate-limit.ts`  
 **Issue:** Rate limiter uses `new Map()` — per-instance in serverless. Each cold start gets a fresh store. Vercel runs many concurrent instances.  
 **Impact:** Rate limit effectively useless in production. Attacker can create unlimited demo accounts by hitting different instances.  
-**Fix:** Replace with Upstash Redis (already documented as production target in the code comments).  
-**Note:** This is the single most important fix before launch.
+**Fix:** Replaced with Supabase-backed rate limiting. Counts `demo_sessions` created in the last hour with matching `metadata->>'client_ip'`. Cross-instance persistent. Client IP stored in session metadata on creation.
 
-### DEMO-002 — Premium access code hardcoded (P1)
+### DEMO-002 — Premium access code hardcoded (P1) ✅ **FIXAD (2026-03-14)**
 
 **File:** `lib/auth/ephemeral-users.ts` (L32), `app/auth/demo/route.ts` (L105)  
 **Issue:** `DEMO_PREMIUM_2024` is in source code as fallback: `process.env.DEMO_PREMIUM_ACCESS_CODE || 'DEMO_PREMIUM_2024'`. Discoverable in source history or client bundle.  
 **Impact:** Anyone who discovers the code gets premium demo access.  
-**Fix:** Remove hardcoded fallback. Require env var. If not set, block premium tier entirely.
+**Fix:** Removed hardcoded fallback. If `DEMO_PREMIUM_ACCESS_CODE` env var is not set, premium tier returns 503 "Premium demo not configured".
 
-### DEMO-003 — Error details leak in auth route (P1)
+### DEMO-003 — Error details leak in auth route (P1) ✅ **FIXAD (2026-03-14)**
 
 **File:** `app/auth/demo/route.ts` (L147)  
 **Issue:** `details: error?.message` exposes internal error messages to the client on demo setup failure.  
 **Impact:** Information disclosure — could reveal database errors, Supabase config, or internal state.  
-**Fix:** Remove `details` field from error response. Log the error server-side only.
+**Fix:** Removed `details` field from error response. Internal errors are logged server-side only.
 
 ### DEMO-004 — auth/demo route not wrapped with apiHandler (P2)
 
@@ -183,10 +182,10 @@ The Demo domain is a comprehensive system supporting anonymous/ephemeral access 
 
 ## Recommended Milestones
 
-### M1 — Launch Critical (P1 fixes)
-- [ ] DEMO-001: Replace in-memory rate limiter with Upstash Redis
-- [ ] DEMO-002: Remove hardcoded premium access code fallback
-- [ ] DEMO-003: Remove error.message from client response
+### M1 — Launch Critical (P1 fixes) ✅ KLAR (2026-03-14)
+- [x] DEMO-001: Replaced in-memory rate limiter with Supabase-backed (DB query on `demo_sessions.metadata->>'client_ip'`)
+- [x] DEMO-002: Removed hardcoded premium access code fallback; blocks premium if env var not set
+- [x] DEMO-003: Removed `error.message` from client response
 
 ### M2 — Launch Hardening (P2 fixes) — Deferred post-launch
 - [ ] DEMO-004/005/006: Wrap auth/demo, convert, track with apiHandler

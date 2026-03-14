@@ -2,7 +2,7 @@
 
 > **Date:** 2025-01-25
 > **Scope:** Event amplification, duplicate reward protection, idempotency enforcement
-> **Verdict:** 🟢 **DB-layer idempotency is STRONG.** No double-reward bugs found. Minor hygiene issues identified.
+> **Verdict:** 🟢 **DB-layer idempotency is strong and launch-sufficient.** No confirmed double-reward bugs in audited paths. Minor hygiene issues identified.
 
 ---
 
@@ -14,7 +14,7 @@ Three initially-suspected critical bugs were investigated and **confirmed safe**
 
 | Category | Count | Severity |
 |----------|-------|----------|
-| Double-reward bugs | **0** | — |
+| Confirmed double-reward bugs in audited paths | **0** | — |
 | Performance/hygiene issues | **4** | P2 |
 | Monitoring gaps | **2** | P3 |
 
@@ -165,8 +165,12 @@ V2 pipeline (`gamification-events-v2.server.ts`) follows the same pattern.
 
 ## 8. Conclusion
 
-Lekbanken's gamification system has **production-grade idempotency** at the database layer. The consistent use of `pg_advisory_xact_lock` + deterministic idempotency key derivation + UNIQUE constraints creates a three-layer defense against duplicate rewards.
+Lekbanken's gamification system has **strong, launch-sufficient idempotency** at the database layer. The consistent use of `pg_advisory_xact_lock` + deterministic idempotency key derivation + UNIQUE constraints creates a three-layer defense against duplicate rewards.
 
 The four P2 findings are hygiene improvements — none represent correctness risks at current scale. F-02 (XP JSONB growth) is the most important to address before sustained high-volume usage.
+
+### Limitations
+
+This audit covered the RPCs, tables, constraints, and app-layer call sites that existed at audit time. Future new reward callers, cron flows, or event types **must preserve deterministic idempotency key derivation** — any caller using `randomUUID()` or omitting keys bypasses the safety model.
 
 **Launch verdict: ✅ Safe to launch.**

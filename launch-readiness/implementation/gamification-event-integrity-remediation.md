@@ -7,7 +7,7 @@
 
 ## Overview
 
-All items below are **P2/P3 hygiene improvements**. No double-reward bugs were found during audit. These items improve performance, defense-in-depth, and observability.
+All items below are **P2/P3 hygiene improvements**. No confirmed double-reward bugs were found in audited paths. These items improve performance, defense-in-depth, and observability.
 
 ---
 
@@ -155,4 +155,4 @@ console.info('[gamification-events] idempotent cascade re-entry', {
 | R-05 | P3 | Trivial | Optional | Sprint 1 |
 | R-06 | P3 | Trivial | Optional | Sprint 1 |
 
-**None of these items block launch.** The DB-layer idempotency guarantees are sufficient for safe operation.
+**None of these items block launch.** The DB-layer idempotency protections are strong and launch-sufficient in the audited paths. Future reward callers must preserve deterministic idempotency key derivation.

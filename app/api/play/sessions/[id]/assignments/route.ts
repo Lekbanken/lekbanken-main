@@ -34,7 +34,7 @@ export const POST = apiHandler({
     // Verify user is host of this session
     const { data: session, error: sessionError } = await supabase
       .from('participant_sessions')
-      .select('id, host_user_id')
+      .select('id, host_user_id, status')
       .eq('id', sessionId)
       .single();
     
@@ -45,6 +45,9 @@ export const POST = apiHandler({
     if (session.host_user_id !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    const statusGuard = assertSessionStatus(session.status, 'assignments');
+    if (statusGuard) return statusGuard;
     
     // Parse request body
     const body: AssignmentRequest = await req.json();
@@ -225,7 +228,7 @@ export const DELETE = apiHandler({
     // Verify user is host of this session
     const { data: session, error: sessionError } = await supabase
       .from('participant_sessions')
-      .select('id, host_user_id')
+      .select('id, host_user_id, status')
       .eq('id', sessionId)
       .single();
     
@@ -236,6 +239,9 @@ export const DELETE = apiHandler({
     if (session.host_user_id !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    const statusGuard = assertSessionStatus(session.status, 'assignments');
+    if (statusGuard) return statusGuard;
     
     // Parse request body
     const body: UnassignRequest = await req.json();

@@ -56,10 +56,28 @@ function validateEnvironment() {
     }
   }
 
-  // APP_ENV safety guard: warn if running against production without explicit APP_ENV=prod
+  // APP_ENV safety guard: warn if running against production without explicit APP_ENV
   const appEnv = process.env.APP_ENV;
   if (!appEnv && nodeEnv === 'production') {
-    console.warn('⚠️  APP_ENV not set in production — set APP_ENV=prod explicitly for safety auditing');
+    console.warn('⚠️  APP_ENV not set in production — set APP_ENV=production explicitly for safety auditing');
+  }
+
+  // Strict APP_ENV validation — reject unknown values at startup
+  const validAppEnvs = ['local', 'staging', 'production'] as const;
+  if (appEnv && !(validAppEnvs as readonly string[]).includes(appEnv)) {
+    throw new Error(
+      `❌ Invalid APP_ENV="${appEnv}". Allowed values: ${validAppEnvs.join(', ')}\n` +
+      `   See SSoT environment model in docs/DEVELOPER_SETUP.md`
+    );
+  }
+
+  // TENANT_COOKIE_SECRET must not use dev default in production
+  const cookieSecret = process.env.TENANT_COOKIE_SECRET;
+  if (appEnv === 'production' && (!cookieSecret || cookieSecret === 'dev-secret-change-in-production')) {
+    throw new Error(
+      `❌ TENANT_COOKIE_SECRET is not set or uses the dev default in APP_ENV=production.\n` +
+      `   Set a unique, strong secret in your production environment variables.`
+    );
   }
 }
 
@@ -137,7 +155,7 @@ export const env = {
   deployment: {
     /** Deploy target identifier for observability (Sentry tags, logs). Values: prod, preview, development, enterprise-<customer> */
     target: process.env.DEPLOY_TARGET || 'development',
-    /** App environment safety guard. Scripts/seeds check this to prevent running against prod. Values: prod, sandbox, local */
+    /** App environment (data scope). Values: local, staging, production — see SSoT in docs/DEVELOPER_SETUP.md */
     appEnv: process.env.APP_ENV || 'local',
   },
 } as const;
@@ -147,7 +165,7 @@ export const env = {
  * Uses APP_ENV (set via Vercel env scopes) — NOT NODE_ENV which is always 'production' on Vercel.
  */
 export function isProductionEnvironment(): boolean {
-  return env.deployment.appEnv === 'prod';
+  return env.deployment.appEnv === 'production';
 }
 
 // Run validation on module load (server-side only)

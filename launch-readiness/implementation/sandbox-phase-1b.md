@@ -79,16 +79,16 @@ Per `launch-control.md` L1058–1065, the following verifications have been run:
 deployment: {
   /** Values: prod, preview, development, enterprise-<customer> */
   target: process.env.DEPLOY_TARGET || 'development',
-  /** Values: prod, sandbox, local */
+  /** Values: production, staging, local */
   appEnv: process.env.APP_ENV || 'local',
 }
 ```
 
-**Canonical enum values** (per `launch-control.md` L1208):
-- `APP_ENV`: `prod` | `sandbox` | `local`
+**Canonical enum values** (per SSoT environment model):
+- `APP_ENV`: `production` | `staging` | `local`
 - `DEPLOY_TARGET`: `prod` | `preview` | `development` | `enterprise-<customer>`
 
-An `isProductionEnvironment()` helper is exported from `env.ts` (checks `appEnv === 'prod'`).
+An `isProductionEnvironment()` helper is exported from `env.ts` (checks `appEnv === 'production'`).
 
 **Consumed by application code:** ❌ **NOWHERE.**
 
@@ -223,8 +223,8 @@ Cosmetic — the "307 migrations" refers to the original count before canonical 
 
 | # | Action | Effort | Owner |
 |---|--------|--------|-------|
-| C1 | **Implement `APP_ENV` runtime guard** — Add middleware or startup check that warns/blocks destructive operations when `APP_ENV=prod`. Currently defined but never consumed. | 1 hour | Engineering |
-| C2 | **Create `.nvmrc`** — Pin Node.js to 20 (matches CI). | 5 min | Engineering |
+| C1 | **Implement `APP_ENV` runtime guard** — Strict validation at startup: rejects unknown `APP_ENV` values, blocks dev cookie secret in production. | 1 hour | ✅ Done (2026-03-15) |
+| C2 | **Create `.nvmrc`** — Pin Node.js to 22 (matches local dev). | 5 min | ✅ Done (2026-03-15) |
 | C3 | ~~**Update ADR-005 status**~~ | ~~15 min~~ | ✅ Done (2026-03-13) — Updated in 6 documents. See §3 for details. |
 
 ### Phase 1B-D: Documentation Sync ✅ COMPLETE (2026-03-13)
@@ -305,12 +305,13 @@ Sandbox must be kept in sync when new migrations are created:
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │  Local Dev       │    │  Preview (Vercel) │    │  Production     │
 │                  │    │                   │    │                 │
-│  Option A:       │    │  Sandbox Supabase │    │  Prod Supabase  │
-│  Local Supabase  │    │  (vmpdejhgpsrful) │    │  (qohhnufxidid) │
-│  (Docker)        │    │                   │    │                 │
-│  Option B:       │    │  APP_ENV=sandbox  │    │  APP_ENV=prod   │
-│  Sandbox Supabase│    │  DEPLOY_TARGET=   │    │  DEPLOY_TARGET= │
-│  (remote)        │    │    preview        │    │    prod         │
+│  Lokal Supabase  │    │  Staging Supabase │    │  Prod Supabase  │
+│  (Docker CLI)    │    │  (vmpdejhgpsrful) │    │  (qohhnufxidid) │
+│                  │    │                   │    │                 │
+│  APP_ENV=local   │    │  APP_ENV=staging  │    │  APP_ENV=       │
+│  DEPLOY_TARGET=  │    │  DEPLOY_TARGET=   │    │    production   │
+│    development   │    │    preview        │    │  DEPLOY_TARGET= │
+│                  │    │                   │    │    prod         │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
@@ -321,7 +322,7 @@ Sandbox must be kept in sync when new migrations are created:
 | `NEXT_PUBLIC_SUPABASE_URL` | Sandbox or localhost:54321 | Sandbox (vmpdejhg…) | Prod (qohhnufx…) | localhost:54322 |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Sandbox key or local key | Sandbox anon key | Prod anon key | Local auto-generated |
 | `SUPABASE_SERVICE_ROLE_KEY` | Sandbox key or local key | Sandbox service role | Prod service role | Local auto-generated |
-| `APP_ENV` | `local` (default) | `sandbox` | `prod` | N/A |
+| `APP_ENV` | `local` (default) | `staging` | `production` | N/A |
 | `DEPLOY_TARGET` | `development` (default) | `preview` | `prod` | N/A |
 | `SKIP_ENV_VALIDATION` | unset | unset | unset | `true` (typecheck) |
 | `STRIPE_ENABLED` | `true` (test keys) | `false` or test keys | `true` (live keys) | unset |

@@ -17,7 +17,7 @@ Before the first production deploy, verify these items:
   - `NEXT_PUBLIC_SUPABASE_URL` → production Supabase (`qohhnufxididbmzqnjwg`)
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → production anon key
   - `SUPABASE_SERVICE_ROLE_KEY` → production service role
-  - `APP_ENV` → `prod`
+  - `APP_ENV` → `production`
   - `DEPLOY_TARGET` → `prod`
 - [ ] Stripe webhook endpoint: `https://app.lekbanken.no/api/billing/webhooks/stripe`
   - Verify in Stripe Dashboard → Developers → Webhooks → correct endpoint + correct secret

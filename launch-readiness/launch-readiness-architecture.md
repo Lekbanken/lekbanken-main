@@ -62,16 +62,17 @@
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │  Local Dev       │    │  Preview (Vercel) │    │  Production     │
-│  Sandbox Supa-   │    │  Sandbox Supabase │    │  Prod Supabase  │
-│  base (remote)   │    │  (vmpdejhgpsrful) │    │  (qohhnufxidid) │
-│  eller lokal     │    │                   │    │                 │
-│  (Docker, TBD)   │    │  APP_ENV=sandbox  │    │  APP_ENV=prod   │
-│                  │    │  DEPLOY_TARGET=   │    │  DEPLOY_TARGET= │
-│                  │    │    preview        │    │    prod         │
+│  Lokal Supabase  │    │  Staging Supabase │    │  Prod Supabase  │
+│  (Docker CLI)    │    │  (vmpdejhgpsrful) │    │  (qohhnufxidid) │
+│                  │    │                   │    │                 │
+│  APP_ENV=local   │    │  APP_ENV=staging  │    │  APP_ENV=       │
+│  DEPLOY_TARGET=  │    │  DEPLOY_TARGET=   │    │    production   │
+│    development   │    │    preview        │    │  DEPLOY_TARGET= │
+│                  │    │                   │    │    prod         │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
-**Status:** ✅ DECIDED (2026-03-13) — Alt B (remote sandbox) implementerat. Preview + Development Vercel-scopes pekar mot sandbox. Alt C (hybrid med lokal Docker) är framtida målbild.
+**Status:** ✅ DECIDED (2026-03-13) — Alt B (remote staging) implementerat. Preview + Development Vercel-scopes pekar mot staging Supabase. Lokal dev kör Docker CLI.
 
 ### Implementeringsplan för Hybrid-setup
 

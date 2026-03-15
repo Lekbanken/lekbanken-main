@@ -212,10 +212,10 @@ Set with scope = **Preview** only:
 | Variable | Value |
 |----------|-------|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://vmpdejhgpsrfulimsoqn.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Sandbox anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Sandbox service role key |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Staging anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Staging service role key |
 | `DEPLOY_TARGET` | `preview` |
-| `APP_ENV` | `sandbox` |
+| `APP_ENV` | `staging` |
 
 `NEXT_PUBLIC_*` vars are build-time, but Vercel builds each preview separately — Preview-scoped values are inlined at build-time for preview builds.
 

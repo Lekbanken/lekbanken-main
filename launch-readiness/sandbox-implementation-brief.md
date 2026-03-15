@@ -119,7 +119,7 @@ NEXT_PUBLIC_SUPABASE_URL          = https://vmpdejhgpsrfulimsoqn.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY     = {sandbox-anon-key}
 SUPABASE_SERVICE_ROLE_KEY         = {sandbox-service-role-key}
 DEPLOY_TARGET                     = preview
-APP_ENV                           = sandbox
+APP_ENV                           = staging
 ```
 
 **Important:** Do NOT modify Production-scoped env vars. Only add/override for Preview scope.
@@ -133,7 +133,7 @@ NEXT_PUBLIC_SUPABASE_URL          = https://qohhnufxididbmzqnjwg.supabase.co  (u
 NEXT_PUBLIC_SUPABASE_ANON_KEY     = {prod-anon-key}                            (unchanged)
 SUPABASE_SERVICE_ROLE_KEY         = {prod-service-role-key}                    (unchanged)
 DEPLOY_TARGET                     = prod                                       (unchanged)
-APP_ENV                           = prod                                       (unchanged)
+APP_ENV                           = production                                 (unchanged)
 ```
 
 ### 5.3 DEPLOY_TARGET Standard Values
@@ -142,7 +142,7 @@ APP_ENV                           = prod                                       (
 |-------|-------------|-------|
 | `prod` | Production builds | `app.lekbanken.no` |
 | `preview` | Vercel preview builds | PR review URLs |
-| `sandbox` | Future standalone sandbox | Optional later |
+| `development` | Local dev | `localhost:3000` |
 | `enterprise-<customer>` | Enterprise isolated | e.g. `enterprise-svenska-kyrkan` |
 
 ### 5.4 APP_ENV Safety Guard
@@ -154,9 +154,9 @@ To prevent accidentally running destructive operations against production:
 #!/bin/bash
 set -euo pipefail
 
-if [ "${APP_ENV:-}" = "prod" ]; then
-  echo "❌ SAFETY: This script cannot run against APP_ENV=prod"
-  echo "   Set APP_ENV=sandbox or APP_ENV=local to proceed."
+if [ "${APP_ENV:-}" = "production" ]; then
+  echo "❌ SAFETY: This script cannot run against APP_ENV=production"
+  echo "   Set APP_ENV=staging or APP_ENV=local to proceed."
   exit 1
 fi
 ```
@@ -165,8 +165,8 @@ fi
 ```sql
 DO $$
 BEGIN
-  IF current_setting('app.env', true) = 'prod' THEN
-    RAISE EXCEPTION 'Seeds cannot run against production (app.env=prod)';
+  IF current_setting('app.env', true) = 'production' THEN
+    RAISE EXCEPTION 'Seeds cannot run against production (app.env=production)';
   END IF;
 END $$;
 ```

@@ -64,8 +64,8 @@ Fält:
 | TYPE_MANAGEMENT.md | A | draft | - | - |
 | VS_CODE_WORKFLOW.md | A | draft | - | - |
 | PROJECT_EXECUTION_PLAN.md | B | draft | - | - |
-| prompts/PROMPT_FOR_NEW_AI.md | E | draft | - | - |
-| HANDOVER_2024-12-07.md | C | draft | - | - |
+| ~~prompts/PROMPT_FOR_NEW_AI.md~~ | E | archived | - | - | → `archive/PROMPT_FOR_NEW_AI.md` |
+| ~~HANDOVER_2024-12-07.md~~ | C | archived | - | - | → `archive/HANDOVER_2024-12-07.md` |
 | DOCS_NAMING_CONVENTIONS.md | A | draft | 2025-12-18 | - |
 
 ## Sub-index
@@ -78,7 +78,7 @@ Fält:
 - templates/: se templates/*
 - validation/: se validation/* (start: `validation/REALITY_CHECK_2025-12-17.md`)
 - reports/: se reports/README.md
-- prompts/: se prompts/README.md
+- ~~prompts/~~: arkiverad 2026-03-15 → `archive/` (se `archive/ARCHIVE_MANIFEST.md`)
 
 ## Nästa validering (rekommenderad ordning)
 

@@ -51,7 +51,7 @@ Fält:
 | [docs/BROWSE_DOMAIN.md](BROWSE_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/BROWSE_REWORK_NOTES.md](BROWSE_REWORK_NOTES.md) | C | draft | - | - | Notes |
 | [docs/CATALYST_UI_KIT.md](CATALYST_UI_KIT.md) | A | draft | - | - | Reference |
-| [docs/prompts/CHATGPT_GAME_CREATOR_PROMPT.md](prompts/CHATGPT_GAME_CREATOR_PROMPT.md) | E | draft | - | - | Prompt |
+| ~~docs/prompts/CHATGPT_GAME_CREATOR_PROMPT.md~~ | E | archived | 2026-03-15 | - | → `archive/CHATGPT_GAME_CREATOR_PROMPT.md` |
 | [docs/BILLING_LICENSING_DOMAIN.md](BILLING_LICENSING_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/CONTENT_MANAGEMENT_DOMAIN.md](CONTENT_MANAGEMENT_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/CSV_IMPORT_FIELD_REFERENCE.md](CSV_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-17 | - | Contract/reference |
@@ -73,7 +73,7 @@ Fält:
 | [docs/GAME_BUILDER_UI_SPEC.md](GAME_BUILDER_UI_SPEC.md) | B | draft | - | - | Spec |
 | [docs/GAME_CSV_IMPORT_EXPORT_PLAN.md](GAME_CSV_IMPORT_EXPORT_PLAN.md) | B | draft | - | - | Plan |
 | [docs/GAMES_DOMAIN.md](GAMES_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/HANDOVER_2024-12-07.md](HANDOVER_2024-12-07.md) | C | draft | - | - | Handover |
+| ~~docs/HANDOVER_2024-12-07.md~~ | C | archived | 2026-03-15 | - | → `archive/HANDOVER_2024-12-07.md` |
 | [docs/MEDIA_DOMAIN.md](MEDIA_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc |
 | [docs/MIGRATIONS.md](MIGRATIONS.md) | A | active | 2025-12-17 | - | Core reference |
 | [docs/MARKETING_DOMAIN.md](MARKETING_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
@@ -86,7 +86,7 @@ Fält:
 | [docs/ops/incident_response.md](ops/incident_response.md) | A | active | 2025-12-17 | - | Runbook |
 | [docs/ops/incidents.md](ops/incidents.md) | A | active | 2025-12-17 | - | Runbook |
 | [docs/ops/README.md](ops/README.md) | A | active | 2025-12-17 | - | Sub-index |
-| [docs/prompts/README.md](prompts/README.md) | A | draft | 2025-12-18 | - | Index for prompts |
+| ~~docs/prompts/README.md~~ | A | archived | 2026-03-15 | - | → `archive/README.md` (prompts dir removed) |
 | [docs/reports/README.md](reports/README.md) | A | draft | 2025-12-18 | - | Index for archived reports |
 | [docs/reports/ADMIN_ACCESS_INVESTIGATION_REPORT.md](reports/ADMIN_ACCESS_INVESTIGATION_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
 | [docs/reports/ADMIN_AUTH_INVESTIGATION_REPORT.md](reports/ADMIN_AUTH_INVESTIGATION_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
@@ -115,7 +115,7 @@ Fält:
 | [docs/PLAY_SESSIONS_UI_SPEC.md](PLAY_SESSIONS_UI_SPEC.md) | B | draft | - | - | Spec |
 | [docs/PERFORMANCE_ADVISOR_PROMPT.md](PERFORMANCE_ADVISOR_PROMPT.md) | E | active | 2026-01-08 | - | Prompt for Supabase Performance Advisor |
 | [docs/PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md) | B | draft | - | - | Plan |
-| [docs/prompts/PROMPT_FOR_NEW_AI.md](prompts/PROMPT_FOR_NEW_AI.md) | E | draft | - | - | Prompt/template |
+| ~~docs/prompts/PROMPT_FOR_NEW_AI.md~~ | E | archived | 2026-03-15 | - | → `archive/PROMPT_FOR_NEW_AI.md` |
 | [docs/README.md](README.md) | A | draft | 2025-12-17 | - | Docs start |
 | [docs/SESSION_COMPLETION_REPORT.md](SESSION_COMPLETION_REPORT.md) | C | draft | - | - | Report |
 | [docs/SECURITY_AUDIT_TODO.md](SECURITY_AUDIT_TODO.md) | D | ✅ done | 2026-01-08 | - | Security backlog (completed) |

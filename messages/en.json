@@ -31,7 +31,6 @@
       "deselectAll": "Deselect all",
       "copy": "Copy",
       "paste": "Paste",
-      "duplicate": "Duplicate",
       "archive": "Archive",
       "restore": "Restore",
       "publish": "Publish",
@@ -41,13 +40,17 @@
       "hide": "Hide",
       "show": "Show",
       "expand": "Expand",
-      "collapse": "Collapse",
-      "more": "More",
       "less": "Less",
       "loading": "Loading...",
       "saving": "Saving...",
       "deleting": "Deleting...",
-      "updating": "Updating..."
+      "updating": "Updating...",
+      "defaults": {
+        "newArtifact": "Ny artefakt"
+      },
+      "correctCode": "Korrekt kod",
+      "codeLength": "Kodlängd",
+      "correctCodePlaceholder": "1234"
     },
     "status": {
       "active": "Active",
@@ -114,29 +117,6 @@
       "noData": "No data available",
       "emptyState": "Nothing here yet",
       "confirmDelete": "Are you sure you want to delete this?",
-      "member": "Member",
-      "licensing": {
-        "title": "Licenses",
-        "selectPlaceholder": "Select license…",
-        "emptyAssignments": "No active seat assignments.",
-        "labels": {
-          "assignedAt": "Assigned {date}"
-        },
-        "actions": {
-          "assign": "Assign",
-          "release": "Release"
-        },
-        "errors": {
-          "unknownUserId": "Unknown user id."
-        },
-        "toasts": {
-          "selectLicense": "Select a license.",
-          "seatAssigned": "Seat assigned.",
-          "assignFailed": "Could not assign seat (no seats left or already assigned).",
-          "seatReleased": "Seat released.",
-          "releaseFailed": "Could not release seat."
-        }
-      },
       "unsavedChanges": "You have unsaved changes. Do you want to leave this page?",
       "loadingError": "Could not load data",
       "saveError": "Could not save",
@@ -144,7 +124,8 @@
       "networkError": "Network error. Check your connection.",
       "unauthorized": "You are not authorized to perform this action",
       "notFound": "Page not found",
-      "serverError": "Server error. Please try again later."
+      "serverError": "Server error. Please try again later.",
+      "confirmAction": "Är du säker på att du vill fortsätta?"
     },
     "states": {
       "errorState": {
@@ -250,6 +231,14 @@
       "passwordMismatch": "Passwords do not match",
       "minLength": "At least {min} characters",
       "maxLength": "Maximum {max} characters"
+    },
+    "tenant": {
+      "personal": "Mitt konto",
+      "selectTenant": "Välj konto",
+      "sectionPersonal": "Personligt",
+      "sectionOrganizations": "Organisationer",
+      "noTenants": "Inga konton",
+      "switchTo": "Byt till {name}"
     }
   },
   "gamification": {
@@ -306,18 +295,6 @@
     "achievementsTitle": "Achievements",
     "achievementsSubtitle": "Your collection of badges and goals",
     "overview": "Overview",
-    "coinReasonCodes": {
-      "event:session_completed": "Reward for completed session",
-      "event:run_completed": "Reward for completed round",
-      "event:plan_created": "Reward for created plan",
-      "event:plan_published": "Reward for published plan",
-      "event:game_played": "Reward for playing a game",
-      "event:achievement_unlocked": "Reward for unlocked achievement",
-      "event:first_session": "Reward for first session",
-      "event:streak_bonus": "Streak bonus",
-      "powerup:coin_multiplier": "Coin multiplier bonus",
-      "refund": "Refund"
-    },
     "faction": {
       "label": "Faction",
       "chooseFaction": "Choose faction",
@@ -358,7 +335,7 @@
       "lockedLevel": "Level {level}",
       "lockedAchievement": "Achievement",
       "lockedShop": "Shop",
-      "loading": "Loading cosmetics\u2026",
+      "loading": "Loading cosmetics…",
       "error": "Could not load cosmetic catalog",
       "noItems": "No cosmetics in this category yet",
       "active": "Active: {name}",
@@ -400,50 +377,172 @@
       "yourCoins": "Your coins",
       "yourStreak": "Your streak",
       "yourAchievements": "Your achievements",
-      "quickNav": "Quick navigation"
+      "quickNav": "Quick navigation",
+      "pageTitle": "DIN RESA",
+      "pageSubtitle": "Framsteg & belöningar"
     }
   },
   "cosmetics": {
-    "void_stars": { "name": "Starfield", "description": "A glittering starfield background" },
-    "void_orbit": { "name": "Orbital", "description": "Particles orbiting your avatar" },
-    "void_warp": { "name": "Hyperspace", "description": "A warp-speed XP bar" },
-    "void_meteors": { "name": "Meteors", "description": "Falling meteors in the background" },
-    "void_nebula": { "name": "Nebula", "description": "A cosmic nebula divider" },
-    "void_constellation": { "name": "Constellation", "description": "A glowing constellation frame" },
-    "sea_bubbles": { "name": "Bubbles", "description": "Rising bubbles in the background" },
-    "sea_ripple": { "name": "Ripple", "description": "Rippling water particles" },
-    "sea_current": { "name": "Current", "description": "A flowing XP bar" },
-    "sea_waves": { "name": "Waves", "description": "Rolling waves in the background" },
-    "sea_tide": { "name": "Tide", "description": "A tide-themed divider" },
-    "sea_coral": { "name": "Coral Reef", "description": "A beautiful coral frame" },
-    "forest_leaves": { "name": "Leaves", "description": "Drifting leaves in the background" },
-    "forest_spores": { "name": "Spores", "description": "Glowing forest particles" },
-    "forest_growth": { "name": "Growth", "description": "An organic XP bar" },
-    "forest_fireflies": { "name": "Fireflies", "description": "Glowing fireflies in the background" },
-    "forest_roots": { "name": "Roots", "description": "A natural root divider" },
-    "forest_vines": { "name": "Vines", "description": "A winding vine frame" },
-    "desert_clouds": { "name": "Clouds", "description": "Drifting clouds in the background" },
-    "desert_halo": { "name": "Halo", "description": "A glowing halo effect" },
-    "desert_rainbow": { "name": "Rainbow", "description": "A shimmering rainbow XP bar" },
-    "desert_rays": { "name": "God Rays", "description": "Pulsing light rays" },
-    "desert_breeze": { "name": "Breeze", "description": "A gentle breeze divider" },
-    "desert_aurora": { "name": "Aurora", "description": "A shimmering aurora frame" },
-    "forest_title_lv1": { "name": "Forest Apprentice", "description": "Starting title for the Forest faction" },
-    "forest_title_lv5": { "name": "Forest Warden", "description": "Level 5 title in Forest" },
-    "forest_title_lv10": { "name": "Master of the Leaf Song", "description": "Level 10 title in Forest" },
-    "forest_title_lv20": { "name": "Ancient of the Forest", "description": "Level 20 title in Forest" },
-    "sea_title_lv1": { "name": "Shore Walker", "description": "Starting title for the Sea faction" },
-    "sea_title_lv5": { "name": "Tidekeeper", "description": "Level 5 title in Sea" },
-    "sea_title_lv10": { "name": "Lord of the Corals", "description": "Level 10 title in Sea" },
-    "sea_title_lv20": { "name": "Ruler of the Deep", "description": "Level 20 title in Sea" },
-    "desert_title_lv1": { "name": "Sand Novice", "description": "Starting title for the Desert faction" },
-    "desert_title_lv5": { "name": "Sun's Messenger", "description": "Level 5 title in Desert" },
-    "desert_title_lv10": { "name": "The Sandstorm", "description": "Level 10 title in Desert" },
-    "desert_title_lv20": { "name": "Heir of the Sun", "description": "Level 20 title in Desert" },
-    "void_title_lv1": { "name": "Space Wanderer", "description": "Starting title for the Void faction" },
-    "void_title_lv5": { "name": "Star Weaver", "description": "Level 5 title in Void" },
-    "void_title_lv10": { "name": "Nebula Guardian", "description": "Level 10 title in Void" },
-    "void_title_lv20": { "name": "Cosmic Overlord", "description": "Level 20 title in Void" }
+    "void_stars": {
+      "name": "Starfield",
+      "description": "A glittering starfield background"
+    },
+    "void_orbit": {
+      "name": "Orbital",
+      "description": "Particles orbiting your avatar"
+    },
+    "void_warp": {
+      "name": "Hyperspace",
+      "description": "A warp-speed XP bar"
+    },
+    "void_meteors": {
+      "name": "Meteors",
+      "description": "Falling meteors in the background"
+    },
+    "void_nebula": {
+      "name": "Nebula",
+      "description": "A cosmic nebula divider"
+    },
+    "void_constellation": {
+      "name": "Constellation",
+      "description": "A glowing constellation frame"
+    },
+    "sea_bubbles": {
+      "name": "Bubbles",
+      "description": "Rising bubbles in the background"
+    },
+    "sea_ripple": {
+      "name": "Ripple",
+      "description": "Rippling water particles"
+    },
+    "sea_current": {
+      "name": "Current",
+      "description": "A flowing XP bar"
+    },
+    "sea_waves": {
+      "name": "Waves",
+      "description": "Rolling waves in the background"
+    },
+    "sea_tide": {
+      "name": "Tide",
+      "description": "A tide-themed divider"
+    },
+    "sea_coral": {
+      "name": "Coral Reef",
+      "description": "A beautiful coral frame"
+    },
+    "forest_leaves": {
+      "name": "Leaves",
+      "description": "Drifting leaves in the background"
+    },
+    "forest_spores": {
+      "name": "Spores",
+      "description": "Glowing forest particles"
+    },
+    "forest_growth": {
+      "name": "Growth",
+      "description": "An organic XP bar"
+    },
+    "forest_fireflies": {
+      "name": "Fireflies",
+      "description": "Glowing fireflies in the background"
+    },
+    "forest_roots": {
+      "name": "Roots",
+      "description": "A natural root divider"
+    },
+    "forest_vines": {
+      "name": "Vines",
+      "description": "A winding vine frame"
+    },
+    "desert_clouds": {
+      "name": "Clouds",
+      "description": "Drifting clouds in the background"
+    },
+    "desert_halo": {
+      "name": "Halo",
+      "description": "A glowing halo effect"
+    },
+    "desert_rainbow": {
+      "name": "Rainbow",
+      "description": "A shimmering rainbow XP bar"
+    },
+    "desert_rays": {
+      "name": "God Rays",
+      "description": "Pulsing light rays"
+    },
+    "desert_breeze": {
+      "name": "Breeze",
+      "description": "A gentle breeze divider"
+    },
+    "desert_aurora": {
+      "name": "Aurora",
+      "description": "A shimmering aurora frame"
+    },
+    "forest_title_lv1": {
+      "name": "Forest Apprentice",
+      "description": "Starting title for the Forest faction"
+    },
+    "forest_title_lv5": {
+      "name": "Forest Warden",
+      "description": "Level 5 title in Forest"
+    },
+    "forest_title_lv10": {
+      "name": "Master of the Leaf Song",
+      "description": "Level 10 title in Forest"
+    },
+    "forest_title_lv20": {
+      "name": "Ancient of the Forest",
+      "description": "Level 20 title in Forest"
+    },
+    "sea_title_lv1": {
+      "name": "Shore Walker",
+      "description": "Starting title for the Sea faction"
+    },
+    "sea_title_lv5": {
+      "name": "Tidekeeper",
+      "description": "Level 5 title in Sea"
+    },
+    "sea_title_lv10": {
+      "name": "Lord of the Corals",
+      "description": "Level 10 title in Sea"
+    },
+    "sea_title_lv20": {
+      "name": "Ruler of the Deep",
+      "description": "Level 20 title in Sea"
+    },
+    "desert_title_lv1": {
+      "name": "Sand Novice",
+      "description": "Starting title for the Desert faction"
+    },
+    "desert_title_lv5": {
+      "name": "Sun's Messenger",
+      "description": "Level 5 title in Desert"
+    },
+    "desert_title_lv10": {
+      "name": "The Sandstorm",
+      "description": "Level 10 title in Desert"
+    },
+    "desert_title_lv20": {
+      "name": "Heir of the Sun",
+      "description": "Level 20 title in Desert"
+    },
+    "void_title_lv1": {
+      "name": "Space Wanderer",
+      "description": "Starting title for the Void faction"
+    },
+    "void_title_lv5": {
+      "name": "Star Weaver",
+      "description": "Level 5 title in Void"
+    },
+    "void_title_lv10": {
+      "name": "Nebula Guardian",
+      "description": "Level 10 title in Void"
+    },
+    "void_title_lv20": {
+      "name": "Cosmic Overlord",
+      "description": "Level 20 title in Void"
+    }
   },
   "browse": {
     "pageTitle": "Explore",
@@ -469,7 +568,6 @@
       "apply": "Apply",
       "showLiked": "Show liked",
       "showLikedDescription": "Only show games you have liked",
-
       "purpose": "Purpose",
       "energy": {
         "label": "Energy",
@@ -494,7 +592,6 @@
       "subPurpose": "Sub-purpose",
       "age": "Age",
       "players": "Players",
-
       "playMode": {
         "label": "Play mode",
         "basic": "Simple play",
@@ -512,7 +609,6 @@
         "medium": "Medium",
         "hard": "Hard"
       },
-
       "group": {
         "basic": "Filter",
         "facilitator": "Facilitator",
@@ -520,11 +616,9 @@
         "material": "Materials",
         "advanced": "Advanced"
       },
-
       "super": {
         "title": "Advanced filters"
       },
-
       "showAdvanced": "Show more filters",
       "hideAdvanced": "Hide advanced filters"
     },
@@ -594,7 +688,7 @@
       "title": "Add to plan",
       "description": "Choose a plan to add \"{gameName}\" to.",
       "addButton": "Add",
-      "adding": "Adding\u2026",
+      "adding": "Adding…",
       "added": "Added",
       "openPlan": "Open plan",
       "addedToPlan": "Added to {planName}",
@@ -1014,7 +1108,9 @@
       "inProgress": "In progress",
       "lastActive": "last active {time}",
       "progress": "{current} of {total}"
-    }
+    },
+    "pageHeaderTitle": "PLANERA",
+    "pageSubtitle": "Mina planer"
   },
   "admin": {
     "pageHeader": {
@@ -1041,7 +1137,9 @@
     "confirm": {
       "defaultConfirm": "Confirm",
       "defaultCancel": "Cancel",
-      "typeToConfirm": "Type the following to confirm:"
+      "typeToConfirm": "Type the following to confirm:",
+      "waiting": "Vänta...",
+      "typePlaceholder": "Skriv {confirmText} för att bekräfta"
     },
     "commandPalette": {
       "searchPlaceholder": "Search commands, navigate...",
@@ -1266,7 +1364,9 @@
           "cancel": "Cancel",
           "deleteMapping": "Remove mapping",
           "copy": "Copy",
-          "copyKeyAria": "Copy template key"
+          "copyKeyAria": "Copy template key",
+          "showCoverage": "Visa täckning",
+          "hideCoverage": "Dölj täckning"
         },
         "create": {
           "title": "Create default image mapping",
@@ -1283,7 +1383,16 @@
           "subPurposeLabel": "Sub-purpose (optional)",
           "subPurposePlaceholder": "Select sub-purpose",
           "subPurposeNone": "None",
-          "selectImageLabel": "Select image *"
+          "selectImageLabel": "Select image *",
+          "templateKeyAutoGenerated": "Genereras automatiskt baserat på produkt och syfte",
+          "showAdvanced": "Anpassa",
+          "hideAdvanced": "Dölj",
+          "nameAutoGenerated": "Genereras automatiskt från produkt- och syfteval",
+          "existingTemplatesTitle": "Befintliga bilder för denna kombination",
+          "noExistingTemplates": "Inga bilder ännu för denna kombination",
+          "slotsUsed": "platser",
+          "slotsFull": "Max antal bilder för denna kombination är uppnått",
+          "slotsFullHint": "Ta bort en befintlig standardbild ovan för att frigöra en plats."
         },
         "list": {
           "title": "Existing default images ({count})",
@@ -1315,7 +1424,23 @@
           "deleted": "Default image removed",
           "deleteFailed": "Could not remove default image",
           "copied": "Copied",
-          "copyFailed": "Could not copy"
+          "copyFailed": "Could not copy",
+          "slotLimitReached": "Det finns redan 5 standardbilder för denna kombination. Ta bort en innan du lägger till en ny.",
+          "duplicateKey": "En mall med denna nyckel finns redan.",
+          "conflict": "Kunde inte skapa standardbild på grund av en konflikt. Försök igen."
+        },
+        "automation": {
+          "hint": "Dessa bilder används automatiskt vid import och bulk-operationer."
+        },
+        "coverage": {
+          "title": "Täckningsmatris",
+          "description": "Visar antal standardbilder per kombination av produkt och huvudsyfte. Spel får automatiskt en bild vid import om kombination har täckning.",
+          "purpose": "Syfte",
+          "global": "Global",
+          "total": "Totalt",
+          "noPurposes": "Inga syften hittades.",
+          "hasCoverage": "Har standardbilder",
+          "missingCoverage": "Saknar standardbilder"
         }
       }
     },
@@ -1348,6 +1473,55 @@
           "unresolved": "No unresolved errors! 🎉",
           "resolved": "No resolved errors yet",
           "all": "No errors reported"
+        },
+        "form": {
+          "loading": "Laddar...",
+          "errors": {
+            "loadFailed": "Kunde inte ladda spel",
+            "saveFailed": "Misslyckades att spara",
+            "unexpected": "Ett fel uppstod"
+          },
+          "messages": {
+            "saved": "Sparat!"
+          },
+          "core": {
+            "nameLabel": "Namn",
+            "statusLabel": "Status",
+            "statusDraft": "Utkast",
+            "statusPublished": "Publicerad",
+            "shortDescriptionLabel": "Kort beskrivning",
+            "shortDescriptionHelp": "Visas i spelbiblioteket och hjälper spelare välja rätt spel.",
+            "fullDescriptionLabel": "Full beskrivning",
+            "fullDescriptionHelp": "Detaljerad beskrivning som visas när spelet öppnas. Förklara temat och upplägget.",
+            "timeMinutesLabel": "Tid (min)",
+            "timeMinutesHelp": "Uppskattad speltid i minuter.",
+            "minPlayersLabel": "Spelare min",
+            "minPlayersHelp": "Minsta antal deltagare.",
+            "maxPlayersLabel": "Spelare max",
+            "maxPlayersHelp": "Max antal deltagare som kan delta."
+          },
+          "materials": {
+            "title": "Material & säkerhet",
+            "itemsLabel": "Material (ett per rad)",
+            "safetyLabel": "Säkerhet",
+            "preparationLabel": "Förberedelser"
+          },
+          "steps": {
+            "title": "Steg / Instruktioner",
+            "addStep": "Lägg till steg",
+            "stepLabel": "Steg {index}",
+            "remove": "Ta bort",
+            "titleLabel": "Titel",
+            "titlePlaceholder": "Ex. Starta leken",
+            "descriptionLabel": "Beskrivning",
+            "descriptionPlaceholder": "Vad ska deltagarna göra?",
+            "durationLabel": "Tid (sekunder)",
+            "durationPlaceholder": "t.ex. 60"
+          },
+          "actions": {
+            "save": "Spara",
+            "saving": "Sparar..."
+          }
         }
       },
       "details": {
@@ -1642,52 +1816,92 @@
         },
         "confirm": {
           "usageMessage": "This purpose is used by:\n- {gamesMain} games (main)\n- {gamesSecondary} games (secondary)\n- {products} products\n- {media} media\n- {childSubs} sub-purposes (will be deleted)\nIt will be detached and deleted. Do you want to continue?"
+        },
+        "cookiePolicy": {
+          "fallbackTitle": "Cookiepolicy",
+          "pendingContent": "Cookiepolicy publiceras snart.",
+          "noCookies": "Inga cookies registrerade ännu.",
+          "manageDescription": "Du kan när som helst ändra dina cookie-inställningar genom att klicka på knappen nedan."
         }
       }
     },
     "licenses": {
-      "confirmReset": {
-        "title": "Reset trigger?",
-        "description": "This will reset the trigger “{name}” so it can be fired again.",
-        "cancel": "Cancel",
-        "confirm": "Reset"
-      },
       "legacy": {
-        "pageTitle": "Licenses",
         "pageDescription": "Overview of customer licenses, status and usage.",
         "notLoggedIn": "You are not logged in",
-        "notLoggedInDescription": "Log in to view licenses.",
-        "errorTitle": "An error occurred",
-        "loading": "Loading licenses...",
         "searchPlaceholder": "Search organization or product",
         "stats": {
-          "total": "Total",
-          "active": "Active",
-          "trial": "Trial",
           "expired": "Expired"
         },
-        "status": {
-          "active": "Active",
-          "trial": "Trial",
-          "expired": "Expired",
-          "suspended": "Suspended"
-        },
-        "filter": {
-          "all": "All statuses"
-        },
-        "empty": {
-          "noLicenses": "No licenses",
-          "noLicensesDescription": "No licenses found with current filters."
-        },
-        "unknownOrg": "Unknown org",
-        "plan": "Annual",
-        "seatsLabel": "Plan: {plan} • Seats: {used}/{total}",
-        "validLabel": "Valid: {start} – {end}",
         "loginToSee": "Log in to see licenses.",
         "errorOccurred": "An error occurred",
         "planSeats": "Plan: {plan} • Seats: {used}/{total}",
         "validPeriod": "Valid: {start} – {end}"
-      }
+      },
+      "title": "Licenser",
+      "description": "Hantera alla licenser – personliga och organisationer",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "licenses": "Licenser"
+      },
+      "stats": {
+        "total": "Totalt",
+        "active": "Aktiva",
+        "private": "Personliga",
+        "organization": "Organisationer"
+      },
+      "filter": {
+        "searchPlaceholder": "Sök e-post, organisation...",
+        "typeAll": "Alla typer",
+        "typePrivate": "Personliga",
+        "typeOrganization": "Organisationer",
+        "statusAll": "Alla status",
+        "statusActive": "Aktiv",
+        "statusInactive": "Inaktiv",
+        "statusRevoked": "Återkallad",
+        "statusExpired": "Utgången"
+      },
+      "type": {
+        "private": "Personlig",
+        "organization": "Organisation"
+      },
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "revoked": "Återkallad",
+        "expired": "Utgången"
+      },
+      "seats": "platser",
+      "grantButton": "Skapa personlig licens",
+      "noLicenses": "Inga licenser hittades",
+      "noLicensesHint": "Justera filter eller skapa en ny licens",
+      "grantSuccess": "Personlig licens skapad",
+      "grantDialog": {
+        "title": "Skapa personlig licens",
+        "description": "Tilldela en licens till en privatperson. Användaren måste redan ha ett konto.",
+        "userEmail": "Användarens e-post",
+        "userEmailPlaceholder": "namn@exempel.se",
+        "userEmailHint": "Användaren måste redan ha ett konto i systemet",
+        "product": "Produkt",
+        "selectProduct": "Välj produkt",
+        "loadingProducts": "Laddar produkter...",
+        "noProducts": "Inga produkter tillgängliga",
+        "seats": "Antal platser",
+        "seatsHint": "Antal platser som ingår i licensen",
+        "validUntil": "Giltig till (valfritt)",
+        "notes": "Anteckningar (valfritt)",
+        "notesPlaceholder": "T.ex. support-ärende #123",
+        "cancel": "Avbryt",
+        "grant": "Skapa licens",
+        "granting": "Skapar...",
+        "submit": "Skapa licens",
+        "submitting": "Skapar...",
+        "validation": {
+          "required": "Fyll i alla obligatoriska fält",
+          "invalidEmail": "Ange en giltig e-postadress"
+        }
+      },
+      "loadError": "Kunde inte ladda licenser"
     },
     "leaderboard": {
       "legacy": {
@@ -2239,7 +2453,8 @@
           "createFailed": "Could not create entitlement.",
           "entitlementRevoked": "Entitlement revoked.",
           "revokeFailed": "Could not revoke entitlement."
-        }
+        },
+        "noProducts": "Inga produkter tillgängliga"
       },
       "billing": {
         "paymentOverdue": "Payment overdue",
@@ -2329,7 +2544,29 @@
         "unknownUser": "Unknown user",
         "noEmail": "No email",
         "primaryContact": "Primary contact",
-        "member": "Member"
+        "member": "Member",
+        "licensing": {
+          "title": "Licenser",
+          "selectPlaceholder": "Välj licens…",
+          "emptyAssignments": "Inga aktiva plats-tilldelningar.",
+          "labels": {
+            "assignedAt": "Tilldelad {date}"
+          },
+          "actions": {
+            "assign": "Tilldela",
+            "release": "Släpp"
+          },
+          "errors": {
+            "unknownUserId": "Okänt user-id."
+          },
+          "toasts": {
+            "selectLicense": "Välj en licens.",
+            "seatAssigned": "Plats tilldelad.",
+            "assignFailed": "Kunde inte tilldela plats (ingen plats kvar eller redan tilldelad).",
+            "seatReleased": "Plats släppt.",
+            "releaseFailed": "Kunde inte släppa plats."
+          }
+        }
       },
       "licenses": {
         "title": "Licenses",
@@ -2489,77 +2726,112 @@
         }
       },
       "security": {
-        "pageTitle": "Security",
-        "pageDescription": "Manage security settings for the organization",
         "mfa": {
           "pageTitle": "MFA Policy",
           "pageDescription": "Manage two-factor authentication requirements for the organization",
-          "usersPageTitle": "MFA Status",
-          "usersPageDescription": "View and manage MFA status for all users in the organization",
-          "loading": "Loading...",
-          "loadingPolicy": "Loading MFA policy...",
-          "loadingUsers": "Loading users...",
-          "error": "An error occurred",
-          "retry": "Retry",
-          "notFound": "Organization not found",
-          "accessDenied": "You do not have access to manage MFA for this organization",
-          "policyCard": {
-            "title": "MFA Policy",
-            "description": "Manage requirements for two-factor authentication"
-          },
           "policy": {
-            "optional": "Optional",
-            "optionalDescription": "Users can choose to enable MFA",
-            "recommended": "Recommended",
-            "recommendedDescription": "Users are encouraged to enable MFA but it is not required",
-            "required": "Required",
-            "requiredDescription": "All users must enable MFA",
             "gracePeriod": "Grace period",
-            "gracePeriodDescription": "Number of days users have to enable MFA after the policy becomes required",
-            "days": "{count} days",
-            "day": "{count} day",
-            "saveChanges": "Save changes",
-            "saving": "Saving...",
-            "saved": "Changes saved",
-            "saveError": "Could not save changes"
+            "enabled": "MFA-krav aktiverat",
+            "enabledDescription": "Användare måste konfigurera tvåfaktorsautentisering enligt vald policy.",
+            "disabled": "MFA valfritt",
+            "disabledDescription": "Användare kan aktivera MFA frivilligt.",
+            "enforcementLevel": "Nivå av tvång",
+            "gracePeriodHelp": "Hur lång tid användare har på sig att aktivera MFA efter att kravet införts.",
+            "trustedDevices": "Betrodda enheter",
+            "trustedDevicesEnabled": "Tillåt betrodda enheter",
+            "trustedDevicesDescription": "Användare kan markera enheter som betrodda för att slippa MFA vid varje inloggning.",
+            "trustedDeviceDuration": "Enhet betrodd i"
           },
           "stats": {
-            "title": "MFA Statistics",
-            "enrolled": "Enrolled",
-            "enrolledDescription": "Users who have enabled MFA",
-            "notEnrolled": "Not enrolled",
-            "notEnrolledDescription": "Users who have not enabled MFA",
-            "percentage": "{percentage}% of all users"
+            "totalUsers": "Totalt användare",
+            "mfaEnabled": "MFA aktiverad",
+            "mfaRequired": "MFA krävs",
+            "inGracePeriod": "I respitperiod"
           },
           "users": {
-            "title": "Users",
-            "viewAll": "View all",
-            "email": "Email",
-            "name": "Name",
-            "status": "MFA Status",
-            "role": "Role",
-            "enrolledAt": "Enrolled",
-            "actions": "Actions",
-            "noUsers": "No users found",
-            "enrolled": "Enabled",
-            "notEnrolled": "Not enabled",
-            "owner": "Owner",
-            "admin": "Admin",
-            "member": "Member",
-            "resetMfa": "Reset MFA",
-            "resetConfirm": "Are you sure you want to reset MFA for this user? They will need to set up MFA again.",
-            "resetSuccess": "MFA has been reset for the user",
-            "resetError": "Could not reset MFA",
+            "status": {
+              "enabled": "Aktiverad",
+              "required": "Krävs",
+              "gracePeriod": "Respitperiod",
+              "disabled": "Inaktiverad"
+            },
+            "actions": {
+              "resetMFA": "Återställ MFA"
+            },
             "filterAll": "All",
-            "filterEnrolled": "Enrolled",
-            "filterNotEnrolled": "Not enrolled",
-            "search": "Search users...",
             "pagination": {
               "previous": "Previous",
               "next": "Next",
               "page": "Page {current} of {total}",
               "showing": "Showing {from}-{to} of {total}"
+            },
+            "pageTitle": "Användare & MFA",
+            "pageDescription": "Visa och hantera MFA-status för användare i organisationen",
+            "searchPlaceholder": "Sök användare...",
+            "filterEnabled": "MFA aktiverad",
+            "filterDisabled": "MFA inaktiverad",
+            "filterRequired": "MFA krävs",
+            "filterGracePeriod": "I respitperiod",
+            "refresh": "Uppdatera",
+            "columns": {
+              "user": "Användare",
+              "role": "Roll",
+              "mfaStatus": "MFA-status",
+              "enrolledAt": "Aktiverad",
+              "trustedDevices": "Betrodda enheter",
+              "actions": "Åtgärder"
+            },
+            "roles": {
+              "owner": "Ägare",
+              "admin": "Admin",
+              "editor": "Redaktör",
+              "member": "Medlem"
+            },
+            "empty": {
+              "title": "Inga användare hittades",
+              "description": "Prova att ändra dina sökkriterier",
+              "noUsersTitle": "Det finns inga användare i den här organisationen"
+            },
+            "tip": {
+              "adminTip": "Som administratör kan du konfigurera MFA-policyn för organisationen under"
             }
+          },
+          "breadcrumb": {
+            "settings": "Inställningar",
+            "security": "Säkerhet"
+          },
+          "enforcement": {
+            "optional": "Valfritt",
+            "optionalDescription": "Användare kan aktivera MFA om de vill, men det krävs inte.",
+            "adminsRequired": "Endast administratörer",
+            "adminsRequiredDescription": "Ägare och administratörer måste aktivera MFA. Vanliga användare kan välja.",
+            "allUsers": "Alla användare",
+            "allUsersDescription": "Alla användare i organisationen måste aktivera MFA."
+          },
+          "gracePeriodOptions": {
+            "immediate": "Ingen (omedelbart)",
+            "days3": "3 dagar",
+            "days7": "7 dagar",
+            "days14": "14 dagar",
+            "days30": "30 dagar"
+          },
+          "deviceTrustOptions": {
+            "days7": "7 dagar",
+            "days14": "14 dagar",
+            "days30": "30 dagar",
+            "days60": "60 dagar",
+            "days90": "90 dagar"
+          },
+          "actions": {
+            "save": "Spara ändringar",
+            "saving": "Sparar...",
+            "reset": "Återställ"
+          },
+          "messages": {
+            "loadError": "Kunde inte ladda MFA-policy",
+            "saveSuccess": "MFA-policy sparad",
+            "saveError": "Kunde inte spara policy",
+            "retry": "Försök igen"
           }
         }
       },
@@ -2630,6 +2902,93 @@
           "activateDescription": "Do you want to activate \"{name}\"?",
           "deleteLabel": "Delete",
           "confirmLabel": "Confirm"
+        },
+        "drawer": {
+          "editTitle": "Redigera utmärkelse",
+          "createTitle": "Skapa utmärkelse",
+          "editDescription": "Ändra inställningar för denna utmärkelse.",
+          "createDescription": "Skapa en ny utmärkelse för din organisation.",
+          "namePlaceholder": "T.ex. Första spelet",
+          "descriptionPlaceholder": "Beskriv hur man uppnår denna utmärkelse...",
+          "thresholdPlaceholder": "T.ex. 10"
+        },
+        "labels": {
+          "name": "Namn",
+          "description": "Beskrivning",
+          "key": "Nyckel (valfritt)",
+          "keyPlaceholder": "t.ex. first-game",
+          "keyHelper": "Unik identifierare för programmatisk referens. Endast små bokstäver, siffror, bindestreck och understreck.",
+          "condition": "Villkor",
+          "threshold": "Tröskelvärde",
+          "thresholdHelper": "Antal som krävs för att uppnå utmärkelsen.",
+          "status": "Status"
+        },
+        "conditions": {
+          "manual": "Manuell",
+          "manualDesc": "Tilldelas manuellt av admin",
+          "gamesPlayed": "Spelade spel",
+          "gamesPlayedDesc": "Efter ett antal spelade spel",
+          "scoreReached": "Poäng uppnådd",
+          "scoreReachedDesc": "När en viss poängnivå nås",
+          "streak": "Streak",
+          "streakDesc": "Efter ett antal dagar i rad",
+          "firstGame": "Första spelet",
+          "firstGameDesc": "När användaren spelar sitt första spel",
+          "perfectScore": "Perfekt poäng",
+          "perfectScoreDesc": "När användaren får max poäng"
+        },
+        "statusOptions": {
+          "draft": "Utkast",
+          "draftDesc": "Ej synlig eller delbar",
+          "active": "Aktiv",
+          "activeDesc": "Synlig och kan delas ut",
+          "archived": "Arkiverad",
+          "archivedDesc": "Dold från listor"
+        },
+        "award": {
+          "title": "Dela ut utmärkelse",
+          "description": "Dela ut \"{name}\" till medlemmar i din organisation.",
+          "selectRecipients": "Välj mottagare",
+          "searchPlaceholder": "Sök medlemmar...",
+          "selectAll": "Välj alla ({count})",
+          "clearSelection": "Rensa ({count})",
+          "usersSelected": "{count} användare valda",
+          "messageLabel": "Meddelande (valfritt)",
+          "messagePlaceholder": "Grattis till din nya utmärkelse!",
+          "messageHelper": "Visas för mottagarna när de får utmärkelsen.",
+          "unknownUser": "Okänd användare",
+          "member": "medlem",
+          "cancel": "Avbryt",
+          "awarding": "Tilldelar...",
+          "awardToUsers": "Dela ut till {count} användare",
+          "errors": {
+            "couldNotLoadMembers": "Kunde inte ladda medlemmar",
+            "selectAtLeastOne": "Välj minst en mottagare",
+            "couldNotAward": "Kunde inte dela ut utmärkelse",
+            "unexpected": "Ett oväntat fel uppstod"
+          },
+          "noMembersMatchSearch": "Inga medlemmar matchar sökningen",
+          "noMembersInOrg": "Inga medlemmar i organisationen"
+        },
+        "errors": {
+          "couldNotUpdate": "Kunde inte uppdatera utmärkelse",
+          "couldNotCreate": "Kunde inte skapa utmärkelse",
+          "unexpected": "Ett oväntat fel uppstod"
+        }
+      },
+      "dashboard": {
+        "title": "Organisation",
+        "welcome": "Välkommen till din organisationsöversikt.",
+        "quickActions": "Snabbåtgärder",
+        "underDevelopment": "Fler snabbåtgärder kommer snart.",
+        "cards": {
+          "members": "Medlemmar",
+          "membersDescription": "Totalt antal medlemmar",
+          "activeSessions": "Aktiva sessioner",
+          "activeSessionsDescription": "Senaste 30 dagarna",
+          "subscription": "Prenumeration",
+          "subscriptionActive": "Aktiv",
+          "nextInvoice": "Nästa faktura: {date}"
         }
       }
     },
@@ -3048,202 +3407,6 @@
           "draft": "Draft",
           "active": "Active",
           "archived": "Archived"
-        },
-        "badgePicker": {
-          "title": "Select Badge",
-          "description": "Choose a badge from the library to use as an icon.",
-          "searchPlaceholder": "Search badge...",
-          "noSearchResults": "No badges match your search.",
-          "noBadges": "No badges found in the library.",
-          "createHint": "Create badges in Badge Builder under Library.",
-          "availableCount": "{count, plural, one {# badge} other {# badges}} available",
-          "cancel": "Cancel",
-          "select": "Select Badge"
-        },
-        "editor": {
-          "title": {
-            "edit": "Edit achievement",
-            "create": "Create new achievement"
-          },
-          "description": {
-            "edit": "Update achievement settings below.",
-            "create": "Fill in the information below to create a new achievement."
-          },
-          "fields": {
-            "name": {
-              "label": "Name *",
-              "placeholder": "e.g. First game"
-            },
-            "description": {
-              "label": "Description",
-              "placeholder": "Describe how to earn this achievement..."
-            },
-            "badge": {
-              "label": "Badge/Icon",
-              "select": "Select Badge",
-              "change": "Change Badge"
-            },
-            "scope": {
-              "label": "Scope *"
-            },
-            "tenant": {
-              "label": "Organization *",
-              "placeholder": "Select organization"
-            },
-            "conditionType": {
-              "label": "Trigger *"
-            },
-            "conditionValue": {
-              "gamesPlayed": "Games played",
-              "scoreReached": "Score to reach",
-              "streak": "Number of days",
-              "placeholder": "Enter value..."
-            },
-            "status": {
-              "label": "Status"
-            }
-          },
-          "scope": {
-            "global": {
-              "label": "Global",
-              "description": "Visible to all users"
-            },
-            "tenant": {
-              "label": "Tenant",
-              "description": "Visible within a specific organization"
-            },
-            "private": {
-              "label": "Private",
-              "description": "Visible only to assigned users"
-            }
-          },
-          "conditions": {
-            "manual": {
-              "label": "Manual",
-              "description": "Awarded manually by admin"
-            },
-            "gamesPlayed": {
-              "label": "Games played",
-              "description": "After a number of games played"
-            },
-            "scoreReached": {
-              "label": "Score reached",
-              "description": "When a certain score is reached"
-            },
-            "streak": {
-              "label": "Streak",
-              "description": "After a number of days in a row"
-            },
-            "firstGame": {
-              "label": "First game",
-              "description": "When the user plays their first game"
-            },
-            "perfectScore": {
-              "label": "Perfect score",
-              "description": "When the user gets the max score"
-            }
-          },
-          "status": {
-            "draft": "Draft",
-            "active": "Active",
-            "archived": "Archived"
-          },
-          "actions": {
-            "cancel": "Cancel",
-            "saving": "Saving...",
-            "update": "Update",
-            "create": "Create"
-          },
-          "errors": {
-            "updateFailed": "Could not update achievement",
-            "createFailed": "Could not create achievement",
-            "unexpected": "An unexpected error occurred"
-          },
-          "steps": {
-            "layers": {
-              "name": "Layer Selection",
-              "description": "Choose base, backgrounds and symbol"
-            },
-            "themeColors": {
-              "name": "Theme & Colors",
-              "description": "Customize colors and theme"
-            },
-            "metadata": {
-              "name": "Metadata",
-              "description": "Title and description"
-            },
-            "publishing": {
-              "name": "Publishing",
-              "description": "Review and publish"
-            }
-          },
-          "themeAndColors": "Theme & Colors",
-          "themeAndColorsDescription": "Choose theme or customize colors individually for each layer.",
-          "randomizeColors": "Randomize colors",
-          "quickThemeSelect": "Quick theme select",
-          "customColorsPerLayer": "Custom colors per layer",
-          "foreground": "Foreground",
-          "layerLabels": {
-            "base": "Base",
-            "background": "Background",
-            "symbol": "Symbol"
-          },
-          "backgrounds": {
-            "label": "Background",
-            "black": "Black",
-            "white": "White",
-            "light": "Light",
-            "dark": "Dark",
-            "gray": "Gray",
-            "transparent": "Transparent"
-          },
-          "selectCustomColor": "Select custom color",
-          "custom": "Custom",
-          "customEllipsis": "Custom...",
-          "textColor": "Text color",
-          "selectCustomTextColor": "Select custom text color",
-          "circleBackground": "Circle background",
-          "customColor": "Custom color",
-          "cardBackground": "Card background"
-        },
-        "awardModal": {
-          "title": "Award achievement",
-          "description": "Award \"{name}\" to users.",
-          "mode": {
-            "tenant": "Whole organization",
-            "users": "Specific users"
-          },
-          "tenant": {
-            "label": "Organization",
-            "placeholder": "Select organization...",
-            "helper": "All users in {tenantName} will receive this achievement."
-          },
-          "users": {
-            "searchLabel": "Search users",
-            "searchPlaceholder": "Search by name or email...",
-            "noName": "No name",
-            "searching": "Searching...",
-            "noResults": "No users found",
-            "selectedLabel": "Selected users ({count})"
-          },
-          "message": {
-            "label": "Message (optional)",
-            "placeholder": "e.g. \"Congrats on completing the course!\"",
-            "helper": "This message will be shown to the user when they receive the achievement."
-          },
-          "actions": {
-            "cancel": "Cancel",
-            "awarding": "Awarding...",
-            "award": "Award"
-          },
-          "errors": {
-            "selectTenant": "Select an organization",
-            "fetchUsers": "Could not fetch users",
-            "noUsersInTenant": "No users found in this organization",
-            "selectUsers": "Select at least one user",
-            "awardFailed": "Could not award achievement",
-            "unexpected": "An unexpected error occurred"
-          }
         }
       },
       "statistics": {
@@ -3362,8 +3525,6 @@
         "connectionPool": "Connection pool"
       }
     },
-    "minutesShort": "{count} min",
-    "scriptLabel": "Script",
     "auditLog": {
       "pageTitle": "Audit Logs",
       "pageDescription": "Review all system activities and changes",
@@ -3493,52 +3654,6 @@
           "description": "Upload logos for light and dark mode. Recommended format: SVG or PNG with transparent background.",
           "light": "Logo (light mode)",
           "lightDesc": "Used on light backgrounds",
-          "loadingSession": "Loading session...",
-          "sessionCodeLabel": "Session code:",
-          "connection": {
-            "connected": "Connected",
-            "degraded": "Degraded",
-            "offline": "Offline"
-          },
-          "updatesTitle": "Updates",
-          "statusLabel": "Status",
-          "statusTitle": {
-            "lobby": "Waiting",
-            "live": "In progress",
-            "paused": "Paused",
-            "ended": "Ended",
-            "locked": "Locked"
-          },
-          "statusBadge": {
-            "lobby": "Waiting",
-            "live": "Live",
-            "paused": "Paused",
-            "ended": "Ended",
-            "locked": "Locked"
-          },
-          "pendingApproval": "Waiting for host approval…",
-          "nowTitle": "Right now",
-          "banner": {
-            "waiting": "Waiting for the host to start.",
-            "paused": "Paused. We'll be back soon.",
-            "locked": "The session is locked.",
-            "ended": "The session has ended. Thanks for joining.",
-            "degraded": "Connection is unstable. Showing the latest known state.",
-            "offline": "No connection. Please try again."
-          },
-          "events": {
-            "session_paused": "Session paused",
-            "session_resumed": "Session resumed",
-            "session_ended": "Session ended",
-            "session_locked": "Session locked",
-            "session_unlocked": "Session unlocked",
-            "host_message": "Message from host",
-            "participant_joined": "{name} joined",
-            "participant_left": "{name} left",
-            "role_changed": "Role updated",
-            "progress_updated": "Progress updated",
-            "achievement_unlocked": "Achievement unlocked"
-          },
           "dark": "Logo (dark mode)",
           "darkDesc": "Used on dark backgrounds"
         },
@@ -4183,6 +4298,202 @@
           "draft": "Draft",
           "active": "Active",
           "archived": "Archived"
+        },
+        "badgePicker": {
+          "title": "Välj Badge",
+          "description": "Välj en badge från biblioteket för att använda som ikon.",
+          "searchPlaceholder": "Sök badge...",
+          "noSearchResults": "Inga badges matchar din sökning.",
+          "noBadges": "Inga badges hittades i biblioteket.",
+          "createHint": "Skapa badges i Badge Builder under Bibliotek.",
+          "availableCount": "{count, plural, one {# badge} other {# badges}} tillgängliga",
+          "cancel": "Avbryt",
+          "select": "Välj Badge"
+        },
+        "editor": {
+          "title": {
+            "edit": "Redigera achievement",
+            "create": "Skapa nytt achievement"
+          },
+          "description": {
+            "edit": "Uppdatera achievement-inställningar nedan.",
+            "create": "Fyll i informationen nedan för att skapa ett nytt achievement."
+          },
+          "fields": {
+            "name": {
+              "label": "Namn *",
+              "placeholder": "T.ex. Första spelet"
+            },
+            "description": {
+              "label": "Beskrivning",
+              "placeholder": "Beskriv hur man uppnår detta achievement..."
+            },
+            "badge": {
+              "label": "Badge/Ikon",
+              "select": "Välj Badge",
+              "change": "Byt Badge"
+            },
+            "scope": {
+              "label": "Scope *"
+            },
+            "tenant": {
+              "label": "Organisation *",
+              "placeholder": "Välj organisation"
+            },
+            "conditionType": {
+              "label": "Trigger *"
+            },
+            "conditionValue": {
+              "gamesPlayed": "Antal spel",
+              "scoreReached": "Poäng att nå",
+              "streak": "Antal dagar",
+              "placeholder": "Ange värde..."
+            },
+            "status": {
+              "label": "Status"
+            }
+          },
+          "scope": {
+            "global": {
+              "label": "Global",
+              "description": "Synlig för alla användare"
+            },
+            "tenant": {
+              "label": "Tenant",
+              "description": "Synlig inom en specifik organisation"
+            },
+            "private": {
+              "label": "Privat",
+              "description": "Endast synlig för tilldelade användare"
+            }
+          },
+          "conditions": {
+            "manual": {
+              "label": "Manuell",
+              "description": "Tilldelas manuellt av admin"
+            },
+            "gamesPlayed": {
+              "label": "Spelade spel",
+              "description": "Efter ett antal spelade spel"
+            },
+            "scoreReached": {
+              "label": "Poäng uppnådd",
+              "description": "När en viss poängnivå nås"
+            },
+            "streak": {
+              "label": "Streak",
+              "description": "Efter ett antal dagar i rad"
+            },
+            "firstGame": {
+              "label": "Första spelet",
+              "description": "När användaren spelar sitt första spel"
+            },
+            "perfectScore": {
+              "label": "Perfekt poäng",
+              "description": "När användaren får max poäng"
+            }
+          },
+          "status": {
+            "draft": "Utkast",
+            "active": "Aktiv",
+            "archived": "Arkiverad"
+          },
+          "actions": {
+            "cancel": "Avbryt",
+            "saving": "Sparar...",
+            "update": "Uppdatera",
+            "create": "Skapa"
+          },
+          "errors": {
+            "updateFailed": "Kunde inte uppdatera achievement",
+            "createFailed": "Kunde inte skapa achievement",
+            "unexpected": "Ett oväntat fel uppstod"
+          },
+          "steps": {
+            "layers": {
+              "name": "Lagerval",
+              "description": "Välj bas, bakgrunder och symbol"
+            },
+            "themeColors": {
+              "name": "Tema & Färger",
+              "description": "Anpassa färger och tema"
+            },
+            "metadata": {
+              "name": "Metadata",
+              "description": "Titel och beskrivning"
+            },
+            "publishing": {
+              "name": "Publicering",
+              "description": "Granska och publicera"
+            }
+          },
+          "themeAndColors": "Tema & Färger",
+          "themeAndColorsDescription": "Välj tema eller anpassa färger individuellt för varje lager.",
+          "randomizeColors": "Slumpa färger",
+          "quickThemeSelect": "Snabbval tema",
+          "customColorsPerLayer": "Anpassade färger per lager",
+          "foreground": "Förgrund",
+          "layerLabels": {
+            "base": "Bas",
+            "background": "Bakgrund",
+            "symbol": "Symbol"
+          },
+          "backgrounds": {
+            "label": "Bakgrund",
+            "black": "Svart",
+            "white": "Vit",
+            "light": "Ljus",
+            "dark": "Mörk",
+            "gray": "Grå",
+            "transparent": "Transparent"
+          },
+          "selectCustomColor": "Välj anpassad färg",
+          "custom": "Anpassad",
+          "customEllipsis": "Anpassad...",
+          "textColor": "Textfärg",
+          "selectCustomTextColor": "Välj anpassad textfärg",
+          "circleBackground": "Cirkelbakgrund",
+          "customColor": "Anpassad färg",
+          "cardBackground": "Kortbakgrund"
+        },
+        "awardModal": {
+          "title": "Tilldela achievement",
+          "description": "Tilldela \"{name}\" till användare.",
+          "mode": {
+            "tenant": "Hel organisation",
+            "users": "Specifika användare"
+          },
+          "tenant": {
+            "label": "Organisation",
+            "placeholder": "Välj organisation...",
+            "helper": "Alla användare i {tenantName} kommer att få detta achievement."
+          },
+          "users": {
+            "searchLabel": "Sök användare",
+            "searchPlaceholder": "Sök på namn eller e-post...",
+            "noName": "Inget namn",
+            "searching": "Söker...",
+            "noResults": "Inga användare hittades",
+            "selectedLabel": "Valda användare ({count})"
+          },
+          "message": {
+            "label": "Meddelande (valfritt)",
+            "placeholder": "T.ex. \"Grattis till avslutad kurs!\"",
+            "helper": "Detta meddelande kommer att visas för användaren när de får sitt achievement."
+          },
+          "actions": {
+            "cancel": "Avbryt",
+            "awarding": "Tilldelar...",
+            "award": "Tilldela"
+          },
+          "errors": {
+            "selectTenant": "Välj en organisation",
+            "fetchUsers": "Kunde inte hämta användare",
+            "noUsersInTenant": "Inga användare hittades i denna organisation",
+            "selectUsers": "Välj minst en användare",
+            "awardFailed": "Kunde inte tilldela achievement",
+            "unexpected": "Ett oväntat fel uppstod"
+          }
         }
       },
       "shopRewards": {
@@ -4939,7 +5250,51 @@
           "step3": "<strong>Repair</strong> in your file and run dry-run again.",
           "step4": "<strong>Import</strong> only when dry-run shows green."
         },
-        "infoDialogTitle": "Information about games"
+        "infoDialogTitle": "Information about games",
+        "title": "Importera spel",
+        "description": "Ladda upp en CSV- eller JSON-fil för att importera spel.",
+        "formatNote": "Stöder CSV (massimport) och JSON (full fidelity).",
+        "format": "Format",
+        "csvDescription": "Excel / Sheets",
+        "jsonDescription": "Full backup",
+        "fileOrData": "Fil eller data",
+        "selectFile": "Välj fil",
+        "upsertMode": "Uppdateringsläge (Upsert)",
+        "upsertModeDescription": "Uppdaterar befintliga spel baserat på game_key istället för att skapa dubbletter.",
+        "cancel": "Avbryt",
+        "validate": "Validera",
+        "validating": "Validerar...",
+        "validationSuccess": "Valideringen lyckades",
+        "validationErrors": "Valideringsfel hittades",
+        "validationError": "Valideringsfel",
+        "couldNotReadFile": "Kunde inte läsa filen",
+        "couldNotValidate": "Kunde inte validera",
+        "importFailed": "Importen misslyckades",
+        "importComplete": "Importen klar!",
+        "importGames": "Importera {count} spel",
+        "importing": "Importerar...",
+        "total": "Totalt",
+        "valid": "Giltiga",
+        "warnings": "Varningar",
+        "errors": "Fel",
+        "preview": "Förhandsgranskning",
+        "tableHeaders": {
+          "row": "Rad",
+          "name": "Namn",
+          "mode": "Läge",
+          "status": "Status",
+          "steps": "Steg",
+          "phases": "Faser",
+          "artifacts": "Artefakter",
+          "triggers": "Triggers",
+          "roles": "Roller",
+          "artifactTypes": "Artefakt-typer"
+        },
+        "statusPublished": "Publicerad",
+        "statusDraft": "Utkast",
+        "productSelect": "Koppla till produkt",
+        "productSelectDescription": "Spelen kopplas till vald produkt. Påverkar vilken standardbild som tilldelas.",
+        "productSelectNone": "Ingen produkt (global)"
       },
       "playModes": {
         "basic": "Simple play",
@@ -5336,55 +5691,6 @@
           "selectedBadge": "Selected",
           "footerSelectedTemplate": "Add \"{name}\" ({triggers})",
           "footerNoSelection": "Select a template to add"
-        },
-        "form": {
-          "loading": "Loading...",
-          "errors": {
-            "loadFailed": "Could not load game",
-            "saveFailed": "Failed to save",
-            "unexpected": "An error occurred"
-          },
-          "messages": {
-            "saved": "Saved!"
-          },
-          "core": {
-            "nameLabel": "Name",
-            "statusLabel": "Status",
-            "statusDraft": "Draft",
-            "statusPublished": "Published",
-            "shortDescriptionLabel": "Short description",
-            "shortDescriptionHelp": "Shown in the game library and helps players choose the right game.",
-            "fullDescriptionLabel": "Full description",
-            "fullDescriptionHelp": "Detailed description shown when the game opens. Explain the theme and setup.",
-            "timeMinutesLabel": "Time (min)",
-            "timeMinutesHelp": "Estimated play time in minutes.",
-            "minPlayersLabel": "Players min",
-            "minPlayersHelp": "Minimum number of participants.",
-            "maxPlayersLabel": "Players max",
-            "maxPlayersHelp": "Maximum number of participants who can join."
-          },
-          "materials": {
-            "title": "Materials & safety",
-            "itemsLabel": "Materials (one per line)",
-            "safetyLabel": "Safety",
-            "preparationLabel": "Preparation"
-          },
-          "steps": {
-            "title": "Steps / Instructions",
-            "addStep": "Add step",
-            "stepLabel": "Step {index}",
-            "remove": "Remove",
-            "titleLabel": "Title",
-            "titlePlaceholder": "E.g. Start the game",
-            "descriptionLabel": "Description",
-            "descriptionPlaceholder": "What should participants do?",
-            "durationLabel": "Time (seconds)",
-            "durationPlaceholder": "e.g. 60"
-          },
-          "actions": {
-            "save": "Save",
-            "saving": "Saving..."
-          }
         },
         "page": {
           "common": {
@@ -6112,9 +6418,6 @@
           "title": "Phases & Rounds",
           "subtitle": "Divide the game into clear phases with their own time limits.",
           "addPhase": "Add phase",
-          "playError": "Could not play the audio",
-          "playLabel": "Play",
-          "pauseLabel": "Pause",
           "noPhasesYet": "No phases yet",
           "noPhases": "No phases yet. Add your first phase.",
           "namePlaceholder": "E.g. The investigation begins",
@@ -6153,7 +6456,10 @@
             "autoAdvance": "Auto advance",
             "autoAdvanceLabel": "Continue automatically when time is up"
           },
-          "duration": "{min} min"
+          "duration": "{min} min",
+          "editPhase": "Redigera fas",
+          "newPhase": "Ny fas",
+          "addFirstPhase": "Lägg till första fasen"
         },
         "role": {
           "title": "Roles",
@@ -6230,6 +6536,15 @@
             "minCount": "Minimum count",
             "maxCount": "Maximum count",
             "strategy": "Assignment strategy"
+          },
+          "sections": {
+            "security": {
+              "emailVerified": "E-post verifierad",
+              "emailNotVerified": "E-post ej verifierad",
+              "mfaEnabled": "MFA aktiverad",
+              "mfaDisabled": "MFA ej aktiverad",
+              "enableMfa": "Aktivera nu"
+            }
           }
         },
         "board": {
@@ -6359,14 +6674,16 @@
             "artifacts": "📦 Artifacts",
             "steps": "📝 Steps",
             "phases": "🎬 Phases",
-            "roles": "👤 Roles"
+            "roles": "👤 Roles",
+            "core": "ℹ️ Grundinfo"
           },
           "itemPrefix": {
             "triggers": "🎯 Trigger: ",
             "artifacts": "📦 Artifact: ",
             "steps": "📝 Step: ",
             "phases": "🎬 Phase: ",
-            "roles": "👤 Role: "
+            "roles": "👤 Role: ",
+            "core": "ℹ️ Grundinfo: "
           },
           "navigate": "Go to",
           "publishBlocked": "⚠️ The game cannot be published until all errors are resolved"
@@ -6481,9 +6798,6 @@
           "back": "Back",
           "next": "Next",
           "cancel": "Cancel",
-          "defaults": {
-            "newArtifact": "New artifact"
-          },
           "fields": {
             "title": "Title",
             "type": "Type",
@@ -6521,63 +6835,161 @@
           "templates": {
             "keypadBasic": {
               "name": "Keypad (4 digits)",
-              "description": "A simple 4-digit PIN code to unlock something"
+              "description": "A simple 4-digit PIN code to unlock something",
+              "title": "Hemlig kod",
+              "correctCode": "1234",
+              "successMessage": "✅ Korrekt! Du har låst upp ledtråden.",
+              "failMessage": "❌ Fel kod. Försök igen!"
             },
             "keypadAdvanced": {
               "name": "Keypad (with attempt limit)",
-              "description": "PIN code with max 3 attempts before lock"
+              "description": "PIN code with max 3 attempts before lock",
+              "title": "Säkerhetskod",
+              "successMessage": "🎉 Korrekt! Vägen är öppen.",
+              "failMessage": "⚠️ Fel kod!",
+              "lockedMessage": "🚫 Keypad låst. Kontakta spelledaren."
             },
             "riddle": {
               "name": "Riddle / Question",
-              "description": "A riddle with text input for answer"
-            },
-            "cipher": {
-              "name": "Caesar cipher",
-              "description": "Encrypted message with letter shift"
-            },
-            "hotspot": {
-              "name": "Clickable image",
-              "description": "Image with hidden zones to find"
+              "description": "A riddle with text input for answer",
+              "title": "Gåtan",
+              "prompt": "Vad har fyra ben men kan inte gå?",
+              "correctAnswers": "bord\nett bord\ntable"
             },
             "tilePuzzle": {
               "name": "Tile puzzle (3x3)",
-              "description": "Sliding tile puzzle to reveal an image"
+              "description": "Sliding tile puzzle to reveal an image",
+              "title": "Pusslet"
             },
             "logicGrid": {
               "name": "Logic grid",
-              "description": "Logic puzzle where things need to be matched"
-            },
-            "counter": {
-              "name": "Clue counter",
-              "description": "Count found clues or progress"
-            },
-            "hints": {
-              "name": "Hint container",
-              "description": "Progressive hints that can be revealed"
+              "description": "Logic puzzle where things need to be matched",
+              "title": "Vem gjorde vad?",
+              "rows": "Alice\nBob\nCharlie",
+              "columns": "Röd\nGrön\nBlå",
+              "solution": "'{\"Alice\":\"Röd\",\"Bob\":\"Grön\",\"Charlie\":\"Blå\"}'"
             },
             "qrGate": {
               "name": "QR code checkpoint",
-              "description": "Scan QR code to continue"
-            },
-            "location": {
-              "name": "Location checkpoint",
-              "description": "GPS verification for city games"
+              "description": "Scan QR code to continue",
+              "title": "Skanna koden",
+              "expectedValue": "SECRET123",
+              "successMessage": "✅ Rätt kod! Fortsätt till nästa ledtråd."
             },
             "clueCard": {
               "name": "Clue/Hint",
-              "description": "A card with a clue that can be revealed"
+              "description": "A card with a clue that can be revealed",
+              "title": "Ledtråd",
+              "descriptionText": "Dold ledtråd som spelledaren kan visa",
+              "variantTitle": "Ledtråd",
+              "variantBody": "Skriv din ledtråd här..."
             },
             "secretDocument": {
               "name": "Secret document",
-              "description": "A document revealed at the right moment"
+              "description": "A document revealed at the right moment",
+              "title": "Hemligt dokument",
+              "descriptionText": "Avslöjas när deltagarna hittar det"
             },
             "revealCard": {
               "name": "Reveal card",
-              "description": "A card for dramatic reveals"
+              "description": "A card for dramatic reveals",
+              "title": "Avslöjandet"
             },
             "roleSecret": {
               "name": "Role secret",
-              "description": "Secret information visible only to one role"
+              "description": "Secret information visible only to one role",
+              "title": "Din hemlighet",
+              "variantTitle": "Hemlig information",
+              "variantBody": "Endast du kan se detta..."
+            },
+            "cipherCaesar": {
+              "name": "Caesar-chiffer",
+              "description": "Krypterat meddelande med bokstavsförskjutning",
+              "title": "Krypterat meddelande",
+              "cipherKey": "3",
+              "plaintext": "hemligheten finns under trappan"
+            },
+            "hotspotImage": {
+              "name": "Klickbar bild",
+              "description": "Bild med dolda zoner att hitta",
+              "title": "Sök i bilden"
+            },
+            "counterClues": {
+              "name": "Ledtrådsräknare",
+              "description": "Räkna hittade ledtrådar eller framsteg",
+              "title": "Hittade ledtrådar",
+              "label": "Ledtrådar"
+            },
+            "hintContainer": {
+              "name": "Tips-behållare",
+              "description": "Progressiva tips som kan avslöjas",
+              "title": "Tips",
+              "hints": "Titta under mattan\nDet finns en nyckel gömd\nNyckeln passar i skåpet till höger"
+            },
+            "locationCheckpoint": {
+              "name": "Plats-checkpoint",
+              "description": "GPS-verifiering för stadsspel",
+              "title": "Hitta platsen",
+              "locationName": "Stortorget"
+            },
+            "audioClue": {
+              "name": "Ljudledtråd",
+              "description": "Ljudklipp som spelas upp för deltagarna",
+              "title": "Lyssna noga"
+            },
+            "soundTrigger": {
+              "name": "Ljudaktivering",
+              "description": "Aktiveras när deltagarna gör ljud",
+              "title": "Ropa högt!",
+              "instruction": "Ropa högt för att öppna dörren!"
+            },
+            "propCheck": {
+              "name": "Rekvisita-check",
+              "description": "Spelledaren bekräftar att deltagare har rätt sak",
+              "title": "Visa upp föremålet",
+              "propName": "Guldnyckeln",
+              "instruction": "Visa upp guldnyckeln för spelledaren för att fortsätta."
+            },
+            "quizAnswer": {
+              "name": "Quizsvar",
+              "description": "Keypad för quiz-frågor med siffersvar",
+              "title": "Fråga",
+              "descriptionText": "Skriv in svaret med siffror",
+              "successMessage": "✅ Rätt svar!",
+              "failMessage": "❌ Fel svar. Försök igen!"
+            },
+            "textQuestion": {
+              "name": "Textfråga",
+              "description": "Öppen fråga med textsvar",
+              "title": "Svara på frågan",
+              "prompt": "Vad är huvudstaden i Sverige?",
+              "correctAnswers": "stockholm\nStockholm"
+            },
+            "checklist": {
+              "name": "Checklista",
+              "description": "Flera saker att bocka av",
+              "title": "Checklista",
+              "items": "Uppgift 1\nUppgift 2\nUppgift 3"
+            },
+            "learningCard": {
+              "name": "Lärokort",
+              "description": "Kort med information eller fakta",
+              "title": "Lärokort"
+            },
+            "imageReveal": {
+              "name": "Bild att avslöja",
+              "description": "En bild som visas vid rätt tidpunkt",
+              "title": "Bild"
+            },
+            "replayMarker": {
+              "name": "Replay-markör",
+              "description": "Låt deltagare markera viktiga ögonblick",
+              "title": "Markera ögonblick"
+            },
+            "blank": {
+              "name": "Tom artefakt",
+              "description": "Börja från scratch",
+              "title": "Ny artefakt"
             }
           },
           "categories": {
@@ -6585,8 +6997,63 @@
             "party": "Party game",
             "educational": "Educational",
             "general": "General"
-          }
+          },
+          "searchPlaceholder": "Sök mallar...",
+          "noResults": "Inga mallar hittades"
+        },
+        "materials": {
+          "title": "Material",
+          "description": "Lista material som behövs för att genomföra leken.",
+          "itemsLabel": "Material",
+          "itemsPlaceholder": "Ex:\n8 koner\n1 boll per lag\nMusik (Spotify-spellista)",
+          "itemsCount": "{count, plural, =0 {Inget material} one {# material} other {# material}}",
+          "addItem": "Lägg till",
+          "addItemPlaceholder": "Lägg till material...",
+          "showSuggestions": "Visa vanliga förslag",
+          "hideSuggestions": "Dölj förslag",
+          "noItems": "Inget material tillagt ännu. Lägg till material som behövs för leken.",
+          "preparationLabel": "Förberedelser",
+          "preparationPlaceholder": "Vad behöver ledaren förbereda innan leken?"
         }
+      },
+      "gameOverview": "Spelöversikt",
+      "bulk": {
+        "selectedCount": "{count} valda",
+        "ofTotal": "av {total} totalt",
+        "selectAll": "Markera alla ({count})",
+        "deselect": "Avmarkera",
+        "export": {
+          "title": "Exportera spel",
+          "description": "Exportera {count} valda spel.",
+          "formatLabel": "Format",
+          "includeRelations": "Inkludera relationer (steg, faser, roller, etc.)",
+          "jsonNote": "JSON-format inkluderar all relaterad data och kan importeras igen.",
+          "cancel": "Avbryt",
+          "exporting": "Exporterar...",
+          "exportButton": "Exportera"
+        }
+      },
+      "export": {
+        "title": "Exportera spel",
+        "description": "Ladda ner spel som CSV- eller JSON-fil.",
+        "selectFormat": "Välj format",
+        "fullBackup": "Full backup",
+        "include": "Inkludera",
+        "stepsInstructions": "Steg och instruktioner",
+        "materialsPreparation": "Material och förberedelser",
+        "phasesIfApplicable": "Faser (om tillämpligt)",
+        "rolesIfApplicable": "Roller (om tillämpligt)",
+        "boardConfigIfApplicable": "Spelplanskonfiguration (om tillämpligt)",
+        "gamesToExport": "Spel att exportera",
+        "allVisibleGames": "Alla synliga spel",
+        "selectedGames": "Valda spel",
+        "count": "st",
+        "noneSelected": "Inga valda",
+        "cancel": "Avbryt",
+        "exporting": "Exporterar...",
+        "download": "Ladda ner ({count} spel)",
+        "exportFailed": "Exporten misslyckades",
+        "unexpectedError": "Ett oväntat fel uppstod"
       }
     },
     "achievements": {
@@ -7140,10 +7607,6 @@
             "title": "Feature Entitlements",
             "noEntitlements": "No entitlements configured",
             "enabled": "Enabled",
-            "header": {
-              "openMenu": "Open menu",
-              "closeMenu": "Close menu"
-            },
             "disabled": "Disabled",
             "dependencies": "Dependencies",
             "noDependencies": "No dependencies configured",
@@ -7160,17 +7623,6 @@
             "unlinkSuccess": "\"{name}\" unlinked from the product",
             "unlinkFailed": "Failed to unlink",
             "helpText": "Games are linked to products via the game builder's Settings section."
-          },
-          "footer": {
-            "tagline": "Activities, sessions, and sharing for coaches, teachers, and leaders.",
-            "actions": {
-              "getStarted": "Get started"
-            },
-            "legal": {
-              "terms": "Terms of use",
-              "privacy": "Privacy policy"
-            },
-            "copyright": "© {year} Lekbanken AS. All rights reserved."
           },
           "availability": {
             "scope": "Availability Scope",
@@ -7496,7 +7948,8 @@
         "all": "All statuses",
         "active": "Active",
         "completed": "Completed",
-        "flagged": "Flagged"
+        "flagged": "Flagged",
+        "placeholder": "Välj status"
       },
       "emptyState": {
         "noAccess": "No access",
@@ -7510,7 +7963,9 @@
         "host": "Host",
         "participants": "Participants",
         "status": "Status",
-        "started": "Started"
+        "started": "Started",
+        "startedAt": "Startad",
+        "global": "Global"
       },
       "statusLabels": {
         "active": "Active",
@@ -7540,6 +7995,10 @@
         "noAccessDescription": "You need permission to view sessions.",
         "notFound": "Session not found",
         "notFoundDescription": "Check the link or go back to the list."
+      },
+      "pageTitle": "Sessioner",
+      "errorState": {
+        "title": "Kunde inte ladda sessioner"
       }
     },
     "tickets": {
@@ -8440,7 +8899,7 @@
           "title": "Map Library",
           "description": "Saved maps and courses from Spatial Editor.",
           "newMap": "New map",
-          "loading": "Loading\u2026",
+          "loading": "Loading…",
           "noMaps": "No saved maps",
           "noMapsDescription": "Create your first map in Spatial Editor.",
           "createNew": "Create new map",
@@ -8745,11 +9204,37 @@
     },
     "notifications": {
       "title": "Notifications",
-      "bell": "Show notifications",
-      "markAllRead": "Mark all as read",
-      "empty": "No notifications",
-      "dismiss": "Dismiss",
-      "viewAll": "View all"
+      "subtitle": "Your messages and updates",
+      "unreadCount": "{count} unread",
+      "allRead": "All read",
+      "markAllAsRead": "Mark all as read",
+      "filters": {
+        "all": "All",
+        "unread": "Unread ({count})",
+        "read": "Read"
+      },
+      "empty": {
+        "title": "No notifications",
+        "titleUnread": "No unread notifications",
+        "message": "You have no notifications yet.",
+        "messageUnread": "You have read all your notifications."
+      },
+      "actions": {
+        "view": "View",
+        "viewAll": "View all",
+        "markAsRead": "Mark as read",
+        "delete": "Delete"
+      },
+      "timeAgo": {
+        "minutes": "{minutes} min ago",
+        "hours": "{hours} hr ago",
+        "yesterday": "Yesterday",
+        "days": "{days} days ago"
+      },
+      "error": {
+        "load": "Could not load notifications",
+        "retry": "Try again"
+      }
     },
     "dashboard": {
       "title": "Dashboard",
@@ -8982,26 +9467,7 @@
         "signInRequired": "You need to be signed in to view the event log.",
         "title": "DICECOIN",
         "subtitle": "Your activity history",
-        "empty": "No events to show yet. Play games and create sessions to earn rewards!",
-        "sources": {
-          "play": "Game",
-          "planner": "Planner",
-          "system": "System",
-          "admin": "Admin"
-        },
-        "eventTypes": {
-          "session_completed": "Completed a session",
-          "run_completed": "Completed a game round",
-          "plan_created": "Created a plan",
-          "plan_published": "Published a plan",
-          "game_played": "Played a game",
-          "achievement_unlocked": "Unlocked an achievement",
-          "first_session": "Started your first session",
-          "streak_bonus": "Earned a streak bonus",
-          "powerup_consumed": "Used a power-up",
-          "shop_purchase": "Made a purchase in the shop",
-          "reward_issued": "Received a reward"
-        }
+        "empty": "No events to show yet. Play games and create sessions to earn rewards!"
       },
       "achievements": {
         "celebration": {
@@ -9185,7 +9651,37 @@
           "emailNotVerified": "Email not verified",
           "mfaEnabled": "MFA enabled",
           "mfaDisabled": "MFA not enabled",
-          "enableMfa": "Enable now"
+          "enableMfa": "Enable now",
+          "title": "Säkerhet & MFA",
+          "description": "Hantera tvåfaktorsautentisering och sessioner",
+          "mfa": {
+            "title": "Tvåfaktorsautentisering",
+            "status": "MFA-status",
+            "enabled": "Aktiverad",
+            "disabled": "Ej aktiverad",
+            "enable": "Aktivera MFA",
+            "disable": "Stäng av",
+            "description": "Lägg till ett extra säkerhetslager på ditt konto"
+          },
+          "sessions": {
+            "title": "Aktiva sessioner",
+            "description": "Hantera dina inloggade enheter",
+            "current": "Nuvarande session",
+            "revoke": "Logga ut",
+            "revokeAll": "Logga ut alla enheter",
+            "lastActive": "Senast aktiv"
+          },
+          "devices": {
+            "title": "Betrodda enheter",
+            "description": "Enheter du har loggat in på",
+            "remove": "Ta bort"
+          },
+          "loginHistory": {
+            "title": "Inloggningshistorik",
+            "description": "Se dina senaste inloggningar",
+            "success": "Lyckad",
+            "failed": "Misslyckad"
+          }
         },
         "organizations": {
           "title": "Organizations",
@@ -9218,7 +9714,15 @@
             "title": "Memberships",
             "description": "Organizations you are a member of."
           },
-          "joinedAt": "Joined {date}"
+          "joinedAt": "Joined {date}",
+          "primary": "Primär",
+          "switch": "Byt till",
+          "leave": "Lämna",
+          "leaveConfirm": "Är du säker på att du vill lämna {name}?",
+          "joinOrg": "Gå med i organisation",
+          "createOrg": "Skapa ny organisation",
+          "joinViaCode": "Gå med via inbjudningskod",
+          "quickActions": "Snabbåtgärder"
         },
         "preferences": {
           "title": "Preferences",
@@ -9240,15 +9744,30 @@
           "save": "Save changes",
           "saving": "Saving...",
           "languageSection": {
-            "description": "Choose which language to use in Lekbanken."
+            "description": "Choose which language to use in Lekbanken.",
+            "title": "Språk"
           },
           "themeSection": {
-            "description": "Choose how Lekbanken should look."
+            "description": "Choose how Lekbanken should look.",
+            "title": "Tema",
+            "light": "Ljust",
+            "dark": "Mörkt",
+            "system": "System"
           },
           "accessibilitySection": {
             "description": "Customize Lekbanken for your needs.",
             "highContrastDesc": "Increase contrast for better readability.",
-            "reduceMotionDesc": "Reduce animations and motion in the interface."
+            "reduceMotionDesc": "Reduce animations and motion in the interface.",
+            "title": "Tillgänglighet",
+            "highContrast": "Hög kontrast",
+            "reduceMotion": "Reducera rörelse",
+            "textSize": "Textstorlek",
+            "textSizes": {
+              "small": "Liten",
+              "medium": "Normal",
+              "large": "Stor",
+              "extraLarge": "Extra stor"
+            }
           },
           "animationsSection": {
             "title": "Animations and feedback",
@@ -9264,8 +9783,15 @@
           },
           "dateTime": {
             "title": "Time and date",
-            "description": "Settings for how time and date are displayed."
-          }
+            "description": "Settings for how time and date are displayed.",
+            "timezone": "Tidszon",
+            "dateFormat": "Datumformat",
+            "timeFormat": "Tidsformat",
+            "12h": "12-timmar",
+            "24h": "24-timmar"
+          },
+          "showThemeToggle": "Visa tema-omkopplare i headern",
+          "showThemeToggleHint": "Styr om snabb-knappen för ljust/mörkt läge syns högst upp."
         },
         "achievements": {
           "title": "Your achievements",
@@ -9302,19 +9828,7 @@
           "noTransactions": "No transactions to show.",
           "unknownTransaction": "Unknown transaction",
           "error": "Could not load coin data",
-          "shopLink": "Spend your coins in the shop",
-          "reasonCodes": {
-            "event:session_completed": "Reward for completed session",
-            "event:run_completed": "Reward for completed round",
-            "event:plan_created": "Reward for created plan",
-            "event:plan_published": "Reward for published plan",
-            "event:game_played": "Reward for playing a game",
-            "event:achievement_unlocked": "Reward for unlocked achievement",
-            "event:first_session": "Reward for first session",
-            "event:streak_bonus": "Streak bonus",
-            "powerup:coin_multiplier": "Coin multiplier bonus",
-            "refund": "Refund"
-          }
+          "shopLink": "Spend your coins in the shop"
         },
         "friends": {
           "title": "Friends",
@@ -9404,18 +9918,150 @@
             "details": "Details",
             "ip": "IP address"
           },
-          "loadError": "Could not load activity",
+          "loadError": "Could not load data",
           "initError": "Could not initialize database connection.",
           "unexpectedError": "An unexpected error occurred.",
           "loadingTakingLong": "This is taking longer than expected. Check Console/Network to see which request is stuck and try reloading the page.",
           "retry": "Try again",
-          "reload": "Reload",
-          "connectionTimeout": "Connection timed out",
-          "loadError": "Could not load data",
-          "unexpectedError": "An unexpected error occurred.",
-          "retry": "Try again",
-          "partialFailure": "Partial error",
-          "partialFailureDesc": "Some data could not be loaded. The information below may be incomplete."
+          "reload": "Reload"
+        },
+        "privacy": {
+          "title": "Integritet & GDPR",
+          "description": "Hantera dina data och samtycken enligt GDPR",
+          "dataExport": "Exportera data",
+          "requestHistory": "Begäranhistorik",
+          "requestStatus": {
+            "pending": "Väntar",
+            "processing": "Bearbetas",
+            "completed": "Slutförd",
+            "cancelled": "Avbruten"
+          },
+          "requestTypes": {
+            "portability": "Dataexport",
+            "erasure": "Kontoborttagning"
+          },
+          "validationError": "Du måste skriva \"{confirmText}\" för att bekräfta",
+          "deleteAccount": "Radera konto",
+          "deleteWarning": "När du raderar ditt konto kommer alla dina personuppgifter, speldata och framsteg att tas bort permanent. Denna åtgärd kan inte ångras.",
+          "gdprRights": {
+            "title": "Dina rättigheter enligt GDPR",
+            "description": "Du har rätt att få tillgång till, exportera och radera dina personuppgifter. Vi behandlar alla GDPR-förfrågningar inom 30 dagar i enlighet med dataskyddsförordningen.",
+            "access": "Rätt till tillgång till dina uppgifter",
+            "rectification": "Rätt till rättelse av felaktiga uppgifter",
+            "erasure": "Rätt till radering (rätten att bli bortglömd)",
+            "portability": "Rätt till dataportabilitet",
+            "restriction": "Rätt till begränsning av behandling",
+            "objection": "Rätt att göra invändningar"
+          },
+          "contact": {
+            "title": "Kontakta oss",
+            "description": "För GDPR-förfrågningar eller frågor om dina personuppgifter, kontakta oss via e-post."
+          },
+          "dataExportSection": {
+            "title": "Exportera data",
+            "description": "Ladda ner en kopia av alla dina personuppgifter i ett maskinläsbart format (JSON).",
+            "button": "Begär dataexport",
+            "pending": "Export pågår...",
+            "ready": "Ladda ner",
+            "success": "Din begäran om dataexport har tagits emot!",
+            "successDescription": "Du kommer att få ett e-postmeddelande med en nedladdningslänk inom 72 timmar.",
+            "contents": {
+              "title": "Din dataexport kommer att innehålla:",
+              "profile": "Profilinformation (namn, e-post, etc.)",
+              "settings": "Inställningar och preferenser",
+              "activity": "Aktivitetshistorik",
+              "gameData": "Speldata och framsteg",
+              "organizations": "Organisationsmedlemskap"
+            },
+            "confirm": "Bekräfta begäran",
+            "cancel": "Avbryt",
+            "requesting": "Skickar begäran..."
+          },
+          "deleteAccountSection": {
+            "title": "Radera konto",
+            "description": "Permanent radera ditt konto och all data",
+            "button": "Radera mitt konto",
+            "warning": "Varning: Denna åtgärd kan inte ångras",
+            "consequences": {
+              "data": "All din profildata kommer att raderas permanent",
+              "progress": "Dina spelframsteg och prestationer försvinner",
+              "organizations": "Du kommer att tas bort från alla organisationer",
+              "subscriptions": "Eventuella aktiva prenumerationer avbryts"
+            },
+            "reasonLabel": "Anledning till borttagning (valfritt)",
+            "reasonPlaceholder": "Hjälp oss förstå varför du vill radera ditt konto...",
+            "confirmLabel": "Skriv {confirmText} för att bekräfta",
+            "confirmText": "RADERA MITT KONTO",
+            "confirmButton": "Bekräfta radering",
+            "confirming": "Skickar begäran...",
+            "cancel": "Avbryt",
+            "pendingRequest": "Begäran om kontoborttagning väntar",
+            "pendingDescription": "Din begäran mottogs {date} och behandlas inom 30 dagar.",
+            "gracePeriod": "Efter att du bekräftat kommer ditt konto att markeras för radering. Du har 14 dagar på dig att ångra beslutet genom att kontakta support."
+          },
+          "consents": {
+            "title": "Samtycken",
+            "description": "Hantera vilka typer av databehandling du samtycker till.",
+            "marketing": "Marknadsföring",
+            "marketingDesc": "Tillåt att vi skickar nyhetsbrev och kampanjer via e-post.",
+            "analytics": "Analys",
+            "analyticsDesc": "Tillåt anonym användningsstatistik för att förbättra tjänsten.",
+            "functional": "Funktionell data",
+            "functionalDesc": "Tillåt delning av data med betrodda partners för förbättrad funktionalitet.",
+            "grant": "Ge samtycke",
+            "revoke": "Återkalla",
+            "loading": "Laddar..."
+          },
+          "visibility": {
+            "title": "Profilsynlighet",
+            "description": "Vem kan se din profil",
+            "public": "Offentlig",
+            "private": "Privat",
+            "organization": "Endast organisation"
+          }
+        },
+        "notifications": {
+          "title": "Notifikationsinställningar",
+          "description": "Välj hur och när du vill bli kontaktad",
+          "channels": "Notifieringskanaler",
+          "categories": "Notifieringskategorier",
+          "emailDigest": "E-postsammanfattning",
+          "quietHours": "Tysta timmar",
+          "email": {
+            "title": "E-postnotifikationer",
+            "enabled": "Aktivera e-postnotifikationer",
+            "activity": "Aktivitetsuppdateringar",
+            "mentions": "Omnämnanden",
+            "comments": "Kommentarer",
+            "updates": "Produktuppdateringar",
+            "marketing": "Marknadsföring",
+            "digest": "Sammanfattning",
+            "digestOptions": {
+              "realtime": "Realtid",
+              "hourly": "Varje timme",
+              "daily": "Dagligen",
+              "weekly": "Veckovis",
+              "never": "Aldrig"
+            }
+          },
+          "push": {
+            "title": "Push-notifikationer",
+            "enabled": "Aktivera push-notifikationer",
+            "activity": "Aktivitetsuppdateringar",
+            "mentions": "Omnämnanden",
+            "comments": "Kommentarer"
+          },
+          "inApp": {
+            "title": "App-notifikationer",
+            "enabled": "Aktivera in-app-notifikationer"
+          },
+          "dnd": {
+            "title": "Stör ej",
+            "enabled": "Aktivera stör ej",
+            "startTime": "Starttid",
+            "endTime": "Sluttid",
+            "days": "Dagar"
+          }
         }
       },
       "achievementsShowcase": {
@@ -9436,6 +10082,54 @@
         "title": "Something went wrong",
         "description": "We could not load your profile page. Try again or contact support if the problem persists.",
         "retry": "Try again"
+      },
+      "pageHeaderTitle": "PROFIL",
+      "pageSubtitle": "Din profil",
+      "loading": "Laddar profil...",
+      "noEmailAvailable": "Ingen e-post tillgänglig",
+      "avatarInitialsHint": "Använd initialer om du inte vill visa en bild.",
+      "loadingOrganizations": "Laddar organisationer...",
+      "noOrganization": "Du tillhör ingen organisation ännu.",
+      "selectLanguage": "Välj språk",
+      "achievements": {
+        "title": "Prestationer",
+        "viewAll": "Visa alla",
+        "unlockedCount": "{unlocked} av {total} upplåsta",
+        "clickBadgeHint": "Klicka på ett märke för att se detaljer",
+        "noAchievementsYet": "Inga prestationer tillgängliga ännu.",
+        "noUnlockedYet": "Inga prestationer upplåsta ännu. Fortsätt spela!"
+      },
+      "nav": {
+        "backToApp": "Tillbaka till appen",
+        "overview": "Översikt",
+        "overviewDesc": "Se din profilöversikt",
+        "general": "Allmänt",
+        "generalDesc": "Namn, avatar och kontaktinfo",
+        "account": "Konto",
+        "accountDesc": "E-post och lösenord",
+        "security": "Säkerhet",
+        "securityDesc": "MFA och sessioner",
+        "privacy": "Integritet",
+        "privacyDesc": "GDPR och dataskydd",
+        "notifications": "Notifikationer",
+        "notificationsDesc": "E-post och push-inställningar",
+        "preferences": "Preferenser",
+        "preferencesDesc": "Språk, tema och tillgänglighet",
+        "friends": "Vänner",
+        "friendsDesc": "Hantera dina vänner och förfrågningar",
+        "organizations": "Organisationer",
+        "organizationsDesc": "Dina organisationer och roller",
+        "activity": "Aktivitet",
+        "activityDesc": "Senaste aktivitet och historik"
+      },
+      "actions": {
+        "save": "Spara ändringar",
+        "saving": "Sparar...",
+        "saved": "Ändringar sparade",
+        "cancel": "Avbryt",
+        "edit": "Redigera",
+        "delete": "Ta bort",
+        "confirm": "Bekräfta"
       }
     },
     "settings": {
@@ -9742,7 +10436,6 @@
       "boostRemaining": "{hours}h {minutes}m remaining",
       "coins": "DiceCoin",
       "gems": "Gems",
-      "level": "Level",
       "featured": "Featured",
       "levelLocked": "Locked: level {level}",
       "buyNow": "Buy now",
@@ -9795,10 +10488,16 @@
       "tabs": {
         "overview": "Overview",
         "plans": "Plans",
-        "invoices": "Invoices"
+        "invoices": "Invoices",
+        "entitlements": "Produkter"
       },
       "status": {
-        "active": "Active"
+        "active": "Active",
+        "canceled": "Avslutad",
+        "past_due": "Förfallen",
+        "canceling": "Avslutas snart",
+        "trialing": "Provperiod",
+        "incomplete": "Ofullständig"
       },
       "currentPlan": {
         "proPlan": "Pro plan",
@@ -9807,7 +10506,12 @@
         "renews": "Renews: {date}",
         "paymentMethod": "{brand} •••• {last4}",
         "changePlan": "Change plan",
-        "cancel": "Cancel subscription"
+        "cancel": "Cancel subscription",
+        "subscription": "Aktiv prenumeration",
+        "perInterval": "per {interval}",
+        "endsOn": "Avslutas {date}",
+        "role": "Din roll: {role}",
+        "manage": "Hantera prenumeration"
       },
       "features": {
         "title": "Your features"
@@ -9815,7 +10519,12 @@
       "stats": {
         "activities": "Activities",
         "usedToday": "Used today",
-        "monthsMember": "Months member"
+        "monthsMember": "Months member",
+        "activeProducts": "Aktiva produkter",
+        "invoices": "Fakturor",
+        "accountType": "Kontotyp",
+        "personal": "Privat",
+        "organization": "Organisation"
       },
       "plans": {
         "free": "Free",
@@ -9912,7 +10621,33 @@
           "reference": "Reference"
         },
         "search": "Search invoice",
-        "downloadPdf": "Download PDF"
+        "downloadPdf": "Download PDF",
+        "view": "Visa",
+        "empty": "Inga fakturor ännu"
+      },
+      "subtitleNoTenant": "Du har inget aktivt konto",
+      "error": {
+        "title": "Något gick fel",
+        "retry": "Försök igen"
+      },
+      "noSubscription": {
+        "title": "Ingen aktiv prenumeration",
+        "description": "Välj en plan för att komma igång",
+        "choosePlan": "Välj plan"
+      },
+      "entitlements": {
+        "unknownProduct": "Okänd produkt",
+        "seats": "{count} platser",
+        "status": {
+          "active": "Aktiv",
+          "inactive": "Inaktiv",
+          "paused": "Pausad"
+        },
+        "empty": {
+          "title": "Inga produkter",
+          "description": "Du har inga aktiva produkter",
+          "browse": "Utforska produkter"
+        }
       }
     },
     "learning": {
@@ -9931,7 +10666,8 @@
         "completed": "Completed",
         "inProgress": "In progress",
         "locked": "Locked",
-        "available": "Available"
+        "available": "Available",
+        "failed": "Ej godkänd"
       },
       "percentComplete": "{percent}% complete",
       "passedWith": "Passed with {score}%",
@@ -9965,7 +10701,13 @@
         "tryAgain": "Try again",
         "back": "Back",
         "backToCourses": "Back to courses"
-      }
+      },
+      "empty": {
+        "title": "Inga kurser tillgängliga",
+        "description": "Det finns inga aktiva kurser för tillfället. Kontakta din organisation för mer information."
+      },
+      "failedWith": "Ej godkänd ({score}%), krävs {required}%",
+      "attemptsCount": "{count} försök gjorda"
     },
     "leaderboard": {
       "title": "Leaderboard",
@@ -10043,40 +10785,6 @@
       "empty": {
         "title": "No challenges found",
         "message": "Try changing your filters to see more challenges."
-      }
-    },
-    "notifications": {
-      "title": "Notifications",
-      "subtitle": "Your messages and updates",
-      "unreadCount": "{count} unread",
-      "allRead": "All read",
-      "markAllAsRead": "Mark all as read",
-      "filters": {
-        "all": "All",
-        "unread": "Unread ({count})",
-        "read": "Read"
-      },
-      "empty": {
-        "title": "No notifications",
-        "titleUnread": "No unread notifications",
-        "message": "You have no notifications yet.",
-        "messageUnread": "You have read all your notifications."
-      },
-      "actions": {
-        "view": "View",
-        "viewAll": "View all",
-        "markAsRead": "Mark as read",
-        "delete": "Delete"
-      },
-      "timeAgo": {
-        "minutes": "{minutes} min ago",
-        "hours": "{hours} hr ago",
-        "yesterday": "Yesterday",
-        "days": "{days} days ago"
-      },
-      "error": {
-        "load": "Could not load notifications",
-        "retry": "Try again"
       }
     },
     "events": {
@@ -10164,15 +10872,10 @@
         "redirecting": "Redirecting you now...",
         "codeLabel": "Authentication code",
         "codePlaceholder": "Enter 6-digit code",
-        "submit": "Verify",
         "verifying": "Verifying...",
-        "invalidCode": "Invalid code. Please try again.",
-        "tooManyAttempts": "Too many attempts. Please try again later.",
         "useRecoveryCode": "Use recovery code instead",
-        "backToCode": "Use authenticator app",
         "recoveryCodeLabel": "Recovery code",
         "recoveryCodePlaceholder": "Enter recovery code",
-        "recoveryCodeDescription": "Enter one of your recovery codes if you don't have access to your authenticator app",
         "recoveryCodeHelp": "Enter one of your recovery codes. Each code can only be used once.",
         "verifyWithRecovery": "Verify with recovery code",
         "trustDevice": "Trust this device for {days} days",
@@ -10180,7 +10883,16 @@
         "needHelp": "Having trouble signing in?",
         "contactSupport": "Contact support",
         "lowRecoveryCodes": "You only have {count} recovery code(s) remaining. Generate new codes in your security settings.",
-        "attemptsRemaining": "{count} attempts remaining"
+        "attemptsRemaining": "{count} attempts remaining",
+        "verifyButton": "Verifiera",
+        "useAuthenticator": "Använd autentiseringsapp",
+        "trustDeviceHelp": "Du behöver inte ange kod nästa gång på denna enhet",
+        "error": {
+          "invalidCode": "Ogiltig kod. Försök igen.",
+          "invalidRecoveryCode": "Ogiltig återställningskod.",
+          "tooManyAttempts": "För många försök. Försök igen senare.",
+          "generic": "Ett fel uppstod. Försök igen."
+        }
       },
       "enroll": {
         "title": "Enable two-factor authentication",
@@ -10199,28 +10911,14 @@
         "verifyDescription": "Enter the 6-digit code from your authenticator app",
         "verifying": "Verifying...",
         "back": "Back",
-        "step1": {
-          "title": "Download an authenticator app",
-          "description": "We recommend Google Authenticator or Microsoft Authenticator"
-        },
-        "step2": {
-          "title": "Scan the QR code",
-          "description": "Open your authenticator app and scan this QR code"
-        },
-        "step3": {
-          "title": "Enter verification code",
-          "description": "Enter the 6-digit code from your authenticator app"
-        },
-        "hideSecret": "Hide secret key",
-        "secretKey": "Secret key",
         "copySecret": "Copy",
-        "copiedSecret": "Copied!",
         "verifyCode": "Verify code",
         "success": "Two-factor authentication enabled",
-        "error": "Could not enable two-factor authentication",
-        "invalidCode": "Invalid code. Please try again.",
-        "cancel": "Cancel",
-        "close": "Close",
+        "error": {
+          "enrollFailed": "Kunde inte starta MFA-registrering",
+          "verifyFailed": "Ogiltig kod. Försök igen.",
+          "generic": "Ett fel uppstod. Försök igen."
+        },
         "recoveryCodes": {
           "title": "Save your recovery codes",
           "description": "If you lose access to your phone you can use these codes to sign in",
@@ -10229,7 +10927,23 @@
           "copy": "Copy",
           "copied": "Copied!",
           "continue": "I have saved my codes"
-        }
+        },
+        "step1Title": "Skanna QR-kod",
+        "step1Description": "Öppna din autentiseringsapp och skanna QR-koden nedan.",
+        "step2Title": "Ange verifieringskod",
+        "step2Description": "Ange den 6-siffriga koden som visas i din app.",
+        "step3Title": "Spara återställningskoder",
+        "step3Description": "Spara dessa koder på en säker plats. Du behöver dem om du tappar åtkomst till din enhet.",
+        "qrCodeAlt": "QR-kod för MFA",
+        "manualEntry": "Kan du inte skanna? Ange manuellt:",
+        "secretCopied": "Kopierad!",
+        "recoveryCodesTitle": "Dina återställningskoder",
+        "recoveryCodesWarning": "Viktigt: Spara dessa koder nu. De visas endast en gång.",
+        "copyAllCodes": "Kopiera alla koder",
+        "codesCopied": "Koder kopierade!",
+        "downloadCodes": "Ladda ner koder",
+        "confirmSaved": "Jag har sparat koderna",
+        "complete": "Slutför aktivering"
       },
       "settings": {
         "title": "Two-factor authentication",
@@ -10238,18 +10952,8 @@
         "enabledDescription": "Your account is protected with two-factor authentication.",
         "disabled": "Disabled",
         "disabledDescription": "Enable two-factor authentication for extra security.",
-        "enable": "Enable",
-        "disable": "Disable",
-        "disableConfirm": "Are you sure you want to disable two-factor authentication? This will make your account less secure.",
-        "disableSuccess": "Two-factor authentication disabled",
-        "disableError": "Could not disable two-factor authentication",
         "regenerateCodes": "Generate new recovery codes",
-        "regenerateConfirm": "Are you sure you want to generate new recovery codes? Your old codes will no longer work.",
-        "regenerateSuccess": "New recovery codes generated",
-        "regenerateError": "Could not generate new recovery codes",
         "lastUsed": "Last used",
-        "never": "Never",
-        "enrolledAt": "Enabled",
         "loading": "Loading...",
         "recoveryCodes": "Recovery codes",
         "recoveryCodesDescription": "Use these codes to sign in if you lose access to your authenticator app",
@@ -10260,7 +10964,31 @@
         "unknownDevice": "Unknown device",
         "on": "on",
         "retry": "Try again",
-        "unknownDate": "Unknown date"
+        "unknownDate": "Unknown date",
+        "required": "MFA krävs",
+        "requiredDescription": "Din organisation kräver att du aktiverar MFA.",
+        "enableButton": "Aktivera MFA",
+        "disableButton": "Inaktivera MFA",
+        "revokeDevice": "Ta bort",
+        "revokeAllDevices": "Ta bort alla",
+        "deviceName": "Enhetsnamn",
+        "expiresAt": "Upphör",
+        "confirm": {
+          "disableTitle": "Inaktivera MFA?",
+          "disableDescription": "Detta minskar säkerheten på ditt konto. Är du säker?",
+          "disableConfirm": "Ja, inaktivera",
+          "disableCancel": "Avbryt",
+          "revokeTitle": "Ta bort betrodd enhet?",
+          "revokeDescription": "Du måste verifiera med MFA nästa gång du loggar in från denna enhet.",
+          "revokeConfirm": "Ta bort",
+          "revokeCancel": "Avbryt"
+        },
+        "messages": {
+          "disabled": "MFA har inaktiverats",
+          "codesRegenerated": "Nya återställningskoder har genererats",
+          "deviceRevoked": "Enheten har tagits bort",
+          "allDevicesRevoked": "Alla enheter har tagits bort"
+        }
       }
     }
   },
@@ -10345,7 +11073,7 @@
           "existingOrg": {
             "label": "Select organization",
             "hint": "The license will be added to the selected organization.",
-            "createNew": "Create new organization\u2026"
+            "createNew": "Create new organization…"
           },
           "plan": {
             "label": "Plan",
@@ -10400,6 +11128,13 @@
           "subtitle": "Your payment went through, but activation is delayed. This can happen during high load.",
           "retry": "Try again",
           "supportHint": "Still not working? Contact us at"
+        },
+        "titlePersonal": "Tack för ditt köp!",
+        "subtitlePersonal": "Vi bekräftar din betalning och aktiverar ditt konto. Det brukar gå snabbt.",
+        "personalSuccess": {
+          "title": "Du har nu tillgång!",
+          "subtitle": "Ditt konto är aktiverat och du har full tillgång till ditt innehåll.",
+          "redirecting": "Omdirigerar till appen..."
         }
       },
       "success": {
@@ -10486,7 +11221,15 @@
       "description": "Lekbanken helps you plan, organize and run activities with children and youth. Save time and create better experiences.",
       "login": "Log in",
       "getStartedFree": "Get started free",
-      "copyright": "Lekbanken AS. All rights reserved."
+      "copyright": "Lekbanken AS. All rights reserved.",
+      "tagline": "Aktiviteter, pass och delning för coacher, lärare och ledare.",
+      "actions": {
+        "getStarted": "Kom igång"
+      },
+      "legal": {
+        "terms": "Användarvillkor",
+        "privacy": "Integritetspolicy"
+      }
     },
     "enterprise": {
       "title": "Enterprise Solutions",
@@ -10546,7 +11289,13 @@
       }
     },
     "hero": {
-      "actionWords": ["Discover", "Lead", "Plan", "Run", "Grow"],
+      "actionWords": [
+        "Discover",
+        "Lead",
+        "Plan",
+        "Run",
+        "Grow"
+      ],
       "title": "<word></word> <highlight>activities</highlight> that engage",
       "description": "From idea to action — all in one place. Browse hundreds of ready-made activities, build your own plans, run sessions live and track your growth as a leader.",
       "quote": "Lekbanken is the tool that helps you create engaging moments — every time.",
@@ -10610,12 +11359,27 @@
           "milestone": "Milestone",
           "content": "New content"
         }
-      }
+      },
+      "badge": "Features"
     },
     "howItWorks": {
       "tagline": "How it works",
       "title": "From idea to execution in minutes",
-      "description": "Four simple steps to plan and run activities that engage."
+      "description": "Four simple steps to plan and run activities that engage.",
+      "steps": {
+        "step1": {
+          "title": "Skapa konto",
+          "description": "Registrera dig gratis och kom igång direkt."
+        },
+        "step2": {
+          "title": "Bygg ditt pass",
+          "description": "Välj aktiviteter och dra dem till din planering."
+        },
+        "step3": {
+          "title": "Dela med teamet",
+          "description": "Exportera till PDF eller dela digitalt med kollegor."
+        }
+      }
     },
     "spotlight": {
       "tagline": "Powerful features",
@@ -10727,42 +11491,150 @@
         "backToCategory": "Back to {category}"
       },
       "products": {
-        "autismnpf": { "name": "Autism & NPF", "description": "Activities adapted for autism and NPF" },
-        "rarelsehinder": { "name": "Mobility Impairment", "description": "Adapted for people with mobility impairments" },
-        "synharselvariation": { "name": "Vision & Hearing Variation", "description": "Activities for visual and hearing variations" },
-        "kickoff": { "name": "Kickoff", "description": "Games for kickoff events" },
-        "kontorsaktiviteter": { "name": "Office Activities", "description": "Activities for the workplace" },
-        "teambuilding": { "name": "Team Building", "description": "Strengthen the team with fun exercises" },
-        "digitalaisbrytare": { "name": "Digital Icebreakers", "description": "Icebreakers for digital meetings" },
-        "sittandegruppovningar": { "name": "Seated Group Exercises", "description": "Group exercises that can be done sitting" },
-        "videomoteslekarteamsmeet": { "name": "Video Meeting Games", "description": "Games for Teams/Meet" },
-        "lagerkolloledare": { "name": "Camp Leader", "description": "Perfect for camps and summer camps" },
-        "scoutledare": { "name": "Scout Leader", "description": "Activities for scouts" },
-        "ungaledare": { "name": "Young Leaders", "description": "For young leaders in activities" },
-        "fodolsedagarkalas": { "name": "Birthdays & Parties", "description": "Games for children's parties" },
-        "smabarnbarn18ar": { "name": "Toddlers & Children (1–8 years)", "description": "Adapted for the youngest" },
-        "tweenstonaringar917ar": { "name": "Tweens & Teenagers (9–17 years)", "description": "For older children and teenagers" },
-        "jul": { "name": "Christmas", "description": "Christmas games and activities" },
-        "midsommar": { "name": "Midsummer", "description": "Midsummer games" },
-        "pask": { "name": "Easter", "description": "Easter games and activities" },
-        "skolavslutning": { "name": "End of School Year", "description": "Games for the end of school" },
-        "brallop": { "name": "Wedding", "description": "Games for wedding parties" },
-        "hemmafest": { "name": "House Party", "description": "Party games at home" },
-        "nyarsfest": { "name": "New Year's Party", "description": "New Year's games" },
-        "studentexamen": { "name": "Graduation", "description": "Games for graduation parties" },
-        "dagisforskola": { "name": "Kindergarten & Preschool", "description": "Adapted for preschool" },
-        "grundskola_lag": { "name": "Primary School (Early Years)", "description": "For early primary school" },
-        "grundskola_mellan": { "name": "Primary School (Middle Years)", "description": "For middle primary school" },
-        "grundskola_hog": { "name": "Middle School", "description": "For middle school" },
-        "gymnasium": { "name": "High School", "description": "For high school" },
-        "fritidspedagog": { "name": "After-School Teacher", "description": "Activities for after-school programs" },
-        "fotboll": { "name": "Football", "description": "Football training and games" },
-        "innebandy": { "name": "Floorball", "description": "Floorball training" },
-        "handboll": { "name": "Handball", "description": "Handball training" },
-        "basket": { "name": "Basketball", "description": "Basketball training" },
-        "trainer": { "name": "Coach", "description": "For coaches and trainers" },
-        "pedagog": { "name": "Educator", "description": "For educators and teachers" },
-        "parent": { "name": "Parent", "description": "For parents and home activities" }
+        "autismnpf": {
+          "name": "Autism & NPF",
+          "description": "Activities adapted for autism and NPF"
+        },
+        "rarelsehinder": {
+          "name": "Mobility Impairment",
+          "description": "Adapted for people with mobility impairments"
+        },
+        "synharselvariation": {
+          "name": "Vision & Hearing Variation",
+          "description": "Activities for visual and hearing variations"
+        },
+        "kickoff": {
+          "name": "Kickoff",
+          "description": "Games for kickoff events"
+        },
+        "kontorsaktiviteter": {
+          "name": "Office Activities",
+          "description": "Activities for the workplace"
+        },
+        "teambuilding": {
+          "name": "Team Building",
+          "description": "Strengthen the team with fun exercises"
+        },
+        "digitalaisbrytare": {
+          "name": "Digital Icebreakers",
+          "description": "Icebreakers for digital meetings"
+        },
+        "sittandegruppovningar": {
+          "name": "Seated Group Exercises",
+          "description": "Group exercises that can be done sitting"
+        },
+        "videomoteslekarteamsmeet": {
+          "name": "Video Meeting Games",
+          "description": "Games for Teams/Meet"
+        },
+        "lagerkolloledare": {
+          "name": "Camp Leader",
+          "description": "Perfect for camps and summer camps"
+        },
+        "scoutledare": {
+          "name": "Scout Leader",
+          "description": "Activities for scouts"
+        },
+        "ungaledare": {
+          "name": "Young Leaders",
+          "description": "For young leaders in activities"
+        },
+        "fodolsedagarkalas": {
+          "name": "Birthdays & Parties",
+          "description": "Games for children's parties"
+        },
+        "smabarnbarn18ar": {
+          "name": "Toddlers & Children (1–8 years)",
+          "description": "Adapted for the youngest"
+        },
+        "tweenstonaringar917ar": {
+          "name": "Tweens & Teenagers (9–17 years)",
+          "description": "For older children and teenagers"
+        },
+        "jul": {
+          "name": "Christmas",
+          "description": "Christmas games and activities"
+        },
+        "midsommar": {
+          "name": "Midsummer",
+          "description": "Midsummer games"
+        },
+        "pask": {
+          "name": "Easter",
+          "description": "Easter games and activities"
+        },
+        "skolavslutning": {
+          "name": "End of School Year",
+          "description": "Games for the end of school"
+        },
+        "brallop": {
+          "name": "Wedding",
+          "description": "Games for wedding parties"
+        },
+        "hemmafest": {
+          "name": "House Party",
+          "description": "Party games at home"
+        },
+        "nyarsfest": {
+          "name": "New Year's Party",
+          "description": "New Year's games"
+        },
+        "studentexamen": {
+          "name": "Graduation",
+          "description": "Games for graduation parties"
+        },
+        "dagisforskola": {
+          "name": "Kindergarten & Preschool",
+          "description": "Adapted for preschool"
+        },
+        "grundskola_lag": {
+          "name": "Primary School (Early Years)",
+          "description": "For early primary school"
+        },
+        "grundskola_mellan": {
+          "name": "Primary School (Middle Years)",
+          "description": "For middle primary school"
+        },
+        "grundskola_hog": {
+          "name": "Middle School",
+          "description": "For middle school"
+        },
+        "gymnasium": {
+          "name": "High School",
+          "description": "For high school"
+        },
+        "fritidspedagog": {
+          "name": "After-School Teacher",
+          "description": "Activities for after-school programs"
+        },
+        "fotboll": {
+          "name": "Football",
+          "description": "Football training and games"
+        },
+        "innebandy": {
+          "name": "Floorball",
+          "description": "Floorball training"
+        },
+        "handboll": {
+          "name": "Handball",
+          "description": "Handball training"
+        },
+        "basket": {
+          "name": "Basketball",
+          "description": "Basketball training"
+        },
+        "trainer": {
+          "name": "Coach",
+          "description": "For coaches and trainers"
+        },
+        "pedagog": {
+          "name": "Educator",
+          "description": "For educators and teachers"
+        },
+        "parent": {
+          "name": "Parent",
+          "description": "For parents and home activities"
+        }
       },
       "categories": {
         "Specialpedagog": "Special Education",
@@ -10783,9 +11655,6 @@
         "Family": "Family",
         "other": "Other"
       },
-      "frequencyLabel": "Payment frequency",
-      "save15": "Save 15%",
-      "mostPopular": "Most popular",
       "detail": {
         "notFound": "Product not found",
         "notFoundDescription": "The requested product does not exist or is not available.",
@@ -10858,80 +11727,6 @@
             "answer": "We offer support via email and chat. Response time within 24 hours on weekdays."
           }
         }
-      },
-      "frequencies": {
-        "monthly": {
-          "label": "Monthly",
-          "suffix": "/month"
-        },
-        "annually": {
-          "label": "Annually",
-          "suffix": "/year"
-        }
-      },
-      "tiers": {
-        "free": {
-          "name": "Free",
-          "description": "Perfect for getting started and exploring the platform.",
-          "price": {
-            "monthly": "$0",
-            "annually": "$0"
-          },
-          "cta": "Get started",
-          "features": [
-            "5 activities",
-            "1 session per week",
-            "Basic filters",
-            "PDF export"
-          ]
-        },
-        "pro": {
-          "name": "Pro",
-          "description": "For active leaders who want more.",
-          "price": {
-            "monthly": "$9",
-            "annually": "$99"
-          },
-          "cta": "Try Pro free",
-          "features": [
-            "Unlimited activities",
-            "Unlimited sessions",
-            "Advanced filters",
-            "Team sharing",
-            "Priority support"
-          ]
-        },
-        "team": {
-          "name": "Team",
-          "description": "For organizations with multiple leaders.",
-          "price": "Contact us",
-          "cta": "Contact sales",
-          "features": [
-            "Everything in Pro",
-            "SSO login",
-            "Admin dashboard",
-            "Dedicated success manager",
-            "Custom onboarding"
-          ]
-        },
-        "marketing": {
-          "name": "Marketing",
-          "highlight": "Basic",
-          "price": "Free",
-          "description": "Explore our activities and games at no cost."
-        },
-        "app": {
-          "name": "App",
-          "highlight": "Popular",
-          "price": "$9/month",
-          "description": "Full access to all app features."
-        },
-        "admin": {
-          "name": "Admin",
-          "highlight": "Advanced",
-          "price": "Contact us",
-          "description": "Custom solutions for organizations."
-        }
       }
     },
     "cta": {
@@ -10991,6 +11786,35 @@
         "tryFree": "Try for free",
         "viewPricing": "View pricing"
       }
+    },
+    "header": {
+      "openMenu": "Öppna menyn",
+      "closeMenu": "Stäng menyn"
+    },
+    "groups": {
+      "sharedProviders": {
+        "title": "Delade providers",
+        "points": {
+          "theme": "Tema, Supabase och i18n laddas i rotlayouten.",
+          "layouts": "Layoutarna är tunna och fokuserar på navigation och chrome."
+        }
+      },
+      "uiWorlds": {
+        "title": "UI-världar",
+        "points": {
+          "marketing": "Marketing använder header och footer utan koppling till appflöden.",
+          "app": "App har bottom navigation och mobilanpassade komponenter.",
+          "admin": "Admin har vänstersidebar och topbar med sök/notifications."
+        }
+      },
+      "responsiveStrategy": {
+        "title": "Responsiv strategi",
+        "points": {
+          "marketing": "Marketing: klassisk responsiv layout.",
+          "app": "App: mobil först med luftigt desktopläge.",
+          "admin": "Admin: desktop först med fallback för mindre skärmar."
+        }
+      }
     }
   },
   "demo": {
@@ -11013,61 +11837,6 @@
         "title": "Premium demo",
         "description": "Full access with personal guide",
         "button": "Contact sales"
-      }
-    },
-    "features": {
-      "badge": "Features",
-      "title": "Architecture at a glance",
-      "description": "The UI worlds stay separate but share a component library. The app/ structure follows Next.js App Router with route groups for marketing, app, and admin.",
-      "groups": {
-        "sharedProviders": {
-          "title": "Shared providers",
-          "points": {
-            "theme": "Theme, Supabase, and i18n are loaded in the root layout.",
-            "layouts": "Layouts stay thin and focus on navigation and chrome."
-          }
-        },
-        "uiWorlds": {
-          "title": "UI worlds",
-          "points": {
-            "marketing": "Marketing uses header and footer without coupling to app flows.",
-            "app": "App has bottom navigation and mobile-first components.",
-            "admin": "Admin has a left sidebar and topbar with search/notifications."
-          }
-        },
-        "responsiveStrategy": {
-          "title": "Responsive strategy",
-          "points": {
-            "marketing": "Marketing: classic responsive layout.",
-            "app": "App: mobile-first with airy desktop layout.",
-            "admin": "Admin: desktop-first with fallback for smaller screens."
-          }
-        }
-      }
-    },
-    "pricing": {
-      "badge": "Pricing",
-      "title": "Three product experiences",
-      "description": "The architecture separates public marketing, mobile App, and desktop Admin so each team can move at its own pace.",
-      "tiers": {
-        "marketing": {
-          "name": "Marketing",
-          "price": "0 SEK",
-          "description": "Landing pages and marketing without login.",
-          "highlight": "Public"
-        },
-        "app": {
-          "name": "App",
-          "price": "Pro per facilitator",
-          "description": "Mobile-first flows with bottom navigation and shared components.",
-          "highlight": "Mobile first"
-        },
-        "admin": {
-          "name": "Admin",
-          "price": "Quote",
-          "description": "Admin portal with desktop priority, sidebar, and modular navigation.",
-          "highlight": "Desktop first"
-        }
       }
     },
     "privacy": {
@@ -12063,10 +12832,6 @@
         "overridesReset": "Overrides reset",
         "rolesSaved": "Roles saved for session"
       },
-      "participants": {
-        "title": "Participants",
-        "count": "Participants ({count})"
-      },
       "share": {
         "title": "Share session",
         "participantsGoTo": "Participants go to",
@@ -12749,7 +13514,7 @@
       "connection": {
         "live": "Live",
         "degraded": "Unstable",
-        "offline": "Reconnecting\u2026"
+        "offline": "Reconnecting…"
       },
       "stage": {
         "participantView": "PARTICIPANT VIEW",
@@ -13120,7 +13885,8 @@
       "noData": "No play data available.",
       "waiting": {
         "title": "Waiting for activity",
-        "description": "Game content will appear here when the host starts."
+        "description": "Game content will appear here when the host starts.",
+        "openStory": "Öppna Story"
       },
       "basic": {
         "title": "Follow the Board",
@@ -14021,7 +14787,9 @@
       },
       "manual": {
         "hostWillVerify": "The host will verify your location"
-      }
+      },
+      "participant": "Deltagare",
+      "verifyLocation": "Verifiera plats"
     },
     "hintPanel": {
       "noMoreHints": "No more hints available",
@@ -14523,7 +15291,53 @@
         "reconnectDescription": "Your connection seems invalid on this device. Try connecting again.",
         "reconnectAction": "Connect again",
         "leaveSession": "Leave session",
-        "activeSession": "Active session"
+        "activeSession": "Active session",
+        "loadingSession": "Laddar session...",
+        "sessionCodeLabel": "Sessionskod:",
+        "connection": {
+          "connected": "Ansluten",
+          "degraded": "Instabil",
+          "offline": "Offline"
+        },
+        "updatesTitle": "Uppdateringar",
+        "statusLabel": "Status",
+        "statusTitle": {
+          "lobby": "Väntar",
+          "live": "Pågår",
+          "paused": "Paus",
+          "ended": "Avslutad",
+          "locked": "Låst"
+        },
+        "statusBadge": {
+          "lobby": "Väntar",
+          "live": "Live",
+          "paused": "Paus",
+          "ended": "Avslutad",
+          "locked": "Låst"
+        },
+        "pendingApproval": "Väntar på godkännande från lekledaren…",
+        "nowTitle": "Just nu",
+        "banner": {
+          "waiting": "Väntar på att lekledaren startar.",
+          "paused": "Paus. Snart kör vi igen.",
+          "locked": "Sessionen är låst.",
+          "ended": "Sessionen är avslutad. Tack för att du var med.",
+          "degraded": "Uppkopplingen är instabil. Visar senaste kända läge.",
+          "offline": "Ingen anslutning. Försök igen."
+        },
+        "events": {
+          "session_paused": "Sessionen pausades",
+          "session_resumed": "Sessionen återupptogs",
+          "session_ended": "Sessionen avslutades",
+          "session_locked": "Sessionen låstes",
+          "session_unlocked": "Sessionen låstes upp",
+          "host_message": "Meddelande från lekledaren",
+          "participant_joined": "{name} anslöt",
+          "participant_left": "{name} lämnade",
+          "role_changed": "Roll uppdaterad",
+          "progress_updated": "Framsteg uppdaterat",
+          "achievement_unlocked": "Utmärkelse upplåst"
+        }
       },
       "waitingRoom": {
         "title": "Waiting Room",
@@ -15216,7 +16030,9 @@
       "totalDuration": "~{minutes} min total",
       "scriptsCount": "{count} scripts",
       "noStepsYet": "No steps in this game yet.",
-      "close": "Close"
+      "close": "Close",
+      "minutesShort": "{count} min",
+      "scriptLabel": "Manus"
     },
     "storyline": {
       "title": "Storyline",

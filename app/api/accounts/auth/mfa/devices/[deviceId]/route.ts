@@ -9,6 +9,7 @@ import { apiHandler } from '@/lib/api/route-handler'
  */
 export const DELETE = apiHandler({
   auth: 'user',
+  rateLimit: 'auth',
   handler: async ({ auth, params }) => {
     const user = auth!.user!
     const { deviceId } = params

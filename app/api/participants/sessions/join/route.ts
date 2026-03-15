@@ -43,44 +43,44 @@ export const POST = apiHandler({
 
     if (!session) {
       return NextResponse.json(
-        { error: 'Session not found', details: 'Invalid session code or session has ended' },
+        { error: 'Unable to join session', code: 'JOIN_FAILED' },
         { status: 404 },
       );
     }
 
-    // Check session status
+    // Check session status — use uniform error to prevent enumeration
     if (session.status === 'draft') {
       return NextResponse.json(
-        { error: 'Session not available', details: 'Session is not open for participants yet.', code: 'SESSION_OFFLINE' },
-        { status: 403 },
+        { error: 'Unable to join session', code: 'JOIN_FAILED' },
+        { status: 404 },
       );
     }
     if (session.status === 'locked') {
       return NextResponse.json(
-        { error: 'Session is locked', details: 'Session is locked. No new participants can join.' },
-        { status: 403 },
+        { error: 'Unable to join session', code: 'JOIN_FAILED' },
+        { status: 404 },
       );
     }
     if (session.status === 'ended' || session.status === 'cancelled' || session.status === 'archived') {
       return NextResponse.json(
-        { error: 'Session ended', details: 'Session has ended.' },
-        { status: 410 },
+        { error: 'Unable to join session', code: 'JOIN_FAILED' },
+        { status: 404 },
       );
     }
 
     // Allow joining during: lobby (waiting), active (running), paused (temporarily stopped)
     if (session.status !== 'lobby' && session.status !== 'active' && session.status !== 'paused') {
       return NextResponse.json(
-        { error: 'Session not available', details: `Session is ${session.status}.` },
-        { status: 403 },
+        { error: 'Unable to join session', code: 'JOIN_FAILED' },
+        { status: 404 },
       );
     }
 
     // Check if session has expired
     if (session.expires_at && new Date(session.expires_at) < new Date()) {
       return NextResponse.json(
-        { error: 'Session has expired' },
-        { status: 410 },
+        { error: 'Unable to join session', code: 'JOIN_FAILED' },
+        { status: 404 },
       );
     }
 
@@ -94,7 +94,7 @@ export const POST = apiHandler({
     const maxParticipants = settings.max_participants ?? settings.maxParticipants;
     if (maxParticipants && session.participant_count >= maxParticipants) {
       return NextResponse.json(
-        { error: 'Session is full', details: `Maximum ${maxParticipants} participants reached` },
+        { error: 'Unable to join session', code: 'SESSION_FULL' },
         { status: 403 },
       );
     }
@@ -138,7 +138,7 @@ export const POST = apiHandler({
         displayName,
       });
       return NextResponse.json(
-        { error: 'Failed to join session', details: createError?.message },
+        { error: 'Failed to join session' },
         { status: 500 },
       );
     }

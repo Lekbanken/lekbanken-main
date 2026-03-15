@@ -58,6 +58,7 @@ export const GET = apiHandler({
  */
 export const POST = apiHandler({
   auth: 'public',
+  rateLimit: 'api',
   handler: async ({ req, params }) => {
   const { id: sessionId } = params;
 

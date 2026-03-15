@@ -108,7 +108,7 @@ export const PATCH = apiHandler({
         updates: userUpdate,
         email: auth!.user!.email 
       })
-      return NextResponse.json({ error: 'Failed to update user', details: error.message }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to update user' }, { status: 500 })
     }
     if (!data) {
       console.warn('[accounts/profile] users update returned no data - row may not exist', { userId: userId })

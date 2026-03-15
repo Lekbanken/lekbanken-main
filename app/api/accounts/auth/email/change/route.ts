@@ -49,7 +49,7 @@ export const POST = apiHandler({
     if (error) {
       console.error('[auth/email/change] Failed to update email', error)
       return NextResponse.json(
-        { error: error.message, errorCode: 'UPDATE_FAILED', field: 'new_email' },
+        { error: 'Email update failed', errorCode: 'UPDATE_FAILED', field: 'new_email' },
         { status: 400 },
       )
     }

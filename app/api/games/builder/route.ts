@@ -244,7 +244,7 @@ export const POST = apiHandler({
 
   const { data: game, error } = await supabase.from('games').insert(insertGame).select().single();
   if (error || !game) {
-    return NextResponse.json({ error: 'Failed to create game', details: error?.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create game' }, { status: 500 });
   }
 
   const secondaryPurposes = body.secondaryPurposes ?? [];
@@ -331,7 +331,7 @@ export const POST = apiHandler({
       .select();
 
     if (artifactsError) {
-      return NextResponse.json({ error: 'Failed to save artifacts', details: artifactsError.message }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to save artifacts' }, { status: 500 });
     }
 
     const insertedArtifactsSafe = (insertedArtifacts ?? []) as Array<{ id: string }>;
@@ -364,7 +364,7 @@ export const POST = apiHandler({
     if (variantRows.length > 0) {
       const { error: variantsError } = await supabase.from('game_artifact_variants').insert(variantRows);
       if (variantsError) {
-        return NextResponse.json({ error: 'Failed to save artifact variants', details: variantsError.message }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to save artifact variants' }, { status: 500 });
       }
     }
   }
@@ -389,17 +389,11 @@ export const POST = apiHandler({
             {
               error:
                 "Toolbelt DB is not migrated: missing table public.game_tools. Apply migration supabase/migrations/20260102120000_game_tools_v1.sql and reload PostgREST schema.",
-              details: {
-                message: toolsError.message,
-                code: toolsError.code,
-                hint: toolsError.hint,
-                details: toolsError.details,
-              },
             },
             { status: 500 }
           );
         }
-        return NextResponse.json({ error: 'Failed to save tools', details: toolsError.message }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to save tools' }, { status: 500 });
       }
     }
   }

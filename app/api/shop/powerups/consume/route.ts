@@ -55,14 +55,15 @@ export const POST = apiHandler({
       if (error) {
         const message = typeof error?.message === 'string' ? error.message : 'Unknown error'
         const status = message.toLowerCase().includes('insufficient') ? 409 : 500
-        return NextResponse.json({ error: 'Consume failed', details: message }, { status })
+        return NextResponse.json({ error: 'Consume failed' }, { status })
       }
 
       const row = Array.isArray(data) ? data[0] : data
       return NextResponse.json({ remainingQuantity: row?.remaining_quantity ?? 0 }, { status: 200 })
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Unknown error'
-      return NextResponse.json({ error: 'Server error', details: message }, { status: 500 })
+      console.error('[shop/powerups/consume] unexpected error:', message)
+      return NextResponse.json({ error: 'Server error' }, { status: 500 })
     }
   },
 })

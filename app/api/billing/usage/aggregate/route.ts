@@ -81,7 +81,7 @@ export const POST = apiHandler({
             tenantId: tenant.id,
             meterId: meter.id,
             success: false,
-            error: error.message,
+            error: 'Processing error',
           })
         } else {
           results.push({

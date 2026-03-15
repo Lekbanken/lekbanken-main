@@ -61,9 +61,8 @@ export const GET = apiHandler({
     }
   } catch (error) {
     console.error('[Atlas API] Failed to load inventory:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: `Failed to load inventory: ${errorMessage}` },
+      { error: 'Failed to load inventory' },
       { status: 500 }
     );
   }

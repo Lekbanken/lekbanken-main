@@ -103,7 +103,7 @@ export const POST = apiHandler({
         stripe_invoice_id: finalized.id,
         notes: body.description || null,
       })
-      .select('*')
+      .select('id, tenant_id, name, amount, amount_subtotal, amount_tax, amount_total, currency, due_date, status, notes, created_at')
       .maybeSingle()
 
     if (insertError) {

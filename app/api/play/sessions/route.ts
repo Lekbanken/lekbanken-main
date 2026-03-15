@@ -18,7 +18,7 @@ export const GET = apiHandler({
       .limit(50);
 
     if (error) {
-      return NextResponse.json({ error: 'Failed to fetch sessions', details: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 });
     }
 
     return NextResponse.json({

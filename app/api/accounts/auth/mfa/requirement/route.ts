@@ -11,6 +11,7 @@ import { apiHandler } from '@/lib/api/route-handler'
 
 export const GET = apiHandler({
   auth: 'user',
+  rateLimit: 'api',
   handler: async ({ auth }) => {
     const status = await getMFAStatus(auth!.user!.id)
 

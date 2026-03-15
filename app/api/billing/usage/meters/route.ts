@@ -11,7 +11,7 @@ export const GET = apiHandler({
   handler: async () => {
     const { data: meters, error } = await supabaseAdmin
       .from('usage_meters')
-      .select('*')
+      .select('id, name, display_name, unit, status, created_at')
       .eq('status', 'active')
       .order('name', { ascending: true })
 

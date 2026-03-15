@@ -9,6 +9,7 @@ import { apiHandler } from '@/lib/api/route-handler'
  */
 export const GET = apiHandler({
   auth: 'user',
+  rateLimit: 'api',
   handler: async ({ auth }) => {
     const user = auth!.user!
 
@@ -37,6 +38,7 @@ export const GET = apiHandler({
  */
 export const DELETE = apiHandler({
   auth: 'user',
+  rateLimit: 'auth',
   handler: async ({ auth }) => {
     const user = auth!.user!
 

@@ -269,7 +269,7 @@ export const POST = apiHandler({
       }
 
       const status = lower.includes('insufficient') ? 409 : 500
-      return NextResponse.json({ error: 'Purchase failed', details: message }, { status })
+      return NextResponse.json({ error: 'Purchase failed' }, { status })
     }
 
     const row = Array.isArray(data) ? data[0] : data

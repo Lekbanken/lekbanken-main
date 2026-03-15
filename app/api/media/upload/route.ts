@@ -1,13 +1,30 @@
 import { NextResponse } from 'next/server'
-import { createServerRlsClient } from '@/lib/supabase/server'
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { apiHandler } from '@/lib/api/route-handler'
 import { z } from 'zod'
 import { logger } from '@/lib/utils/logger'
 import { assertTenantMembership } from '@/lib/planner/require-plan-access'
+import { getQuotaLimit, parseTenantFeatureConfig } from '@/lib/features/tenant-features'
+import type { SubscriptionTier } from '@/lib/features/tenant-features'
+
+// Allowed MIME types for uploads
+const ALLOWED_MIME_TYPES = new Set([
+  // Images
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/avif',
+  // Audio
+  'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/mp4',
+  // Video
+  'video/mp4', 'video/webm',
+  // Documents
+  'application/pdf',
+])
 
 const uploadSchema = z.object({
   fileName: z.string().min(1).max(255),
-  fileType: z.string().min(1),
+  fileType: z.string().min(1).refine(
+    (v) => ALLOWED_MIME_TYPES.has(v),
+    { message: 'File type not allowed' }
+  ),
   fileSize: z.number().int().positive().max(10 * 1024 * 1024), // 10MB max
   tenantId: z.string().uuid().optional().nullable(),
   bucket: z
@@ -32,12 +49,46 @@ export const POST = apiHandler({
     )
   }
 
-  const { fileName, fileType, tenantId, bucket } = parsed.data
+  const { fileName, fileType, fileSize, tenantId, bucket } = parsed.data
 
   // Verify tenant membership when tenant-scoped upload
   if (tenantId) {
     const tenantCheck = await assertTenantMembership(supabase, auth!.user!, tenantId)
     if (!tenantCheck.allowed) return tenantCheck.response
+
+    // Enforce storage quota
+    const serviceClient = await createServiceRoleClient()
+    const { data: tenant } = await serviceClient
+      .from('tenants')
+      .select('subscription_tier, metadata')
+      .eq('id', tenantId)
+      .single()
+
+    if (tenant) {
+      const tier = (tenant.subscription_tier ?? 'free') as SubscriptionTier
+      const config = parseTenantFeatureConfig(tenant.metadata as Record<string, unknown> | null)
+      const quotaMb = getQuotaLimit('max_storage_mb', tier, config)
+
+      if (quotaMb !== -1) {
+        // Get current storage usage from all buckets for this tenant
+        const { data: files } = await serviceClient.storage
+          .from(bucket)
+          .list(tenantId, { limit: 10000 })
+
+        const currentUsageBytes = (files ?? []).reduce(
+          (sum, f) => sum + ((f as { metadata?: { size?: number } }).metadata?.size ?? 0),
+          0
+        )
+        const quotaBytes = quotaMb * 1024 * 1024
+
+        if (currentUsageBytes + fileSize > quotaBytes) {
+          return NextResponse.json(
+            { error: 'Storage quota exceeded', quotaMb, usedMb: Math.round(currentUsageBytes / 1024 / 1024) },
+            { status: 403 }
+          )
+        }
+      }
+    }
   }
 
   // Generate unique file path

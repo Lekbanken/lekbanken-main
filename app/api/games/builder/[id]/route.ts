@@ -522,7 +522,7 @@ export const PUT = apiHandler({
     .eq('id', id);
 
   if (updateError) {
-    return NextResponse.json({ error: 'Failed to update game', details: updateError.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to update game' }, { status: 500 });
   }
 
   // GAME-009: collect non-fatal save warnings instead of silently ignoring errors
@@ -642,20 +642,13 @@ export const PUT = apiHandler({
             {
               error:
                 "Toolbelt DB is not migrated: missing table public.game_tools. Apply migration supabase/migrations/20260102120000_game_tools_v1.sql and reload PostgREST schema.",
-              details: {
-                message: toolsError.message,
-                code: toolsError.code,
-                hint: toolsError.hint,
-                details: toolsError.details,
-              },
             },
             { status: 500 }
           );
         }
         return NextResponse.json(
           {
-            error: `Failed to save tools: ${toolsError.message}`,
-            details: { message: toolsError.message, code: toolsError.code, hint: toolsError.hint, details: toolsError.details },
+            error: 'Failed to save tools',
           },
           { status: 500 }
         );
@@ -822,7 +815,7 @@ export const PUT = apiHandler({
       .select();
 
     if (artifactsError) {
-      return NextResponse.json({ error: 'Failed to save artifacts', details: artifactsError.message }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to save artifacts' }, { status: 500 });
     }
 
     const upsertedArtifactsSafe = (upsertedArtifacts ?? []) as Array<{ id: string }>;
@@ -863,7 +856,7 @@ export const PUT = apiHandler({
     if (variantRows.length > 0) {
       const { error: variantsError } = await supabase.from('game_artifact_variants').insert(variantRows);
       if (variantsError) {
-        return NextResponse.json({ error: 'Failed to save artifact variants', details: variantsError.message }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to save artifact variants' }, { status: 500 });
       }
     }
   }
@@ -895,7 +888,7 @@ export const PUT = apiHandler({
     }));
     const { error: triggersError } = await supabase.from('game_triggers').upsert(triggerRows, { onConflict: 'id' });
     if (triggersError) {
-      return NextResponse.json({ error: 'Failed to save triggers', details: triggersError.message }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to save triggers' }, { status: 500 });
     }
   }
 

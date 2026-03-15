@@ -199,7 +199,7 @@ export const DELETE = apiHandler({
 
     if (error) {
       console.error('[schedule] delete error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Schedule update failed' }, { status: 500 });
     }
 
     return new NextResponse(null, { status: 204 });

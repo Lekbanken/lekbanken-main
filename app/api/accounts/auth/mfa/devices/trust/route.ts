@@ -11,6 +11,7 @@ const trustDeviceSchema = z.object({
 
 export const POST = apiHandler({
   auth: 'user',
+  rateLimit: 'auth',
   input: trustDeviceSchema,
   handler: async ({ auth, body }) => {
     const headersList = await headers()

@@ -8,7 +8,7 @@ export const GET = apiHandler({
     const supabase = await createServerRlsClient()
     const { data, error } = await supabase
       .from('user_sessions')
-      .select('*')
+      .select('id, user_id, device_name, browser, os, last_seen_at, created_at')
       .eq('user_id', auth!.user!.id)
       .order('last_seen_at', { ascending: false })
 

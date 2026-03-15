@@ -26,6 +26,7 @@ interface VerifyRequestBody {
 
 export const POST = apiHandler({
   auth: 'user',
+  rateLimit: 'auth',
   handler: async ({ auth, req }) => {
     const supabase = await createServerRlsClient()
     const userId = auth!.user!.id

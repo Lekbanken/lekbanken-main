@@ -11,7 +11,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
-  const rate = applyRateLimitMiddleware(request, 'api');
+  const rate = applyRateLimitMiddleware(request, 'strict');
   if (rate) return rate;
 
   const { code } = await params;

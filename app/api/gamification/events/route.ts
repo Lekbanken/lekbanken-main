@@ -114,8 +114,9 @@ export const POST = apiHandler({
           })
 
           if (coinError) {
+            console.error('Coin award failed:', coinError.message)
             return NextResponse.json(
-              { error: 'Coin award failed', details: coinError.message ?? 'Unknown error' },
+              { error: 'Coin award failed' },
               { status: 500 }
             )
           }
@@ -135,8 +136,9 @@ export const POST = apiHandler({
         return NextResponse.json({ eventId: existingEventId, idempotent: true }, { status: 200 })
       }
 
+      console.error('Event insert failed:', insertError.message)
       return NextResponse.json(
-        { error: 'Event insert failed', details: insertError.message ?? 'Unknown error' },
+        { error: 'Event insert failed' },
         { status: 500 }
       )
     }
@@ -158,7 +160,7 @@ export const POST = apiHandler({
 
       if (coinError) {
         return NextResponse.json(
-          { error: 'Coin award failed', details: coinError.message ?? 'Unknown error' },
+          { error: 'Coin award failed' },
           { status: 500 }
         )
       }

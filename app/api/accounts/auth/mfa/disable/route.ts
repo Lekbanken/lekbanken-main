@@ -7,6 +7,7 @@ import { apiHandler } from '@/lib/api/route-handler'
 
 export const POST = apiHandler({
   auth: 'user',
+  rateLimit: 'auth',
   handler: async ({ auth, req }) => {
     const user = auth!.user!
     const supabase = await createServerRlsClient()

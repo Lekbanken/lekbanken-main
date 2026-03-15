@@ -48,7 +48,7 @@ export const POST = apiHandler({
 
     if (error) {
       console.error('[usage API] Record error:', error)
-      return NextResponse.json({ error: error.message || 'Failed to record usage' }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to record usage' }, { status: 500 })
     }
 
     return NextResponse.json({ record_id: data })

@@ -10,7 +10,11 @@ export const GET = apiHandler({
   handler: async ({ params }) => {
     const { tenantId } = params
     const supabase = await createServerRlsClient()
-    const { data: tenant, error } = await supabase.from('tenants').select('*').eq('id', tenantId).maybeSingle()
+    const { data: tenant, error } = await supabase
+      .from('tenants')
+      .select('id, name, slug, type, status, subscription_tier, default_language, default_theme, logo_url, logo_dark_url, icon_url, demo_flag, created_at, updated_at')
+      .eq('id', tenantId)
+      .maybeSingle()
     if (error) {
       console.error('[api/tenants/:id] get error', error)
       return NextResponse.json({ error: 'Failed to load tenant' }, { status: 500 })

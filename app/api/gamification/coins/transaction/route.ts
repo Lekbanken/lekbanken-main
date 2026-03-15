@@ -49,7 +49,7 @@ export const POST = apiHandler({
     if (error) {
       const message = typeof error?.message === 'string' ? error.message : 'Unknown error'
       const status = message.toLowerCase().includes('insufficient') ? 409 : 500
-      return NextResponse.json({ error: 'Coin transaction failed', details: message }, { status })
+      return NextResponse.json({ error: 'Coin transaction failed' }, { status })
     }
 
     const row = Array.isArray(data) ? data[0] : data

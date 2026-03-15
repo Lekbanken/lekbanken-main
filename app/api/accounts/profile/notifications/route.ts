@@ -134,7 +134,7 @@ export const PATCH = apiHandler({
 
   if (result.error) {
     console.error('[accounts/profile/notifications] save error', result.error)
-    return NextResponse.json({ error: result.error.message || 'Failed to save notification settings' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to save notification settings' }, { status: 500 })
   }
 
   return NextResponse.json({ settings: mapRowToSettings(result.data) })

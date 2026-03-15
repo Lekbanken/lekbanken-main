@@ -11,30 +11,20 @@
       "close": "Lukk",
       "confirm": "Bekreft",
       "back": "Tilbake",
-      "common": {
-        "dash": "–"
-      },
       "next": "Neste",
       "previous": "Forrige",
-      "separator": "•",
       "search": "Søk",
       "filter": "Filtrer",
       "sort": "Sorter",
       "export": "Eksporter",
       "import": "Importer",
       "download": "Last ned",
-      "leaderScript": {
-        "title": "LEADER SCRIPT"
-      },
       "upload": "Last opp",
       "refresh": "Oppdater",
       "retry": "Prøv igjen",
       "submit": "Send",
       "apply": "Bruk",
       "reset": "Tilbakestill",
-      "armedLabel": "🟢 ARMED ({count})",
-      "errorLabel": "❌ ERROR ({count})",
-      "firedLabel": "✅ FIRED ({count})",
       "defaults": {
         "newArtifact": "Nytt artefakt"
       },
@@ -44,196 +34,23 @@
       "deselectAll": "Fjern alle valg",
       "copy": "Kopier",
       "paste": "Lim inn",
-      "duplicate": "Dupliser",
       "archive": "Arkiver",
       "restore": "Gjenopprett",
       "publish": "Publiser",
       "unpublish": "Avpubliser",
       "preview": "Forhåndsvis",
-      "executingIndicator": "●",
-      "notificationsStatus": "Varsler: {status}",
-      "toast": {
-        "title": "Varsel",
-        "body": "In-app toast",
-        "correctCode": "Riktig kode",
-        "codeLength": "Kodelengde",
-        "correctCodePlaceholder": "1234",
-        "toggle": {
-          "show": "+",
-          "hide": "−"
-        }
-      },
       "view": "Vis",
       "hide": "Skjul",
       "show": "Vis",
       "expand": "Utvid",
-      "collapse": "Skjul",
-      "more": "Mer",
       "less": "Mindre",
       "loading": "Laster...",
       "saving": "Lagrer...",
       "deleting": "Sletter...",
-      "templates": {
-        "keypadBasic": {
-          "name": "Keypad (4 sifre)",
-          "description": "En enkel 4-sifret PIN for å låse opp noe",
-          "title": "Hemmelig kode",
-          "correctCode": "1234",
-          "successMessage": "✅ Riktig! Du har låst opp ledetråden.",
-          "failMessage": "❌ Feil kode. Prøv igjen!"
-        },
-        "keypadAdvanced": {
-          "name": "Keypad (med forsøksbegrensning)",
-          "description": "PIN med maks 3 forsøk før låsing",
-          "title": "Sikkerhetskode",
-          "successMessage": "🎉 Riktig! Veien er åpen.",
-          "failMessage": "⚠️ Feil kode!",
-          "lockedMessage": "🚫 Keypad låst. Kontakt spilllederen."
-        },
-        "riddle": {
-          "name": "Gåte / Spørsmål",
-          "description": "En gåte med tekstinnmating for svar",
-          "title": "Gåten",
-          "prompt": "Hva har fire bein men kan ikke gå?",
-          "correctAnswers": "bord\net bord\nbordet"
-        },
-        "cipherCaesar": {
-          "name": "Caesar-chiffer",
-          "description": "Kryptert melding med bokstavforskyvning",
-          "title": "Kryptert melding",
-          "cipherKey": "3",
-          "plaintext": "hemmeligheten er under trappen"
-        },
-        "hotspotImage": {
-          "name": "Klikkbart bilde",
-          "description": "Bilde med skjulte soner å finne",
-          "title": "Søk i bildet"
-        },
-        "tilePuzzle": {
-          "name": "Puslespill (3x3)",
-          "description": "Skyvepuslespill for å avsløre et bilde",
-          "title": "Puslespillet"
-        },
-        "logicGrid": {
-          "name": "Logikkrutenett",
-          "description": "Logikkpussel der ting skal matches",
-          "title": "Hvem gjorde hva?",
-          "rows": "Alice\nBob\nCharlie",
-          "columns": "Rød\nGrønn\nBlå",
-          "solution": "{\"Alice\":\"Rød\",\"Bob\":\"Grønn\",\"Charlie\":\"Blå\"}"
-        },
-        "counterClues": {
-          "name": "Ledetrådteller",
-          "description": "Tell funnede ledetråder eller fremdrift",
-          "title": "Funne ledetråder",
-          "label": "Ledetråder"
-        },
-        "hintContainer": {
-          "name": "Tips-beholder",
-          "description": "Progressive tips som kan avsløres",
-          "title": "Tips",
-          "hints": "Se under matten\nDet finnes en skjult nøkkel\nNøkkelen passer i skapet til høyre"
-        },
-        "qrGate": {
-          "name": "QR-kode checkpoint",
-          "description": "Skann QR-kode for å fortsette",
-          "title": "Skann koden",
-          "expectedValue": "SECRET123",
-          "successMessage": "✅ Riktig kode! Fortsett til neste ledetråd."
-        },
-        "locationCheckpoint": {
-          "name": "Steds-checkpoint",
-          "description": "GPS-verifisering for byspill",
-          "title": "Finn stedet",
-          "locationName": "Torget"
-        },
-        "clueCard": {
-          "name": "Ledetråd/Hint",
-          "description": "Et kort med en ledetråd som kan avsløres",
-          "title": "Ledetråd",
-          "descriptionText": "Skjult ledetråd som spilllederen kan vise",
-          "variantTitle": "Ledetråd",
-          "variantBody": "Skriv ledetråden din her..."
-        },
-        "secretDocument": {
-          "name": "Hemmelig dokument",
-          "description": "Et dokument som avsløres til riktig tid",
-          "title": "Hemmelig dokument",
-          "descriptionText": "Avsløres når deltakerne finner det"
-        },
-        "revealCard": {
-          "name": "Avsløringskort",
-          "description": "Et kort for dramatiske avsløringer",
-          "title": "Avsløringen"
-        },
-        "roleSecret": {
-          "name": "Rollehemmelighet",
-          "description": "Hemmelig informasjon synlig kun for en rolle",
-          "title": "Din hemmelighet",
-          "variantTitle": "Hemmelig informasjon",
-          "variantBody": "Bare du kan se dette..."
-        },
-        "audioClue": {
-          "name": "Lydledetråd",
-          "description": "Lydklipp som spilles av for deltakerne",
-          "title": "Lytt nøye"
-        },
-        "soundTrigger": {
-          "name": "Lydaktivering",
-          "description": "Aktiveres når deltakerne lager lyd",
-          "title": "Rop høyt!",
-          "instruction": "Rop høyt for å åpne døren!"
-        },
-        "propCheck": {
-          "name": "Rekvisitt-sjekk",
-          "description": "Spilllederen bekrefter at deltakerne har riktig ting",
-          "title": "Vis frem gjenstanden",
-          "propName": "Gullnøkkelen",
-          "instruction": "Vis gullnøkkelen til spilllederen for å fortsette."
-        },
-        "quizAnswer": {
-          "name": "Quizsvar",
-          "description": "Keypad for quizspørsmål med siffersvar",
-          "title": "Spørsmål",
-          "descriptionText": "Skriv inn svaret med sifre",
-          "successMessage": "✅ Riktig svar!",
-          "failMessage": "❌ Feil svar. Prøv igjen!"
-        },
-        "textQuestion": {
-          "name": "Tekstspørsmål",
-          "description": "Åpent spørsmål med tekstsvar",
-          "title": "Svar på spørsmålet",
-          "prompt": "Hva er hovedstaden i Sverige?",
-          "correctAnswers": "stockholm\nStockholm"
-        },
-        "checklist": {
-          "name": "Sjekkliste",
-          "description": "Flere ting å krysse av",
-          "title": "Sjekkliste",
-          "items": "Oppgave 1\nOppgave 2\nOppgave 3"
-        },
-        "learningCard": {
-          "name": "Lærekort",
-          "description": "Kort med informasjon eller fakta",
-          "title": "Lærekort"
-        },
-        "imageReveal": {
-          "name": "Bilde å avsløre",
-          "description": "Et bilde som vises til riktig tid",
-          "title": "Bilde"
-        },
-        "replayMarker": {
-          "name": "Replay-markør",
-          "description": "La deltakere markere viktige øyeblikk",
-          "title": "Marker øyeblikk"
-        },
-        "blank": {
-          "name": "Tom artefakt",
-          "description": "Start fra scratch",
-          "title": "Nytt artefakt"
-        }
-      },
-      "updating": "Oppdaterer..."
+      "updating": "Oppdaterer...",
+      "correctCode": "Korrekt kod",
+      "codeLength": "Kodlängd",
+      "correctCodePlaceholder": "1234"
     },
     "status": {
       "active": "Aktiv",
@@ -245,8 +62,7 @@
       "published": "Publisert",
       "archived": "Arkivert",
       "enabled": "Aktivert",
-      "disabled": "Deaktivert",
-      "minutesShort": "min"
+      "disabled": "Deaktivert"
     },
     "labels": {
       "name": "Navn",
@@ -486,7 +302,7 @@
       "lockedLevel": "Nivå {level}",
       "lockedAchievement": "Prestasjon",
       "lockedShop": "Butikk",
-      "loading": "Laster kosmetikk\u2026",
+      "loading": "Laster kosmetikk…",
       "error": "Kunne ikke laste kosmetikkatalogen",
       "noItems": "Ingen kosmetikk i denne kategorien ennå",
       "active": "Aktiv: {name}",
@@ -560,66 +376,173 @@
       "shop": "Butikk",
       "shopDesc": "Bruk mynter til belønninger",
       "eventlog": "Eventlogg",
-      "eventlogDesc": "Din aktivitetshistorikk",
-      "manageApp": "Administrer appen"
+      "eventlogDesc": "Din aktivitetshistorikk"
     },
     "achievementsTitle": "Prestasjoner",
     "achievementsSubtitle": "Din samling av badges og mål",
-    "overview": "Oversikt",
-    "coinReasonCodes": {
-      "event:session_completed": "Belønning for fullført økt",
-      "event:run_completed": "Belønning for fullført runde",
-      "event:plan_created": "Belønning for opprettet plan",
-      "event:plan_published": "Belønning for publisert plan",
-      "event:game_played": "Belønning for spilt spill",
-      "event:achievement_unlocked": "Belønning for opplåst prestasjon",
-      "event:first_session": "Belønning for første økt",
-      "event:streak_bonus": "Streak-bonus",
-      "powerup:coin_multiplier": "Myntmultiplikator-bonus",
-      "refund": "Refusjon"
-    }
+    "overview": "Oversikt"
   },
   "cosmetics": {
-    "void_stars": { "name": "Stjernefelt", "description": "Et glitrende stjernefelt i bakgrunnen" },
-    "void_orbit": { "name": "Orbital", "description": "Partikler som kretser rundt avataren din" },
-    "void_warp": { "name": "Hyperspace", "description": "En warp-hastighetbar" },
-    "void_meteors": { "name": "Meteorer", "description": "Fallende meteorer i bakgrunnen" },
-    "void_nebula": { "name": "Nebulosa", "description": "En kosmisk nebulosadeler" },
-    "void_constellation": { "name": "Stjernebilde", "description": "En lysende stjernebilderamme" },
-    "sea_bubbles": { "name": "Bobler", "description": "Stigende bobler i bakgrunnen" },
-    "sea_ripple": { "name": "Krusning", "description": "Krusende vannpartikler" },
-    "sea_current": { "name": "Havstrøm", "description": "En flytende XP-bar" },
-    "sea_waves": { "name": "Bølger", "description": "Rullende bølger i bakgrunnen" },
-    "sea_tide": { "name": "Tidevann", "description": "En tidvannsdeler" },
-    "sea_coral": { "name": "Korallrev", "description": "En vakker korallramme" },
-    "forest_leaves": { "name": "Løv", "description": "Drivende løv i bakgrunnen" },
-    "forest_spores": { "name": "Sporer", "description": "Lysende skogspartikler" },
-    "forest_growth": { "name": "Vekst", "description": "En organisk XP-bar" },
-    "forest_fireflies": { "name": "Ildfluer", "description": "Glødende ildfluer i bakgrunnen" },
-    "forest_roots": { "name": "Røtter", "description": "En naturlig rotdeler" },
-    "forest_vines": { "name": "Ranker", "description": "En slingrende rankeramme" },
-    "desert_clouds": { "name": "Skyer", "description": "Drivende skyer i bakgrunnen" },
-    "desert_halo": { "name": "Glorie", "description": "En lysende glorieeffekt" },
-    "desert_rainbow": { "name": "Regnbue", "description": "En skimrende regnbue XP-bar" },
-    "desert_rays": { "name": "Gudestråler", "description": "Pulserende lysstråler" },
-    "desert_breeze": { "name": "Bris", "description": "En myk brisdeler" },
-    "desert_aurora": { "name": "Nordlys", "description": "En skimrende nordlysramme" },
-    "forest_title_lv1": { "name": "Skogens lærling", "description": "Starttittel for Forest-fraksjonen" },
-    "forest_title_lv5": { "name": "Skogvokter", "description": "Tittel ved nivå 5 i Forest" },
-    "forest_title_lv10": { "name": "Løvsangens mester", "description": "Tittel ved nivå 10 i Forest" },
-    "forest_title_lv20": { "name": "Skogens eldgamle", "description": "Tittel ved nivå 20 i Forest" },
-    "sea_title_lv1": { "name": "Strandvandrer", "description": "Starttittel for Sea-fraksjonen" },
-    "sea_title_lv5": { "name": "Tidevannets vokter", "description": "Tittel ved nivå 5 i Sea" },
-    "sea_title_lv10": { "name": "Korallenes herre", "description": "Tittel ved nivå 10 i Sea" },
-    "sea_title_lv20": { "name": "Dypets hersker", "description": "Tittel ved nivå 20 i Sea" },
-    "desert_title_lv1": { "name": "Sandens nybegynner", "description": "Starttittel for Desert-fraksjonen" },
-    "desert_title_lv5": { "name": "Solens budbringer", "description": "Tittel ved nivå 5 i Desert" },
-    "desert_title_lv10": { "name": "Ørkenstormen", "description": "Tittel ved nivå 10 i Desert" },
-    "desert_title_lv20": { "name": "Solens arving", "description": "Tittel ved nivå 20 i Desert" },
-    "void_title_lv1": { "name": "Romvandrer", "description": "Starttittel for Void-fraksjonen" },
-    "void_title_lv5": { "name": "Stjernevever", "description": "Tittel ved nivå 5 i Void" },
-    "void_title_lv10": { "name": "Nebulavokter", "description": "Tittel ved nivå 10 i Void" },
-    "void_title_lv20": { "name": "Kosmisk overherre", "description": "Tittel ved nivå 20 i Void" }
+    "void_stars": {
+      "name": "Stjernefelt",
+      "description": "Et glitrende stjernefelt i bakgrunnen"
+    },
+    "void_orbit": {
+      "name": "Orbital",
+      "description": "Partikler som kretser rundt avataren din"
+    },
+    "void_warp": {
+      "name": "Hyperspace",
+      "description": "En warp-hastighetbar"
+    },
+    "void_meteors": {
+      "name": "Meteorer",
+      "description": "Fallende meteorer i bakgrunnen"
+    },
+    "void_nebula": {
+      "name": "Nebulosa",
+      "description": "En kosmisk nebulosadeler"
+    },
+    "void_constellation": {
+      "name": "Stjernebilde",
+      "description": "En lysende stjernebilderamme"
+    },
+    "sea_bubbles": {
+      "name": "Bobler",
+      "description": "Stigende bobler i bakgrunnen"
+    },
+    "sea_ripple": {
+      "name": "Krusning",
+      "description": "Krusende vannpartikler"
+    },
+    "sea_current": {
+      "name": "Havstrøm",
+      "description": "En flytende XP-bar"
+    },
+    "sea_waves": {
+      "name": "Bølger",
+      "description": "Rullende bølger i bakgrunnen"
+    },
+    "sea_tide": {
+      "name": "Tidevann",
+      "description": "En tidvannsdeler"
+    },
+    "sea_coral": {
+      "name": "Korallrev",
+      "description": "En vakker korallramme"
+    },
+    "forest_leaves": {
+      "name": "Løv",
+      "description": "Drivende løv i bakgrunnen"
+    },
+    "forest_spores": {
+      "name": "Sporer",
+      "description": "Lysende skogspartikler"
+    },
+    "forest_growth": {
+      "name": "Vekst",
+      "description": "En organisk XP-bar"
+    },
+    "forest_fireflies": {
+      "name": "Ildfluer",
+      "description": "Glødende ildfluer i bakgrunnen"
+    },
+    "forest_roots": {
+      "name": "Røtter",
+      "description": "En naturlig rotdeler"
+    },
+    "forest_vines": {
+      "name": "Ranker",
+      "description": "En slingrende rankeramme"
+    },
+    "desert_clouds": {
+      "name": "Skyer",
+      "description": "Drivende skyer i bakgrunnen"
+    },
+    "desert_halo": {
+      "name": "Glorie",
+      "description": "En lysende glorieeffekt"
+    },
+    "desert_rainbow": {
+      "name": "Regnbue",
+      "description": "En skimrende regnbue XP-bar"
+    },
+    "desert_rays": {
+      "name": "Gudestråler",
+      "description": "Pulserende lysstråler"
+    },
+    "desert_breeze": {
+      "name": "Bris",
+      "description": "En myk brisdeler"
+    },
+    "desert_aurora": {
+      "name": "Nordlys",
+      "description": "En skimrende nordlysramme"
+    },
+    "forest_title_lv1": {
+      "name": "Skogens lærling",
+      "description": "Starttittel for Forest-fraksjonen"
+    },
+    "forest_title_lv5": {
+      "name": "Skogvokter",
+      "description": "Tittel ved nivå 5 i Forest"
+    },
+    "forest_title_lv10": {
+      "name": "Løvsangens mester",
+      "description": "Tittel ved nivå 10 i Forest"
+    },
+    "forest_title_lv20": {
+      "name": "Skogens eldgamle",
+      "description": "Tittel ved nivå 20 i Forest"
+    },
+    "sea_title_lv1": {
+      "name": "Strandvandrer",
+      "description": "Starttittel for Sea-fraksjonen"
+    },
+    "sea_title_lv5": {
+      "name": "Tidevannets vokter",
+      "description": "Tittel ved nivå 5 i Sea"
+    },
+    "sea_title_lv10": {
+      "name": "Korallenes herre",
+      "description": "Tittel ved nivå 10 i Sea"
+    },
+    "sea_title_lv20": {
+      "name": "Dypets hersker",
+      "description": "Tittel ved nivå 20 i Sea"
+    },
+    "desert_title_lv1": {
+      "name": "Sandens nybegynner",
+      "description": "Starttittel for Desert-fraksjonen"
+    },
+    "desert_title_lv5": {
+      "name": "Solens budbringer",
+      "description": "Tittel ved nivå 5 i Desert"
+    },
+    "desert_title_lv10": {
+      "name": "Ørkenstormen",
+      "description": "Tittel ved nivå 10 i Desert"
+    },
+    "desert_title_lv20": {
+      "name": "Solens arving",
+      "description": "Tittel ved nivå 20 i Desert"
+    },
+    "void_title_lv1": {
+      "name": "Romvandrer",
+      "description": "Starttittel for Void-fraksjonen"
+    },
+    "void_title_lv5": {
+      "name": "Stjernevever",
+      "description": "Tittel ved nivå 5 i Void"
+    },
+    "void_title_lv10": {
+      "name": "Nebulavokter",
+      "description": "Tittel ved nivå 10 i Void"
+    },
+    "void_title_lv20": {
+      "name": "Kosmisk overherre",
+      "description": "Tittel ved nivå 20 i Void"
+    }
   },
   "browse": {
     "pageTitle": "Utforsk",
@@ -721,7 +644,8 @@
     "filterHint": "Tips: Bruk filtre for å finne riktig aktivitet",
     "gameCard": {
       "ageYears": "{age} år"
-    }
+    },
+    "minutes": "Minuter"
   },
   "profile": {
     "achievements": {
@@ -1203,7 +1127,9 @@
     "confirm": {
       "defaultConfirm": "Bekreft",
       "defaultCancel": "Avbryt",
-      "typeToConfirm": "Skriv følgende for å bekrefte:"
+      "typeToConfirm": "Skriv følgende for å bekrefte:",
+      "waiting": "Vänta...",
+      "typePlaceholder": "Skriv {confirmText} för att bekräfta"
     },
     "commandPalette": {
       "searchPlaceholder": "Søk kommandoer, naviger...",
@@ -1428,7 +1354,9 @@
           "cancel": "Avbryt",
           "deleteMapping": "Fjern mapping",
           "copy": "Kopier",
-          "copyKeyAria": "Kopier template key"
+          "copyKeyAria": "Kopier template key",
+          "showCoverage": "Visa täckning",
+          "hideCoverage": "Dölj täckning"
         },
         "create": {
           "title": "Opprett standardbilde-mapping",
@@ -1445,7 +1373,16 @@
           "subPurposeLabel": "Delformål (valgfritt)",
           "subPurposePlaceholder": "Velg delformål",
           "subPurposeNone": "Ingen",
-          "selectImageLabel": "Velg bilde *"
+          "selectImageLabel": "Velg bilde *",
+          "templateKeyAutoGenerated": "Genereras automatiskt baserat på produkt och syfte",
+          "showAdvanced": "Anpassa",
+          "hideAdvanced": "Dölj",
+          "nameAutoGenerated": "Genereras automatiskt från produkt- och syfteval",
+          "existingTemplatesTitle": "Befintliga bilder för denna kombination",
+          "noExistingTemplates": "Inga bilder ännu för denna kombination",
+          "slotsUsed": "platser",
+          "slotsFull": "Max antal bilder för denna kombination är uppnått",
+          "slotsFullHint": "Ta bort en befintlig standardbild ovan för att frigöra en plats."
         },
         "list": {
           "title": "Eksisterende standardbilder ({count})",
@@ -1477,7 +1414,23 @@
           "deleted": "Standardbilde fjernet",
           "deleteFailed": "Kunne ikke fjerne standardbilde",
           "copied": "Kopiert",
-          "copyFailed": "Kunne ikke kopiere"
+          "copyFailed": "Kunne ikke kopiere",
+          "slotLimitReached": "Det finns redan 5 standardbilder för denna kombination. Ta bort en innan du lägger till en ny.",
+          "duplicateKey": "En mall med denna nyckel finns redan.",
+          "conflict": "Kunde inte skapa standardbild på grund av en konflikt. Försök igen."
+        },
+        "automation": {
+          "hint": "Dessa bilder används automatiskt vid import och bulk-operationer."
+        },
+        "coverage": {
+          "title": "Täckningsmatris",
+          "description": "Visar antal standardbilder per kombination av produkt och huvudsyfte. Spel får automatiskt en bild vid import om kombination har täckning.",
+          "purpose": "Syfte",
+          "global": "Global",
+          "total": "Totalt",
+          "noPurposes": "Inga syften hittades.",
+          "hasCoverage": "Har standardbilder",
+          "missingCoverage": "Saknar standardbilder"
         }
       }
     },
@@ -1676,7 +1629,11 @@
         "targetAudience": "Målgruppe",
         "selectRecipients": "Velg mottakere",
         "actionUrl": "Action URL (valgfritt)",
-        "actionLabel": "Action label (valgfritt)"
+        "actionLabel": "Action label (valgfritt)",
+        "selectOrg": "Välj organisation",
+        "scope": "Mottagare",
+        "excludeDemoUsers": "Exkludera demoanvändare",
+        "excludeDemoUsersDesc": "Skicka inte till användare som är i demoläge"
       },
       "placeholders": {
         "title": "Appoppdatering",
@@ -1685,421 +1642,10 @@
       },
       "options": {
         "allInOrg": "Alle i organisasjonen",
-        "specificUsers": "Spesifikke brukere"
+        "specificUsers": "Spesifikke brukere",
+        "selectOrg": "-- Välj organisation --"
       },
       "loading": {
-        "page": {
-          "common": {
-            "required": "*"
-          },
-          "errors": {
-            "loadPurposes": "Kunne ikke laste formål",
-            "loadGame": "Kunne ikke laste spill",
-            "loadData": "Kunne ikke laste data",
-            "saveFailed": "Kunne ikke lagre",
-            "unexpected": "En feil oppstod",
-            "publishMissingRequired": "Fyll inn obligatoriske felt og velg omslagsbilde før publisering."
-          },
-          "defaults": {
-            "triggerName": "Trigger"
-          },
-          "loadingGame": "Laster spill...",
-          "header": {
-            "backToGames": "Tilbake til spill",
-            "editTitle": "Rediger spill",
-            "createTitle": "Opprett nytt spill",
-            "preview": "Forhåndsvis",
-            "saveDraft": "Lagre utkast",
-            "publish": "Publiser"
-          },
-          "basicInfo": {
-            "title": "Grunninformasjon",
-            "description": "Navn og beskrivelse som vises i spillbiblioteket.",
-            "nameLabel": "Navn",
-            "namePlaceholder": "F.eks. Samarbeidsstafett",
-            "shortDescriptionLabel": "Kort beskrivelse",
-            "shortDescriptionPlaceholder": "1–2 setninger som oppsummerer spillet.",
-            "fullDescriptionLabel": "Full beskrivelse",
-            "fullDescriptionPlaceholder": "Detaljert beskrivelse av spillet..."
-          },
-          "purposes": {
-            "title": "Formål og omslagsbilde",
-            "mainLabel": "Hovedformål",
-            "subLabel": "Delformål",
-            "loadingOption": "Laster formål...",
-            "emptyHint": "Velg hovedformål for å se delformål.",
-            "unknownMain": "Ukjent formål",
-            "unknownSub": "Ukjent delformål"
-          },
-          "classification": {
-            "title": "Klassifisering",
-            "energyLabel": "Energinivå",
-            "locationLabel": "Sted",
-            "timeLabel": "Tid (minutter)",
-            "artifact": {
-              "newArtifact": "Nytt artefakt",
-              "defaults": {
-                "role": "Rolle"
-              },
-              "common": {
-                "yes": "Ja",
-                "no": "Nei"
-              },
-              "header": {
-                "title": "Artefakter ({count})",
-                "subtitle": "Ledetråder, keypads, dokumenter og medier",
-                "wizard": "Wizard",
-                "add": "Legg til"
-              },
-              "empty": {
-                "title": "Ingen artefakter ennå.",
-                "description": "Bruk Wizard for å raskt lage artefakter, eller legg til manuelt."
-              },
-              "fields": {
-                "titlePlaceholder": "Tittel",
-                "typeLabel": "Type",
-                "tagsLabel": "Tagger (kommaseparert)",
-                "tagsPlaceholder": "mystery, clue",
-                "descriptionLabel": "Beskrivelse",
-                "descriptionPlaceholder": "Kort bakgrunn eller notater"
-              },
-              "errors": {
-                "loadConversationDecks": "Kunne ikke laste samtalekortstokker."
-              },
-              "visibleFromStart": {
-                "label": "Synlig fra start",
-                "help": "Artefakten vises direkte for deltakere uten at spillederen trenger å avsLøre den.",
-                "badge": "Synlig"
-              },
-              "visibility": {
-                "public": "Offentlig",
-                "leaderOnly": "Kun leder",
-                "rolePrivate": "Rollespesifikk"
-              },
-              "types": {
-                "card": "Kort",
-                "document": "Dokument",
-                "image": "Bilde",
-                "conversationCards": "Samtalekort",
-                "keypad": "Keypad",
-                "riddle": "Gåte",
-                "multiAnswer": "Flervalgssvar",
-                "audio": "Lyd",
-                "hotspot": "Hotspot",
-                "tilePuzzle": "Puslespill",
-                "cipher": "Chiffer",
-                "logicGrid": "Logikkrutenett",
-                "counter": "Teller",
-                "qrGate": "QR-port",
-                "hintContainer": "Tips-beholder",
-                "propConfirmation": "Rekvisitt-bekreftelse",
-                "locationCheck": "Stedskontroll",
-                "soundLevel": "Lydnivå",
-                "replayMarker": "Replay-markør",
-                "signalGenerator": "Signalgenerator",
-                "timeBankStep": "Tidsbank-steg",
-                "emptyArtifact": "Tom artefakt",
-                "spatialMap": "Kart (Spatial)"
-              },
-              "spatialMap": {
-                "title": "Romlig kart",
-                "pickLabel": "Velg kart",
-                "pickPlaceholder": "— Velg et kart —",
-                "noMaps": "Ingen lagrede kart funnet",
-                "currentMap": "Valgt kart",
-                "titleOverrideLabel": "Overstyr tittel (valgfritt)",
-                "titleOverridePlaceholder": "F.eks. Kjeller, Inngang",
-                "helpText": "Kartet vises som en artefakt for ledere og/eller deltakere.",
-                "openFull": "Åpne kart",
-                "loadError": "Kunne ikke laste kartet",
-                "noAccess": "Ingen tilgang til kartet",
-                "loading": "Laster kart…",
-                "loadingMap": "Laster kart…",
-                "retry": "Prøv igjen",
-                "close": "Lukk"
-              },
-              "keypad": {
-                "title": "PIN-kode-innstillinger",
-                "correctCodeLabel": "Riktig kode",
-                "correctCodePlaceholder": "1234",
-                "correctCodeHelp": "Kun sifre (maks 8)",
-                "codeLengthLabel": "Kodelengde",
-                "codeLengthPlaceholder": "4",
-                "codeLengthHelp": "Antall sifre i koden (2-8)",
-                "successMessageLabel": "Melding ved riktig kode (valgfritt)",
-                "successMessagePlaceholder": "Låst opp! Du fant ledetråden.",
-                "advancedTitle": "Avanserte innstillinger",
-                "maxAttemptsLabel": "Maks forsøk",
-                "maxAttemptsPlaceholder": "Ubegrenset",
-                "maxAttemptsHelp": "0 eller tom = ubegrenset",
-                "lockOnFailLabel": "Lås ved feil",
-                "lockOnFailNo": "Nei – kan prøve igjen",
-                "lockOnFailYes": "Ja – låses permanent",
-                "failMessageLabel": "Melding ved feil kode",
-                "failMessagePlaceholder": "Feil kode! Prøv igjen.",
-                "lockedMessageLabel": "Melding når låst",
-                "lockedMessagePlaceholder": "Keypaden er låst. Kontakt spilllederen."
-              },
-              "conversation": {
-                "title": "Samtalekort",
-                "selectLabel": "Velg lek (kun publiserte)",
-                "selectPlaceholder": "— Velg —",
-                "helpText": "Artefakten viser leken i skrivebeskyttet modus for deltakere og spillleder."
-              },
-              "riddle": {
-                "title": "Gåte / Spørsmål-innstillinger",
-                "promptLabel": "Spørsmål / Ledetråd",
-                "promptPlaceholder": "Hva har fire bein men kan ikke gå?",
-                "answersLabel": "Riktige svar (ett per linje)",
-                "answersPlaceholder": "bord\net bord\nbordet",
-                "answersHelp": "Flere alternativer = alle godkjennes",
-                "matchModeLabel": "Matchingsmodus",
-                "matchModeExact": "Eksakt match",
-                "matchModeFlexible": "Fleksibel (ignorer store/små bokstaver og mellomrom)",
-                "matchModeNumeric": "Kun sifre",
-                "maxAttemptsLabel": "Maks forsøk",
-                "maxAttemptsPlaceholder": "Ubegrenset"
-              },
-              "counter": {
-                "title": "Teller-innstillinger",
-                "initialLabel": "Startverdi",
-                "initialPlaceholder": "0",
-                "targetLabel": "Målverdi",
-                "targetPlaceholder": "5",
-                "stepLabel": "Stegstørrelse",
-                "stepPlaceholder": "1",
-                "labelLabel": "Etikett (valgfritt)",
-                "labelPlaceholder": "Fant ledetråder"
-              },
-              "audio": {
-                "title": "Lydklipp-innstillinger",
-                "urlLabel": "Lyd-URL (valgfritt)",
-                "urlPlaceholder": "https://example.com/audio.mp3"
-              },
-              "hotspot": {
-                "title": "Klikkbart bilde-innstillinger",
-                "imageLabel": "Bilde-URL",
-                "imagePlaceholder": "https://example.com/image.jpg",
-                "requiredHitsLabel": "Antall soner å finne",
-                "requiredHitsPlaceholder": "Alle",
-                "showFeedbackLabel": "Vis tilbakemelding",
-                "showFeedbackYes": "Ja – vis treff",
-                "showFeedbackNo": "Nei – stille",
-                "helpText": "💡 Hotspot-soner defineres i JSON-metadata: zones: [{x, y, radius, label}]"
-              },
-              "tilePuzzle": {
-                "title": "Puslespill-innstillinger",
-                "imageLabel": "Bilde-URL",
-                "imagePlaceholder": "https://example.com/puzzle-image.jpg",
-                "gridLabel": "Rutenettstørrelse",
-                "grid2": "2×2 (lett)",
-                "grid3": "3×3 (normal)",
-                "grid4": "4×4 (vanskelig)",
-                "grid5": "5×5 (ekspert)",
-                "previewLabel": "Vis forhåndsvisning"
-              },
-              "cipher": {
-                "title": "Chiffer-innstillinger",
-                "methodLabel": "Chiffermetode",
-                "methodCaesar": "Caesar (forskyvning)",
-                "methodAtbash": "Atbash (speiling)",
-                "methodVigenere": "Vigenère (nøkkelord)",
-                "methodSubstitution": "Substitusjon (egen)",
-                "keyLabelCaesar": "Forskyvning (1-25)",
-                "keyLabelVigenere": "Nøkkelord",
-                "keyPlaceholderCaesar": "3",
-                "keyPlaceholderVigenere": "hemmelig",
-                "plaintextLabel": "Klartekst (det som skal krypteres)",
-                "plaintextPlaceholder": "Hemmeligheten er under trappen"
-              },
-              "logicGrid": {
-                "title": "Logikk-rutenett-innstillinger",
-                "rowsLabel": "Rader (kommadelt)",
-                "rowsPlaceholder": "Alice, Bob, Charlie",
-                "columnsLabel": "Kolonner (kommadelt)",
-                "columnsPlaceholder": "Rød, Grønn, Blå",
-                "helpText": "💡 Løsningen defineres i JSON:",
-                "helpCode": "solution: {\"Alice\": \"Rød\", \"Bob\": \"Grønn\"}"
-              },
-              "multiAnswer": {
-                "title": "Flervalgssvar-innstillinger",
-                "itemsLabel": "Ting å krysse av (ett per linje)",
-                "itemsPlaceholder": "Finn nøkkelen\nLøs gåten\nÅpne døren",
-                "requiredCountLabel": "Krev antall for ferdig",
-                "requiredCountPlaceholder": "Alle"
-              },
-              "qrGate": {
-                "title": "QR/NFC-skanning-innstillinger",
-                "expectedLabel": "Forventet verdi",
-                "expectedPlaceholder": "SECRET123",
-                "expectedHelp": "Teksten QR-koden skal inneholde",
-                "successLabel": "Melding ved vellykket skanning",
-                "successPlaceholder": "Riktig kode! Fortsett til neste ledetråd."
-              },
-              "hintContainer": {
-                "title": "Tips-beholder-innstillinger",
-                "hintsLabel": "Tips (ett per linje, i rekkefølge)",
-                "hintsPlaceholder": "Se under matten\nDet finnes en skjult nøkkel\nNøkkelen passer i skapet til høyre",
-                "maxHintsLabel": "Maks tips å gi",
-                "maxHintsPlaceholder": "Alle",
-                "penaltyLabel": "Poengtrekk per tips",
-                "penaltyPlaceholder": "0"
-              },
-              "propConfirmation": {
-                "title": "Rekvisitt-bekreftelse-innstillinger",
-                "propNameLabel": "Rekvisittnavn",
-                "propNamePlaceholder": "Gullnøkkelen",
-                "instructionLabel": "Instruksjon til deltakere",
-                "instructionPlaceholder": "Vis gullnøkkelen til spilllederen for å fortsette."
-              },
-              "locationCheck": {
-                "title": "Stedsverifisering-innstillinger",
-                "latitudeLabel": "Breddegrad",
-                "latitudePlaceholder": "59.3293",
-                "longitudeLabel": "Lengdegrad",
-                "longitudePlaceholder": "18.0686",
-                "radiusLabel": "Radius (meter)",
-                "radiusPlaceholder": "50",
-                "locationNameLabel": "Stedsnavn (valgfritt)",
-                "locationNamePlaceholder": "Torget"
-              },
-              "soundLevel": {
-                "title": "Lydnivå-detektor-innstillinger",
-                "thresholdLabel": "Terskel (0-100)",
-                "thresholdPlaceholder": "70",
-                "holdLabel": "Tid over terskel (sek)",
-                "holdPlaceholder": "2",
-                "instructionLabel": "Instruksjon",
-                "instructionPlaceholder": "Rop høyt for å åpne døren!"
-              },
-              "replayMarker": {
-                "title": "Replay-markør-innstillinger",
-                "description": "Denne artefakten lar deltakere markere viktige øyeblikk under sesjonen for senere analyse.",
-                "maxMarkersLabel": "Maks markører",
-                "maxMarkersPlaceholder": "Ubegrenset",
-                "allowLabelsLabel": "Tillat etiketter"
-              },
-              "variants": {
-                "title": "Varianter",
-                "subtitle": "Styr synlighet, rolletilgang og når varianten kan låses opp.",
-                "add": "Legg til variant",
-                "label": "Variant",
-                "titleLabel": "Tittel",
-                "titlePlaceholder": "Varianttittel",
-                "visibilityLabel": "Synlighet",
-                "roleLabel": "Rolle (for privat variant)",
-                "roleNoneOption": "Ingen (vises etter synlighet)",
-                "mediaLabel": "Mediareferanse (valgfri)",
-                "mediaPlaceholder": "media_id eller URL",
-                "bodyLabel": "Tekst/innhold",
-                "bodyPlaceholder": "Hva viser denne varianten?",
-                "stepIndexLabel": "Steg-indeks (0 = første)",
-                "stepIndexPlaceholder": "0",
-                "phaseIndexLabel": "Fase-indeks (0 = første)",
-                "phaseIndexPlaceholder": "0"
-              }
-            },
-            "minPlayersLabel": "Spillere min",
-            "maxPlayersLabel": "Spillere maks",
-            "ageMinLabel": "Alder min",
-            "ageMaxLabel": "Alder maks",
-            "timePlaceholder": "F.eks. 15",
-            "minPlayersPlaceholder": "F.eks. 4",
-            "maxPlayersPlaceholder": "F.eks. 30",
-            "ageMinPlaceholder": "F.eks. 6",
-            "ageMaxPlaceholder": "F.eks. 99",
-            "energyPlaceholder": "Velg energinivå",
-            "energyLow": "Lav",
-            "energyMedium": "Middels",
-            "energyHigh": "Høy",
-            "locationPlaceholder": "Velg sted",
-            "locationIndoor": "Innendørs",
-            "locationOutdoor": "Utendørs",
-            "locationBoth": "Begge"
-          },
-          "materials": {
-            "title": "Materialer",
-            "description": "List materialer som trengs for å gjennomføre spillet.",
-            "itemsLabel": "Materialer (én per linje)",
-            "itemsPlaceholder": "Eksempel:\n8 kjegler\n1 ball per lag\nMusikk (Spotify-spilleliste)",
-            "itemsCount": "{count} materialer lagt til",
-            "preparationLabel": "Forberedelser",
-            "preparationPlaceholder": "Hva må lederen forberede før spillet?"
-          },
-          "safety": {
-            "title": "Sikkerhet og inkludering",
-            "description": "Viktige sikkerhetsnotater og tips for inkludering.",
-            "safetyNotesLabel": "⚠️ Sikkerhetsnotater",
-            "safetyNotesPlaceholder": "Eks: Pass på vegger ved rask bevegelse. Unngå glatte gulv.",
-            "accessibilityLabel": "♿ Tilgjengelighetsnotater",
-            "accessibilityPlaceholder": "Tips for tilpasning til ulike behov...",
-            "spaceLabel": "🏠 Plasskrav",
-            "spacePlaceholder": "Eks: Minst 10x10 meter fri plass",
-            "leaderTipsLabel": "💡 Leder-tips",
-            "leaderTipsPlaceholder": "Tips til lederen for at spillet skal fungere bedre..."
-          },
-          "artifacts": {
-            "title": "Artefakter",
-            "description": "Opprett artefakter med varianter som kan låses opp per steg/fase og begrenses per rolle.",
-            "rolesHint": "Tips: Legg til roller for å kunne lage private varianter per rolle."
-          },
-          "triggers": {
-            "title": "Triggere",
-            "description": "Automatiser spillet med \"Når X skjer, gjør Y\"-regler.",
-            "artifactsHint": "Tips: Legg til artefakter (f.eks. keypads) for å kunne trigge på hendelser."
-          },
-          "roles": {
-            "title": "Roller",
-            "description": "Definer roller med hemmelige instruksjoner for deltakere."
-          },
-          "board": {
-            "title": "Publik tavle",
-            "description": "Innhold som vises på prosjektor/storskjerm under spillet."
-          },
-          "tools": {
-            "title": "Verktøy (Toolbelt)",
-            "description": "Aktiver verktøy som kan brukes under en spilløkt.",
-            "availabilityLabel": "Tilgjengelig for",
-            "availabilityHost": "Leder",
-            "availabilityParticipants": "Deltakere",
-            "availabilityBoth": "Begge",
-            "availabilityHelp": "Velg om verktøyet vises for ledere, deltakere eller begge."
-          },
-          "translations": {
-            "title": "Oversettelser",
-            "description": "Administrer oversettelser til ulike språk.",
-            "languageSwedish": "Svensk",
-            "languageNorwegian": "Norsk",
-            "languageEnglish": "Engelsk",
-            "percent": "{percent}%",
-            "comingSoon": "Full oversettelseshåndtering kommer snart."
-          },
-          "settings": {
-            "title": "Innstillinger",
-            "description": "Status og synlighet for spillet.",
-            "taxonomyLabel": "Taksonomi / spillkategori",
-            "taxonomyPlaceholder": "F.eks. Ring-leker",
-            "taxonomyNote": "Beholder tidligere verdi ved import; lagres som spillkategori i databasen.",
-            "statusLabel": "Status",
-            "statusDraft": "Utkast",
-            "statusPublished": "Publisert",
-            "statusHelpDraft": "Utkast er bare synlige for deg.",
-            "statusHelpPublished": "Publiserte spill er synlige for alle med tilgang.",
-            "demoContentLabel": "Demo-innhold",
-            "demoContentHelp": "Aktiver for å vise dette spillet for demo-brukere på demo.lekbanken.no",
-            "dangerTitle": "Faresone",
-            "dangerDescription": "Permanent sletting av spillet. Denne handlingen kan ikke angres.",
-            "deleteButton": "Slett spill",
-            "taxonomyPresets": {
-              "boardGames": "Brettspill",
-              "partyGame": "Festlek",
-              "circleGames": "Ring-leker",
-              "outdoorGames": "Uteleker",
-              "indoorGames": "Innelek",
-              "icebreakers": "Isbrytere"
-            }
-          }
-        },
         "users": "Laster brukere..."
       },
       "empty": {
@@ -2108,17 +1654,53 @@
       "recipients": {
         "title": "Mottakere",
         "count": "{count} brukere i organisasjonen.",
-        "hint": "Når du velger spesifikke brukere, kan du velge fra listen. Ellers sendes det til alle."
+        "hint": "Når du velger spesifikke brukere, kan du velge fra listen. Ellers sendes det til alle.",
+        "globalDesc": "Broadcast till {count} organisationer",
+        "tenantDesc": "{name} ({count} medlemmar)",
+        "usersDesc": "{count} valda användare",
+        "selectTenant": "Välj en organisation först"
       },
       "actions": {
         "sending": "Sender...",
-        "send": "Send varsel"
+        "send": "Send varsel",
+        "selectAll": "Välj alla",
+        "deselectAll": "Avmarkera alla"
       },
       "errors": {
         "loadUsers": "Kunne ikke laste brukere for organisasjonen.",
         "loadUsersFailed": "Kunne ikke laste brukere.",
         "noUsersToSend": "Det finnes ingen brukere å sende til.",
-        "sendFailed": "Kunne ikke sende varsler."
+        "sendFailed": "Kunne ikke sende varsler.",
+        "noAccess": "Du har inte behörighet att skicka notifikationer."
+      },
+      "title": "Notifikationer",
+      "markAllAsRead": "Markera alla som lästa",
+      "noNotifications": "Inga notifikationer",
+      "noAccessTitle": "Ingen åtkomst",
+      "noAccessDescription": "Du har inte behörighet att skicka notifikationer.",
+      "optional": "valfritt",
+      "scope": {
+        "global": "Alla organisationer",
+        "globalDesc": "Skicka till alla användare i systemet",
+        "tenant": "En organisation",
+        "tenantDesc": "Skicka till alla i vald organisation",
+        "users": "Specifika användare",
+        "usersDesc": "Välj enskilda mottagare"
+      },
+      "categories": {
+        "system": "System",
+        "support": "Support",
+        "billing": "Fakturering",
+        "learning": "Lärande",
+        "gamification": "Gamification",
+        "announcement": "Nyhet"
+      },
+      "preview": {
+        "title": "Förhandsvisning",
+        "empty": "Skriv titel och meddelande för att se förhandsvisning."
+      },
+      "success": {
+        "sent": "Notifikation skickad till {count} mottagare."
       }
     },
     "purposes": {
@@ -2234,48 +1816,82 @@
       }
     },
     "licenses": {
-      "confirmReset": {
-        "title": "Tilbakestill trigger?",
-        "description": "Dette vil tilbakestille triggeren “{name}” slik at den kan utløses igjen.",
-        "cancel": "Avbryt",
-        "confirm": "Tilbakestill"
-      },
       "legacy": {
-        "pageTitle": "Lisenser",
         "pageDescription": "Oversikt over kundelisenser, status og bruk.",
         "notLoggedIn": "Du er ikke logget inn",
-        "notLoggedInDescription": "Logg inn for å se lisenser.",
-        "errorTitle": "En feil oppstod",
-        "loading": "Laster lisenser...",
         "searchPlaceholder": "Søk organisasjon eller produkt",
         "stats": {
-          "total": "Totalt",
-          "active": "Aktive",
-          "trial": "Prøveperiode",
           "expired": "Utgått"
         },
-        "status": {
-          "active": "Aktiv",
-          "trial": "Prøveperiode",
-          "expired": "Utgått",
-          "suspended": "Suspendert"
-        },
-        "filter": {
-          "all": "Alle statuser"
-        },
-        "empty": {
-          "noLicenses": "Ingen lisenser",
-          "noLicensesDescription": "Ingen lisenser funnet med gjeldende filtre."
-        },
-        "unknownOrg": "Ukjent org",
-        "plan": "Årlig",
-        "seatsLabel": "Plan: {plan} • Seter: {used}/{total}",
-        "validLabel": "Gyldig: {start} – {end}",
         "loginToSee": "Logg inn for å se lisenser.",
         "errorOccurred": "En feil oppstod",
         "planSeats": "Plan: {plan} • Seats: {used}/{total}",
         "validPeriod": "Gjelder: {start} – {end}"
-      }
+      },
+      "title": "Licenser",
+      "description": "Hantera alla licenser – personliga och organisationer",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "licenses": "Licenser"
+      },
+      "stats": {
+        "total": "Totalt",
+        "active": "Aktiva",
+        "private": "Personliga",
+        "organization": "Organisationer"
+      },
+      "filter": {
+        "searchPlaceholder": "Sök e-post, organisation...",
+        "typeAll": "Alla typer",
+        "typePrivate": "Personliga",
+        "typeOrganization": "Organisationer",
+        "statusAll": "Alla status",
+        "statusActive": "Aktiv",
+        "statusInactive": "Inaktiv",
+        "statusRevoked": "Återkallad",
+        "statusExpired": "Utgången"
+      },
+      "type": {
+        "private": "Personlig",
+        "organization": "Organisation"
+      },
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "revoked": "Återkallad",
+        "expired": "Utgången"
+      },
+      "seats": "platser",
+      "grantButton": "Skapa personlig licens",
+      "noLicenses": "Inga licenser hittades",
+      "noLicensesHint": "Justera filter eller skapa en ny licens",
+      "grantSuccess": "Personlig licens skapad",
+      "grantDialog": {
+        "title": "Skapa personlig licens",
+        "description": "Tilldela en licens till en privatperson. Användaren måste redan ha ett konto.",
+        "userEmail": "Användarens e-post",
+        "userEmailPlaceholder": "namn@exempel.se",
+        "userEmailHint": "Användaren måste redan ha ett konto i systemet",
+        "product": "Produkt",
+        "selectProduct": "Välj produkt",
+        "loadingProducts": "Laddar produkter...",
+        "noProducts": "Inga produkter tillgängliga",
+        "seats": "Antal platser",
+        "seatsHint": "Antal platser som ingår i licensen",
+        "validUntil": "Giltig till (valfritt)",
+        "notes": "Anteckningar (valfritt)",
+        "notesPlaceholder": "T.ex. support-ärende #123",
+        "cancel": "Avbryt",
+        "grant": "Skapa licens",
+        "granting": "Skapar...",
+        "submit": "Skapa licens",
+        "submitting": "Skapar...",
+        "validation": {
+          "required": "Fyll i alla obligatoriska fält",
+          "invalidEmail": "Ange en giltig e-postadress"
+        }
+      },
+      "loadError": "Kunde inte ladda licenser"
     },
     "leaderboard": {
       "legacy": {
@@ -2849,7 +2465,58 @@
           "createFailed": "Kunne ikke opprette entitlement.",
           "entitlementRevoked": "Entitlement tilbakekalt.",
           "revokeFailed": "Kunne ikke tilbakekalle entitlement."
-        }
+        },
+        "noProducts": "Inga produkter tillgängliga"
+      },
+      "identity": {
+        "slugReadOnly": "kan ej ändras"
+      },
+      "locale": {
+        "title": "Språk & Region",
+        "undo": "Ångra",
+        "save": "Spara",
+        "saving": "Sparar...",
+        "mainLanguage": "Huvudspråk (innehåll)",
+        "selectLanguage": "Välj språk",
+        "mainLanguageDescription": "Språk för spelinnehåll och media.",
+        "defaultLanguage": "Standardspråk (gränssnitt)",
+        "defaultLanguageDescription": "Standardspråk för användargränssnittet. Användare kan ändra själva.",
+        "defaultTheme": "Standardtema",
+        "selectTheme": "Välj tema",
+        "defaultThemeDescription": "Standardtema för nya användare. Användare kan ändra i sina inställningar.",
+        "languageSupportTitle": "Språkstöd",
+        "languageSupportDescription": "Lekbanken stödjer flera språk. Huvudspråket avgör vilket innehåll som visas för spel och aktiviteter. Användare kan alltid ändra sitt gränssnittsspråk via sina personliga inställningar."
+      },
+      "members": {
+        "pendingInvites": "{count, plural, one {# inbjudan väntar på svar} other {# inbjudningar väntar på svar}}"
+      },
+      "list": {
+        "openOrganisation": "Öppna {name}",
+        "copyUuid": "Kopiera UUID för {name}",
+        "copy": "Kopiera",
+        "createdAt": "Skapad {date}",
+        "quickActions": "Snabbåtgärder",
+        "viewOrganisation": "Visa organisation",
+        "edit": "Redigera",
+        "manageMembers": "Hantera medlemmar",
+        "manageBilling": "Hantera billing",
+        "openStripe": "Öppna Stripe",
+        "reactivate": "Återaktivera",
+        "suspend": "Stäng av",
+        "removeOrganisation": "Ta bort organisation",
+        "domainActive": "Domän aktiv",
+        "domainPending": "Domän väntande",
+        "noDomain": "Ingen domän",
+        "contact": "Kontakt",
+        "members": "Medlemmar",
+        "billing": "Billing",
+        "domain": "Domän",
+        "billingConnected": "Kopplad",
+        "noBilling": "Ingen billing",
+        "removeDialogTitle": "Ta bort organisation?",
+        "removeDialogDescription": "Detta går inte att ångra. Organisationen och kopplade data kan försvinna permanent.",
+        "cancel": "Avbryt",
+        "remove": "Ta bort"
       }
     },
     "tenant": {
@@ -3049,77 +2716,112 @@
         }
       },
       "security": {
-        "pageTitle": "Sikkerhet",
-        "pageDescription": "Administrer sikkerhetsinnstillinger for organisasjonen",
         "mfa": {
           "pageTitle": "MFA-policy",
           "pageDescription": "Administrer krav til tofaktorautentisering for organisasjonen",
-          "usersPageTitle": "MFA-status",
-          "usersPageDescription": "Se og administrer MFA-status for alle brukere i organisasjonen",
-          "loading": "Laster...",
-          "loadingPolicy": "Laster MFA-policy...",
-          "loadingUsers": "Laster brukere...",
-          "error": "En feil oppstod",
-          "retry": "Prøv igjen",
-          "notFound": "Organisasjon ikke funnet",
-          "accessDenied": "Du har ikke tilgang til å administrere MFA for denne organisasjonen",
-          "policyCard": {
-            "title": "MFA-policy",
-            "description": "Administrer krav til tofaktorautentisering"
-          },
           "policy": {
-            "optional": "Valgfritt",
-            "optionalDescription": "Brukere kan velge å aktivere MFA",
-            "recommended": "Anbefalt",
-            "recommendedDescription": "Brukere oppfordres til å aktivere MFA, men det er ikke påkrevd",
-            "required": "Påkrevd",
-            "requiredDescription": "Alle brukere må aktivere MFA",
             "gracePeriod": "Utsettelsesperiode",
-            "gracePeriodDescription": "Antall dager brukere har på å aktivere MFA etter at policyen blir påkrevd",
-            "days": "{count} dager",
-            "day": "{count} dag",
-            "saveChanges": "Lagre endringer",
-            "saving": "Lagrer...",
-            "saved": "Endringer lagret",
-            "saveError": "Kunne ikke lagre endringer"
+            "enabled": "MFA-krav aktiverat",
+            "enabledDescription": "Användare måste konfigurera tvåfaktorsautentisering enligt vald policy.",
+            "disabled": "MFA valfritt",
+            "disabledDescription": "Användare kan aktivera MFA frivilligt.",
+            "enforcementLevel": "Nivå av tvång",
+            "gracePeriodHelp": "Hur lång tid användare har på sig att aktivera MFA efter att kravet införts.",
+            "trustedDevices": "Betrodda enheter",
+            "trustedDevicesEnabled": "Tillåt betrodda enheter",
+            "trustedDevicesDescription": "Användare kan markera enheter som betrodda för att slippa MFA vid varje inloggning.",
+            "trustedDeviceDuration": "Enhet betrodd i"
           },
           "stats": {
-            "title": "MFA-statistikk",
-            "enrolled": "Registrert",
-            "enrolledDescription": "Brukere som har aktivert MFA",
-            "notEnrolled": "Ikke registrert",
-            "notEnrolledDescription": "Brukere som ikke har aktivert MFA",
-            "percentage": "{percentage}% av alle brukere"
+            "totalUsers": "Totalt användare",
+            "mfaEnabled": "MFA aktiverad",
+            "mfaRequired": "MFA krävs",
+            "inGracePeriod": "I respitperiod"
           },
           "users": {
-            "title": "Brukere",
-            "viewAll": "Se alle",
-            "email": "E-post",
-            "name": "Navn",
-            "status": "MFA-status",
-            "role": "Rolle",
-            "enrolledAt": "Registrert",
-            "actions": "Handlinger",
-            "noUsers": "Ingen brukere funnet",
-            "enrolled": "Aktivert",
-            "notEnrolled": "Ikke aktivert",
-            "owner": "Eier",
-            "admin": "Admin",
-            "member": "Medlem",
-            "resetMfa": "Tilbakestill MFA",
-            "resetConfirm": "Er du sikker på at du vil tilbakestille MFA for denne brukeren? De må sette opp MFA på nytt.",
-            "resetSuccess": "MFA har blitt tilbakestilt for brukeren",
-            "resetError": "Kunne ikke tilbakestille MFA",
+            "status": {
+              "enabled": "Aktiverad",
+              "required": "Krävs",
+              "gracePeriod": "Respitperiod",
+              "disabled": "Inaktiverad"
+            },
+            "actions": {
+              "resetMFA": "Återställ MFA"
+            },
             "filterAll": "Alle",
-            "filterEnrolled": "Registrert",
-            "filterNotEnrolled": "Ikke registrert",
-            "search": "Søk etter brukere...",
             "pagination": {
               "previous": "Forrige",
               "next": "Neste",
               "page": "Side {current} av {total}",
               "showing": "Viser {from}-{to} av {total}"
+            },
+            "pageTitle": "Användare & MFA",
+            "pageDescription": "Visa och hantera MFA-status för användare i organisationen",
+            "searchPlaceholder": "Sök användare...",
+            "filterEnabled": "MFA aktiverad",
+            "filterDisabled": "MFA inaktiverad",
+            "filterRequired": "MFA krävs",
+            "filterGracePeriod": "I respitperiod",
+            "refresh": "Uppdatera",
+            "columns": {
+              "user": "Användare",
+              "role": "Roll",
+              "mfaStatus": "MFA-status",
+              "enrolledAt": "Aktiverad",
+              "trustedDevices": "Betrodda enheter",
+              "actions": "Åtgärder"
+            },
+            "roles": {
+              "owner": "Ägare",
+              "admin": "Admin",
+              "editor": "Redaktör",
+              "member": "Medlem"
+            },
+            "empty": {
+              "title": "Inga användare hittades",
+              "description": "Prova att ändra dina sökkriterier",
+              "noUsersTitle": "Det finns inga användare i den här organisationen"
+            },
+            "tip": {
+              "adminTip": "Som administratör kan du konfigurera MFA-policyn för organisationen under"
             }
+          },
+          "breadcrumb": {
+            "settings": "Inställningar",
+            "security": "Säkerhet"
+          },
+          "enforcement": {
+            "optional": "Valfritt",
+            "optionalDescription": "Användare kan aktivera MFA om de vill, men det krävs inte.",
+            "adminsRequired": "Endast administratörer",
+            "adminsRequiredDescription": "Ägare och administratörer måste aktivera MFA. Vanliga användare kan välja.",
+            "allUsers": "Alla användare",
+            "allUsersDescription": "Alla användare i organisationen måste aktivera MFA."
+          },
+          "gracePeriodOptions": {
+            "immediate": "Ingen (omedelbart)",
+            "days3": "3 dagar",
+            "days7": "7 dagar",
+            "days14": "14 dagar",
+            "days30": "30 dagar"
+          },
+          "deviceTrustOptions": {
+            "days7": "7 dagar",
+            "days14": "14 dagar",
+            "days30": "30 dagar",
+            "days60": "60 dagar",
+            "days90": "90 dagar"
+          },
+          "actions": {
+            "save": "Spara ändringar",
+            "saving": "Sparar...",
+            "reset": "Återställ"
+          },
+          "messages": {
+            "loadError": "Kunde inte ladda MFA-policy",
+            "saveSuccess": "MFA-policy sparad",
+            "saveError": "Kunde inte spara policy",
+            "retry": "Försök igen"
           }
         }
       },
@@ -3190,6 +2892,93 @@
           "activateDescription": "Vil du aktivere \"{name}\"?",
           "deleteLabel": "Slett",
           "confirmLabel": "Bekreft"
+        },
+        "drawer": {
+          "editTitle": "Redigera utmärkelse",
+          "createTitle": "Skapa utmärkelse",
+          "editDescription": "Ändra inställningar för denna utmärkelse.",
+          "createDescription": "Skapa en ny utmärkelse för din organisation.",
+          "namePlaceholder": "T.ex. Första spelet",
+          "descriptionPlaceholder": "Beskriv hur man uppnår denna utmärkelse...",
+          "thresholdPlaceholder": "T.ex. 10"
+        },
+        "labels": {
+          "name": "Namn",
+          "description": "Beskrivning",
+          "key": "Nyckel (valfritt)",
+          "keyPlaceholder": "t.ex. first-game",
+          "keyHelper": "Unik identifierare för programmatisk referens. Endast små bokstäver, siffror, bindestreck och understreck.",
+          "condition": "Villkor",
+          "threshold": "Tröskelvärde",
+          "thresholdHelper": "Antal som krävs för att uppnå utmärkelsen.",
+          "status": "Status"
+        },
+        "conditions": {
+          "manual": "Manuell",
+          "manualDesc": "Tilldelas manuellt av admin",
+          "gamesPlayed": "Spelade spel",
+          "gamesPlayedDesc": "Efter ett antal spelade spel",
+          "scoreReached": "Poäng uppnådd",
+          "scoreReachedDesc": "När en viss poängnivå nås",
+          "streak": "Streak",
+          "streakDesc": "Efter ett antal dagar i rad",
+          "firstGame": "Första spelet",
+          "firstGameDesc": "När användaren spelar sitt första spel",
+          "perfectScore": "Perfekt poäng",
+          "perfectScoreDesc": "När användaren får max poäng"
+        },
+        "statusOptions": {
+          "draft": "Utkast",
+          "draftDesc": "Ej synlig eller delbar",
+          "active": "Aktiv",
+          "activeDesc": "Synlig och kan delas ut",
+          "archived": "Arkiverad",
+          "archivedDesc": "Dold från listor"
+        },
+        "award": {
+          "title": "Dela ut utmärkelse",
+          "description": "Dela ut \"{name}\" till medlemmar i din organisation.",
+          "selectRecipients": "Välj mottagare",
+          "searchPlaceholder": "Sök medlemmar...",
+          "selectAll": "Välj alla ({count})",
+          "clearSelection": "Rensa ({count})",
+          "usersSelected": "{count} användare valda",
+          "messageLabel": "Meddelande (valfritt)",
+          "messagePlaceholder": "Grattis till din nya utmärkelse!",
+          "messageHelper": "Visas för mottagarna när de får utmärkelsen.",
+          "unknownUser": "Okänd användare",
+          "member": "medlem",
+          "cancel": "Avbryt",
+          "awarding": "Tilldelar...",
+          "awardToUsers": "Dela ut till {count} användare",
+          "errors": {
+            "couldNotLoadMembers": "Kunde inte ladda medlemmar",
+            "selectAtLeastOne": "Välj minst en mottagare",
+            "couldNotAward": "Kunde inte dela ut utmärkelse",
+            "unexpected": "Ett oväntat fel uppstod"
+          },
+          "noMembersMatchSearch": "Inga medlemmar matchar sökningen",
+          "noMembersInOrg": "Inga medlemmar i organisationen"
+        },
+        "errors": {
+          "couldNotUpdate": "Kunde inte uppdatera utmärkelse",
+          "couldNotCreate": "Kunde inte skapa utmärkelse",
+          "unexpected": "Ett oväntat fel uppstod"
+        }
+      },
+      "dashboard": {
+        "title": "Organisation",
+        "welcome": "Välkommen till din organisationsöversikt.",
+        "quickActions": "Snabbåtgärder",
+        "underDevelopment": "Fler snabbåtgärder kommer snart.",
+        "cards": {
+          "members": "Medlemmar",
+          "membersDescription": "Totalt antal medlemmar",
+          "activeSessions": "Aktiva sessioner",
+          "activeSessionsDescription": "Senaste 30 dagarna",
+          "subscription": "Prenumeration",
+          "subscriptionActive": "Aktiv",
+          "nextInvoice": "Nästa faktura: {date}"
         }
       }
     },
@@ -3608,367 +3397,6 @@
           "draft": "Utkast",
           "active": "Aktiv",
           "archived": "Arkivert"
-        },
-        "badgePicker": {
-          "title": "Velg merke",
-          "description": "Velg et merke fra biblioteket som ikon.",
-          "searchPlaceholder": "Søk etter merke...",
-          "noSearchResults": "Ingen merker matcher søket ditt.",
-          "noBadges": "Fant ingen merker i biblioteket.",
-          "createHint": "Lag merker i Badge Builder under Bibliotek.",
-          "availableCount": "{count, plural, one {# merke} other {# merker}} tilgjengelig",
-          "cancel": "Avbryt",
-          "select": "Velg merke"
-        },
-        "editor": {
-          "title": {
-            "edit": "Rediger achievement",
-            "create": "Opprett nytt achievement"
-          },
-          "description": {
-            "edit": "Oppdater achievement-innstillingene nedenfor.",
-            "create": "Fyll inn informasjonen nedenfor for å opprette et nytt achievement."
-          },
-          "fields": {
-            "name": {
-              "label": "Navn *",
-              "placeholder": "f.eks. Første spill"
-            },
-            "description": {
-              "label": "Beskrivelse",
-              "placeholder": "Beskriv hvordan man oppnår dette achievement..."
-            },
-            "badge": {
-              "label": "Merke/ikon",
-              "select": "Velg merke",
-              "change": "Bytt merke"
-            },
-            "scope": {
-              "label": "Omfang *"
-            },
-            "tenant": {
-              "label": "Organisasjon *",
-              "placeholder": "Velg organisasjon"
-            },
-            "conditionType": {
-              "label": "Utløser *"
-            },
-            "conditionValue": {
-              "gamesPlayed": "Antall spill",
-              "scoreReached": "Poeng å nå",
-              "streak": "Antall dager",
-              "placeholder": "Oppgi verdi..."
-            },
-            "status": {
-              "label": "Status"
-            }
-          },
-          "scope": {
-            "global": {
-              "label": "Global",
-              "description": "Synlig for alle brukere"
-            },
-            "tenant": {
-              "label": "Tenant",
-              "description": "Synlig innen en spesifikk organisasjon"
-            },
-            "private": {
-              "label": "Privat",
-              "description": "Synlig kun for tildelte brukere"
-            }
-          },
-          "conditions": {
-            "manual": {
-              "label": "Manuell",
-              "description": "Tildeles manuelt av admin"
-            },
-            "gamesPlayed": {
-              "label": "Spilte spill",
-              "description": "Etter et antall spilte spill"
-            },
-            "scoreReached": {
-              "label": "Poeng nådd",
-              "description": "Når en bestemt poengsum nås"
-            },
-            "streak": {
-              "label": "Streak",
-              "description": "Etter et antall dager på rad"
-            },
-            "firstGame": {
-              "label": "Første spill",
-              "description": "Når brukeren spiller sitt første spill"
-            },
-            "perfectScore": {
-              "label": "Perfekt poeng",
-              "description": "Når brukeren får maks poeng"
-            }
-          },
-          "status": {
-            "draft": "Utkast",
-            "active": "Aktiv",
-            "archived": "Arkivert"
-          },
-          "actions": {
-            "cancel": "Avbryt",
-            "saving": "Lagrer...",
-            "update": "Oppdater",
-            "create": "Opprett"
-          },
-          "errors": {
-            "updateFailed": "Kunne ikke oppdatere achievement",
-            "createFailed": "Kunne ikke opprette achievement",
-            "unexpected": "En uventet feil oppstod"
-          },
-          "steps": {
-            "layers": {
-              "name": "Lagvalg",
-              "description": "Velg base, bakgrunner og symbol"
-            },
-            "themeColors": {
-              "name": "Tema og farger",
-              "description": "Tilpass farger og tema"
-            },
-            "metadata": {
-              "name": "Metadata",
-              "description": "Tittel og beskrivelse"
-            },
-            "meta": {
-              "name": "Metadata",
-              "description": "Tittel, beskrivelse og kategori"
-            },
-            "publishing": {
-              "name": "Publisering",
-              "description": "Gjennomgå og publiser"
-            }
-          },
-          "preview": "Forhåndsvisning",
-          "previewMode": {
-            "badgeOnly": "Kun merke",
-            "fullCard": "Fullt kort"
-          },
-          "undo": "Angre",
-          "redo": "Gjør om",
-          "reset": "Tilbakestill",
-          "back": "Tilbake",
-          "next": "Neste",
-          "fixValidationErrors": "Fiks valideringsfeil",
-          "saving": "Lagrer...",
-          "publish": "Publiser",
-          "saveDraft": "Lagre som utkast",
-          "saveBadge": "Lagre merke",
-          "cancel": "Avbryt",
-          "selectLayers": "Velg lag",
-          "layersDescription": "Velg base, symbol og dekorasjoner",
-          "layerSelection": "Lagvalg",
-          "randomizeAll": "Tilfeldiggjør alt",
-          "baseShape": "Grunnform",
-          "baseDescription": "Velg formen på merket",
-          "baseLabel": "Base",
-          "baseDropdownDesc": "Velg grunnform for merket",
-          "symbol": "Symbol",
-          "symbolDescription": "Velg symbolet i midten",
-          "symbolLabel": "Symbol",
-          "symbolDropdownDesc": "Velg symbol for merket",
-          "backgroundDecorations": "Bakgrunnsdekorasjoner",
-          "backgroundDecorationsDesc": "Dekorasjoner bak merket",
-          "backgroundLabel": "Bakgrunn",
-          "backgroundDropdownDesc": "Velg bakgrunnsdekorasjon",
-          "foregroundDecorations": "Forgrunnsdekorasjoner",
-          "foregroundDecorationsDesc": "Dekorasjoner foran merket",
-          "foregroundLabel": "Forgrunn",
-          "foregroundDropdownDesc": "Velg forgrunnsdekorasjon",
-          "metadata": "Metadata",
-          "metadataDescription": "Legg til tittel, beskrivelse og belønning",
-          "nameLabel": "Navn",
-          "namePlaceholder": "f.eks. Første seier",
-          "subtitleLabel": "Undertittel",
-          "subtitlePlaceholder": "f.eks. Vinn ditt første spill",
-          "descriptionLabel": "Beskrivelse",
-          "descriptionPlaceholder": "Beskriv hva utmärkelsen innebär...",
-          "rewardCoinsLabel": "Belønning (DiceCoin)",
-          "rewardCoinsTip": "Antall DiceCoin brukeren får",
-          "categoryLabel": "Kategori",
-          "categoryPlaceholder": "Velg kategori",
-          "categories": {
-            "games": "Spill",
-            "social": "Sosialt",
-            "achievement": "Prestasjon",
-            "learning": "Læring",
-            "event": "Arrangement",
-            "special": "Spesielt"
-          },
-          "categoryTip": "Brukes for filtrering og gruppering",
-          "tagsLabel": "Tagger",
-          "tagsPlaceholder": "Legg til tagger...",
-          "tagsTip": "Kommaseparert liste med nøkkelord",
-          "publishing": "Publisering",
-          "publishingDescription": "Gjennomgå og publiser merket",
-          "publishingAndSync": "Publisering og synkronisering",
-          "cannotPublish": "Kan ikke publisere uten tittel",
-          "published": "Publisert",
-          "draft": "Utkast",
-          "summary": "Oppsummering",
-          "summaryName": "Navn",
-          "noName": "(uten navn)",
-          "summaryReward": "Belønning",
-          "summaryLayers": "Lag",
-          "noLayers": "Ingen lag valgt",
-          "statusLabel": "Status",
-          "statusDraft": "Utkast",
-          "statusPublished": "Publisert",
-          "syncToProfileFrame": "Synk til profilramme",
-          "syncToProfileFrameDescription": "Tilgjengeliggjør merket som profilramme",
-          "saveInfoText": "Merket lagres som utkast til det publiseres.",
-          "myPresets": "Mine forhåndsinnstillinger",
-          "themeAndColors": "Tema og farger",
-          "themeAndColorsDescription": "Velg tema eller tilpass farger individuelt for hvert lag.",
-          "themePresetsMode": "Temaforhåndsinnstillinger",
-          "customModeActive": "Egendefinert modus aktiv",
-          "randomizeColors": "Tilfeldiggjør farger",
-          "quickThemeSelect": "Hurtigvalg tema",
-          "customColorsPerLayer": "Egendefinerte farger per lag",
-          "foreground": "Forgrunn",
-          "layerLabels": {
-            "base": "Base",
-            "background": "Bakgrunn",
-            "symbol": "Symbol"
-          },
-          "backgrounds": {
-            "label": "Bakgrunn",
-            "black": "Svart",
-            "white": "Hvit",
-            "light": "Lys",
-            "dark": "Mørk",
-            "gray": "Grå",
-            "transparent": "Gjennomsiktig",
-            "circleBackground": "Sirkelbakgrunn",
-            "selectCustomColor": "Velg egendefinert farge",
-            "custom": "Egendefinert",
-            "customEllipsis": "Egendefinert..."
-          },
-          "selectCustomColor": "Velg egendefinert farge",
-          "custom": "Egendefinert",
-          "customEllipsis": "Egendefinert...",
-          "textColor": "Tekstfarge",
-          "selectCustomTextColor": "Velg egendefinert tekstfarge",
-          "circleBackground": "Sirkelbakgrunn",
-          "customColor": "Egendefinert farge",
-          "cardBackground": "Kortbakgrunn",
-          "colorControls": {
-            "title": "Fargekontroller",
-            "custom": "Egendefinert",
-            "description": "Tilpass fargene for hvert lag individuelt"
-          },
-          "colorPicker": {
-            "selectCustomColor": "Velg egendefinert farge",
-            "clickToSelectColor": "Klikk for å velge farge"
-          },
-          "contrast": {
-            "lowContrast": "Lav kontrast",
-            "symbolHardToSee": "Symbolet kan være vanskelig å se",
-            "ratio": "Forhold",
-            "recommended": "Anbefalt: over 3:1",
-            "suggestFix": "Prøv en mørkere eller lysere farge",
-            "baseMayBlend": "Basen kan blende inn i bakgrunnen",
-            "goodContrast": "God kontrast",
-            "excellent": "Utmerket",
-            "good": "Bra",
-            "acceptable": "Akseptabel",
-            "low": "Lav",
-            "label": "Kontrast",
-            "considerMoreContrast": "Vurder mer kontrast",
-            "goodForMostUses": "Bra for de fleste bruk",
-            "excellentVisibility": "Utmerket synlighet",
-            "colorContrast": "Fargekontrast",
-            "vsBase": "mot base"
-          },
-          "layers": {
-            "noLayersSelected": "Ingen lag valgt",
-            "selectBaseToStart": "Velg en base for å begynne",
-            "title": "Lag",
-            "topToBottom": "Topp til bunn"
-          },
-          "presets": {
-            "copy": "Kopier",
-            "myPresets": "Mine forhåndsinnstillinger",
-            "saveAsPreset": "Lagre som forhåndsinnstilling",
-            "namePlaceholder": "Navn på forhåndsinnstilling...",
-            "save": "Lagre",
-            "cancel": "Avbryt",
-            "noPresetsYet": "Ingen forhåndsinnstillinger ennå",
-            "noPresetsHint": "Lagre en merkekombinasjon for rask gjenbruk",
-            "duplicate": "Dupliser",
-            "delete": "Slett"
-          },
-          "roles": {
-            "owner": "Eier",
-            "admin": "Administrator",
-            "creator": "Skaper",
-            "org_admin": "Org.admin",
-            "editor": "Redaktør",
-            "member": "Medlem"
-          },
-          "title2": "Tittel",
-          "titlePlaceholder": "f.eks. Første seier",
-          "subtitle": "Undertittel",
-          "subtitlePlaceholder": "f.eks. Vinn ditt første spill",
-          "description2": "Beskrivelse",
-          "descriptionPlaceholder2": "Beskriv hva merket innebærer...",
-          "rewardCoins": "Belønning (DiceCoin)",
-          "status2": "Status",
-          "statusDraft2": "Utkast",
-          "statusPublished2": "Publisert",
-          "publishingRoles": "Roller som kan publisere",
-          "addRole": "Legg til rolle",
-          "availableForOrgs": "Tilgjengelig for organisasjoner",
-          "orgsPlaceholder": "Velg organisasjoner...",
-          "addOrg": "Legg til organisasjon",
-          "rolesCanPublish": "Roller som kan publisere",
-          "profileFrameSync": {
-            "title": "Profilramme-synkronisering",
-            "syncedDescription": "Merket er tilgjengelig som profilramme",
-            "disabled": "Deaktivert",
-            "durationLabel": "Varighet (dager)"
-          }
-        },
-        "awardModal": {
-          "title": "Tildel achievement",
-          "description": "Tildel \"{name}\" til brukere.",
-          "mode": {
-            "tenant": "Hele organisasjonen",
-            "users": "Spesifikke brukere"
-          },
-          "tenant": {
-            "label": "Organisasjon",
-            "placeholder": "Velg organisasjon...",
-            "helper": "Alle brukere i {tenantName} vil få dette achievement."
-          },
-          "users": {
-            "searchLabel": "Søk etter brukere",
-            "searchPlaceholder": "Søk på navn eller e-post...",
-            "noName": "Ingen navn",
-            "searching": "Søker...",
-            "noResults": "Ingen brukere funnet",
-            "selectedLabel": "Valgte brukere ({count})"
-          },
-          "message": {
-            "label": "Melding (valgfritt)",
-            "placeholder": "f.eks. \"Gratulerer med fullført kurs!\"",
-            "helper": "Denne meldingen vises for brukeren når de får sitt achievement."
-          },
-          "actions": {
-            "cancel": "Avbryt",
-            "awarding": "Tildeler...",
-            "award": "Tildel"
-          },
-          "errors": {
-            "selectTenant": "Velg en organisasjon",
-            "fetchUsers": "Kunne ikke hente brukere",
-            "noUsersInTenant": "Ingen brukere funnet i denne organisasjonen",
-            "selectUsers": "Velg minst én bruker",
-            "awardFailed": "Kunne ikke tildele achievement",
-            "unexpected": "En uventet feil oppstod"
-          }
         }
       },
       "statistics": {
@@ -4081,10 +3509,12 @@
         "totalFiles": "Totalt filer",
         "databaseRecords": "Database-poster",
         "connectionPool": "Tilkoblingspool"
+      },
+      "labels": {
+        "unknown": "Okänd",
+        "notAvailable": "Ej tillgängligt"
       }
     },
-    "minutesShort": "{count} min",
-    "scriptLabel": "Manus",
     "auditLog": {
       "pageTitle": "Audit Logs",
       "pageDescription": "Gjennomgå alle systemaktiviteter og endringer",
@@ -4214,52 +3644,6 @@
           "description": "Last opp logoer for lyst og mørkt modus. Anbefalt format: SVG eller PNG med gjennomsiktig bakgrunn.",
           "light": "Logo (lys modus)",
           "lightDesc": "Brukes på lyse bakgrunner",
-          "loadingSession": "Laster økten...",
-          "sessionCodeLabel": "Sesjonskode:",
-          "connection": {
-            "connected": "Tilkoblet",
-            "degraded": "Ustabil",
-            "offline": "Frakoblet"
-          },
-          "updatesTitle": "Oppdateringer",
-          "statusLabel": "Status",
-          "statusTitle": {
-            "lobby": "Venter",
-            "live": "Pågår",
-            "paused": "Pause",
-            "ended": "Avsluttet",
-            "locked": "Låst"
-          },
-          "statusBadge": {
-            "lobby": "Venter",
-            "live": "Live",
-            "paused": "Pause",
-            "ended": "Avsluttet",
-            "locked": "Låst"
-          },
-          "pendingApproval": "Venter på godkjenning fra verten…",
-          "nowTitle": "Akkurat nå",
-          "banner": {
-            "waiting": "Venter på at verten starter.",
-            "paused": "Pause. Vi er snart tilbake.",
-            "locked": "Økten er låst.",
-            "ended": "Økten er avsluttet. Takk for at du deltok.",
-            "degraded": "Tilkoblingen er ustabil. Viser siste kjente tilstand.",
-            "offline": "Ingen tilkobling. Prøv igjen."
-          },
-          "events": {
-            "session_paused": "Økten er pauset",
-            "session_resumed": "Økten er gjenopptatt",
-            "session_ended": "Økten er avsluttet",
-            "session_locked": "Økten er låst",
-            "session_unlocked": "Økten er låst opp",
-            "host_message": "Melding fra verten",
-            "participant_joined": "{name} ble med",
-            "participant_left": "{name} forlot",
-            "role_changed": "Rolle oppdatert",
-            "progress_updated": "Fremdrift oppdatert",
-            "achievement_unlocked": "Utmerkelse låst opp"
-          },
           "dark": "Logo (mørk modus)",
           "darkDesc": "Brukes på mørke bakgrunner"
         },
@@ -4701,54 +4085,9 @@
               "versioning": "Versjonering",
               "exportLog": "Eksportlogg"
             },
-            "actions": {
-              "createTemplate": "Opprett eksportmal",
-              "createTemplateShort": "Opprett mal"
-            },
             "stats": {
               "templates": "Eksportmaler",
-              "active": "Aktive",
-              "totalExports": "Totalt eksporter",
-              "successRate": "Suksessrate"
-            },
-            "tabs": {
-              "templates": "Eksportmaler",
-              "logs": "Eksportlogg"
-            },
-            "formats": {
-              "csv": "CSV",
-              "json": "JSON",
-              "pdf": "PDF",
-              "xlsx": "Excel"
-            },
-            "status": {
-              "active": "Aktiv",
-              "draft": "Utkast",
-              "archived": "Arkivert"
-            },
-            "logStatus": {
-              "completed": "Fullført",
-              "pending": "Pågår",
-              "failed": "Mislykket"
-            },
-            "templates": {
-              "version": "v{version}",
-              "exportCount": "{count, plural, one {# eksport} other {# eksporter}}"
-            },
-            "logs": {
-              "empty": {
-                "title": "Ingen eksporthistorikk",
-                "description": "Her vises historikk over gjennomførte eksporter."
-              },
-              "table": {
-                "template": "Mal",
-                "format": "Format",
-                "status": "Status",
-                "records": "Poster",
-                "size": "Størrelse",
-                "exportedBy": "Eksportert av",
-                "date": "Dato"
-              }
+              "exports": "Exports"
             }
           }
         }
@@ -4910,6 +4249,202 @@
           "draft": "Utkast",
           "active": "Aktiv",
           "archived": "Arkivert"
+        },
+        "badgePicker": {
+          "title": "Välj Badge",
+          "description": "Välj en badge från biblioteket för att använda som ikon.",
+          "searchPlaceholder": "Sök badge...",
+          "noSearchResults": "Inga badges matchar din sökning.",
+          "noBadges": "Inga badges hittades i biblioteket.",
+          "createHint": "Skapa badges i Badge Builder under Bibliotek.",
+          "availableCount": "{count, plural, one {# badge} other {# badges}} tillgängliga",
+          "cancel": "Avbryt",
+          "select": "Välj Badge"
+        },
+        "editor": {
+          "title": {
+            "edit": "Redigera achievement",
+            "create": "Skapa nytt achievement"
+          },
+          "description": {
+            "edit": "Uppdatera achievement-inställningar nedan.",
+            "create": "Fyll i informationen nedan för att skapa ett nytt achievement."
+          },
+          "fields": {
+            "name": {
+              "label": "Namn *",
+              "placeholder": "T.ex. Första spelet"
+            },
+            "description": {
+              "label": "Beskrivning",
+              "placeholder": "Beskriv hur man uppnår detta achievement..."
+            },
+            "badge": {
+              "label": "Badge/Ikon",
+              "select": "Välj Badge",
+              "change": "Byt Badge"
+            },
+            "scope": {
+              "label": "Scope *"
+            },
+            "tenant": {
+              "label": "Organisation *",
+              "placeholder": "Välj organisation"
+            },
+            "conditionType": {
+              "label": "Trigger *"
+            },
+            "conditionValue": {
+              "gamesPlayed": "Antal spel",
+              "scoreReached": "Poäng att nå",
+              "streak": "Antal dagar",
+              "placeholder": "Ange värde..."
+            },
+            "status": {
+              "label": "Status"
+            }
+          },
+          "scope": {
+            "global": {
+              "label": "Global",
+              "description": "Synlig för alla användare"
+            },
+            "tenant": {
+              "label": "Tenant",
+              "description": "Synlig inom en specifik organisation"
+            },
+            "private": {
+              "label": "Privat",
+              "description": "Endast synlig för tilldelade användare"
+            }
+          },
+          "conditions": {
+            "manual": {
+              "label": "Manuell",
+              "description": "Tilldelas manuellt av admin"
+            },
+            "gamesPlayed": {
+              "label": "Spelade spel",
+              "description": "Efter ett antal spelade spel"
+            },
+            "scoreReached": {
+              "label": "Poäng uppnådd",
+              "description": "När en viss poängnivå nås"
+            },
+            "streak": {
+              "label": "Streak",
+              "description": "Efter ett antal dagar i rad"
+            },
+            "firstGame": {
+              "label": "Första spelet",
+              "description": "När användaren spelar sitt första spel"
+            },
+            "perfectScore": {
+              "label": "Perfekt poäng",
+              "description": "När användaren får max poäng"
+            }
+          },
+          "status": {
+            "draft": "Utkast",
+            "active": "Aktiv",
+            "archived": "Arkiverad"
+          },
+          "actions": {
+            "cancel": "Avbryt",
+            "saving": "Sparar...",
+            "update": "Uppdatera",
+            "create": "Skapa"
+          },
+          "errors": {
+            "updateFailed": "Kunde inte uppdatera achievement",
+            "createFailed": "Kunde inte skapa achievement",
+            "unexpected": "Ett oväntat fel uppstod"
+          },
+          "steps": {
+            "layers": {
+              "name": "Lagerval",
+              "description": "Välj bas, bakgrunder och symbol"
+            },
+            "themeColors": {
+              "name": "Tema & Färger",
+              "description": "Anpassa färger och tema"
+            },
+            "metadata": {
+              "name": "Metadata",
+              "description": "Titel och beskrivning"
+            },
+            "publishing": {
+              "name": "Publicering",
+              "description": "Granska och publicera"
+            }
+          },
+          "themeAndColors": "Tema & Färger",
+          "themeAndColorsDescription": "Välj tema eller anpassa färger individuellt för varje lager.",
+          "randomizeColors": "Slumpa färger",
+          "quickThemeSelect": "Snabbval tema",
+          "customColorsPerLayer": "Anpassade färger per lager",
+          "foreground": "Förgrund",
+          "layerLabels": {
+            "base": "Bas",
+            "background": "Bakgrund",
+            "symbol": "Symbol"
+          },
+          "backgrounds": {
+            "label": "Bakgrund",
+            "black": "Svart",
+            "white": "Vit",
+            "light": "Ljus",
+            "dark": "Mörk",
+            "gray": "Grå",
+            "transparent": "Transparent"
+          },
+          "selectCustomColor": "Välj anpassad färg",
+          "custom": "Anpassad",
+          "customEllipsis": "Anpassad...",
+          "textColor": "Textfärg",
+          "selectCustomTextColor": "Välj anpassad textfärg",
+          "circleBackground": "Cirkelbakgrund",
+          "customColor": "Anpassad färg",
+          "cardBackground": "Kortbakgrund"
+        },
+        "awardModal": {
+          "title": "Tilldela achievement",
+          "description": "Tilldela \"{name}\" till användare.",
+          "mode": {
+            "tenant": "Hel organisation",
+            "users": "Specifika användare"
+          },
+          "tenant": {
+            "label": "Organisation",
+            "placeholder": "Välj organisation...",
+            "helper": "Alla användare i {tenantName} kommer att få detta achievement."
+          },
+          "users": {
+            "searchLabel": "Sök användare",
+            "searchPlaceholder": "Sök på namn eller e-post...",
+            "noName": "Inget namn",
+            "searching": "Söker...",
+            "noResults": "Inga användare hittades",
+            "selectedLabel": "Valda användare ({count})"
+          },
+          "message": {
+            "label": "Meddelande (valfritt)",
+            "placeholder": "T.ex. \"Grattis till avslutad kurs!\"",
+            "helper": "Detta meddelande kommer att visas för användaren när de får sitt achievement."
+          },
+          "actions": {
+            "cancel": "Avbryt",
+            "awarding": "Tilldelar...",
+            "award": "Tilldela"
+          },
+          "errors": {
+            "selectTenant": "Välj en organisation",
+            "fetchUsers": "Kunde inte hämta användare",
+            "noUsersInTenant": "Inga användare hittades i denna organisation",
+            "selectUsers": "Välj minst en användare",
+            "awardFailed": "Kunde inte tilldela achievement",
+            "unexpected": "Ett oväntat fel uppstod"
+          }
         }
       },
       "shopRewards": {
@@ -5268,7 +4803,56 @@
           "description": "Opprett din første eksportmal for å begynne å eksportere data fra biblioteket.",
           "createAction": "Opprett eksportmal"
         },
-        "searchPlaceholder": "Søk maler..."
+        "searchPlaceholder": "Søk maler...",
+        "actions": {
+          "createTemplate": "Skapa exportmall",
+          "createTemplateShort": "Skapa mall"
+        },
+        "stats": {
+          "templates": "Exportmallar",
+          "active": "Aktiva",
+          "totalExports": "Totalt exporter",
+          "successRate": "Framgångsgrad"
+        },
+        "tabs": {
+          "templates": "Exportmallar",
+          "logs": "Exportlogg"
+        },
+        "formats": {
+          "csv": "CSV",
+          "json": "JSON",
+          "pdf": "PDF",
+          "xlsx": "Excel"
+        },
+        "status": {
+          "active": "Aktiv",
+          "draft": "Utkast",
+          "archived": "Arkiverad"
+        },
+        "logStatus": {
+          "completed": "Klar",
+          "pending": "Pågår",
+          "failed": "Misslyckad"
+        },
+        "templates": {
+          "version": "v{version}",
+          "exportCount": "{count, plural, one {# export} other {# exporter}}"
+        },
+        "logs": {
+          "empty": {
+            "title": "Ingen exporthistorik",
+            "description": "Här visas historik över genomförda exporter."
+          },
+          "table": {
+            "template": "Mall",
+            "format": "Format",
+            "status": "Status",
+            "records": "Poster",
+            "size": "Storlek",
+            "exportedBy": "Exporterad av",
+            "date": "Datum"
+          }
+        }
       }
     },
     "users": {
@@ -5587,7 +5171,12 @@
           "name": "Navn",
           "mode": "Modus",
           "status": "Status",
-          "steps": "Steg"
+          "steps": "Steg",
+          "phases": "Faser",
+          "artifacts": "Artefakter",
+          "triggers": "Triggers",
+          "roles": "Roller",
+          "artifactTypes": "Artefakt-typer"
         },
         "statusPublished": "Publisert",
         "statusDraft": "Utkast",
@@ -5898,15 +5487,12 @@
           "status": "Status",
           "playMode": "Spillmodus",
           "global": "Global"
-        }
+        },
+        "owner": "Ägare"
       },
       "drawer": {
         "tabs": {
           "overview": "Oversikt",
-          "labels": {
-            "unknown": "Ukjent",
-            "notAvailable": "Ikke tilgjengelig"
-          },
           "content": "Innhold",
           "availability": "Tilgjengelighet",
           "metadata": "Metadata",
@@ -6019,7 +5605,9 @@
         "importComplete": "Import fullført! Spillisten oppdatert.",
         "importedGames": "Importerte {count} spill.",
         "importFailed": "Mislyktes for {count} spill.",
-        "changesSaved": "Endringer lagret."
+        "changesSaved": "Endringer lagret.",
+        "gamesDeleted": "{count, plural, one {# lek borttagen.} other {# lekar borttagna.}}",
+        "gameDeletedWithSessions": "Leken och dess aktiva sessioner togs bort."
       },
       "actions": {
         "edit": "Rediger",
@@ -6154,7 +5742,12 @@
             "itemsPlaceholder": "Eksempel:\n8 kjegler\n1 ball per lag\nMusikk (Spotify-spilleliste)",
             "itemsCount": "{count} materialer lagt til",
             "preparationLabel": "Forberedelse",
-            "preparationPlaceholder": "Hva skal lederen forberede før spillet?"
+            "preparationPlaceholder": "Hva skal lederen forberede før spillet?",
+            "addItem": "Lägg till",
+            "addItemPlaceholder": "Lägg till material...",
+            "showSuggestions": "Visa vanliga förslag",
+            "hideSuggestions": "Dölj förslag",
+            "noItems": "Inget material tillagt ännu. Lägg till material som behövs för leken."
           },
           "safety": {
             "title": "Sikkerhet og inkludering",
@@ -6649,6 +6242,15 @@
             "minCount": "Minste antall",
             "maxCount": "Høyeste antall",
             "strategy": "Tildelingsstrategi"
+          },
+          "sections": {
+            "security": {
+              "emailVerified": "E-post verifierad",
+              "emailNotVerified": "E-post ej verifierad",
+              "mfaEnabled": "MFA aktiverad",
+              "mfaDisabled": "MFA ej aktiverad",
+              "enableMfa": "Aktivera nu"
+            }
           }
         },
         "board": {
@@ -6778,14 +6380,16 @@
             "artifacts": "📦 Artefakter",
             "steps": "📝 Steg",
             "phases": "🎬 Faser",
-            "roles": "👤 Roller"
+            "roles": "👤 Roller",
+            "core": "ℹ️ Grundinfo"
           },
           "itemPrefix": {
             "triggers": "🎯 Trigger: ",
             "artifacts": "📦 Artefakt: ",
             "steps": "📝 Steg: ",
             "phases": "🎬 Fase: ",
-            "roles": "👤 Rolle: "
+            "roles": "👤 Rolle: ",
+            "core": "ℹ️ Grundinfo: "
           },
           "navigate": "Gå til",
           "publishBlocked": "⚠️ Spillet kan ikke publiseres før alle feil er rettet"
@@ -7099,8 +6703,308 @@
               "description": "Start fra bunnen",
               "title": "Ny artefakt"
             }
+          },
+          "searchPlaceholder": "Sök mallar...",
+          "noResults": "Inga mallar hittades"
+        },
+        "artifact": {
+          "newArtifact": "Ny artefakt",
+          "defaults": {
+            "role": "Roll"
+          },
+          "common": {
+            "yes": "Ja",
+            "no": "Nej"
+          },
+          "header": {
+            "title": "Artefakter ({count})",
+            "subtitle": "Ledtrådar, keypads, dokument och media",
+            "wizard": "Wizard",
+            "add": "Lägg till"
+          },
+          "empty": {
+            "title": "Inga artefakter ännu.",
+            "description": "Använd Wizard för att snabbt skapa artefakter, eller lägg till manuellt."
+          },
+          "fields": {
+            "titlePlaceholder": "Titel",
+            "typeLabel": "Typ",
+            "tagsLabel": "Taggar (komma-separerade)",
+            "tagsPlaceholder": "mystery, clue",
+            "descriptionLabel": "Beskrivning",
+            "descriptionPlaceholder": "Kort bakgrund eller anteckningar"
+          },
+          "errors": {
+            "loadConversationDecks": "Kunde inte ladda samtalskortlekar."
+          },
+          "visibleFromStart": {
+            "label": "Synlig från start",
+            "help": "Artefakten visas direkt för deltagare utan att spelledaren behöver avslöja den.",
+            "badge": "Synlig"
+          },
+          "visibility": {
+            "public": "Publik",
+            "leaderOnly": "Endast ledare",
+            "rolePrivate": "Roll-privat"
+          },
+          "types": {
+            "card": "Kort",
+            "document": "Dokument",
+            "image": "Bild",
+            "conversationCards": "Samtalskort",
+            "keypad": "Keypad",
+            "riddle": "Gåta",
+            "multiAnswer": "Flervalssvar",
+            "audio": "Ljud",
+            "hotspot": "Hotspot",
+            "tilePuzzle": "Pusselspel",
+            "cipher": "Chiffer",
+            "logicGrid": "Logikrutnät",
+            "counter": "Räknare",
+            "qrGate": "QR-gate",
+            "hintContainer": "Tips-behållare",
+            "propConfirmation": "Rekvisita-bekräftelse",
+            "locationCheck": "Platskontroll",
+            "soundLevel": "Ljudnivå",
+            "replayMarker": "Replay-markör",
+            "signalGenerator": "Signalgenerator",
+            "timeBankStep": "Tidsbank-steg",
+            "emptyArtifact": "Tom artefakt",
+            "spatialMap": "Karta (Spatial)"
+          },
+          "spatialMap": {
+            "title": "Spatial-karta",
+            "pickLabel": "Välj karta",
+            "pickPlaceholder": "— Välj en karta —",
+            "noMaps": "Inga sparade kartor hittades",
+            "currentMap": "Vald karta",
+            "titleOverrideLabel": "Överskrid titel (valfritt)",
+            "titleOverridePlaceholder": "T.ex. Källarplan, Entré",
+            "helpText": "Kartan visas som artefakt för ledare och/eller deltagare.",
+            "openFull": "Öppna karta",
+            "loadError": "Kunde inte ladda kartan",
+            "noAccess": "Ingen åtkomst till kartan",
+            "loading": "Laddar kartor…",
+            "loadingMap": "Laddar karta…",
+            "retry": "Försök igen",
+            "close": "Stäng"
+          },
+          "keypad": {
+            "title": "Pinkod-inställningar",
+            "correctCodeLabel": "Korrekt kod",
+            "correctCodePlaceholder": "1234",
+            "correctCodeHelp": "Endast siffror (max 8)",
+            "codeLengthLabel": "Kodlängd",
+            "codeLengthPlaceholder": "4",
+            "codeLengthHelp": "Antal siffror i koden (2-8)",
+            "successMessageLabel": "Meddelande vid rätt kod (valfritt)",
+            "successMessagePlaceholder": "Låst uppnådd! Du har hittat ledtråden.",
+            "advancedTitle": "Avancerade inställningar",
+            "maxAttemptsLabel": "Max försök",
+            "maxAttemptsPlaceholder": "Obegränsat",
+            "maxAttemptsHelp": "0 eller tom = obegränsat",
+            "lockOnFailLabel": "Lås vid misslyckande",
+            "lockOnFailNo": "Nej – kan försöka igen",
+            "lockOnFailYes": "Ja – låses permanent",
+            "failMessageLabel": "Meddelande vid fel kod",
+            "failMessagePlaceholder": "Fel kod! Försök igen.",
+            "lockedMessageLabel": "Meddelande när låst",
+            "lockedMessagePlaceholder": "Keypaden är låst. Kontakta spelledaren."
+          },
+          "conversation": {
+            "title": "Samtalskort",
+            "selectLabel": "Välj lek (endast publicerade)",
+            "selectPlaceholder": "— Välj —",
+            "helpText": "Artefakten visar leken read-only för deltagare och lekledare."
+          },
+          "riddle": {
+            "title": "Gåta / Fråga-inställningar",
+            "promptLabel": "Fråga / Ledtråd",
+            "promptPlaceholder": "Vad har fyra ben men kan inte gå?",
+            "answersLabel": "Korrekta svar (ett per rad)",
+            "answersPlaceholder": "bord\nett bord\ntable",
+            "answersHelp": "Flera alternativ = alla godkänns",
+            "matchModeLabel": "Matchningsläge",
+            "matchModeExact": "Exakt matchning",
+            "matchModeFlexible": "Flexibel (ignorera versaler/mellanslag)",
+            "matchModeNumeric": "Endast siffror",
+            "maxAttemptsLabel": "Max försök",
+            "maxAttemptsPlaceholder": "Obegränsat"
+          },
+          "counter": {
+            "title": "Räknare-inställningar",
+            "initialLabel": "Startvärde",
+            "initialPlaceholder": "0",
+            "targetLabel": "Målvärde",
+            "targetPlaceholder": "5",
+            "stepLabel": "Stegstorlek",
+            "stepPlaceholder": "1",
+            "labelLabel": "Etikett (valfritt)",
+            "labelPlaceholder": "Hittade ledtrådar"
+          },
+          "audio": {
+            "title": "Ljudklipp-inställningar",
+            "urlLabel": "Ljud-URL (valfritt)",
+            "urlPlaceholder": "https://example.com/audio.mp3"
+          },
+          "hotspot": {
+            "title": "Klickbar bild-inställningar",
+            "imageLabel": "Bild-URL",
+            "imagePlaceholder": "https://example.com/image.jpg",
+            "requiredHitsLabel": "Antal zoner att hitta",
+            "requiredHitsPlaceholder": "Alla",
+            "showFeedbackLabel": "Visa feedback",
+            "showFeedbackYes": "Ja – visa träffar",
+            "showFeedbackNo": "Nej – tyst",
+            "helpText": "💡 Hotspot-zoner definieras i JSON-metadata: zones: [{x, y, radius, label}]"
+          },
+          "tilePuzzle": {
+            "title": "Pusselspel-inställningar",
+            "imageLabel": "Bild-URL",
+            "imagePlaceholder": "https://example.com/puzzle-image.jpg",
+            "gridLabel": "Rutnätsstorlek",
+            "grid2": "2×2 (lätt)",
+            "grid3": "3×3 (normal)",
+            "grid4": "4×4 (svår)",
+            "grid5": "5×5 (expert)",
+            "previewLabel": "Visa förhandsvisning"
+          },
+          "cipher": {
+            "title": "Chiffer-inställningar",
+            "methodLabel": "Chiffermetod",
+            "methodCaesar": "Caesar (förskjutning)",
+            "methodAtbash": "Atbash (spegling)",
+            "methodVigenere": "Vigenère (nyckelord)",
+            "methodSubstitution": "Substitution (egen)",
+            "keyLabelCaesar": "Förskjutning (1-25)",
+            "keyLabelVigenere": "Nyckelord",
+            "keyPlaceholderCaesar": "3",
+            "keyPlaceholderVigenere": "hemligt",
+            "plaintextLabel": "Klartext (vad som ska krypteras)",
+            "plaintextPlaceholder": "Hemligheten finns under trappan"
+          },
+          "logicGrid": {
+            "title": "Logikrutnät-inställningar",
+            "rowsLabel": "Rader (kommaseparerade)",
+            "rowsPlaceholder": "Alice, Bob, Charlie",
+            "columnsLabel": "Kolumner (kommaseparerade)",
+            "columnsPlaceholder": "Röd, Grön, Blå",
+            "helpText": "💡 Lösningen definieras i JSON:",
+            "helpCode": "solution: {\"Alice\": \"Röd\", \"Bob\": \"Grön\"}"
+          },
+          "multiAnswer": {
+            "title": "Flervalssvar-inställningar",
+            "itemsLabel": "Saker att bocka av (ett per rad)",
+            "itemsPlaceholder": "Hitta nyckeln\nLösa gåtan\nÖppna dörren",
+            "requiredCountLabel": "Kräv antal för klart",
+            "requiredCountPlaceholder": "Alla"
+          },
+          "qrGate": {
+            "title": "QR/NFC-skanning-inställningar",
+            "expectedLabel": "Förväntat värde",
+            "expectedPlaceholder": "SECRET123",
+            "expectedHelp": "Texten som QR-koden ska innehålla",
+            "successLabel": "Meddelande vid lyckad skanning",
+            "successPlaceholder": "Rätt kod! Fortsätt till nästa ledtråd."
+          },
+          "hintContainer": {
+            "title": "Tips-behållare-inställningar",
+            "hintsLabel": "Tips (ett per rad, i ordning av avslöjande)",
+            "hintsPlaceholder": "Titta under mattan\nDet finns en nyckel gömd\nNyckeln passar i skåpet till höger",
+            "maxHintsLabel": "Max tips att ge",
+            "maxHintsPlaceholder": "Alla",
+            "penaltyLabel": "Poängavdrag per tips",
+            "penaltyPlaceholder": "0"
+          },
+          "propConfirmation": {
+            "title": "Rekvisita-bekräftelse-inställningar",
+            "propNameLabel": "Rekvisitanamn",
+            "propNamePlaceholder": "Guldnyckeln",
+            "instructionLabel": "Instruktion till deltagare",
+            "instructionPlaceholder": "Visa upp guldnyckeln för spelledaren för att fortsätta."
+          },
+          "locationCheck": {
+            "title": "Platsverifiering-inställningar",
+            "latitudeLabel": "Latitud",
+            "latitudePlaceholder": "59.3293",
+            "longitudeLabel": "Longitud",
+            "longitudePlaceholder": "18.0686",
+            "radiusLabel": "Radie (meter)",
+            "radiusPlaceholder": "50",
+            "locationNameLabel": "Platsnamn (valfritt)",
+            "locationNamePlaceholder": "Stortorget"
+          },
+          "soundLevel": {
+            "title": "Ljudnivå-detektor-inställningar",
+            "thresholdLabel": "Tröskel (0-100)",
+            "thresholdPlaceholder": "70",
+            "holdLabel": "Tid över tröskel (sek)",
+            "holdPlaceholder": "2",
+            "instructionLabel": "Instruktion",
+            "instructionPlaceholder": "Ropa högt för att öppna dörren!"
+          },
+          "replayMarker": {
+            "title": "Replay-markör-inställningar",
+            "description": "Denna artefakt låter deltagare markera viktiga ögonblick under sessionen för senare analys.",
+            "maxMarkersLabel": "Max markörer",
+            "maxMarkersPlaceholder": "Obegränsat",
+            "allowLabelsLabel": "Tillåt etiketter"
+          },
+          "variants": {
+            "title": "Varianter",
+            "subtitle": "Styr synlighet, rollåtkomst och när varianten kan låsas upp.",
+            "add": "Lägg till variant",
+            "label": "Variant",
+            "titleLabel": "Titel",
+            "titlePlaceholder": "Varianttitel",
+            "visibilityLabel": "Synlighet",
+            "roleLabel": "Roll (för privat variant)",
+            "roleNoneOption": "Ingen (syns enligt synlighet)",
+            "mediaLabel": "Mediareferens (valfri)",
+            "mediaPlaceholder": "media_id eller URL",
+            "bodyLabel": "Text/innehåll",
+            "bodyPlaceholder": "Vad visar denna variant?",
+            "stepIndexLabel": "Steg-index (0 = första)",
+            "stepIndexPlaceholder": "0",
+            "phaseIndexLabel": "Fas-index (0 = första)",
+            "phaseIndexPlaceholder": "0"
           }
+        },
+        "materials": {
+          "title": "Material",
+          "description": "Lista material som behövs för att genomföra leken.",
+          "itemsLabel": "Material",
+          "itemsPlaceholder": "Ex:\n8 koner\n1 boll per lag\nMusik (Spotify-spellista)",
+          "itemsCount": "{count, plural, =0 {Inget material} one {# material} other {# material}}",
+          "addItem": "Lägg till",
+          "addItemPlaceholder": "Lägg till material...",
+          "showSuggestions": "Visa vanliga förslag",
+          "hideSuggestions": "Dölj förslag",
+          "noItems": "Inget material tillagt ännu. Lägg till material som behövs för leken.",
+          "preparationLabel": "Förberedelser",
+          "preparationPlaceholder": "Vad behöver ledaren förbereda innan leken?"
         }
+      },
+      "bulk": {
+        "selectedCount": "{count} valda",
+        "ofTotal": "av {total} totalt",
+        "selectAll": "Markera alla ({count})",
+        "deselect": "Avmarkera",
+        "export": {
+          "title": "Exportera spel",
+          "description": "Exportera {count} valda spel.",
+          "formatLabel": "Format",
+          "includeRelations": "Inkludera relationer (steg, faser, roller, etc.)",
+          "jsonNote": "JSON-format inkluderar all relaterad data och kan importeras igen.",
+          "cancel": "Avbryt",
+          "exporting": "Exporterar...",
+          "exportButton": "Exportera"
+        }
+      },
+      "activeSessionsDialog": {
+        "title": "Lek har aktiva sessioner",
+        "description": "\"{gameName}\" har {count, plural, one {# aktiv session} other {# aktiva sessioner}}. Om du fortsätter avslutas alla sessioner och leken tas bort permanent.",
+        "confirmLabel": "Avsluta sessioner och ta bort"
       }
     },
     "achievements": {
@@ -7226,7 +7130,8 @@
       "breadcrumbs": {
         "admin": "Admin",
         "productsAndContent": "Produkter & Innhold",
-        "products": "Produkter"
+        "products": "Produkter",
+        "home": "Startsida"
       },
       "stats": {
         "products": "Produkter",
@@ -7238,7 +7143,10 @@
       "tabs": {
         "products": "Produkter",
         "licenses": "Lisenser",
-        "purposes": "Formål"
+        "purposes": "Formål",
+        "categories": "Kategorier",
+        "discounts": "Rabatter",
+        "images": "Standardbilder"
       },
       "productsTab": {
         "searchPlaceholder": "Søk produkter...",
@@ -7422,7 +7330,7 @@
           "statusActive": "Aktiv",
           "statusInactive": "Inaktiv",
           "categorySlugLabel": "Kategori",
-          "categorySlugHelp": "Hvilken markedsf\u00f8ringskategori produktet tilh\u00f8rer p\u00e5 prissiden.",
+          "categorySlugHelp": "Hvilken markedsføringskategori produktet tilhører på prissiden.",
           "noCategorySlug": "Ingen kategori",
           "bundleLabel": "Dette produktet er en pakke",
           "bundleHelp": "Bundle-produkter kan kobles til en kategori og inneholde flere enkeltprodukter. Konfigurer pakkeinnhold etter at produktet er opprettet.",
@@ -7432,7 +7340,7 @@
           "submit": "Opprett produkt",
           "creating": "Oppretter...",
           "success": "Produkt opprettet",
-          "successDescription": "Produktet er opprettet. Du kan n\u00e5 konfigurere priser og Stripe-kobling.",
+          "successDescription": "Produktet er opprettet. Du kan nå konfigurere priser og Stripe-kobling.",
           "error": "Kunne ikke opprette produkt",
           "keyChecking": "Sjekker tilgjengelighet...",
           "keyExists": "Denne produktnøkkelen finnes allerede",
@@ -7646,10 +7554,6 @@
             "title": "Feature Entitlements",
             "noEntitlements": "Ingen entitlements konfigurert",
             "enabled": "Aktivert",
-            "header": {
-              "openMenu": "Åpne menyen",
-              "closeMenu": "Lukk menyen"
-            },
             "disabled": "Deaktivert",
             "dependencies": "Avhengigheter",
             "noDependencies": "Ingen avhengigheter konfigurert",
@@ -7666,17 +7570,6 @@
             "unlinkSuccess": "\"{name}\" frakoblet fra produktet",
             "unlinkFailed": "Kunne ikke fjerne kobling",
             "helpText": "Leker kobles til produkter via lekbyggerens Innstillinger-seksjon."
-          },
-          "footer": {
-            "tagline": "Aktiviteter, økter og deling for trenere, lærere og ledere.",
-            "actions": {
-              "getStarted": "Kom i gang"
-            },
-            "legal": {
-              "terms": "Vilkår for bruk",
-              "privacy": "Personvernpolicy"
-            },
-            "copyright": "© {year} Lekbanken AS. Alle rettigheter forbeholdt."
           },
           "availability": {
             "scope": "Tilgjengelighetsomfang",
@@ -7899,7 +7792,11 @@
             "systemActor": "System"
           }
         }
-      }
+      },
+      "title": "Produkter",
+      "accessDenied": "Åtkomst nekad",
+      "noPermissionProducts": "Du har inte behörighet att se produkter.",
+      "goToDashboard": "Gå till dashboard"
     },
     "participants": {
       "title": "Deltakere",
@@ -8002,7 +7899,8 @@
         "all": "Alle statuser",
         "active": "Aktive",
         "completed": "Fullførte",
-        "flagged": "Flaggede"
+        "flagged": "Flaggede",
+        "placeholder": "Välj status"
       },
       "emptyState": {
         "noAccess": "Ingen tilgang",
@@ -8016,7 +7914,9 @@
         "host": "Vert",
         "participants": "Deltakere",
         "status": "Status",
-        "started": "Startet"
+        "started": "Startet",
+        "startedAt": "Startad",
+        "global": "Global"
       },
       "statusLabels": {
         "active": "Aktiv",
@@ -8046,6 +7946,10 @@
         "noAccessDescription": "Du trenger tillatelse for å se økter.",
         "notFound": "Økten ble ikke funnet",
         "notFoundDescription": "Sjekk lenken eller gå tilbake til listen."
+      },
+      "pageTitle": "Sessioner",
+      "errorState": {
+        "title": "Kunde inte ladda sessioner"
       }
     },
     "tickets": {
@@ -8284,7 +8188,9 @@
           "to": "Til:",
           "unknown": "Ukjent",
           "org": "Org:"
-        }
+        },
+        "title": "Notifikationer",
+        "markAllAsRead": "Markera alla som lästa"
       }
     },
     "moderation": {
@@ -8944,7 +8850,7 @@
           "title": "Kartbibliotek",
           "description": "Lagrede kart og baner fra Spatial Editor.",
           "newMap": "Nytt kart",
-          "loading": "Laster\u2026",
+          "loading": "Laster…",
           "noMaps": "Ingen lagrede kart",
           "noMapsDescription": "Opprett ditt første kart i Spatial Editor.",
           "createNew": "Opprett nytt kart",
@@ -9194,6 +9100,55 @@
         "notificationTemplateTranslations": "Varslingsmal",
         "tenantTranslationOverrides": "Tenant-tilpasning"
       }
+    },
+    "pageHeader": {
+      "breadcrumbsLabel": "Brödsmulor"
+    },
+    "states": {
+      "errorState": {
+        "defaultTitle": "Något gick fel",
+        "defaultDescription": "Ett fel uppstod. Försök igen.",
+        "retryButton": "Försök igen"
+      }
+    },
+    "scheduledJobs": {
+      "title": "Schemalagda jobb",
+      "description": "Översikt över automatiska databas-jobb (pg_cron).",
+      "activeJobs": "Aktiva jobb",
+      "lastRun": "Senaste körning",
+      "nextRun": "Nästa körning",
+      "status": "Status",
+      "result": "Resultat",
+      "duration": "Varaktighet",
+      "runHistory": "Körhistorik",
+      "runNow": "Kör nu",
+      "refresh": "Uppdatera",
+      "noHistory": "Ingen körhistorik ännu",
+      "errorTitle": "Kunde inte hämta jobbstatus",
+      "cronNotEnabled": "pg_cron är inte aktiverat",
+      "time": "Tid",
+      "job": "Jobb",
+      "schedule": "Schema",
+      "running": "Körs",
+      "runningManual": "Kör manuellt...",
+      "success": "Lyckades",
+      "failed": "Misslyckades",
+      "never": "Aldrig kört",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "ms": "ms",
+      "seconds": "sekunder",
+      "cronExpressions": {
+        "daily3am": "Dagligen kl 03:00 UTC"
+      },
+      "dailyAt": "Dagligen {time} (svensk tid)",
+      "jobs": {
+        "cleanupDemoUsers": {
+          "name": "Städa demo-användare",
+          "description": "Raderar demo-användare äldre än 24 timmar som inte konverterat till betalande."
+        }
+      },
+      "resultFormat": "{users} användare, {sessions} sessioner raderade"
     }
   },
   "app": {
@@ -9249,11 +9204,37 @@
     },
     "notifications": {
       "title": "Varsler",
-      "bell": "Vis varsler",
-      "markAllRead": "Merk alle som lest",
-      "empty": "Ingen varsler",
-      "dismiss": "Lukk",
-      "viewAll": "Vis alle"
+      "subtitle": "Dine meldinger og oppdateringer",
+      "unreadCount": "{count} uleste",
+      "allRead": "Alle lest",
+      "markAllAsRead": "Merk alle som lest",
+      "filters": {
+        "all": "Alle",
+        "unread": "Uleste ({count})",
+        "read": "Leste"
+      },
+      "empty": {
+        "title": "Ingen varsler",
+        "titleUnread": "Ingen uleste varsler",
+        "message": "Du har ingen varsler ennå.",
+        "messageUnread": "Du har lest alle varslene dine."
+      },
+      "actions": {
+        "view": "Vis",
+        "viewAll": "Vis alle",
+        "markAsRead": "Merk som lest",
+        "delete": "Slett"
+      },
+      "timeAgo": {
+        "minutes": "{minutes} min siden",
+        "hours": "{hours} t siden",
+        "yesterday": "I går",
+        "days": "{days} dager siden"
+      },
+      "error": {
+        "load": "Kunne ikke hente varsler",
+        "retry": "Prøv igjen"
+      }
     },
     "dashboard": {
       "title": "Dashboard",
@@ -9486,26 +9467,7 @@
         "signInRequired": "Du må være logget inn for å se hendelsesloggen.",
         "title": "DICECOIN",
         "subtitle": "Din aktivitetshistorikk",
-        "empty": "Ingen hendelser ennå. Spill spill og opprett økter for å tjene belønninger!",
-        "sources": {
-          "play": "Spill",
-          "planner": "Planlegger",
-          "system": "System",
-          "admin": "Admin"
-        },
-        "eventTypes": {
-          "session_completed": "Fullførte en økt",
-          "run_completed": "Fullførte en spill-runde",
-          "plan_created": "Opprettet en plan",
-          "plan_published": "Publiserte en plan",
-          "game_played": "Spilte et spill",
-          "achievement_unlocked": "Låste opp en prestasjon",
-          "first_session": "Startet din første økt",
-          "streak_bonus": "Oppnådde en streak-bonus",
-          "powerup_consumed": "Brukte en power-up",
-          "shop_purchase": "Kjøpte noe i butikken",
-          "reward_issued": "Mottok en belønning"
-        }
+        "empty": "Ingen hendelser ennå. Spill spill og opprett økter for å tjene belønninger!"
       },
       "achievements": {
         "celebration": {
@@ -9729,7 +9691,36 @@
           "emailNotVerified": "E-post ikke bekreftet",
           "mfaEnabled": "MFA aktivert",
           "mfaDisabled": "MFA ikke aktivert",
-          "enableMfa": "Aktiver nå"
+          "enableMfa": "Aktiver nå",
+          "description": "Hantera tvåfaktorsautentisering och sessioner",
+          "mfa": {
+            "title": "Tvåfaktorsautentisering",
+            "status": "MFA-status",
+            "enabled": "Aktiverad",
+            "disabled": "Ej aktiverad",
+            "enable": "Aktivera MFA",
+            "disable": "Stäng av",
+            "description": "Lägg till ett extra säkerhetslager på ditt konto"
+          },
+          "sessions": {
+            "title": "Aktiva sessioner",
+            "description": "Hantera dina inloggade enheter",
+            "current": "Nuvarande session",
+            "revoke": "Logga ut",
+            "revokeAll": "Logga ut alla enheter",
+            "lastActive": "Senast aktiv"
+          },
+          "devices": {
+            "title": "Betrodda enheter",
+            "description": "Enheter du har loggat in på",
+            "remove": "Ta bort"
+          },
+          "loginHistory": {
+            "title": "Inloggningshistorik",
+            "description": "Se dina senaste inloggningar",
+            "success": "Lyckad",
+            "failed": "Misslyckad"
+          }
         },
         "privacy": {
           "title": "Personvern og GDPR",
@@ -9747,6 +9738,83 @@
           "contact": {
             "title": "Kontakt oss",
             "description": "For GDPR-forespørsler eller spørsmål om dine personopplysninger, kontakt oss via e-post."
+          },
+          "dataExport": "Exportera data",
+          "requestHistory": "Begäranhistorik",
+          "requestStatus": {
+            "pending": "Väntar",
+            "processing": "Bearbetas",
+            "completed": "Slutförd",
+            "cancelled": "Avbruten"
+          },
+          "requestTypes": {
+            "portability": "Dataexport",
+            "erasure": "Kontoborttagning"
+          },
+          "validationError": "Du måste skriva \"{confirmText}\" för att bekräfta",
+          "deleteAccount": "Radera konto",
+          "deleteWarning": "När du raderar ditt konto kommer alla dina personuppgifter, speldata och framsteg att tas bort permanent. Denna åtgärd kan inte ångras.",
+          "dataExportSection": {
+            "title": "Exportera data",
+            "description": "Ladda ner en kopia av alla dina personuppgifter i ett maskinläsbart format (JSON).",
+            "button": "Begär dataexport",
+            "pending": "Export pågår...",
+            "ready": "Ladda ner",
+            "success": "Din begäran om dataexport har tagits emot!",
+            "successDescription": "Du kommer att få ett e-postmeddelande med en nedladdningslänk inom 72 timmar.",
+            "contents": {
+              "title": "Din dataexport kommer att innehålla:",
+              "profile": "Profilinformation (namn, e-post, etc.)",
+              "settings": "Inställningar och preferenser",
+              "activity": "Aktivitetshistorik",
+              "gameData": "Speldata och framsteg",
+              "organizations": "Organisationsmedlemskap"
+            },
+            "confirm": "Bekräfta begäran",
+            "cancel": "Avbryt",
+            "requesting": "Skickar begäran..."
+          },
+          "deleteAccountSection": {
+            "title": "Radera konto",
+            "description": "Permanent radera ditt konto och all data",
+            "button": "Radera mitt konto",
+            "warning": "Varning: Denna åtgärd kan inte ångras",
+            "consequences": {
+              "data": "All din profildata kommer att raderas permanent",
+              "progress": "Dina spelframsteg och prestationer försvinner",
+              "organizations": "Du kommer att tas bort från alla organisationer",
+              "subscriptions": "Eventuella aktiva prenumerationer avbryts"
+            },
+            "reasonLabel": "Anledning till borttagning (valfritt)",
+            "reasonPlaceholder": "Hjälp oss förstå varför du vill radera ditt konto...",
+            "confirmLabel": "Skriv {confirmText} för att bekräfta",
+            "confirmText": "RADERA MITT KONTO",
+            "confirmButton": "Bekräfta radering",
+            "confirming": "Skickar begäran...",
+            "cancel": "Avbryt",
+            "pendingRequest": "Begäran om kontoborttagning väntar",
+            "pendingDescription": "Din begäran mottogs {date} och behandlas inom 30 dagar.",
+            "gracePeriod": "Efter att du bekräftat kommer ditt konto att markeras för radering. Du har 14 dagar på dig att ångra beslutet genom att kontakta support."
+          },
+          "consents": {
+            "title": "Samtycken",
+            "description": "Hantera vilka typer av databehandling du samtycker till.",
+            "marketing": "Marknadsföring",
+            "marketingDesc": "Tillåt att vi skickar nyhetsbrev och kampanjer via e-post.",
+            "analytics": "Analys",
+            "analyticsDesc": "Tillåt anonym användningsstatistik för att förbättra tjänsten.",
+            "functional": "Funktionell data",
+            "functionalDesc": "Tillåt delning av data med betrodda partners för förbättrad funktionalitet.",
+            "grant": "Ge samtycke",
+            "revoke": "Återkalla",
+            "loading": "Laddar..."
+          },
+          "visibility": {
+            "title": "Profilsynlighet",
+            "description": "Vem kan se din profil",
+            "public": "Offentlig",
+            "private": "Privat",
+            "organization": "Endast organisation"
           }
         },
         "organizations": {
@@ -9780,7 +9848,15 @@
             "title": "Medlemskap",
             "description": "Organisasjoner du er medlem av."
           },
-          "joinedAt": "Ble med {date}"
+          "joinedAt": "Ble med {date}",
+          "primary": "Primär",
+          "switch": "Byt till",
+          "leave": "Lämna",
+          "leaveConfirm": "Är du säker på att du vill lämna {name}?",
+          "joinOrg": "Gå med i organisation",
+          "createOrg": "Skapa ny organisation",
+          "joinViaCode": "Gå med via inbjudningskod",
+          "quickActions": "Snabbåtgärder"
         },
         "preferences": {
           "title": "Preferanser",
@@ -9802,15 +9878,30 @@
           "save": "Lagre endringer",
           "saving": "Lagrer...",
           "languageSection": {
-            "description": "Velg hvilket språk du vil bruke i Lekbanken."
+            "description": "Velg hvilket språk du vil bruke i Lekbanken.",
+            "title": "Språk"
           },
           "themeSection": {
-            "description": "Velg hvordan Lekbanken skal se ut."
+            "description": "Velg hvordan Lekbanken skal se ut.",
+            "title": "Tema",
+            "light": "Ljust",
+            "dark": "Mörkt",
+            "system": "System"
           },
           "accessibilitySection": {
             "description": "Tilpass Lekbanken for dine behov.",
             "highContrastDesc": "Øk kontrasten for bedre lesbarhet.",
-            "reduceMotionDesc": "Reduser animasjoner og bevegelse i grensesnittet."
+            "reduceMotionDesc": "Reduser animasjoner og bevegelse i grensesnittet.",
+            "title": "Tillgänglighet",
+            "highContrast": "Hög kontrast",
+            "reduceMotion": "Reducera rörelse",
+            "textSize": "Textstorlek",
+            "textSizes": {
+              "small": "Liten",
+              "medium": "Normal",
+              "large": "Stor",
+              "extraLarge": "Extra stor"
+            }
           },
           "animationsSection": {
             "title": "Animasjoner og tilbakemeldinger",
@@ -9826,8 +9917,15 @@
           },
           "dateTime": {
             "title": "Tid og dato",
-            "description": "Innstillinger for hvordan tid og dato vises."
-          }
+            "description": "Innstillinger for hvordan tid og dato vises.",
+            "timezone": "Tidszon",
+            "dateFormat": "Datumformat",
+            "timeFormat": "Tidsformat",
+            "12h": "12-timmar",
+            "24h": "24-timmar"
+          },
+          "showThemeToggle": "Visa tema-omkopplare i headern",
+          "showThemeToggleHint": "Styr om snabb-knappen för ljust/mörkt läge syns högst upp."
         },
         "achievements": {
           "title": "Dine utmerkelser",
@@ -9864,19 +9962,7 @@
           "noTransactions": "Ingen transaksjoner å vise.",
           "unknownTransaction": "Ukjent transaksjon",
           "error": "Kunne ikke hente myntdata",
-          "shopLink": "Bruk myntene dine i butikken",
-          "reasonCodes": {
-            "event:session_completed": "Belønning for fullført økt",
-            "event:run_completed": "Belønning for fullført runde",
-            "event:plan_created": "Belønning for opprettet plan",
-            "event:plan_published": "Belønning for publisert plan",
-            "event:game_played": "Belønning for spilt spill",
-            "event:achievement_unlocked": "Belønning for opplåst prestasjon",
-            "event:first_session": "Belønning for første økt",
-            "event:streak_bonus": "Streak-bonus",
-            "powerup:coin_multiplier": "Myntmultiplikator-bonus",
-            "refund": "Refusjon"
-          }
+          "shopLink": "Bruk myntene dine i butikken"
         },
         "friends": {
           "title": "Venner",
@@ -9972,6 +10058,49 @@
           "loadingTakingLong": "Dette tar uvanlig lang tid. Sjekk Console/Network for å se hvilken forespørsel som har hengt seg og prøv å laste siden på nytt.",
           "retry": "Prøv igjen",
           "reload": "Last på nytt"
+        },
+        "notifications": {
+          "title": "Notifikationsinställningar",
+          "description": "Välj hur och när du vill bli kontaktad",
+          "channels": "Notifieringskanaler",
+          "categories": "Notifieringskategorier",
+          "emailDigest": "E-postsammanfattning",
+          "quietHours": "Tysta timmar",
+          "email": {
+            "title": "E-postnotifikationer",
+            "enabled": "Aktivera e-postnotifikationer",
+            "activity": "Aktivitetsuppdateringar",
+            "mentions": "Omnämnanden",
+            "comments": "Kommentarer",
+            "updates": "Produktuppdateringar",
+            "marketing": "Marknadsföring",
+            "digest": "Sammanfattning",
+            "digestOptions": {
+              "realtime": "Realtid",
+              "hourly": "Varje timme",
+              "daily": "Dagligen",
+              "weekly": "Veckovis",
+              "never": "Aldrig"
+            }
+          },
+          "push": {
+            "title": "Push-notifikationer",
+            "enabled": "Aktivera push-notifikationer",
+            "activity": "Aktivitetsuppdateringar",
+            "mentions": "Omnämnanden",
+            "comments": "Kommentarer"
+          },
+          "inApp": {
+            "title": "App-notifikationer",
+            "enabled": "Aktivera in-app-notifikationer"
+          },
+          "dnd": {
+            "title": "Stör ej",
+            "enabled": "Aktivera stör ej",
+            "startTime": "Starttid",
+            "endTime": "Sluttid",
+            "days": "Dagar"
+          }
         }
       },
       "achievementsShowcase": {
@@ -10307,7 +10436,6 @@
       "boostRemaining": "{hours}t {minutes}m igjen",
       "coins": "DiceCoin",
       "gems": "Gems",
-      "level": "Nivå",
       "featured": "Utvalgt",
       "levelLocked": "Låst: nivå {level}",
       "buyNow": "Kjøp nå",
@@ -10360,10 +10488,16 @@
       "tabs": {
         "overview": "Oversikt",
         "plans": "Planer",
-        "invoices": "Fakturaer"
+        "invoices": "Fakturaer",
+        "entitlements": "Produkter"
       },
       "status": {
-        "active": "Aktiv"
+        "active": "Aktiv",
+        "canceled": "Avslutad",
+        "past_due": "Förfallen",
+        "canceling": "Avslutas snart",
+        "trialing": "Provperiod",
+        "incomplete": "Ofullständig"
       },
       "currentPlan": {
         "proPlan": "Pro-plan",
@@ -10372,7 +10506,12 @@
         "renews": "Fornyes: {date}",
         "paymentMethod": "{brand} •••• {last4}",
         "changePlan": "Bytt plan",
-        "cancel": "Avbryt abonnement"
+        "cancel": "Avbryt abonnement",
+        "subscription": "Aktiv prenumeration",
+        "perInterval": "per {interval}",
+        "endsOn": "Avslutas {date}",
+        "role": "Din roll: {role}",
+        "manage": "Hantera prenumeration"
       },
       "features": {
         "title": "Dine funksjoner"
@@ -10380,7 +10519,12 @@
       "stats": {
         "activities": "Aktiviteter",
         "usedToday": "Brukt i dag",
-        "monthsMember": "Måneder medlem"
+        "monthsMember": "Måneder medlem",
+        "activeProducts": "Aktiva produkter",
+        "invoices": "Fakturor",
+        "accountType": "Kontotyp",
+        "personal": "Privat",
+        "organization": "Organisation"
       },
       "plans": {
         "free": "Gratis",
@@ -10477,7 +10621,33 @@
           "reference": "Referanse"
         },
         "search": "Søk faktura",
-        "downloadPdf": "Last ned PDF"
+        "downloadPdf": "Last ned PDF",
+        "view": "Visa",
+        "empty": "Inga fakturor ännu"
+      },
+      "subtitleNoTenant": "Du har inget aktivt konto",
+      "error": {
+        "title": "Något gick fel",
+        "retry": "Försök igen"
+      },
+      "noSubscription": {
+        "title": "Ingen aktiv prenumeration",
+        "description": "Välj en plan för att komma igång",
+        "choosePlan": "Välj plan"
+      },
+      "entitlements": {
+        "unknownProduct": "Okänd produkt",
+        "seats": "{count} platser",
+        "status": {
+          "active": "Aktiv",
+          "inactive": "Inaktiv",
+          "paused": "Pausad"
+        },
+        "empty": {
+          "title": "Inga produkter",
+          "description": "Du har inga aktiva produkter",
+          "browse": "Utforska produkter"
+        }
       }
     },
     "learning": {
@@ -10496,7 +10666,8 @@
         "completed": "Fullført",
         "inProgress": "Pågår",
         "locked": "Låst",
-        "available": "Tilgjengelig"
+        "available": "Tilgjengelig",
+        "failed": "Ej godkänd"
       },
       "percentComplete": "{percent}% fullført",
       "passedWith": "Bestått med {score}%",
@@ -10530,7 +10701,13 @@
         "tryAgain": "Prøv igjen",
         "back": "Tilbake",
         "backToCourses": "Tilbake til kurs"
-      }
+      },
+      "empty": {
+        "title": "Inga kurser tillgängliga",
+        "description": "Det finns inga aktiva kurser för tillfället. Kontakta din organisation för mer information."
+      },
+      "failedWith": "Ej godkänd ({score}%), krävs {required}%",
+      "attemptsCount": "{count} försök gjorda"
     },
     "leaderboard": {
       "title": "Toppliste",
@@ -10608,40 +10785,6 @@
       "empty": {
         "title": "Ingen utfordringer funnet",
         "message": "Prøv å endre filtrene dine for å se flere utfordringer."
-      }
-    },
-    "notifications": {
-      "title": "Varsler",
-      "subtitle": "Dine meldinger og oppdateringer",
-      "unreadCount": "{count} uleste",
-      "allRead": "Alle lest",
-      "markAllAsRead": "Merk alle som lest",
-      "filters": {
-        "all": "Alle",
-        "unread": "Uleste ({count})",
-        "read": "Leste"
-      },
-      "empty": {
-        "title": "Ingen varsler",
-        "titleUnread": "Ingen uleste varsler",
-        "message": "Du har ingen varsler ennå.",
-        "messageUnread": "Du har lest alle varslene dine."
-      },
-      "actions": {
-        "view": "Vis",
-        "viewAll": "Vis alle",
-        "markAsRead": "Merk som lest",
-        "delete": "Slett"
-      },
-      "timeAgo": {
-        "minutes": "{minutes} min siden",
-        "hours": "{hours} t siden",
-        "yesterday": "I går",
-        "days": "{days} dager siden"
-      },
-      "error": {
-        "load": "Kunne ikke hente varsler",
-        "retry": "Prøv igjen"
       }
     },
     "events": {
@@ -10729,15 +10872,10 @@
         "redirecting": "Omdirigerer deg nå...",
         "codeLabel": "Autentiseringskode",
         "codePlaceholder": "Skriv inn 6-sifret kode",
-        "submit": "Bekreft",
         "verifying": "Bekrefter...",
-        "invalidCode": "Ugyldig kode. Prøv igjen.",
-        "tooManyAttempts": "For mange forsøk. Prøv igjen senere.",
         "useRecoveryCode": "Bruk gjenopprettingskode i stedet",
-        "backToCode": "Bruk autentiserings-app",
         "recoveryCodeLabel": "Gjenopprettingskode",
         "recoveryCodePlaceholder": "Skriv inn gjenopprettingskode",
-        "recoveryCodeDescription": "Skriv inn en av gjenopprettingskodene dine hvis du ikke har tilgang til autentiserings-appen",
         "recoveryCodeHelp": "Skriv inn en av gjenopprettingskodene dine. Hver kode kan bare brukes én gang.",
         "verifyWithRecovery": "Bekreft med gjenopprettingskode",
         "trustDevice": "Stol på denne enheten i {days} dager",
@@ -10745,7 +10883,16 @@
         "needHelp": "Problemer med å logge inn?",
         "contactSupport": "Kontakt support",
         "lowRecoveryCodes": "Du har bare {count} gjenopprettingskode(r) igjen. Generer nye koder i sikkerhetsinnstillingene.",
-        "attemptsRemaining": "{count} forsøk igjen"
+        "attemptsRemaining": "{count} forsøk igjen",
+        "verifyButton": "Verifiera",
+        "useAuthenticator": "Använd autentiseringsapp",
+        "trustDeviceHelp": "Du behöver inte ange kod nästa gång på denna enhet",
+        "error": {
+          "invalidCode": "Ogiltig kod. Försök igen.",
+          "invalidRecoveryCode": "Ogiltig återställningskod.",
+          "tooManyAttempts": "För många försök. Försök igen senare.",
+          "generic": "Ett fel uppstod. Försök igen."
+        }
       },
       "enroll": {
         "title": "Aktiver tofaktorautentisering",
@@ -10764,28 +10911,14 @@
         "verifyDescription": "Skriv inn den 6-sifrede koden fra autentiserings-appen din",
         "verifying": "Bekrefter...",
         "back": "Tilbake",
-        "step1": {
-          "title": "Last ned en autentiserings-app",
-          "description": "Vi anbefaler Google Authenticator eller Microsoft Authenticator"
-        },
-        "step2": {
-          "title": "Skann QR-koden",
-          "description": "Åpne autentiserings-appen din og skann denne QR-koden"
-        },
-        "step3": {
-          "title": "Skriv inn bekreftelseskode",
-          "description": "Skriv inn den 6-sifrede koden fra autentiserings-appen din"
-        },
-        "hideSecret": "Skjul hemmelig nøkkel",
-        "secretKey": "Hemmelig nøkkel",
         "copySecret": "Kopier",
-        "copiedSecret": "Kopiert!",
         "verifyCode": "Bekreft kode",
         "success": "Tofaktorautentisering aktivert",
-        "error": "Kunne ikke aktivere tofaktorautentisering",
-        "invalidCode": "Ugyldig kode. Prøv igjen.",
-        "cancel": "Avbryt",
-        "close": "Lukk",
+        "error": {
+          "enrollFailed": "Kunde inte starta MFA-registrering",
+          "verifyFailed": "Ogiltig kod. Försök igen.",
+          "generic": "Ett fel uppstod. Försök igen."
+        },
         "recoveryCodes": {
           "title": "Lagre gjenopprettingskodene dine",
           "description": "Hvis du mister tilgang til telefonen din kan du bruke disse kodene for å logge inn",
@@ -10794,7 +10927,23 @@
           "copy": "Kopier",
           "copied": "Kopiert!",
           "continue": "Jeg har lagret kodene mine"
-        }
+        },
+        "step1Title": "Skanna QR-kod",
+        "step1Description": "Öppna din autentiseringsapp och skanna QR-koden nedan.",
+        "step2Title": "Ange verifieringskod",
+        "step2Description": "Ange den 6-siffriga koden som visas i din app.",
+        "step3Title": "Spara återställningskoder",
+        "step3Description": "Spara dessa koder på en säker plats. Du behöver dem om du tappar åtkomst till din enhet.",
+        "qrCodeAlt": "QR-kod för MFA",
+        "manualEntry": "Kan du inte skanna? Ange manuellt:",
+        "secretCopied": "Kopierad!",
+        "recoveryCodesTitle": "Dina återställningskoder",
+        "recoveryCodesWarning": "Viktigt: Spara dessa koder nu. De visas endast en gång.",
+        "copyAllCodes": "Kopiera alla koder",
+        "codesCopied": "Koder kopierade!",
+        "downloadCodes": "Ladda ner koder",
+        "confirmSaved": "Jag har sparat koderna",
+        "complete": "Slutför aktivering"
       },
       "settings": {
         "title": "Sikkerhet",
@@ -10803,18 +10952,8 @@
         "enabledDescription": "Kontoen din er beskyttet med tofaktorautentisering.",
         "disabled": "Deaktivert",
         "disabledDescription": "Aktiver tofaktorautentisering for ekstra sikkerhet.",
-        "enable": "Aktiver",
-        "disable": "Deaktiver",
-        "disableConfirm": "Er du sikker på at du vil deaktivere tofaktorautentisering? Dette gjør kontoen din mindre sikker.",
-        "disableSuccess": "Tofaktorautentisering deaktivert",
-        "disableError": "Kunne ikke deaktivere tofaktorautentisering",
         "regenerateCodes": "Generer nye gjenopprettingskoder",
-        "regenerateConfirm": "Er du sikker på at du vil generere nye gjenopprettingskoder? De gamle kodene vil ikke lenger fungere.",
-        "regenerateSuccess": "Nye gjenopprettingskoder generert",
-        "regenerateError": "Kunne ikke generere nye gjenopprettingskoder",
         "lastUsed": "Sist brukt",
-        "never": "Aldri",
-        "enrolledAt": "Aktivert",
         "loading": "Laster...",
         "recoveryCodes": "Gjenopprettingskoder",
         "recoveryCodesDescription": "Bruk disse kodene for å logge inn hvis du mister tilgang til autentiserings-appen din",
@@ -10825,7 +10964,31 @@
         "unknownDevice": "Ukjent enhet",
         "on": "på",
         "retry": "Prøv igjen",
-        "unknownDate": "Ukjent dato"
+        "unknownDate": "Ukjent dato",
+        "required": "MFA krävs",
+        "requiredDescription": "Din organisation kräver att du aktiverar MFA.",
+        "enableButton": "Aktivera MFA",
+        "disableButton": "Inaktivera MFA",
+        "revokeDevice": "Ta bort",
+        "revokeAllDevices": "Ta bort alla",
+        "deviceName": "Enhetsnamn",
+        "expiresAt": "Upphör",
+        "confirm": {
+          "disableTitle": "Inaktivera MFA?",
+          "disableDescription": "Detta minskar säkerheten på ditt konto. Är du säker?",
+          "disableConfirm": "Ja, inaktivera",
+          "disableCancel": "Avbryt",
+          "revokeTitle": "Ta bort betrodd enhet?",
+          "revokeDescription": "Du måste verifiera med MFA nästa gång du loggar in från denna enhet.",
+          "revokeConfirm": "Ta bort",
+          "revokeCancel": "Avbryt"
+        },
+        "messages": {
+          "disabled": "MFA har inaktiverats",
+          "codesRegenerated": "Nya återställningskoder har genererats",
+          "deviceRevoked": "Enheten har tagits bort",
+          "allDevicesRevoked": "Alla enheter har tagits bort"
+        }
       }
     }
   },
@@ -10959,6 +11122,19 @@
           "missingIntentId": "Mangler purchase_intent_id.",
           "readStatusFailed": "Kunne ikke lese status.",
           "generic": "Noe gikk galt. Prøv igjen."
+        },
+        "titlePersonal": "Tack för ditt köp!",
+        "subtitlePersonal": "Vi bekräftar din betalning och aktiverar ditt konto. Det brukar gå snabbt.",
+        "timeout": {
+          "title": "Det tar längre tid än väntat",
+          "subtitle": "Din betalning har gått igenom, men aktiveringen dröjer. Det kan bero på tillfällig belastning.",
+          "retry": "Försök igen",
+          "supportHint": "Fungerar det fortfarande inte? Kontakta oss på"
+        },
+        "personalSuccess": {
+          "title": "Du har nu tillgång!",
+          "subtitle": "Ditt konto är aktiverat och du har full tillgång till ditt innehåll.",
+          "redirecting": "Omdirigerar till appen..."
         }
       },
       "success": {
@@ -11045,7 +11221,15 @@
       "description": "Lekbanken hjelper deg planlegge, organisere og gjennomføre aktiviteter med barn og unge. Spar tid og skap bedre opplevelser.",
       "login": "Logg inn",
       "getStartedFree": "Kom i gang gratis",
-      "copyright": "Lekbanken AS. Alle rettigheter forbeholdt."
+      "copyright": "Lekbanken AS. Alle rettigheter forbeholdt.",
+      "tagline": "Aktiviteter, pass och delning för coacher, lärare och ledare.",
+      "actions": {
+        "getStarted": "Kom igång"
+      },
+      "legal": {
+        "terms": "Användarvillkor",
+        "privacy": "Integritetspolicy"
+      }
     },
     "enterprise": {
       "title": "Bedriftsløsninger",
@@ -11105,7 +11289,13 @@
       }
     },
     "hero": {
-      "actionWords": ["Oppdag", "Led", "Planlegg", "Gjennomfør", "Utvikle"],
+      "actionWords": [
+        "Oppdag",
+        "Led",
+        "Planlegg",
+        "Gjennomfør",
+        "Utvikle"
+      ],
       "title": "<word></word> <highlight>aktiviteter</highlight> som engasjerer",
       "description": "Fra idé til gjennomføring — alt på ett sted. Bla gjennom hundrevis av ferdige aktiviteter, bygg egne planer, kjør økter live og følg utviklingen din som leder.",
       "quote": "Lekbanken er verktøyet som hjelper deg å skape engasjerende øyeblikk — hver gang.",
@@ -11169,12 +11359,27 @@
           "milestone": "Milepæl",
           "content": "Nytt innhold"
         }
-      }
+      },
+      "badge": "Features"
     },
     "howItWorks": {
       "tagline": "Slik fungerer det",
       "title": "Fra idé til gjennomføring på minutter",
-      "description": "Fire enkle steg for å planlegge og gjennomføre aktiviteter som engasjerer."
+      "description": "Fire enkle steg for å planlegge og gjennomføre aktiviteter som engasjerer.",
+      "steps": {
+        "step1": {
+          "title": "Skapa konto",
+          "description": "Registrera dig gratis och kom igång direkt."
+        },
+        "step2": {
+          "title": "Bygg ditt pass",
+          "description": "Välj aktiviteter och dra dem till din planering."
+        },
+        "step3": {
+          "title": "Dela med teamet",
+          "description": "Exportera till PDF eller dela digitalt med kollegor."
+        }
+      }
     },
     "spotlight": {
       "tagline": "Kraftige funksjoner",
@@ -11286,42 +11491,150 @@
         "backToCategory": "Tilbake til {category}"
       },
       "products": {
-        "autismnpf": { "name": "Autisme & NPF", "description": "Aktiviteter tilpasset autisme og NPF" },
-        "rarelsehinder": { "name": "Bevegelseshemming", "description": "Tilpasset for personer med bevegelseshemming" },
-        "synharselvariation": { "name": "Syn- og hørselsvariasjon", "description": "Aktiviteter for syn- og hørselsvariasjon" },
-        "kickoff": { "name": "Kickoff", "description": "Leker for kickoff-arrangementer" },
-        "kontorsaktiviteter": { "name": "Kontorativiteter", "description": "Aktiviteter for arbeidsplassen" },
-        "teambuilding": { "name": "Teambuilding", "description": "Styrk teamet med morsomme øvelser" },
-        "digitalaisbrytare": { "name": "Digitale isbrytere", "description": "Isbrytere for digitale møter" },
-        "sittandegruppovningar": { "name": "Sittende gruppeøvelser", "description": "Gruppeøvelser som kan gjøres sittende" },
-        "videomoteslekarteamsmeet": { "name": "Videomøteleker", "description": "Leker for Teams/Meet" },
-        "lagerkolloledare": { "name": "Leir/Ferieleder", "description": "Perfekt for leir og ferieopphold" },
-        "scoutledare": { "name": "Speiderledere", "description": "Aktiviteter for speidere" },
-        "ungaledare": { "name": "Unge ledere", "description": "For unge ledere i aktiviteter" },
-        "fodolsedagarkalas": { "name": "Bursdager og fester", "description": "Leker for barnefester" },
-        "smabarnbarn18ar": { "name": "Småbarn og barn (1–8 år)", "description": "Tilpasset de yngste" },
-        "tweenstonaringar917ar": { "name": "Tweens og tenåringer (9–17 år)", "description": "For eldre barn og tenåringer" },
-        "jul": { "name": "Jul", "description": "Juleleker og aktiviteter" },
-        "midsommar": { "name": "Sankthans", "description": "Sankthans-leker" },
-        "pask": { "name": "Påske", "description": "Påskeleker og aktiviteter" },
-        "skolavslutning": { "name": "Skoleavslutning", "description": "Leker for skoleavslutningen" },
-        "brallop": { "name": "Bryllup", "description": "Leker for bryllupsfesten" },
-        "hemmafest": { "name": "Hjemmefest", "description": "Festleker hjemme" },
-        "nyarsfest": { "name": "Nyttårsfest", "description": "Nyttårsleker" },
-        "studentexamen": { "name": "Student / Eksamen", "description": "Leker for russefeiring" },
-        "dagisforskola": { "name": "Barnehage", "description": "Tilpasset for barnehagen" },
-        "grundskola_lag": { "name": "Barneskole (1.–4. trinn)", "description": "For de yngste på skolen" },
-        "grundskola_mellan": { "name": "Barneskole (5.–7. trinn)", "description": "For mellomtrinnet" },
-        "grundskola_hog": { "name": "Ungdomsskole", "description": "For ungdomsskolen" },
-        "gymnasium": { "name": "Videregående", "description": "For videregående skole" },
-        "fritidspedagog": { "name": "SFO-ansatt", "description": "Aktiviteter for SFO" },
-        "fotboll": { "name": "Fotball", "description": "Fotballtrening og leker" },
-        "innebandy": { "name": "Innebandy", "description": "Innebandytrening" },
-        "handboll": { "name": "Håndball", "description": "Håndballtrening" },
-        "basket": { "name": "Basketball", "description": "Basketballtrening" },
-        "trainer": { "name": "Trener", "description": "For trenere og coacher" },
-        "pedagog": { "name": "Pedagog", "description": "For pedagoger og lærere" },
-        "parent": { "name": "Forelder", "description": "For foreldre og hjemmeaktiviteter" }
+        "autismnpf": {
+          "name": "Autisme & NPF",
+          "description": "Aktiviteter tilpasset autisme og NPF"
+        },
+        "rarelsehinder": {
+          "name": "Bevegelseshemming",
+          "description": "Tilpasset for personer med bevegelseshemming"
+        },
+        "synharselvariation": {
+          "name": "Syn- og hørselsvariasjon",
+          "description": "Aktiviteter for syn- og hørselsvariasjon"
+        },
+        "kickoff": {
+          "name": "Kickoff",
+          "description": "Leker for kickoff-arrangementer"
+        },
+        "kontorsaktiviteter": {
+          "name": "Kontorativiteter",
+          "description": "Aktiviteter for arbeidsplassen"
+        },
+        "teambuilding": {
+          "name": "Teambuilding",
+          "description": "Styrk teamet med morsomme øvelser"
+        },
+        "digitalaisbrytare": {
+          "name": "Digitale isbrytere",
+          "description": "Isbrytere for digitale møter"
+        },
+        "sittandegruppovningar": {
+          "name": "Sittende gruppeøvelser",
+          "description": "Gruppeøvelser som kan gjøres sittende"
+        },
+        "videomoteslekarteamsmeet": {
+          "name": "Videomøteleker",
+          "description": "Leker for Teams/Meet"
+        },
+        "lagerkolloledare": {
+          "name": "Leir/Ferieleder",
+          "description": "Perfekt for leir og ferieopphold"
+        },
+        "scoutledare": {
+          "name": "Speiderledere",
+          "description": "Aktiviteter for speidere"
+        },
+        "ungaledare": {
+          "name": "Unge ledere",
+          "description": "For unge ledere i aktiviteter"
+        },
+        "fodolsedagarkalas": {
+          "name": "Bursdager og fester",
+          "description": "Leker for barnefester"
+        },
+        "smabarnbarn18ar": {
+          "name": "Småbarn og barn (1–8 år)",
+          "description": "Tilpasset de yngste"
+        },
+        "tweenstonaringar917ar": {
+          "name": "Tweens og tenåringer (9–17 år)",
+          "description": "For eldre barn og tenåringer"
+        },
+        "jul": {
+          "name": "Jul",
+          "description": "Juleleker og aktiviteter"
+        },
+        "midsommar": {
+          "name": "Sankthans",
+          "description": "Sankthans-leker"
+        },
+        "pask": {
+          "name": "Påske",
+          "description": "Påskeleker og aktiviteter"
+        },
+        "skolavslutning": {
+          "name": "Skoleavslutning",
+          "description": "Leker for skoleavslutningen"
+        },
+        "brallop": {
+          "name": "Bryllup",
+          "description": "Leker for bryllupsfesten"
+        },
+        "hemmafest": {
+          "name": "Hjemmefest",
+          "description": "Festleker hjemme"
+        },
+        "nyarsfest": {
+          "name": "Nyttårsfest",
+          "description": "Nyttårsleker"
+        },
+        "studentexamen": {
+          "name": "Student / Eksamen",
+          "description": "Leker for russefeiring"
+        },
+        "dagisforskola": {
+          "name": "Barnehage",
+          "description": "Tilpasset for barnehagen"
+        },
+        "grundskola_lag": {
+          "name": "Barneskole (1.–4. trinn)",
+          "description": "For de yngste på skolen"
+        },
+        "grundskola_mellan": {
+          "name": "Barneskole (5.–7. trinn)",
+          "description": "For mellomtrinnet"
+        },
+        "grundskola_hog": {
+          "name": "Ungdomsskole",
+          "description": "For ungdomsskolen"
+        },
+        "gymnasium": {
+          "name": "Videregående",
+          "description": "For videregående skole"
+        },
+        "fritidspedagog": {
+          "name": "SFO-ansatt",
+          "description": "Aktiviteter for SFO"
+        },
+        "fotboll": {
+          "name": "Fotball",
+          "description": "Fotballtrening og leker"
+        },
+        "innebandy": {
+          "name": "Innebandy",
+          "description": "Innebandytrening"
+        },
+        "handboll": {
+          "name": "Håndball",
+          "description": "Håndballtrening"
+        },
+        "basket": {
+          "name": "Basketball",
+          "description": "Basketballtrening"
+        },
+        "trainer": {
+          "name": "Trener",
+          "description": "For trenere og coacher"
+        },
+        "pedagog": {
+          "name": "Pedagog",
+          "description": "For pedagoger og lærere"
+        },
+        "parent": {
+          "name": "Forelder",
+          "description": "For foreldre og hjemmeaktiviteter"
+        }
       },
       "categories": {
         "Specialpedagog": "Spesialpedagog",
@@ -11342,9 +11655,6 @@
         "Family": "Familie",
         "other": "Annet"
       },
-      "frequencyLabel": "Betalingsfrekvens",
-      "save15": "Spar 15%",
-      "mostPopular": "Mest populær",
       "detail": {
         "notFound": "Produktet ble ikke funnet",
         "notFoundDescription": "Det forespurte produktet finnes ikke eller er ikke tilgjengelig.",
@@ -11417,80 +11727,6 @@
             "answer": "Vi tilbyr støtte via e-post og chat. Svartid innen 24 timer på hverdager."
           }
         }
-      },
-      "frequencies": {
-        "monthly": {
-          "label": "Månedlig",
-          "suffix": "/måned"
-        },
-        "annually": {
-          "label": "Årlig",
-          "suffix": "/år"
-        }
-      },
-      "tiers": {
-        "free": {
-          "name": "Gratis",
-          "description": "Perfekt for å komme i gang og utforske plattformen.",
-          "price": {
-            "monthly": "0 kr",
-            "annually": "0 kr"
-          },
-          "cta": "Kom i gang",
-          "features": [
-            "5 aktiviteter",
-            "1 økt per uke",
-            "Grunnleggende filter",
-            "PDF-eksport"
-          ]
-        },
-        "pro": {
-          "name": "Pro",
-          "description": "For aktive ledere som vil ha mer.",
-          "price": {
-            "monthly": "99 kr",
-            "annually": "999 kr"
-          },
-          "cta": "Prøv Pro gratis",
-          "features": [
-            "Ubegrensede aktiviteter",
-            "Ubegrensede økter",
-            "Avanserte filtre",
-            "Teamdeling",
-            "Prioritert støtte"
-          ]
-        },
-        "team": {
-          "name": "Team",
-          "description": "For organisasjoner med flere ledere.",
-          "price": "Kontakt oss",
-          "cta": "Kontakt salg",
-          "features": [
-            "Alt i Pro",
-            "SSO-innlogging",
-            "Admin-dashboard",
-            "Dedikert suksessleder",
-            "Tilpasset onboarding"
-          ]
-        },
-        "marketing": {
-          "name": "Markedsføring",
-          "highlight": "Grunnleggende",
-          "price": "Gratis",
-          "description": "Utforsk våre aktiviteter og leker uten kostnad."
-        },
-        "app": {
-          "name": "App",
-          "highlight": "Populær",
-          "price": "99 kr/mnd",
-          "description": "Full tilgang til alle funksjoner i appen."
-        },
-        "admin": {
-          "name": "Admin",
-          "highlight": "Avansert",
-          "price": "Kontakt oss",
-          "description": "Tilpassede løsninger for organisasjoner."
-        }
       }
     },
     "cta": {
@@ -11550,6 +11786,35 @@
         "tryFree": "Prøv gratis",
         "viewPricing": "Se priser"
       }
+    },
+    "header": {
+      "openMenu": "Öppna menyn",
+      "closeMenu": "Stäng menyn"
+    },
+    "groups": {
+      "sharedProviders": {
+        "title": "Delade providers",
+        "points": {
+          "theme": "Tema, Supabase och i18n laddas i rotlayouten.",
+          "layouts": "Layoutarna är tunna och fokuserar på navigation och chrome."
+        }
+      },
+      "uiWorlds": {
+        "title": "UI-världar",
+        "points": {
+          "marketing": "Marketing använder header och footer utan koppling till appflöden.",
+          "app": "App har bottom navigation och mobilanpassade komponenter.",
+          "admin": "Admin har vänstersidebar och topbar med sök/notifications."
+        }
+      },
+      "responsiveStrategy": {
+        "title": "Responsiv strategi",
+        "points": {
+          "marketing": "Marketing: klassisk responsiv layout.",
+          "app": "App: mobil först med luftigt desktopläge.",
+          "admin": "Admin: desktop först med fallback för mindre skärmar."
+        }
+      }
     }
   },
   "demo": {
@@ -11572,61 +11837,6 @@
         "title": "Premium demo",
         "description": "Full tilgang med personlig guide",
         "button": "Kontakt salg"
-      }
-    },
-    "features": {
-      "badge": "Funksjoner",
-      "title": "Arkitekturen i korte trekk",
-      "description": "UI-verdener holdes adskilt, men deler komponentbibliotek. Strukturen i app/ følger Next.js App Router med route groups for marketing, app og admin.",
-      "groups": {
-        "sharedProviders": {
-          "title": "Delte providere",
-          "points": {
-            "theme": "Tema, Supabase og i18n lastes i rotlayouten.",
-            "layouts": "Layoutene er slanke og fokuserer på navigasjon og chrome."
-          }
-        },
-        "uiWorlds": {
-          "title": "UI-verdener",
-          "points": {
-            "marketing": "Marketing bruker header og footer uten kobling til appflyt.",
-            "app": "App har bunnnavigasjon og mobiltilpassede komponenter.",
-            "admin": "Admin har venstresidefelt og topbar med søk/varsler."
-          }
-        },
-        "responsiveStrategy": {
-          "title": "Responsiv strategi",
-          "points": {
-            "marketing": "Marketing: klassisk responsiv layout.",
-            "app": "App: mobil først med luftig desktopvisning.",
-            "admin": "Admin: desktop først med fallback for mindre skjermer."
-          }
-        }
-      }
-    },
-    "pricing": {
-      "badge": "Priser",
-      "title": "Tre produktopplevelser",
-      "description": "Arkitekturen skiller offentlig marketing, mobil App og desktop Admin slik at hvert team kan utvikle i sitt eget tempo.",
-      "tiers": {
-        "marketing": {
-          "name": "Marketing",
-          "price": "0 kr",
-          "description": "Landingssider og markedsføring uten innlogging.",
-          "highlight": "Offentlig"
-        },
-        "app": {
-          "name": "App",
-          "price": "Pro per lekleder",
-          "description": "Mobil-først flyter med bunnnavigasjon og delte komponenter.",
-          "highlight": "Mobil først"
-        },
-        "admin": {
-          "name": "Admin",
-          "price": "Tilbud",
-          "description": "Adminportal med desktopprioritet, sidefelt og modulbasert navigasjon.",
-          "highlight": "Desktop først"
-        }
       }
     },
     "privacy": {
@@ -12068,10 +12278,6 @@
       "triggersActive": "Triggere aktive",
       "emergencyStop": "Nødstopp",
       "reactivate": "Reaktiver",
-      "meta": {
-        "manual": "Manuell trigger",
-        "automatic": "Automatisk trigger"
-      },
       "reactivateTriggers": "Reaktiver triggere",
       "tooltips": {
         "emergencyStopActive": "Nødstopp aktivt - triggere deaktivert",
@@ -12080,12 +12286,6 @@
         "disableAllTriggers": "Deaktiver alle {count} aktive triggere"
       },
       "status": {
-        "confirmFire": {
-          "title": "Utløs trigger nå?",
-          "description": "Dette vil utløse triggeren “{name}” umiddelbart og kan påvirke alle i økten.",
-          "cancel": "Avbryt",
-          "confirm": "Utløs"
-        },
         "disabled": "{disabled} av {total} deaktivert",
         "ready": "{armed} av {total} klare",
         "disabledOfTotal": "{disabled} av {total} deaktivert",
@@ -12151,13 +12351,23 @@
         "locked": "Sesjonen er låst.",
         "ended": "Sesjonen er avsluttet.",
         "degraded": "Tilkoblingen er ustabil. Viser siste kjente tilstand.",
-        "offline": "Ingen tilkobling. Viser siste kjente tilstand."
+        "offline": "Ingen tilkobling. Viser siste kjente tilstand.",
+        "meta": {
+          "manual": "Manuell trigger",
+          "automatic": "Automatisk trigger"
+        }
       },
       "lobby": {
         "sessionCodeLabel": "Sesjonskode",
         "joinHint": "Skann QR-koden eller skriv inn koden for å bli med.",
         "qrAlt": "QR-kode",
-        "qrLoading": "QR-kode lastes..."
+        "qrLoading": "QR-kode lastes...",
+        "confirmFire": {
+          "title": "Aktivera trigger nu?",
+          "description": "Detta aktiverar triggern “{name}” direkt och kan påverka alla i sessionen.",
+          "cancel": "Avbryt",
+          "confirm": "Aktivera"
+        }
       },
       "status": {
         "paused": "Pauset",
@@ -12642,10 +12852,6 @@
         "settingsSaved": "Sesjonens innstillinger lagret",
         "overridesReset": "Overrides tilbakestilt",
         "rolesSaved": "Roller lagret for sesjonen"
-      },
-      "participants": {
-        "title": "Deltakere",
-        "count": "Deltakere ({count})"
       },
       "share": {
         "title": "Del sesjon",
@@ -13322,17 +13528,14 @@
         "showLatestHint": {
           "highlighted": "Hopper til markert artefakt",
           "event": "Hopper til artefakt med siste hendelse",
-          "fallback": "Hopper til f\u00f8rste tilgjengelige artefakt"
+          "fallback": "Hopper til første tilgjengelige artefakt"
         },
         "new": "Ny"
-      },
-      "footer": {
-        "backToLobby": "Tilbake til Lobby"
       },
       "connection": {
         "live": "Live",
         "degraded": "Ustabilt",
-        "offline": "Kobler til\u2026"
+        "offline": "Kobler til…"
       },
       "stage": {
         "participantView": "DELTAKERVISING",
@@ -13354,7 +13557,7 @@
       },
       "signalInbox": {
         "title": "SIGNAL INNBOKS",
-        "empty": "Ingen signaler mottatt enn\u00e5",
+        "empty": "Ingen signaler mottatt ennå",
         "markHandled": "Ferdig",
         "channels": {
           "pause": "Pause",
@@ -13380,12 +13583,12 @@
         },
         "filter": {
           "incoming": "Innkommende",
-          "outgoing": "Utg\u00e5ende",
+          "outgoing": "Utgående",
           "urgent": "Haster"
         },
         "filterEmpty": {
           "incoming": "Ingen innkommende signaler",
-          "outgoing": "Ingen utg\u00e5ende signaler",
+          "outgoing": "Ingen utgående signaler",
           "urgent": "Ingen hastesignaler",
           "combo": "Ingen signaler matcher filteret"
         }
@@ -13703,7 +13906,8 @@
       "noData": "Ingen spilldata tilgjengelig.",
       "waiting": {
         "title": "Venter på aktivitet",
-        "description": "Spillinnhold vises her når verten starter."
+        "description": "Spillinnhold vises her når verten starter.",
+        "openStory": "Öppna Story"
       },
       "basic": {
         "title": "Følg tavlen",
@@ -14604,7 +14808,9 @@
       },
       "manual": {
         "hostWillVerify": "Spillederen vil bekrefte din posisjon"
-      }
+      },
+      "participant": "Deltagare",
+      "verifyLocation": "Verifiera plats"
     },
     "hintPanel": {
       "noMoreHints": "Ingen flere hint tilgjengelige",
@@ -14847,7 +15053,11 @@
       "showTranscript": "Vis transkripsjon"
     },
     "riddleInput": {
-      "noMoreAttempts": "Ingen flere forsøk tillatt"
+      "noMoreAttempts": "Ingen flere forsøk tillatt",
+      "correctAnswer": "Rätt svar!",
+      "placeholder": "Skriv ditt svar...",
+      "submit": "Svara",
+      "attempts": "Försök: {used}/{max}"
     },
     "activeSessionShell": {
       "defaultTitle": "Aktiv sesjon",
@@ -14922,10 +15132,6 @@
         "title": "Ingen roller opprettet",
         "description": "Legg til roller for å tildele deltakere",
         "createFirst": "Opprett første rolle"
-      },
-      "checklist": {
-        "title": "Sjekkliste",
-        "complete": "✓ Alle klare!"
       }
     },
     "participantView": {
@@ -14934,16 +15140,13 @@
         "playingAs": "Du spiller som {name}",
         "artifacts": "Artefakter",
         "decisions": "Beslutninger",
-        "role": "Rolle",
-        "notConfigured": "Hotspot-bilde ikke konfigurert",
-        "complete": "✓ Alle funnet!"
+        "role": "Rolle"
       },
       "timer": {
-        "title": "Puslespill",
-        "missingConfig": "Puslespill ikke konfigurert",
         "timeUp": "Tiden er ute!",
         "timeRemaining": "Tid igjen",
-        "almostDone": "Nesten ferdig…"
+        "almostDone": "Nesten ferdig…",
+        "paused": "Timer pausad"
       },
       "status": {
         "active": "Aktiv",
@@ -15012,7 +15215,53 @@
         "reconnectDescription": "Tilkoblingen din virker ugyldig på denne enheten. Prøv å koble til igjen.",
         "reconnectAction": "Koble til igjen",
         "leaveSession": "Forlat økt",
-        "activeSession": "Aktiv økt"
+        "activeSession": "Aktiv økt",
+        "loadingSession": "Laddar session...",
+        "sessionCodeLabel": "Sessionskod:",
+        "connection": {
+          "connected": "Ansluten",
+          "degraded": "Instabil",
+          "offline": "Offline"
+        },
+        "updatesTitle": "Uppdateringar",
+        "statusLabel": "Status",
+        "statusTitle": {
+          "lobby": "Väntar",
+          "live": "Pågår",
+          "paused": "Paus",
+          "ended": "Avslutad",
+          "locked": "Låst"
+        },
+        "statusBadge": {
+          "lobby": "Väntar",
+          "live": "Live",
+          "paused": "Paus",
+          "ended": "Avslutad",
+          "locked": "Låst"
+        },
+        "pendingApproval": "Väntar på godkännande från lekledaren…",
+        "nowTitle": "Just nu",
+        "banner": {
+          "waiting": "Väntar på att lekledaren startar.",
+          "paused": "Paus. Snart kör vi igen.",
+          "locked": "Sessionen är låst.",
+          "ended": "Sessionen är avslutad. Tack för att du var med.",
+          "degraded": "Uppkopplingen är instabil. Visar senaste kända läge.",
+          "offline": "Ingen anslutning. Försök igen."
+        },
+        "events": {
+          "session_paused": "Sessionen pausades",
+          "session_resumed": "Sessionen återupptogs",
+          "session_ended": "Sessionen avslutades",
+          "session_locked": "Sessionen låstes",
+          "session_unlocked": "Sessionen låstes upp",
+          "host_message": "Meddelande från lekledaren",
+          "participant_joined": "{name} anslöt",
+          "participant_left": "{name} lämnade",
+          "role_changed": "Roll uppdaterad",
+          "progress_updated": "Framsteg uppdaterat",
+          "achievement_unlocked": "Utmärkelse upplåst"
+        }
       },
       "secrets": {
         "title": "Hemmelige instruksjoner",
@@ -15127,6 +15376,34 @@
         "storyShown": "Fortelling",
         "boardUpdated": "Ny info fra lederen",
         "reconnected": "Tilkoblet igjen"
+      },
+      "waitingRoom": {
+        "title": "Vänterum",
+        "statusWaiting": "Väntar på start",
+        "lobbyWelcome": "Välkommen till Lobbyn",
+        "statusActive": "Sessionen pågår",
+        "statusPaused": "Paus",
+        "sessionCode": "Sessionskod",
+        "codeCopied": "Kod kopierad!",
+        "codeCopyFailed": "Kunde inte kopiera koden",
+        "tapToCopy": "Tryck för att kopiera",
+        "copied": "Kopierad!",
+        "participantsTitle": "Deltagare",
+        "readyCount": "{ready} av {total} redo",
+        "allReady": "Alla redo!",
+        "waitingForOthers": "Väntar på övriga…",
+        "readyButton": "Redo",
+        "readyActive": "Redo",
+        "openChat": "Chatt",
+        "leave": "Lämna",
+        "degradedAuth": "Din anslutning behöver förnyas.",
+        "degradedNotFound": "Du verkar inte vara med i sessionen längre.",
+        "degradedTemporary": "Tillfälligt synkproblem — försöker igen…",
+        "connectionOffline": "Ingen internetanslutning — försöker återansluta…",
+        "retryAction": "Försök igen",
+        "retryReconnect": "Anslut igen",
+        "retryGoBack": "Gå tillbaka",
+        "lastSynced": "Senast synkad: {time}"
       }
     },
     "puzzleProgress": {
@@ -15708,7 +15985,9 @@
       "totalDuration": "~{minutes} min totalt",
       "scriptsCount": "{count} scripts",
       "noStepsYet": "Ingen steg i dette spillet ennå.",
-      "close": "Lukk"
+      "close": "Lukk",
+      "minutesShort": "{count} min",
+      "scriptLabel": "Manus"
     },
     "storyline": {
       "title": "Storyline",
@@ -15809,6 +16088,51 @@
         "balance_below": "Hvis tid under",
         "balance_above": "Hvis tid over"
       }
+    },
+    "countdownOverlay": {
+      "defaultMessage": "Nästa steg startar om",
+      "secondsRemaining": "{seconds} sekunder kvar",
+      "skip": "Hoppa över"
+    },
+    "counter": {
+      "decrease": "Minska",
+      "increase": "Öka"
+    },
+    "hotspotImage": {
+      "notConfigured": "Hotspot-bild ej konfigurerad",
+      "complete": "✓ Alla hittade!"
+    },
+    "checklist": {
+      "title": "Checklista",
+      "complete": "✓ Alla klara!"
+    },
+    "participantList": {
+      "title": "Deltagare ({count})",
+      "noParticipants": "Inga deltagare ännu",
+      "showLess": "Visa färre",
+      "showMore": "+{count} till"
+    },
+    "participantStatusBadge": {
+      "active": "Ansluten",
+      "idle": "Inaktiv",
+      "kicked": "Sparkad",
+      "blocked": "Blockerad"
+    },
+    "tilePuzzle": {
+      "moves": "Drag",
+      "hideSolution": "Dölj facit",
+      "showSolution": "Visa facit",
+      "solutionImageAlt": "Facitbild",
+      "puzzleComplete": "Pusslet är klart! ({moves} drag)"
+    },
+    "storyOverlay": {
+      "skip": "Hoppa över",
+      "continue": "Fortsätt"
+    },
+    "typewriterText": {
+      "pause": "Pausa",
+      "continue": "Fortsätt",
+      "skip": "Hoppa över"
     }
   },
   "tools": {

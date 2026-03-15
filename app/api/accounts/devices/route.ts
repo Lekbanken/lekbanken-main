@@ -17,7 +17,7 @@ export const GET = apiHandler({
 
     const { data, error } = await supabase
       .from('user_devices')
-      .select('*')
+      .select('id, user_id, device_name, browser, os, last_seen_at, trusted, created_at')
       .eq('user_id', userId)
       .order('last_seen_at', { ascending: false })
 

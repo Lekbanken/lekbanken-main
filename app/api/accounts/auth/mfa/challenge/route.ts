@@ -14,6 +14,7 @@ const LOCKOUT_WINDOW_MINUTES = 15
  */
 export const POST = apiHandler({
   auth: 'user',
+  rateLimit: 'auth',
   handler: async ({ auth, req }) => {
     const user = auth!.user!
     const supabase = await createServerRlsClient()

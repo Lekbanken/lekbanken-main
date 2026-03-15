@@ -59,7 +59,7 @@ export const GET = apiHandler({
 
     if (scheduleError) {
       console.error('[schedules] fetch error:', scheduleError);
-      return NextResponse.json({ error: scheduleError.message }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to load schedules' }, { status: 500 });
     }
 
     // Get plan details for each schedule
@@ -173,7 +173,7 @@ export const POST = apiHandler({
 
     if (error) {
       console.error('[schedules] create error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to create schedule' }, { status: 500 });
     }
 
     const totalTimeMinutes = (blocks ?? []).reduce((sum, b) => sum + (b.duration_minutes ?? 0), 0);

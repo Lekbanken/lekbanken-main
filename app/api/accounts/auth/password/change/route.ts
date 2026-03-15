@@ -56,7 +56,7 @@ export const POST = apiHandler({
     if (error) {
       console.error('[auth/password/change] Failed to update password', error)
       return NextResponse.json(
-        { error: error.message, errorCode: 'UPDATE_FAILED' },
+        { error: 'Password update failed', errorCode: 'UPDATE_FAILED' },
         { status: 400 },
       )
     }

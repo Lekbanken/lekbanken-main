@@ -57,7 +57,7 @@ export const GET = apiHandler({
 
   const { data, error } = await supabase
     .from('payments')
-    .select('*')
+    .select('id, invoice_id, name, amount, currency, status, paid_at, created_at')
     .eq('invoice_id', invoiceId)
     .order('created_at', { ascending: false })
 
@@ -119,7 +119,7 @@ export const POST = apiHandler({
     paid_at: null as string | null,
   }
 
-  const { data, error } = await supabase.from('payments').insert(payload).select('*').maybeSingle()
+  const { data, error } = await supabase.from('payments').insert(payload).select('id, invoice_id, name, amount, currency, status, paid_at, created_at').maybeSingle()
 
   if (error) {
     console.error('[billing/payments] insert error', error)

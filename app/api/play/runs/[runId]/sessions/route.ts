@@ -220,7 +220,7 @@ export const POST = apiHandler({
   if (upsertError) {
     console.error('[run-sessions] upsert error:', upsertError);
     return NextResponse.json(
-      { error: 'Failed to link session to run', details: upsertError.message },
+      { error: 'Failed to link session to run' },
       { status: 500 }
     );
   }

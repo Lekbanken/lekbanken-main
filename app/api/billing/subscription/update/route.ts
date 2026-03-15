@@ -141,9 +141,8 @@ export const POST = apiHandler({
     console.error('[subscription-update] Stripe error:', error)
     
     if (error instanceof Error && 'type' in error) {
-      const stripeError = error as { type: string; message: string }
       return NextResponse.json(
-        { error: stripeError.message, code: 'STRIPE_ERROR' },
+        { error: 'Subscription update failed', code: 'STRIPE_ERROR' },
         { status: 400 }
       )
     }

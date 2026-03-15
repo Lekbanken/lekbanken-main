@@ -163,6 +163,33 @@ supabase db push
 
 ---
 
+## MFA in Local Development
+
+Local MFA enrollment depends on GoTrue settings in `supabase/config.toml`.
+
+Required settings (already enabled in the repo):
+
+```toml
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+```
+
+If these are `false`, MFA enrollment will fail with `mfa_totp_enroll_not_enabled`.
+
+After changing `supabase/config.toml`, restart local Supabase:
+
+```bash
+supabase stop --no-backup
+supabase start
+```
+
+> **Note:** `supabase/config.toml` controls your **local** Supabase CLI environment only.
+> Staging and production MFA are configured in the Supabase Dashboard under
+> Authentication → Multi-Factor Authentication.
+
+---
+
 ## Useful Commands
 
 | Command | Purpose |

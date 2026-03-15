@@ -8,7 +8,7 @@ import type { ParsedGame } from '../../../../types/csv-import';
 import { 
   normalizeLegacyTrigger,
   normalizeAndValidateGameTriggers,
-} from '@/lib/import/trigger-normalization';
+} from '../../../../lib/import/trigger-normalization';
 
 // Re-export for backward compatibility with existing imports
 export { normalizeLegacyTrigger };

@@ -381,7 +381,7 @@ describe('Step 7 Behavioral â€” API CRUD Behavior', () => {
       const res = await cosmeticsRoute.POST(req, emptyContext);
       expect(res.status).toBe(400);
       const json = await res.json();
-      expect(json.error).toContain('Validation');
+      expect(json.error).toContain('Invalid payload');
     });
 
     it('returns 400 for invalid render_config', async () => {

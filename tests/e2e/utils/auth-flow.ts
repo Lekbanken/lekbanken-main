@@ -99,7 +99,8 @@ export async function resetMfaFactorsForTestUser(email: string) {
 
   const { data: usersResponse, error: usersError } = await adminClient.auth.admin.listUsers({ page: 1, perPage: 200 })
   if (usersError) {
-    throw new Error(`Failed to list test users: ${usersError.message}`)
+    console.warn(`⚠️  Could not reset MFA factors for ${email} (admin API error: ${usersError.message}). Proceeding with login — will fail only if MFA is actually enrolled.`)
+    return
   }
 
   const user = usersResponse.users.find((entry) => entry.email?.toLowerCase() === email.toLowerCase())

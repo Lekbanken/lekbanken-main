@@ -207,7 +207,6 @@ const legendaryGame = {
   triggers: [
     {
       name: 'Keypad → Reveal',
-      description: null,
       enabled: true,
       condition: triggerConditionOrderBased,
       actions: triggerActionsOrderBased,

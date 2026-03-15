@@ -10,9 +10,14 @@
 
 -- 1) Create auth users in auth.users (Supabase GoTrue)
 --    Password "TestAdmin123!" hashed with pgcrypto crypt/bf
+--    NOTE: confirmation_token, recovery_token, email_change_token_new, and
+--    email_change MUST be set to '' (not NULL). GoTrue v2.187+ scans these
+--    as Go strings which cannot represent NULL → "converting NULL to string
+--    is unsupported" error on login.
 INSERT INTO auth.users (
   id, instance_id, email, encrypted_password, email_confirmed_at,
-  raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at
+  raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at,
+  confirmation_token, recovery_token, email_change_token_new, email_change
 ) VALUES
   -- System admin
   (
@@ -23,7 +28,8 @@ INSERT INTO auth.users (
     now(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"Test System Admin"}',
-    'authenticated', 'authenticated', now(), now()
+    'authenticated', 'authenticated', now(), now(),
+    '', '', '', ''
   ),
   -- Tenant admin
   (
@@ -34,7 +40,8 @@ INSERT INTO auth.users (
     now(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"Test Tenant Admin"}',
-    'authenticated', 'authenticated', now(), now()
+    'authenticated', 'authenticated', now(), now(),
+    '', '', '', ''
   ),
   -- Regular user
   (
@@ -45,7 +52,8 @@ INSERT INTO auth.users (
     now(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"Test Regular User"}',
-    'authenticated', 'authenticated', now(), now()
+    'authenticated', 'authenticated', now(), now(),
+    '', '', '', ''
   )
 ON CONFLICT (id) DO NOTHING;
 

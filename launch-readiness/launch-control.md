@@ -1,8 +1,8 @@
 # Lekbanken Launch Control
 
 > **Status:** LAUNCH READY — Post-launch operational phase  
-> **Last updated:** 2026-03-14  
-> **Current Phase:** Phase 3+4 COMPLETE. Scaling hardening done. Ready for production traffic.  
+> **Last updated:** 2026-03-15  
+> **Current Phase:** Post-launch Observe Mode. All phases complete (Phase 2 formal execution skipped; Phase 6 deferred). Awaiting production traffic data.  
 
 ---
 
@@ -26,18 +26,18 @@ No architectural changes will be implemented before real production traffic has 
 |-------|------|--------|---------|-----------|
 | 0 | Audit Operating Model | ✅ Complete | 2026-03-10 | 2026-03-10 |
 | 1 | Architecture & Environment Strategy | ✅ Complete | 2026-03-10 | 2026-03-11 |
-| 2 | Test Foundation | ⏭️ Skipped | — | — |
+| 2 | Test Foundation | 🟡 Formal execution skipped; ad-hoc test assets and CI coverage exist | — | — |
 | 3 | Domain Audits | ✅ Complete | 2026-03-10 | 2026-03-12 |
 | 4 | Remediation (P0/P1) | ✅ Complete | 2026-03-10 | 2026-03-12 |
-| 5 | Regression Audits | ⏭️ Deferred post-launch | — | — |
+| 5 | Regression Audits | ✅ Complete (per-domain, inline) | 2026-03-14 | 2026-03-14 |
 | 6 | Documentation Refresh | ⏭️ Deferred post-launch | — | — |
 | 7 | Release Readiness Gate | ✅ READY | 2026-03-12 | 2026-03-12 |
 
 > **Note:** Phases 3 and 4 ran concurrently per domain: Audit → Implement → Regression before moving to next domain. Phase 1 produced the API wrapper infrastructure and architectural decisions that enabled all subsequent work.
 >
 > **Phase deviations:**
-> - **Phase 2 (Test Foundation):** Skipped — `tsc --noEmit` + code-level regression used as safety net. E2E tests remain a post-launch investment.
-> - **Phase 5 (Regression):** Deferred — each domain was regression-verified during audit→implement cycle. Formal regression pass recommended post-launch.
+> - **Phase 2 (Test Foundation):** Formal Phase 2 execution was skipped. Ad-hoc test assets exist (261 test files: 72 unit, 12 E2E specs, RLS tests) and CI runs 7 checks including `tsc --noEmit`. E2E test coverage remains a post-launch investment.
+> - **Phase 5 (Regression):** ✅ Complete — 16/16 domain regressions executed inline during audit→implement cycle. 4 Level 2 building-block audits completed. All regressions passed. See Regression Progress Summary below.
 > - **Phase 6 (Docs Refresh):** Deferred — documentation kept current during audit cycle. Bulk cleanup of root-level .md files planned post-launch.
 > - **Phase 7 (Release Gate):** Verdict READY issued 2026-03-12 (see §6).
 
@@ -96,7 +96,7 @@ No architectural changes will be implemented before real production traffic has 
 | Area | Audit | Remediation | Status |
 |------|-------|-------------|--------|
 | API Security & Auth (287 routes) | ✅ | ✅ | 17 findings. All P0/P1 resolved. SEC-002b open (infra — non-actionable). |
-| API Consistency (287 routes) | ✅ | ✅ | 14 findings. APC-003/011 resolved (RLS policy). Wrapper: **247/287 (86.1%)**, 360/408 (88.2%). |
+| API Consistency (288 routes) | ✅ | ✅ | 14 findings. APC-003/011 resolved (RLS policy). Wrapper: **253/288 (87.8%)**, 369/410 (90.0%). |
 | Tenant Isolation | ✅ | ✅ | 10 findings. TI-001 P0 fixed. TI-002/TI-NEW-1c product decisions resolved. |
 | i18n | ✅ | — | 7 findings (0 P0, 0 P1, 2 P2, 5 P3). GPT-calibrated. sv complete, en/no fallback works. No launch remediation needed. |
 | Performance / Bundle Size | ✅ | — | 6 findings (0 P0, 0 P1, 4 P2, 2 P3). GPT-calibrated. No launch remediation needed. |
@@ -133,7 +133,7 @@ No architectural changes will be implemented before real production traffic has 
 
 ### §3a P1 Reconciliation (2026-03-12)
 
-After 8 domain audits and Batches 1–6d wrapper migration (88.2% coverage), a reconciliation pass verified which P1s are resolved, merged, downgraded, or truly remaining.
+After 8 domain audits and Batches 1–6d wrapper migration (90.0% handler coverage), a reconciliation pass verified which P1s are resolved, merged, downgraded, or truly remaining.
 
 **Resolved by prior work (removed from P1 count):**
 
@@ -142,7 +142,7 @@ After 8 domain audits and Batches 1–6d wrapper migration (88.2% coverage), a r
 | SEC-003 | 57 tenantAuth routes migrated to `apiHandler` | Batches 4a–4c-4 (zero `tenantAuth` imports remain in API routes) |
 | SEC-004 | Participant token auth centralized via `auth: 'participant'` | DD-2 + Batch 6a–6d (10 routes, standardized `x-participant-token` header) |
 | APC-006 | `consent/log` now has `apiHandler({ auth: 'public', rateLimit: 'strict', input: consentLogSchema })` | Batch 1 |
-| ARCH-002 | Parallel auth patterns eliminated — 88.2% use `apiHandler`, 0 tenantAuth imports remain | Same root cause as SEC-003, resolved by same migration |
+| ARCH-002 | Parallel auth patterns eliminated — 87.8% use `apiHandler`, 0 tenantAuth imports remain | Same root cause as SEC-003, resolved by same migration |
 
 **Merged (deduplicated — same root cause):**
 
@@ -161,7 +161,7 @@ After 8 domain audits and Batches 1–6d wrapper migration (88.2% coverage), a r
 | # | Finding | Type | Status | Actionable? |
 |---|---------|------|--------|-------------|
 | 1 | SEC-002b | Rate limiter architecture (in-memory, per-instance) | ⬜ Open | Blocked — infra decision (Redis/Upstash/Edge KV) |
-| 2 | SYS-001 | Wrapper convergence (error format + validation) | 🟡 Converging | Self-resolving — 88.2% coverage, remaining ~12% are edge cases |
+| 2 | SYS-001 | Wrapper convergence (error format + validation) | 🟡 Converging | Self-resolving — 90.0% handler coverage, remaining ~10% are edge cases |
 
 ### §3b Remaining P1 Control Sheet (2026-03-13)
 
@@ -170,14 +170,14 @@ After 8 domain audits and Batches 1–6d wrapper migration (88.2% coverage), a r
 | Finding | Category | Owner | Blocker | Next action | Risk if deferred to post-launch |
 |---------|----------|-------|---------|-------------|---------------------------------|
 | **SEC-002b** | Infra | Engineering | Needs architectural decision: Redis, Upstash, or Edge KV | Decide rate-limiter backend; current in-memory limiter works per-instance but doesn't share state across Edge workers | **Medium** — brute-force protection works per-instance; multi-instance bypass requires coordinated attack across regions |
-| **SYS-001** | Convergence | Engineering | Self-resolving | Continue wrapper migration toward 100%; remaining ~12% are niche handlers (webhooks, SSE, file streams) | **Low** — error format inconsistency causes no security/data risk; already at 88.2% |
+| **SYS-001** | Convergence | Engineering | Self-resolving | Continue wrapper migration toward 100%; remaining ~10% are niche handlers (webhooks, SSE, file streams) | **Low** — error format inconsistency causes no security/data risk; already at 90.0% |
 | ~~**TI-002**~~ | ~~Product~~ | ~~Product owner~~ | ~~Needs decision~~ | ✅ **RESOLVED** (2026-03-14) — Product decision Alt A: show `display_name` + `avatar_url` only. Removed `userId` (UUID) and `maskEmail` fallback from leaderboard API response. | ~~Medium~~ |
 | ~~**TI-NEW-1c**~~ | ~~Product~~ | ~~Product owner~~ | ~~Needs decision~~ | ✅ **RESOLVED** (2026-03-14) — Product decision Alt A: public endpoint returns `participant_count` only. Removed `include_participants` query param and participant name query from `public/v1/sessions/[id]`. | ~~Medium~~ |
 | ~~**APC-003/011**~~ | ~~RLS~~ | ~~Engineering~~ | ~~Requires new RLS policy~~ | ✅ **RESOLVED** (2026-03-14) — RLS policy `tenant_admin_view_sessions` + route migrated to `createServerRlsClient()` | ~~Low~~ |
 
 **Remaining work:**
 1. **SEC-002b** — infra decision (can ship with in-memory limiter, upgrade post-launch)
-2. **SYS-001** — self-resolving (88.2% → continues toward 100%)
+2. **SYS-001** — self-resolving (90.0% → continues toward 100%)
 
 ### Unverified Findings (from prior audits — needs triage)
 
@@ -306,14 +306,14 @@ Audit-programmet omfattar nu **två nivåer**: Level 1 (domain audits, alla geno
 
 | Metric | Count | Notes |
 |--------|-------|-------|
-| Total API route files | 287 | All `app/api/**/route.ts` files |
-| **Wrapped files** | **247** | Files with ≥ 1 `export const X = apiHandler(...)` (includes 3 mixed) |
-| **Wrapped handler exports** | **360** | Individual GET/POST/PUT/PATCH/DELETE exports using `apiHandler` |
-| Total handler exports | 408 | All HTTP method exports across all route files |
-| Unwrapped-only files | 38 | No `apiHandler` export |
-| Mixed files | 3 | Both `apiHandler` and `export async function` exports (gdpr/delete, gdpr/export, media) |
-| **File-level coverage** | **86.1%** | 247/287 — primary metric |
-| **Handler-level coverage** | **88.2%** | 360/408 — secondary metric |
+| Total API route files | 288 | All `app/api/**/route.ts` files |
+| **Wrapped files** | **253** | Files with ≥ 1 `export const X = apiHandler(...)` (includes 3 mixed) |
+| **Wrapped handler exports** | **369** | Individual GET/POST/PUT/PATCH/DELETE exports using `apiHandler` |
+| Total handler exports | 410 | All HTTP method exports across all route files |
+| Unwrapped-only files | 35 | No `apiHandler` export |
+| Mixed files | 3 | Both `apiHandler` and `export async function` exports |
+| **File-level coverage** | **87.8%** | 253/288 — primary metric |
+| **Handler-level coverage** | **90.0%** | 369/410 — secondary metric |
 
 #### Per-Pattern Migration Backlog
 
@@ -522,7 +522,7 @@ Atlas (`/sandbox/atlas`) tracks the system graph (287 routes, components, domain
 ```
 ╔═══════════════════════════════════════════════════════════════════════╗
 ║  LAUNCH VERDICT: READY          P0: 0   P1 actionable: 0            ║
-║  23/23 audits GPT-calibrated    Wrapper: 86.1% files, 88.2% handlers║
+║  23/23 audits GPT-calibrated    Wrapper: 87.8% files, 90.0% handlers║
 ║  tsc --noEmit: 0 errors         Scaling hardening: 3/4 items done   ║
 ╚═══════════════════════════════════════════════════════════════════════╝
 ```
@@ -631,16 +631,16 @@ For the church/youth audience, bottlenecks are expected to hit in this order:
 | P1 | Type | Why not blocking | Resolution path |
 |----|------|------------------|-----------------|
 | SEC-002b | In-memory rate limiter | Functional per-instance; multi-instance bypass requires coordinated regional attack | Upstash migration (Phase 3, when needed) |
-| SYS-001 | Wrapper convergence (88.2%) | Self-resolving; remaining ~12% are edge cases (webhooks, SSE, file streams) | Organic convergence during post-launch work |
+| SYS-001 | Wrapper convergence (90.0%) | Self-resolving; remaining ~10% are edge cases (webhooks, SSE, file streams) | Organic convergence during post-launch work |
 
 ### Deferred Phases (Not Needed for Launch)
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| Phase 2 — Test Foundation | ⏭️ Skipped | `tsc --noEmit` + code-level regression used. E2E test investment recommended post-launch. |
-| Phase 5 — Regression Audits | ⏭️ Deferred | Each domain regression-verified during audit cycle. Formal pass if significant refactoring occurs. |
+| Phase 2 — Test Foundation | 🟡 Formal execution skipped | Ad-hoc test assets exist (261 test files, CI runs 7 checks). Formal E2E test investment recommended post-launch. |
+| Phase 5 — Regression Audits | ✅ Complete | 16/16 domain regressions + 4 Level 2 audits completed inline during audit cycle. All passed. |
 | Phase 6 — Documentation Refresh | ⏭️ Deferred | Root-level `.md` cleanup, Notion sync, Atlas annotations. Low risk. |
-| Phase 1B — Sandbox Strategy | ✅ Config + DB layer done | ADR-005 (Alt B remote sandbox) decided and implemented 2026-03-13. DB layer fix applied 2026-03-14 (5/5 permission checks passed). Preview E2E (V7/V8) pending. See `sandbox-phase-1b.md`. |
+| Phase 1B — Sandbox Strategy | ✅ Implemented | ADR-005 (Alt B remote sandbox) decided and implemented 2026-03-13. DB layer fix applied 2026-03-14 (5/5 permission checks passed). Preview → sandbox isolation verified. See `sandbox-phase-1b.md`. |
 
 ### Completed Milestones (reference)
 
@@ -721,13 +721,13 @@ For the church/youth audience, bottlenecks are expected to hit in this order:
 - [ ] ~~**M3 — Hardening**~~ — Post-launch (ATLAS-006/007/008)
 - [ ] ~~**M4 — Cleanup**~~ — Post-launch (ATLAS-009/010/011)
 
-**Atlas domain: launch-scope complete.** 0 P1 remaining. 2 P1 fixed (M1). Wrapper coverage: **247/287 files (86.1%)**, **360/408 handlers (88.2%)**. M2/M3/M4 deferred post-launch. `tsc --noEmit` = 0 errors.
+**Atlas domain: launch-scope complete.** 0 P1 remaining. 2 P1 fixed (M1). Wrapper coverage: **253/288 files (87.8%)**, **369/410 handlers (90.0%)**. M2/M3/M4 deferred post-launch. `tsc --noEmit` = 0 errors.
 
 ### Architecture Findings (reconciled 2026-03-12)
 
 | ID | Finding | Severity | Status |
 |----|---------|----------|--------|
-| ~~ARCH-002~~ | ~~Parallel API auth patterns~~ | ~~P1~~ | ✅ **RESOLVED** — merged with SEC-003, 88.2% wrapper coverage, 0 tenantAuth imports in API routes |
+| ~~ARCH-002~~ | ~~Parallel API auth patterns~~ | ~~P1~~ | ✅ **RESOLVED** — merged with SEC-003, 87.8% wrapper coverage, 0 tenantAuth imports in API routes |
 | ~~ARCH-003~~ | ~~Multiple API error response formats~~ | ~~P1~~ | ✅ **MERGED** → SYS-001 (wrapper convergence) |
 | ~~ARCH-004~~ | ~~Mixed input validation~~ | ~~P1~~ | ✅ **MERGED** → SYS-001 (wrapper convergence) |
 | ~~ARCH-006~~ | ~~Direct Supabase mutations in client components~~ | ~~P1~~ | ✅ **RESOLVED** — 20+ direct `supabase.from()` calls moved to 11 server actions in `organisationMutations.server.ts`. 6 client components cleaned: BrandingSection, FeaturesSection, DomainsSection, LocaleSection, DetailPage, AdminPage. All mutations now server-side with `requireSystemAdmin()` auth. `tsc --noEmit` = 0 errors. |
@@ -759,7 +759,7 @@ P1 actionable:     0  ✅
 | Remaining P1 | Type | Launch-blocking? | Mitigation |
 |---|---|---|---|
 | SEC-002b | Infra decision (rate limiter backend) | No | In-memory limiter functional per-instance; multi-instance bypass requires coordinated regional attack |
-| SYS-001 | Wrapper convergence (88.2%) | No | Self-resolving; remaining ~12% are edge cases (webhooks, SSE, file streams) |
+| SYS-001 | Wrapper convergence (87.8% files, 90.0% handlers) | No | Self-resolving; remaining ~12% files are edge cases (webhooks, SSE, file streams) |
 
 **Domains with launch-scope remediation complete (0 P1 remaining):** Play, Sessions, Games, Planner, Journey, Billing, Atlas, Media.
 
@@ -776,7 +776,7 @@ P1 actionable:     0  ✅
 - Zod validation: missing across Support, Profile, several admin routes
 - PostgREST `.or()` sanitization: applied in Games, still needed in Support/admin routes
 - Rate limiting: ~87% routes lack explicit rate limits (SEC-002b infra decision unlocks)
-- Wrapper convergence: 247/287 files (86.1%), remaining 40 files are edge cases
+- Wrapper convergence: 253/288 files (87.8%), remaining ~35 files are edge cases
 
 ### Launch Verdict
 
@@ -788,7 +788,7 @@ P1 actionable:     0  ✅
 ║  P1 actionable:     0  ✅                                     ║
 ║  Audits complete:  23/23  ✅ (all GPT-calibrated)             ║
 ║  tsc --noEmit:      0 errors  ✅                              ║
-║  Wrapper coverage:  86.1% files, 88.2% handlers              ║
+║  Wrapper coverage:  87.8% files, 90.0% handlers              ║
 ║                                                               ║  
 ║  Conditions:                                                  ║
 ║  • GDPR self-service disabled (manual DSAR active)            ║
@@ -1267,7 +1267,7 @@ Skapa en ny baseline-migration som representerar dagens faktiska produktionssche
 | ~~OPS-SAND-001 — Preview runtime E2E~~ | ~~P1~~ | ✅ | **CLOSED (2026-03-14)** — V7/V8 passed. Preview confirmed on sandbox DB. |
 | APC-003/011 deploy order | P1 | Engineering | Apply migration `20260314000000` to prod before deploying session route change |
 | SEC-002b — In-memory rate limiter | P1 (non-actionable) | Infra decision | Works per-instance. Upgrade to Upstash when needed. |
-| SYS-001 — Wrapper convergence | P1 (non-actionable) | Self-resolving | 88.2% → organic convergence |
+| SYS-001 — Wrapper convergence | P1 (non-actionable) | Self-resolving | 90.0% → organic convergence |
 
 ### Active Incidents
 
@@ -1309,6 +1309,8 @@ Before any production deploy, verify:
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-03-15 | Claude | **v2.65 — SSoT RECONCILIATION MICRO-PASS (GPT feedback).** Three stale headers fixed: (1) launch-control.md Current Phase: "Phase 3+4 COMPLETE" → "Post-launch Observe Mode. All phases complete (Phase 2 formal execution skipped; Phase 6 deferred). Awaiting production traffic data." (2) architecture.md status: "Environment isolation and test foundation still proposed" → "Environment isolation implemented (local Docker + staging Supabase). Test foundation exists ad-hoc." (3) implementation-plan.md Phase 3 gate: "Alla 8 cross-cutting audits klara (6 genomförda + 6 deferred)" → "Cross-cutting audit scope tillräckligt täckt för launch (6 genomförda, 2 deferred med acceptabel täckning via domänaudits)." Documentation-only — no code changes. |
+| 2026-03-15 | Claude | **v2.64 — SSoT RECONCILIATION.** Documentation-only update — no code changes. Phase 5: ⏭️ Deferred → ✅ Complete (16/16 regressions + 4 L2 audits all passed inline). Phase 2: ⏭️ Skipped → 🟡 "Formal execution skipped; ad-hoc test assets and CI coverage exist." Phase 1B: sub-items updated to reflect actual completion (ADR-005 Alt B, 7/8 tasks done). Wrapper coverage: 247/287→253/288 (87.8%), 360/408→369/410 (90.0%). Architecture §2 environment table: dev/preview ⚠️ → ✅ isolated. Architecture §6 observability: "Okänt" → documented (telemetry pack + incident playbook). All stale references updated across all 3 SSoT docs. Changelog entries left as historical records. |
 | 2026-03-14 | Claude | **v2.63 — DEVELOPER GUARDRAILS + CI-PREFLIGHT + ESLINT ZERO-WARNINGS.** Two-part sprint per GPT directive: "inte fler regler i efterhand, utan bättre räcken före stupet." **Part 1 — Developer Guardrails infrastructure:** Three-level quality model: **Nivå A (pre-commit)** lint-staged (ESLint on staged TS/TSX, action-validator on staged YAML) + `tsc --noEmit`; **Nivå B (pre-push)** `npm run verify` — ESLint + TypeScript + workflow validation + i18n + vitest + integration tests; **Nivå C (PR gate)** `.github/workflows/validate.yml` — all Nivå B + `as any` diff check + `npm run build`. New scripts: `verify`, `verify:quick`, `check:workflows`, `prepare`. New devDeps: `husky@^9.1.7`, `lint-staged@^16.4.0`, `@action-validator/core`, `@action-validator/cli`. Husky hooks rewritten: `.husky/pre-commit` (sh, lint-staged + tsc), `.husky/pre-push` (npm run verify). `.github/workflows/typecheck.yml` + `unit-tests.yml` → push-only post-merge safety nets (PR triggers moved to validate.yml). `.husky/README.md` rewritten as comprehensive developer guardrails documentation with branch protection guidance. **Part 2 — ESLint zero-warnings:** Fixed all 10 pre-existing ESLint errors (prefer-const, no-empty-object-type, set-state-in-effect ×4, no-html-link-for-pages, no-unsafe-function-type, no-restricted-properties ×2, unused param). Then fixed all 34 ESLint warnings across 22 files: 17× `no-unused-vars` (prefixed with `_`, removed dead imports/functions/types), 6× `consistent-type-imports` (added `type` keyword, replaced inline `import()` annotations with proper imports), 3× `exhaustive-deps` (added `t` to deps, wrapped conditional `events` in `useMemo`), 3× unused eslint-disable directives (removed), 2× `no-explicit-any` (typed cast via `Record<string,boolean>`). **Final: ESLint 0 errors, 0 warnings. verify:quick ALL 4 checks PASS. tsc --noEmit clean.** |
 | 2026-03-16 | Claude | **v2.62 — L2-SESS REMEDIATION: L2-SESS-001 + L2-SESS-002 + L2-SESS-003.** Remediation sprint for 3 P2 findings from L2-4 audit. (1) **L2-SESS-001 (P2→✅):** `game/route.ts` — wrapped with `apiHandler({ auth: 'public' })` (adds rate limiting, standardized error format, request ID). Replaced inline triple-auth (cookie + `users.global_role` + participant token) with canonical pattern: participant token check first, then `requireSessionHost(sessionId)` fallback for host/admin. Removed `createServerRlsClient` import. Preserved: participant response shape filtering (`isParticipant` flag), security tripwire (hard-strip leaderScript/boardText/leaderTips), dual-auth semantics (host+participant token → participant shape). (2) **L2-SESS-002 (P2→✅):** `overrides/route.ts` — complete rewrite. GET+PATCH wrapped with `apiHandler({ auth: 'user' })`. Replaced `getSessionAndAssertHost()` inline helper with canonical `requireSessionHost(sessionId)`. Replaced 90-line manual `sanitizeOverrides()` with 30-line Zod schema (`adminOverridesSchema` with nested step/phase/safety schemas). PATCH uses `input: adminOverridesSchema` for pre-handler validation. Removed: `isObject`, `DISPLAY_MODES`, `sanitizeOverrides`, `getSessionAndAssertHost`, `createServerRlsClient`. (3) **L2-SESS-003 (P2→✅):** 3 routes — replaced inline `users.global_role` admin bypass with canonical `requireSessionHost(sessionId)` (uses `deriveEffectiveGlobalRole` via cached `getServerAuthContext`). `command/route.ts`: removed `ParticipantSessionService` auth fetch + `createServerRlsClient`, kept `applySessionCommand`. `state/route.ts`: removed `createServerRlsClient`, kept `ParticipantSessionService` for operations. Inner try/catch blocks removed (apiHandler handles errors). Cross-ref L2-AUTH-003 (inline `app_metadata.role` bypass) now resolved in 3 more routes. **Re-regression: 4 proof traces PASS.** (1) Host read/mutate: cookie auth → `requireSessionHost` → full game data + state/command mutations ✅. (2) Participant sanitized projection: token → valid → authorized, security tripwire strips leader-only fields ✅. Rejected → 403, expired → 401 ✅. (3) Admin bypass: `effectiveGlobalRole === 'system_admin'` in all 4 routes via canonical helper ✅. (4) Non-authorized: game → 401 inline, command/state/overrides → `AuthError` → `errorResponse` standardized format ✅. `tsc --noEmit` = 0 errors. Post-remediation: **0 P0, 0 P1, 0 P2, 4 P3.** |
 | 2026-03-16 | Claude | **v2.61 — LEVEL 2 AUDIT: PLAY / SESSION AUTHORING CHAIN.** Fourth Level 2 Building Block Audit — largest domain in the codebase (68 API routes, 215+ files). 6 building blocks deep-analyzed: play-auth (dual-path participant/host resolution), session-command pipeline (idempotency + TOCTOU guard + state machine), play-broadcast-server (atomic seq + best-effort), session-guards (18 mutation types × 8 statuses), participant-token (UUID v4, verify/revoke lifecycle), route-handler auth dispatch. Complete auth survey of all 68 routes: 42 user, 14 public, 9 participant, 3 cron_or_admin, 8 no-apiHandler. 4 end-to-end proofs: (1) anonymous join→play→heartbeat→rejoin lifecycle ✅, (2) host create→start→command→end lifecycle ✅, (3) kick→rejection propagation across all API surfaces ✅, (4) concurrent command TOCTOU guard with atomic WHERE clause ✅. 5 L1 remediations verified intact (SESS-001/002/003/005/007). 6 known deferred P2/P3 confirmed present (SESS-004/006/010/011/012/013). **7 findings:** L2-SESS-001 (P2) game/ route bypasses apiHandler with complex inline auth + admin bypass, L2-SESS-002 (P2) overrides/ route bypasses apiHandler with inline auth, L2-SESS-003 (P2) inline `users.global_role` admin bypass in 3 routes (cross-ref L2-AUTH-003), L2-SESS-004 (P3) legacy PATCH uses Date.now() as client_seq defeating idempotency, L2-SESS-005 (P3) setNextStarter N+1 queries, L2-SESS-006 (P3) deprecated routes have zero auth, L2-SESS-007 (P3) heartbeat inline token validation vs auth:'participant'. **0 P0, 0 P1, 3 P2, 4 P3 — PASS (launch-safe).** Report: `audits/level2-session-authoring-chain-audit.md`. |

@@ -1,10 +1,10 @@
 # Lekbanken Launch Readiness — Architecture & Environment
 
-> **Version:** 1.1  
+> **Version:** 1.2  
 > **Created:** 2026-03-10  
-> **Last updated:** 2026-03-13  
+> **Last updated:** 2026-03-15  
 > **Purpose:** Målbild för sandbox, test foundation, miljöer, databaser, migrationssäkerhet, release/rollback och framtidssäkring.  
-> **Status:** LAUNCH READY — API wrapper, rate limiting, auth standardization, and scaling hardening done. Environment isolation and test foundation still proposed.
+> **Status:** LAUNCH READY — API wrapper, rate limiting, auth standardization, and scaling hardening done. Environment isolation implemented (local Docker + staging Supabase). Test foundation exists ad-hoc (261 test files, CI 7 checks).
 
 ---
 
@@ -32,13 +32,13 @@
 
 | Miljö | URL | DB | Status |
 |-------|-----|-----|--------|
-| Production | app.lekbanken.no | Supabase prod | ✅ Live |
+| Production | app.lekbanken.no | Supabase prod (`qohhnufxididbmzqnjwg`) | ✅ Live |
 | Demo | demo.lekbanken.no | Supabase prod (demo tenant) | ✅ Live |
-| Development | localhost:3000 | Supabase prod (!) | ⚠️ Risk |
-| Preview (Vercel) | *.vercel.app | Supabase prod (!) | ⚠️ Risk |
+| Development | localhost:3000 | Lokal Supabase (Docker CLI) | ✅ Isolerad |
+| Preview (Vercel) | *.vercel.app | Staging Supabase (`vmpdejhgpsrfulimsoqn`) | ✅ Isolerad |
 | Sandbox (Atlas) | localhost:3000/sandbox/atlas | — | ✅ Dev only |
 
-**Problem:** Utveckling och preview-deploys pekar mot prod-databasen. Alla schema-ändringar, seed-data och migrations som testats kan påverka prod.
+**Status:** ✅ LÖST (2026-03-13) — Utveckling och preview-deploys pekar nu mot isolerade databaser. ADR-005 (Alt B remote sandbox) implementerat. Lokal Supabase via Docker CLI för development.
 
 ---
 
@@ -236,9 +236,9 @@ Dessa utreddes i Phase 1A (Architecture Audit) — **alla lösta utom B och D:**
 
 **Problem:** 287 API-routes med inkonsistenta mönster (auth guards, error handling, response format).
 
-**Status: ✅ LÖST.** `apiHandler()` wrapper implementerad i `lib/api/route-handler.ts`. 247/287 filer (86.1%) migrerade. Auth-nivåer: `'user'`, `'system_admin'`, `'participant'`, `'public'`. Zod input-validering via `input:`, centraliserad felformat, audit-logging på mutationer.
+**Status: ✅ LÖST.** `apiHandler()` wrapper implementerad i `lib/api/route-handler.ts`. 253/288 filer (87.8%) migrerade. Auth-nivåer: `'user'`, `'system_admin'`, `'participant'`, `'public'`. Zod input-validering via `input:`, centraliserad felformat, audit-logging på mutationer.
 
-> Resterande ~40 routes är specialfall (webhooks, publika kataloger, sandbox-verktyg) som konvergerar organiskt.
+> Resterande ~35 routes är specialfall (webhooks, publika kataloger, sandbox-verktyg) som konvergerar organiskt.
 
 #### B. Data Access Layer
 
@@ -292,7 +292,13 @@ Dessa ska INTE göras nu utan dokumenteras inför framtida beslut:
 
 ### Nuläge
 
-**Okänt.** Behöver utredas i Phase 3 (observability-audit).
+✅ **Utrett och dokumenterat.** Launch Telemetry Pack definierar 5 signaler + 3 alerts. Alla mätvärden från befintliga tabeller (ingen ny instrumentering krävs). Incident Playbook finns med rollback-procedurer och kill-switches.
+
+**Dokumentation:**
+- `launch-readiness/launch-telemetry-pack.md` — Signals + alerts definition
+- `docs/ops/production-signals-dashboard.md` — Signal query reference
+- `docs/ops/anomaly-detection-playbook.md` — Alert response procedures
+- `launch-readiness/incident-playbook.md` — Rollback, kill-switches, domain playbooks
 
 ### Rekommenderad minimum för launch
 
@@ -331,7 +337,7 @@ Dessa ska INTE göras nu utan dokumenteras inför framtida beslut:
 │  (proxy.ts)          │  Circuit breaker, locale/theme
 ├──────────────────────┤
 │  apiHandler() wrapper │  Auth (user/admin/participant/public), Zod validation,
-│  (lib/api/)           │  Rate limiting, error format. 247/287 routes (86.1%).
+│  (lib/api/)           │  Rate limiting, error format. 253/288 routes (87.8%).
 ├──────────────────────┤
 │  Supabase RLS        │  Row-level security on ALL tables
 │  (PostgreSQL)        │  Tenant isolation, user scoping

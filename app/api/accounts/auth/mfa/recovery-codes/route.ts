@@ -8,12 +8,12 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 const RECOVERY_CODE_COUNT = 10
 
 /**
- * Generate recovery codes in XXXX-XXXX-XX format
+ * Generate recovery codes in XXXX-XXXX-XXXX format (12 hex chars, 6 bytes)
  */
 function generateCodes(count = RECOVERY_CODE_COUNT): string[] {
   return Array.from({ length: count }).map(() => {
-    const code = randomBytes(5).toString('hex').toUpperCase()
-    return `${code.slice(0, 4)}-${code.slice(4, 8)}-${code.slice(8, 10)}`
+    const code = randomBytes(6).toString('hex').toUpperCase()
+    return `${code.slice(0, 4)}-${code.slice(4, 8)}-${code.slice(8, 12)}`
   })
 }
 

@@ -11,8 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 
 import { coachDiagramDocumentSchemaV1, type CoachDiagramDocumentV1 } from '@/lib/validation/coachDiagramSchemaV1';
-import { diagramViewBox, renderDiagramSvg } from '@/features/admin/library/coach-diagrams/svg';
-import { getCourtBackgroundUrl } from '@/features/admin/library/coach-diagrams/courtBackgrounds';
+import { diagramViewBox, renderDiagramSvg } from '@/lib/coach-diagrams/svg';
+import { getCourtBackgroundUrl } from '@/lib/coach-diagrams/courtBackgrounds';
 
 type SessionGameResponse = {
   steps?: Array<{ media?: { type?: string; url?: string; altText?: string } | null } | null>;

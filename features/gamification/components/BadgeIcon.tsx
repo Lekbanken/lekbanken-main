@@ -1,9 +1,9 @@
 'use client';
 
-import { themes } from "@/features/admin/achievements/data";
-import { resolveAssetUrl } from "@/features/admin/achievements/assets";
-import { getEffectiveColor, normalizeIconConfig, normalizeSize } from "@/features/admin/achievements/icon-utils";
-import type { AchievementAssetSize, AchievementAssetType, AchievementIconConfig, AchievementLayerStackItem } from "@/features/admin/achievements/types";
+import { themes } from "@/lib/achievements/data";
+import { resolveAssetUrl } from "@/lib/achievements/assets";
+import { getEffectiveColor, normalizeIconConfig, normalizeSize } from "@/lib/achievements/icon-utils";
+import type { AchievementAssetSize, AchievementAssetType, AchievementIconConfig, AchievementLayerStackItem } from "@/lib/achievements/types";
 
 type BadgeIconProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

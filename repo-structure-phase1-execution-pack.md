@@ -169,7 +169,7 @@ If shared across domains, it goes in `components/`.
 ## Do Not Touch Zones
 
 Do not reorganize these areas without a dedicated audit:
-- `features/play/` ↔ `components/play/` — largest structural risk, requires import graph analysis
+- `features/play/` ↔ `components/play/` — ✅ audited 2026-03-16, deliberate layered architecture (see `play-structure-audit.md`)
 - `lib/services/` — catch-all but functional, decompose only when needed
 - `app/sandbox/` — needs access policy decision, not deletion
 ```

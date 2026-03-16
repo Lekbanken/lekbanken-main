@@ -218,15 +218,18 @@ Rule: if a component is only used within one `features/{domain}/`, it belongs th
 If it's used across multiple domains, it goes in `components/`.
 ```
 
-### 13. Address `features/play/` vs `components/play/` split
+### 13. ~~Address `features/play/` vs `components/play/` split~~ ✅ **AUDITED** (2026-03-16)
 
-This is the biggest structural issue but needs careful analysis before acting:
-1. Map which `components/play/` files are imported and by what
-2. Determine if they're lobby/join primitives vs session-runtime components
-3. If they're only used by `features/play/`, move them into `features/play/components/`
-4. If shared across multiple features, keep in `components/play/`
+Audit completed — this is a **deliberate 4-layer architecture**, not a broken split:
+- `components/play/` = shared UI primitives (puzzle modules, immersion, session UI)
+- `features/play/` = domain orchestration (play modes, director, sessions)
+- `features/play-participant/` = API client (join/create session)
+- `lib/play/` = server utilities (guards, commands)
 
-**Do not rush this** — it's the largest move and the most likely to break imports.
+Dependencies flow one direction: `features/play` → `components/play` (6 cross-imports). Zero reverse.
+
+**Action taken:** 3 orphaned files identified for deletion. No structural reorganization needed.
+See: `play-structure-audit.md`, `play-structure-canonical-map.md`, `play-structure-consolidation-plan.md`.
 
 ### 14. Sandbox protection
 
@@ -255,12 +258,12 @@ These areas are **known risk zones** but must NOT be restructured without a dedi
 
 | Area | Why it's a risk | Why to wait |
 |------|----------------|-------------|
-| `features/play/` vs `components/play/` | 118+ components in two parallel trees with zero cross-imports | Largest move in the repo. Requires full import graph analysis to determine which components/play/ files are shared vs features-only. Wrong moves break runtime. |
+| ~~`features/play/` vs `components/play/`~~ | ✅ **AUDITED 2026-03-16** — deliberate layered architecture | See `play-structure-audit.md`. No reorganization needed. |
 | `lib/services/` | Catch-all with 30+ files — unclear domain ownership | Low urgency. Works fine, just messy. Decompose when a specific service needs refactoring. |
 | `app/sandbox/` access policy | 166 files shipping as production routes without auth gate | Must decide between env-var gate, middleware, or build exclusion. Don't delete sandbox — just protect it. |
-| `components/play/` → `features/play/` merge | May be the right consolidation, but untested | Need to first map every import of every `components/play/` file and verify no external consumers exist. |
+| ~~`components/play/` → `features/play/` merge~~ | ✅ **REJECTED** — components/play is correctly shared across marketing, admin, sandbox | Merging would break consumers. Trees stay separate. |
 
-**Rule for agents:** If your task touches `features/play/`, `components/play/`, or `lib/services/`, complete your task within the existing structure. Do not reorganize.
+**Rule for agents:** If your task touches `lib/services/`, complete it within the existing structure. For play zones, follow `play-structure-agent-risk.md`.
 
 ---
 

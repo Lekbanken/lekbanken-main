@@ -139,7 +139,7 @@ These areas must NOT be restructured without a dedicated audit:
 
 | Zone | Risk | Rule |
 |------|------|------|
-| `features/play/` ↔ `components/play/` | 118+ components in parallel trees | Work within existing structure. Do not move files between them. |
+| `features/play/` ↔ `components/play/` | ✅ Audited 2026-03-16 — deliberate 4-layer architecture, not a broken split. See `play-structure-audit.md`. | Respect the layered design: primitives in `components/play/`, orchestration in `features/play/`. Do not merge trees. |
 | `lib/services/` | Catch-all with 30+ files | Decompose only when a specific service needs refactoring. |
 | `app/sandbox/` | No auth gate in production | Needs policy decision before changes. Do not delete. |
 

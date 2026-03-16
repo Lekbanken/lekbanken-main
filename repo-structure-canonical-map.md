@@ -87,7 +87,7 @@ Legend:
 | `components/marketing/` | **SUI** | Marketing header, footer, hero, feature grid, pricing CTA, etc. |
 | `components/auth/` | **SUI** | MFA components (MFAChallenge, MFACodeInput, MFARecoveryInput, TrustDeviceCheckbox) |
 | `components/game/` | **SUI** | Game display components (GameCard, GameDetailsView, etc.) |
-| `components/play/` | **NC** | 38 play components — **parallel tree** to `features/play/` with zero cross-imports |
+| `components/play/` | **SUI** | 44 shared play UI primitives — ✅ audited 2026-03-16, deliberate shared layer (see `play-structure-audit.md`) |
 | `components/journey/` | **SUI** | Journey visualization (JourneyScene, JourneyStats, ParticleField) — imported by features/gamification |
 | `components/achievements/` | **SUI** | Badge builder and display |
 | `components/billing/` | **SUI** | Billing/payment UI |
@@ -111,7 +111,7 @@ Legend:
 | `features/admin/` | **DF** | 15 sub-domains | Full admin domain pages. Imports from `components/admin/shared/` for UI primitives |
 | `features/browse/` | **DF** | ~10 files | Game browsing. Has local GameCard that may be dead (imports shared one) |
 | `features/gamification/` | **DF** | ~30 files | Achievements, XP, badges, cosmetics, streaks |
-| `features/play/` | **DF** | **80+ components**, 18 hooks, API layer | Session orchestration. **Parallel to** `components/play/` |
+| `features/play/` | **DF** | **134 files**, 17 hooks, API layer | Session orchestration. Imports from `components/play/` (layered, not parallel) |
 | `features/planner/` | **DF** | 27+ components, calendar module, wizard | Plan creation and scheduling |
 | `features/participants/` | **DF** | 6 components, 7 hooks | Host-side session participant management |
 | `features/journey/` | **DF** | ~5 files | Player journey. Has mock `JourneyPage.tsx` with hardcoded Swedish |

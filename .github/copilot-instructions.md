@@ -1,5 +1,7 @@
 # Copilot Project Instructions
 
+> For full repo governance rules, see `REPO_GOVERNANCE.md` in root.
+
 ## Documentation Sync Rule
 
 When making architectural changes to the **Planner** domain (`features/planner/`, `lib/planner/`, `app/app/planner/`), you **MUST** update these documents:

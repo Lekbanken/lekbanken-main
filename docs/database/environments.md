@@ -26,20 +26,43 @@ The Supabase CLI is linked to **production** (`qohhnufxididbmzqnjwg`) via `supab
 
 The guardrail script (`scripts/db-push-guard.mjs`) blocks push from non-`main` branches to production. Always use `npm run db:push` instead of bare `supabase db push`.
 
+## Development Environment Matrix
+
+| Scenario | App connects to | CLI target | `.env.local` keys | When |
+|----------|----------------|------------|-------------------|------|
+| **Local dev** (default) | Local Supabase (Docker) | Local | Local URL + local anon/service keys | Day-to-day development |
+| **Remote migration op** | — (CLI only, no app) | Production | N/A | `npm run db:push` from `main` |
+| **CI / Vercel preview** | Preview branch DB | Auto | Set by Vercel env vars | PR deploys |
+| **Production** | Production DB | Production | Set by Vercel env vars | Live site |
+
+### Core principle
+
+> **Local development always runs against local Supabase.**
+> Production is reached only through explicit, guarded CLI operations.
+
+### What this means in practice
+
+- `.env.local` points to `http://127.0.0.1:54321` with local keys — **never change this to production as default.**
+- The Supabase CLI is linked to production (`supabase/.temp/project-ref`), but that linkage is **only used for explicit remote commands** like `db push`, `migration list`, `migration repair`, `gen types`.
+- You do **not** run the app against production data during development.
+- If you need production-like data locally, take a sanitized dump or create representative seed data — don't point the app at the live DB.
+
 ## Rules
 
 ### Migration workflow
 
 1. Create migrations locally: `supabase migration new <name>`
 2. Test locally: `supabase db reset` (Docker)
-3. Push to production: `npm run db:push` (only from `main` branch, guardrail enforced)
-4. Commit migration files to git
+3. Commit migration files to git
+4. Push to production: `npm run db:push` (only from `main` branch, guardrail enforced)
 
 ### What to avoid
 
+- **Never** change `.env.local` to point the app at production as a default working setup.
 - **Never** create migrations via SQL Editor in Supabase Dashboard — it creates remote-only history entries that drift from the repo.
 - **Never** run bare `supabase db push` — always use `npm run db:push` which runs the guardrail.
 - **Never** assume which DB the CLI targets — the guardrail shows the target before every push.
+- **Never** use `supabase link` to switch the CLI to production for casual browsing — only for deliberate admin/migration operations.
 
 ## Supabase Branching
 

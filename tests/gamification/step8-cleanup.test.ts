@@ -171,7 +171,7 @@ describe('Step 8d — Documentation', () => {
   });
 
   it('Journey_v2_CHANGELOG.md exists and covers all 8 steps', () => {
-    const src = readSrc('Journey_v2_CHANGELOG.md');
+    const src = readSrc('docs/archive/Journey_v2_CHANGELOG.md');
     expect(src).toContain('Step 1');
     expect(src).toContain('Step 2');
     expect(src).toContain('Step 3');
@@ -183,7 +183,7 @@ describe('Step 8d — Documentation', () => {
   });
 
   it('Journey_v2_CHANGELOG.md documents key architectural decisions', () => {
-    const src = readSrc('Journey_v2_CHANGELOG.md');
+    const src = readSrc('docs/archive/Journey_v2_CHANGELOG.md');
     expect(src).toContain('render_type');
     expect(src).toContain('cosmetic_loadout');
     expect(src).toContain('CosmeticControlPanel');
@@ -192,7 +192,7 @@ describe('Step 8d — Documentation', () => {
   });
 
   it('Journey_v2_CHANGELOG.md includes test coverage summary', () => {
-    const src = readSrc('Journey_v2_CHANGELOG.md');
+    const src = readSrc('docs/archive/Journey_v2_CHANGELOG.md');
     expect(src).toContain('Test Coverage Summary');
   });
 });

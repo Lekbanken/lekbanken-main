@@ -147,9 +147,9 @@ Multiple sandbox pages import from both trees for testing/preview.
 
 | File | Status | Reason |
 |------|--------|--------|
-| `SessionHeader.tsx` | **ORPHAN** | Never imported — superseded by `features/play/components/SessionHeader.tsx` |
 | `SessionCard.tsx` | **ORPHAN** | `SessionCard` and `SessionCardSkeleton` — zero external references |
-| `ParticipantStatusBadge.tsx` | **ORPHAN** | `ParticipantStatusBadge` and `ParticipantStatusDot` — zero external references |
+| `SessionHeader.tsx` | **NOT orphaned** | Imported via barrel by `app/app/play/sessions/[id]/client.tsx` and `features/play/components/HostSessionWithPlay.tsx`. Different component from `features/play/SessionHeader` (different props). |
+| `ParticipantStatusBadge.tsx` | **NOT orphaned** | Internal dependency — imported by `ParticipantRow.tsx` (which is canonical) |
 | `KeypadDisplay.tsx` | Internal only | Only used by `Keypad.tsx` within same directory — not orphaned |
 
 ---
@@ -185,7 +185,7 @@ lib/play/ (server utils)           /api/play/* routes
 ### Why it looks confusing
 
 1. **The names suggest competition** — `features/play` and `components/play` sound like they do the same thing
-2. **3 orphaned files** create noise — `SessionHeader`, `SessionCard`, `ParticipantStatusBadge`
+2. **1 orphaned file** (`SessionCard`) creates noise
 3. **Shared import style** — routes import from both `@/components/play` and `@/features/play`, making them look interchangeable
 4. **No documentation** explains the intended layering
 
@@ -197,16 +197,16 @@ lib/play/ (server utils)           /api/play/* routes
 
 | Risk | Severity | Impact |
 |------|----------|--------|
-| 3 orphaned files in `components/play/` | LOW | Agent confusion, no runtime impact |
+| 1 orphaned file (`SessionCard`) in `components/play/` | LOW | Agent confusion, no runtime impact |
 | No architectural documentation for the layering | MEDIUM | New contributors may put orchestration code in `components/play/` |
-| `SessionHeader` name collision | LOW | Confusing but non-breaking (orphaned one is never imported) |
+| `SessionHeader` name collision | LOW | Two different components with same name in different trees — confusing but both are used |
 
 ### Previously assumed risks (now resolved)
 
 | Previous assumption | Reality |
 |---------------------|---------|
 | "118+ components in parallel trees with zero cross-imports" | **Partially wrong** — there ARE cross-imports (6 files), flowing `features/play` → `components/play`. The trees are layered, not parallel. |
-| "Largest structural risk in the repo" | **Overstated** — this is a working architecture, not a broken one. The real issue is 3 orphaned files + missing documentation. |
+| "Largest structural risk in the repo" | **Overstated** — this is a working architecture, not a broken one. The real issue is 1 orphaned file + missing documentation. |
 | "Requires full import graph analysis before touching" | **Done** — the graph is clean and one-directional. Safe to work within either tree. |
 
 ---
@@ -215,8 +215,8 @@ lib/play/ (server utils)           /api/play/* routes
 
 ### Immediate (safe, zero risk)
 
-1. Delete 3 orphaned files: `SessionHeader.tsx`, `SessionCard.tsx`, `ParticipantStatusBadge.tsx` from `components/play/`
-2. Remove their barrel exports from `components/play/index.ts`
+1. Delete 1 orphaned file: `SessionCard.tsx` from `components/play/`
+2. Remove its barrel export from `components/play/index.ts`
 
 ### Short-term (documentation)
 

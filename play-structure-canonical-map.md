@@ -11,7 +11,7 @@
 | File | Status | Consumers |
 |------|--------|-----------|
 | `SessionStatusBadge.tsx` | **CAN** | Marketing play, features/play |
-| `ParticipantStatusBadge.tsx` | **ORP** | Zero external references |
+| `ParticipantStatusBadge.tsx` | **INT** | Internal dependency of ParticipantRow.tsx |
 
 ### Participant components
 | File | Status | Consumers |
@@ -24,7 +24,7 @@
 |------|--------|-----------|
 | `SessionCard.tsx` | **ORP** | Zero external references |
 | `SessionListItem.tsx` | **CAN** | App play sessions list |
-| `SessionHeader.tsx` | **ORP** | Superseded by features/play version |
+| `SessionHeader.tsx` | **CAN** | App play sessions, features/play (via barrel) — note: different component from features/play/SessionHeader |
 | `SessionControls.tsx` | **CAN** | App play sessions, features/play |
 | `SessionFeedback.tsx` | **CAN** | Exports `SessionStatusMessage`, `ReconnectingBanner` — heavily used |
 
@@ -200,6 +200,4 @@
 
 | File | Tree | Action |
 |------|------|--------|
-| `components/play/SessionHeader.tsx` | components/play | DELETE — superseded by features/play version |
 | `components/play/SessionCard.tsx` | components/play | DELETE — zero consumers |
-| `components/play/ParticipantStatusBadge.tsx` | components/play | DELETE — zero consumers |

@@ -14,27 +14,27 @@ No structural reorganisation is needed. Actions are limited to hygiene.
 
 ## Phase 1 — Orphan Cleanup (Safe, immediate)
 
-### DELETE (3 files)
+### DELETE (1 file)
 
 | ID | File | Reason |
 |----|------|--------|
-| PD-1 | `components/play/SessionHeader.tsx` | Superseded by `features/play/SessionHeader.tsx` — zero consumers |
-| PD-2 | `components/play/SessionCard.tsx` | Zero consumers anywhere in codebase |
-| PD-3 | `components/play/ParticipantStatusBadge.tsx` | Zero consumers anywhere in codebase |
+| PD-1 | `components/play/SessionCard.tsx` | Zero consumers anywhere in codebase |
+
+**Correction:** `SessionHeader.tsx` and `ParticipantStatusBadge.tsx` were initially classified as orphaned but are NOT:
+- `SessionHeader.tsx` — imported via barrel by `app/app/play/sessions/[id]/client.tsx` and `features/play/components/HostSessionWithPlay.tsx`
+- `ParticipantStatusBadge.tsx` — internal dependency of `ParticipantRow.tsx` (canonical component)
 
 ### UPDATE barrel export
 
 | ID | File | Action |
 |----|------|--------|
-| PD-4 | `components/play/index.ts` | Remove barrel exports for PD-1, PD-2, PD-3 |
+| PD-2 | `components/play/index.ts` | Remove barrel export for `SessionCard`, `SessionCardSkeleton` |
 
 ### Pre-check
 
 ```bash
-# Must return 0 matches for each deleted component
-git grep -l "SessionHeader" -- ':!components/play/SessionHeader.tsx' ':!components/play/index.ts'
+# Must return 0 matches
 git grep -l "SessionCard" -- ':!components/play/SessionCard.tsx' ':!components/play/index.ts'
-git grep -l "ParticipantStatusBadge" -- ':!components/play/ParticipantStatusBadge.tsx' ':!components/play/index.ts'
 ```
 
 ### Post-check
@@ -50,10 +50,10 @@ npx next lint
 
 | ID | Action |
 |----|--------|
-| PD-5 | Add `components/play/README.md` — explain this is the shared UI primitives layer |
-| PD-6 | Add `features/play/README.md` — explain this is the domain orchestration layer |
-| PD-7 | Update `REPO_GOVERNANCE.md` § Do-Not-Touch Zones — replace "features/play/ ↔ components/play/ — largest structural risk" with "Audited 2026-03-16. Layered architecture — see play-structure-audit.md" |
-| PD-8 | Archive audit docs to `docs/play/` after GPT review |
+| PD-3 | Add `components/play/README.md` — explain this is the shared UI primitives layer |
+| PD-4 | Add `features/play/README.md` — explain this is the domain orchestration layer |
+| PD-5 | Update `REPO_GOVERNANCE.md` § Do-Not-Touch Zones — ✅ DONE (2026-03-16) |
+| PD-6 | Archive audit docs to `docs/play/` after GPT review |
 
 ---
 
@@ -72,10 +72,10 @@ These actions were considered and explicitly rejected:
 
 ## Execution Checklist
 
-- [ ] Pre-check grep (PD-1/2/3 truly zero consumers)
-- [ ] Delete 3 orphaned files
-- [ ] Update `components/play/index.ts` barrel
-- [ ] `npx tsc --noEmit` — 0 errors
+- [x] Pre-check grep (PD-1 truly zero consumers) ✅
+- [x] Delete 1 orphaned file ✅
+- [x] Update `components/play/index.ts` barrel ✅
+- [x] `npx tsc --noEmit` — 0 errors ✅
 - [ ] `npx next lint` — 0 errors
 - [ ] Add READMEs (PD-5/6)
 - [ ] Update REPO_GOVERNANCE.md (PD-7)

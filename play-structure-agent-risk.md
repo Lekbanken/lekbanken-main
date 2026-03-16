@@ -104,5 +104,6 @@ This domain was previously classified as "largest structural risk" in `repo-stru
 
 - The architecture is **intentional and correct** — NOT a broken parallel system
 - Dependencies flow in **one direction only** (no circular imports)
-- Only **3 orphaned files** — delete via `play-structure-consolidation-plan.md`
+- Only **1 orphaned file** (`SessionCard.tsx`) — deleted via `play-structure-consolidation-plan.md`
+- `SessionHeader` exists in both trees but they are **different components** with different props — both are used
 - No reorganisation needed

@@ -18,6 +18,8 @@
     "test:legendary-json-roundtrip": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/test-legendary-json-roundtrip.ts",
     "db:types": "npx --yes supabase gen types typescript --local > types/supabase.ts",
     "db:types:remote": "npx --yes supabase gen types typescript --linked > types/supabase.ts",
+    "db:push": "node scripts/db-push-guard.mjs",
+    "db:push:dry": "node scripts/db-push-guard.mjs --dry-run",
     "db:reset": "supabase db reset",
     "db:seed:staging": "echo 'Run supabase/staging-seed.sql in staging SQL Editor — see file header for instructions'",
     "db:verify": "echo 'Run scripts/verify-migrations.sql in Supabase SQL Editor'",

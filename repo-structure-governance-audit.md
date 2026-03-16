@@ -166,6 +166,8 @@ Mostly correct. Contains achievement SVGs, avatars, coach-diagram assets, SFX so
 
 ### Scripts Governance Rule
 
+> ✅ **LÖST (2026-03-16)** — 14 legacy migration scripts moved to `scripts/legacy/` with README. Rule added to `copilot-instructions.md`.
+
 > **Canonical migration path:** `supabase db reset` (local) / `supabase db push` (remote).  
 > **Never use** any of the 14 scripts in `scripts/` for migrations — all are legacy, none are in `package.json`.  
 > **Before running any script**, verify it is referenced in `package.json` or `README.md`.  

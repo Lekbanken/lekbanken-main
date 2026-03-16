@@ -33,8 +33,8 @@ This plan avoids large rewrites. Each action is scoped to be:
 | D12 | `app/admin/leaderboard/_legacy-page.tsx` | Dead code — `page.tsx` exists |
 | D13 | `app/admin/licenses/_legacy-page.tsx` | Dead code — `page.tsx` exists |
 | D14 | `app/admin/marketplace/_legacy-page.tsx` | Dead code — `page.tsx` exists |
-| D15 | `app/admin/media/_legacy-page.tsx` | Dead code — `page.tsx` exists |
-| D16 | `app/admin/purposes/_legacy-page.tsx` | Dead code — `page.tsx` exists |
+| ~~D15~~ | ~~`app/admin/media/_legacy-page.tsx`~~ | **RETAINED** — imported by `page.tsx` |
+| ~~D16~~ | ~~`app/admin/purposes/_legacy-page.tsx`~~ | **RETAINED** — imported by `page.tsx` |
 | D17 | `features/play/components/ParticipantPlayView.legacy.tsx` | `.legacy.` suffix — verify zero imports first |
 
 **Pre-check for D10:** `grep -r "components/legal/CookieConsentBanner"` → must return 0.  
@@ -285,14 +285,14 @@ These areas are **known risk zones** but must NOT be restructured without a dedi
 
 | # | Action | Type | Risk | Effort | Impact |
 |---|--------|------|------|--------|--------|
-| D1–D17 | Delete dead code/orphans | DELETE | None | 15 min | MEDIUM |
-| A1–A37 | Archive/move root .md files | ARCHIVE | None | 20 min | **HIGH** |
-| R1–R7 | Gitignore dumps, label kept files | RELABEL | None | 10 min | MEDIUM |
-| 8 | Execute archive operations | ARCHIVE | None | 15 min | **HIGH** |
-| 9 | Move legacy migration scripts | ARCHIVE | None | 10 min | MEDIUM |
+| D1–D17 | Delete dead code/orphans | DELETE | None | 15 min | MEDIUM | ✅ KLAR (2026-03-16) |
+| A1–A37 | Archive/move root .md files | ARCHIVE | None | 20 min | **HIGH** | ✅ KLAR (2026-03-16) |
+| R1–R7 | Gitignore dumps, label kept files | RELABEL | None | 10 min | MEDIUM | ✅ KLAR (2026-03-16) |
+| 8 | Execute archive operations | ARCHIVE | None | 15 min | **HIGH** | ✅ KLAR (2026-03-16) |
+| 9 | Move legacy migration scripts | ARCHIVE | None | 10 min | MEDIUM | ✅ KLAR (2026-03-16) |
 | 10 | Move one-time scripts | ARCHIVE | None | 10 min | LOW |
-| 11 | Expand copilot-instructions.md | RELABEL | None | 15 min | **HIGH** |
-| 12 | Document components/features boundary | RELABEL | None | 10 min | **HIGH** |
+| 11 | Expand copilot-instructions.md | RELABEL | None | 15 min | **HIGH** | ✅ KLAR (2026-03-16) |
+| 12 | Document components/features boundary | RELABEL | None | 10 min | **HIGH** | ✅ KLAR (2026-03-16) |
 | 13 | Resolve play component split | — | MEDIUM | 1+ hr | **HIGH** |
 | 14 | Sandbox protection | — | Low | 15 min | MEDIUM |
 | 15 | Root .md file policy | RELABEL | None | 5 min | **HIGH** |

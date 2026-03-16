@@ -376,7 +376,9 @@ Sandbox-related code also exists in:
 
 ### Orphaned — DELETE (verified zero imports, safe to remove)
 
-| File | Canonical replacement |
+> ✅ **Phase 1 cleanup executed 2026-03-16.** Files below have been deleted (D15/D16 retained — actually imported by `page.tsx`).
+
+| File | Canonical replacement | Status |
 |------|----------------------|
 | `app/(marketing)/components/marketing-header.tsx` | `components/marketing/header.tsx` |
 | `app/(marketing)/components/marketing-footer.tsx` | `components/marketing/footer.tsx` |

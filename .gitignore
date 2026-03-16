@@ -66,8 +66,13 @@ scripts/supabase-inspect-report.json
 scripts/roles-dump.sql
 
 # Generated lint/test artifacts
+dump.txt
+lint-output.txt
 test-output.txt
 play-lint.json
 play-lint.txt
 schema_dump.txt
 *.bak
+
+# Diagnostic snapshots
+2026-01-07/

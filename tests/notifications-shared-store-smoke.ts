@@ -80,7 +80,7 @@ async function main() {
     const bell = page.locator('button[aria-label="Varsler"]');
     
     // If that doesn't exist, try broader selectors
-    let bellFound = await bell.isVisible({ timeout: 3000 }).catch(() => false);
+    const bellFound = await bell.isVisible({ timeout: 3000 }).catch(() => false);
     if (!bellFound) {
       console.log('  Bell not found with aria-label, checking page structure...');
       const allButtons = await page.locator('button').count();

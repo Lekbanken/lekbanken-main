@@ -1,5 +1,6 @@
 # Phase 1 Execution Pack — Repo Structure Cleanup
 
+> ✅ **EXECUTED 2026-03-16.** All steps completed. tsc/lint/build pass.
 > Short operational work card. No analysis — only actions.  
 > Source: `repo-structure-consolidation-plan.md` + `repo-structure-agent-risk.md`  
 > Generated 2026-03-16.
@@ -26,8 +27,8 @@ REMOVE:
   app/admin/leaderboard/_legacy-page.tsx
   app/admin/licenses/_legacy-page.tsx
   app/admin/marketplace/_legacy-page.tsx
-  app/admin/media/_legacy-page.tsx
-  app/admin/purposes/_legacy-page.tsx
+  app/admin/media/_legacy-page.tsx          # ~~D15~~ RETAINED — imported by page.tsx
+  app/admin/purposes/_legacy-page.tsx       # ~~D16~~ RETAINED — imported by page.tsx
   features/play/components/ParticipantPlayView.legacy.tsx
 ```
 

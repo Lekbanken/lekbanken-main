@@ -72,3 +72,28 @@ Do not reorganize these areas without a dedicated audit:
 - `features/play/` ↔ `components/play/` — ✅ audited 2026-03-16, deliberate layered architecture (see `play-structure-audit.md`). Respect layer boundaries.
 - `lib/services/` — catch-all but functional, decompose only when needed
 - `app/sandbox/` — needs access policy decision, not deletion
+
+## Terminal Hygiene
+
+Reuse the same terminal session throughout your work. Do not open a new terminal for every command.
+
+**Rules:**
+
+- Batch related commands in the same shell when safe (e.g., `git status; git log --oneline -3`).
+- Open a new terminal **only** if: (1) a separate long-running process must live in parallel, (2) the previous session is broken, or (3) the user explicitly asks.
+- Use `node scripts/verify.mjs` for verification — one command, not separate runs of lint, tsc, tests.
+- Close or stop background terminals that are no longer needed.
+
+**Target layout:**
+
+- Terminal 1: dev server (if running)
+- Terminal 2: all other agent work
+- No additional terminals without clear reason
+
+## Database Environment Rules
+
+- Local development always runs against local Supabase (`supabase start`).
+- `.env.local` must point to `http://127.0.0.1:54321` — never change this to production as default.
+- Production is reached only through `npm run db:push` (guardrail enforced, `main` branch only).
+- Never run bare `supabase db push` — always use the npm script.
+- See `docs/database/environments.md` for the full environment matrix.

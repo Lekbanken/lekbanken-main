@@ -5,17 +5,17 @@
 | Environment | Supabase Project | Ref ID | Purpose |
 |-------------|-----------------|--------|---------|
 | **Production** | lekbanken-main | `qohhnufxididbmzqnjwg` | Live database, CLI linked target |
-| **Staging** | Supabase Branch | `cxkfcqyasszjmxvvhkxt` | Preview branch under lekbanken-main |
 | **Sandbox** | lekbanken-sandbox | `vmpdejhgpsrfulimsoqn` | Experimental. Baseline was generated from this DB |
 | **Local dev** | Docker | `supabase start` | Local development, isolated |
 | **Legacy** | Lekbanken Projekt | `zaufhdwajplipthjicts` | Original project, not in active use |
+
+> **Note:** Staging was previously a Supabase Branch (`cxkfcqyasszjmxvvhkxt`). It was deleted 2026-03-17 because it referenced a non-existent `staging` git branch. Recreate when a real staging git branch exists on origin.
 
 ## Git Branch → Database Target
 
 | Git branch | Database target | Supabase ref | CLI action |
 |------------|----------------|--------------|------------|
 | `main` | **Production** | `qohhnufxididbmzqnjwg` | `npm run db:push` (guardrail enforces this) |
-| `staging` | **Staging branch** | `cxkfcqyasszjmxvvhkxt` | Must explicitly `supabase link --project-ref cxkfcqyasszjmxvvhkxt` first |
 | Any other | **Local Docker only** | N/A | `supabase db reset` / `supabase start` |
 
 ## CLI Link Target
@@ -43,13 +43,26 @@ The guardrail script (`scripts/db-push-guard.mjs`) blocks push from non-`main` b
 
 ## Supabase Branching
 
-The project uses Supabase Branching with a persistent `staging` preview branch under the `lekbanken-main` project.
+The project has Supabase Branching enabled on `lekbanken-main`.
 
-### Branch status (2026-03-16)
+### Rules
 
-Both `main` and `staging` branches show `MIGRATIONS_FAILED`. This is a residual state from migration history drift that existed before the 2026-03-16 normalization (see [migration-history.md](migration-history.md)). The branches were created while migration history was inconsistent, so they inherited the broken state.
+- **Supabase branches must only reference git branches that exist on `origin`.** A branch pointing to a non-existent git ref will fail on every clone attempt.
+- **Persistent `CREATING_PROJECT` or `MIGRATIONS_FAILED` after a config fix should be resolved by recreating the branch**, not by further debugging the stuck instance.
+- Preview branches are automatically created by Supabase when a PR is opened (if the GitHub integration is active).
 
-**Recommended fix:** Recreate the branches from the now-normalized main migration history rather than attempting to patch them. Do not blindly reset — first verify what state the branches hold.
+### Status (2026-03-17)
+
+| Branch | Status | Notes |
+|--------|--------|-------|
+| main | `FUNCTIONS_DEPLOYED` / `ACTIVE_HEALTHY` | Default branch, healthy |
+| staging | **Deleted** | Was pointing to non-existent `staging` git branch. Recreate when needed. |
+
+### History
+
+- **2026-03-15:** Both branches created. `staging` referenced non-existent `staging` git branch.
+- **2026-03-16:** Discovered `config.toml` parse error (`db.health_timeout` invalid key) causing all branch-actions to fail. Fixed in commit `0d79e54`.
+- **2026-03-17:** `staging` branch deleted (unsalvageable — broken git ref). `main` branch recovered to healthy state after config fix reached origin.
 
 ## Related
 

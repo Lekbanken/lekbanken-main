@@ -6,9 +6,13 @@
  * Fetches and manages notifications for the current user.
  * Reads from notification_deliveries table via RPC with direct-query fallback.
  *
+ * Architecture: **Module-level shared store** — all hook instances (bell, page)
+ * subscribe to the same canonical state per userId. Optimistic updates, fetches,
+ * and error state are broadcast to every mounted consumer instantly.
+ *
  * Features:
- * - **Single-flight dedup** — module-level Map keyed by userId; superset-aware
- *   (a limit=100 fetch satisfies a limit=20 consumer via `.slice()`)
+ * - **Shared store** — bell (limit=20) and page (limit=100) always show same data
+ * - **Single-flight dedup** — module-level Map keyed by userId
  * - **Per-user RPC cooldown** — on RPC timeout, skips RPC for 60→120→300s
  *   and goes straight to direct query. Auth/permission errors don't trigger cooldown.
  * - **Supabase Realtime** subscription for instant updates (debounced 300ms)
@@ -22,7 +26,7 @@
  * ```
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { withTimeout } from '@/lib/utils/withTimeout';
 import { TimeoutError } from '@/lib/utils/withTimeout';
@@ -124,12 +128,158 @@ const BASE_RPC_COOLDOWN_MS = 60_000;
 const REALTIME_DEBOUNCE_MS = 300;
 
 // =============================================================================
-// MODULE-LEVEL SHARED STATE
+// MODULE-LEVEL SHARED STORE
 // =============================================================================
 
 /**
+ * Canonical notification state shared by all hook instances for a given user.
+ * Bell (limit=20) and page (limit=100) both read from and write to this store.
+ * Changes trigger re-renders in all subscribed hook instances.
+ */
+interface StoreState {
+  notifications: AppNotification[];
+  unreadCount: number;
+  isLoading: boolean;
+  error: string | null;
+  hasLoadedOnce: boolean;
+}
+
+const INITIAL_STORE_STATE: StoreState = {
+  notifications: [],
+  unreadCount: 0,
+  isLoading: true,
+  error: null,
+  hasLoadedOnce: false,
+};
+
+type StoreListener = () => void;
+
+class NotificationStore {
+  private state: StoreState = { ...INITIAL_STORE_STATE };
+  private listeners = new Set<StoreListener>();
+
+  getSnapshot = (): StoreState => this.state;
+
+  subscribe = (listener: StoreListener): (() => void) => {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  };
+
+  private emit() {
+    // Create a new reference so React detects the change
+    this.state = { ...this.state };
+    this.listeners.forEach((l) => l());
+  }
+
+  applyNotifications(next: AppNotification[]) {
+    this.state = {
+      ...this.state,
+      notifications: next,
+      unreadCount: next.filter((n) => !n.readAt).length,
+      error: null,
+      hasLoadedOnce: true,
+      isLoading: false,
+    };
+    this.emit();
+  }
+
+  finishWithoutSession(clearState: boolean) {
+    if (clearState || !this.state.hasLoadedOnce) {
+      this.state = {
+        ...this.state,
+        notifications: [],
+        unreadCount: 0,
+        error: null,
+        hasLoadedOnce: true,
+        isLoading: false,
+      };
+    } else {
+      this.state = {
+        ...this.state,
+        error: null,
+        isLoading: false,
+      };
+    }
+    this.emit();
+  }
+
+  setLoading(loading: boolean) {
+    if (this.state.isLoading === loading) return;
+    this.state = { ...this.state, isLoading: loading };
+    this.emit();
+  }
+
+  setError(error: string | null) {
+    this.state = { ...this.state, error, isLoading: false };
+    this.emit();
+  }
+
+  /** Optimistic: mark one notification as read */
+  markRead(deliveryId: string) {
+    const next = this.state.notifications.map((n) =>
+      n.id === deliveryId ? { ...n, readAt: n.readAt ?? new Date() } : n
+    );
+    this.state = {
+      ...this.state,
+      notifications: next,
+      unreadCount: next.filter((n) => !n.readAt).length,
+    };
+    this.emit();
+  }
+
+  /** Optimistic: mark all as read */
+  markAllRead() {
+    const next = this.state.notifications.map((n) => ({
+      ...n,
+      readAt: n.readAt || new Date(),
+    }));
+    this.state = {
+      ...this.state,
+      notifications: next,
+      unreadCount: 0,
+    };
+    this.emit();
+  }
+
+  /** Optimistic: dismiss (remove) a notification */
+  dismiss(deliveryId: string) {
+    const removed = this.state.notifications.find((n) => n.id === deliveryId);
+    const next = this.state.notifications.filter((n) => n.id !== deliveryId);
+    const unreadDelta = removed && !removed.readAt ? 1 : 0;
+    this.state = {
+      ...this.state,
+      notifications: next,
+      unreadCount: Math.max(0, this.state.unreadCount - unreadDelta),
+    };
+    this.emit();
+  }
+
+  /** Full reset (sign-out, user switch) */
+  reset() {
+    this.state = { ...INITIAL_STORE_STATE };
+    this.emit();
+  }
+}
+
+/** One store per userId */
+const storesByUser = new Map<string, NotificationStore>();
+
+function getOrCreateStore(userId: string): NotificationStore {
+  let store = storesByUser.get(userId);
+  if (!store) {
+    store = new NotificationStore();
+    storesByUser.set(userId, store);
+  }
+  return store;
+}
+
+/** Server-side fallback — never changes, so React skips re-renders */
+const SERVER_STORE = new NotificationStore();
+const SERVER_SNAPSHOT = SERVER_STORE.getSnapshot();
+
+/**
  * Single-flight dedup map — keyed by userId.
- * Superset-aware: a limit=100 fetch can satisfy a limit=20 consumer.
+ * Uses the largest requested limit so all consumers benefit.
  */
 interface InFlightEntry {
   limit: number;
@@ -149,11 +299,6 @@ interface RpcCooldownState {
   consecutiveTimeouts: number;
 }
 const rpcStateByUser = new Map<string, RpcCooldownState>();
-
-interface CachedNotificationsEntry {
-  notifications: AppNotification[];
-}
-const cachedNotificationsByUser = new Map<string, CachedNotificationsEntry>();
 
 /** Check if RPC is available (not in cooldown) for a user */
 function isRpcAvailable(userId: string): boolean {
@@ -205,6 +350,8 @@ function cleanupUser(userId: string): void {
     inFlightRequests.delete(userId);
   }
   rpcStateByUser.delete(userId);
+  // Don't delete the store — keep cached state for re-mount.
+  // Store will be garbage collected if the Map entry is removed on sign-out.
 }
 
 /**
@@ -294,57 +441,59 @@ function mapDirectRows(rows: DirectQueryRow[]): AppNotification[] {
 // =============================================================================
 
 export function useAppNotifications(limit = 20): UseAppNotificationsResult {
-  const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   // Per-instance refs
-  const hasLoadedOnce = useRef(false);
   const mountedRef = useRef(false);
 
   // AbortController for the current in-flight fetch.
-  // New fetches abort the previous one so that timed-out HTTP requests
-  // don't pile up and exhaust the browser's connection pool (~6/origin).
   const abortRef = useRef<AbortController | null>(null);
 
   // Consecutive failure counter for exponential backoff on polling
   const consecutiveFailures = useRef(0);
 
   // Cached userId so we can key the dedup map without re-fetching session.
-  // On userId change (logout / account switch), we release the old user's
-  // refcount and retain the new one.
   const userIdRef = useRef<string | null>(null);
 
-  // Per-instance trigger cooldown (not module-level — avoids one instance
-  // throttling another when both react to focus/visibility events).
+  // Per-instance trigger cooldown
   const lastTriggerFetchRef = useRef(0);
 
-  // Client components can still render on the server in Next.js; avoid
-  // calling `createBrowserClient()` when `window` is not available.
+  // The store ref — set once we know the userId; used by useSyncExternalStore.
+  // storeRef is for synchronous access in callbacks; storeInstance triggers
+  // re-subscription when the store changes (useState → new subscribe fn ref).
+  const storeRef = useRef<NotificationStore | null>(null);
+  const [storeInstance, setStoreInstance] = useState<NotificationStore | null>(null);
+
+  /** Update both ref (for callbacks) and state (for re-subscription). */
+  const setStore = useCallback((store: NotificationStore | null) => {
+    if (storeRef.current !== store) {
+      storeRef.current = store;
+      setStoreInstance(store);
+    }
+  }, []);
+
+  // Client components can still render on the server in Next.js
   const supabase = typeof window !== 'undefined' ? createBrowserClient() : null;
 
-  const applyNotifications = useCallback((nextNotifications: AppNotification[]) => {
-    if (!mountedRef.current) return;
+  // =========================================================================
+  // Subscribe to shared store via useSyncExternalStore
+  // =========================================================================
+  const subscribe = useCallback((onStoreChange: () => void) => {
+    if (!storeInstance) return () => {};
+    return storeInstance.subscribe(onStoreChange);
+  }, [storeInstance]);
 
-    setNotifications(nextNotifications);
-    setUnreadCount(nextNotifications.filter((n) => !n.readAt).length);
-    setError(null);
-    hasLoadedOnce.current = true;
-    setIsLoading(false);
+  const getSnapshot = useCallback((): StoreState => {
+    return storeInstance?.getSnapshot() ?? INITIAL_STORE_STATE;
+  }, [storeInstance]);
+
+  const getServerSnapshot = useCallback((): StoreState => {
+    return SERVER_SNAPSHOT;
   }, []);
 
-  const finishWithoutSession = useCallback((options?: { clearState?: boolean }) => {
-    if (!mountedRef.current) return;
+  const storeState = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-    if (options?.clearState ?? !hasLoadedOnce.current) {
-      setNotifications([]);
-      setUnreadCount(0);
-    }
-    setError(null);
-    hasLoadedOnce.current = true;
-    setIsLoading(false);
-  }, []);
+  // Derive per-instance view: slice to requested limit
+  const notifications = storeState.notifications.slice(0, limit);
+  const { unreadCount, isLoading, error } = storeState;
 
   // =========================================================================
   // Helpers: attach AbortSignal to PostgREST builders (if method exists)
@@ -477,15 +626,18 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   }, [supabase]);
 
   // =========================================================================
-  // Fetch — single-flight dedup with superset-aware reuse.
+  // Fetch — single-flight dedup with shared store.
   //
   // Dedup key: userId. If an in-flight entry exists with limit >= ours,
-  // we reuse it and slice. If our limit is larger, we abort the old entry
-  // and start a fresh fetch with our limit (the old reusers get our result
-  // through the promise chain).
+  // we reuse it. If our limit is larger, we start a new fetch alongside
+  // (the old one completes on its own — no abort).
+  // All fetched data is written to the shared store, so every consumer
+  // sees it immediately.
   // =========================================================================
   const fetchNotifications = useCallback(async () => {
     if (!supabase) return;
+
+    const store = storeRef.current;
 
     // ---- Circuit breaker: stop trying after too many consecutive failures ----
     if (consecutiveFailures.current >= MAX_CONSECUTIVE_FAILURES) {
@@ -496,9 +648,8 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
           'consecutive failures'
         );
       }
-      if (!hasLoadedOnce.current) {
-        setError('Notifikationer kunde inte laddas. Prova att ladda om sidan.');
-        setIsLoading(false);
+      if (store && !store.getSnapshot().hasLoadedOnce) {
+        store.setError('Notifikationer kunde inte laddas. Prova att ladda om sidan.');
       }
       return;
     }
@@ -510,7 +661,9 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         if (process.env.NODE_ENV === 'development') {
           console.debug('[useAppNotifications] No active session — skipping fetch');
         }
-        finishWithoutSession();
+        if (store) {
+          store.finishWithoutSession(false);
+        }
         return;
       }
       const newUserId = session.user.id;
@@ -518,27 +671,24 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       if (userIdRef.current && userIdRef.current !== newUserId) {
         releaseUser(userIdRef.current);
         retainUser(newUserId);
+        // Switch to new store
+        setStore(getOrCreateStore(newUserId));
       } else if (!userIdRef.current) {
-        // First time seeing this user — retain
         retainUser(newUserId);
+        setStore(getOrCreateStore(newUserId));
       }
       userIdRef.current = newUserId;
-
-      const cached = cachedNotificationsByUser.get(newUserId);
-      if (cached && !hasLoadedOnce.current) {
-        applyNotifications(cached.notifications.slice(0, limit));
-      }
     } catch {
-      if (!hasLoadedOnce.current) {
-        setError('Kunde inte läsa session för notifikationer');
-        setIsLoading(false);
+      if (store && !store.getSnapshot().hasLoadedOnce) {
+        store.setError('Kunde inte läsa session för notifikationer');
       }
       return;
     }
 
     const userId = userIdRef.current!;
+    const currentStore = storeRef.current!;
 
-    // ---- Single-flight dedup (superset-aware) ----
+    // ---- Single-flight dedup ----
     const existing = inFlightRequests.get(userId);
     if (existing) {
       const isStale = Date.now() - existing.startedAt > MAX_INFLIGHT_AGE_MS;
@@ -551,25 +701,21 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         }
         try {
           const result = await existing.promise;
-          if (!mountedRef.current) return;
-          const sliced = existing.limit > limit ? result.slice(0, limit) : result;
           consecutiveFailures.current = 0;
-          applyNotifications(sliced);
+          // Store already updated by the owning fetch — no action needed
+          // But if this is the first load and store hasn't been populated yet, apply now
+          if (!currentStore.getSnapshot().hasLoadedOnce) {
+            currentStore.applyNotifications(result);
+          }
           return;
         } catch {
           // Existing fetch failed — fall through to start our own
-          if (!mountedRef.current) return;
-        } finally {
-          // Only clear loading if we actually set it (SWR: first load only)
-          if (mountedRef.current && !hasLoadedOnce.current) {
-            setIsLoading(false);
-          }
         }
-      } else if (!isStale && !isAborted) {
-        // Existing has smaller limit — abort it and take over.
-        // The old entry's reusers will get our (larger) result via the
-        // promise chain since we replace the Map entry.
-        existing.abortController.abort();
+        return;
+      } else if (!isStale && !isAborted && existing.limit < limit) {
+        // Our limit is larger — let the existing fetch complete on its own
+        // but start a new fetch with our larger limit.
+        // Don't abort the existing one — it will still write to the shared store.
         inFlightRequests.delete(userId);
       } else {
         // Stale or aborted — clean up
@@ -578,15 +724,11 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     }
 
     // ---- Start our own fetch ----
-    // Cancel any previous per-instance in-flight request
     abortRef.current?.abort();
     const ac = new AbortController();
     abortRef.current = ac;
 
-    // Master timeout: abort the entire fetch cycle (RPC + fallback combined)
-    // after the computed timeout. This prevents the 40s worst-case where RPC
-    // times out and direct query gets another full timeout independently.
-    // Dynamic: bell (limit ≤ 20) gets 12s, page (limit > 20) gets 20s.
+    // Master timeout
     const masterTimeoutMs = limit > 20 ? FETCH_TIMEOUT_MS : 12_000;
     const masterTimer = setTimeout(() => {
       if (!ac.signal.aborted) {
@@ -594,14 +736,12 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       }
     }, masterTimeoutMs);
 
-    // Stale-while-revalidate: only show loading spinner on first load.
-    // After that, keep showing stale data while fetching fresh data.
-    if (!hasLoadedOnce.current) {
-      setIsLoading(true);
+    // Only show loading on first load (SWR pattern)
+    if (!currentStore.getSnapshot().hasLoadedOnce) {
+      currentStore.setLoading(true);
     }
-    setError(null);
 
-    // Create the deduped promise
+    // Create the fetch promise
     const fetchPromise = executeFetch(ac, limit, userId).then((mapped) => {
       if (mapped) return mapped;
       throw new Error('All strategies failed');
@@ -614,9 +754,6 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       if (entry?.promise === selfCleaningPromise) {
         inFlightRequests.delete(userId);
       }
-      if (process.env.NODE_ENV === 'development') {
-        console.info('[useAppNotifications] inFlight size', inFlightRequests.size);
-      }
     });
 
     inFlightRequests.set(userId, {
@@ -628,32 +765,23 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
 
     try {
       const result = await selfCleaningPromise;
-
-      if (!mountedRef.current || ac.signal.aborted) return;
+      if (ac.signal.aborted) return;
 
       consecutiveFailures.current = 0;
-      cachedNotificationsByUser.set(userId, {
-        notifications: result,
-      });
-      applyNotifications(result);
+      currentStore.applyNotifications(result);
     } catch {
-      if (!mountedRef.current || ac.signal.aborted) return;
+      if (ac.signal.aborted) return;
 
       consecutiveFailures.current += 1;
-      if (!hasLoadedOnce.current) {
-        setNotifications([]);
-        setUnreadCount(0);
-        setError('Kunde inte hämta notifikationer');
+      if (!currentStore.getSnapshot().hasLoadedOnce) {
+        currentStore.setError('Kunde inte hämta notifikationer');
       }
     } finally {
       if (abortRef.current === ac) {
         abortRef.current = null;
       }
-      if (mountedRef.current && !hasLoadedOnce.current) {
-        setIsLoading(false);
-      }
     }
-  }, [supabase, limit, executeFetch, applyNotifications, finishWithoutSession]);
+  }, [supabase, limit, executeFetch, setStore]);
 
   // =========================================================================
   // Lifecycle: mount/unmount tracking + abort cleanup + user refcount
@@ -690,10 +818,13 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         const previousUserId = userIdRef.current;
         userIdRef.current = null;
         if (previousUserId) {
+          const oldStore = storesByUser.get(previousUserId);
+          oldStore?.reset();
           releaseUser(previousUserId);
         }
+        storeRef.current = null;
+        setStoreInstance(null);
         consecutiveFailures.current = 0;
-        finishWithoutSession({ clearState: true });
         return;
       }
 
@@ -710,13 +841,14 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       }
 
       userIdRef.current = nextUserId;
+      setStore(getOrCreateStore(nextUserId));
       consecutiveFailures.current = 0;
-      setError(null);
+      storeRef.current!.setError(null);
       void fetchNotifications();
     });
 
     return () => subscription?.unsubscribe();
-  }, [supabase, fetchNotifications, finishWithoutSession]);
+  }, [supabase, fetchNotifications, setStore]);
 
   // Ref so the visibility handler can restart polling after circuit breaker
   const restartPollingRef = useRef<(() => void) | null>(null);
@@ -737,7 +869,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
 
       const wasCircuitOpen = consecutiveFailures.current >= MAX_CONSECUTIVE_FAILURES;
       consecutiveFailures.current = 0;
-      setError(null);
+      storeRef.current?.setError(null);
       fetchNotifications();
       if (wasCircuitOpen && restartPollingRef.current) {
         restartPollingRef.current();
@@ -762,7 +894,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     const onOnline = () => {
       // Coming back online — reset failures and fetch immediately
       consecutiveFailures.current = 0;
-      setError(null);
+      storeRef.current?.setError(null);
       lastTriggerFetchRef.current = Date.now();
       fetchNotifications();
     };
@@ -865,7 +997,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
               'consecutive failures. Will retry on next tab focus.'
             );
           }
-          setError('Notifikationer kunde inte laddas. Prova att ladda om sidan.');
+          storeRef.current?.setError('Notifikationer kunde inte laddas. Prova att ladda om sidan.');
           return; // Don't schedule another poll
         }
         // Schedule next poll (recursive setTimeout instead of setInterval
@@ -898,13 +1030,8 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     async (deliveryId: string) => {
       if (!supabase) return;
 
-      // Optimistic update — instant UI
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === deliveryId ? { ...n, readAt: new Date() } : n
-        )
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
+      // Optimistic update — writes to shared store, all consumers re-render
+      storeRef.current?.markRead(deliveryId);
 
       // Fire RPC in background
       try {
@@ -931,11 +1058,8 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   const markAllAsRead = useCallback(async () => {
     if (!supabase) return;
 
-    // Optimistic update
-    setNotifications((prev) =>
-      prev.map((n) => ({ ...n, readAt: n.readAt || new Date() }))
-    );
-    setUnreadCount(0);
+    // Optimistic update — writes to shared store, all consumers re-render
+    storeRef.current?.markAllRead();
 
     try {
       const { error: rpcError } = await withTimeout(
@@ -959,15 +1083,8 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     async (deliveryId: string) => {
       if (!supabase) return;
 
-      // Optimistic update — remove from list instantly
-      let removedNotification: AppNotification | undefined;
-      setNotifications((prev) => {
-        removedNotification = prev.find((n) => n.id === deliveryId);
-        if (removedNotification && !removedNotification.readAt) {
-          setUnreadCount((c) => Math.max(0, c - 1));
-        }
-        return prev.filter((n) => n.id !== deliveryId);
-      });
+      // Optimistic update — writes to shared store, all consumers re-render
+      storeRef.current?.dismiss(deliveryId);
 
       // Fire RPC in background
       try {

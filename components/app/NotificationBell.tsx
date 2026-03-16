@@ -69,7 +69,8 @@ export function NotificationBell({ className }: NotificationBellProps) {
   const t = useTranslations('app.notifications');
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [imgError, setImgError] = useState(false);
+  // Track which bell state (active/rest) had an image error — auto-resets on switch
+  const [imgErrorFor, setImgErrorFor] = useState<boolean | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -84,11 +85,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
 
   // Reset image error flag when switching between active/rest bell
   const isActive = unreadCount > 0;
-  const [prevIsActive, setPrevIsActive] = useState(isActive);
-  if (prevIsActive !== isActive) {
-    setPrevIsActive(isActive);
-    setImgError(false);
-  }
+  const imgError = imgErrorFor === isActive;
 
   // Close on click outside
   useEffect(() => {
@@ -170,7 +167,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
             width={24}
             height={24}
             className="h-6 w-6 object-contain"
-            onError={() => setImgError(true)}
+            onError={() => setImgErrorFor(isActive)}
             unoptimized
           />
         )}
@@ -302,24 +299,22 @@ export function NotificationBell({ className }: NotificationBellProps) {
             )}
           </div>
 
-          {/* Footer */}
-          {hasNotifications && (
-            <div className="border-t border-border p-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsOpen(false);
-                  router.push('/app/notifications');
-                }}
-                className={cn(
-                  'w-full rounded-lg px-3 py-2 text-center text-sm font-medium',
-                  'text-primary hover:bg-primary/10 transition-colors'
-                )}
-              >
-                {t('actions.viewAll')}
-              </button>
-            </div>
-          )}
+          {/* Footer — always show "View all" link */}
+          <div className="border-t border-border p-2">
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                router.push('/app/notifications');
+              }}
+              className={cn(
+                'w-full rounded-lg px-3 py-2 text-center text-sm font-medium',
+                'text-primary hover:bg-primary/10 transition-colors'
+              )}
+            >
+              {t('actions.viewAll')}
+            </button>
+          </div>
         </div>
       )}
     </div>

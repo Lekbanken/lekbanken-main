@@ -55,6 +55,7 @@ export default function NotificationsAdminPage() {
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [lastSentAt, setLastSentAt] = useState(0);
 
   // Check access and load tenants on mount
   useEffect(() => {
@@ -127,7 +128,7 @@ export default function NotificationsAdminPage() {
 
     switch (scope) {
       case 'global':
-        return isSystemAdmin && tenants.length > 0;
+        return isSystemAdmin;
       case 'tenant':
         return !!selectedTenantId;
       case 'users':
@@ -135,7 +136,7 @@ export default function NotificationsAdminPage() {
       default:
         return false;
     }
-  }, [scope, isSystemAdmin, tenants.length, selectedTenantId, selectedUserIds.length, notificationTitle, notificationMessage]);
+  }, [scope, isSystemAdmin, selectedTenantId, selectedUserIds.length, notificationTitle, notificationMessage]);
 
   // Get recipient description for sidebar
   const getRecipientDescription = () => {
@@ -157,7 +158,11 @@ export default function NotificationsAdminPage() {
   const handleSend = async () => {
     if (!canSend) return;
 
+    // Client-side debounce: 5s cooldown between sends (best-effort, Block B.3)
+    if (Date.now() - lastSentAt < 5000) return;
+
     setIsSending(true);
+    setLastSentAt(Date.now());
     setError(null);
     setSuccessMessage(null);
 

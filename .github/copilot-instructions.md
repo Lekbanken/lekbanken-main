@@ -1,5 +1,7 @@
 # Copilot Project Instructions
 
+> For full repo governance rules, see `REPO_GOVERNANCE.md` in root.
+
 ## Documentation Sync Rule
 
 When making architectural changes to the **Planner** domain (`features/planner/`, `lib/planner/`, `app/app/planner/`), you **MUST** update these documents:
@@ -37,3 +39,36 @@ Do not assume architecture. Always verify against documentation.
 - **i18n**: All UI strings in `messages/{sv,en,no}.json` under domain-specific keys (e.g., `planner.*`)
 - **Types**: Strict TypeScript — `npx tsc --noEmit` must pass with 0 errors
 - **Components**: Feature-scoped under `features/{domain}/` — not in global `components/`
+
+## Documentation Routing
+
+When starting work on any domain:
+
+1. Read `PROJECT_CONTEXT.md` — understand the product
+2. Read `launch-readiness/launch-control.md` — current system state
+3. Read the domain's canonical docs (see `repo-structure-agent-risk.md` for lookup table)
+
+Do not read `docs/archive/` unless explicitly asked.
+
+## Scripts Rule
+
+Never use `scripts/*` for database migrations. All migration scripts in `scripts/legacy/` are historical — none are canonical. Use `supabase db reset` (local) / `supabase db push` (remote).
+
+Before running any script, verify it is referenced in `package.json` or `README.md`.
+
+## Code Organization
+
+- `components/` — reusable UI imported across multiple routes/features
+- `features/` — domain-scoped modules (components + hooks + API) for one domain
+- `lib/` — data layer, services, utilities (no UI)
+- `hooks/` — cross-domain React hooks
+
+Rule: if a component is only used within one `features/{domain}/`, it belongs there. If shared across domains, it goes in `components/`.
+
+## Do Not Touch Zones
+
+Do not reorganize these areas without a dedicated audit:
+
+- `features/play/` ↔ `components/play/` — ✅ audited 2026-03-16, deliberate layered architecture (see `play-structure-audit.md`). Respect layer boundaries.
+- `lib/services/` — catch-all but functional, decompose only when needed
+- `app/sandbox/` — needs access policy decision, not deletion

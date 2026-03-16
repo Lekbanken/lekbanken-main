@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { apiHandler } from '@/lib/api/route-handler'
 import type { Database } from '@/types/supabase'
@@ -44,8 +45,22 @@ function mapRowToSettings(data: NotificationPreferenceRow | null) {
   }
 }
 
+const UpdatePreferencesSchema = z.object({
+  settings: z.object({
+    email_enabled: z.boolean().optional(),
+    push_enabled: z.boolean().optional(),
+    sms_enabled: z.boolean().optional(),
+    inapp_enabled: z.boolean().optional(),
+    dnd_enabled: z.boolean().optional(),
+    dnd_start_time: z.string().regex(/^\d{2}:\d{2}$/, 'Ogiltigt tidsformat (HH:MM)').nullable().optional(),
+    dnd_end_time: z.string().regex(/^\d{2}:\d{2}$/, 'Ogiltigt tidsformat (HH:MM)').nullable().optional(),
+    email_digest: z.enum(['real-time', 'hourly', 'daily', 'weekly', 'never']).optional(),
+  }).optional(),
+})
+
 export const GET = apiHandler({
   auth: 'user',
+  rateLimit: 'api',
   handler: async ({ auth }) => {
     const userId = auth!.user!.id
 
@@ -70,36 +85,42 @@ export const GET = apiHandler({
 
 export const PATCH = apiHandler({
   auth: 'user',
+  rateLimit: 'api',
   handler: async ({ auth, req }) => {
     const userId = auth!.user!.id
 
-    const body = (await req.json().catch(() => null)) as {
-    settings?: Record<string, unknown>
-  } | null
+    const body = await req.json().catch(() => null)
+    const parsed = UpdatePreferencesSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message || 'Validering misslyckades' },
+        { status: 400 }
+      )
+    }
 
-  const settings = body?.settings ?? {}
-  const dbUpdate: NotificationPreferenceUpdate = {
-    user_id: userId,
-    updated_at: new Date().toISOString(),
-  }
+    const settings = parsed.data.settings ?? {}
+    const dbUpdate: NotificationPreferenceUpdate = {
+      user_id: userId,
+      updated_at: new Date().toISOString(),
+    }
 
-  if (typeof settings.email_enabled === 'boolean') dbUpdate.email_enabled = settings.email_enabled
-  if (typeof settings.push_enabled === 'boolean') dbUpdate.push_enabled = settings.push_enabled
-  if (typeof settings.sms_enabled === 'boolean') dbUpdate.sms_enabled = settings.sms_enabled
-  if (typeof settings.inapp_enabled === 'boolean') dbUpdate.in_app_enabled = settings.inapp_enabled
-  if (typeof settings.dnd_enabled === 'boolean') dbUpdate.quiet_hours_enabled = settings.dnd_enabled
-  if (settings.dnd_start_time === null || typeof settings.dnd_start_time === 'string') {
-    dbUpdate.quiet_hours_start = settings.dnd_start_time
-  }
-  if (settings.dnd_end_time === null || typeof settings.dnd_end_time === 'string') {
-    dbUpdate.quiet_hours_end = settings.dnd_end_time
-  }
-  if (typeof settings.email_digest === 'string') {
-    dbUpdate.digest_frequency =
-      settings.email_digest === 'real-time' || settings.email_digest === 'hourly'
-        ? 'realtime'
-        : settings.email_digest
-  }
+    if (typeof settings.email_enabled === 'boolean') dbUpdate.email_enabled = settings.email_enabled
+    if (typeof settings.push_enabled === 'boolean') dbUpdate.push_enabled = settings.push_enabled
+    if (typeof settings.sms_enabled === 'boolean') dbUpdate.sms_enabled = settings.sms_enabled
+    if (typeof settings.inapp_enabled === 'boolean') dbUpdate.in_app_enabled = settings.inapp_enabled
+    if (typeof settings.dnd_enabled === 'boolean') dbUpdate.quiet_hours_enabled = settings.dnd_enabled
+    if (settings.dnd_start_time === null || typeof settings.dnd_start_time === 'string') {
+      dbUpdate.quiet_hours_start = settings.dnd_start_time
+    }
+    if (settings.dnd_end_time === null || typeof settings.dnd_end_time === 'string') {
+      dbUpdate.quiet_hours_end = settings.dnd_end_time
+    }
+    if (typeof settings.email_digest === 'string') {
+      dbUpdate.digest_frequency =
+        settings.email_digest === 'real-time' || settings.email_digest === 'hourly'
+          ? 'realtime'
+          : settings.email_digest
+    }
 
   const admin = createServiceRoleClient()
   const { data: existingRow, error: existingError } = await admin

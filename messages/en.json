@@ -10965,6 +10965,7 @@
         "on": "on",
         "retry": "Try again",
         "unknownDate": "Unknown date",
+        "enrolledAt": "Enrolled",
         "required": "MFA krävs",
         "requiredDescription": "Din organisation kräver att du aktiverar MFA.",
         "enableButton": "Aktivera MFA",

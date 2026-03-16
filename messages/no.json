@@ -10965,6 +10965,7 @@
         "on": "på",
         "retry": "Prøv igjen",
         "unknownDate": "Ukjent dato",
+        "enrolledAt": "Aktivert",
         "required": "MFA krävs",
         "requiredDescription": "Din organisation kräver att du aktiverar MFA.",
         "enableButton": "Aktivera MFA",

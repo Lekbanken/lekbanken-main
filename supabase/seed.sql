@@ -9,7 +9,7 @@
 -- =============================================================================
 
 -- 1) Create auth users in auth.users (Supabase GoTrue)
---    Password "TestAdmin123!" hashed with pgcrypto crypt/bf
+--    Password must match .env.local TEST_*_PASSWORD values.
 --    NOTE: confirmation_token, recovery_token, email_change_token_new, and
 --    email_change MUST be set to '' (not NULL). GoTrue v2.187+ scans these
 --    as Go strings which cannot represent NULL → "converting NULL to string
@@ -24,10 +24,10 @@ INSERT INTO auth.users (
     '00000000-0000-0000-0000-000000000001',
     '00000000-0000-0000-0000-000000000000',
     'test-system-admin@lekbanken.no',
-    crypt('TestAdmin123!', gen_salt('bf')),
+    crypt('Rapid$teel261', gen_salt('bf')),
     now(),
-    '{"provider":"email","providers":["email"]}',
-    '{"full_name":"Test System Admin"}',
+    '{"provider":"email","providers":["email"],"global_role":"system_admin"}',
+    '{"full_name":"Test System Admin","global_role":"system_admin"}',
     'authenticated', 'authenticated', now(), now(),
     '', '', '', ''
   ),
@@ -36,7 +36,7 @@ INSERT INTO auth.users (
     '00000000-0000-0000-0000-000000000002',
     '00000000-0000-0000-0000-000000000000',
     'test-tenant-admin@lekbanken.no',
-    crypt('TestAdmin123!', gen_salt('bf')),
+    crypt('Rapid$teel261', gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"Test Tenant Admin"}',
@@ -48,7 +48,7 @@ INSERT INTO auth.users (
     '00000000-0000-0000-0000-000000000003',
     '00000000-0000-0000-0000-000000000000',
     'test-regular-user@lekbanken.no',
-    crypt('TestUser123!', gen_salt('bf')),
+    crypt('Rapid$teel261', gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"Test Regular User"}',

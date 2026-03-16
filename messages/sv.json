@@ -10858,7 +10858,8 @@
           "allDevicesRevoked": "Alla enheter har tagits bort"
         },
         "retry": "Försök igen",
-        "unknownDate": "Okänt datum"
+        "unknownDate": "Okänt datum",
+        "enrolledAt": "Aktiverad"
       }
     },
     "errors": {

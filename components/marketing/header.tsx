@@ -9,7 +9,7 @@ import { LanguageSwitcher } from "@/components/navigation/LanguageSwitcher";
 import { ProfileMenu } from "@/components/navigation/ProfileMenu";
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { usePreferences } from "@/lib/context/PreferencesContext";
 import { getUiCopy } from "@/lib/i18n/ui";
 import { useAuth } from "@/lib/supabase/auth";
@@ -68,6 +68,7 @@ export function Header() {
           </div>
 
           <SheetContent side="right" className="w-full border-l border-border px-6 py-4 sm:max-w-sm">
+            <SheetTitle className="sr-only">Meny</SheetTitle>
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2 p-1.5">
                 <span className="sr-only">Lekbanken</span>

@@ -1,22 +1,27 @@
 -- =============================================================================
--- Notifications v2: Atomic write pipeline + admin history + tighter RLS
+-- Hotfix: create_notification_v1 param type text→uuid + event_key uniqueness
 -- =============================================================================
--- Fixes:
---   NTF-002: Non-atomic master → delivery writes (orphan master rows)
---   NTF-003: Admin history reads wrong table (notifications.is_read)
---   NTF-005: Tenant-admin history is RLS-incomplete
---   NTF-007: Duplicated delivery materialization logic
---   NTF-010: Over-broad delivery INSERT policies
+-- Fixes applied after 20260320000000_notifications_v2_atomic_pipeline.sql
+-- was already deployed with p_related_entity_id as text instead of uuid.
+--
+--   1. Drop the incorrect text-signature function
+--   2. Recreate with correct uuid type for p_related_entity_id
+--   3. Add scope-aware event_key unique indexes for idempotency
 -- =============================================================================
 
 -- ---------------------------------------------------------------------------
--- 1. create_notification_v1()
---    Single transactional function that creates master + materializes deliveries.
---    Replaces the two-step pattern in notifications-admin.ts & notifications-user.ts.
---    Callable only via service-role (no RLS bypass needed — SECURITY DEFINER).
+-- 1. Drop the text-signature version (already applied to production manually)
+-- ---------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS public.create_notification_v1(
+  text, uuid, uuid[], text, text, text, text, text, text, text, text, text, uuid, boolean
+);
+
+-- ---------------------------------------------------------------------------
+-- 2. Recreate with correct uuid type for p_related_entity_id
+--    (CREATE OR REPLACE is safe here since the old signature is dropped above)
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.create_notification_v1(
-  p_scope         text,           -- 'all' | 'tenant' | 'users'
+  p_scope         text,
   p_tenant_id     uuid    DEFAULT NULL,
   p_user_ids      uuid[]  DEFAULT NULL,
   p_title         text    DEFAULT '',
@@ -26,7 +31,7 @@ CREATE OR REPLACE FUNCTION public.create_notification_v1(
   p_action_url    text    DEFAULT NULL,
   p_action_label  text    DEFAULT NULL,
   p_event_key     text    DEFAULT NULL,
-  p_related_entity_id   text DEFAULT NULL,
+  p_related_entity_id   uuid DEFAULT NULL,
   p_related_entity_type text DEFAULT NULL,
   p_created_by    uuid    DEFAULT NULL,
   p_exclude_demo  boolean DEFAULT true
@@ -130,100 +135,34 @@ EXCEPTION WHEN unique_violation THEN
 END;
 $fn$;
 
--- Grant to authenticated (for server actions using service role) and service_role
 GRANT EXECUTE ON FUNCTION public.create_notification_v1 TO service_role;
 GRANT EXECUTE ON FUNCTION public.create_notification_v1 TO authenticated;
 
 
 -- ---------------------------------------------------------------------------
--- 2. get_notification_history_v1()
---    Admin read-model: joins deliveries + notifications + users.
---    Shows aggregated delivery stats per notification.
---    Replaces the broken listRecentNotifications() that reads notifications.is_read.
--- ---------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.get_notification_history_v1(
-  p_tenant_id uuid    DEFAULT NULL,
-  p_limit     int     DEFAULT 100,
-  p_category  text    DEFAULT NULL,
-  p_days_back int     DEFAULT 7
-)
-RETURNS TABLE (
-  notification_id    uuid,
-  title              text,
-  message            text,
-  type               text,
-  category           text,
-  scope              text,
-  action_url         text,
-  event_key          text,
-  created_at         timestamptz,
-  created_by         uuid,
-  total_deliveries   bigint,
-  read_count         bigint,
-  unread_count       bigint
-)
-LANGUAGE sql
-SECURITY DEFINER
-SET search_path TO 'pg_catalog', 'public'
-AS $fn$
-  SELECT
-    n.id              AS notification_id,
-    n.title,
-    n.message,
-    n.type,
-    n.category,
-    n.scope,
-    n.action_url,
-    n.event_key,
-    n.created_at,
-    n.created_by,
-    COUNT(nd.id)                          AS total_deliveries,
-    COUNT(nd.id) FILTER (WHERE nd.read_at IS NOT NULL) AS read_count,
-    COUNT(nd.id) FILTER (WHERE nd.read_at IS NULL)     AS unread_count
-  FROM public.notifications n
-  LEFT JOIN public.notification_deliveries nd ON nd.notification_id = n.id
-  WHERE n.status = 'sent'
-    AND n.created_at >= (now() - make_interval(days => p_days_back))
-    AND (p_tenant_id IS NULL OR n.tenant_id = p_tenant_id OR n.scope = 'all')
-    AND (p_category IS NULL OR n.category = p_category)
-  GROUP BY n.id
-  ORDER BY n.created_at DESC
-  LIMIT p_limit;
-$fn$;
-
--- Admin function — grant to service_role and authenticated (server actions check auth separately)
-GRANT EXECUTE ON FUNCTION public.get_notification_history_v1 TO service_role;
-GRANT EXECUTE ON FUNCTION public.get_notification_history_v1 TO authenticated;
-
-
--- ---------------------------------------------------------------------------
--- 3. Tighten delivery INSERT policies (NTF-010)
---    The current policies allow ANY authenticated user to insert deliveries
---    for any user. Since deliveries are ONLY created by:
---      a) create_notification_v1 (SECURITY DEFINER — bypasses RLS)
---      b) process_scheduled_notifications (SECURITY DEFINER — bypasses RLS)
---    No RLS INSERT policy is needed for regular users.
---    We keep one policy that only service_role can satisfy.
+-- 3. Scope-aware event_key uniqueness for V2 notifications
+--
+--    The existing index is (user_id, event_key) which only fires on per-user
+--    notifications. V2 scope-based notifications have user_id IS NULL on the
+--    master row, so that index never fires.
+--
+--    We add TWO partial indexes:
+--      a) Global notifications (tenant_id IS NULL): unique per event_key
+--      b) Tenant-scoped notifications: unique per (tenant_id, event_key)
+--
+--    This allows the same event_key to be used in different tenants
+--    while still preventing duplicates within one tenant or globally.
 -- ---------------------------------------------------------------------------
 
--- Drop the overly broad policies
-DROP POLICY IF EXISTS "notification_deliveries_insert" ON public.notification_deliveries;
-DROP POLICY IF EXISTS "notification_deliveries_insert_service" ON public.notification_deliveries;
+-- Drop the overly broad single index if it exists (was applied manually)
+DROP INDEX IF EXISTS public.notifications_event_key_scope_unique_idx;
 
--- New restrictive policy: only system admin (which effectively means service_role
--- or the SECURITY DEFINER functions above). Regular authenticated users cannot
--- insert deliveries directly.
-CREATE POLICY "notification_deliveries_insert_restricted"
-  ON public.notification_deliveries
-  FOR INSERT
-  WITH CHECK (public.is_system_admin());
+-- a) Global notifications — unique event_key when no tenant and no user
+CREATE UNIQUE INDEX IF NOT EXISTS notifications_event_key_global_unique_idx
+  ON public.notifications (event_key)
+  WHERE event_key IS NOT NULL AND user_id IS NULL AND tenant_id IS NULL;
 
-
--- ---------------------------------------------------------------------------
--- 4. Ensure existing read functions have proper grants
--- ---------------------------------------------------------------------------
-GRANT EXECUTE ON FUNCTION public.get_user_notifications TO authenticated;
-GRANT EXECUTE ON FUNCTION public.get_unread_notification_count TO authenticated;
-GRANT EXECUTE ON FUNCTION public.mark_notification_read TO authenticated;
-GRANT EXECUTE ON FUNCTION public.mark_all_notifications_read TO authenticated;
-GRANT EXECUTE ON FUNCTION public.dismiss_notification TO authenticated;
+-- b) Tenant-scoped notifications — unique (tenant_id, event_key) per tenant
+CREATE UNIQUE INDEX IF NOT EXISTS notifications_event_key_tenant_unique_idx
+  ON public.notifications (tenant_id, event_key)
+  WHERE event_key IS NOT NULL AND user_id IS NULL AND tenant_id IS NOT NULL;

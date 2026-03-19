@@ -39,7 +39,11 @@ function LoginForm() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      // Hard redirect so every server component re-renders with fresh cookies
+      // Hard redirect so every server component re-renders with fresh cookies.
+      // We use window.location.href (not router.push) because router.push uses
+      // cached RSC payloads prefetched before login and won't include auth cookies.
+      // This effect runs AFTER the re-render where effectiveGlobalRole is set,
+      // so redirectTo already reflects the user's real role (e.g. /admin for admins).
       window.location.href = redirectTo
     }
   }, [isAuthenticated, isLoading, redirectTo])
@@ -52,9 +56,9 @@ function LoginForm() {
 
     try {
       await signIn(email, password)
-      // Hard redirect — router.push() uses cached RSC payloads that
-      // were prefetched before login and won't include the auth cookies.
-      window.location.href = redirectTo
+      // Do NOT redirect here — redirectTo is a stale closure value computed
+      // before login (when effectiveGlobalRole was null). The useEffect above
+      // fires after the auth state re-render and uses the correct redirectTo.
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
       setIsSubmitting(false)

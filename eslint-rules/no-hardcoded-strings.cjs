@@ -4,9 +4,18 @@
  * Detects hardcoded Swedish/Norwegian text in JSX that should be internationalized.
  * Part of the i18n migration strategy for Phase 3.
  * 
- * Usage:
- * - "warn" for migration phase (current)
- * - "error" for enforcing after migration complete
+ * Severity:
+ * - "error" in critical user-facing paths (legal, play, app)
+ * - "warn" elsewhere (migration phase — broad detection, may have false positives)
+ * 
+ * When to suppress:
+ * - Technical English-only strings that happen to contain short Nordic words
+ * - Strings already handled by a non-standard i18n path (e.g. CMS content)
+ * - Use: // eslint-disable-next-line lekbanken/no-hardcoded-strings
+ * 
+ * When NOT to suppress:
+ * - Any user-visible UI text in Swedish/Norwegian — use useTranslations()/t() instead
+ * - Translatable attributes: title, placeholder, label, aria-label, description
  */
 
 'use strict';

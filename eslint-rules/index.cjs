@@ -2,9 +2,12 @@
 /**
  * Custom ESLint Rules for Lekbanken
  * 
- * These rules enforce project-specific coding standards, including:
- * - i18n compliance (no-hardcoded-strings)
- * - Profile loading resilience (no-manual-profile-fetch)
+ * These rules enforce project-specific coding standards:
+ * - no-hardcoded-strings: i18n compliance (error in critical paths, warn elsewhere)
+ * - no-manual-profile-fetch: Profile loading resilience (error — locked pattern)
+ * 
+ * Severity is configured per file scope in eslint.config.mjs.
+ * See each rule file for suppression guidance.
  */
 
 'use strict';

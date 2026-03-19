@@ -1,6 +1,10 @@
 name: TypeScript Type Check (post-merge)
 
 # Post-merge safety net. PR validation is handled by validate.yml.
+# This deliberately duplicates tsc + build from the PR gate to catch:
+#   - force-merged PRs that bypassed Validate
+#   - race conditions between concurrent PR merges
+# If CI minutes are a concern, this workflow can be removed — Validate covers the same checks pre-merge.
 on:
   push:
     branches: [main, develop]

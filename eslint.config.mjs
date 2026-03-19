@@ -66,6 +66,8 @@ const eslintConfig = defineConfig([
     }
   },
   // i18n: ERROR for critical user-facing areas (legal, play, app)
+  // These paths have high user visibility — all strings must go through useTranslations()/t().
+  // To suppress: use eslint-disable with justification, e.g. technical/English-only string.
   {
     files: [
       "app/legal/**/*.tsx",
@@ -78,6 +80,8 @@ const eslintConfig = defineConfig([
     },
   },
   // i18n: Warn about hardcoded Nordic strings in other components (migration phase)
+  // This is intentionally 'warn' — the rule is broad and may produce false positives.
+  // Promote to 'error' per-path as i18n migration completes and confidence increases.
   {
     files: ["components/**/*.tsx", "app/**/*.tsx", "features/**/*.tsx"],
     ignores: [
@@ -156,14 +160,16 @@ const eslintConfig = defineConfig([
   // =============================================================================
   // PROFILE LOADING RESILIENCE (Prevent regression to manual useEffect patterns)
   // =============================================================================
-  // Profile routes should use useProfileQuery hook instead of manual useEffect
+  // Profile routes MUST use useProfileQuery hook instead of manual useEffect
   // to prevent infinite loading spinners and request storms.
+  // This is an error because the pattern has high signal and low noise.
+  // To suppress for intentional patterns, add: // profile-fetch:allow
   {
     files: [
       "app/app/profile/**/*.tsx",
     ],
     rules: {
-      "lekbanken/no-manual-profile-fetch": "warn",
+      "lekbanken/no-manual-profile-fetch": "error",
     },
   },
   // =============================================================================

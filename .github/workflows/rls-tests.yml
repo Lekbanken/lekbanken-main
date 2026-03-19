@@ -36,7 +36,7 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.78.1  # Pin to avoid CI flakiness from upstream CLI changes
 
       - name: Start local database and apply migrations
         run: |

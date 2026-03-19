@@ -1,6 +1,10 @@
 name: Unit Tests (post-merge)
 
 # Post-merge safety net. PR validation is handled by validate.yml.
+# This deliberately duplicates vitest from the PR gate to catch:
+#   - force-merged PRs that bypassed Validate
+#   - race conditions between concurrent PR merges
+# If CI minutes are a concern, this workflow can be removed — Validate covers the same checks pre-merge.
 "on":
   push:
     branches: [main, develop]

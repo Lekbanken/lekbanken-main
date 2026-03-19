@@ -20,9 +20,12 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.78.1  # Pin to avoid CI flakiness from upstream CLI changes
 
       - name: Start local Supabase
+        # 'start' boots the Postgres container (excluding unneeded services for speed).
+        # 'db reset' then drops and re-applies all migrations from scratch,
+        # proving the migration chain is valid from zero state.
         run: supabase start -x realtime,storage-api,imgproxy,inbucket,postgrest,gotrue,studio,edge-runtime,logflare,vector,supavisor
 
       - name: Verify baseline fresh install

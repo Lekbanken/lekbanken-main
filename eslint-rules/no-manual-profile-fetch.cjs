@@ -5,8 +5,19 @@
  * This prevents the common pattern of manual useEffect + setState that can lead
  * to infinite loading spinners and request storms.
  * 
- * To opt-out for intentional patterns, add a comment before the useEffect:
- * // profile-fetch:allow
+ * Severity: error (high signal, low noise — locked pattern)
+ * 
+ * When to suppress:
+ * - The useEffect intentionally fetches data that useProfileQuery does not cover
+ * - A one-off migration step that will be removed before merge
+ * - Add: // profile-fetch:allow   (as a comment before the useEffect call)
+ * 
+ * When NOT to suppress:
+ * - Any Supabase .from()/.rpc() or fetch('/api/...') call in a profile useEffect
+ * - "I'll refactor it later" — use useProfileQuery now
+ * 
+ * Note: This rule only applies to files under app/app/profile/.
+ * If profile code moves to a different path, update the file scope in eslint.config.mjs.
  */
 
 'use strict';

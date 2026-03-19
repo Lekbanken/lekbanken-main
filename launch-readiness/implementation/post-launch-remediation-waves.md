@@ -1,10 +1,12 @@
 # Post-Launch Remediation Waves
 
-> **Status:** WAVE 1 BATCH D COMPLETE — 18 closed, 1 needs decision, 2 blocked (2026-03-19)  
+> **Status:** WAVE 1 BATCH D COMPLETE — 20 closed, 1 needs decision (BUG-022/DD-LEGACY-1), 2 blocked (MFA-005/DD-MFA-1, BUG-020/DD-RACE-1) (2026-03-19)  
 > **Created:** 2026-03-18  
 > **Updated:** 2026-03-19  
 > **Source:** `audits/post-launch-cluster-triage.md`, `audits/wave1-extension-verification.md`  
 > **Rule:** Do not start Wave N+1 until Wave N is green. Do not skip verification.
+>
+> **Errata (2026-03-19):** Commit `3966ae6` subject says "18 bugs" — canonical count is **20 closed**. BUG-022 was erroneously listed under "Bugs closed" in the commit message; it remains ⚠️ PARTIALLY REMEDIATED pending DD-LEGACY-1 decision. The 20 closed bugs are: MFA-004, BUG-006, BUG-019, BUG-025, BUG-027, BUG-029, BUG-031, BUG-034, BUG-035, BUG-047, BUG-056, BUG-057, BUG-058, BUG-060, BUG-061, BUG-079, BUG-081, BUG-083, BUG-084, BUG-085.
 
 ---
 

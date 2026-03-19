@@ -184,11 +184,12 @@ After 8 domain audits and Batches 1–6d wrapper migration (90.0% handler covera
 **Remaining work:**
 1. **SEC-002b** — infra decision (can ship with in-memory limiter, upgrade post-launch)
 2. **SYS-001** — self-resolving (90.0% → continues toward 100%)
-3. **MFA-004** (P0) — `user_mfa` update uses wrong field names + returns success on failure. **Status: OPEN, executable immediately.** See `implementation/post-launch-remediation-waves.md` §1.1.
+3. **MFA-004** (P0) — `user_mfa` update uses wrong field names + returns success on failure. **Status: ✅ CLOSED (2026-03-18).** See `implementation/post-launch-remediation-waves.md` §1.1.
 4. **MFA-005** (P0) — Cross-tenant MFA bypass: `verifyTrustedDevice()` missing `tenant_id` filter. **Status: OPEN, blocked on DD-MFA-1 (tenant scope decision).** See `implementation/post-launch-remediation-waves.md` §1.8.
 5. **MFA-001** (P1) — `profiles!inner` join references non-existent relation. **Status: OPEN.** Wave 2.
 6. **MFA-002** (P1) — `.eq('is_active', true)` on non-existent column. **Status: OPEN.** Wave 2.
-7. **BUG-006–029** (24 findings, P1/P2) — Codex cluster findings across 6 domains. **Status: TRIAGED, remediation not started.** Wave 1: BUG-006, BUG-019, BUG-020, BUG-022, BUG-025, BUG-027, BUG-029. See `implementation/post-launch-remediation-waves.md`.
+7. **BUG-006–085** (24 findings, P1/P2) — Codex cluster findings across 6 domains. **Status: Wave 1 — 20 CLOSED, 1 PARTIAL (BUG-022/DD-LEGACY-1), 2 BLOCKED (BUG-020/DD-RACE-1, MFA-005/DD-MFA-1).** See `implementation/post-launch-remediation-waves.md`.
+   > **Commit note:** Commit `3966ae6` subject says "18 bugs" — canonical count is 20 closed + BUG-022 partially remediated. BUG-022 was erroneously included in the commit's "Bugs closed" list; it remains under DD-LEGACY-1 decision.
 
 ### Unverified Findings (from prior audits — needs triage)
 

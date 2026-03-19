@@ -14,6 +14,8 @@
  */
 
 import { describe, it, expect } from 'vitest'
+import type { User } from '@supabase/supabase-js'
+import { shouldBootstrapFromClient } from '@/lib/auth/bootstrap'
 
 /**
  * Simulate the auth state change handler's decision logic.
@@ -169,6 +171,35 @@ describe('Auth state change handler resilience', () => {
     it('should be ignored (keep state)', () => {
       const result = simulateAuthHandler('INITIAL_SESSION', null, { user: null, error: null })
       expect(result.type).toBe('keep')
+    })
+  })
+
+  describe('bootstrap recovery after degraded server auth', () => {
+    it('should bootstrap on the client when the server returned no user under degraded auth', () => {
+      expect(
+        shouldBootstrapFromClient({
+          initialUser: null,
+          initialAuthDegraded: true,
+        })
+      ).toBe(true)
+    })
+
+    it('should not bootstrap on the client for a normal guest page render', () => {
+      expect(
+        shouldBootstrapFromClient({
+          initialUser: null,
+          initialAuthDegraded: false,
+        })
+      ).toBe(false)
+    })
+
+    it('should not bootstrap on the client when the server already provided a user', () => {
+      expect(
+        shouldBootstrapFromClient({
+          initialUser: { id: 'user-123' } as User,
+          initialAuthDegraded: true,
+        })
+      ).toBe(false)
     })
   })
 })

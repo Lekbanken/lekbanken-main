@@ -22,6 +22,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from './client'
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
+import { shouldBootstrapFromClient } from '@/lib/auth/bootstrap'
 import type { GlobalRole, UserProfile } from '@/types/auth'
 import type { TenantMembership } from '@/types/tenant'
 
@@ -30,6 +31,7 @@ interface AuthProviderProps {
   initialUser?: User | null
   initialProfile?: UserProfile | null
   initialMemberships?: TenantMembership[]
+  initialAuthDegraded?: boolean
 }
 
 interface AuthContextType {
@@ -56,14 +58,17 @@ export function AuthProvider({
   initialUser,
   initialProfile,
   initialMemberships,
+  initialAuthDegraded = false,
 }: AuthProviderProps) {
   const router = useRouter()
   const pathname = usePathname()
 
+  const needsClientBootstrap = shouldBootstrapFromClient({ initialUser, initialAuthDegraded })
+
   const [user, setUser] = useState<User | null>(initialUser ?? null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(initialProfile ?? null)
   const [memberships, setMemberships] = useState<TenantMembership[]>(initialMemberships ?? [])
-  const [isLoading, setIsLoading] = useState(initialUser === undefined)
+  const [isLoading, setIsLoading] = useState(needsClientBootstrap)
 
   // Debounce router.refresh() to prevent SSR auth storms.
   // Multiple auth events (e.g. USER_UPDATED firing rapidly, or tab-focus
@@ -238,8 +243,10 @@ export function AuthProvider({
   }, [fetchProfile, fetchMemberships])
 
   useEffect(() => {
-    // Skip client init if server provided initial data (including null)
-    if (initialUser !== undefined) {
+    // Server-first auth remains the default. The only time we re-bootstrap on
+    // the client is when the server explicitly marked auth as degraded and
+    // returned no user, which would otherwise strand the app in a false guest state.
+    if (!needsClientBootstrap) {
       setIsLoading(false)
       return
     }
@@ -252,6 +259,10 @@ export function AuthProvider({
 
         if (authUser && isMountedRef.current) {
           await refreshAuthData(authUser)
+        } else if (isMountedRef.current) {
+          setUser(null)
+          setUserProfile(null)
+          setMemberships([])
         }
       } catch (error) {
         console.error('Error initializing auth:', error)
@@ -263,7 +274,7 @@ export function AuthProvider({
     }
 
     void initAuth()
-  }, [refreshAuthData, initialUser])
+  }, [refreshAuthData, needsClientBootstrap])
 
   useEffect(() => {
     const {

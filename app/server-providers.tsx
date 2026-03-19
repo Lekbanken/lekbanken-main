@@ -10,6 +10,7 @@ export default async function ServerProviders({ children }: { children: ReactNod
       initialUser={authContext.user}
       initialProfile={authContext.profile}
       initialMemberships={authContext.memberships}
+      initialAuthDegraded={authContext.authDegraded}
     >
       {children}
     </Providers>

@@ -64,12 +64,14 @@ export interface AppNotification {
 export interface UseAppNotificationsResult {
   /** List of notifications */
   notifications: AppNotification[];
-  /** Number of unread notifications */
+  /** Number of unread notifications (canonical from DB) */
   unreadCount: number;
   /** Loading state */
   isLoading: boolean;
   /** Error message */
   error: string | null;
+  /** True when no session was found — distinguishes "empty inbox" from "not authenticated" */
+  noSession: boolean;
   /** Mark a notification as read */
   markAsRead: (deliveryId: string) => Promise<void>;
   /** Mark all notifications as read */
@@ -142,6 +144,8 @@ interface StoreState {
   isLoading: boolean;
   error: string | null;
   hasLoadedOnce: boolean;
+  /** True when no session was found — distinguishes "empty inbox" from "not authenticated" */
+  noSession: boolean;
 }
 
 const INITIAL_STORE_STATE: StoreState = {
@@ -150,6 +154,7 @@ const INITIAL_STORE_STATE: StoreState = {
   isLoading: true,
   error: null,
   hasLoadedOnce: false,
+  noSession: false,
 };
 
 type StoreListener = () => void;
@@ -171,14 +176,15 @@ class NotificationStore {
     this.listeners.forEach((l) => l());
   }
 
-  applyNotifications(next: AppNotification[]) {
+  applyNotifications(next: AppNotification[], dbUnreadCount?: number) {
     this.state = {
       ...this.state,
       notifications: next,
-      unreadCount: next.filter((n) => !n.readAt).length,
+      unreadCount: dbUnreadCount ?? next.filter((n) => !n.readAt).length,
       error: null,
       hasLoadedOnce: true,
       isLoading: false,
+      noSession: false,
     };
     this.emit();
   }
@@ -192,12 +198,14 @@ class NotificationStore {
         error: null,
         hasLoadedOnce: true,
         isLoading: false,
+        noSession: true,
       };
     } else {
       this.state = {
         ...this.state,
         error: null,
         isLoading: false,
+        noSession: true,
       };
     }
     this.emit();
@@ -281,9 +289,14 @@ const SERVER_SNAPSHOT = SERVER_STORE.getSnapshot();
  * Single-flight dedup map — keyed by userId.
  * Uses the largest requested limit so all consumers benefit.
  */
+interface FetchResult {
+  notifications: AppNotification[];
+  dbUnreadCount: number;
+}
+
 interface InFlightEntry {
   limit: number;
-  promise: Promise<AppNotification[]>;
+  promise: Promise<FetchResult>;
   abortController: AbortController;
   startedAt: number;
 }
@@ -493,7 +506,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
 
   // Derive per-instance view: slice to requested limit
   const notifications = storeState.notifications.slice(0, limit);
-  const { unreadCount, isLoading, error } = storeState;
+  const { unreadCount, isLoading, error, noSession } = storeState;
 
   // =========================================================================
   // Helpers: attach AbortSignal to PostgREST builders (if method exists)
@@ -521,12 +534,13 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // Core fetch — the actual RPC + direct-query logic.
   // Called by fetchNotifications (which handles dedup) and always gets
   // a fresh AbortController + the limit to use.
+  // Returns { notifications, dbUnreadCount } or null on failure.
   // =========================================================================
   const executeFetch = useCallback(async (
     ac: AbortController,
     fetchLimit: number,
     userId: string,
-  ): Promise<AppNotification[] | null> => {
+  ): Promise<{ notifications: AppNotification[]; dbUnreadCount: number } | null> => {
     if (!supabase) return null;
 
     let mapped: AppNotification[] | null = null;
@@ -622,7 +636,24 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       }
     }
 
-    return mapped;
+    if (!mapped) return null;
+
+    // --- Fetch canonical unread count from DB ---
+    let dbUnreadCount = mapped.filter((n) => !n.readAt).length; // fallback
+    if (!ac.signal.aborted && supabase) {
+      try {
+        const { data: countData, error: countError } = await (supabase.rpc as AnyRpc)(
+          'get_unread_notification_count'
+        );
+        if (!countError && typeof countData === 'number') {
+          dbUnreadCount = countData;
+        }
+      } catch {
+        // Non-critical — keep list-derived count
+      }
+    }
+
+    return { notifications: mapped, dbUnreadCount };
   }, [supabase]);
 
   // =========================================================================
@@ -705,7 +736,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
           // Store already updated by the owning fetch — no action needed
           // But if this is the first load and store hasn't been populated yet, apply now
           if (!currentStore.getSnapshot().hasLoadedOnce) {
-            currentStore.applyNotifications(result);
+            currentStore.applyNotifications(result.notifications, result.dbUnreadCount);
           }
           return;
         } catch {
@@ -742,8 +773,8 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     }
 
     // Create the fetch promise
-    const fetchPromise = executeFetch(ac, limit, userId).then((mapped) => {
-      if (mapped) return mapped;
+    const fetchPromise = executeFetch(ac, limit, userId).then((result) => {
+      if (result) return result;
       throw new Error('All strategies failed');
     });
 
@@ -768,7 +799,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       if (ac.signal.aborted) return;
 
       consecutiveFailures.current = 0;
-      currentStore.applyNotifications(result);
+      currentStore.applyNotifications(result.notifications, result.dbUnreadCount);
     } catch {
       if (ac.signal.aborted) return;
 
@@ -1113,6 +1144,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     unreadCount,
     isLoading,
     error,
+    noSession,
     markAsRead,
     markAllAsRead,
     dismiss,

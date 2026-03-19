@@ -8187,7 +8187,9 @@
         "details": {
           "to": "Til:",
           "unknown": "Ukjent",
-          "org": "Org:"
+          "org": "Org:",
+          "recipients": "mottakere",
+          "readOf": "lest"
         },
         "title": "Notifikationer",
         "markAllAsRead": "Markera alla som lästa"

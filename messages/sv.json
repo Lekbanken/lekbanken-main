@@ -8116,7 +8116,9 @@
         "details": {
           "to": "Till:",
           "unknown": "Okänd",
-          "org": "Org:"
+          "org": "Org:",
+          "recipients": "mottagare",
+          "readOf": "lästa"
         }
       }
     },

@@ -95,7 +95,7 @@ export default function NotificationHistoryPage() {
   }
 
   const filteredNotifications = showUnreadOnly 
-    ? notifications.filter(n => !n.is_read)
+    ? notifications.filter(n => n.unread_count > 0)
     : notifications
 
   const formatDate = (dateStr: string) => {
@@ -218,7 +218,7 @@ export default function NotificationHistoryPage() {
                 <div 
                   key={notification.id} 
                   className={`p-4 hover:bg-muted/50 transition-colors ${
-                    !notification.is_read ? 'bg-primary/5' : ''
+                    notification.unread_count > 0 ? 'bg-primary/5' : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -231,12 +231,19 @@ export default function NotificationHistoryPage() {
                         <span className="font-medium text-foreground truncate">
                           {notification.title}
                         </span>
-                        {!notification.is_read && (
-                          <Badge variant="primary" className="text-xs">{t('status.unread')}</Badge>
+                        {notification.unread_count > 0 && (
+                          <Badge variant="primary" className="text-xs">
+                            {notification.unread_count} {t('status.unread')}
+                          </Badge>
                         )}
                         {notification.category && (
                           <Badge variant="outline" className="text-xs">
                             {CATEGORY_LABELS[notification.category] || notification.category}
+                          </Badge>
+                        )}
+                        {notification.scope && (
+                          <Badge variant="outline" className="text-xs opacity-60">
+                            {notification.scope === 'all' ? 'Global' : 'Tenant'}
                           </Badge>
                         )}
                       </div>
@@ -247,11 +254,11 @@ export default function NotificationHistoryPage() {
                       
                       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-muted-foreground">
                         <span>
-                          {t('details.to')} {notification.user_email || notification.user_id?.slice(0, 8) || t('details.unknown')}
+                          {t('details.to')} {notification.total_deliveries} {t('details.recipients')}
                         </span>
-                        {isSystemAdmin && notification.tenant_name && (
-                          <span>{t('details.org')} {notification.tenant_name}</span>
-                        )}
+                        <span>
+                          {notification.read_count}/{notification.total_deliveries} {t('details.readOf')}
+                        </span>
                         <span>{notification.created_at ? formatDate(notification.created_at) : ''}</span>
                         {notification.event_key && (
                           <span className="font-mono text-xs opacity-60" title={notification.event_key}>
@@ -273,7 +280,7 @@ export default function NotificationHistoryPage() {
                     </div>
                     
                     <div className="flex-shrink-0">
-                      {notification.is_read ? (
+                      {notification.unread_count === 0 ? (
                         <EnvelopeOpenIcon className="h-4 w-4 text-muted-foreground/50" />
                       ) : (
                         <EnvelopeIcon className="h-4 w-4 text-primary" />

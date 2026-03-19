@@ -601,18 +601,17 @@ export async function listTenantsForSupportHub(): Promise<{
 
 export interface NotificationHistoryItem {
   id: string
-  user_id: string | null
-  user_email?: string | null
-  tenant_id: string | null
-  tenant_name?: string | null
   title: string
   message: string
   type: string
   category: string | null
-  is_read: boolean | null
+  scope: string | null
   action_url: string | null
   event_key: string | null
   created_at: string | null
+  total_deliveries: number
+  read_count: number
+  unread_count: number
 }
 
 export async function listRecentNotifications(params: {
@@ -624,64 +623,39 @@ export async function listRecentNotifications(params: {
   if (error) return { success: false, error }
   
   try {
-    const supabase = isSystem && !params.tenantId 
-      ? await createServiceRoleClient() 
+    const supabase = isSystem
+      ? await createServiceRoleClient()
       : await createServerRlsClient()
     
-    let query = supabase
-      .from('notifications')
-      .select(`
-        id,
-        user_id,
-        tenant_id,
-        title,
-        message,
-        type,
-        category,
-        is_read,
-        action_url,
-        event_key,
-        created_at,
-        users:user_id (email),
-        tenants:tenant_id (name)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(params.limit ?? 100)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error: rpcError } = await (supabase.rpc as any)(
+      'get_notification_history_v1',
+      {
+        p_tenant_id: params.tenantId ?? null,
+        p_limit: params.limit ?? 100,
+        p_category: params.category ?? null,
+        p_days_back: 7,
+      }
+    )
     
-    if (params.tenantId) {
-      query = query.eq('tenant_id', params.tenantId)
-    }
-    
-    if (params.category) {
-      query = query.eq('category', params.category)
-    }
-    
-    // Only show recent (last 7 days)
-    const sevenDaysAgo = new Date()
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-    query = query.gte('created_at', sevenDaysAgo.toISOString())
-    
-    const { data, error: queryError } = await query
-    
-    if (queryError) {
-      console.error('listRecentNotifications error:', queryError)
+    if (rpcError) {
+      console.error('listRecentNotifications RPC error:', rpcError)
       return { success: false, error: 'Kunde inte hämta notifikationer' }
     }
     
-    const items: NotificationHistoryItem[] = (data ?? []).map((row) => ({
-      id: row.id,
-      user_id: row.user_id,
-      user_email: (row.users as { email?: string } | null)?.email ?? null,
-      tenant_id: row.tenant_id,
-      tenant_name: (row.tenants as { name?: string } | null)?.name ?? null,
-      title: row.title,
-      message: row.message,
-      type: row.type,
-      category: row.category,
-      is_read: row.is_read,
-      action_url: row.action_url,
-      event_key: row.event_key,
-      created_at: row.created_at,
+    const items: NotificationHistoryItem[] = (data ?? []).map((row: Record<string, unknown>) => ({
+      id: row.notification_id as string,
+      title: row.title as string,
+      message: row.message as string,
+      type: row.type as string,
+      category: (row.category as string) ?? null,
+      scope: (row.scope as string) ?? null,
+      action_url: (row.action_url as string) ?? null,
+      event_key: (row.event_key as string) ?? null,
+      created_at: row.created_at ? String(row.created_at) : null,
+      total_deliveries: Number(row.total_deliveries) || 0,
+      read_count: Number(row.read_count) || 0,
+      unread_count: Number(row.unread_count) || 0,
     }))
     
     return { success: true, data: items }

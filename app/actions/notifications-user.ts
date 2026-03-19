@@ -76,31 +76,28 @@ export async function createTicketNotification(params: {
         message = `Det har skett en uppdatering på ärendet "${params.ticketTitle}".`
     }
     
-    const { data: inserted, error: insertError } = await supabase
-      .from('notifications')
-      .insert({
-        tenant_id: params.tenantId,
-        user_id: params.userId,
-        title,
-        message,
-        type,
-        category: 'support',
-        related_entity_id: params.ticketId,
-        related_entity_type: 'ticket',
-        action_url: `/app/support/tickets/${params.ticketId}`,
-        action_label: 'Visa ärende',
-        event_key: eventKey, // Idempotency key for deduplication
-        scope: 'tenant',
-        status: 'sent',
-        sent_at: new Date().toISOString(),
-      })
-      .select('id')
-      .single()
+    const { data: inserted, error: insertError } = await (supabase.rpc as any)( // eslint-disable-line @typescript-eslint/no-explicit-any
+      'create_notification_v1',
+      {
+        p_scope: 'users',
+        p_tenant_id: params.tenantId,
+        p_user_ids: [params.userId],
+        p_title: title,
+        p_message: message,
+        p_type: type,
+        p_category: 'support',
+        p_action_url: `/app/support/tickets/${params.ticketId}`,
+        p_action_label: 'Visa ärende',
+        p_event_key: eventKey,
+        p_related_entity_id: params.ticketId,
+        p_related_entity_type: 'ticket',
+        p_exclude_demo: false,
+      }
+    )
     
     if (insertError) {
-      // Check if it's a duplicate key error (unique constraint violation)
-      if (insertError.code === '23505' && insertError.message?.includes('event_key')) {
-        // Duplicate notification - this is expected and OK
+      // Check if it's a duplicate key error (unique constraint violation on event_key)
+      if (inserted?.skipped) {
         console.log(`Skipped duplicate notification: ${eventKey}`)
         return { success: true, skipped: true }
       }
@@ -108,21 +105,12 @@ export async function createTicketNotification(params: {
       return { success: false, error: 'Kunde inte skapa notifikation' }
     }
 
-    // Create delivery row so the notification shows in the app bell / page
-    if (inserted?.id) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: deliveryError } = await (supabase as any)
-        .from('notification_deliveries')
-        .insert({
-          notification_id: inserted.id,
-          user_id: params.userId,
-          delivered_at: new Date().toISOString(),
-        })
-
-      if (deliveryError) {
-        console.error('createTicketNotification delivery error:', deliveryError)
-        // Don't fail — the notification itself was created
+    if (inserted && !inserted.success) {
+      if (inserted.skipped) {
+        console.log(`Skipped duplicate notification: ${eventKey}`)
+        return { success: true, skipped: true }
       }
+      return { success: false, error: inserted.error || 'Kunde inte skapa notifikation' }
     }
     
     return { success: true }

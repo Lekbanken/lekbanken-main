@@ -8238,7 +8238,9 @@
         "details": {
           "to": "To:",
           "unknown": "Unknown",
-          "org": "Org:"
+          "org": "Org:",
+          "recipients": "recipients",
+          "readOf": "read"
         }
       }
     },

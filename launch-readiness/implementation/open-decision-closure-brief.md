@@ -81,17 +81,19 @@ Evidence is overwhelming — 4 out of 6 layers already implement tenant scoping:
 
 1. Add `tenantId: string` as required 4th parameter to `verifyTrustedDevice()`
 2. Add `.eq('tenant_id', tenantId)` to the verify query
-3. Update verify route to accept `tenant_id` in request body and pass it through
+3. ~~Update verify route to accept `tenant_id` in request body and pass it through~~ → **HARDENED:** Route uses ONLY HMAC-signed cookie via `readTenantIdFromCookies()`. Client body is never trusted for tenant context.
 4. **Key question:** Where does the MFA challenge flow obtain tenant context?
    - The login flow must have active tenant context before MFA challenge
-   - If the user must select a tenant before MFA, `tenant_id` flows naturally
-   - If MFA happens before tenant selection, the endpoint needs tenant context from session/cookie
+   - The `lb_tenant` cookie is already set during login, so it's available for both route and middleware paths
+   - If cookie is not set (e.g. first login), trust check is skipped (falls through to normal MFA)
 
 **Files affected:**
 | File | Change |
 |------|--------|
 | `lib/services/mfa/mfaDevices.server.ts` | Add `tenantId` param + `.eq('tenant_id', tenantId)` to verify query |
-| `app/api/accounts/auth/mfa/devices/verify/route.ts` | Accept `tenant_id` in body, pass to service |
+| `app/api/accounts/auth/mfa/devices/verify/route.ts` | Read tenant from signed cookie only (no body param) |
+| `lib/auth/mfa-aal.ts` | Add `tenantId` to `checkMFAStatus` options + `checkTrustedDevice` filter |
+| `proxy.ts` | Read signed tenant cookie before MFA check, pass to `checkMFAStatus` |
 
 **Migration needed:** No (schema already has `tenant_id NOT NULL`).
 

@@ -690,10 +690,13 @@ export default async function proxy(request: NextRequest) {
         // Get trusted device token from cookie
         const trustToken = request.cookies.get(MFA_TRUST_COOKIE)?.value
         const deviceFingerprint = extractDeviceFingerprint(request.headers, request.cookies)
+        // Tenant ID from HMAC-signed cookie — required for tenant-scoped trust check (MFA-005)
+        const mfaTenantId = await readTenantIdFromCookies(request.cookies)
         
         const mfaStatus = await checkMFAStatus(supabase, user, {
           trustToken,
           deviceFingerprint: deviceFingerprint ?? undefined,
+          tenantId: mfaTenantId ?? undefined,
           enforceAdmins,
           enforceTenantAdmins,
         })

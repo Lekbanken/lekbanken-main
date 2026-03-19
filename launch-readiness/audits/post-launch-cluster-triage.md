@@ -254,7 +254,7 @@
 | ID | Sev | Root Cause | Status |
 |----|-----|------------|--------|
 | ~~**MFA-004**~~ | P0 | RC-1 + RC-4 | ✅ CLOSED (2026-03-18) — Fixed column names, removed type cast, fail-hard on error |
-| **MFA-005** | P0 | RC-2 | ✅ CLOSED (2026-03-19) — DD-MFA-1 resolved: tenant-scoped trust. `tenantId` added to `verifyTrustedDevice()`, verify route reads from cookie/body |
+| **MFA-005** | P0 | RC-2 | ✅ CLOSED (2026-03-19) — DD-MFA-1 resolved: tenant-scoped trust. Server-canonical cookie only (body param removed). Middleware `checkTrustedDevice` also tenant-scoped. |
 | **BUG-006** | P1 | RC-2 | ✅ FIXED/CLOSED (2026-03-19) — Route param canonical for all 9 tenant-scoped pages |
 | **BUG-019** | P1 | RC-4 | ⚠️ NEEDS SECOND PASS (2026-03-18) — Multi-product loop works; partial-failure split-brain risk |
 | **BUG-020** | P1 | RC-3 | ✅ CLOSED (2026-03-19) — DD-RACE-1 resolved: atomic RPC `assign_seat_if_available()` with `FOR UPDATE` lock |

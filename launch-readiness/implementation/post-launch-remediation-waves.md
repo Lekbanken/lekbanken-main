@@ -140,17 +140,19 @@
 
 #### 1.8 MFA-005 — Cross-tenant MFA bypass ✅ KLAR (2026-03-19)
 
-**Files:** `lib/services/mfa/mfaDevices.server.ts`, `app/api/accounts/auth/mfa/devices/verify/route.ts`  
+**Files:** `lib/services/mfa/mfaDevices.server.ts`, `app/api/accounts/auth/mfa/devices/verify/route.ts`, `lib/auth/mfa-aal.ts`, `proxy.ts`  
 **Root cause:** RC-2 — verify path queries `user_id` without `tenant_id`, returns device from any tenant  
-**Fix:** Added `tenantId: string` as required 4th parameter to `verifyTrustedDevice()`. Added `.eq('tenant_id', tenantId)` to the verify query. Route now reads tenant context from body `tenant_id` or active tenant cookie. Returns 400 if no tenant context available.  
-**Design decision:** DD-MFA-1 — RESOLVED: Tenant-scoped trust (cookie + explicit body param)  
+**Fix:** Added `tenantId: string` as required 4th parameter to `verifyTrustedDevice()`. Added `.eq('tenant_id', tenantId)` to the verify query. Route reads tenant ONLY from HMAC-signed cookie — never from client body.  
+**Design decision:** DD-MFA-1 — RESOLVED: Tenant-scoped trust (server-canonical cookie only)  
 **Migration:** None (RLS policy already has `tenant_id` column)  
 **Frontend impact:** MFA challenge flow must supply tenant context (already available via cookie)  
 **Regression test:** User with devices in tenant A and B → verify from tenant A context → only tenant A device accepted
 
 **Noteringar:**
-- Tenant resolution order: explicit `tenant_id` in request body > `readTenantIdFromCookies()` > 400 error
-- No fallback to system-level UUID — verify always requires real tenant context
+- **Postfix hardening (2026-03-19):** Two additional vectors closed:
+  1. `devices/verify` route: removed `body.tenant_id` override — uses ONLY `readTenantIdFromCookies()` (HMAC-signed, httpOnly cookie). Prevents client spoofing.
+  2. Middleware path: `checkTrustedDevice()` in `mfa-aal.ts` now requires `tenantId` param with `.eq('tenant_id', tenantId)`. `proxy.ts` reads tenant from signed cookie before MFA check.
+- Trust check is skipped (falls through to normal MFA) if tenant cookie is not yet set (e.g. first login before tenant selection).
 
 ---
 

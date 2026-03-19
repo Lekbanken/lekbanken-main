@@ -82,6 +82,7 @@ export async function checkMFAStatus(
   options?: {
     trustToken?: string
     deviceFingerprint?: string
+    tenantId?: string
     enforceAdmins?: boolean
     enforceTenantAdmins?: boolean
   }
@@ -103,12 +104,13 @@ export async function checkMFAStatus(
   try {
     // OPTIMIZATION: Check trusted device FIRST if we have both token and fingerprint
     // This is the fastest path - if device is trusted, we can skip all other checks
-    if (options?.trustToken && options?.deviceFingerprint) {
+    if (options?.trustToken && options?.deviceFingerprint && options?.tenantId) {
       const isTrusted = await checkTrustedDevice(
         supabase,
         user.id,
         options.trustToken,
-        options.deviceFingerprint
+        options.deviceFingerprint,
+        options.tenantId
       )
       if (isTrusted) {
         result.deviceTrusted = true
@@ -219,7 +221,8 @@ async function checkTrustedDevice(
   supabase: SupabaseClient<Database>,
   userId: string,
   trustToken: string,
-  deviceFingerprint: string
+  deviceFingerprint: string,
+  tenantId: string
 ): Promise<boolean> {
   try {
     // Hash the token for comparison
@@ -231,6 +234,7 @@ async function checkTrustedDevice(
       .from('mfa_trusted_devices')
       .select('id, expires_at')
       .eq('user_id', userId)
+      .eq('tenant_id', tenantId)
       .eq('trust_token_hash', tokenHash)
       .eq('device_fingerprint', deviceFingerprint)
       .eq('is_revoked', false)

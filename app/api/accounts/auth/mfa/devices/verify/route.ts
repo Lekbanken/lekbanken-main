@@ -22,7 +22,6 @@ export const POST = apiHandler({
     const body = (await req.json().catch(() => ({}))) as {
       trust_token?: string
       device_fingerprint?: string
-      tenant_id?: string
     }
 
     if (!body.trust_token || !body.device_fingerprint) {
@@ -32,13 +31,13 @@ export const POST = apiHandler({
       )
     }
 
-    // Resolve tenant context: explicit body param > cookie > primary membership
+    // Tenant context from HMAC-signed cookie only — never trust client body (MFA-005)
     const cookieStore = await cookies()
-    const tenantId = body.tenant_id || await readTenantIdFromCookies(cookieStore)
+    const tenantId = await readTenantIdFromCookies(cookieStore)
 
     if (!tenantId) {
       return NextResponse.json(
-        { error: 'tenant_id is required (via body or active tenant cookie)' },
+        { error: 'No active tenant cookie — cannot verify device trust' },
         { status: 400 }
       )
     }

@@ -120,12 +120,12 @@ No architectural changes will be implemented before real production traffic has 
 
 | Severity | Count | Resolved | Remaining |
 |----------|-------|----------|-----------|
-| P0 — Launch blocker | 15 | 13 | 2 — MFA-004 (silent data corruption), MFA-005 (cross-tenant MFA bypass) |
+| P0 — Launch blocker | 15 | 15 | 0 — All P0s closed (MFA-004 2026-03-18, MFA-005 2026-03-19) |
 | P1 — Must fix before launch | 49 + 24 new | 47 | 2 legacy + 24 new Codex — see below |
 | P2 — Should fix, not blocker | 136 + 3 new | 15 | 121 legacy + MFA-003, BUG-009, BUG-021 |
 | P3 — Nice to have | 90 | 0 | 90 — post-launch backlog |
 
-> **MFA sub-audit (2026-03-18):** 5 new findings discovered by Codex, verified by Claude against generated types and baseline migration. All caused by `as unknown as SupabaseClient` casts bypassing TypeScript checking. See `audits/mfa-trusted-device-audit.md` and `implementation/mfa-trusted-device-remediation.md`. **Status: findings verified, remediation PENDING. DD-MFA-1 (tenant scope) must be locked before MFA-005 fix.**
+> **MFA sub-audit (2026-03-18):** 5 new findings discovered by Codex, verified by Claude. **Status: MFA-004 ✅ CLOSED (2026-03-18), MFA-005 ✅ CLOSED (2026-03-19).** DD-MFA-1 resolved: tenant-scoped trust via server-canonical cookie. See `audits/mfa-trusted-device-audit.md`.
 
 > **⚠️ Codex Cluster Triage (2026-03-18):** 24 additional findings (BUG-006 through BUG-029) discovered by Codex across 6 clusters: Tenant Admin (C1), Account Management (C2), Participant/Session (C3), Billing/Stripe (C4), Entitlement/Access (C5), Games Catalog (C6). 11 of 29 total findings independently verified by Claude; remaining 18 marked "VERIFIED (Codex)" — high confidence based on code proof but not yet re-verified. All 29 findings triaged into 8 root-cause families and 3 remediation waves. **No implementation started.** See:
 > - `audits/post-launch-cluster-triage.md` — master triage table + root-cause families + wave assignments
@@ -188,8 +188,8 @@ After 8 domain audits and Batches 1–6d wrapper migration (90.0% handler covera
 4. **MFA-005** (P0) — Cross-tenant MFA bypass: `verifyTrustedDevice()` missing `tenant_id` filter. **Status: ✅ CLOSED (2026-03-19).** DD-MFA-1 resolved: tenant-scoped trust via server-canonical cookie only. Postfix hardened: removed `body.tenant_id` override + added tenant filter to middleware `checkTrustedDevice()`. See `implementation/post-launch-remediation-waves.md` §1.8.
 5. **MFA-001** (P1) — `profiles!inner` join references non-existent relation. **Status: OPEN.** Wave 2.
 6. **MFA-002** (P1) — `.eq('is_active', true)` on non-existent column. **Status: OPEN.** Wave 2.
-7. **BUG-006–085** (24 findings, P1/P2) — Codex cluster findings across 6 domains. **Status: Wave 1 — 22 CLOSED, 1 PARTIAL (BUG-022/DD-LEGACY-1).** See `implementation/post-launch-remediation-waves.md`.
-   > **Commit note:** Commit `3966ae6` subject says "18 bugs" — canonical count is 20 closed in that commit + BUG-022 partially remediated. MFA-005 and BUG-020 closed in follow-up commit (2026-03-19).
+7. **BUG-006–085** (24 findings, P1/P2) — Codex cluster findings across 6 domains. **Status: Wave 1 — 23 CLOSED (all).** DD-LEGACY-1 resolved: legacy fallback removed (Option A). See `implementation/post-launch-remediation-waves.md`.
+   > **Commit note:** Commit `3966ae6` subject says "18 bugs" — canonical count is 20 closed in that commit. MFA-005 and BUG-020 closed in follow-up (2026-03-19). BUG-022 closed via DD-LEGACY-1 Option A (2026-03-19).
 
 ### Unverified Findings (from prior audits — needs triage)
 

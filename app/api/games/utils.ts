@@ -2,7 +2,6 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 
 type RlsClient = SupabaseClient<Database>
-type BillingProduct = { billing_product_key: string | null }
 
 export async function getAllowedProductIds(
   supabase: RlsClient,
@@ -65,49 +64,9 @@ export async function getAllowedProductIds(
     }
   }
 
-  // 2) Legacy fallback: billing subscription → billing_product_key → products.product_key
-  // Keep this until the billing domain is fully migrated away.
-  // RLS on tenant_subscriptions restricts to admin/owner — no seat enforcement needed here
-  // because the RLS policy itself serves as the access gate. When all tenants migrate to
-  // the entitlement model, this entire block can be removed.
+  // DD-LEGACY-1 (2026-03-19): Legacy billing fallback REMOVED.
+  // Access is now resolved exclusively through tenant_product_entitlements + seat assignments.
+  // See: launch-readiness/audits/bug-022-legacy-resolution.md
 
-  // BUG-022: Legacy fallback must exclude paused subscriptions — paused means no access.
-  // BUG-022 (second pass): Skip legacy path when no userId — matches canonical path guard.
-  if (!userId) {
-    return { allowedProductIds: Array.from(productIds), resolvedViaBillingKey: [] }
-  }
-
-  const { data: subs, error } = await supabase
-    .from('tenant_subscriptions')
-    .select(`billing_product:billing_products(id,billing_product_key)`) // billing_products table does not carry product_id
-    .eq('tenant_id', tenantId)
-    .in('status', ['active', 'trial'])
-
-  if (error) {
-    console.error('[games/utils] billing fallback lookup error', error)
-    return { allowedProductIds: Array.from(productIds), resolvedViaBillingKey: [] }
-  }
-  const billingKeys: string[] = []
-
-  for (const sub of subs ?? []) {
-    const bp = (sub as { billing_product: BillingProduct | null }).billing_product
-    if (bp?.billing_product_key) billingKeys.push(bp.billing_product_key)
-  }
-
-  if (billingKeys.length) {
-    const { data: products, error: prodErr } = await supabase
-      .from('products')
-      .select('id, product_key')
-      .in('product_key', billingKeys.filter(Boolean))
-
-    if (prodErr) {
-      console.warn('[games/utils] product_key resolution failed', prodErr)
-    } else {
-      for (const p of products ?? []) {
-        if (p.id) productIds.add(p.id)
-      }
-    }
-  }
-
-  return { allowedProductIds: Array.from(productIds), resolvedViaBillingKey: billingKeys }
+  return { allowedProductIds: Array.from(productIds), resolvedViaBillingKey: [] }
 }

@@ -1,12 +1,12 @@
 # Post-Launch Remediation Waves
 
-> **Status:** WAVE 1 COMPLETE — 22 closed, 1 needs decision (BUG-022/DD-LEGACY-1) (2026-03-19)  
+> **Status:** WAVE 1 COMPLETE — 23 closed (2026-03-19). DD-LEGACY-1 resolved: Option A (hard cleanup).  
 > **Created:** 2026-03-18  
 > **Updated:** 2026-03-19  
 > **Source:** `audits/post-launch-cluster-triage.md`, `audits/wave1-extension-verification.md`  
 > **Rule:** Do not start Wave N+1 until Wave N is green. Do not skip verification.
 >
-> **Errata (2026-03-19):** Commit `3966ae6` subject says "18 bugs" — canonical count is **20 closed**. BUG-022 was erroneously listed under "Bugs closed" in the commit message; it remains ⚠️ PARTIALLY REMEDIATED pending DD-LEGACY-1 decision. The 20 closed bugs are: MFA-004, BUG-006, BUG-019, BUG-025, BUG-027, BUG-029, BUG-031, BUG-034, BUG-035, BUG-047, BUG-056, BUG-057, BUG-058, BUG-060, BUG-061, BUG-079, BUG-081, BUG-083, BUG-084, BUG-085.
+> **Errata (2026-03-19):** Commit `3966ae6` subject says "18 bugs" — canonical count was **20 closed** at that point. BUG-022 was erroneously listed under "Bugs closed" in that commit but was only partially remediated then. All 23 Wave 1 items now fully closed as of 2026-03-19 (MFA-005, BUG-020, BUG-022 closed in follow-up commits).
 
 ---
 
@@ -100,23 +100,16 @@
 
 ---
 
-#### 1.6 BUG-022 — Legacy billing fallback ⚠️ PARTIALLY REMEDIATED / NEEDS DECISION (2026-03-19)
+#### 1.6 BUG-022 — Legacy billing fallback ✅ KLAR (2026-03-19)
 
 **File:** `app/api/games/utils.ts` (`getAllowedProductIds`)  
 **Root cause:** RC-5 — legacy `tenant_subscriptions` path adds products without seat check, includes paused subscriptions  
-**Fix applied (pass 1):** Status filter changed from `['active', 'trial', 'paused']` to `['active', 'trial']` — paused subscriptions no longer grant access.  
-**Fix applied (pass 2 — 2026-03-19):** Legacy path now skips entirely when `!userId`, matching canonical entitlement path's guard.
+**Fix applied (pass 1):** Status filter changed from `['active', 'trial', 'paused']` to `['active', 'trial']`.  
+**Fix applied (pass 2):** Legacy path skips entirely when `!userId`.  
+**Fix applied (pass 3 — DD-LEGACY-1 resolved):** Legacy fallback block **removed entirely**. Access now resolved exclusively through `tenant_product_entitlements` + `tenant_entitlement_seat_assignments`.
 
-**⚠️ Open decision (DD-LEGACY-1):** Legacy subscription fallback still grants access to authenticated admin/owner users without seat enforcement. This is NOT an intentional coexistence — it's an unfinished migration:
-- New purchases (cart/checkout flow) → `tenant_product_entitlements` + seat assignments (canonical)
-- Old `create-subscription` route → `tenant_subscriptions` only (legacy)
-- No formal ADR exists; no tenant data migration has been performed
-- 5 files still write/read `tenant_subscriptions`; `billing_product_key` only consumed in this legacy path
-
-**To close BUG-022 fully, one of:**
-1. **Migrate data:** Audit which tenants have subscriptions but no entitlements → create entitlements + seats → remove legacy block
-2. **Accept & document:** Write formal ADR accepting legacy admin/owner access as permanent design → close as accepted risk
-
+**Decision:** DD-LEGACY-1 — Option A (Hard Cleanup). See `audits/bug-022-legacy-resolution.md`.  
+**Migration:** Phase 2 data migration needed post-cleanup to provision entitlements for legacy-subscription-only tenants.  
 **5 runtime callers:** `browse/filters`, `games/featured`, `games/[gameId]`, `games/[gameId]/related`, `games/search`.
 
 ---

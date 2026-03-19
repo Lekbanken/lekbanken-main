@@ -33,7 +33,7 @@
 | BUG-019 | C4 | Cart checkout charges N items, provisions only first | ✅ FIXED | P1 | RC-4 False success | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `checkout/cart/route.ts`, `billing/webhooks/stripe/route.ts` | Multi-product provisioning loop from Stripe metadata |
 | BUG-020 | C4 | Seat assignment oversubscription race | ✅ FIXED | P1 | RC-3 TOCTOU race | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `billing/tenants/[tenantId]/seats/route.ts` | DD-RACE-1 resolved |
 | BUG-021 | C4 | Subscription update writes Stripe price ID into local-UUID field | VERIFIED (Codex) | P2 | RC-8 Lossy data mapping | Wave 3 | `billing/subscription/update/route.ts` | — |
-| BUG-022 | C5 | Legacy billing fallback bypasses seat enforcement | ⚠️ PARTIALLY REMEDIATED | P1 | RC-5 Legacy bypass | Wave 1 — NEEDS DECISION (DD-LEGACY-1) | `app/api/games/utils.ts` | userId guard + paused excluded; legacy admin/owner access still open pending migration decision |
+| BUG-022 | C5 | Legacy billing fallback bypasses seat enforcement | ✅ FIXED | P1 | RC-5 Legacy bypass | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `app/api/games/utils.ts` | DD-LEGACY-1 resolved: Option A — legacy fallback removed entirely |
 | BUG-023 | C5 | /billing/subscription/my shows wrong tenant for multi-tenant users | VERIFIED (Codex) | P1 | RC-2 Tenant drift | Wave 2 | `billing/subscription/my/route.ts` | — |
 | BUG-024 | C5 | valid_until vs valid_to field mismatch in subscription/my | VERIFIED (Codex) | P1 | RC-1 Schema drift | Wave 2 | `billing/subscription/my/route.ts` | Bundle w/ BUG-023 (same file) |
 | BUG-025 | C5 | Provisioning reports success without granting seat | ✅ FIXED/CLOSED | P1 | RC-4 False success | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `billing/webhooks/stripe/route.ts` | Split-brain fixed; partial failure stays paid for retry |
@@ -258,7 +258,7 @@
 | **BUG-006** | P1 | RC-2 | ✅ FIXED/CLOSED (2026-03-19) — Route param canonical for all 9 tenant-scoped pages |
 | **BUG-019** | P1 | RC-4 | ⚠️ NEEDS SECOND PASS (2026-03-18) — Multi-product loop works; partial-failure split-brain risk |
 | **BUG-020** | P1 | RC-3 | ✅ CLOSED (2026-03-19) — DD-RACE-1 resolved: atomic RPC `assign_seat_if_available()` with `FOR UPDATE` lock |
-| **BUG-022** | P1 | RC-5 | ⚠️ PARTIALLY REMEDIATED (2026-03-18) — Paused excluded; seat bypass + no-user guard still open |
+| **BUG-022** | P1 | RC-5 | ✅ CLOSED (2026-03-19) — DD-LEGACY-1 resolved: Option A — legacy fallback removed. Access via entitlements + seats only. |
 | **BUG-025** | P1 | RC-4 | ⚠️ NEEDS SECOND PASS (2026-03-18) — Seat assigned per product; partial-failure shared w/ BUG-019 |
 | ~~**BUG-027**~~ | P1 | RC-7 | ✅ CLOSED (2026-03-18) — Products intersected with allowedProductIds |
 | ~~**BUG-029**~~ | P1 | RC-7 | ✅ CLOSED (2026-03-18) — All create/update paths force draft; also covers BUG-031, BUG-034 |
@@ -335,5 +335,6 @@
 | ~~**DD-MFA-1**~~ | MFA-005 | ~~Trusted device: tenant-scoped or global?~~ ✅ **RESOLVED** (2026-03-19): Tenant-scoped. `tenantId` required param on verify. | ~~Wave 1: MFA-005~~ ✅ |
 | **DD-CART-1** | BUG-019 | Multi-product cart: one intent per item, or webhook loops over metadata? | Wave 1: BUG-019 |
 | ~~**DD-RACE-1**~~ | BUG-016, BUG-017, BUG-020 | ~~Atomic reservation pattern~~ ✅ **RESOLVED** (2026-03-19): `FOR UPDATE` lock + conditional INSERT via PL/pgSQL RPC. | ~~Wave 1: BUG-020~~ ✅; Wave 2: BUG-016, BUG-017 |
+| ~~**DD-LEGACY-1**~~ | BUG-022 | ~~Legacy billing fallback: retire, bridge, or accept?~~ ✅ **RESOLVED** (2026-03-19): Option A — hard cleanup. Legacy fallback removed. | ~~Wave 1: BUG-022~~ ✅ |
 | **DD-EDITOR-1** | BUG-007 | Should editors have tenant-admin mutation access? Or read-only? | Wave 2: BUG-007 |
 | **DD-NOTIF-1** | BUG-014 | Are granular notification categories still a product requirement? | Wave 3: BUG-014 |

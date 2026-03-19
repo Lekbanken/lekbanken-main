@@ -3,7 +3,7 @@
 > Created: 2026-03-19  
 > Author: Claude (analysis agent)  
 > Purpose: Unblock the three remaining Wave 1 strategic open items  
-> Created: 2026-03-19  \n> Author: Claude (analysis agent)  \n> Purpose: Unblock the three remaining Wave 1 strategic open items  \n> Status: **DD-MFA-1 ✅ IMPLEMENTED (2026-03-19), DD-RACE-1 ✅ IMPLEMENTED (2026-03-19), DD-LEGACY-1 awaiting decision**
+> Created: 2026-03-19  \n> Author: Claude (analysis agent)  \n> Purpose: Unblock the three remaining Wave 1 strategic open items  \n> Status: **ALL THREE RESOLVED + IMPLEMENTED (2026-03-19)**
 
 ---
 
@@ -15,7 +15,7 @@
 |----------|--------|----------|--------|
 | ~~DD-MFA-1~~ | ~~MFA-005~~ | ~~**P0**~~ | ✅ RESOLVED + IMPLEMENTED (2026-03-19) |
 | ~~DD-RACE-1~~ | ~~BUG-020~~ (+ Wave 2: BUG-016, BUG-017) | ~~**P1**~~ | ✅ RESOLVED + IMPLEMENTED (2026-03-19) |
-| DD-LEGACY-1 | BUG-022 | **P1** | Awaiting decision |
+| ~~DD-LEGACY-1~~ | ~~BUG-022~~ | ~~**P1**~~ | ✅ RESOLVED + IMPLEMENTED (2026-03-19) — Option A: legacy fallback removed |
 
 ---
 
@@ -311,12 +311,12 @@ Not an acute exploit, but a structural inconsistency that erodes the entitlement
 |----------|---------------|----------------------|-----------|
 | **DD-MFA-1** | Tenant-scoped ✅ | Small (2 files, ~10 lines) | No |
 | **DD-RACE-1** | Conditional INSERT via RPC | Small-medium (1 migration + 1 call-site) | Yes (new RPC) |
-| **DD-LEGACY-1** | Constrain + document (Option B) | Minimal (ADR comment + status update) | No |
+| ~~**DD-LEGACY-1**~~ | ~~Hard cleanup (Option A)~~ | ~~Remove legacy fallback + plan data migration~~ | ~~No (data migration Phase 2)~~ |
 
 ### Suggested execution order after approval
 
 1. **DD-MFA-1 → MFA-005** — P0, smallest fix, highest impact. Unblocks the last P0.
 2. **DD-RACE-1 → BUG-020** — P1, requires migration but well-defined pattern.
-3. **DD-LEGACY-1 → BUG-022** — P1, close as accepted risk with ADR.
+3. ~~**DD-LEGACY-1 → BUG-022**~~ — ✅ CLOSED. Option A: legacy fallback removed entirely. See `audits/bug-022-legacy-resolution.md`.
 
 After all three: Wave 1 would be **21 closed, 0 open.**

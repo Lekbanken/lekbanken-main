@@ -1,6 +1,6 @@
 # Post-Launch Remediation Waves
 
-> **Status:** WAVE 1 BATCH D COMPLETE — 20 closed, 1 needs decision (BUG-022/DD-LEGACY-1), 2 blocked (MFA-005/DD-MFA-1, BUG-020/DD-RACE-1) (2026-03-19)  
+> **Status:** WAVE 1 COMPLETE — 22 closed, 1 needs decision (BUG-022/DD-LEGACY-1) (2026-03-19)  
 > **Created:** 2026-03-18  
 > **Updated:** 2026-03-19  
 > **Source:** `audits/post-launch-cluster-triage.md`, `audits/wave1-extension-verification.md`  
@@ -121,38 +121,36 @@
 
 ---
 
-#### 1.7 BUG-020 — Seat oversubscription race ⏳ NEEDS MIGRATION
+#### 1.7 BUG-020 — Seat oversubscription race ✅ KLAR (2026-03-19)
 
 **File:** `app/api/billing/tenants/[tenantId]/seats/route.ts`  
 **Root cause:** RC-3 — `SELECT count` → compare → `INSERT` not atomic  
-**Fix:** Create Postgres RPC:
-```sql
-CREATE OR REPLACE FUNCTION assign_seat_if_available(
-  p_tenant_id uuid, p_user_id uuid, p_product_id uuid, p_max_seats int
-) RETURNS boolean AS $$
-  INSERT INTO seat_assignments (tenant_id, user_id, product_id)
-  SELECT p_tenant_id, p_user_id, p_product_id
-  WHERE (SELECT count(*) FROM seat_assignments
-         WHERE tenant_id = p_tenant_id AND product_id = p_product_id) < p_max_seats
-  RETURNING true;
-$$ LANGUAGE sql;
-```
-**Design decision:** DD-RACE-1 — confirm pattern (conditional INSERT vs advisory lock)  
-**Migration:** New RPC + call site change  
+**Fix:** Created Postgres RPC `assign_seat_if_available()` using `SELECT ... FOR UPDATE` on the subscription row + conditional INSERT. Route now calls RPC instead of count→check→insert.  
+**Migration:** `20260319012804_assign_seat_if_available.sql`  
+**Design decision:** DD-RACE-1 — RESOLVED: `FOR UPDATE` lock on subscription row + conditional INSERT (not advisory lock)  
 **Frontend impact:** None  
 **Regression test:** Concurrent seat assignment requests at limit → verify exactly N seats, not N+M
 
+**Noteringar:**
+- RPC uses `SECURITY DEFINER` to bypass RLS (admin-only action already gated by role check in route)
+- Subscription row locked with `FOR UPDATE` to serialize concurrent assignments
+- Error messages mapped from PG exceptions to user-friendly HTTP responses
+
 ---
 
-#### 1.8 MFA-005 — Cross-tenant MFA bypass ⏸ BLOCKED
+#### 1.8 MFA-005 — Cross-tenant MFA bypass ✅ KLAR (2026-03-19)
 
 **Files:** `lib/services/mfa/mfaDevices.server.ts`, `app/api/accounts/auth/mfa/devices/verify/route.ts`  
 **Root cause:** RC-2 — verify path queries `user_id` without `tenant_id`, returns device from any tenant  
-**Fix:** Add `tenant_id` filter to all verify + delete queries in `mfaDevices.server.ts`  
-**Blocker:** DD-MFA-1 — verify endpoint has no tenant context in the MFA challenge flow. Need to pass it through.  
-**Migration:** None (RLS policy already has `tenant_id` column but code doesn't use it)  
-**Frontend impact:** MFA challenge flow must supply tenant context  
+**Fix:** Added `tenantId: string` as required 4th parameter to `verifyTrustedDevice()`. Added `.eq('tenant_id', tenantId)` to the verify query. Route now reads tenant context from body `tenant_id` or active tenant cookie. Returns 400 if no tenant context available.  
+**Design decision:** DD-MFA-1 — RESOLVED: Tenant-scoped trust (cookie + explicit body param)  
+**Migration:** None (RLS policy already has `tenant_id` column)  
+**Frontend impact:** MFA challenge flow must supply tenant context (already available via cookie)  
 **Regression test:** User with devices in tenant A and B → verify from tenant A context → only tenant A device accepted
+
+**Noteringar:**
+- Tenant resolution order: explicit `tenant_id` in request body > `readTenantIdFromCookies()` > 400 error
+- No fallback to system-level UUID — verify always requires real tenant context
 
 ---
 

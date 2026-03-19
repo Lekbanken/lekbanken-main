@@ -16,7 +16,7 @@
 | MFA-002 | MFA | `.eq('is_active', true)` on non-existent column | VERIFIED | P1 | RC-1 Schema drift | Wave 2 | `mfa/users/route.ts` | Bundle w/ MFA-001, MFA-003 |
 | MFA-003 | MFA | Status filter after DB pagination | VERIFIED | P2 | Standalone logic bug | Wave 3 | `mfa/users/route.ts` | Bundle w/ MFA-001, MFA-002 |
 | MFA-004 | MFA | `user_mfa` update wrong fields + silent success | ✅ FIXED | **P0** | RC-1 Schema drift + RC-4 False success | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `mfa/reset/route.ts` | Bundle w/ MFA-005 (same file) |
-| MFA-005 | MFA | Cross-tenant MFA bypass (verify missing tenant_id) | VERIFIED | **P0** | RC-2 Tenant drift | **Wave 1** | `mfaDevices.server.ts`, `mfa/verify/route.ts`, `mfa/reset/route.ts` | Needs DD-MFA-1 |
+| MFA-005 | MFA | Cross-tenant MFA bypass (verify missing tenant_id) | ✅ FIXED | **P0** | RC-2 Tenant drift | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `mfaDevices.server.ts`, `mfa/verify/route.ts` | DD-MFA-1 resolved |
 | BUG-006 | C1 | Route-param / currentTenant desync in admin pages | ✅ FIXED/CLOSED | P1 | RC-2 Tenant drift | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `admin/tenant/[tenantId]/layout.tsx`, 9 pages | Route param canonical via use(params); context secondary |
 | BUG-007 | C1 | Editor role allowed into admin pages but blocked by mutations | VERIFIED (Codex) | P1 | RC-6 Bespoke auth drift | Wave 2 | `layout.tsx`, `tenantAuth.ts`, `tenant-achievements-admin.ts` | — |
 | BUG-008 | C1 | Achievement award hard-caps recipients to first 100 members | VERIFIED (Codex) | P1 | Standalone UX/correctness | Wave 3 | `tenant-achievements-admin.ts`, `TenantAwardModal.tsx` | — |
@@ -31,7 +31,7 @@
 | BUG-017 | C3 | No-expiry token quota enforcement is non-atomic + silent bypass | VERIFIED (Codex) | P1 | RC-3 TOCTOU race | Wave 2 | `lib/services/participants/session-service.ts` | RC-3 family fix |
 | BUG-018 | C4 | Stripe customer lookup inconsistent across billing routes | VERIFIED (Codex) | P1 | RC-8 Lossy data mapping | Wave 2 | `billing/portal/route.ts`, `billing/subscription/update/route.ts` | Centralize customer resolution |
 | BUG-019 | C4 | Cart checkout charges N items, provisions only first | ✅ FIXED | P1 | RC-4 False success | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `checkout/cart/route.ts`, `billing/webhooks/stripe/route.ts` | Multi-product provisioning loop from Stripe metadata |
-| BUG-020 | C4 | Seat assignment oversubscription race | VERIFIED | P1 | RC-3 TOCTOU race | **Wave 1** | `billing/tenants/[tenantId]/seats/route.ts` | RC-3 family fix |
+| BUG-020 | C4 | Seat assignment oversubscription race | ✅ FIXED | P1 | RC-3 TOCTOU race | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `billing/tenants/[tenantId]/seats/route.ts` | DD-RACE-1 resolved |
 | BUG-021 | C4 | Subscription update writes Stripe price ID into local-UUID field | VERIFIED (Codex) | P2 | RC-8 Lossy data mapping | Wave 3 | `billing/subscription/update/route.ts` | — |
 | BUG-022 | C5 | Legacy billing fallback bypasses seat enforcement | ⚠️ PARTIALLY REMEDIATED | P1 | RC-5 Legacy bypass | Wave 1 — NEEDS DECISION (DD-LEGACY-1) | `app/api/games/utils.ts` | userId guard + paused excluded; legacy admin/owner access still open pending migration decision |
 | BUG-023 | C5 | /billing/subscription/my shows wrong tenant for multi-tenant users | VERIFIED (Codex) | P1 | RC-2 Tenant drift | Wave 2 | `billing/subscription/my/route.ts` | — |
@@ -254,10 +254,10 @@
 | ID | Sev | Root Cause | Status |
 |----|-----|------------|--------|
 | ~~**MFA-004**~~ | P0 | RC-1 + RC-4 | ✅ CLOSED (2026-03-18) — Fixed column names, removed type cast, fail-hard on error |
-| **MFA-005** | P0 | RC-2 | ⏳ Blocked on DD-MFA-1 |
+| **MFA-005** | P0 | RC-2 | ✅ CLOSED (2026-03-19) — DD-MFA-1 resolved: tenant-scoped trust. `tenantId` added to `verifyTrustedDevice()`, verify route reads from cookie/body |
 | **BUG-006** | P1 | RC-2 | ✅ FIXED/CLOSED (2026-03-19) — Route param canonical for all 9 tenant-scoped pages |
 | **BUG-019** | P1 | RC-4 | ⚠️ NEEDS SECOND PASS (2026-03-18) — Multi-product loop works; partial-failure split-brain risk |
-| **BUG-020** | P1 | RC-3 | ⏳ Needs migration (RPC) — blocked on DD-RACE-1 |
+| **BUG-020** | P1 | RC-3 | ✅ CLOSED (2026-03-19) — DD-RACE-1 resolved: atomic RPC `assign_seat_if_available()` with `FOR UPDATE` lock |
 | **BUG-022** | P1 | RC-5 | ⚠️ PARTIALLY REMEDIATED (2026-03-18) — Paused excluded; seat bypass + no-user guard still open |
 | **BUG-025** | P1 | RC-4 | ⚠️ NEEDS SECOND PASS (2026-03-18) — Seat assigned per product; partial-failure shared w/ BUG-019 |
 | ~~**BUG-027**~~ | P1 | RC-7 | ✅ CLOSED (2026-03-18) — Products intersected with allowedProductIds |
@@ -332,8 +332,8 @@
 
 | DD | Finding(s) | Question | Blocking |
 |----|-----------|----------|----------|
-| **DD-MFA-1** | MFA-005 | Trusted device: tenant-scoped or global? (Proposal: tenant-scoped — see `implementation/mfa-trusted-device-remediation.md` §2) | Wave 1: MFA-005 only |
+| ~~**DD-MFA-1**~~ | MFA-005 | ~~Trusted device: tenant-scoped or global?~~ ✅ **RESOLVED** (2026-03-19): Tenant-scoped. `tenantId` required param on verify. | ~~Wave 1: MFA-005~~ ✅ |
 | **DD-CART-1** | BUG-019 | Multi-product cart: one intent per item, or webhook loops over metadata? | Wave 1: BUG-019 |
-| **DD-RACE-1** | BUG-016, BUG-017, BUG-020 | Atomic reservation pattern: DB RPC? Conditional INSERT + FOR UPDATE? Advisory lock? | Wave 1: BUG-020; Wave 2: BUG-016, BUG-017 |
+| ~~**DD-RACE-1**~~ | BUG-016, BUG-017, BUG-020 | ~~Atomic reservation pattern~~ ✅ **RESOLVED** (2026-03-19): `FOR UPDATE` lock + conditional INSERT via PL/pgSQL RPC. | ~~Wave 1: BUG-020~~ ✅; Wave 2: BUG-016, BUG-017 |
 | **DD-EDITOR-1** | BUG-007 | Should editors have tenant-admin mutation access? Or read-only? | Wave 2: BUG-007 |
 | **DD-NOTIF-1** | BUG-014 | Are granular notification categories still a product requirement? | Wave 3: BUG-014 |

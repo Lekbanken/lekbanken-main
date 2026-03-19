@@ -3,19 +3,19 @@
 > Created: 2026-03-19  
 > Author: Claude (analysis agent)  
 > Purpose: Unblock the three remaining Wave 1 strategic open items  
-> Status: **RECOMMENDATION ONLY — awaiting approval before implementation**
+> Created: 2026-03-19  \n> Author: Claude (analysis agent)  \n> Purpose: Unblock the three remaining Wave 1 strategic open items  \n> Status: **DD-MFA-1 ✅ IMPLEMENTED (2026-03-19), DD-RACE-1 ✅ IMPLEMENTED (2026-03-19), DD-LEGACY-1 awaiting decision**
 
 ---
 
 ## Wave 1 Context
 
-18 bugs closed. 3 items remain, each blocked by an unresolved design decision:
+22 bugs closed. 1 item remains, blocked by an unresolved design decision:
 
-| Decision | Blocks | Severity | Nature |
+| Decision | Blocks | Severity | Status |
 |----------|--------|----------|--------|
-| DD-MFA-1 | MFA-005 | **P0** | Tenant scope for trusted device verification |
-| DD-RACE-1 | BUG-020 (+ Wave 2: BUG-016, BUG-017) | **P1** | Atomic reservation pattern choice |
-| DD-LEGACY-1 | BUG-022 | **P1** | Legacy billing fallback strategy |
+| ~~DD-MFA-1~~ | ~~MFA-005~~ | ~~**P0**~~ | ✅ RESOLVED + IMPLEMENTED (2026-03-19) |
+| ~~DD-RACE-1~~ | ~~BUG-020~~ (+ Wave 2: BUG-016, BUG-017) | ~~**P1**~~ | ✅ RESOLVED + IMPLEMENTED (2026-03-19) |
+| DD-LEGACY-1 | BUG-022 | **P1** | Awaiting decision |
 
 ---
 

@@ -10,6 +10,12 @@
 
 The app-zone shell has **one clean canonical chain** — this is good. However, there are **4 orphaned components** and **1 dead duplicate** that create confusion and risk for AI agents and humans alike. The notifications surface is **structurally sound**: bell and page share the same hook and data flow. The core hypothesis of "two parallel component families" is **partially confirmed**: a dead `bottom-nav.tsx` duplicate exists, but it is not causing runtime bugs. The real notification issues are hook/state-level, not structural.
 
+### Update 2026-03-19: Notifications V2 Batch 1 Stabilized
+
+**DB layer consolidated.** Atomic write pipeline (`create_notification_v1`), delivery-based admin history (`get_notification_history_v1`), tightened RLS, and scoped `event_key` idempotency are all live and tested.
+
+**New discovery:** pg_cron IS active in production (previously documented as "unverified"). `process_scheduled_notifications()` runs daily at 02:00 UTC. It uses legacy fanout (`auth.users` instead of `public.users`, no demo exclusion). **Batch 2 spec written:** see `app-shell-notifications-batch2-spec.md`.
+
 ---
 
 ## 2. Runtime Component Chain (Verified)

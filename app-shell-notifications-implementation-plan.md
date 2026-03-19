@@ -158,6 +158,17 @@ These are state/logic issues in `hooks/useAppNotifications.ts`, not structural:
 2. ✅ Milestone 1: Delete 4 dead files — KLAR (2026-03-16)
 3. Milestone 2: No action now (monitoring only)
 4. ✅ Milestone 3: Notification shared-store verified 7/7 — KLAR (2026-03-16)
+5. ✅ Milestone 4 (Batch 1): Atomic write pipeline — KLAR (2026-03-19)
+   - `create_notification_v1()` — atomic master+delivery creation
+   - `get_notification_history_v1()` — admin history from deliveries
+   - Tightened RLS (delivery INSERT restricted to system_admin)
+   - Hotfix migration for `uuid` type + scoped `event_key` indexes
+   - Migrations: `20260320000000`, `20260320100000`
+6. Milestone 5 (Batch 2): Scheduled path consolidation — **SPEC READY**
+   - See `app-shell-notifications-batch2-spec.md`
+   - Fix `process_scheduled_notifications()` recipient source + demo exclusion
+   - pg_cron confirmed active (jobid=3, daily 02:00 UTC)
+7. **Manual browser E2E verification** — PENDING (user action required)
 
 ---
 

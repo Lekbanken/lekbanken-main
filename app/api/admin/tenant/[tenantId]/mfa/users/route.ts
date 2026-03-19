@@ -11,20 +11,20 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 interface MFAUserRow {
   user_id: string;
   role: string;
-  profiles: {
+  users: {
     email: string;
-    display_name: string | null;
+    full_name: string | null;
   }[] | {
     email: string;
-    display_name: string | null;
+    full_name: string | null;
   } | null;
 }
 
 // Helper to extract first profile from joined data
-function getProfile(profiles: MFAUserRow['profiles']): { email: string; display_name: string | null } | null {
-  if (!profiles) return null;
-  if (Array.isArray(profiles)) return profiles[0] || null;
-  return profiles;
+function getProfile(users: MFAUserRow['users']): { email: string; full_name: string | null } | null {
+  if (!users) return null;
+  if (Array.isArray(users)) return users[0] || null;
+  return users;
 }
 
 /**
@@ -65,20 +65,20 @@ export const GET = apiHandler({
       .eq('tenant_id', tenantId)
       .maybeSingle();
 
-    // Build base query
+    // MFA-001: Join users table (not profiles — that relation doesn't exist)
     let query = db
       .from('user_tenant_memberships')
       .select(`
         user_id,
         role,
-        profiles!inner(email, display_name)
+        users!inner(email, full_name)
       `, { count: 'exact' })
       .eq('tenant_id', tenantId);
 
     // Apply search filter
     if (search) {
       // Search by email or display_name
-      query = query.or(`profiles.email.ilike.%${search}%,profiles.display_name.ilike.%${search}%`);
+      query = query.or(`users.email.ilike.%${search}%,users.full_name.ilike.%${search}%`);
     }
 
     // Get all matching members first (for MFA status joining)
@@ -111,12 +111,12 @@ export const GET = apiHandler({
       .select('user_id, enrolled_at, grace_period_end')
       .in('user_id', userIds);
 
-    // Get trusted devices count
+    // MFA-002: Column is is_revoked (not is_active)
     const { data: trustedDevices } = await db
       .from('mfa_trusted_devices')
       .select('user_id')
       .in('user_id', userIds)
-      .eq('is_active', true)
+      .eq('is_revoked', false)
       .gt('expires_at', new Date().toISOString());
 
     // Count trusted devices per user
@@ -168,11 +168,11 @@ export const GET = apiHandler({
         mfa_status = 'disabled';
       }
 
-      const profile = getProfile(member.profiles);
+      const profile = getProfile(member.users);
       return {
         user_id: member.user_id,
         email: profile?.email ?? '',
-        display_name: profile?.display_name ?? null,
+        display_name: profile?.full_name ?? null,
         role: member.role,
         mfa_status,
         enrolled_at: mfa?.enrolled_at ?? null,

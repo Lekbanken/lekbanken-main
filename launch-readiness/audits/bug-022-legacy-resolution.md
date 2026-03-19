@@ -257,20 +257,21 @@ This is a direct consequence of DD-LEGACY-1. The fix is the Phase 2 data migrati
 
 This is a **separate design issue** that existed before DD-LEGACY-1. The current architecture assumes every tenant has at least one product entitlement. Tenants with zero entitlements see zero games — even games with `product_id IS NULL` (free) or `owner_tenant_id IS NULL` (global).
 
-Five routes implement an early-return guard:
-- `app/api/games/featured/route.ts` — line 32
-- `app/api/games/search/route.ts` — line 162
-- `app/api/games/[gameId]/route.ts` — line 32
-- `app/api/games/[gameId]/related/route.ts` — line 79
-- `app/api/browse/filters/route.ts` — line 145
+**Status:** ✅ **RESOLVED (2026-03-19)** — Product owner chose Option 1: free games always visible.
 
-Each returns empty results when `allowedProductIds.length === 0`, without querying for free/global games.
+**Design invariant (DD-FREE-GAMES-1):**
+- `product_id IS NULL` = free/global visibility path — always accessible
+- Entitlement gating applies only when `product_id IS NOT NULL`
+- No tenant should need an entitlement just to see free/global games
 
-**The fix:** These guards should allow through queries for `product_id IS NULL` games even when `allowedProductIds` is empty. This is a code change (not a data migration) that belongs in **Wave 2**.
+**Implementation:** Removed early-return guards in 5 routes. Changed product filters from strict `IN(allowedProductIds)` to `product_id IS NULL OR product_id IN(allowedProductIds)`. When a tenant has zero entitlements, queries return only `product_id IS NULL` games instead of nothing.
 
-**Recommendation:**
-- Problem A → resolve with Phase 2 data migration (pre-deploy)
-- Problem B → **Wave 2 item** (requires design decision: what's the free-game visibility model?)
+Routes changed:
+- `app/api/games/featured/route.ts`
+- `app/api/games/search/route.ts`
+- `app/api/games/[gameId]/route.ts`
+- `app/api/games/[gameId]/related/route.ts`
+- `app/api/browse/filters/route.ts`
 
 ### 8.4 Wave 1 closure statement
 
@@ -286,4 +287,4 @@ The DD-LEGACY-1 code change (removing the legacy billing fallback) may affect te
 2. **If count > 0:** Run the Phase 2 migration (§6) to provision entitlements before or alongside the deploy
 3. **If count = 0:** Safe to deploy — all tenants already have canonical entitlements
 
-BUG-026 Problem B (free/global game visibility for zero-entitlement tenants) is a separate Wave 2 item that requires a design decision on the free-game model.
+BUG-026 Problem B (free/global game visibility) is now resolved — see §8.3 above.

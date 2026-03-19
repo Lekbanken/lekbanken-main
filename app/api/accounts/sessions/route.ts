@@ -6,9 +6,10 @@ export const GET = apiHandler({
   auth: 'user',
   handler: async ({ auth }) => {
     const supabase = await createServerRlsClient()
+    // BUG-010: Select only columns that exist on user_sessions
     const { data, error } = await supabase
       .from('user_sessions')
-      .select('id, user_id, device_name, browser, os, last_seen_at, created_at')
+      .select('id, user_id, user_agent, ip, last_login_at, last_seen_at, device_id')
       .eq('user_id', auth!.user!.id)
       .order('last_seen_at', { ascending: false })
 

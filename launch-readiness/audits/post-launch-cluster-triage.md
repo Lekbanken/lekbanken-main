@@ -12,8 +12,8 @@
 
 | ID | Cluster | Title | Verdict | Sev | Root-Cause Family | Action | Shared file(s) | Shared remediation |
 |----|---------|-------|---------|-----|-------------------|--------|----------------|-------------------|
-| MFA-001 | MFA | `profiles!inner` join on non-existent relation | VERIFIED | P1 | RC-1 Schema drift | Wave 2 | `mfa/users/route.ts` | Bundle w/ MFA-002, MFA-003 |
-| MFA-002 | MFA | `.eq('is_active', true)` on non-existent column | VERIFIED | P1 | RC-1 Schema drift | Wave 2 | `mfa/users/route.ts` | Bundle w/ MFA-001, MFA-003 |
+| MFA-001 | MFA | `profiles!inner` join on non-existent relation | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `mfa/users/route.ts` | Fixed: profiles→users join, display_name→full_name |
+| MFA-002 | MFA | `.eq('is_active', true)` on non-existent column | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `mfa/users/route.ts` | Fixed: is_active→is_revoked (negated) |
 | MFA-003 | MFA | Status filter after DB pagination | VERIFIED | P2 | Standalone logic bug | Wave 3 | `mfa/users/route.ts` | Bundle w/ MFA-001, MFA-002 |
 | MFA-004 | MFA | `user_mfa` update wrong fields + silent success | ✅ FIXED | **P0** | RC-1 Schema drift + RC-4 False success | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `mfa/reset/route.ts` | Bundle w/ MFA-005 (same file) |
 | MFA-005 | MFA | Cross-tenant MFA bypass (verify missing tenant_id) | ✅ FIXED | **P0** | RC-2 Tenant drift | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `mfaDevices.server.ts`, `mfa/verify/route.ts` | DD-MFA-1 resolved |
@@ -21,8 +21,8 @@
 | BUG-007 | C1 | Editor role allowed into admin pages but blocked by mutations | VERIFIED (Codex) | P1 | RC-6 Bespoke auth drift | Wave 2 | `layout.tsx`, `tenantAuth.ts`, `tenant-achievements-admin.ts` | — |
 | BUG-008 | C1 | Achievement award hard-caps recipients to first 100 members | VERIFIED (Codex) | P1 | Standalone UX/correctness | Wave 3 | `tenant-achievements-admin.ts`, `TenantAwardModal.tsx` | — |
 | BUG-009 | C1 | Members page Retry deadlocks into loading state | VERIFIED (Codex) | P2 | Standalone UX bug | Wave 3 | `members/page.tsx` | — |
-| BUG-010 | C2 | Sessions list selects non-existent columns | VERIFIED (Codex) | P1 | RC-1 Schema drift | Wave 2 | `accounts/sessions/route.ts` | Bundle w/ BUG-011 |
-| BUG-011 | C2 | Devices list selects non-existent columns | VERIFIED (Codex) | P1 | RC-1 Schema drift | Wave 2 | `accounts/devices/route.ts` | Bundle w/ BUG-010 |
+| BUG-010 | C2 | Sessions list selects non-existent columns | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/sessions/route.ts` | Fixed: select correct columns from user_sessions |
+| BUG-011 | C2 | Devices list selects non-existent columns | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/devices/route.ts` | Fixed: select correct columns from user_devices |
 | BUG-012 | C2 | Profile update partial commit (no rollback) | VERIFIED (Codex) | P1 | RC-4 False success | Wave 2 | `accounts/profile/route.ts` | — |
 | BUG-013 | C2 | Session revoke reports success even when auth revocation fails | VERIFIED (Codex) | P1 | RC-4 False success | Wave 2 | `accounts/sessions/revoke/route.ts` | — |
 | BUG-014 | C2 | Notification settings destroys granular preferences | VERIFIED (Codex) | P1 | RC-8 Lossy data mapping | Wave 3 | `accounts/profile/notifications/route.ts` | — |
@@ -34,17 +34,17 @@
 | BUG-020 | C4 | Seat assignment oversubscription race | ✅ FIXED | P1 | RC-3 TOCTOU race | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `billing/tenants/[tenantId]/seats/route.ts` | DD-RACE-1 resolved |
 | BUG-021 | C4 | Subscription update writes Stripe price ID into local-UUID field | VERIFIED (Codex) | P2 | RC-8 Lossy data mapping | Wave 3 | `billing/subscription/update/route.ts` | — |
 | BUG-022 | C5 | Legacy billing fallback bypasses seat enforcement | ✅ FIXED | P1 | RC-5 Legacy bypass | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `app/api/games/utils.ts` | DD-LEGACY-1 resolved: Option A — legacy fallback removed entirely |
-| BUG-023 | C5 | /billing/subscription/my shows wrong tenant for multi-tenant users | VERIFIED (Codex) | P1 | RC-2 Tenant drift | Wave 2 | `billing/subscription/my/route.ts` | — |
-| BUG-024 | C5 | valid_until vs valid_to field mismatch in subscription/my | VERIFIED (Codex) | P1 | RC-1 Schema drift | Wave 2 | `billing/subscription/my/route.ts` | Bundle w/ BUG-023 (same file) |
+| BUG-023 | C5 | /billing/subscription/my shows wrong tenant for multi-tenant users | ✅ FIXED | P1 | RC-2 Tenant drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `billing/subscription/my/route.ts` | Fixed: prefer is_primary tenant |
+| BUG-024 | C5 | valid_until vs valid_to field mismatch in subscription/my | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `billing/subscription/my/route.ts` | Fixed: valid_until → valid_to |
 | BUG-025 | C5 | Provisioning reports success without granting seat | ✅ FIXED/CLOSED | P1 | RC-4 False success | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `billing/webhooks/stripe/route.ts` | Split-brain fixed; partial failure stays paid for retry |
-| BUG-026 | C6 | Tenant with no products = all games hidden (including free/global) | VERIFIED (Codex) | P1 | RC-5 Legacy bypass | Wave 2 | `games/utils.ts`, `games/search/route.ts`, `games/featured/route.ts` | **Classified (2026-03-19):** Rollout risk (Problem A — mitigated by Phase 2 data migration) + Wave 2 design item (Problem B — free/global game visibility). See `bug-022-legacy-resolution.md` §8.3 |
+| BUG-026 | C6 | Tenant with no products = all games hidden (including free/global) | ✅ FIXED | P1 | RC-5 Legacy bypass | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `games/featured/route.ts`, `games/search/route.ts`, `games/[gameId]/route.ts`, `games/[gameId]/related/route.ts`, `browse/filters/route.ts` | DD-FREE-GAMES-1: product_id IS NULL always visible |
 | BUG-027 | C6 | Caller products replace rather than intersect allowed set | ✅ FIXED | P1 | RC-7 AuthZ bypass | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `games/search/route.ts` | Products intersected with allowedProductIds |
 | BUG-028 | C6 | Publish auth checks wrong role source (app_metadata.role) | VERIFIED (Codex) | P1 | RC-6 Bespoke auth drift | Wave 2 | `games/[gameId]/publish/route.ts` | — |
 | BUG-029 | C6 | Game creation can bypass publish validation via status: 'published' | ✅ FIXED | P1 | RC-7 AuthZ bypass | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `games/route.ts`, `builder/route.ts`, `builder/[id]/route.ts`, `csv-import/route.ts` | All create/update paths force draft; only /publish can set published |
 | BUG-030 | C7 | Builder read auth too lax — exposes unpublished games | CODEX-REPORTED | P1 | RC-7 AuthZ bypass | Wave 2 | `games/builder/route.ts`, `games/builder/[id]/route.ts` | — |
 | BUG-031 | C7 | Builder create can set status: 'published' bypassing validation | ✅ FIXED | P1 | RC-7 AuthZ bypass | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `games/builder/route.ts` | Fixed as part of BUG-029 family |
 | BUG-032 | C7 | Builder save non-transactional — partial failure state | CODEX-REPORTED | P1 | RC-4 False success | Wave 2 | `games/builder/[id]/route.ts` | — |
-| BUG-033 | C7 | CSV import allows cross-tenant owner_tenant_id injection | CODEX-REPORTED | P1 | RC-2 Tenant drift | Wave 2 | `games/csv-import/route.ts` | — |
+| BUG-033 | C7 | CSV import allows cross-tenant owner_tenant_id injection | ✅ FIXED | P1 | RC-2 Tenant drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `games/csv-import/route.ts` | Fixed: force owner_tenant_id to authenticated context |
 | BUG-034 | C7 | CSV import preserves arbitrary status from CSV data | ✅ FIXED | P1 | RC-7 AuthZ bypass | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `games/csv-import/route.ts` | Fixed as part of BUG-029 family |
 | BUG-035 | C8 | Invitation email not verified before granting membership | ✅ FIXED | P1 | RC-6 Bespoke auth drift | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `invitations/[token]/accept/route.ts` | Case-insensitive email check + audit log on mismatch |
 | BUG-036 | C8 | Invite accept overwrites existing membership role | CODEX-REPORTED | P1 | RC-8 Lossy data mapping | Wave 2 | `invitations/accept/route.ts` | Bundle w/ BUG-035 (same file) |

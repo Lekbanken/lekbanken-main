@@ -568,7 +568,9 @@ export const POST = apiHandler({
           leader_tips: normalizedGame.leader_tips,
           main_purpose_id: normalizedGame.main_purpose_id,
           product_id: normalizedGame.product_id,
-          owner_tenant_id: normalizedGame.owner_tenant_id,
+          // BUG-033: Force owner_tenant_id to the authenticated tenant context.
+          // Never accept owner_tenant_id from untrusted import data.
+          owner_tenant_id: tenant_id || null,
         };
 
         let gameId: string;

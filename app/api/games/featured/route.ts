@@ -29,10 +29,6 @@ export const GET = apiHandler({
   const { tenantId = null, limit } = parsed.data
   const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId, user?.id ?? null)
 
-  if (tenantId && allowedProductIds.length === 0) {
-    return NextResponse.json({ games: [], metadata: { allowedProducts: allowedProductIds } })
-  }
-
   let query = supabase
     .from('games')
     .select(
@@ -52,8 +48,13 @@ export const GET = apiHandler({
     query = query.is('owner_tenant_id', null)
   }
 
+  // BUG-026(B): Free games (product_id IS NULL) are always visible.
+  // Entitlement gating applies only to games with a product_id.
   if (allowedProductIds.length > 0) {
-    query = query.in('product_id', allowedProductIds)
+    query = query.or(`product_id.is.null,product_id.in.(${allowedProductIds.join(',')})`)
+  } else if (tenantId) {
+    // Tenant has no entitlements — show only free games
+    query = query.is('product_id', null)
   }
 
   const { data, error } = await query

@@ -142,19 +142,6 @@ export const GET = apiHandler({
 
   const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId, userId)
 
-  if (tenantId && allowedProductIds.length === 0) {
-    const emptyCoverage: FilterCoverage = { hasRoles: 0, hasArtifacts: 0, hasPhases: 0, hasMaterials: 0, hasAgeRange: 0 }
-    const payload: CachedFilters = { 
-      products: [], 
-      purposes: [], 
-      subPurposes: [], 
-      coverage: emptyCoverage,
-      metadata: { allowedProducts: allowedProductIds } 
-    }
-    setCachedFilters(cacheId, payload)
-    return NextResponse.json(payload)
-  }
-
   // STRATEGY: Extract filter options from the games the user can actually access
   // This ensures filters always correlate with available content
   // IMPORTANT: Must mirror the same access logic as /api/games/search
@@ -191,9 +178,13 @@ export const GET = apiHandler({
     gamesQuery = gamesQuery.is('owner_tenant_id', null)
   }
   
-  // Apply product filter if user has specific entitlements
+  // BUG-026(B): Free games (product_id IS NULL) are always visible.
+  // Entitlement gating applies only to games with a product_id.
   if (allowedProductIds.length > 0) {
-    gamesQuery = gamesQuery.in('product_id', allowedProductIds)
+    gamesQuery = gamesQuery.or(`product_id.is.null,product_id.in.(${allowedProductIds.join(',')})`)
+  } else if (tenantId) {
+    // Tenant has no entitlements — show only free games
+    gamesQuery = gamesQuery.is('product_id', null)
   }
   
   const { data: accessibleGames, error: gamesErr } = await gamesQuery

@@ -76,11 +76,11 @@ export const GET = apiHandler({
 
   const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId, user?.id ?? null)
 
-  if (tenantId && allowedProductIds.length === 0) {
-    return NextResponse.json({ games: [], metadata: { allowedProducts: allowedProductIds } })
+  // BUG-026(B): Free games (product_id IS NULL) are always visible.
+  if (baseGame.product_id && allowedProductIds.length > 0 && !allowedProductIds.includes(baseGame.product_id)) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
-
-  if (allowedProductIds.length > 0 && baseGame.product_id && !allowedProductIds.includes(baseGame.product_id)) {
+  if (baseGame.product_id && allowedProductIds.length === 0 && tenantId) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
@@ -111,7 +111,9 @@ export const GET = apiHandler({
   }
 
   if (allowedProductIds.length > 0) {
-    query = query.in('product_id', allowedProductIds)
+    query = query.or(`product_id.is.null,product_id.in.(${allowedProductIds.join(',')})`)
+  } else if (tenantId) {
+    query = query.is('product_id', null)
   }
 
   const orFilters: string[] = []

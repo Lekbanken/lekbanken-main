@@ -16,12 +16,13 @@ export async function GET() {
   }
 
   try {
-    // Get user's active tenant membership
+    // BUG-023: Use primary tenant, not most-recently-joined
     const { data: memberships } = await supabaseAdmin
       .from('user_tenant_memberships')
       .select(`
         tenant_id,
         role,
+        is_primary,
         tenant:tenants(
           id,
           name,
@@ -31,6 +32,7 @@ export async function GET() {
       `)
       .eq('user_id', user.id)
       .eq('status', 'active')
+      .order('is_primary', { ascending: false })
       .order('created_at', { ascending: false })
 
     if (!memberships || memberships.length === 0) {
@@ -42,8 +44,8 @@ export async function GET() {
       })
     }
 
-    // Use first (most recent) active tenant
-    const membership = memberships[0]
+    // BUG-023: Prefer the primary tenant; fall back to first active
+    const membership = memberships.find(m => m.is_primary) ?? memberships[0]
     const tenantId = membership.tenant_id
     const tenant = membership.tenant as { id: string; name: string; type: string; metadata: Record<string, unknown> } | null
 
@@ -55,7 +57,7 @@ export async function GET() {
         status,
         quantity_seats,
         valid_from,
-        valid_until,
+        valid_to,
         metadata,
         product:products(
           id,

@@ -159,9 +159,6 @@ export const POST = apiHandler({
   }
 
   const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId, user?.id ?? null)
-  if (tenantId && allowedProductIds.length === 0 && !isElevated) {
-    return NextResponse.json({ games: [], total: 0, page, pageSize, hasMore: false, metadata: { allowedProducts: allowedProductIds } })
-  }
 
   // BUG-027: Caller products must intersect with allowed set, not replace it
   const effectiveProductFilter = (products.length
@@ -230,8 +227,13 @@ export const POST = apiHandler({
     // if elevated and no tenantId provided: no owner filter => all games
   }
 
+  // BUG-026(B): Free games (product_id IS NULL) are always visible.
+  // Entitlement gating applies only to games with a product_id.
   if (effectiveProductFilter.length > 0) {
-    query = query.in('product_id', effectiveProductFilter)
+    query = query.or(`product_id.is.null,product_id.in.(${effectiveProductFilter.join(',')})`)
+  } else if (tenantId && !isElevated) {
+    // Tenant has no entitlements — show only free games
+    query = query.is('product_id', null)
   }
 
   if (subPurposeGameIds.length > 0) {

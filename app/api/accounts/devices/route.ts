@@ -15,9 +15,10 @@ export const GET = apiHandler({
     const supabase = await createServerRlsClient()
     const userId = auth!.user!.id
 
+    // BUG-011: Select only columns that exist on user_devices
     const { data, error } = await supabase
       .from('user_devices')
-      .select('id, user_id, device_name, browser, os, last_seen_at, trusted, created_at')
+      .select('id, user_id, device_fingerprint, device_type, user_agent, first_seen_at, last_seen_at, metadata')
       .eq('user_id', userId)
       .order('last_seen_at', { ascending: false })
 

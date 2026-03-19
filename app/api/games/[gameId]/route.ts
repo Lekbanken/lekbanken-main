@@ -29,9 +29,6 @@ export const GET = apiHandler({
   const activeTenantId = isSystemAdmin ? null : await readTenantIdFromCookies(cookieStore)
 
   const { allowedProductIds } = await getAllowedProductIds(supabase, activeTenantId || null, user?.id ?? null)
-  if (activeTenantId && allowedProductIds.length === 0 && !isElevated) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  }
 
   let query = supabase
     .from('games')
@@ -61,7 +58,11 @@ export const GET = apiHandler({
     if (activeTenantId) {
       const ownsGame = data.owner_tenant_id === activeTenantId || data.owner_tenant_id === null
       if (!ownsGame) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-      if (allowedProductIds.length > 0 && data.product_id && !allowedProductIds.includes(data.product_id)) {
+      // BUG-026(B): Free games (product_id IS NULL) are always visible.
+      if (data.product_id && allowedProductIds.length > 0 && !allowedProductIds.includes(data.product_id)) {
+        return NextResponse.json({ error: 'Not found' }, { status: 404 })
+      }
+      if (data.product_id && allowedProductIds.length === 0) {
         return NextResponse.json({ error: 'Not found' }, { status: 404 })
       }
     } else {

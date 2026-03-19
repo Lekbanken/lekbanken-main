@@ -26,7 +26,7 @@ CREATE OR REPLACE FUNCTION public.create_notification_v1(
   p_action_url    text    DEFAULT NULL,
   p_action_label  text    DEFAULT NULL,
   p_event_key     text    DEFAULT NULL,
-  p_related_entity_id   text DEFAULT NULL,
+  p_related_entity_id   uuid DEFAULT NULL,
   p_related_entity_type text DEFAULT NULL,
   p_created_by    uuid    DEFAULT NULL,
   p_exclude_demo  boolean DEFAULT true
@@ -227,3 +227,13 @@ GRANT EXECUTE ON FUNCTION public.get_unread_notification_count TO authenticated;
 GRANT EXECUTE ON FUNCTION public.mark_notification_read TO authenticated;
 GRANT EXECUTE ON FUNCTION public.mark_all_notifications_read TO authenticated;
 GRANT EXECUTE ON FUNCTION public.dismiss_notification TO authenticated;
+
+
+-- ---------------------------------------------------------------------------
+-- 5. Scope-based event_key uniqueness for V2 notifications
+--    The old index is (user_id, event_key) which doesn't fire when user_id IS NULL.
+--    V2 master rows use scope-based delivery (no user_id on notifications table).
+-- ---------------------------------------------------------------------------
+CREATE UNIQUE INDEX IF NOT EXISTS notifications_event_key_scope_unique_idx
+  ON public.notifications (event_key)
+  WHERE event_key IS NOT NULL AND user_id IS NULL;

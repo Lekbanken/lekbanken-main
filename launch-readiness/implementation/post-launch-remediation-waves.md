@@ -373,7 +373,7 @@ After all Wave 1 fixes:
 | BUG-026 | `games/utils.ts` | Free games bypass entitlement check |
 | BUG-018 | `billing/portal/route.ts` etc. | Centralize Stripe customer resolution |
 
-**Strategy:** BUG-026 bundles with BUG-022 (same file, probably same PR from Wave 1).
+**Strategy:** ~~BUG-026 bundles with BUG-022 (same file, probably same PR from Wave 1).~~ **Updated (2026-03-19):** BUG-022 is resolved (DD-LEGACY-1 Option A). BUG-026 remains as two sub-problems: (A) rollout risk — mitigated by Phase 2 data migration, (B) free/global game visibility — requires early-return guard changes in 5 route files. See `bug-022-legacy-resolution.md` §8.3.
 
 ### Wave 2 Regression Plan
 
@@ -412,7 +412,7 @@ DD-RACE-1  ──informs──▶  BUG-020 (Wave 1), BUG-016 + BUG-017 (Wave 2)
 DD-EDITOR-1──blocks──▶  BUG-007 (Wave 2)
 DD-NOTIF-1 ──blocks──▶  BUG-014 (Wave 3)
 
-BUG-022 (Wave 1) + BUG-026 (Wave 2) ── same file, prefer bundling
+BUG-022 (Wave 1) ✅ CLOSED + BUG-026 (Wave 2) ── BUG-026 now independent (5 route files, not utils.ts)
 BUG-019 (Wave 1) + BUG-025 (Wave 1) ── same webhook, must bundle
 BUG-023 + BUG-024 (Wave 2) ── same file, must bundle
 ```

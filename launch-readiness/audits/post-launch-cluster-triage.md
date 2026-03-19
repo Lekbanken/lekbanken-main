@@ -37,7 +37,7 @@
 | BUG-023 | C5 | /billing/subscription/my shows wrong tenant for multi-tenant users | VERIFIED (Codex) | P1 | RC-2 Tenant drift | Wave 2 | `billing/subscription/my/route.ts` | — |
 | BUG-024 | C5 | valid_until vs valid_to field mismatch in subscription/my | VERIFIED (Codex) | P1 | RC-1 Schema drift | Wave 2 | `billing/subscription/my/route.ts` | Bundle w/ BUG-023 (same file) |
 | BUG-025 | C5 | Provisioning reports success without granting seat | ✅ FIXED/CLOSED | P1 | RC-4 False success | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `billing/webhooks/stripe/route.ts` | Split-brain fixed; partial failure stays paid for retry |
-| BUG-026 | C6 | Tenant with no products = all games hidden (including free/global) | VERIFIED (Codex) | P1 | RC-5 Legacy bypass | Wave 2 | `games/utils.ts`, `games/search/route.ts`, `games/featured/route.ts` | Bundle w/ BUG-022 |
+| BUG-026 | C6 | Tenant with no products = all games hidden (including free/global) | VERIFIED (Codex) | P1 | RC-5 Legacy bypass | Wave 2 | `games/utils.ts`, `games/search/route.ts`, `games/featured/route.ts` | **Classified (2026-03-19):** Rollout risk (Problem A — mitigated by Phase 2 data migration) + Wave 2 design item (Problem B — free/global game visibility). See `bug-022-legacy-resolution.md` §8.3 |
 | BUG-027 | C6 | Caller products replace rather than intersect allowed set | ✅ FIXED | P1 | RC-7 AuthZ bypass | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `games/search/route.ts` | Products intersected with allowedProductIds |
 | BUG-028 | C6 | Publish auth checks wrong role source (app_metadata.role) | VERIFIED (Codex) | P1 | RC-6 Bespoke auth drift | Wave 2 | `games/[gameId]/publish/route.ts` | — |
 | BUG-029 | C6 | Game creation can bypass publish validation via status: 'published' | ✅ FIXED | P1 | RC-7 AuthZ bypass | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `games/route.ts`, `builder/route.ts`, `builder/[id]/route.ts`, `csv-import/route.ts` | All create/update paths force draft; only /publish can set published |
@@ -158,9 +158,11 @@
 **Why they're the same problem:** `getAllowedProductIds()` merges two access models: canonical (entitlement + seat) and legacy (subscription → billing_product_key → product). The legacy path bypasses seat requirements and includes paused subscriptions. BUG-026 is the inverse: when the canonical path finds no products, the code blocks ALL content including free/global games.
 
 **Remediation strategy:**
-1. Remove or constrain legacy fallback to require active seat assignment
-2. Treat `product_id IS NULL` games as always accessible regardless of entitlement state
-3. Both fixes are in `app/api/games/utils.ts` — bundle together
+1. ~~Remove or constrain legacy fallback to require active seat assignment~~ ✅ **DONE** (DD-LEGACY-1, 2026-03-19)
+2. Treat `product_id IS NULL` games as always accessible regardless of entitlement state — **Wave 2**
+3. ~~Both fixes are in `app/api/games/utils.ts` — bundle together~~ BUG-022 resolved; BUG-026 requires changes in 5 route files (early-return guards)
+
+**Post-resolution note (2026-03-19):** BUG-026 is now explicitly classified as two sub-problems: (A) rollout risk for legacy-only tenants — mitigated by Phase 2 data migration, (B) design gap for free/global game visibility — Wave 2 item. See `bug-022-legacy-resolution.md` §8.3.
 
 ---
 
@@ -303,7 +305,7 @@
 | BUG-018 | P1 | RC-8 | Stripe customer resolution |
 | BUG-007 + BUG-028 | P1 | RC-6 | Auth drift — publish role check |
 | ~~**BUG-035**~~ | **P1** | RC-6 | ✅ CLOSED (2026-03-18) — invite email verification + audit log |
-| BUG-026 | P1 | RC-5 | No-product tenants blocked from free games |
+| BUG-026 | P1 | RC-5 | No-product tenants blocked from free games — **classified: rollout risk + Wave 2 design item** (see §8.3 in bug-022-legacy-resolution.md) |
 | BUG-030 | P1 | RC-7 | Builder read auth too lax — exposes unpublished games |
 | BUG-032 | P1 | RC-4 | Builder save non-transactional partial failure |
 | BUG-033 | P1 | RC-2 | CSV import cross-tenant owner_tenant_id injection |

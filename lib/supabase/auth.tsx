@@ -23,8 +23,9 @@ import type { User } from '@supabase/supabase-js'
 import { supabase } from './client'
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import { shouldBootstrapFromClient } from '@/lib/auth/bootstrap'
-import type { GlobalRole, UserProfile } from '@/types/auth'
+import type { GlobalRole, ProfileUpdateInput, UserProfile } from '@/types/auth'
 import type { TenantMembership } from '@/types/tenant'
+import { resolveCanonicalAvatarUrl } from '@/lib/profile/avatar'
 
 interface AuthProviderProps {
   children: ReactNode
@@ -48,7 +49,7 @@ interface AuthContextType {
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
   updatePassword: (newPassword: string) => Promise<void>
-  updateProfile: (updates: Partial<UserProfile>) => Promise<void>
+  updateProfile: (updates: ProfileUpdateInput) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -112,11 +113,18 @@ export function AuthProvider({
       }
 
       // ONLY query by ID - never by email (email can have orphaned profiles)
-      const { data: profile, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', currentUser.id)
-        .maybeSingle()
+      const [{ data: profile, error }, { data: profileAvatar }] = await Promise.all([
+        supabase
+          .from('users')
+          .select('*')
+          .eq('id', currentUser.id)
+          .maybeSingle(),
+        supabase
+          .from('user_profiles')
+          .select('avatar_url')
+          .eq('user_id', currentUser.id)
+          .maybeSingle(),
+      ])
 
       if (error && error.code !== 'PGRST116') {
         console.warn('ensureProfile select error:', error)
@@ -127,17 +135,24 @@ export function AuthProvider({
         console.log('[ensureProfile] Demo user profile fetched:', {
           exists: !!profile,
           full_name: profile?.full_name,
-          avatar_url: profile?.avatar_url,
+          avatar_url: resolveCanonicalAvatarUrl(profileAvatar?.avatar_url, profile?.avatar_url),
           is_demo_user: profile?.is_demo_user
         })
       }
+
+      const canonicalAvatarUrl = resolveCanonicalAvatarUrl(
+        profileAvatar?.avatar_url,
+        profile?.avatar_url ??
+          (currentUser.user_metadata?.avatar_url as string | undefined) ??
+          (currentUser.user_metadata?.picture as string | undefined)
+      )
 
       // For demo users, retry a few times if profile is incomplete
       // This handles race condition between trigger and upsert
       const profileIncomplete = profile && (
         !profile.full_name || 
         profile.full_name === currentUser.email?.split('@')[0] ||
-        !profile.avatar_url ||
+        !canonicalAvatarUrl ||
         !profile.is_demo_user
       )
       
@@ -149,7 +164,12 @@ export function AuthProvider({
         return ensureProfile(currentUser, retryCount + 1)
       }
 
-      if (profile) return profile as UserProfile
+      if (profile) {
+        return {
+          ...profile,
+          avatar_url: canonicalAvatarUrl,
+        } as UserProfile
+      }
 
       // No profile found by ID - this means the user needs a profile created
       // DO NOT fallback to email lookup as it can return orphaned/wrong profiles
@@ -163,8 +183,7 @@ export function AuthProvider({
         full_name: (currentUser.user_metadata?.full_name as string) ?? 
                    (currentUser.user_metadata?.name as string) ?? 
                    currentUser.email?.split('@')[0] ?? undefined,
-        avatar_url: (currentUser.user_metadata?.avatar_url as string) ?? 
-                    (currentUser.user_metadata?.picture as string) ?? undefined,
+        avatar_url: canonicalAvatarUrl ?? undefined,
         created_at: currentUser.created_at,
         updated_at: new Date().toISOString(),
       }
@@ -505,7 +524,7 @@ export function AuthProvider({
     if (error) throw error
   }, [])
 
-  const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
+  const updateProfile = useCallback(async (updates: ProfileUpdateInput) => {
     if (!user) throw new Error('No user logged in')
 
     const response = await fetch('/api/accounts/profile', {

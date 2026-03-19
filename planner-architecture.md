@@ -1,6 +1,6 @@
 # Planner v2.0 — Arkitektur & Systemöversikt
 
-> **Senast uppdaterad:** 2026-03-13 (Post-launch roadmap: tenant-custom block types planeras — se `launch-control.md` §11, ADR-K1)
+> **Senast uppdaterad:** 2026-03-19 (Publish/status canonicalization: only `/api/plans/[planId]/publish` may produce `published` state)
 > **Syfte:** Stabil referens för systemdesign. Ändras sällan — bara vid arkitekturella förändringar.
 > **Arkitektur-guardrails:** (ADR-K1) `plan_blocks.metadata` (JSONB) ska hållas flexibelt. Nya blocktyper ska bli tenant-definierade via metadata, inte fler hardcoded enum-värden. (ADR-K2) Framtida kursförbättringar ska konvergera mot block-modell, inte fördjupa JSON-mönstret.
 
@@ -172,6 +172,8 @@ Plan (draft)
                  └─ Annars → skapar ny run + run_steps
 ```
 
+    **Kanonisk regel (2026-03-19):** `published` får bara uppnås via `POST /api/plans/[planId]/publish`, eftersom publicering också måste skapa `plan_versions` + `plan_version_blocks`. `POST /api/plans/[planId]/status` hanterar endast icke-publicerande övergångar som archive/restore. Bulk publish är därför avstängd tills den kan använda samma snapshot-flöde.
+
 ### Run Resume
 
 ```
@@ -225,6 +227,8 @@ Client-API:
          │
          └─→ draft (återställ)
 ```
+
+**Implementationsnotering:** state-machine tillåter fortfarande övergången till `published`, men runtime-regeln är att just den övergången måste gå genom publish-endpointen. State machine beskriver domänens målstatus; publish-endpointen är den enda vägen som även uppdaterar versionssanningen.
 
 ### Kalenderflöde
 

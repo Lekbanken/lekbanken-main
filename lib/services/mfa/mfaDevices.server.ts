@@ -10,6 +10,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { MFATrustedDevice } from '@/types/mfa'
 import { randomBytes, createHash } from 'crypto'
 import { logDeviceTrusted, logDeviceRevoked } from './mfaAudit.server'
+import { requireCanonicalMfaTenant } from '@/lib/auth/mfa-tenant'
 
 // ============================================================================
 // TYPES
@@ -20,7 +21,7 @@ export interface TrustDeviceParams {
   device_name?: string
   user_agent?: string
   ip_address?: string
-  tenant_id?: string
+  tenant_id: string
 }
 
 export interface TrustDeviceResult {
@@ -91,38 +92,7 @@ export async function trustDevice(
   const supabase = await createServerRlsClient()
   // Cast since mfa_trusted_devices types not yet regenerated
   const db = supabase as unknown as SupabaseClient
-
-  // Get user's primary tenant if not provided
-  let tenantId = params.tenant_id
-  if (!tenantId) {
-    // First try to get primary tenant
-    const { data: primaryMembership } = await supabase
-      .from('user_tenant_memberships')
-      .select('tenant_id')
-      .eq('user_id', userId)
-      .eq('is_primary', true)
-      .maybeSingle()
-    
-    if (primaryMembership?.tenant_id) {
-      tenantId = primaryMembership.tenant_id
-    } else {
-      // Fall back to any tenant the user is a member of
-      const { data: anyMembership } = await supabase
-        .from('user_tenant_memberships')
-        .select('tenant_id')
-        .eq('user_id', userId)
-        .limit(1)
-        .maybeSingle()
-      tenantId = anyMembership?.tenant_id
-    }
-  }
-
-  // If still no tenant, use a system-level placeholder for users without tenants
-  // This allows system admins or users in onboarding to still trust devices
-  if (!tenantId) {
-    // Use a constant UUID for "no tenant" devices - allows system admins to trust devices
-    tenantId = '00000000-0000-0000-0000-000000000000'
-  }
+  const tenantId = requireCanonicalMfaTenant(params.tenant_id, 'trust')
 
   // Generate trust token
   const { token, hash } = generateTrustToken()

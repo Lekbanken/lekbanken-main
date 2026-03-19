@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { deriveEffectiveGlobalRole, isSystemAdminRole } from '@/lib/auth/role'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
-import { isSystemAdmin } from '@/lib/utils/authRoles'
 import { apiHandler } from '@/lib/api/route-handler'
+import { withCanonicalAvatarUrl } from '@/lib/profile/avatar'
 
 export const GET = apiHandler({
   auth: 'user',
@@ -25,19 +26,22 @@ export const GET = apiHandler({
       .select('tenant_id, role, status, is_primary')
       .eq('user_id', user.id)
 
+    const { data: profileRow } = await supabase
+      .from('user_profiles')
+      .select('avatar_url')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
     const activeTenantId = await readTenantIdFromCookies(cookieStore)
 
-    const globalRole = (userRow as { global_role?: string | null } | null)?.global_role ?? null
+    const effectiveGlobalRole = deriveEffectiveGlobalRole(userRow, user)
 
     return NextResponse.json({
-      user: userRow,
+      user: withCanonicalAvatarUrl(userRow, profileRow?.avatar_url),
       auth_user: user,
       memberships: memberships ?? [],
       active_tenant_id: activeTenantId,
-      is_system_admin: isSystemAdmin(
-        { id: user.id, app_metadata: { role: (user.app_metadata as { role?: string } | null)?.role } },
-        globalRole
-      ),
+      is_system_admin: isSystemAdminRole(effectiveGlobalRole),
     })
   },
 })

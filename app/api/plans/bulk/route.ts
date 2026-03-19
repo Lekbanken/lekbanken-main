@@ -156,13 +156,7 @@ export const POST = apiHandler({
             result.error = `Cannot publish from ${plan.status} status`
             break
           }
-          // Just update status - version creation would need more logic
-          const { error } = await supabase
-            .from('plans')
-            .update({ status: 'published', updated_by: userId })
-            .eq('id', plan.id)
-          if (error) throw error
-          result.success = true
+          result.error = 'Bulk publish is disabled: use the per-plan publish endpoint so version snapshots are created'
           break
         }
       }

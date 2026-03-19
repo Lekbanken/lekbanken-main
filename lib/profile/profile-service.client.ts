@@ -36,7 +36,6 @@ type NotificationPreferenceRow = Database['public']['Tables']['notification_pref
 type UserConsentRow = Database['public']['Tables']['user_consents']['Row']
 type GDPRRequestRow = Database['public']['Tables']['gdpr_requests']['Row']
 type UserMfaRow = Database['public']['Tables']['user_mfa']['Row']
-type UserProfileInsert = Database['public']['Tables']['user_profiles']['Insert']
 type UserConsentInsert = Database['public']['Tables']['user_consents']['Insert']
 
 const THEME_VALUES = new Set(['light', 'dark', 'system'])
@@ -449,31 +448,16 @@ export class ProfileService {
    * Update user profile
    */
   async updateProfile(userId: string, data: Partial<UserProfile>): Promise<UserProfile | null> {
-    const supabase = this.getSupabase()
-    const updates: UserProfileInsert = {
-      user_id: userId,
-      display_name: data.display_name,
-      phone: data.phone,
-      job_title: data.job_title,
-      organisation: data.organisation,
-      timezone: data.timezone,
-      locale: data.locale,
-      avatar_url: data.avatar_url,
-      metadata: data.metadata as Json | undefined,
-      updated_at: new Date().toISOString(),
-    }
-    const { data: profile, error } = await supabase
-      .from('user_profiles')
-      .upsert(updates, { onConflict: 'user_id' })
-      .select()
-      .single();
+    void userId
+    const payload = await this.requestJson<{ profile: UserProfile | null }>(
+      '/api/accounts/profile',
+      {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }
+    )
 
-    if (error) {
-      console.error('[ProfileService] Failed to update profile:', error);
-      return null;
-    }
-
-    return mapUserProfile(profile);
+    return payload.profile ?? null
   }
 
   // ---------------------------------------------------------------------------

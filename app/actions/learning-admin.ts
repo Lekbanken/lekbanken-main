@@ -13,7 +13,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { isSystemAdmin, assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth';
+import { checkIsSystemAdmin as checkIsSystemAdminFromAdminActions, getCurrentAdminUser } from '@/lib/auth/admin-actions';
+import { assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth';
 import { z } from 'zod';
 
 import type { Json } from '@/types/supabase';
@@ -197,18 +198,6 @@ const requirementCreateSchema = z.object({
 // ============================================
 // HELPER: Get current user with admin check
 // ============================================
-
-async function getCurrentAdminUser() {
-  const supabase = await createServerRlsClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  
-  if (error || !user) {
-    return { user: null, isSystem: false, error: 'Inte autentiserad' };
-  }
-  
-  const isSystem = isSystemAdmin(user);
-  return { user, isSystem, error: null };
-}
 
 // ============================================
 // COURSES - LIST
@@ -1261,8 +1250,7 @@ export async function listCoursesForSelector(
 // ============================================
 
 export async function checkIsSystemAdmin(): Promise<boolean> {
-  const { isSystem } = await getCurrentAdminUser();
-  return isSystem;
+  return checkIsSystemAdminFromAdminActions();
 }
 
 // ============================================

@@ -134,6 +134,14 @@ export function getAvailableActions(current: PlannerStatus): PlanStatusAction[] 
   return actions
 }
 
+/**
+ * Published state is canonical only when reached through the publish endpoint,
+ * because publishing must also create a frozen version snapshot.
+ */
+export function requiresPublishSnapshot(target: PlannerStatus): boolean {
+  return target === 'published'
+}
+
 // =============================================================================
 // ERROR CLASS
 // =============================================================================

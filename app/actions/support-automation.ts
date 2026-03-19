@@ -12,7 +12,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { getCurrentAdminUser } from '@/lib/auth/admin-actions';
 
 import type { Database } from '@/types/supabase';
 
@@ -99,18 +99,6 @@ export interface EscalatedTicket {
 // ============================================
 // HELPER: Get current user with admin check
 // ============================================
-
-async function getCurrentAdminUser() {
-  const supabase = await createServerRlsClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  
-  if (error || !user) {
-    return { user: null, isSystem: false, error: 'Inte autentiserad' };
-  }
-  
-  const isSystem = isSystemAdmin(user);
-  return { user, isSystem, error: null };
-}
 
 async function getUserAdminTenantIds(userId: string): Promise<string[]> {
   const supabase = await createServerRlsClient();

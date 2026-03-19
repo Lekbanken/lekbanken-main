@@ -1,48 +1,32 @@
 'use server'
 
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
+import { getCurrentAdminUser } from '@/lib/auth/admin-actions'
+import { isTenantAdmin } from '@/lib/utils/tenantAuth'
 
 // ============================================================================
 // AUTH HELPERS
 // ============================================================================
 
-interface AdminUser {
-  user: { id: string; email?: string; app_metadata?: Record<string, unknown> }
-  isSystem: boolean
-  error?: string
-}
-
-async function getCurrentAdminUser(): Promise<AdminUser> {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
-  
-  if (error || !user) {
-    return { user: null as unknown as AdminUser['user'], isSystem: false, error: 'Ej inloggad' }
-  }
-  
-  const isSystem = isSystemAdmin(user)
-  return { user, isSystem }
-}
-
 async function assertAdminAccess(tenantId?: string): Promise<{
-  user: AdminUser['user']
+  user: Awaited<ReturnType<typeof getCurrentAdminUser>>['user']
   isSystem: boolean
   error?: string
 }> {
   const { user, isSystem, error } = await getCurrentAdminUser()
-  if (error) return { user, isSystem, error }
+  if (error || !user) return { user, isSystem, error: error ?? 'Ej inloggad' }
+  const currentUser = user
   
   // System admin has full access
-  if (isSystem) return { user, isSystem }
+  if (isSystem) return { user: currentUser, isSystem }
   
   // Tenant admin needs specific tenant
   if (tenantId) {
-    const hasTenantAccess = await isTenantAdmin(tenantId, user.id)
+    const hasTenantAccess = await isTenantAdmin(tenantId, currentUser.id)
     if (!hasTenantAccess) {
-      return { user, isSystem, error: 'Ingen åtkomst till denna organisation' }
+      return { user: currentUser, isSystem, error: 'Ingen åtkomst till denna organisation' }
     }
-    return { user, isSystem }
+    return { user: currentUser, isSystem }
   }
   
   // No tenant specified, check if user is admin of any tenant
@@ -50,14 +34,14 @@ async function assertAdminAccess(tenantId?: string): Promise<{
   const { data: memberships } = await supabase
     .from('user_tenant_memberships')
     .select('tenant_id, role')
-    .eq('user_id', user.id)
+    .eq('user_id', currentUser.id)
     .in('role', ['owner', 'admin'])
   
   if (!memberships || memberships.length === 0) {
-    return { user, isSystem, error: 'Ingen admin-åtkomst' }
+    return { user: currentUser, isSystem, error: 'Ingen admin-åtkomst' }
   }
   
-  return { user, isSystem }
+  return { user: currentUser, isSystem }
 }
 
 // ============================================================================
@@ -182,7 +166,8 @@ export async function listMyAssignedTickets(params: {
   limit?: number
 }): Promise<{ success: boolean; data?: AssignedTicket[]; error?: string }> {
   const { user, isSystem, error } = await assertAdminAccess(params.tenantId)
-  if (error) return { success: false, error }
+  if (error || !user) return { success: false, error: error ?? 'Ej inloggad' }
+  const currentUser = user
   
   try {
     const supabase = isSystem && !params.tenantId 
@@ -200,7 +185,7 @@ export async function listMyAssignedTickets(params: {
         created_at,
         tenants:tenant_id (name)
       `)
-      .eq('assigned_to_user_id', user.id)
+      .eq('assigned_to_user_id', currentUser.id)
       .in('status', ['open', 'in_progress', 'waiting_for_user'])
       .order('priority', { ascending: false })
       .order('created_at', { ascending: false })
@@ -519,14 +504,13 @@ export async function checkSupportHubAccess(): Promise<{
   tenantIds: string[]
   error?: string
 }> {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
-  
+  const { user, isSystem, error } = await getCurrentAdminUser()
+
   if (error || !user) {
     return { hasAccess: false, isSystemAdmin: false, tenantIds: [], error: 'Ej inloggad' }
   }
-  
-  const isSystem = isSystemAdmin(user)
+
+  const supabase = await createServerRlsClient()
   
   if (isSystem) {
     return { hasAccess: true, isSystemAdmin: true, tenantIds: [] }
@@ -557,7 +541,7 @@ export async function listTenantsForSupportHub(): Promise<{
   error?: string
 }> {
   const { user, isSystem, error } = await getCurrentAdminUser()
-  if (error) return { success: false, error }
+  if (error || !user) return { success: false, error: error ?? 'Ej inloggad' }
   
   try {
     if (isSystem) {

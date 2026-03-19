@@ -1,10 +1,12 @@
 # Planner v2.0 — Komplett Implementeringsplan
 
-> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-13  
+> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-19  
 > **Status:** MS0–MS11 ✅ KLARA. PlanSnapshot Pipeline ✅ KLAR. 0 TS-errors.  
 > **Förutsättning:** Denna plan bygger på `planner-audit.md`. Se även `planner-architecture.md` för systemdesign.  
 > **Nästa:** Post-launch Priority 1 — Tenant-Custom Planner Blocks (se `launch-control.md` §11)  
 > **Kvarvarande:** Supabase type regeneration (TEMP casts → compile-time `RunSessionStatus` union hela vägen)
+
+**Notering (2026-03-19):** planner publish/status canonicalization är genomförd. `published` får endast sättas via `/api/plans/[planId]/publish`, och `/api/plans/[planId]/status` är begränsad till icke-publicerande övergångar. Bulk publish är uttryckligen avstängd tills den kan skapa snapshots på samma sätt som den individuella publish-vägen.
 
 ### Låsta beslut (godkänns 2026-03-04)
 
@@ -16,6 +18,7 @@
 | 4 | **Scope-tabs** | UI-tabs visas (Mina / {Org} / Global). Org-tab aktiv om användaren har tenant. Global alltid aktiv. "Kommer snart"-badge visas bara på genuint disabled tabs (Org utan tenant). |
 | 5 | **Kalender end-to-end** | Planlägg → välj plan → skapa schedule → synligt i dagvy → starta körning. CRUD begränsat till **create + delete** i beta. |
 | 6 | **Session-block = post-beta** | Om ett plan-block refererar en deltagarlek (play_mode=participants) → visa tydlig blockering i UI: "Kräver session — stöds i nästa version". |
+| 7 | **Publicering är en snapshot-operation** | `published` är inte bara ett statusvärde. Alla publiceringar måste gå genom `/publish` så `plan_versions` + `plan_version_blocks` alltid hålls i sync med listor, wizard och adminytor. |
 
 ---
 

@@ -7,7 +7,12 @@ import {
   requireCapability,
   planToResource,
 } from '@/lib/auth/capabilities'
-import { assertTransition, getNextStatus, type PlanStatusAction } from '@/lib/planner/state-machine'
+import {
+  assertTransition,
+  getNextStatus,
+  requiresPublishSnapshot,
+  type PlanStatusAction,
+} from '@/lib/planner/state-machine'
 import { apiHandler } from '@/lib/api/route-handler'
 import type { PlannerStatus } from '@/types/planner'
 
@@ -105,6 +110,18 @@ export const POST = apiHandler({
     return NextResponse.json(
       { error: { code: 'BAD_REQUEST', message: 'Either status or action is required' } },
       { status: 400 }
+    )
+  }
+
+  if (body.action === 'publish' || requiresPublishSnapshot(targetStatus)) {
+    return NextResponse.json(
+      {
+        error: {
+          code: 'USE_PUBLISH_ENDPOINT',
+          message: 'Publishing must use /api/plans/[planId]/publish so a version snapshot is created',
+        },
+      },
+      { status: 409 }
     )
   }
 

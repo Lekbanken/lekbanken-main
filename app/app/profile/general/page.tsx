@@ -59,19 +59,11 @@ export default function GeneralSettingsPage() {
     setSaveSuccess(false);
 
     try {
-      // Update profile via auth context
-      await updateProfile({ full_name: fullName, avatar_url: avatarUrl });
-
-      // Also update extended profile via API
-      await fetch('/api/accounts/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          full_name: fullName,
-          avatar_url: avatarUrl,
-          display_name: displayName || undefined,
-          phone: phone || undefined,
-        }),
+      await updateProfile({
+        full_name: fullName,
+        avatar_url: avatarUrl,
+        display_name: displayName || undefined,
+        phone: phone || undefined,
       });
 
       setSaveSuccess(true);

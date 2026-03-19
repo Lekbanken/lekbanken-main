@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logUserAuditEvent } from '@/lib/services/userAudit.server'
 import { apiHandler } from '@/lib/api/route-handler'
+import { withCanonicalAvatarUrl } from '@/lib/profile/avatar'
 
 export const GET = apiHandler({
   auth: 'user',
@@ -28,7 +29,10 @@ export const GET = apiHandler({
     .eq('user_id', userId)
     .maybeSingle()
 
-  return NextResponse.json({ user: userRow, profile: profileRow ?? null })
+  return NextResponse.json({
+    user: withCanonicalAvatarUrl(userRow, profileRow?.avatar_url),
+    profile: profileRow ?? null,
+  })
   },
 })
 
@@ -57,7 +61,6 @@ export const PATCH = apiHandler({
   const userUpdate: Record<string, unknown> = {}
   if (body.full_name !== undefined) userUpdate.full_name = body.full_name
   if (body.language !== undefined) userUpdate.language = body.language
-  if (body.avatar_url !== undefined) userUpdate.avatar_url = body.avatar_url
   if (body.avatar_config !== undefined) userUpdate.avatar_config = body.avatar_config
   if (body.preferred_theme !== undefined) userUpdate.preferred_theme = body.preferred_theme
 
@@ -91,13 +94,32 @@ export const PATCH = apiHandler({
   // Only sync essential fields that are needed for auth checks
   // full_name is used in some RLS policies, so we keep it minimal
   if (body.full_name !== undefined) authMetadata.full_name = body.full_name
-  // NOTE: avatar_url, language, theme preferences are now ONLY stored in user_profiles
-  // This reduces JWT token size and prevents cookie chunking
+  // NOTE: auth metadata stays minimal to keep JWT cookies small.
+  // avatar_url now has its canonical home in user_profiles.
+  // users.avatar_url remains a compatibility mirror for legacy read paths.
 
   // BUG-012: Track which writes have committed so errors indicate partial state.
   // These three writes are not transactional (auth.updateUser is external).
   // On failure after a prior write, we return a specific error so the client knows to retry.
   let writesCommitted = 0
+
+  if (Object.keys(profileUpdate).length > 0) {
+    const { error } = await supabase
+      .from('user_profiles')
+      .upsert({ user_id: userId, ...profileUpdate }, { onConflict: 'user_id' })
+    if (error) {
+      console.error('[accounts/profile] profiles upsert error', error)
+      return NextResponse.json({
+        error: 'Failed to update profile',
+        partial: writesCommitted > 0,
+      }, { status: 500 })
+    }
+    writesCommitted++
+  }
+
+  if (body.avatar_url !== undefined) {
+    userUpdate.avatar_url = body.avatar_url
+  }
 
   if (Object.keys(userUpdate).length > 0) {
     const { data, error } = await supabase
@@ -117,20 +139,6 @@ export const PATCH = apiHandler({
     }
     if (!data) {
       console.warn('[accounts/profile] users update returned no data - row may not exist', { userId: userId })
-    }
-    writesCommitted++
-  }
-
-  if (Object.keys(profileUpdate).length > 0) {
-    const { error } = await supabase
-      .from('user_profiles')
-      .upsert({ user_id: userId, ...profileUpdate }, { onConflict: 'user_id' })
-    if (error) {
-      console.error('[accounts/profile] profiles upsert error', error)
-      return NextResponse.json({
-        error: 'Failed to update profile',
-        partial: writesCommitted > 0,
-      }, { status: 500 })
     }
     writesCommitted++
   }
@@ -176,6 +184,9 @@ export const PATCH = apiHandler({
     payload: { userUpdate, profileUpdate, authMetadata },
   })
 
-  return NextResponse.json({ user: userRow, profile: profileRow ?? null })
+  return NextResponse.json({
+    user: withCanonicalAvatarUrl(userRow, profileRow?.avatar_url),
+    profile: profileRow ?? null,
+  })
   },
 })

@@ -1,6 +1,6 @@
 # MFA Stabilization Brief
 
-> **Status:** PENDING — remediation not yet executed  
+> **Status:** PARTIALLY COMPLETE — MFA-001, MFA-002, MFA-004, MFA-005 fixed on 2026-03-19; MFA-003 remains open  
 > **Created:** 2026-03-18  
 > **Audit:** `audits/mfa-trusted-device-audit.md`  
 > **Findings:** 5 (2 P0, 2 P1, 1 P2) — all verified against code + generated types + live DB schema  
@@ -11,17 +11,23 @@
 
 | ID | Sev | Summary | Status |
 |----|-----|---------|--------|
-| MFA-004 | **P0** | `user_mfa` update uses 3 wrong field names; PostgREST rejects entire update; route returns `success: true` anyway → split-brain auth state | **VERIFIED — executable immediately** |
-| MFA-005 | **P0** | `verifyTrustedDevice()` missing `tenant_id` filter → cross-tenant MFA bypass; admin reset deletes across all tenants | **VERIFIED — blocked on DD-MFA-1** |
-| MFA-001 | **P1** | `profiles!inner(email, display_name)` join — no `profiles` relation exists on `user_tenant_memberships` → entire endpoint returns 400 | **VERIFIED — executable immediately** |
-| MFA-002 | **P1** | `.eq('is_active', true)` — column is `is_revoked`, not `is_active` → trusted device count query returns 400 | **VERIFIED — executable immediately** |
-| MFA-003 | **P2** | Status filter applied JS-side after DB `.range()` pagination → inconsistent page sizes when filtering | **VERIFIED — executable immediately** |
+| MFA-004 | **P0** | `user_mfa` update uses 3 wrong field names; PostgREST rejects entire update; route returns `success: true` anyway → split-brain auth state | **✅ FIXED (2026-03-18)** |
+| MFA-005 | **P0** | `verifyTrustedDevice()` missing `tenant_id` filter → cross-tenant MFA bypass; admin reset deletes across all tenants | **✅ FIXED (2026-03-19)** |
+| MFA-001 | **P1** | `profiles!inner(email, display_name)` join — no `profiles` relation exists on `user_tenant_memberships` → entire endpoint returns 400 | **✅ FIXED (2026-03-19)** |
+| MFA-002 | **P1** | `.eq('is_active', true)` — column is `is_revoked`, not `is_active` → trusted device count query returns 400 | **✅ FIXED (2026-03-19)** |
+| MFA-003 | **P2** | Status filter applied JS-side after DB `.range()` pagination → inconsistent page sizes when filtering | **OPEN — Wave 3 / follow-up** |
+
+**Implemented summary (2026-03-19):**
+- `trustDevice()` now requires explicit canonical `tenant_id`; fallback membership and placeholder-UUID resolution removed.
+- MFA trust/verify routes read tenant context from the signed tenant cookie only.
+- Admin MFA user listing now uses the real `users` relation and `is_revoked = false` for active-device counts.
+- Remaining work is isolated to pagination/filter ordering in the admin MFA users list.
 
 ---
 
-## 2. Canonical Contract Decision Proposal: DD-MFA-1
+## 2. Canonical Contract Decision: DD-MFA-1
 
-### DD-MFA-1 — Trusted device scope: tenant-scoped or global?
+### DD-MFA-1 — Trusted device scope: tenant-scoped or global? ✅ RESOLVED (2026-03-19)
 
 **Question:** Is trusted-device MFA bypass scoped per tenant or global per user?
 
@@ -56,7 +62,7 @@ Single policy `mfa_trusted_devices_owner`:
 - **MFA-005 verify path:** RLS does **NOT** mitigate. The verify query runs as the user, and users can read all their own devices across tenants. A device trusted in Tenant A will be found when verifying for Tenant B. **Fully exploitable at app layer.**
 - **MFA-005 delete path (admin reset):** RLS **partially** mitigates. Admin can only delete devices in tenants where they have `owner`/`admin` role. But for a system admin, **NO mitigation** — `is_system_admin()` bypasses all tenant filtering.
 
-**Decision proposal:** **Tenant-scoped trust is the canonical model.**
+**Decision:** **Tenant-scoped trust is the canonical model.**
 
 Rationale:
 1. Schema was explicitly designed with `tenant_id NOT NULL` and composite unique key
@@ -75,16 +81,16 @@ Rationale:
 
 | Item | Finding | Can execute now? | Why |
 |------|---------|------------------|-----|
-| **M1a** — Fix `user_mfa` field names + error handling | MFA-004 | **YES** | Wrong field names are objectively wrong regardless of any design decision. Silent success on failure is always a bug. |
-| **M2a** — Fix `profiles` join | MFA-001 | **YES** | No `profiles` relation exists. Endpoint is dead. Fix is to use `users` join. No design decision needed. |
-| **M2b** — Fix `is_active` column | MFA-002 | **YES** | Column doesn't exist. Correct column is `is_revoked`. No design decision needed. |
+| **M1a** — Fix `user_mfa` field names + error handling | MFA-004 | **DONE** | Closed 2026-03-18. |
+| **M2a** — Fix `profiles` join | MFA-001 | **DONE** | Closed 2026-03-19. |
+| **M2b** — Fix `is_active` column | MFA-002 | **DONE** | Closed 2026-03-19. |
 | **M3** — Fix pagination logic | MFA-003 | **YES** | Logic bug independent of any contract decision. |
 
 ## 4. Requires-Decision Items
 
 | Item | Finding | Blocked on | Decision needed |
 |------|---------|------------|-----------------|
-| **M1b** — Add `tenant_id` to verify + scope admin delete | MFA-005 | **DD-MFA-1** | Must confirm tenant-scoped trust as canonical model. Must determine where verify endpoint gets tenant context from. |
+| **M1b** — Add `tenant_id` to verify + scope admin delete | MFA-005 | **RESOLVED** | Closed 2026-03-19 via DD-MFA-1 and signed-cookie canonical tenant source. |
 
 ---
 

@@ -1,6 +1,6 @@
 # Post-Launch Cluster Triage
 
-> **Status:** WAVE 1 BATCH D COMPLETE — 18 closed, 1 needs decision, 2 blocked  
+> **Status:** WAVE 1 COMPLETE — 23 closed, 1 needs decision, Wave 2/3 remainder tracked  
 > **Created:** 2026-03-18  
 > **Updated:** 2026-03-19  
 > **Sources:** MFA audit (Claude-verified), Codex clusters 1–9 (Claude spot-verified)  
@@ -23,7 +23,7 @@
 | BUG-009 | C1 | Members page Retry deadlocks into loading state | VERIFIED (Codex) | P2 | Standalone UX bug | Wave 3 | `members/page.tsx` | — |
 | BUG-010 | C2 | Sessions list selects non-existent columns | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/sessions/route.ts` | Fixed: select correct columns from user_sessions |
 | BUG-011 | C2 | Devices list selects non-existent columns | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/devices/route.ts` | Fixed: select correct columns from user_devices |
-| BUG-012 | C2 | Profile update partial commit (no rollback) | ✅ FIXED | P1 | RC-4 False success | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/profile/route.ts` | Fixed: writesCommitted counter + partial flag on error response |
+| BUG-012 | C2 | Profile update partial commit (no rollback) | ✅ FIXED | P1 | RC-4 False success | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/profile/route.ts` | Fixed: writesCommitted counter + partial flag on error response; follow-up canonicalized profile writes through `/api/accounts/profile` |
 | BUG-013 | C2 | Session revoke reports success even when auth revocation fails | ✅ FIXED | P1 | RC-4 False success | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/sessions/revoke/route.ts` | Fixed: fail-hard if auth signOut fails — return 500 before local revoke |
 | BUG-014 | C2 | Notification settings destroys granular preferences | VERIFIED (Codex) | P1 | RC-8 Lossy data mapping | Wave 3 | `accounts/profile/notifications/route.ts` | — |
 | BUG-015 | C3 | Multi-tenant user fails session create (.single() on multi-row) | VERIFIED (Codex) | P1 | RC-2 Tenant drift | Wave 2 | `participants/sessions/create/route.ts` | — |

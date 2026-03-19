@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { apiHandler } from '@/lib/api/route-handler'
 import { logUserAuditEvent } from '@/lib/services/userAudit.server'
@@ -11,6 +11,8 @@ import {
 } from '@/lib/services/mfa/mfaAudit.server'
 import { markMFAEnrolled, updateLastMFAVerification, checkMFARequirement } from '@/lib/services/mfa/mfaService.server'
 import { trustDevice } from '@/lib/services/mfa/mfaDevices.server'
+import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
+import { requireCanonicalMfaTenant } from '@/lib/auth/mfa-tenant'
 
 const MAX_FAILED_ATTEMPTS = 5
 const LOCKOUT_WINDOW_MINUTES = 15
@@ -84,17 +86,23 @@ export const POST = apiHandler({
   if (body.trust_device && body.device_fingerprint) {
     try {
       const headersList = await headers()
+      const cookieStore = await cookies()
       const ipAddress =
         headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
         headersList.get('x-real-ip') ||
         undefined
       const userAgent = headersList.get('user-agent') || undefined
+      const tenantId = requireCanonicalMfaTenant(
+        await readTenantIdFromCookies(cookieStore),
+        'trust'
+      )
 
       const result = await trustDevice(userId, {
         device_fingerprint: body.device_fingerprint,
         device_name: body.device_name,
         user_agent: userAgent,
         ip_address: ipAddress,
+        tenant_id: tenantId,
       })
       trustToken = result.trust_token
     } catch (trustError) {

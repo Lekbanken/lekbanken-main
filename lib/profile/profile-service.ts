@@ -288,13 +288,13 @@ export class ProfileService {
       .from('avatars')
       .getPublicUrl(filename);
 
-    // Update both users and user_profiles
+    // Canonical home is user_profiles.avatar_url; users.avatar_url remains a compatibility mirror.
     await Promise.all([
-      supabase.from('users').update({ avatar_url: publicUrl }).eq('id', userId),
       supabase.from('user_profiles').upsert(
         { user_id: userId, avatar_url: publicUrl },
         { onConflict: 'user_id' }
       ),
+      supabase.from('users').update({ avatar_url: publicUrl }).eq('id', userId),
     ]);
 
     // Log audit event
@@ -329,10 +329,10 @@ export class ProfileService {
       }
     }
 
-    // Clear avatar URLs
+    // Clear canonical avatar first, then the compatibility mirror.
     await Promise.all([
-      supabase.from('users').update({ avatar_url: null }).eq('id', userId),
       supabase.from('user_profiles').update({ avatar_url: null }).eq('user_id', userId),
+      supabase.from('users').update({ avatar_url: null }).eq('id', userId),
     ]);
 
     // Log audit event

@@ -352,7 +352,7 @@ After all Wave 1 fixes:
 
 | ID | File | Fix |
 |----|------|-----|
-| BUG-012 | `accounts/profile/route.ts` | Fail on secondary write failure |
+| BUG-012 | `accounts/profile/route.ts` | Fail on secondary write failure; keep `/api/accounts/profile` as canonical client write path |
 | BUG-013 | `accounts/sessions/revoke/route.ts` | Fail or return partial-success |
 
 **Strategy:** Isolated fixes. Apply fail-closed principle.

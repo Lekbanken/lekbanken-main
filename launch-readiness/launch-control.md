@@ -47,7 +47,7 @@ No architectural changes will be implemented before real production traffic has 
 
 | Domain | Audit | Remediation | Regression | i18n | Tests | Docs | Status |
 |--------|-------|-------------|------------|------|-------|------|--------|
-| Auth / Onboarding | ✅ | 🟡 | ✅ | — | — | — | Covered by Security & Auth Audit (17 findings). All original P0/P1 resolved. **⚠️ MFA sub-audit (2026-03-18):** 5 new findings (2 P0, 2 P1, 1 P2) — schema drift, silent failure, cross-tenant MFA bypass. See `audits/mfa-trusted-device-audit.md`. Remediation pending. |
+| Auth / Onboarding | ✅ | ✅ | ✅ | — | — | — | Covered by Security & Auth Audit (17 findings). All original P0/P1 resolved. **MFA sub-audit (2026-03-18):** MFA-001/002/004/005 ✅ closed by 2026-03-19. Only MFA-003 (pagination/filter ordering, P2) remains open. See `audits/mfa-trusted-device-audit.md` and `implementation/mfa-trusted-device-remediation.md`. |
 | Tenants / Multi-tenancy | ✅ | ✅ | ✅ | — | — | — | Audit complete — 10 findings. TI-001 P0 fixed. TI-002/TI-NEW-1c resolved (product decisions). Regression covered by per-domain tenant boundary checks (Games, Planner, Journey, Media). |
 | Games / Library | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | Audit complete + GPT-calibrated — 14 findings (0 P0, 3 P1, 8 P2, 3 P3). **M1 ✅** **M2 ✅** **M3 ✅** — 0 P0, 0 P1 remaining. **Remediation complete for launch scope.** M4 deferred post-launch. **Regression ✅ (2026-03-14)** — all 8 areas pass, all 7 M1–M3 fixes verified intact, 18 handlers verified, 0 new findings. Test-group-ready for current scope. See `audits/games-regression-audit.md`. |
 | Game Authoring (Admin) | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | Covered by Games System Audit (builder routes, publish, snapshots included). Regression verified in Games regression (2026-03-14). |
@@ -62,7 +62,7 @@ No architectural changes will be implemented before real production traffic has 
 | Support / Tickets | ✅ | — | ✅ | ❌ | ❌ | ❌ | Audit complete + GPT-calibrated — 10 findings (0 P0, 0 P1, 8 P2, 2 P3). No launch remediation needed. **Regression ✅ (2026-03-14)** — 0 API routes (server actions), RLS-first design unchanged, 0 new findings. See `audits/batch-regression-tier2-tier3.md`. |
 | Marketing / Landing | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | Audit complete + GPT-calibrated — 7 findings (0 P0, 0 P1, 2 P2, 5 P3). MKT-001 M1 fixed (robots.ts + sitemap.ts). **Regression ✅ (2026-03-14)** — M1 files confirmed present, 0 API routes, 0 new findings. See `audits/batch-regression-tier2-tier3.md`. |
 | Demo | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | Audit complete — 18 findings (0 P0, 3 P1, 10 P2, 5 P3). Own domain per GPT directive (Tier 1 — externt exponerad). **M1 ✅** — 3 P1 fixed: DEMO-001 (launch-sufficient persistent rate limiter), DEMO-002 (hardcoded access code removed), DEMO-003 (error leak removed). **Regression ✅ (2026-03-14)** — all 8 GPT-defined areas pass, 3 M1 fixes verified intact. **M2 ✅ (2026-03-14)** — 3 regression findings fixed: REG-DEMO-001 (demo-expired UX dead-end → link to /demo), REG-DEMO-002 (RLS policy scoped to authenticated+admin), REG-DEMO-003 (RPC ownership checks added). Migration `20260314200000`. Re-regression passed (10 checks). Demo is test-group-ready for current scope. See `audits/demo-regression-audit.md`. |
-| Profile / Settings | ✅ | — | ✅ | ❌ | ❌ | ❌ | Audit complete + GPT-calibrated — 8 findings (0 P0, 0 P1, 4 P2, 4 P3). No launch remediation needed. **Regression ✅ (2026-03-14)** — 4 routes all `apiHandler({ auth: 'user' })`, 0 new findings. See `audits/batch-regression-tier2-tier3.md`. |
+| Profile / Settings | ✅ | — | ✅ | ❌ | ❌ | ❌ | Audit complete + GPT-calibrated — 8 findings (0 P0, 0 P1, 4 P2, 4 P3). No launch remediation needed. **Regression ✅ (2026-03-14)** — 4 routes all `apiHandler({ auth: 'user' })`, 0 new findings. **Post-launch hardening follow-up (2026-03-19):** profile writes canonicalized to `/api/accounts/profile`; duplicate general-page PATCH and direct client `user_profiles` write path removed. **Avatar canonicalization follow-up (2026-03-19):** `user_profiles.avatar_url` is now the canonical source for auth/profile reads, with `users.avatar_url` retained as a compatibility mirror for legacy/admin surfaces. See `audits/batch-regression-tier2-tier3.md`. |
 | Calendar | ✅ | — | ✅ | ❌ | ❌ | ❌ | Audit complete + GPT-calibrated — 7 findings (0 P0, 0 P1, 3 P2, 4 P3). Sub-feature of Planner. **Regression ✅ (2026-03-14)** — 2 routes both wrapped + `requirePlanEditAccess`, 0 new findings. See `audits/batch-regression-tier2-tier3.md`. |
 
 ### Regression Progress Summary
@@ -95,7 +95,7 @@ No architectural changes will be implemented before real production traffic has 
 
 | Area | Audit | Remediation | Status |
 |------|-------|-------------|--------|
-| API Security & Auth (287 routes) | ✅ | 🟡 | 17 original findings. All original P0/P1 resolved. SEC-002b open (infra — non-actionable). **MFA sub-audit (2026-03-18):** +5 findings (2 P0, 2 P1, 1 P2) — remediation pending. |
+| API Security & Auth (287 routes) | ✅ | 🟡 | 17 original findings. All original P0/P1 resolved. SEC-002b open (infra — non-actionable). **MFA sub-audit (2026-03-18):** 4 of 5 findings closed (MFA-001/002/004/005); MFA-003 remains as a P2 follow-up. |
 | API Consistency (288 routes) | ✅ | ✅ | 14 findings. APC-003/011 resolved (RLS policy). Wrapper: **253/288 (87.8%)**, 369/410 (90.0%). |
 | Tenant Isolation | ✅ | ✅ | 10 findings. TI-001 P0 fixed. TI-002/TI-NEW-1c product decisions resolved. |
 | i18n | ✅ | ✅ | 7 findings (0 P0, 0 P1, 2 P2, 5 P3). GPT-calibrated. sv complete, en/no synced (2026-03-15): 932 en + 1104 no keys added, 430 en + 997 no orphans removed. All 3 locales at 11,927 keys. |
@@ -571,6 +571,8 @@ Atlas (`/sandbox/atlas`) tracks the system graph (287 routes, components, domain
 ### Pre-Launch Smoke Test Checklist
 
 Manuell verifiering i browser/network tab innan launch markeras som komplett:
+
+> **Supplerande runtime-verifiering (2026-03-19):** Efter canonicalization-rundan för auth/profile/planner/admin ska även [canonicalization-e2e-checklist.md](canonicalization-e2e-checklist.md) köras. Den checklistan fokuserar på state convergence efter login, MFA, tenant switch, profile/avatar updates, notifications, planner publish och admin access.
 
 | # | Test | Route/Flöde | Förväntat |
 |---|------|-------------|-----------|

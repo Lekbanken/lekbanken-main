@@ -1,7 +1,8 @@
 'use server'
 
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
+import { getCurrentAdminUser } from '@/lib/auth/admin-actions'
+import { isTenantAdmin } from '@/lib/utils/tenantAuth'
 
 // ============================================================================
 // TYPES
@@ -49,50 +50,33 @@ export interface UpdateFAQInput {
 // AUTH HELPERS
 // ============================================================================
 
-interface AdminUser {
-  user: { id: string; email?: string; app_metadata?: Record<string, unknown> }
-  isSystem: boolean
-  error?: string
-}
-
-async function getCurrentAdminUser(): Promise<AdminUser> {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
-  
-  if (error || !user) {
-    return { user: null as unknown as AdminUser['user'], isSystem: false, error: 'Ej inloggad' }
-  }
-  
-  const isSystem = isSystemAdmin(user)
-  return { user, isSystem }
-}
-
 async function assertAdminAccess(tenantId?: string | null): Promise<{
-  user: AdminUser['user']
+  user: Awaited<ReturnType<typeof getCurrentAdminUser>>['user']
   isSystem: boolean
   error?: string
 }> {
   const { user, isSystem, error } = await getCurrentAdminUser()
-  if (error) return { user, isSystem, error }
+  if (error || !user) return { user, isSystem, error: error ?? 'Ej inloggad' }
+  const currentUser = user
   
   // System admin has full access (including global FAQs)
-  if (isSystem) return { user, isSystem }
+  if (isSystem) return { user: currentUser, isSystem }
   
   // For global FAQs (tenantId is null), only system admins
   if (tenantId === null) {
-    return { user, isSystem, error: 'Endast systemadministratörer kan hantera globala FAQ' }
+    return { user: currentUser, isSystem, error: 'Endast systemadministratörer kan hantera globala FAQ' }
   }
   
   // Tenant admin needs specific tenant
   if (tenantId) {
-    const hasTenantAccess = await isTenantAdmin(tenantId, user.id)
+    const hasTenantAccess = await isTenantAdmin(tenantId, currentUser.id)
     if (!hasTenantAccess) {
-      return { user, isSystem, error: 'Ingen åtkomst till denna organisation' }
+      return { user: currentUser, isSystem, error: 'Ingen åtkomst till denna organisation' }
     }
-    return { user, isSystem }
+    return { user: currentUser, isSystem }
   }
   
-  return { user, isSystem }
+  return { user: currentUser, isSystem }
 }
 
 // ============================================================================
@@ -262,7 +246,8 @@ export async function getFAQEntry(id: string): Promise<{ success: boolean; data?
 
 export async function createFAQEntry(input: CreateFAQInput): Promise<{ success: boolean; data?: FAQEntry; error?: string }> {
   const { user, isSystem, error } = await assertAdminAccess(input.tenantId)
-  if (error) return { success: false, error }
+  if (error || !user) return { success: false, error: error ?? 'Ej inloggad' }
+  const currentUser = user
   
   // Only system admins can create global FAQs
   if (input.tenantId === null && !isSystem) {
@@ -282,8 +267,8 @@ export async function createFAQEntry(input: CreateFAQInput): Promise<{ success: 
         tags: input.tags ?? [],
         is_published: input.isPublished ?? false,
         position: input.position ?? 0,
-        created_by: user.id,
-        updated_by: user.id,
+        created_by: currentUser.id,
+        updated_by: currentUser.id,
       })
       .select(`
         id,
@@ -345,13 +330,14 @@ export async function updateFAQEntry(input: UpdateFAQInput): Promise<{ success: 
   }
   
   const { user, isSystem, error } = await assertAdminAccess(existingResult.data.tenant_id)
-  if (error) return { success: false, error }
+  if (error || !user) return { success: false, error: error ?? 'Ej inloggad' }
+  const currentUser = user
   
   try {
     const supabase = isSystem ? await createServiceRoleClient() : await createServerRlsClient()
     
     const updateData: Record<string, unknown> = {
-      updated_by: user.id,
+      updated_by: currentUser.id,
     }
     
     if (input.question !== undefined) updateData.question = input.question

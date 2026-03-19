@@ -23,6 +23,21 @@ export function deriveEffectiveGlobalRoleFromUser(user: User | null): GlobalRole
   return globalRole ?? null
 }
 
+export function isSystemAdminRole(role: GlobalRole | null | undefined): boolean {
+  return role === 'system_admin'
+}
+
+export function isSystemAdminFromUser(user: User | null): boolean {
+  return isSystemAdminRole(deriveEffectiveGlobalRoleFromUser(user))
+}
+
+export function isSystemAdminFromProfileAndUser(
+  profile: Partial<Pick<UserProfile, 'global_role' | 'role'>> | null,
+  user: User | null
+): boolean {
+  return isSystemAdminRole(deriveEffectiveGlobalRole(profile, user))
+}
+
 export function deriveEffectiveGlobalRole(
   profile: Partial<Pick<UserProfile, 'global_role' | 'role'>> | null,
   user: User | null

@@ -5,6 +5,8 @@
 > **Syfte:** Kartlägga nuvarande tillstånd, identifiera risker och föreslå en genomtänkt ändringsplan inför beta-launch.  
 > **Status:** MS0–MS5 implementerade. Se `planner-architecture.md` för stabil systemöversikt.
 
+**Post-launch notering (2026-03-19):** publish/status-spliten är delvis stängd. `published` kan inte längre sättas via `/api/plans/[planId]/status`, och bulk publish är avstängd tills den kan skapa versionssnapshot. Kvarvarande planner-risker ligger nu främst i read/cache/AppShell-synk och övriga post-launch-förbättringar, inte i dubbla publiceringssemantiker.
+
 ---
 
 ## 1. Audit (Nuvarande läge)
@@ -156,6 +158,7 @@ Plan (plans-tabell)
 | Risk | Sannolikhet | Påverkan | Beskrivning |
 |------|-------------|----------|-------------|
 | **Duplicerad UI-logik admin vs app** | HÖG | MEDEL | Admin-sidorna (1 112 rader) duplicerar lista/detalj/åtgärder. Vid ändringar i features/planner syns de inte i admin. |
+| ~~**Publish/status split-brain**~~ | ~~MEDEL~~ | ~~HÖG~~ | ✅ **LÖST** (2026-03-19) — `published` kräver nu `/publish` så version snapshot alltid skapas. `/status` får inte längre användas för att sätta `published`, och bulk publish är avstängd tills samma semantik kan garanteras. |
 | **Två i18n-system** | ~~MEDEL~~ | ~~LÅG~~ | ✅ **LÖST** — `lib/planner/locales.json` + `i18n.ts` raderade (död kod). Alla nycklar i `messages/*.json` |
 | **Legacy tabeller/API** | LÅG | LÅG | `plan_games`, `plan_play_progress`, `fetchLegacyPlayView` — fungerar men skapar förvirring |
 | **RLS-gap för delning** | ~~HÖG~~ | ~~HÖG~~ | ✅ **LÖST** (MS5) — Tenant-aware RLS-policies implementerade för alla planner-tabeller. Migration `20260305100000_tenant_rls_planner.sql`. `plan_version_blocks` SELECT existerade redan (gammalt namn `users_can_select_version_blocks`), standardiserad till `plan_version_blocks_select`. |

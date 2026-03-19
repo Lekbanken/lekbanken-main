@@ -2,7 +2,8 @@
 
 import { z } from 'zod'
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
-import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
+import { getCurrentAdminUser } from '@/lib/auth/admin-actions'
+import { isTenantAdmin } from '@/lib/utils/tenantAuth'
 
 // ============================================================================
 // TYPES
@@ -53,24 +54,6 @@ const DEDUP_WINDOW_MS = 5 * 60 * 1000 // 5 minutes
 // AUTH HELPERS
 // ============================================================================
 
-interface AdminUser {
-  user: { id: string; email?: string; app_metadata?: Record<string, unknown> }
-  isSystem: boolean
-  error?: string
-}
-
-async function getCurrentAdminUser(): Promise<AdminUser> {
-  const supabase = await createServerRlsClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
-  
-  if (error || !user) {
-    return { user: null as unknown as AdminUser['user'], isSystem: false, error: 'Ej inloggad' }
-  }
-  
-  const isSystem = isSystemAdmin(user)
-  return { user, isSystem }
-}
-
 // ============================================================================
 // LIST TENANTS (for System Admin)
 // ============================================================================
@@ -81,7 +64,7 @@ export async function listTenantsForNotifications(): Promise<{
   error?: string
 }> {
   const { user, isSystem, error } = await getCurrentAdminUser()
-  if (error) return { success: false, error }
+  if (error || !user) return { success: false, error: error ?? 'Ej inloggad' }
   
   try {
     if (isSystem) {
@@ -130,7 +113,7 @@ export async function listUsersInTenant(tenantId: string): Promise<{
   error?: string
 }> {
   const { user, isSystem, error } = await getCurrentAdminUser()
-  if (error) return { success: false, error }
+  if (error || !user) return { success: false, error: error ?? 'Ej inloggad' }
   
   // Check access
   if (!isSystem) {
@@ -174,7 +157,7 @@ export async function listUsersInTenant(tenantId: string): Promise<{
 
 export async function sendAdminNotification(params: SendNotificationParams): Promise<SendNotificationResult> {
   const { user, isSystem, error: authError } = await getCurrentAdminUser()
-  if (authError) return { success: false, error: authError }
+  if (authError || !user) return { success: false, error: authError ?? 'Ej inloggad' }
   
   // --- Zod validation (Block B.1) ---
   const parsed = SendNotificationSchema.safeParse(params)
@@ -285,8 +268,8 @@ export async function checkNotificationAdminAccess(): Promise<{
 }> {
   const { user, isSystem, error } = await getCurrentAdminUser()
   
-  if (error) {
-    return { hasAccess: false, isSystemAdmin: false, error }
+  if (error || !user) {
+    return { hasAccess: false, isSystemAdmin: false, error: error ?? 'Ej inloggad' }
   }
   
   // System admins always have access

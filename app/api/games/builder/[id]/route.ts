@@ -276,10 +276,12 @@ export const GET = apiHandler({
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  // TI-001: Validate caller is a tenant member or system admin
+  // BUG-030: Validate caller has editor/admin/owner role in owning tenant (matches PUT check)
   if (game.owner_tenant_id) {
     const membership = ctx.memberships.find(m => m.tenant_id === game.owner_tenant_id);
-    if (!membership && ctx.effectiveGlobalRole !== 'system_admin') {
+    const role = membership?.role;
+    const hasEditRole = role === 'editor' || role === 'admin' || role === 'owner';
+    if (!hasEditRole && ctx.effectiveGlobalRole !== 'system_admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
   } else if (ctx.effectiveGlobalRole !== 'system_admin') {

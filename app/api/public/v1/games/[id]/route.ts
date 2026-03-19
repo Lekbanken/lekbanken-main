@@ -77,10 +77,12 @@ export async function GET(request: Request, { params }: RouteParams) {
 
   // Fetch stats if requested
   if (includeStats) {
+    // BUG-041: Scope stats to requesting tenant — prevent cross-tenant session leak
     const { data: sessions } = await supabase
       .from('participant_sessions')
       .select('id, status, started_at, ended_at')
-      .eq('game_id', id);
+      .eq('game_id', id)
+      .eq('tenant_id', tenantId);
 
     if (sessions) {
       const completedSessions = sessions.filter((s) => s.status === 'ended');

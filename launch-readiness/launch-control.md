@@ -47,7 +47,7 @@ No architectural changes will be implemented before real production traffic has 
 
 | Domain | Audit | Remediation | Regression | i18n | Tests | Docs | Status |
 |--------|-------|-------------|------------|------|-------|------|--------|
-| Auth / Onboarding | ✅ | ✅ | ✅ | — | — | — | Covered by Security & Auth Audit (17 findings). All P0/P1 resolved. Regression covered by cross-cutting + per-domain regressions. |
+| Auth / Onboarding | ✅ | 🟡 | ✅ | — | — | — | Covered by Security & Auth Audit (17 findings). All original P0/P1 resolved. **⚠️ MFA sub-audit (2026-03-18):** 5 new findings (2 P0, 2 P1, 1 P2) — schema drift, silent failure, cross-tenant MFA bypass. See `audits/mfa-trusted-device-audit.md`. Remediation pending. |
 | Tenants / Multi-tenancy | ✅ | ✅ | ✅ | — | — | — | Audit complete — 10 findings. TI-001 P0 fixed. TI-002/TI-NEW-1c resolved (product decisions). Regression covered by per-domain tenant boundary checks (Games, Planner, Journey, Media). |
 | Games / Library | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | Audit complete + GPT-calibrated — 14 findings (0 P0, 3 P1, 8 P2, 3 P3). **M1 ✅** **M2 ✅** **M3 ✅** — 0 P0, 0 P1 remaining. **Remediation complete for launch scope.** M4 deferred post-launch. **Regression ✅ (2026-03-14)** — all 8 areas pass, all 7 M1–M3 fixes verified intact, 18 handlers verified, 0 new findings. Test-group-ready for current scope. See `audits/games-regression-audit.md`. |
 | Game Authoring (Admin) | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | Covered by Games System Audit (builder routes, publish, snapshots included). Regression verified in Games regression (2026-03-14). |
@@ -95,7 +95,7 @@ No architectural changes will be implemented before real production traffic has 
 
 | Area | Audit | Remediation | Status |
 |------|-------|-------------|--------|
-| API Security & Auth (287 routes) | ✅ | ✅ | 17 findings. All P0/P1 resolved. SEC-002b open (infra — non-actionable). |
+| API Security & Auth (287 routes) | ✅ | 🟡 | 17 original findings. All original P0/P1 resolved. SEC-002b open (infra — non-actionable). **MFA sub-audit (2026-03-18):** +5 findings (2 P0, 2 P1, 1 P2) — remediation pending. |
 | API Consistency (288 routes) | ✅ | ✅ | 14 findings. APC-003/011 resolved (RLS policy). Wrapper: **253/288 (87.8%)**, 369/410 (90.0%). |
 | Tenant Isolation | ✅ | ✅ | 10 findings. TI-001 P0 fixed. TI-002/TI-NEW-1c product decisions resolved. |
 | i18n | ✅ | ✅ | 7 findings (0 P0, 0 P1, 2 P2, 5 P3). GPT-calibrated. sv complete, en/no synced (2026-03-15): 932 en + 1104 no keys added, 430 en + 997 no orphans removed. All 3 locales at 11,927 keys. |
@@ -120,10 +120,16 @@ No architectural changes will be implemented before real production traffic has 
 
 | Severity | Count | Resolved | Remaining |
 |----------|-------|----------|-----------|
-| P0 — Launch blocker | 13 | 13 | 0 |
-| P1 — Must fix before launch | 47 | 47 | 0 — SEC-002b infra (non-actionable), SYS-001 converging (self-resolving) |
-| P2 — Should fix, not blocker | 135 | 15 | 120 — post-launch backlog |
+| P0 — Launch blocker | 15 | 13 | 2 — MFA-004 (silent data corruption), MFA-005 (cross-tenant MFA bypass) |
+| P1 — Must fix before launch | 49 + 24 new | 47 | 2 legacy + 24 new Codex — see below |
+| P2 — Should fix, not blocker | 136 + 3 new | 15 | 121 legacy + MFA-003, BUG-009, BUG-021 |
 | P3 — Nice to have | 90 | 0 | 90 — post-launch backlog |
+
+> **MFA sub-audit (2026-03-18):** 5 new findings discovered by Codex, verified by Claude against generated types and baseline migration. All caused by `as unknown as SupabaseClient` casts bypassing TypeScript checking. See `audits/mfa-trusted-device-audit.md` and `implementation/mfa-trusted-device-remediation.md`. **Status: findings verified, remediation PENDING. DD-MFA-1 (tenant scope) must be locked before MFA-005 fix.**
+
+> **⚠️ Codex Cluster Triage (2026-03-18):** 24 additional findings (BUG-006 through BUG-029) discovered by Codex across 6 clusters: Tenant Admin (C1), Account Management (C2), Participant/Session (C3), Billing/Stripe (C4), Entitlement/Access (C5), Games Catalog (C6). 11 of 29 total findings independently verified by Claude; remaining 18 marked "VERIFIED (Codex)" — high confidence based on code proof but not yet re-verified. All 29 findings triaged into 8 root-cause families and 3 remediation waves. **No implementation started.** See:
+> - `audits/post-launch-cluster-triage.md` — master triage table + root-cause families + wave assignments
+> - `implementation/post-launch-remediation-waves.md` — execution order + dependencies + regression plans
 
 > **P1 clarification:** 47 P1s were discovered across all 23 audits. 45 were resolved via code fixes, product decisions, or kill-switches. The 2 remaining are non-actionable: SEC-002b requires an infrastructure decision (Upstash), SYS-001 self-resolves as wrapper adoption continues. **12 Abuse & Privacy P1s** (ABUSE-003/004, UPLOAD-001–003, LEAK-001–003, ENUM-001/002) were **fixed 2026-03-15** — rate limiting, MIME validation, storage quota enforcement, error leaking removal, data exposure closure, and anti-enumeration hardening.
 
@@ -178,6 +184,11 @@ After 8 domain audits and Batches 1–6d wrapper migration (90.0% handler covera
 **Remaining work:**
 1. **SEC-002b** — infra decision (can ship with in-memory limiter, upgrade post-launch)
 2. **SYS-001** — self-resolving (90.0% → continues toward 100%)
+3. **MFA-004** (P0) — `user_mfa` update uses wrong field names + returns success on failure. **Status: OPEN, executable immediately.** See `implementation/post-launch-remediation-waves.md` §1.1.
+4. **MFA-005** (P0) — Cross-tenant MFA bypass: `verifyTrustedDevice()` missing `tenant_id` filter. **Status: OPEN, blocked on DD-MFA-1 (tenant scope decision).** See `implementation/post-launch-remediation-waves.md` §1.8.
+5. **MFA-001** (P1) — `profiles!inner` join references non-existent relation. **Status: OPEN.** Wave 2.
+6. **MFA-002** (P1) — `.eq('is_active', true)` on non-existent column. **Status: OPEN.** Wave 2.
+7. **BUG-006–029** (24 findings, P1/P2) — Codex cluster findings across 6 domains. **Status: TRIAGED, remediation not started.** Wave 1: BUG-006, BUG-019, BUG-020, BUG-022, BUG-025, BUG-027, BUG-029. See `implementation/post-launch-remediation-waves.md`.
 
 ### Unverified Findings (from prior audits — needs triage)
 
@@ -227,6 +238,8 @@ Order of audits to execute. Each audit follows the cycle: **Audit → Implement 
 | 22 | React Server/Client Boundary | 'use client' boundaries, hydration mismatches, RSC data flow | ✅ Complete — 7 findings (0 P0, 0 P1, 3 P2, 4 P3). GPT-calibrated. No launch remediation needed. | `audits/react-boundary-audit.md` |
 | 23 | Migration Safety | 330+ migrations, rollback strategy, destructive DDL, data backfill | ✅ Complete — 14 findings (0 P0, 1 P1, 9 P2, 4 P3). GPT-calibrated. | `audits/migration-safety-audit.md` |
 | 24 | Demo | Ephemeral users, demo sessions, feature gating, conversion tracking, cleanup, abuse tolerance | ✅ Complete — 18 findings (0 P0, 3 P1, 10 P2, 5 P3). Own domain per GPT directive. | `audits/demo-audit.md` |
+| 25 | MFA & Trusted Devices | MFA admin listing, admin reset, trusted device trust/verify/revoke, tenant isolation | 🟡 Audit complete, remediation pending — 5 findings (2 P0, 2 P1, 1 P2). Codex discovery, Claude verification. | `audits/mfa-trusted-device-audit.md` |
+| 26 | Codex Cluster Triage | Cross-domain findings from Codex static analysis — admin, accounts, participants, billing, games | 🟡 Triage complete, remediation pending — 24 findings (0 P0, 21 P1, 3 P2) across 6 clusters, 8 root-cause families, 3 waves. | `audits/post-launch-cluster-triage.md` |
 
 ### Audit Cycle Rule
 

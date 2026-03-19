@@ -136,7 +136,7 @@ export const GET = apiHandler({
       occurredAt,
       title: `Spelade: ${gameName}`,
       description: typeof s.score === 'number' ? `Poäng: ${s.score}` : undefined,
-      href: '/app/play',
+      href: '/app/play/sessions',
       meta: { gameId: s.game_id, score: s.score, durationSeconds: s.duration_seconds },
     });
   }
@@ -149,7 +149,7 @@ export const GET = apiHandler({
       type: 'plan_progressed',
       occurredAt,
       title: `Fortsatte plan: ${planName}`,
-      href: `/app/planner/${p.plan_id}`,
+      href: `/app/planner/plan/${p.plan_id}`,
       meta: { planId: p.plan_id },
     });
   }

@@ -70,7 +70,7 @@ export function HostSessionsClient() {
   );
   
   const activeSessions = sessions.filter((s) => s.status === 'active' || s.status === 'paused');
-  const playNavIcon = appNavItems.find((item) => item.href === '/app/play')?.icon;
+  const playNavIcon = appNavItems.find((item) => item.href === '/app/play/sessions')?.icon;
 
   return (
     <div className="space-y-6">

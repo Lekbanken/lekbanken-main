@@ -34,10 +34,10 @@ const COSMETIC_LOADOUT_REQUIRED_LEVEL = 2
 
 // Mock data - replace with real data fetching
 const quickActions = [
-  { icon: MagnifyingGlassIcon, label: 'Upptäck', href: '/app/browse', color: 'bg-primary/10 text-primary' },
-  { icon: CalendarIcon, label: 'Planera', href: '/app/planner', color: 'bg-amber-500/10 text-amber-600' },
-  { icon: PlayIcon, label: 'Spela', href: '/app/play', color: 'bg-emerald-500/10 text-emerald-600' },
-  { icon: TrophyIcon, label: 'Topplista', href: '/app/leaderboard', color: 'bg-violet-500/10 text-violet-600' },
+  { icon: MagnifyingGlassIcon, label: 'Upptäck', href: '/app/browse', color: 'bg-primary/10 text-primary', prefetch: true },
+  { icon: CalendarIcon, label: 'Planera', href: '/app/planner/plans', color: 'bg-amber-500/10 text-amber-600', prefetch: false },
+  { icon: PlayIcon, label: 'Spela', href: '/app/play/sessions', color: 'bg-emerald-500/10 text-emerald-600', prefetch: false },
+  { icon: TrophyIcon, label: 'Topplista', href: '/app/leaderboard', color: 'bg-violet-500/10 text-violet-600', prefetch: false },
 ]
 
 function formatRelativeTimeSv(iso: string): string {
@@ -286,6 +286,7 @@ export default function AppDashboardPage() {
             <Link
               key={action.href}
               href={action.href}
+              prefetch={action.prefetch}
               className="group flex flex-col items-center gap-3 rounded-2xl border border-border/50 bg-card p-5 transition-all hover:border-primary/30 hover:shadow-lg hover:-translate-y-0.5"
             >
               <div className={`rounded-xl p-3 ${action.color} transition-transform group-hover:scale-110`}>
@@ -334,7 +335,7 @@ export default function AppDashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-foreground">{t('dashboard.pinnedAchievements.title')}</h2>
-          <Link href="/app/gamification/achievements" className="text-sm text-primary hover:underline">
+          <Link href="/app/gamification/achievements" prefetch={false} className="text-sm text-primary hover:underline">
             {t('dashboard.pinnedAchievements.manage')}
           </Link>
         </div>
@@ -366,7 +367,7 @@ export default function AppDashboardPage() {
                 {t('dashboard.pinnedAchievements.emptyHint')}
               </p>
               <div className="mt-3">
-                <Link href="/app/gamification/achievements" className="inline-flex text-sm font-semibold text-primary hover:underline">
+                <Link href="/app/gamification/achievements" prefetch={false} className="inline-flex text-sm font-semibold text-primary hover:underline">
                   {t('dashboard.pinnedAchievements.goToAchievements')}
                   <ArrowRightIcon className="h-4 w-4 ml-1" />
                 </Link>
@@ -380,7 +381,7 @@ export default function AppDashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-foreground">{t('dashboard.cosmetics.title')}</h2>
-          <Link href="/app/shop" className="text-sm text-primary hover:underline">
+          <Link href="/app/shop" prefetch={false} className="text-sm text-primary hover:underline">
             {t('dashboard.cosmetics.toShop')}
           </Link>
         </div>
@@ -454,7 +455,7 @@ export default function AppDashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       {activity.href ? (
-                        <Link href={activity.href} className="font-medium text-foreground truncate hover:underline">
+                        <Link href={activity.href} prefetch={false} className="font-medium text-foreground truncate hover:underline">
                           {activity.title}
                         </Link>
                       ) : (
@@ -481,6 +482,7 @@ export default function AppDashboardPage() {
         <h2 className="text-lg font-semibold text-foreground mb-4">{t('dashboard.continue.title')}</h2>
         <Link
           href="/app/browse"
+          prefetch
           className="flex items-center justify-between rounded-2xl border border-border/50 bg-gradient-to-r from-primary/5 to-accent/5 p-6 transition-all hover:border-primary/30 hover:shadow-lg group"
         >
           <div>

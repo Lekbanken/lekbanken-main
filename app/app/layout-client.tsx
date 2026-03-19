@@ -17,7 +17,9 @@ const ROOT_ROUTES = [
   '/app',
   '/app/browse',
   '/app/play',
+  '/app/play/sessions',
   '/app/planner',
+  '/app/planner/plans',
   '/app/profile',
 ];
 

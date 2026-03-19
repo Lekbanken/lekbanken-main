@@ -7,6 +7,7 @@ export type AppNavItem = {
   icon: JSX.Element;
   iconActive: JSX.Element;
   isHero?: boolean; // For the central "Play" button
+  prefetch?: boolean;
 };
 
 function navPngIcon({ src, alt, size, className }: { src: string; alt: string; size: number; className?: string }) {
@@ -58,9 +59,9 @@ const iconUserActive = (
 );
 
 export const appNavItems: AppNavItem[] = [
-  { href: "/app/gamification", labelKey: "app.nav.gamification", icon: iconLekvaluta, iconActive: iconLekvalutaActive },
-  { href: "/app/browse", labelKey: "app.nav.browse", icon: iconBrowse, iconActive: iconBrowseActive },
-  { href: "/app/play", labelKey: "app.nav.play", icon: iconPlay, iconActive: iconPlayActive, isHero: true },
-  { href: "/app/planner", labelKey: "app.nav.planner", icon: iconPlanning, iconActive: iconPlanningActive },
-  { href: "/app/profile", labelKey: "app.nav.profile", icon: iconUser, iconActive: iconUserActive },
+  { href: "/app/gamification", labelKey: "app.nav.gamification", icon: iconLekvaluta, iconActive: iconLekvalutaActive, prefetch: false },
+  { href: "/app/browse", labelKey: "app.nav.browse", icon: iconBrowse, iconActive: iconBrowseActive, prefetch: true },
+  { href: "/app/play/sessions", labelKey: "app.nav.play", icon: iconPlay, iconActive: iconPlayActive, isHero: true, prefetch: false },
+  { href: "/app/planner/plans", labelKey: "app.nav.planner", icon: iconPlanning, iconActive: iconPlanningActive, prefetch: false },
+  { href: "/app/profile", labelKey: "app.nav.profile", icon: iconUser, iconActive: iconUserActive, prefetch: false },
 ];

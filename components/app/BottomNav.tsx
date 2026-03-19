@@ -81,6 +81,7 @@ export function BottomNav() {
               <Link
                 key={tab.href}
                 href={tab.href}
+                prefetch={tab.prefetch}
                 aria-label={t(tab.labelKey)}
                 aria-current={active ? "page" : undefined}
                 className="group relative flex flex-col items-center justify-center py-1"
@@ -148,6 +149,7 @@ export function BottomNav() {
             <Link
               key={tab.href}
               href={tab.href}
+              prefetch={tab.prefetch}
               aria-label={t(tab.labelKey)}
               aria-current={active ? "page" : undefined}
               className={buttonClasses}

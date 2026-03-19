@@ -15,11 +15,13 @@ export const POST = apiHandler({
       return NextResponse.json({ errors: ['session_id is required'] }, { status: 400 })
     }
 
-    // Best-effort revoke via admin API
+    // BUG-013: Auth revocation is the critical operation — if it fails, the session
+    // remains valid in Supabase Auth. Do not mark as revoked locally unless auth succeeds.
     try {
       await supabaseAdmin.auth.admin.signOut(body.session_id)
     } catch (err) {
-      console.warn('[accounts/sessions/revoke] admin signOut warning', err)
+      console.error('[accounts/sessions/revoke] admin signOut failed', err)
+      return NextResponse.json({ error: 'Failed to revoke session' }, { status: 500 })
     }
 
     const { error } = await supabase

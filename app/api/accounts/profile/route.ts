@@ -94,6 +94,11 @@ export const PATCH = apiHandler({
   // NOTE: avatar_url, language, theme preferences are now ONLY stored in user_profiles
   // This reduces JWT token size and prevents cookie chunking
 
+  // BUG-012: Track which writes have committed so errors indicate partial state.
+  // These three writes are not transactional (auth.updateUser is external).
+  // On failure after a prior write, we return a specific error so the client knows to retry.
+  let writesCommitted = 0
+
   if (Object.keys(userUpdate).length > 0) {
     const { data, error } = await supabase
       .from('users')
@@ -113,6 +118,7 @@ export const PATCH = apiHandler({
     if (!data) {
       console.warn('[accounts/profile] users update returned no data - row may not exist', { userId: userId })
     }
+    writesCommitted++
   }
 
   if (Object.keys(profileUpdate).length > 0) {
@@ -121,15 +127,22 @@ export const PATCH = apiHandler({
       .upsert({ user_id: userId, ...profileUpdate }, { onConflict: 'user_id' })
     if (error) {
       console.error('[accounts/profile] profiles upsert error', error)
-      return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
+      return NextResponse.json({
+        error: 'Failed to update profile',
+        partial: writesCommitted > 0,
+      }, { status: 500 })
     }
+    writesCommitted++
   }
 
   if (Object.keys(authMetadata).length > 0) {
     const { error: authError } = await supabase.auth.updateUser({ data: authMetadata })
     if (authError) {
       console.error('[accounts/profile] auth metadata update error', authError)
-      return NextResponse.json({ error: 'Failed to update auth profile' }, { status: 500 })
+      return NextResponse.json({
+        error: 'Failed to update auth profile',
+        partial: writesCommitted > 0,
+      }, { status: 500 })
     }
   }
 

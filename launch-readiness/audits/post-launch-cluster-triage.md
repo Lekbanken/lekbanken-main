@@ -23,12 +23,12 @@
 | BUG-009 | C1 | Members page Retry deadlocks into loading state | VERIFIED (Codex) | P2 | Standalone UX bug | Wave 3 | `members/page.tsx` | — |
 | BUG-010 | C2 | Sessions list selects non-existent columns | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/sessions/route.ts` | Fixed: select correct columns from user_sessions |
 | BUG-011 | C2 | Devices list selects non-existent columns | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/devices/route.ts` | Fixed: select correct columns from user_devices |
-| BUG-012 | C2 | Profile update partial commit (no rollback) | VERIFIED (Codex) | P1 | RC-4 False success | Wave 2 | `accounts/profile/route.ts` | — |
-| BUG-013 | C2 | Session revoke reports success even when auth revocation fails | VERIFIED (Codex) | P1 | RC-4 False success | Wave 2 | `accounts/sessions/revoke/route.ts` | — |
+| BUG-012 | C2 | Profile update partial commit (no rollback) | ✅ FIXED | P1 | RC-4 False success | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/profile/route.ts` | Fixed: writesCommitted counter + partial flag on error response |
+| BUG-013 | C2 | Session revoke reports success even when auth revocation fails | ✅ FIXED | P1 | RC-4 False success | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `accounts/sessions/revoke/route.ts` | Fixed: fail-hard if auth signOut fails — return 500 before local revoke |
 | BUG-014 | C2 | Notification settings destroys granular preferences | VERIFIED (Codex) | P1 | RC-8 Lossy data mapping | Wave 3 | `accounts/profile/notifications/route.ts` | — |
 | BUG-015 | C3 | Multi-tenant user fails session create (.single() on multi-row) | VERIFIED (Codex) | P1 | RC-2 Tenant drift | Wave 2 | `participants/sessions/create/route.ts` | — |
-| BUG-016 | C3 | Participant join oversubscribes session (count-then-insert race) | VERIFIED (Codex) | P1 | RC-3 TOCTOU race | Wave 2 | `participants/sessions/join/route.ts` | RC-3 family fix |
-| BUG-017 | C3 | No-expiry token quota enforcement is non-atomic + silent bypass | VERIFIED (Codex) | P1 | RC-3 TOCTOU race | Wave 2 | `lib/services/participants/session-service.ts` | RC-3 family fix |
+| BUG-016 | C3 | Participant join oversubscribes session (count-then-insert race) | ✅ FIXED | P1 | RC-3 TOCTOU race | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `participants/sessions/join/route.ts` | Fixed: check_session_join_allowed RPC with FOR UPDATE lock |
+| BUG-017 | C3 | No-expiry token quota enforcement is non-atomic + silent bypass | ✅ FIXED | P1 | RC-3 TOCTOU race | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `lib/services/participants/session-service.ts` | Fixed: check_and_increment_no_expiry_quota RPC — atomic check+increment with FOR UPDATE |
 | BUG-018 | C4 | Stripe customer lookup inconsistent across billing routes | VERIFIED (Codex) | P1 | RC-8 Lossy data mapping | Wave 2 | `billing/portal/route.ts`, `billing/subscription/update/route.ts` | Centralize customer resolution |
 | BUG-019 | C4 | Cart checkout charges N items, provisions only first | ✅ FIXED | P1 | RC-4 False success | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `checkout/cart/route.ts`, `billing/webhooks/stripe/route.ts` | Multi-product provisioning loop from Stripe metadata |
 | BUG-020 | C4 | Seat assignment oversubscription race | ✅ FIXED | P1 | RC-3 TOCTOU race | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `billing/tenants/[tenantId]/seats/route.ts` | DD-RACE-1 resolved |
@@ -47,9 +47,9 @@
 | BUG-033 | C7 | CSV import allows cross-tenant owner_tenant_id injection | ✅ FIXED | P1 | RC-2 Tenant drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `games/csv-import/route.ts` | Fixed: force owner_tenant_id to authenticated context |
 | BUG-034 | C7 | CSV import preserves arbitrary status from CSV data | ✅ FIXED | P1 | RC-7 AuthZ bypass | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `games/csv-import/route.ts` | Fixed as part of BUG-029 family |
 | BUG-035 | C8 | Invitation email not verified before granting membership | ✅ FIXED | P1 | RC-6 Bespoke auth drift | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `invitations/[token]/accept/route.ts` | Case-insensitive email check + audit log on mismatch |
-| BUG-036 | C8 | Invite accept overwrites existing membership role | CODEX-REPORTED | P1 | RC-8 Lossy data mapping | Wave 2 | `invitations/accept/route.ts` | Bundle w/ BUG-035 (same file) |
-| BUG-037 | C8 | PATCH membership clears seat_assignment_id | CODEX-REPORTED | P1 | RC-8 Lossy data mapping | Wave 2 | `memberships/route.ts` | — |
-| BUG-038 | C8 | Multiple primary tenants possible (no uniqueness constraint) | CODEX-REPORTED | P1 | RC-2 Tenant drift | Wave 2 | `user_tenant_memberships` table | Needs migration (unique constraint) |
+| BUG-036 | C8 | Invite accept overwrites existing membership role | ✅ FIXED | P1 | RC-8 Lossy data mapping | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `invitations/accept/route.ts` | Fixed: check-first pattern, only upgrade role (ROLE_RANK map), never downgrade |
+| BUG-037 | C8 | PATCH membership clears seat_assignment_id | ✅ FIXED | P1 | RC-8 Lossy data mapping | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `memberships/route.ts` | Fixed: conditional field inclusion — only sets fields actually in request body |
+| BUG-038 | C8 | Multiple primary tenants possible (no uniqueness constraint) | ✅ FIXED | P1 | RC-2 Tenant drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `user_tenant_memberships` table | Fixed: partial unique index on (user_id) WHERE is_primary = TRUE + clear-old-primary in write paths |
 | BUG-039 | C9 | Public APIs serve data without any auth | **PARTIALLY VERIFIED** | P1 | RC-7 AuthZ bypass | Wave 2 (needs decision) | Public API routes | Comment says `// API key validation would go here`; service role client bypasses RLS; by-design tension |
 | BUG-040 | C9 | Pagination count mismatch (total from different query) | CODEX-REPORTED | P2 | Standalone logic bug | Wave 3 | Various listing routes | — |
 | BUG-041 | C9 | Cross-tenant stats leak through shared endpoint | ✅ FIXED | P1 | RC-2 Tenant drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `public/v1/games/[id]/route.ts` | Fixed: stats query scoped by tenant_id |
@@ -106,7 +106,7 @@
 
 **Definition:** Code assumes a single-tenant context or uses the wrong tenant source. Pages use mutable `currentTenant` from context instead of route param. Services use `.single()` on multi-tenant membership queries. Verify/delete paths omit `tenant_id` entirely.
 
-**Members:** MFA-005, ~~BUG-006~~, BUG-015, BUG-023, BUG-033, BUG-038, BUG-041
+**Members:** MFA-005, ~~BUG-006~~, BUG-015, ~~BUG-023~~, ~~BUG-033~~, ~~BUG-038~~, ~~BUG-041~~
 
 **Why they're the same problem:** All fail when a user belongs to multiple tenants, or when the active context doesn't match the URL. The system was built for multi-tenancy at the DB layer but some application paths assume single-tenant.
 
@@ -122,7 +122,7 @@
 
 **Definition:** Count/check query followed by separate insert/update without transactional guard. Concurrent requests can all pass the check before any write commits.
 
-**Members:** BUG-016, BUG-017, BUG-020
+**Members:** ~~BUG-016~~, ~~BUG-017~~, ~~BUG-020~~
 
 **Why they're the same problem:** All follow the pattern: `SELECT count → compare to limit → INSERT`. No `FOR UPDATE`, no RPC, no transaction. Classic TOCTOU.
 
@@ -137,7 +137,7 @@
 
 **Definition:** Route returns success to the client despite one or more critical downstream writes failing. Creates split-brain state between what the user sees and what the system actually did.
 
-**Members:** ~~MFA-004~~ (also RC-1), BUG-012, BUG-013, ~~BUG-019~~, ~~BUG-025~~, BUG-032
+**Members:** ~~MFA-004~~ (also RC-1), ~~BUG-012~~, ~~BUG-013~~, ~~BUG-019~~, ~~BUG-025~~, BUG-032
 
 **Why they're the same problem:** All catch errors from secondary writes, log them, and continue to return `{ success: true }`. The code treats critical operations as best-effort.
 
@@ -200,7 +200,7 @@
 
 **Definition:** API layer maps to different field semantics than the DB, or different code paths disagree on where canonical data lives.
 
-**Members:** BUG-014, BUG-018, BUG-021, BUG-036, BUG-037
+**Members:** BUG-014, BUG-018, BUG-021, ~~BUG-036~~, ~~BUG-037~~
 
 **Why they're the same problem:** All have a mismatch between what the API exposes and what the DB actually stores. BUG-014 fabricates fine-grained notification settings from coarse booleans. BUG-018 looks for Stripe customer ID in metadata instead of billing_accounts. BUG-021 mixes local UUIDs and Stripe price IDs in the same column.
 

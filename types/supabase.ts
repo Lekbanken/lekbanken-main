@@ -15160,6 +15160,12 @@ export type Database = {
           xp_reduced: number
         }[]
       }
+      check_and_increment_no_expiry_quota: {
+        Args: {
+          p_tenant_id: string
+        }
+        Returns: boolean
+      }
       check_cooldown_eligible_v1: {
         Args: {
           p_cooldown_type: string
@@ -15182,6 +15188,16 @@ export type Database = {
           request_id: string
           request_type: string
           user_id: string
+        }[]
+      }
+      check_session_join_allowed: {
+        Args: {
+          p_session_id: string
+        }
+        Returns: {
+          allowed: boolean
+          current_count: number
+          max_allowed: number
         }[]
       }
       cleanup_demo_users: { Args: never; Returns: Json }

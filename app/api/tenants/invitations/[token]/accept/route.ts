@@ -56,19 +56,46 @@ export const POST = apiHandler({
       )
     }
 
-    const { error: memberError } = await supabase.from('user_tenant_memberships').upsert(
-      {
+    // BUG-036: Check for existing membership before upserting.
+    // If user already has a membership with a higher role, keep it.
+    const ROLE_RANK: Record<string, number> = { owner: 4, admin: 3, editor: 2, member: 1 }
+    const inviteRole = invite.role as TenantRole
+
+    const { data: existingMembership } = await supabase
+      .from('user_tenant_memberships')
+      .select('id, role, status')
+      .eq('tenant_id', invite.tenant_id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (existingMembership) {
+      // User already a member — only upgrade role, never downgrade
+      const existingRank = ROLE_RANK[existingMembership.role] ?? 0
+      const inviteRank = ROLE_RANK[inviteRole] ?? 0
+      const effectiveRole = inviteRank > existingRank ? inviteRole : existingMembership.role as TenantRole
+
+      const { error: memberError } = await supabase
+        .from('user_tenant_memberships')
+        .update({ role: effectiveRole, status: 'active' })
+        .eq('id', existingMembership.id)
+
+      if (memberError) {
+        console.error('[api/tenants/invitations/:token/accept] membership update error', memberError)
+        return NextResponse.json({ error: 'Failed to accept invite' }, { status: 500 })
+      }
+    } else {
+      // New membership
+      const { error: memberError } = await supabase.from('user_tenant_memberships').insert({
         tenant_id: invite.tenant_id,
         user_id: user.id,
-        role: invite.role as TenantRole,
+        role: inviteRole,
         status: 'active',
-      },
-      { onConflict: 'tenant_id,user_id' }
-    )
+      })
 
-    if (memberError) {
-      console.error('[api/tenants/invitations/:token/accept] membership error', memberError)
-      return NextResponse.json({ error: 'Failed to accept invite' }, { status: 500 })
+      if (memberError) {
+        console.error('[api/tenants/invitations/:token/accept] membership insert error', memberError)
+        return NextResponse.json({ error: 'Failed to accept invite' }, { status: 500 })
+      }
     }
 
     await supabase

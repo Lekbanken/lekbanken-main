@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerRlsClient } from '@/lib/supabase/server'
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { apiHandler } from '@/lib/api/route-handler'
 import { requireTenantRole } from '@/lib/api/auth-guard'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
@@ -41,15 +41,32 @@ export const PATCH = apiHandler({
       return NextResponse.json({ error: 'Demo tenants can only be modified by system admins' }, { status: 403 })
     }
 
+    // BUG-037: Only include fields that were actually provided in the request body.
+    // Previous code defaulted seat_assignment_id to null when not provided,
+    // which would clear existing seat assignments unintentionally.
+    const updatePayload: Record<string, unknown> = {
+      updated_at: new Date().toISOString(),
+    }
+    if (body.role !== undefined) updatePayload.role = body.role
+    if (body.status !== undefined) updatePayload.status = body.status
+    if (body.is_primary !== undefined) updatePayload.is_primary = body.is_primary
+    if ('seat_assignment_id' in body) updatePayload.seat_assignment_id = body.seat_assignment_id ?? null
+
+    // BUG-038: Clear existing primary membership before setting a new one.
+    // The partial unique index (user_id WHERE is_primary = TRUE) enforces at most one primary.
+    // Use service role to clear across tenants (RLS may block cross-tenant writes).
+    if (body.is_primary === true) {
+      const admin = createServiceRoleClient()
+      await admin
+        .from('user_tenant_memberships')
+        .update({ is_primary: false })
+        .eq('user_id', userId)
+        .eq('is_primary', true)
+    }
+
     const { data, error } = await supabase
       .from('user_tenant_memberships')
-      .update({
-        role: body.role,
-        status: body.status,
-        is_primary: body.is_primary,
-        seat_assignment_id: body.seat_assignment_id ?? null,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq('tenant_id', tenantId)
       .eq('user_id', userId)
       .select()

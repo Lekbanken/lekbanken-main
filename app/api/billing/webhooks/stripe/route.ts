@@ -131,6 +131,14 @@ async function provisionFromPurchaseIntent(params: {
 
     tenantId = tenant.id
 
+    // BUG-038: Clear any existing primary membership before inserting new owner as primary.
+    // The partial unique index (user_id WHERE is_primary = TRUE) enforces at most one.
+    await supabaseAdmin
+      .from('user_tenant_memberships')
+      .update({ is_primary: false })
+      .eq('user_id', intent.user_id)
+      .eq('is_primary', true)
+
     const { error: membershipError } = await supabaseAdmin
       .from('user_tenant_memberships')
       .insert({

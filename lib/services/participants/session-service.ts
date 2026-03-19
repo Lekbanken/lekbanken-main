@@ -99,10 +99,8 @@ export class ParticipantSessionService {
         throw error;
       }
       
-      // If no-expiry token used, increment quota
-      if (options.settings?.tokenExpiryHours === null) {
-        await this.incrementNoExpiryQuota(options.tenantId);
-      }
+      // BUG-017: No-expiry quota increment is now handled atomically inside
+      // checkNoExpiryQuota() via the check_and_increment_no_expiry_quota RPC.
       
       logger.info('Participant session created', {
         sessionId: data.id,
@@ -225,66 +223,19 @@ export class ParticipantSessionService {
       });
     }
     
-    // Check tenant quota
-    const { data: quota } = await supabase
-      .from('participant_token_quotas')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .single();
-    
-    if (!quota) {
-      // Create default quota if missing
-      await supabase
-        .from('participant_token_quotas')
-        .insert({ tenant_id: tenantId, no_expiry_tokens_limit: 2 });
-      return true; // First usage allowed
-    }
-    
-    return quota.no_expiry_tokens_used < quota.no_expiry_tokens_limit;
-  }
-  
-  /**
-   * Increment no-expiry token usage
-   */
-  private static async incrementNoExpiryQuota(tenantId: string): Promise<void> {
-    const supabase = await createServiceRoleClient();
+    // BUG-017: Atomic check-and-increment via RPC with FOR UPDATE lock.
+    // Prevents TOCTOU race where concurrent requests both pass the check.
+    const { data: allowed, error: rpcError } = await supabase.rpc(
+      'check_and_increment_no_expiry_quota',
+      { p_tenant_id: tenantId }
+    );
 
-    const { data: quota, error: quotaError } = await supabase
-      .from('participant_token_quotas')
-      .select('no_expiry_tokens_used, no_expiry_tokens_limit')
-      .eq('tenant_id', tenantId)
-      .single();
-
-    if (quotaError) {
-      logger.error('Failed to fetch quota for increment', quotaError, { tenantId });
-      return;
+    if (rpcError) {
+      logger.error('Failed to check no-expiry quota via RPC', rpcError, { tenantId });
+      return false; // Fail closed
     }
 
-    if (!quota) {
-      const { error: createError } = await supabase
-        .from('participant_token_quotas')
-        .insert({
-          tenant_id: tenantId,
-          no_expiry_tokens_limit: 2,
-          no_expiry_tokens_used: 1,
-        });
-
-      if (createError) {
-        logger.error('Failed to create quota record when incrementing', createError, {
-          tenantId,
-        });
-      }
-      return;
-    }
-
-    const { error: updateError } = await supabase
-      .from('participant_token_quotas')
-      .update({ no_expiry_tokens_used: quota.no_expiry_tokens_used + 1 })
-      .eq('tenant_id', tenantId);
-
-    if (updateError) {
-      logger.error('Failed to increment no-expiry quota', updateError, { tenantId });
-    }
+    return Boolean(allowed);
   }
   
   /**

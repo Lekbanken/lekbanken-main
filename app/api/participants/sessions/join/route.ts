@@ -84,28 +84,44 @@ export const POST = apiHandler({
       );
     }
 
-    // Check max participants limit
-    const settings = session.settings as {
-      max_participants?: number;
-      maxParticipants?: number;
-      require_approval?: boolean;
-      requireApproval?: boolean;
-    };
-    const maxParticipants = settings.max_participants ?? settings.maxParticipants;
-    if (maxParticipants && session.participant_count >= maxParticipants) {
+    // BUG-016: Atomic max-participants check via RPC with FOR UPDATE lock.
+    // Prevents TOCTOU race where concurrent requests all pass the count check.
+    const supabase = createServiceRoleClient();
+    const { data: joinCheck, error: joinCheckError } = await supabase.rpc(
+      'check_session_join_allowed',
+      { p_session_id: session.id }
+    );
+
+    if (joinCheckError) {
+      logger.error('Failed to check join eligibility', joinCheckError, {
+        sessionId: session.id,
+      });
+      return NextResponse.json(
+        { error: 'Failed to join session' },
+        { status: 500 },
+      );
+    }
+
+    const checkResult = Array.isArray(joinCheck) ? joinCheck[0] : joinCheck;
+    if (checkResult && !checkResult.allowed) {
       return NextResponse.json(
         { error: 'Unable to join session', code: 'SESSION_FULL' },
         { status: 403 },
       );
     }
 
+    const settings = session.settings as {
+      require_approval?: boolean;
+      requireApproval?: boolean;
+      token_expiry_hours?: number | null;
+    };
     const requireApproval = Boolean(settings.require_approval ?? settings.requireApproval);
 
     // Generate participant token
     const participantToken = generateParticipantToken();
 
     // Calculate token expiry based on session settings
-    const tokenExpiryHours = (session.settings as { token_expiry_hours?: number | null }).token_expiry_hours ?? 24;
+    const tokenExpiryHours = settings.token_expiry_hours ?? 24;
     const tokenExpiresAt = calculateTokenExpiry(tokenExpiryHours);
 
     // Get client IP for security/moderation
@@ -115,7 +131,6 @@ export const POST = apiHandler({
     const userAgent = req.headers.get('user-agent') || 'unknown';
 
     // Create participant
-    const supabase = createServiceRoleClient();
     const { data: participant, error: createError } = await supabase
       .from('participants')
       .insert({

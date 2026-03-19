@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerRlsClient } from '@/lib/supabase/server'
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { apiHandler } from '@/lib/api/route-handler'
 import { requireTenantRole } from '@/lib/api/auth-guard'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
@@ -58,6 +58,17 @@ export const POST = apiHandler({
     const { data: existingTenant } = await supabase.from('tenants').select('type,demo_flag').eq('id', tenantId).maybeSingle()
     if (existingTenant && (existingTenant.type === 'demo' || existingTenant.demo_flag) && auth!.effectiveGlobalRole !== 'system_admin') {
       return NextResponse.json({ error: 'Demo tenants can only be modified by system admins' }, { status: 403 })
+    }
+
+    // BUG-038: Clear existing primary membership before inserting a new primary.
+    // The partial unique index (user_id WHERE is_primary = TRUE) enforces at most one.
+    if (body.is_primary === true) {
+      const admin = createServiceRoleClient()
+      await admin
+        .from('user_tenant_memberships')
+        .update({ is_primary: false })
+        .eq('user_id', body.user_id)
+        .eq('is_primary', true)
     }
 
     const { data, error } = await supabase

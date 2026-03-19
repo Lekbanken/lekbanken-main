@@ -1,10 +1,10 @@
 'use client';
 
+import { use } from 'react';
 import Link from "next/link";
 import { useTranslations } from 'next-intl';
 import { TrophyIcon, StarIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminCard } from "@/components/admin/shared";
-import { useTenant } from "@/lib/context/TenantContext";
 
 const gamificationFeatures = [
   {
@@ -18,9 +18,8 @@ const gamificationFeatures = [
   // Future: Leaderboards, Challenges, Rewards, etc.
 ];
 
-export default function TenantGamificationHubPage() {
-  const { currentTenant } = useTenant();
-  const tenantId = currentTenant?.id;
+export default function TenantGamificationHubPage({ params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = use(params);
   const t = useTranslations('admin.gamification');
 
   return (

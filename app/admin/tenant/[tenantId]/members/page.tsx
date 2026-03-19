@@ -1,12 +1,11 @@
  'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { useTranslations } from 'next-intl';
 import { UsersIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState, AdminErrorState, AdminCard } from "@/components/admin/shared";
 import { Badge, Button, Input, Select } from "@/components/ui";
 import { useToast } from "@/components/ui/toast";
-import { useTenant } from "@/lib/context/TenantContext";
 import { supabase } from "@/lib/supabase/client";
 import type { Database } from "@/types/supabase";
 
@@ -37,10 +36,9 @@ type SeatAssignmentRow = {
   user: { id: string; email: string | null; full_name: string | null } | null;
 };
 
-export default function TenantMembersPage() {
+export default function TenantMembersPage({ params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = use(params);
   const t = useTranslations('admin.tenant.members');
-  const { currentTenant } = useTenant();
-  const tenantId = currentTenant?.id ?? null;
   const { success, warning } = useToast();
 
   const [members, setMembers] = useState<MemberRow[]>([]);

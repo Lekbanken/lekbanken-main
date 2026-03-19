@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 import {
@@ -11,15 +11,13 @@ import {
   AdminStatGrid,
   AdminStatCard,
 } from '@/components/admin/shared';
-import { useTenant } from '@/lib/context/TenantContext';
 import { getPageViewStats, getSessionStats } from '@/lib/services/analyticsService';
 
 type DateRange = { startDate: string; endDate: string };
 
-export default function TenantAnalyticsPage() {
+export default function TenantAnalyticsPage({ params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = use(params);
   const t = useTranslations('admin.tenant.analytics');
-  const { currentTenant } = useTenant();
-  const tenantId = currentTenant?.id ?? null;
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

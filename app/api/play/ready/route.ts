@@ -14,6 +14,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 import { apiHandler } from '@/lib/api/route-handler';
+import { requireActiveParticipant } from '@/lib/api/play-auth';
 
 export const POST = apiHandler({
   auth: 'participant',
@@ -60,6 +61,10 @@ export const POST = apiHandler({
     if (p!.sessionId !== session.id) {
       return NextResponse.json({ error: 'Session mismatch' }, { status: 403 });
     }
+
+    // BUG-083 FIX: idle participants must not toggle readiness
+    const activeGuard = requireActiveParticipant(p!.status);
+    if (activeGuard) return activeGuard;
 
     // Only allow readiness toggle in lobby state
     if (session.status !== 'lobby' && session.status !== 'active') {

@@ -111,6 +111,23 @@ export async function selectTenant(tenantId: string) {
     .maybeSingle()
 
   if (!membership?.tenant) {
+    // BUG-006: System admins may not have membership in target tenant.
+    // RLS policy `tenants_select_sysadmin` allows system admins to read any tenant row,
+    // so this query only succeeds for system admins — no authorization bypass.
+    const { data: tenant } = await supabase
+      .from('tenants')
+      .select('*')
+      .eq('id', tenantId)
+      .maybeSingle()
+
+    if (tenant) {
+      await setTenantCookie(cookieStore, tenantId)
+      return {
+        tenant: { ...tenant, membership: { tenant_id: tenantId, role: 'admin' } } as TenantWithMembership,
+        role: 'admin' as TenantRole,
+      }
+    }
+
     clearTenantCookie(cookieStore)
     return { tenant: null, role: null }
   }

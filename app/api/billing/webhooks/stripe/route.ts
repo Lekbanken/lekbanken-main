@@ -31,7 +31,7 @@ async function provisionFromPurchaseIntent(params: {
   const { data: intent, error: intentError } = await supabaseAdmin
     .from('purchase_intents')
     .select(
-      'id,kind,status,user_id,email,tenant_id,tenant_name,product_id,product_price_id,quantity_seats,stripe_checkout_session_id,stripe_customer_id,stripe_subscription_id'
+      'id,kind,status,user_id,email,tenant_id,tenant_name,product_id,product_price_id,quantity_seats,stripe_checkout_session_id,stripe_customer_id,stripe_subscription_id,metadata'
     )
     .eq('id', intentId)
     .maybeSingle()
@@ -49,23 +49,9 @@ async function provisionFromPurchaseIntent(params: {
     return
   }
 
-  // Idempotency guard: atomically claim the intent to prevent duplicate provisioning
-  // on Stripe webhook retries. Only one concurrent handler can move status to 'provisioning'.
-  const { data: claimed, error: claimError } = await supabaseAdmin
-    .from('purchase_intents')
-    .update({ status: 'provisioning' as never })
-    .eq('id', intent.id)
-    .in('status', ['draft', 'awaiting_payment', 'paid'])
-    .select('id')
-    .maybeSingle()
-
-  if (claimError) {
-    console.error('[stripe-webhook] purchase_intent claim error', claimError)
-    return
-  }
-  if (!claimed) {
-    // Another handler already claimed this intent — skip
-    console.log('[stripe-webhook] purchase_intent already claimed or provisioned', intent.id)
+  // Skip if already terminally failed (manual intervention required)
+  if (intent.status === 'failed') {
+    console.log('[stripe-webhook] purchase_intent already failed, skipping', intent.id)
     return
   }
 
@@ -161,101 +147,159 @@ async function provisionFromPurchaseIntent(params: {
     }
   }
 
-  // Ensure entitlement exists (idempotent-ish)
-  const { data: existingEntitlement, error: entitlementLookupError } = await supabaseAdmin
-    .from('tenant_product_entitlements')
-    .select('id')
-    .eq('tenant_id', tenantId)
-    .eq('product_id', intent.product_id)
-    .eq('status', 'active')
-    .maybeSingle()
+  // BUG-019 + BUG-025: Provision entitlements for ALL cart products, not just the primary one.
+  // The cart route stores all product IDs both in intent metadata and Stripe session metadata.
+  const allProductIds: string[] = (() => {
+    const metaProductIds = stripeSession.metadata?.product_ids
+    if (metaProductIds) {
+      const parsed = metaProductIds.split(',').filter(Boolean)
+      if (parsed.length > 0) return parsed
+    }
+    // Fallback to the single product_id from the intent record
+    return intent.product_id ? [intent.product_id] : []
+  })()
 
-  if (entitlementLookupError) {
-    console.error('[stripe-webhook] entitlement lookup error', entitlementLookupError)
+  if (allProductIds.length === 0) {
+    console.error('[stripe-webhook] purchase_intent has no product IDs', intent.id)
+    await supabaseAdmin.from('purchase_intents').update({ status: 'failed' }).eq('id', intent.id)
+    return
   }
 
-  let entitlementId = existingEntitlement?.id ?? null
+  const provisionedEntitlementIds: string[] = []
+  let provisioningFailed = false
 
-  if (!existingEntitlement) {
-    const source = stripeSubscriptionId ? 'stripe_subscription' : 'stripe_checkout'
-    const { data: insertedEntitlement, error: entitlementInsertError } = await supabaseAdmin
+  for (const productId of allProductIds) {
+    // Ensure entitlement exists (idempotent-ish)
+    const { data: existingEntitlement, error: entitlementLookupError } = await supabaseAdmin
       .from('tenant_product_entitlements')
-      .insert({
-        tenant_id: tenantId,
-        product_id: intent.product_id,
-        status: 'active',
-        source,
-        quantity_seats: intent.quantity_seats ?? 1,
-        created_by: intent.user_id,
-        metadata: {
-          purchase_intent_id: intent.id,
-          stripe_checkout_session_id: stripeCheckoutSessionId,
-          stripe_customer_id: stripeCustomerId,
-          stripe_subscription_id: stripeSubscriptionId,
-          product_price_id: intent.product_price_id,
-        } as unknown as Json,
-      })
       .select('id')
+      .eq('tenant_id', tenantId)
+      .eq('product_id', productId)
+      .eq('status', 'active')
+      .maybeSingle()
+
+    if (entitlementLookupError) {
+      console.error('[stripe-webhook] entitlement lookup error', entitlementLookupError, productId)
+    }
+
+    let entitlementId = existingEntitlement?.id ?? null
+
+    if (!existingEntitlement) {
+      const source = stripeSubscriptionId ? 'stripe_subscription' : 'stripe_checkout'
+      const { data: insertedEntitlement, error: entitlementInsertError } = await supabaseAdmin
+        .from('tenant_product_entitlements')
+        .insert({
+          tenant_id: tenantId,
+          product_id: productId,
+          status: 'active',
+          source,
+          quantity_seats: intent.quantity_seats ?? 1,
+          created_by: intent.user_id,
+          metadata: {
+            purchase_intent_id: intent.id,
+            stripe_checkout_session_id: stripeCheckoutSessionId,
+            stripe_customer_id: stripeCustomerId,
+            stripe_subscription_id: stripeSubscriptionId,
+            product_price_id: intent.product_price_id,
+          } as unknown as Json,
+        })
+        .select('id')
+        .single()
+
+      if (entitlementInsertError) {
+        console.error('[stripe-webhook] entitlement insert error', entitlementInsertError, productId)
+        provisioningFailed = true
+        continue
+      }
+
+      entitlementId = insertedEntitlement?.id ?? null
+    }
+
+    if (entitlementId) {
+      provisionedEntitlementIds.push(entitlementId)
+
+      // Best-effort: auto-assign a seat to the purchaser/owner so they can access gated content.
+      const { error: seatAssignError } = await supabaseAdmin
+        .from('tenant_entitlement_seat_assignments')
+        .insert({
+          tenant_id: tenantId,
+          entitlement_id: entitlementId,
+          user_id: intent.user_id,
+          assigned_by: intent.user_id,
+          status: 'active',
+        })
+
+      if (seatAssignError && seatAssignError.code !== '23505') {
+        console.error('[stripe-webhook] seat assignment insert error', seatAssignError, productId)
+        // Non-fatal: tenant admins can assign seats later.
+      }
+    }
+
+    // Task 2.2: Expand bundle products into child entitlements
+    const { data: bundleProduct, error: bundleCheckError } = await supabaseAdmin
+      .from('products')
+      .select('is_bundle')
+      .eq('id', productId)
       .single()
 
-    if (entitlementInsertError) {
-      console.error('[stripe-webhook] entitlement insert error', entitlementInsertError)
-      await supabaseAdmin.from('purchase_intents').update({ status: 'failed' }).eq('id', intent.id)
-      return
+    if (bundleCheckError) {
+      console.warn('[stripe-webhook] bundle check error (non-fatal)', bundleCheckError)
     }
 
-    entitlementId = insertedEntitlement?.id ?? null
+    if (bundleProduct?.is_bundle) {
+      console.log('[stripe-webhook] expanding bundle product', productId)
+      
+      const { data: expandedItems, error: expandError } = await supabaseAdmin
+        .rpc('expand_bundle_entitlements', {
+          p_purchase_intent_id: intent.id,
+          p_tenant_id: tenantId,
+          p_bundle_product_id: productId,
+          p_base_quantity: intent.quantity_seats ?? 1,
+          p_expires_at: undefined,
+        })
+
+      if (expandError) {
+        console.error('[stripe-webhook] bundle expansion error', expandError)
+      } else {
+        console.log('[stripe-webhook] expanded bundle to child entitlements', expandedItems)
+      }
+    }
   }
 
-  // Best-effort: auto-assign a seat to the purchaser/owner so they can access gated content.
-  if (entitlementId) {
-    const { error: seatAssignError } = await supabaseAdmin
-      .from('tenant_entitlement_seat_assignments')
-      .insert({
+  if (provisioningFailed && provisionedEntitlementIds.length === 0) {
+    console.error('[stripe-webhook] all entitlement provisioning failed', intent.id)
+    await supabaseAdmin.from('purchase_intents').update({ status: 'failed' }).eq('id', intent.id)
+    return
+  }
+
+  if (provisioningFailed) {
+    // Partial failure: some products provisioned, some failed.
+    // Leave status as 'paid' so Stripe webhook retry can re-attempt the failed products.
+    // Already-provisioned entitlements will be found by existing-check and skipped on retry.
+    console.warn(
+      '[stripe-webhook] partial provisioning failure — leaving intent as paid for retry',
+      { intentId: intent.id, provisioned: provisionedEntitlementIds.length, total: allProductIds.length }
+    )
+    // Store partial result in metadata for observability
+    const existingMetadata = (intent.metadata as Record<string, unknown>) ?? {}
+    await supabaseAdmin
+      .from('purchase_intents')
+      .update({
         tenant_id: tenantId,
-        entitlement_id: entitlementId,
-        user_id: intent.user_id,
-        assigned_by: intent.user_id,
-        status: 'active',
+        stripe_customer_id: stripeCustomerId ?? intent.stripe_customer_id,
+        stripe_subscription_id: stripeSubscriptionId ?? intent.stripe_subscription_id,
+        stripe_checkout_session_id: stripeCheckoutSessionId ?? intent.stripe_checkout_session_id,
+        metadata: {
+          ...existingMetadata,
+          partial_provisioning: {
+            provisioned_entitlement_ids: provisionedEntitlementIds,
+            total_products: allProductIds.length,
+            last_attempt: new Date().toISOString(),
+          },
+        } as unknown as Json,
       })
-
-    if (seatAssignError && seatAssignError.code !== '23505') {
-      console.error('[stripe-webhook] seat assignment insert error', seatAssignError)
-      // Non-fatal: tenant admins can assign seats later.
-    }
-  }
-
-  // Task 2.2: Expand bundle products into child entitlements
-  // Check if the purchased product is a bundle
-  const { data: bundleProduct, error: bundleCheckError } = await supabaseAdmin
-    .from('products')
-    .select('is_bundle')
-    .eq('id', intent.product_id)
-    .single()
-
-  if (bundleCheckError) {
-    console.warn('[stripe-webhook] bundle check error (non-fatal)', bundleCheckError)
-  }
-
-  if (bundleProduct?.is_bundle) {
-    console.log('[stripe-webhook] expanding bundle product', intent.product_id)
-    
-    // Call the expand_bundle_entitlements function
-    const { data: expandedItems, error: expandError } = await supabaseAdmin
-      .rpc('expand_bundle_entitlements', {
-        p_purchase_intent_id: intent.id,
-        p_tenant_id: tenantId,
-        p_bundle_product_id: intent.product_id,
-        p_base_quantity: intent.quantity_seats ?? 1,
-        p_expires_at: undefined, // TODO: Calculate from subscription billing period if needed
-      })
-
-    if (expandError) {
-      console.error('[stripe-webhook] bundle expansion error', expandError)
-      // Non-fatal: the main bundle entitlement is still granted
-    } else {
-      console.log('[stripe-webhook] expanded bundle to child entitlements', expandedItems)
-    }
+      .eq('id', intent.id)
+    return
   }
 
   const { error: finalUpdateError } = await supabaseAdmin

@@ -67,12 +67,21 @@ export async function getAllowedProductIds(
 
   // 2) Legacy fallback: billing subscription → billing_product_key → products.product_key
   // Keep this until the billing domain is fully migrated away.
+  // RLS on tenant_subscriptions restricts to admin/owner — no seat enforcement needed here
+  // because the RLS policy itself serves as the access gate. When all tenants migrate to
+  // the entitlement model, this entire block can be removed.
+
+  // BUG-022: Legacy fallback must exclude paused subscriptions — paused means no access.
+  // BUG-022 (second pass): Skip legacy path when no userId — matches canonical path guard.
+  if (!userId) {
+    return { allowedProductIds: Array.from(productIds), resolvedViaBillingKey: [] }
+  }
 
   const { data: subs, error } = await supabase
     .from('tenant_subscriptions')
     .select(`billing_product:billing_products(id,billing_product_key)`) // billing_products table does not carry product_id
     .eq('tenant_id', tenantId)
-    .in('status', ['active', 'trial', 'paused'])
+    .in('status', ['active', 'trial'])
 
   if (error) {
     console.error('[games/utils] billing fallback lookup error', error)

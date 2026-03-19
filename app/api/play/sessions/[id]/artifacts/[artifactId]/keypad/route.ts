@@ -4,6 +4,7 @@ import { ParticipantSessionService } from '@/lib/services/participants/session-s
 import type { Json } from '@/types/supabase';
 import { assertSessionStatus } from '@/lib/play/session-guards';
 import { apiHandler } from '@/lib/api/route-handler';
+import { requireActiveParticipant } from '@/lib/api/play-auth';
 
 /**
  * POST /api/play/sessions/[id]/artifacts/[artifactId]/keypad
@@ -113,6 +114,10 @@ export const POST = apiHandler({
     if (p!.sessionId !== sessionId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    // BUG-083 FIX: idle participants must not submit keypad codes
+    const activeGuard = requireActiveParticipant(p!.status);
+    if (activeGuard) return activeGuard;
 
     // Parse request body
     let enteredCode: string;

@@ -40,6 +40,22 @@ export const POST = apiHandler({
       return NextResponse.json({ error: 'Invite expired' }, { status: 400 })
     }
 
+    // BUG-035 FIX: Verify the authenticated user's email matches the invitation email.
+    // Without this check, any authenticated user with the token could accept the invite
+    // and gain membership at the invitation's role on the target tenant.
+    if (invite.email && user.email && invite.email.toLowerCase() !== user.email.toLowerCase()) {
+      await logTenantAuditEvent({
+        tenantId: invite.tenant_id,
+        actorUserId: user.id,
+        eventType: 'invitation_email_mismatch',
+        payload: { expected: invite.email, actual: user.email },
+      })
+      return NextResponse.json(
+        { error: 'This invitation was sent to a different email address' },
+        { status: 403 }
+      )
+    }
+
     const { error: memberError } = await supabase.from('user_tenant_memberships').upsert(
       {
         tenant_id: invite.tenant_id,

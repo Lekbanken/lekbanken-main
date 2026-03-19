@@ -163,7 +163,11 @@ export const POST = apiHandler({
     return NextResponse.json({ games: [], total: 0, page, pageSize, hasMore: false, metadata: { allowedProducts: allowedProductIds } })
   }
 
-  const effectiveProductFilter = (products.length ? products : allowedProductIds).filter(Boolean)
+  // BUG-027: Caller products must intersect with allowed set, not replace it
+  const effectiveProductFilter = (products.length
+    ? products.filter((p: string) => allowedProductIds.includes(p))
+    : allowedProductIds
+  ).filter(Boolean)
 
   const subPurposeGameIds = subPurposes.length > 0 ? await getSubPurposeGameIds(supabase, subPurposes) : []
   if (subPurposes.length > 0 && subPurposeGameIds.length === 0) {

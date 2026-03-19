@@ -1,17 +1,15 @@
  'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
 import { CreditCardIcon, BoltIcon } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState } from '@/components/admin/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useTenant } from '@/lib/context/TenantContext';
 import { getSubscription, type Subscription } from '@/lib/services/billingService';
 
-export default function TenantSubscriptionPage() {
+export default function TenantSubscriptionPage({ params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = use(params);
   const t = useTranslations('admin.tenant.subscription');
-  const { currentTenant } = useTenant();
-  const tenantId = currentTenant?.id ?? null;
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 

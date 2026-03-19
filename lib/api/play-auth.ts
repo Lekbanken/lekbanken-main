@@ -9,6 +9,7 @@
  * This replaces ~18 inline lookups scattered across play routes.
  */
 
+import { NextResponse } from 'next/server'
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 
 // ---------------------------------------------------------------------------
@@ -25,6 +26,24 @@ export const REJECTED_PARTICIPANT_STATUSES: ReadonlySet<string> = new Set([
   'blocked',
   'kicked',
 ])
+
+/**
+ * Guard: require participant to have 'active' status for mutations.
+ * Returns a 403 NextResponse if not active, null if OK.
+ *
+ * idle-safe routes (GET /api/play/me, heartbeat presence) must NOT use this.
+ * All participant POST mutation routes (ready, vote, puzzle, keypad,
+ * role/reveal, progress/update) MUST use this.
+ */
+export function requireActiveParticipant(
+  status: string | null,
+): NextResponse | null {
+  if (status === 'active') return null
+  return NextResponse.json(
+    { error: 'Participant must be active to perform this action' },
+    { status: 403 },
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Types

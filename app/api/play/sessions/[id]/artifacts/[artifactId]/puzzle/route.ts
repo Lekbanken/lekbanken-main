@@ -8,6 +8,7 @@ import {
   checkRiddleAnswer,
   type RiddleNormalizeMode,
 } from '@/types/puzzle-modules';
+import { requireActiveParticipant } from '@/lib/api/play-auth';
 
 // =============================================================================
 // V2 Architecture Notes:
@@ -127,6 +128,10 @@ export const POST = apiHandler({
     if (p!.sessionId !== sessionId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    // BUG-083 FIX: idle participants must not submit puzzle answers
+    const activeGuard = requireActiveParticipant(p!.status);
+    if (activeGuard) return activeGuard;
 
     // Verify session status allows puzzle submissions
     const session = await ParticipantSessionService.getSessionById(sessionId);

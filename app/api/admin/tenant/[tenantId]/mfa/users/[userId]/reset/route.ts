@@ -7,7 +7,6 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { apiHandler } from '@/lib/api/route-handler';
 import { logMFADisabledByAdmin } from '@/lib/services/mfa/mfaAudit.server';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * POST /api/admin/tenant/[tenantId]/mfa/users/[userId]/reset
@@ -36,11 +35,10 @@ export const POST = apiHandler({
   }
 
   const supabase = await createServerRlsClient();
-  const db = supabase as unknown as SupabaseClient;
 
   try {
     // Verify target user is a member of this tenant
-    const { data: targetMembership, error: membershipError } = await db
+    const { data: targetMembership, error: membershipError } = await supabase
       .from('user_tenant_memberships')
       .select('user_id, role')
       .eq('tenant_id', tenantId)
@@ -99,19 +97,20 @@ export const POST = apiHandler({
       }
     }
 
-    // Clear user_mfa record
-    const { error: clearError } = await db
+    // Clear user_mfa record — MFA-004: use correct column names from schema
+    const { error: clearError } = await supabase
       .from('user_mfa')
       .update({
-        is_enrolled: false,
         enrolled_at: null,
-        last_verification_at: null,
+        last_verified_at: null,
+        methods: null,
         recovery_codes_hashed: null,
         recovery_codes_count: 0,
         recovery_codes_used: 0,
         recovery_codes_generated_at: null,
-        // Reset grace period to give user time to re-enroll
-        grace_period_started_at: new Date().toISOString(),
+        // Reset clears grace period — if policy requires re-enrollment with grace,
+        // the MFA enforcement flow will set a new grace_period_end
+        grace_period_end: null,
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', userId)
@@ -119,14 +118,15 @@ export const POST = apiHandler({
 
     if (clearError) {
       console.error('[admin/mfa/reset] clear user_mfa error', clearError);
-      // Continue anyway - the Supabase factors are already cleared
+      return NextResponse.json({ error: 'Failed to reset MFA enrollment state' }, { status: 500 });
     }
 
-    // Revoke all trusted devices for this user
-    const { error: devicesError } = await db
+    // Revoke all trusted devices for this user in this tenant
+    const { error: devicesError } = await supabase
       .from('mfa_trusted_devices')
       .delete()
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .eq('tenant_id', tenantId);
 
     if (devicesError) {
       console.error('[admin/mfa/reset] revoke devices error', devicesError);

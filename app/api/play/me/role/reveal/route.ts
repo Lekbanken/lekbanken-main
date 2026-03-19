@@ -10,6 +10,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
 import { apiHandler } from '@/lib/api/route-handler';
 import { assertSessionStatus } from '@/lib/play/session-guards';
+import { requireActiveParticipant } from '@/lib/api/play-auth';
 
 export const POST = apiHandler({
   auth: 'participant',
@@ -50,6 +51,10 @@ export const POST = apiHandler({
     if (p!.sessionId !== sessionId) {
       return NextResponse.json({ error: 'Session mismatch' }, { status: 403 });
     }
+
+    // BUG-083 FIX: idle participants must not reveal roles
+    const activeGuard = requireActiveParticipant(p!.status);
+    if (activeGuard) return activeGuard;
 
     if (!(session as Record<string, unknown>)?.secret_instructions_unlocked_at) {
       return NextResponse.json(

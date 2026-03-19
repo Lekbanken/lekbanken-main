@@ -1,17 +1,15 @@
  'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { useTranslations } from 'next-intl';
 import { PuzzlePieceIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState, AdminErrorState, AdminCard } from "@/components/admin/shared";
 import { Input } from "@/components/ui";
-import { useTenant } from "@/lib/context/TenantContext";
 import { searchGames, type Game } from "@/lib/services/gameService";
 
-export default function TenantGamesPage() {
+export default function TenantGamesPage({ params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = use(params);
   const t = useTranslations('admin.tenant.games');
-  const { currentTenant } = useTenant();
-  const tenantId = currentTenant?.id ?? null;
 
   const [games, setGames] = useState<Game[]>([]);
   const [search, setSearch] = useState("");

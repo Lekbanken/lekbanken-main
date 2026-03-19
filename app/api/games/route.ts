@@ -46,7 +46,8 @@ export const POST = apiHandler({
     age_max: body.age_max ?? null,
     category: body.category ?? null,
     owner_tenant_id: body.owner_tenant_id ?? null,
-    status: body.status || 'draft',
+    // BUG-029: Only the /publish endpoint may set published status
+    status: 'draft',
   }
 
   const { data, error } = await supabase

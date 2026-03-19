@@ -1,6 +1,6 @@
  'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { DocumentTextIcon } from "@heroicons/react/24/outline";
 import { useTranslations } from "next-intl";
 import {
@@ -11,15 +11,13 @@ import {
   AdminCard,
 } from "@/components/admin/shared";
 import { Input, Select } from "@/components/ui";
-import { useTenant } from "@/lib/context/TenantContext";
 import { getContentItems, type ContentItem } from "@/lib/services/contentService";
 
 type ContentType = ContentItem["type"] | "all";
 
-export default function TenantContentPage() {
+export default function TenantContentPage({ params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = use(params);
   const t = useTranslations('admin.tenant.content');
-  const { currentTenant } = useTenant();
-  const tenantId = currentTenant?.id ?? null;
 
   const [items, setItems] = useState<ContentItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);

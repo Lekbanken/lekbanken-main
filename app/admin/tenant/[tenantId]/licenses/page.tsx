@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { use, useCallback, useEffect, useMemo, useState } from 'react';
 import { KeyIcon } from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
 import {
@@ -12,7 +12,6 @@ import {
 } from '@/components/admin/shared';
 import { Badge, Button, Select } from '@/components/ui';
 import { useToast } from '@/components/ui/toast';
-import { useTenant } from '@/lib/context/TenantContext';
 import { supabase } from '@/lib/supabase/client';
 
 type EntitlementRow = {
@@ -41,10 +40,9 @@ type SeatAssignmentRow = {
   user: { id: string; email: string | null; full_name: string | null } | null;
 };
 
-export default function TenantLicensesPage() {
+export default function TenantLicensesPage({ params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = use(params);
   const t = useTranslations('admin.tenant.licenses');
-  const { currentTenant } = useTenant();
-  const tenantId = currentTenant?.id ?? null;
   const { success, warning } = useToast();
 
   const [isLoading, setIsLoading] = useState(false);

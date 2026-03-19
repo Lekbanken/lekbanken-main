@@ -551,7 +551,8 @@ export const POST = apiHandler({
           short_description: normalizedGame.short_description,
           description: normalizedGame.description,
           play_mode: normalizedGame.play_mode,
-          status: normalizedGame.status,
+          // BUG-034: Import must not bypass publish workflow — force draft
+          status: 'draft' as const,
           energy_level: normalizedGame.energy_level,
           location_type: normalizedGame.location_type,
           time_estimate_min: normalizedGame.time_estimate_min,

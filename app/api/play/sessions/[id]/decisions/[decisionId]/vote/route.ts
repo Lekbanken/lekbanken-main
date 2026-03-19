@@ -4,6 +4,7 @@ import { ParticipantSessionService } from '@/lib/services/participants/session-s
 import { broadcastPlayEvent } from '@/lib/realtime/play-broadcast-server';
 import { assertSessionStatus } from '@/lib/play/session-guards';
 import { apiHandler } from '@/lib/api/route-handler';
+import { requireActiveParticipant } from '@/lib/api/play-auth';
 
 function getCurrentStepPhase(session: {
   current_step_index?: number | null;
@@ -36,6 +37,10 @@ export const POST = apiHandler({
     if (p!.sessionId !== sessionId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    // BUG-083 FIX: idle participants must not vote
+    const activeGuard = requireActiveParticipant(p!.status);
+    if (activeGuard) return activeGuard;
 
     const session = await ParticipantSessionService.getSessionById(sessionId);
     if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 });

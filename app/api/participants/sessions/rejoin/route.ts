@@ -84,6 +84,27 @@ export const POST = apiHandler({
       );
     }
 
+    // BUG-057: Check if session has expired (mirrors join route guard)
+    if (session.expires_at && new Date(session.expires_at) < new Date()) {
+      return NextResponse.json(
+        { error: 'This session has expired' },
+        { status: 410 },
+      );
+    }
+
+    // BUG-056: Check if rejoin is allowed by session policy
+    const sessionSettings = session.settings as {
+      allow_rejoin?: boolean; allowRejoin?: boolean;
+      require_approval?: boolean; requireApproval?: boolean;
+    } | null;
+    const allowRejoin = sessionSettings?.allow_rejoin ?? sessionSettings?.allowRejoin ?? true;
+    if (!allowRejoin) {
+      return NextResponse.json(
+        { error: 'Rejoining is not allowed for this session' },
+        { status: 403 },
+      );
+    }
+
     // Check if token has expired
     if (participant.token_expires_at) {
       const expiresAt = new Date(participant.token_expires_at);
@@ -96,11 +117,15 @@ export const POST = apiHandler({
     }
 
     const requireApproval = Boolean(
-      (session.settings as { require_approval?: boolean; requireApproval?: boolean } | null)?.require_approval ??
-      (session.settings as { require_approval?: boolean; requireApproval?: boolean } | null)?.requireApproval,
+      sessionSettings?.require_approval ?? sessionSettings?.requireApproval,
     );
 
-    const shouldActivate = !requireApproval && participant.status !== 'idle';
+    // BUG-081 FIX: Distinguish idle (not yet approved) from disconnected (previously approved).
+    // Previously: `!requireApproval && status !== 'idle'` — blocked approved-then-disconnected
+    // participants from reactivating in requireApproval sessions.
+    // Now: activate if (a) no approval needed, or (b) previously approved (active/disconnected).
+    const previouslyApproved = participant.status === 'active' || participant.status === 'disconnected';
+    const shouldActivate = !requireApproval || previouslyApproved;
 
     if (shouldActivate) {
       const { error: updateError } = await supabase

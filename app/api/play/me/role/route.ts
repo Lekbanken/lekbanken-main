@@ -28,7 +28,7 @@ export const GET = apiHandler({
 
     const { data: session, error: sessionError } = await supabase
       .from('participant_sessions')
-      .select('id')
+      .select('id, secret_instructions_unlocked_at')
       .eq('session_code', normalizedCode)
       .single();
 
@@ -83,6 +83,16 @@ export const GET = apiHandler({
           }
           delete (role as Record<string, unknown>)[field];
         }
+      }
+
+      // BUG-047 FIX: Mask private_instructions and private_hints until BOTH gates pass:
+      // 1. Host has unlocked secrets (session.secret_instructions_unlocked_at is set)
+      // 2. Participant has revealed their secrets (assignment.secret_instructions_revealed_at is set)
+      const hostUnlocked = !!(session as Record<string, unknown>).secret_instructions_unlocked_at;
+      const participantRevealed = !!(assignment as unknown as Record<string, unknown>)?.secret_instructions_revealed_at;
+      if (!hostUnlocked || !participantRevealed) {
+        delete (role as Record<string, unknown>)['private_instructions'];
+        delete (role as Record<string, unknown>)['private_hints'];
       }
     }
 

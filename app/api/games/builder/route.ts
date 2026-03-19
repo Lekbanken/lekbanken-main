@@ -87,7 +87,7 @@ function asLocationType(value: unknown): LocationType | null {
   return null;
 }
 
-function asGameStatus(value: unknown): GameStatus {
+function _asGameStatus(value: unknown): GameStatus {
   if (value === 'published') return 'published';
   return 'draft';
 }
@@ -219,7 +219,8 @@ export const POST = apiHandler({
     name: core.name.trim(),
     short_description: core.short_description.trim(),
     description: core.description ?? null,
-    status: asGameStatus(core.status),
+    // BUG-031: Only the /publish endpoint may set published status
+    status: 'draft' as const,
     main_purpose_id: core.main_purpose_id ?? null,
     product_id: core.product_id ?? null,
     owner_tenant_id: core.owner_tenant_id ?? null,

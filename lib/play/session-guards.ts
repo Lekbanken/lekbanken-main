@@ -37,6 +37,7 @@ export const PLAY_MUTATION_STATUS_POLICY = {
   'secrets':         ['lobby', 'active', 'paused'],
   'state':           ['active', 'paused'],
   'role-reveal':     ['lobby', 'active', 'paused'],
+  'progress-update': ['active', 'paused'],
 } as const satisfies Record<string, readonly SessionStatus[]>;
 
 export type PlayMutationType = keyof typeof PLAY_MUTATION_STATUS_POLICY;

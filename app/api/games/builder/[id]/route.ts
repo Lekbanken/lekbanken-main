@@ -493,7 +493,8 @@ export const PUT = apiHandler({
     name: core.name.trim(),
     short_description: core.short_description.trim(),
     description: core.description ?? null,
-    status: asGameStatus(core.status),
+    // BUG-031: Builder update must not change publish status — use /publish endpoint
+    ...(asGameStatus(core.status) !== 'published' ? { status: asGameStatus(core.status) } : {}),
     main_purpose_id: core.main_purpose_id ?? null,
     product_id: core.product_id ?? null,
     owner_tenant_id: core.owner_tenant_id ?? null,

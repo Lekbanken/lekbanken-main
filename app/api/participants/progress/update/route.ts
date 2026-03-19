@@ -8,6 +8,8 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { apiHandler } from '@/lib/api/route-handler';
+import { requireActiveParticipant } from '@/lib/api/play-auth';
+import { assertSessionStatus } from '@/lib/play/session-guards';
 import type { Database, Json } from '@/types/supabase';
 
 interface UpdateProgressBody {
@@ -25,6 +27,10 @@ interface UpdateProgressBody {
 export const POST = apiHandler({
   auth: 'participant',
   handler: async ({ req, participant: p }) => {
+    // BUG-083 FIX: idle participants must not update progress
+    const activeGuard = requireActiveParticipant(p!.status);
+    if (activeGuard) return activeGuard;
+
     let body: UpdateProgressBody;
     try {
       body = await req.json();
@@ -46,7 +52,7 @@ export const POST = apiHandler({
     // Get session to resolve tenant
     const { data: session, error: sessionError } = await supabase
       .from('participant_sessions')
-      .select('id, tenant_id')
+      .select('id, tenant_id, status')
       .eq('id', p!.sessionId)
       .single();
 
@@ -56,6 +62,10 @@ export const POST = apiHandler({
         { status: 404 }
       );
     }
+
+    // BUG-084 FIX: reject progress writes after session ends
+    const statusError = assertSessionStatus(session.status, 'progress-update');
+    if (statusError) return statusError;
 
     // Check if game exists
     const { data: game, error: gameError } = await supabase

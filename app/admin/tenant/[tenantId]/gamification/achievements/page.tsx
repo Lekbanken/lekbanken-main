@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useTransition, useEffect, useMemo } from 'react';
+import { use, useState, useCallback, useTransition, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   TrophyIcon,
@@ -55,9 +55,9 @@ const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'outline' | 'suc
 // MAIN COMPONENT
 // ============================================
 
-export default function TenantAchievementsPage() {
+export default function TenantAchievementsPage({ params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = use(params);
   const { currentTenant } = useTenant();
-  const tenantId = currentTenant?.id ?? null;
   const t = useTranslations('admin.tenant.achievements');
 
   // Translated options

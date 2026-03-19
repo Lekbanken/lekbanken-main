@@ -48,7 +48,7 @@ export default async function TenantAdminLayout({
 
   return (
     <>
-      <TenantRouteSync tenantId={tenantId} enabled={!isSystemAdmin && hasTenantAccess} />
+      <TenantRouteSync tenantId={tenantId} />
       {children}
     </>
   );

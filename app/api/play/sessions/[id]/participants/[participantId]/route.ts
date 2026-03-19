@@ -37,13 +37,24 @@ export const PATCH = apiHandler({
   try {
     switch (action) {
       case 'approve': {
-        const { error } = await supabase
+        // BUG-061: Only approve participants in 'idle' (pending approval) state
+        // BUG-060: Use .select() to verify a row was actually updated
+        const { data: approvedRows, error } = await supabase
           .from('participants')
           .update({ status: 'active' })
           .eq('id', participantId)
-          .eq('session_id', sessionId);
+          .eq('session_id', sessionId)
+          .eq('status', 'idle')
+          .select('id');
 
         if (error) throw error;
+
+        if (!approvedRows || approvedRows.length === 0) {
+          return NextResponse.json(
+            { error: 'Participant not found or not in pending state' },
+            { status: 404 },
+          );
+        }
 
         await broadcastPlayEvent(sessionId, {
           type: 'participants_changed',
@@ -54,13 +65,22 @@ export const PATCH = apiHandler({
         return NextResponse.json({ success: true, message: 'Participant approved' });
       }
       case 'kick': {
-        const { error } = await supabase
+        // BUG-060: Use .select() to verify a row was actually updated
+        const { data: kickedRows, error } = await supabase
           .from('participants')
           .update({ status: 'kicked' })
           .eq('id', participantId)
-          .eq('session_id', sessionId);
+          .eq('session_id', sessionId)
+          .select('id');
 
         if (error) throw error;
+
+        if (!kickedRows || kickedRows.length === 0) {
+          return NextResponse.json(
+            { error: 'Participant not found' },
+            { status: 404 },
+          );
+        }
 
         await broadcastPlayEvent(sessionId, {
           type: 'participants_changed',
@@ -72,13 +92,22 @@ export const PATCH = apiHandler({
       }
 
       case 'block': {
-        const { error } = await supabase
+        // BUG-060: Use .select() to verify a row was actually updated
+        const { data: blockedRows, error } = await supabase
           .from('participants')
           .update({ status: 'blocked' })
           .eq('id', participantId)
-          .eq('session_id', sessionId);
+          .eq('session_id', sessionId)
+          .select('id');
 
         if (error) throw error;
+
+        if (!blockedRows || blockedRows.length === 0) {
+          return NextResponse.json(
+            { error: 'Participant not found' },
+            { status: 404 },
+          );
+        }
 
         await broadcastPlayEvent(sessionId, {
           type: 'participants_changed',
@@ -111,21 +140,38 @@ export const PATCH = apiHandler({
           }
         }
 
-        // Set the new next starter
+        // BUG-085: Scope progress read by session_id to prevent cross-session leak
         const { data: participant } = await supabase
           .from('participants')
           .select('progress')
           .eq('id', participantId)
+          .eq('session_id', sessionId)
           .single();
 
-        const currentProgress = (participant?.progress as Record<string, unknown>) || {};
-        const { error } = await supabase
+        if (!participant) {
+          return NextResponse.json(
+            { error: 'Participant not found' },
+            { status: 404 },
+          );
+        }
+
+        const currentProgress = (participant.progress as Record<string, unknown>) || {};
+        // BUG-060: Use .select() to verify mutation + gate broadcast on real row
+        const { data: starterRows, error } = await supabase
           .from('participants')
           .update({ progress: { ...currentProgress, isNextStarter: true } })
           .eq('id', participantId)
-          .eq('session_id', sessionId);
+          .eq('session_id', sessionId)
+          .select('id');
 
         if (error) throw error;
+
+        if (!starterRows || starterRows.length === 0) {
+          return NextResponse.json(
+            { error: 'Participant not found' },
+            { status: 404 },
+          );
+        }
 
         await broadcastPlayEvent(sessionId, {
           type: 'turn_update',

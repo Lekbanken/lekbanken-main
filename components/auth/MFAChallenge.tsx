@@ -95,11 +95,14 @@ export function MFAChallenge({
       // Call success callback
       onSuccess?.();
       
-      // Redirect after short delay
+      // Hard redirect after short delay — forces full page reload so the
+      // browser Supabase client singleton is recreated from the new AAL2
+      // cookies written by the server-side challengeAndVerify(). A soft
+      // navigation (router.push) would keep the stale AAL1 session in
+      // the singleton's memory, causing split-brain auth state.
       setTimeout(() => {
         const redirect = searchParams.get('redirect') || redirectUrl;
-        router.push(redirect);
-        router.refresh();
+        window.location.href = redirect;
       }, 1500);
     },
   });
@@ -128,13 +131,13 @@ export function MFAChallenge({
       
       onSuccess?.();
       
+      // Hard redirect — same reason as TOTP path above
       setTimeout(() => {
         const redirect = searchParams.get('redirect') || redirectUrl;
-        router.push(redirect);
-        router.refresh();
+        window.location.href = redirect;
       }, 1500);
     }
-  }, [verifyRecoveryCode, onSuccess, searchParams, redirectUrl, router]);
+  }, [verifyRecoveryCode, onSuccess, searchParams, redirectUrl]);
 
   // Handle trust device change
   const handleTrustChange = useCallback((checked: boolean, name?: string) => {

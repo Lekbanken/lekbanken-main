@@ -77,6 +77,13 @@ function simulateAuthHandler(
   return { type: 'refresh-from-user', user: getUserResult.user, triggerRouterRefresh: event === 'USER_UPDATED' }
 }
 
+function shouldBootstrapFromClient(params: {
+  initialUser: { id: string } | null | undefined
+  initialAuthDegraded?: boolean
+}) {
+  return params.initialUser === undefined || (params.initialUser === null && params.initialAuthDegraded === true)
+}
+
 describe('Auth state change handler resilience', () => {
   const mockUser = { id: 'user-123' }
   const mockSession = { user: mockUser }
@@ -169,6 +176,35 @@ describe('Auth state change handler resilience', () => {
     it('should be ignored (keep state)', () => {
       const result = simulateAuthHandler('INITIAL_SESSION', null, { user: null, error: null })
       expect(result.type).toBe('keep')
+    })
+  })
+
+  describe('bootstrap recovery after degraded server auth', () => {
+    it('should bootstrap on the client when the server returned no user under degraded auth', () => {
+      expect(
+        shouldBootstrapFromClient({
+          initialUser: null,
+          initialAuthDegraded: true,
+        })
+      ).toBe(true)
+    })
+
+    it('should not bootstrap on the client for a normal guest page render', () => {
+      expect(
+        shouldBootstrapFromClient({
+          initialUser: null,
+          initialAuthDegraded: false,
+        })
+      ).toBe(false)
+    })
+
+    it('should not bootstrap on the client when the server already provided a user', () => {
+      expect(
+        shouldBootstrapFromClient({
+          initialUser: { id: 'user-123' },
+          initialAuthDegraded: true,
+        })
+      ).toBe(false)
     })
   })
 })

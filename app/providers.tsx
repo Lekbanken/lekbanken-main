@@ -21,6 +21,7 @@ type ProvidersProps = {
   initialUser?: User | null
   initialProfile?: UserProfile | null
   initialMemberships?: TenantMembership[]
+  initialAuthDegraded?: boolean
 }
 
 export function Providers({
@@ -28,12 +29,14 @@ export function Providers({
   initialUser,
   initialProfile,
   initialMemberships,
+  initialAuthDegraded,
 }: ProvidersProps) {
   return (
     <AuthProvider
       initialUser={initialUser}
       initialProfile={initialProfile}
       initialMemberships={initialMemberships}
+      initialAuthDegraded={initialAuthDegraded}
     >
       <PreferencesProvider>
         <CartProvider>

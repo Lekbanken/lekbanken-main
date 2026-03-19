@@ -22,6 +22,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from './client'
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
+import { shouldBootstrapFromClient } from '@/lib/auth/bootstrap'
 import type { GlobalRole, UserProfile } from '@/types/auth'
 import type { TenantMembership } from '@/types/tenant'
 
@@ -62,13 +63,12 @@ export function AuthProvider({
   const router = useRouter()
   const pathname = usePathname()
 
-  const shouldBootstrapFromClient =
-    initialUser === undefined || (initialUser === null && initialAuthDegraded)
+  const needsClientBootstrap = shouldBootstrapFromClient({ initialUser, initialAuthDegraded })
 
   const [user, setUser] = useState<User | null>(initialUser ?? null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(initialProfile ?? null)
   const [memberships, setMemberships] = useState<TenantMembership[]>(initialMemberships ?? [])
-  const [isLoading, setIsLoading] = useState(shouldBootstrapFromClient)
+  const [isLoading, setIsLoading] = useState(needsClientBootstrap)
 
   // Debounce router.refresh() to prevent SSR auth storms.
   // Multiple auth events (e.g. USER_UPDATED firing rapidly, or tab-focus
@@ -246,7 +246,7 @@ export function AuthProvider({
     // Server-first auth remains the default. The only time we re-bootstrap on
     // the client is when the server explicitly marked auth as degraded and
     // returned no user, which would otherwise strand the app in a false guest state.
-    if (!shouldBootstrapFromClient) {
+    if (!needsClientBootstrap) {
       setIsLoading(false)
       return
     }
@@ -274,7 +274,7 @@ export function AuthProvider({
     }
 
     void initAuth()
-  }, [refreshAuthData, shouldBootstrapFromClient])
+  }, [refreshAuthData, needsClientBootstrap])
 
   useEffect(() => {
     const {

@@ -62,48 +62,39 @@ export const POST = apiHandler({
     return NextResponse.json({ error: 'user_id, subscription_id and billing_product_id are required' }, { status: 400 })
   }
 
-  const { data: subscription, error: subError } = await supabase
-    .from('tenant_subscriptions')
-    .select('id, seats_purchased, status, tenant_id')
-    .eq('id', body.subscription_id)
-    .maybeSingle()
+  // Atomic seat assignment via RPC — prevents TOCTOU race (BUG-020 / DD-RACE-1)
+  const { data: newId, error: rpcError } = await supabase.rpc(
+    'assign_seat_if_available' as never,
+    {
+      p_tenant_id: tenantId,
+      p_user_id: body.user_id,
+      p_subscription_id: body.subscription_id,
+      p_billing_product_id: body.billing_product_id,
+      p_name: body.name || '',
+      p_assigned_by: userId,
+    } as never
+  )
 
-  if (subError || !subscription || subscription.tenant_id !== tenantId) {
-    
-    console.error('[billing/seats] subscription fetch error', subError)
-    return NextResponse.json({ error: 'Invalid subscription' }, { status: 400 })
+  if (rpcError) {
+    const msg = rpcError.message ?? ''
+    if (msg.includes('no_seats_available')) {
+      return NextResponse.json({ error: 'No seats available on this subscription' }, { status: 400 })
+    }
+    if (msg.includes('subscription_not_found') || msg.includes('subscription_tenant_mismatch')) {
+      return NextResponse.json({ error: 'Invalid subscription' }, { status: 400 })
+    }
+    if (msg.includes('subscription_canceled')) {
+      return NextResponse.json({ error: 'Subscription is canceled' }, { status: 400 })
+    }
+    console.error('[billing/seats] rpc error', rpcError)
+    return NextResponse.json({ error: 'Failed to assign seat' }, { status: 500 })
   }
 
-  if (subscription.status === 'canceled') {
-    return NextResponse.json({ error: 'Subscription is canceled' }, { status: 400 })
-  }
-
-  const { count, error: countError } = await supabase
-    .from('tenant_seat_assignments')
-    .select('*', { count: 'exact', head: true })
-    .eq('subscription_id', body.subscription_id)
-    .not('status', 'in', '(released,revoked)')
-
-  if (countError) {
-    console.error('[billing/seats] count error', countError)
-    return NextResponse.json({ error: 'Failed to validate seats' }, { status: 500 })
-  }
-
-  if (typeof count === 'number' && count >= subscription.seats_purchased) {
-    return NextResponse.json({ error: 'No seats available on this subscription' }, { status: 400 })
-  }
-
+  // Fetch the full seat record with relations for the response
   const { data, error } = await supabase
     .from('tenant_seat_assignments')
-    .insert({
-      tenant_id: tenantId,
-      user_id: body.user_id,
-      subscription_id: body.subscription_id,
-      billing_product_id: body.billing_product_id,
-      name: body.name || '',
-      status: 'active',
-    })
     .select('*, user:users(id,email,full_name), subscription:tenant_subscriptions(*), billing_product:billing_products(*)')
+    .eq('id', newId as string)
     .maybeSingle()
 
   if (error) {

@@ -191,7 +191,8 @@ export async function trustDevice(
 export async function verifyTrustedDevice(
   userId: string,
   trustToken: string,
-  deviceFingerprint: string
+  deviceFingerprint: string,
+  tenantId: string
 ): Promise<VerifyDeviceResult> {
   const supabase = await createServerRlsClient()
   // Cast since mfa_trusted_devices types not yet regenerated
@@ -200,11 +201,12 @@ export async function verifyTrustedDevice(
   // Hash the provided token for lookup
   const tokenHash = createHash('sha256').update(trustToken).digest('hex')
 
-  // Look up device
+  // Look up device — tenant-scoped to prevent cross-tenant MFA bypass (MFA-005)
   const { data, error } = await db
     .from('mfa_trusted_devices')
     .select('*')
     .eq('user_id', userId)
+    .eq('tenant_id', tenantId)
     .eq('trust_token_hash', tokenHash)
     .eq('device_fingerprint', deviceFingerprint)
     .eq('is_revoked', false)

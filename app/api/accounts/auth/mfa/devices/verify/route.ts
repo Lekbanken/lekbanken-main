@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { verifyTrustedDevice } from '@/lib/services/mfa/mfaDevices.server'
-import { headers } from 'next/headers'
+import { headers, cookies } from 'next/headers'
 import { apiHandler } from '@/lib/api/route-handler'
+import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 
 /**
  * POST /api/accounts/auth/mfa/devices/verify
@@ -21,6 +22,7 @@ export const POST = apiHandler({
     const body = (await req.json().catch(() => ({}))) as {
       trust_token?: string
       device_fingerprint?: string
+      tenant_id?: string
     }
 
     if (!body.trust_token || !body.device_fingerprint) {
@@ -30,10 +32,22 @@ export const POST = apiHandler({
       )
     }
 
+    // Resolve tenant context: explicit body param > cookie > primary membership
+    const cookieStore = await cookies()
+    const tenantId = body.tenant_id || await readTenantIdFromCookies(cookieStore)
+
+    if (!tenantId) {
+      return NextResponse.json(
+        { error: 'tenant_id is required (via body or active tenant cookie)' },
+        { status: 400 }
+      )
+    }
+
     const result = await verifyTrustedDevice(
       user.id,
       body.trust_token,
-      body.device_fingerprint
+      body.device_fingerprint,
+      tenantId
     )
 
     if (!result.is_trusted) {

@@ -114,7 +114,22 @@ INSERT INTO public.user_tenant_memberships (user_id, tenant_id, role, is_primary
   ('00000000-0000-0000-0000-000000000003', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'member', true)
 ON CONFLICT (user_id, tenant_id) DO NOTHING;
 
--- 5) Log what was seeded
+-- 5) Realtime publication fix
+-- supabase db reset recreates the supabase_realtime publication empty AFTER
+-- running migrations, so migration-managed ADD TABLE statements are lost.
+-- Re-apply here (seed.sql runs last during reset).
 DO $$ BEGIN
-  RAISE NOTICE '✅ Seed complete: 3 users, 2 tenants, 3 memberships';
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'notification_deliveries'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.notification_deliveries;
+  END IF;
+END $$;
+
+-- 6) Log what was seeded
+DO $$ BEGIN
+  RAISE NOTICE '✅ Seed complete: 3 users, 2 tenants, 3 memberships, realtime publication configured';
 END $$;

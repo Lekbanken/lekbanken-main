@@ -20,7 +20,7 @@ export const DEMO_TENANT_ID = '00000000-0000-0000-0000-00000000de01';
  * Stored in Supabase storage bucket 'avatars'
  * Cache-bust param updated when image changes
  */
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qohhnufxididbmzqnjwg.supabase.co';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 export const DEMO_AVATAR_URL = `${SUPABASE_URL}/storage/v1/object/public/avatars/demo-avatar.png?v=2`;
 
 /**

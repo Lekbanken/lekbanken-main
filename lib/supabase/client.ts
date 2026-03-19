@@ -80,8 +80,11 @@ function serializeCookie(name: string, value: string, options: CookieOptions = {
   const enhancedOptions = enhanceCookieOptions(options, hostname)
   
   // Minimal cookie serializer for browser usage; mirrors Next.js defaults.
+  // Do NOT encodeURIComponent(value) — @supabase/ssr stores base64 chunks
+  // that are safe as cookie values. Encoding corrupts them because
+  // readBrowserCookies cannot distinguish encoded from raw values.
   const parts = [
-    `${name}=${encodeURIComponent(value)}`,
+    `${name}=${value}`,
     `Path=${enhancedOptions.path ?? '/'}`,
     enhancedOptions.maxAge ? `Max-Age=${enhancedOptions.maxAge}` : null,
     enhancedOptions.expires ? `Expires=${enhancedOptions.expires.toUTCString()}` : null,
@@ -107,7 +110,10 @@ function readBrowserCookies() {
     .map((cookie) => {
       const separatorIndex = cookie.indexOf('=')
       const name = cookie.substring(0, separatorIndex)
-      const value = cookie.substring(separatorIndex + 1)
+      const raw = cookie.substring(separatorIndex + 1)
+      // Decode in case a previous version wrote URL-encoded values
+      let value: string
+      try { value = decodeURIComponent(raw) } catch { value = raw }
       return { name, value }
     })
 }

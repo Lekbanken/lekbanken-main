@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "msedge",
+            "name": "https://lekbanken.no",
+            "request": "launch",
+            "url": "https://lekbanken.no"
+        }
+    ]
+}

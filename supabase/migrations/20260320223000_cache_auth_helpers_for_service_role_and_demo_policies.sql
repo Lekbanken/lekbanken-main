@@ -51,9 +51,31 @@ alter policy service_role_insert_leaderboards on public.social_leaderboards
 alter policy service_role_update_leaderboards on public.social_leaderboards
   using ((select auth.role()) = 'service_role');
 
-alter policy tenant_product_entitlements_manage_service on public.tenant_product_entitlements
-  using (((select auth.role()) = 'service_role') or is_system_admin())
-  with check (((select auth.role()) = 'service_role') or is_system_admin());
+do $$
+begin
+  if exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'tenant_product_entitlements'
+      and policyname = 'tenant_product_entitlements_manage_service'
+  ) then
+    alter policy tenant_product_entitlements_manage_service on public.tenant_product_entitlements
+      using (((select auth.role()) = 'service_role') or is_system_admin())
+      with check (((select auth.role()) = 'service_role') or is_system_admin());
+  elsif exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'tenant_product_entitlements'
+      and policyname = 'tenant_product_entitlements_manage'
+  ) then
+    alter policy tenant_product_entitlements_manage on public.tenant_product_entitlements
+      using (((select auth.role()) = 'service_role') or is_system_admin())
+      with check (((select auth.role()) = 'service_role') or is_system_admin());
+  end if;
+end;
+$$;
 
 alter policy service_can_modify_user_coins on public.user_coins
   using ((select auth.role()) = 'service_role')

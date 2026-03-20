@@ -83,28 +83,16 @@ export default function PreferencesPage() {
     }
   );
 
-  // Update local preferences when data is fetched
   useEffect(() => {
-    if (!fetchedPreferences) return
+    if (hasChanges) return
+
     setPreferences({
       ...defaultPreferences,
-      ...fetchedPreferences,
-      language: fetchedPreferences.language ?? locale,
-      theme: fetchedPreferences.theme ?? theme,
+      ...(fetchedPreferences ?? {}),
+      language: locale,
+      theme,
     })
-  }, [fetchedPreferences, locale, theme]);
-
-  useEffect(() => {
-    setPreferences((prev) => {
-      if (hasChanges) return prev
-
-      return {
-        ...prev,
-        language: locale,
-        theme,
-      }
-    })
-  }, [hasChanges, locale, theme])
+  }, [fetchedPreferences, hasChanges, locale, theme])
 
   const stillLoading = isLoading || authLoading || isLoadingTenants;
 

@@ -338,7 +338,7 @@ export const sandboxCategories: SandboxCategory[] = [
         description: 'Event-kort, progress, belöningar', 
         status: 'done',
         components: ['@/features/journey/components/EventCard', '@/features/journey/components/EventProgress'],
-        routes: ['/app/events', '/app/events/*'],
+        routes: ['/app/gamification/events', '/app/gamification/events/*'],
       },
       { 
         id: 'app-planner', 

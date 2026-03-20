@@ -697,11 +697,4 @@ export const PROFILE_NAV_ITEMS: ProfileNavItem[] = [
     icon: 'BuildingOfficeIcon',
     description: 'profile.nav.organizationsDesc',
   },
-  {
-    id: 'activity',
-    label: 'profile.nav.activity',
-    href: '/app/profile/activity',
-    icon: 'ClockIcon',
-    description: 'profile.nav.activityDesc',
-  },
 ];

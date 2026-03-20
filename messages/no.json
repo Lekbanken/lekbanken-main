@@ -9567,9 +9567,7 @@
         "friends": "Venner",
         "friendsDesc": "Administrer venner og forespørsler",
         "organizations": "Organisasjoner",
-        "organizationsDesc": "Dine organisasjoner og roller",
-        "activity": "Aktivitet",
-        "activityDesc": "Nylig aktivitet og historikk"
+        "organizationsDesc": "Dine organisasjoner og roller"
       },
       "sections": {
         "overview": {

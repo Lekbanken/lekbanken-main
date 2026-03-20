@@ -151,16 +151,10 @@ test.describe('Profile Loading Resilience', () => {
     }).toPass({ timeout: 15000 });
   });
 
-  test('friends page loads or shows error state', async ({ page }) => {
+  test('friends route redirects to profile hub', async ({ page }) => {
     await page.goto('/app/profile/friends');
-    
-    // Should reach a terminal state
-    await expect(async () => {
-      const hasContent = await page.locator('[data-testid="friends-list"], .friends-content, h1').isVisible();
-      const hasError = await page.locator('[data-testid="error-state"], .error-boundary').isVisible();
-      const hasEmpty = await page.locator('text=/inga vänner|no friends|empty/i').isVisible();
-      
-      expect(hasContent || hasError || hasEmpty).toBe(true);
-    }).toPass({ timeout: 15000 });
+
+    await expect(page).toHaveURL(/\/app\/profile$/, { timeout: 5000 });
+    await expect(page.locator('h1, [data-testid="profile-content"]')).toBeVisible();
   });
 });

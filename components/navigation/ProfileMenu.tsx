@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getProfileSurfaceActions } from "@/components/profile/profile-surface-actions";
 import { useAuth } from "@/lib/supabase/auth";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
   const email = user.email || "";
   const avatarUrl = userProfile?.avatar_url;
   const isAdmin = effectiveGlobalRole === "system_admin";
+  const actions = getProfileSurfaceActions({ isAdmin, context });
 
   const handleNavigate = (href: string) => {
     router.push(href);
@@ -67,44 +69,40 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
           <p className="text-xs text-muted-foreground">{email}</p>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleNavigate("/app/profile")} className="flex items-center gap-2">
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M5 20c0-3.3 3-6 7-6s7 2.7 7 6" />
-          </svg>
-          {t('app.nav.profile')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleNavigate("/app/profile/security")} className="flex items-center gap-2">
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M12 3 4 7v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V7l-8-4Z" />
-            <path d="m9 12 2 2 4-4" />
-          </svg>
-          {t('app.profile.security')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleNavigate("/app")} className="flex items-center gap-2">
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M3 12s2-4 9-4 9 4 9 4-2 4-9 4-9-4-9-4Z" />
-            <circle cx="12" cy="12" r="2" />
-          </svg>
-          {t('app.nav.dashboard')}
-        </DropdownMenuItem>
-        {isAdmin && (
-          <DropdownMenuItem onClick={() => handleNavigate("/admin")} className="flex items-center gap-2">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M12 3 4 7v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V7l-8-4Z" />
-            </svg>
-            {t('app.nav.admin')}
+        {actions.map((action) => (
+          <DropdownMenuItem key={action.id} onClick={() => handleNavigate(action.href)} className="flex items-center gap-2">
+            {action.id === 'profile' && (
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M5 20c0-3.3 3-6 7-6s7 2.7 7 6" />
+              </svg>
+            )}
+            {action.id === 'security' && (
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M12 3 4 7v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V7l-8-4Z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+            )}
+            {action.id === 'dashboard' && (
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M3 12s2-4 9-4 9 4 9 4-2 4-9 4-9-4-9-4Z" />
+                <circle cx="12" cy="12" r="2" />
+              </svg>
+            )}
+            {action.id === 'admin' && (
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M12 3 4 7v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V7l-8-4Z" />
+              </svg>
+            )}
+            {action.id === 'marketing' && (
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M3 12l9-9 9 9" />
+                <path d="M9 21V9h6v12" />
+              </svg>
+            )}
+            {t(action.labelKey)}
           </DropdownMenuItem>
-        )}
-        {context !== "marketing" && (
-          <DropdownMenuItem onClick={() => handleNavigate("/")} className="flex items-center gap-2">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M3 12l9-9 9 9" />
-              <path d="M9 21V9h6v12" />
-            </svg>
-            {t('app.nav.marketing')}
-          </DropdownMenuItem>
-        )}
+        ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem destructive onClick={handleLogout} className="flex items-center gap-2">
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">

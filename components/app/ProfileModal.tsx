@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { getProfileSurfaceActions } from "@/components/profile/profile-surface-actions";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +29,7 @@ export function ProfileModal({
   isAdmin = false,
 }: ProfileModalProps) {
   const t = useTranslations();
+  const actions = getProfileSurfaceActions({ isAdmin, context: 'app' }).filter((action) => action.id !== 'profile' && action.id !== 'security')
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -66,62 +68,50 @@ export function ProfileModal({
 
         {/* Navigation Links */}
         <div className="grid gap-2 p-5">
-          {isAdmin && (
-            <DialogClose asChild>
+          {actions.map((action) => (
+            <DialogClose key={action.id} asChild>
               <Link
-                href="/admin"
+                href={action.href}
                 prefetch={false}
-                className="flex items-center gap-3 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-accent/20"
+                className={action.id === 'admin'
+                  ? "flex items-center gap-3 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-accent/20"
+                  : "flex items-center gap-3 rounded-xl bg-muted/50 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-muted"
+                }
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/20">
-                  <svg className="h-5 w-5 text-accent-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z" />
-                  </svg>
+                <div className={action.id === 'admin'
+                  ? "flex h-9 w-9 items-center justify-center rounded-lg bg-accent/20"
+                  : action.id === 'dashboard'
+                    ? "flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10"
+                    : "flex h-9 w-9 items-center justify-center rounded-lg bg-muted"
+                }>
+                  {action.id === 'admin' && (
+                    <svg className="h-5 w-5 text-accent-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+                    </svg>
+                  )}
+                  {action.id === 'dashboard' && (
+                    <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                  )}
+                  {action.id === 'marketing' && (
+                    <svg className="h-5 w-5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M3 3h18v18H3z" />
+                      <path d="M21 12H3M12 3v18" />
+                    </svg>
+                  )}
                 </div>
                 <div className="flex-1">
-                  <span className="font-semibold">Admin</span>
-                  <p className="text-xs text-muted-foreground">{t('app.nav.manageApp')}</p>
+                  <span className="font-semibold">{t(action.labelKey)}</span>
+                  {action.descriptionKey && (
+                    <p className="text-xs text-muted-foreground">{t(action.descriptionKey)}</p>
+                  )}
                 </div>
               </Link>
             </DialogClose>
-          )}
-          <DialogClose asChild>
-            <Link
-              href="/app"
-              prefetch={false}
-              className="flex items-center gap-3 rounded-xl bg-muted/50 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-muted"
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <span className="font-semibold">{t('app.nav.dashboard')}</span>
-                <p className="text-xs text-muted-foreground">{t('app.nav.goToDashboard')}</p>
-              </div>
-            </Link>
-          </DialogClose>
-          <DialogClose asChild>
-            <Link
-              href="/"
-              prefetch={false}
-              className="flex items-center gap-3 rounded-xl bg-muted/50 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-muted"
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                <svg className="h-5 w-5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 3h18v18H3z" />
-                  <path d="M21 12H3M12 3v18" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <span className="font-semibold">{t('app.nav.marketing')}</span>
-                <p className="text-xs text-muted-foreground">{t('app.nav.visitWebsite')}</p>
-              </div>
-            </Link>
-          </DialogClose>
+          ))}
         </div>
 
         {/* Divider */}

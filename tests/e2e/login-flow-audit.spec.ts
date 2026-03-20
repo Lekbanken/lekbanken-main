@@ -237,6 +237,7 @@ test.describe('Login Flow Audit', () => {
     currentPhase = 'app'
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(1000)
+    await expect(page.getByTestId('profile-menu-trigger')).toBeVisible({ timeout: 5000 })
     finalUrls.app = page.url()
 
     const appCookies = await page.context().cookies()

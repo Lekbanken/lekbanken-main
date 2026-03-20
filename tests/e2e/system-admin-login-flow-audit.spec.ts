@@ -90,6 +90,7 @@ test.describe('System Admin Login Flow Audit', () => {
     }
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(1000)
+    await expect(page.getByTestId('profile-menu-trigger')).toBeVisible({ timeout: 5000 })
     await expect(page.locator('main').last()).toBeVisible({ timeout: 15000 })
     finalUrls.admin = page.url()
 

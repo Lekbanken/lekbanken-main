@@ -50,6 +50,7 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
       <DropdownMenuTrigger asChild>
         <button
           type="button"
+          data-testid="profile-menu-trigger"
           className={cn(
             "flex items-center gap-2 rounded-full border border-border/70 bg-card px-2.5 py-1.5 text-sm font-medium text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
             className,

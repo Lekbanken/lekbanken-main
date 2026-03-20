@@ -6,6 +6,7 @@
  */
 
 'use client'
+import { clearBrowserCookieVariants, getBrowserHostname } from '@/lib/supabase/cookie-domain'
 
 import type {
   ReactNode} from 'react';
@@ -309,12 +310,13 @@ export function AuthProvider({
         inflightRef.current = null
 
         if (typeof document !== 'undefined') {
-          document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
-          document.cookie = 'demo_session_id=; Path=/; Max-Age=0; SameSite=Lax'
+          const hostname = getBrowserHostname()
+          clearBrowserCookieVariants('lb_tenant', hostname)
+          clearBrowserCookieVariants('demo_session_id', hostname)
           document.cookie.split(';').forEach(cookie => {
             const name = cookie.split('=')[0].trim()
             if (name.includes('sb-') || name.includes('supabase')) {
-              document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`
+              clearBrowserCookieVariants(name, hostname)
             }
           })
         }
@@ -502,7 +504,7 @@ export function AuthProvider({
     }
 
     if (typeof document !== 'undefined') {
-      document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
+      clearBrowserCookieVariants('lb_tenant', getBrowserHostname())
     }
 
     window.location.href = '/auth/login?signedOut=true'

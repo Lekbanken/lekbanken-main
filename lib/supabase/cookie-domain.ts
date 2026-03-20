@@ -75,6 +75,27 @@ function isLocalHostname(hostname?: string | null): boolean {
   return !hostname || hostname === 'localhost' || hostname === '127.0.0.1'
 }
 
+export function clearBrowserCookieVariants(name: string, hostname?: string | null) {
+  if (typeof document === 'undefined') {
+    return
+  }
+
+  const domains = new Set<string>()
+  if (hostname && !isLocalHostname(hostname)) {
+    domains.add(hostname)
+    const sharedDomain = getCookieDomain(hostname)
+    if (sharedDomain) {
+      domains.add(sharedDomain)
+    }
+  }
+
+  const base = `${name}=; Path=/; Max-Age=0; SameSite=Lax`
+  document.cookie = base
+  domains.forEach((domain) => {
+    document.cookie = `${base}; Domain=${domain}`
+  })
+}
+
 export function clearCookieVariants(
   cookieStore: CookieMutationStore,
   name: string,

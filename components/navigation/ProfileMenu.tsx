@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/avatar";
 import {
@@ -29,12 +28,6 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
   const { language } = usePreferences();
   const copy = getUiCopy(language).marketing.actions;
   const { user, userProfile, effectiveGlobalRole, signOut } = useAuth();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
 
   if (!user) return null;
   const displayName = userProfile?.full_name || (user.email ? user.email.split("@")[0] : "Profil");
@@ -51,12 +44,6 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
     await signOut();
     onNavigate?.();
   };
-
-  if (!mounted) {
-    return (
-      <div className={cn("h-10 w-10 rounded-full border border-border/60 bg-muted", className)} aria-hidden />
-    );
-  }
 
   return (
     <DropdownMenu>

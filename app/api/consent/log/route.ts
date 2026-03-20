@@ -2,15 +2,14 @@
  * Consent Log API
  * Logs consent events to the database for GDPR compliance
  * 
- * NOTE: This API uses tables created by migration 20260115000000_cookie_consent_v2.sql
- * After applying the migration, run `npx supabase gen types typescript` to update types.
- * Until then, we use eslint-disable to bypass type checking on these operations.
+ * NOTE: This API uses generated Supabase types for the cookie consent tables.
  */
 
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { apiHandler } from '@/lib/api/route-handler'
 import { z } from 'zod'
+import type { TablesInsert } from '@/types/supabase'
 
 const cookieConsentStateSchema = z.object({
   necessary: z.boolean(),
@@ -45,29 +44,27 @@ export const POST = apiHandler({
 
     // Use service role client to insert audit log (bypasses RLS — anonymous users don't have RLS sessions)
     const supabase = await createServiceRoleClient()
-    
-    // Cast to any to bypass type checking until migration is applied and types regenerated
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = supabase as any
 
     // Insert into audit log
-    const { error: auditError } = await db
+    const auditPayload: TablesInsert<'cookie_consent_audit'> = {
+      consent_id: body.consentId,
+      user_id: body.userId || null,
+      event_type: body.eventType,
+      previous_state: body.previousState || null,
+      new_state: body.newState,
+      consent_version: body.consentVersion,
+      ip_address: ipAddress,
+      user_agent: body.userAgent || null,
+      page_url: body.pageUrl || null,
+      referrer: body.referrer || null,
+      locale: body.locale || null,
+      dnt_enabled: body.dntEnabled ?? false,
+      gpc_enabled: body.gpcEnabled ?? false,
+    }
+
+    const { error: auditError } = await supabase
       .from('cookie_consent_audit')
-      .insert({
-        consent_id: body.consentId,
-        user_id: body.userId || null,
-        event_type: body.eventType,
-        previous_state: body.previousState || null,
-        new_state: body.newState,
-        consent_version: body.consentVersion,
-        ip_address: ipAddress,
-        user_agent: body.userAgent || null,
-        page_url: body.pageUrl || null,
-        referrer: body.referrer || null,
-        locale: body.locale || null,
-        dnt_enabled: body.dntEnabled ?? false,
-        gpc_enabled: body.gpcEnabled ?? false,
-      })
+      .insert(auditPayload)
 
     if (auditError) {
       console.error('[consent/log] Audit log error:', auditError)
@@ -76,22 +73,24 @@ export const POST = apiHandler({
 
     // For anonymous users, also store/update their consent state
     if (!body.userId && (body.eventType === 'granted' || body.eventType === 'updated')) {
-      const { error: consentError } = await db
+      const anonymousConsentPayload: TablesInsert<'anonymous_cookie_consents'> = {
+        consent_id: body.consentId,
+        necessary: body.newState.necessary ?? true,
+        functional: body.newState.functional ?? false,
+        analytics: body.newState.analytics ?? false,
+        marketing: body.newState.marketing ?? false,
+        consent_version: body.consentVersion,
+        locale: body.locale || 'en',
+        ip_address: ipAddress,
+        user_agent: body.userAgent || null,
+        dnt_enabled: body.dntEnabled ?? false,
+        gpc_enabled: body.gpcEnabled ?? false,
+        updated_at: new Date().toISOString(),
+      }
+
+      const { error: consentError } = await supabase
         .from('anonymous_cookie_consents')
-        .upsert({
-          consent_id: body.consentId,
-          necessary: body.newState.necessary ?? true,
-          functional: body.newState.functional ?? false,
-          analytics: body.newState.analytics ?? false,
-          marketing: body.newState.marketing ?? false,
-          consent_version: body.consentVersion,
-          locale: body.locale || 'en',
-          ip_address: ipAddress,
-          user_agent: body.userAgent || null,
-          dnt_enabled: body.dntEnabled ?? false,
-          gpc_enabled: body.gpcEnabled ?? false,
-          updated_at: new Date().toISOString(),
-        }, { 
+        .upsert(anonymousConsentPayload, { 
           onConflict: 'consent_id',
           ignoreDuplicates: false 
         })

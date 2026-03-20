@@ -17,8 +17,7 @@ export const GET = apiHandler({
     }
 
     // Fetch our extended MFA settings (optional; may not exist yet for all users)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: userMfa, error: userMfaError } = await (supabase as any)
+    const { data: userMfa, error: userMfaError } = await supabase
       .from('user_mfa')
       .select('*')
       .eq('user_id', userId)
@@ -33,8 +32,7 @@ export const GET = apiHandler({
     const requirement = await checkMFARequirement(userId)
 
     // Count trusted devices (head count)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { count: trustedDevicesCount, error: trustedDevicesError } = await (supabase as any)
+    const { count: trustedDevicesCount, error: trustedDevicesError } = await supabase
       .from('mfa_trusted_devices')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)

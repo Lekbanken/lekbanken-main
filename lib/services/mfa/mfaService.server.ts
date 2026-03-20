@@ -6,12 +6,10 @@
  * - System admins MUST have MFA (required)
  * - Tenant admins (owner/admin) MUST have MFA (required)
  *
- * NOTE: Uses type casting because new tables (tenant_mfa_policies, mfa_trusted_devices)
- * and RPC functions will have types regenerated after migration runs.
+ * NOTE: Uses generated Supabase types for MFA tables and RPCs.
  */
 
 import { createServerRlsClient } from '@/lib/supabase/server'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { revokeAllDevices } from './mfaDevices.server'
 import type {
   MFAUserSettings,
@@ -20,6 +18,14 @@ import type {
   MFAStatus,
   MFARequiredReason,
 } from '@/types/mfa'
+import type { TablesInsert } from '@/types/supabase'
+
+type UserRequiresMfaRow = {
+  required: boolean
+  reason: string | null
+  grace_period_end: string | null
+  enrolled: boolean
+}
 
 // ============================================================================
 // USER MFA SETTINGS
@@ -53,22 +59,22 @@ export async function upsertUserMFASettings(
   settings: Partial<Omit<MFAUserSettings, 'user_id' | 'created_at' | 'updated_at'>>
 ): Promise<MFAUserSettings | null> {
   const supabase = await createServerRlsClient()
+  type UserMfaInsert = TablesInsert<'user_mfa'>
 
   // Filter out undefined values and prepare update object
-  const updateData: Record<string, unknown> = {
+  const updateData: UserMfaInsert = {
     user_id: userId,
     updated_at: new Date().toISOString(),
   }
 
   // Only add defined settings
-  for (const [key, value] of Object.entries(settings)) {
-    if (value !== undefined) {
-      updateData[key] = value
-    }
-  }
+  const definedSettings = Object.fromEntries(
+    Object.entries(settings).filter(([, value]) => value !== undefined)
+  ) as Partial<UserMfaInsert>
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
+  Object.assign(updateData, definedSettings)
+
+  const { data, error } = await supabase
     .from('user_mfa')
     .upsert(updateData, { onConflict: 'user_id' })
     .select()
@@ -91,10 +97,8 @@ export async function upsertUserMFASettings(
  */
 export async function getTenantMFAPolicy(tenantId: string): Promise<TenantMFAPolicy | null> {
   const supabase = await createServerRlsClient()
-  // Cast since tenant_mfa_policies types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('tenant_mfa_policies')
     .select('*')
     .eq('tenant_id', tenantId)
@@ -116,10 +120,8 @@ export async function upsertTenantMFAPolicy(
   policy: Partial<Omit<TenantMFAPolicy, 'id' | 'tenant_id' | 'created_at' | 'updated_at'>>
 ): Promise<TenantMFAPolicy | null> {
   const supabase = await createServerRlsClient()
-  // Cast since tenant_mfa_policies types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('tenant_mfa_policies')
     .upsert(
       {
@@ -143,13 +145,6 @@ export async function upsertTenantMFAPolicy(
 // MFA REQUIREMENT CHECK
 // ============================================================================
 
-interface MFARequirementResult {
-  required: boolean
-  reason: string | null
-  grace_period_end: string | null
-  enrolled: boolean
-}
-
 /**
  * Check if MFA is required for a user
  *
@@ -160,11 +155,9 @@ interface MFARequirementResult {
  */
 export async function checkMFARequirement(userId: string): Promise<MFARequirementCheck> {
   const supabase = await createServerRlsClient()
-  // Cast since RPC function types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
   // Use the database function for consistent logic
-  const { data, error } = await db.rpc('user_requires_mfa', {
+  const { data, error } = await supabase.rpc('user_requires_mfa', {
     target_user_id: userId,
   })
 
@@ -181,7 +174,7 @@ export async function checkMFARequirement(userId: string): Promise<MFARequiremen
     }
   }
 
-  const results = data as MFARequirementResult[] | null
+  const results = data as UserRequiresMfaRow[] | null
   const result = results?.[0]
 
   if (!result) {
@@ -225,10 +218,8 @@ export async function getUserAdminRoles(
   userId: string
 ): Promise<{ isSystemAdmin: boolean; tenantAdminOf: string[] }> {
   const supabase = await createServerRlsClient()
-  // Cast since RPC function types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
-  const { data, error } = await db.rpc('get_user_admin_roles', {
+  const { data, error } = await supabase.rpc('get_user_admin_roles', {
     target_user_id: userId,
   })
 
@@ -255,8 +246,6 @@ export async function getUserAdminRoles(
  */
 export async function getMFAStatus(userId: string): Promise<MFAStatus> {
   const supabase = await createServerRlsClient()
-  // Cast since mfa_trusted_devices types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
   // Get user MFA settings
   const userSettings = await getUserMFASettings(userId)
@@ -271,7 +260,7 @@ export async function getMFAStatus(userId: string): Promise<MFAStatus> {
   const factors = user?.factors ?? []
 
   // Count trusted devices
-  const { count: trustedDevicesCount } = await db
+  const { count: trustedDevicesCount } = await supabase
     .from('mfa_trusted_devices')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)

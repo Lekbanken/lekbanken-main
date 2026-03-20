@@ -136,8 +136,7 @@ export async function checkMFAStatus(
     }
     
     // Check if MFA is required for this user via RPC
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: requirementData, error: reqError } = await (supabase as any).rpc('user_requires_mfa', {
+    const { data: requirementData, error: reqError } = await supabase.rpc('user_requires_mfa', {
       target_user_id: user.id,
     })
     
@@ -229,8 +228,7 @@ async function checkTrustedDevice(
     const tokenHash = await hashToken(trustToken)
     
     // Check if device is trusted
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from('mfa_trusted_devices')
       .select('id, expires_at')
       .eq('user_id', userId)
@@ -251,13 +249,11 @@ async function checkTrustedDevice(
     }
     
     // Update last_used_at (fire and forget)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(supabase as any)
+    void supabase
       .from('mfa_trusted_devices')
       .update({ last_used_at: new Date().toISOString() })
       .eq('id', data.id)
-      .then(() => {})
-      .catch(() => {})
+      .then(() => {}, () => {})
     
     return true
   } catch {

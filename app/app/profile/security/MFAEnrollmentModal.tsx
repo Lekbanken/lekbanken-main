@@ -88,28 +88,13 @@ export function MFAEnrollmentModal({
     setError(null);
     
     try {
-      // First create a challenge
-      const challengeRes = await fetch('/api/accounts/auth/mfa/challenge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ factor_id: enrollmentData.factor_id }),
-        credentials: 'include',
-      });
-      
-      if (!challengeRes.ok) {
-        throw new Error('Kunde inte skapa verifieringsutmaning');
-      }
-      
-      const challengeData = await challengeRes.json();
-      
-      // Then verify
       const verifyRes = await fetch('/api/accounts/auth/mfa/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           factor_id: enrollmentData.factor_id,
-          challenge_id: challengeData.challenge_id,
           code,
+          is_enrollment: true,
         }),
         credentials: 'include',
       });

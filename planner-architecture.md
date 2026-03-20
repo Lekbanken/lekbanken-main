@@ -315,13 +315,14 @@ plans                     plan_blocks              plan_versions
 
 plan_version_blocks       plan_schedules           runs
   id (PK)                   id (PK)                  id (PK)
-  version_id (FK)           plan_id (FK)             user_id (FK)
-  position                  scheduled_date           tenant_id (FK, nullable)
-  block_type, game_id       scheduled_time           plan_version_id (FK)
-  duration_minutes          status (enum)            status (enum)
-  title, notes              recurrence_rule          current_step
-                            notes, group_id          elapsed_seconds
-                            completed_at             last_heartbeat_at (nullable)
+  version_id (FK)           plan_id (FK)             plan_id (FK)
+  position                  scheduled_date           user_id (FK)
+  block_type, game_id       scheduled_time           tenant_id (FK, nullable)
+  duration_minutes          status (enum/text)       plan_version_id (FK)
+  title, notes              recurrence_rule          status (enum)
+                            notes, group_id          current_step_index
+                            completed_at             elapsed_seconds
+                            created_by               last_heartbeat_at (nullable)
                                                      metadata (jsonb)
 
 plan_notes_private        plan_notes_tenant
@@ -354,6 +355,8 @@ plan_block_type_enum: 'game' | 'pause' | 'preparation' | 'custom' | 'section'
 | `plan_notes_private` | `plan_notes_private_manage` | ✅ Owner-only (oförändrad) |
 | `plan_notes_tenant` | `plan_notes_tenant_select/insert/update/delete` | ✅ Tenant-medlem + plan synlig |
 | `runs` | `runs_select/insert/update` | ✅ Per-operation, insert kräver synlig plan_version |
+
+**Notering (2026-03-20):** `plan_schedules` är nu återförd till den kanoniska migrationskedjan via backfill-migration `20260320120000_plan_schedules_backfill_and_runs_canonical_sync.sql`. `runs.plan_id` + `runs.current_step_index` behandlas också som den stabila databassanningen för play/resume-API:erna.
 
 **SQL helper-funktioner (befintliga):**
 - `is_tenant_member(p_tenant_id)` — SECURITY DEFINER, checkar `user_tenant_memberships`

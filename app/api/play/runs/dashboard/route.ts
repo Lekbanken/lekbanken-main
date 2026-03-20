@@ -34,13 +34,14 @@ export const GET = apiHandler({
     .from('runs')
     .select(`
       id,
+      plan_id,
       plan_version_id,
       status,
-      current_step,
+      current_step_index,
       started_at,
       last_heartbeat_at,
       metadata,
-      plan_versions(plan_id, name, plans(name))
+      plan_versions(name, plans(name))
     `)
     .eq('user_id', userId)
     .order('started_at', { ascending: false })
@@ -103,13 +104,12 @@ export const GET = apiHandler({
   const rows: DashboardRunRow[] = runs
     .map((r) => {
       const pv = r.plan_versions as {
-        plan_id?: string
         name?: string
         plans?: { name?: string } | null
       } | null
       const meta = r.metadata as Record<string, unknown> | null
 
-      const planId = pv?.plan_id ?? (meta?.planId as string | undefined)
+      const planId = r.plan_id ?? (meta?.planId as string | undefined)
       if (!planId) return null
 
       // Robust plan name: plan name (SSoT) → version name → metadata fallback → default
@@ -163,7 +163,7 @@ export const GET = apiHandler({
         planId,
         planName,
         runStatus: r.status as RunStatus,
-        currentStepIndex: r.current_step ?? 0,
+        currentStepIndex: r.current_step_index ?? 0,
         totalSteps,
         startedAt: r.started_at ?? new Date().toISOString(),
         lastHeartbeatAt: r.last_heartbeat_at,

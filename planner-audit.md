@@ -7,6 +7,8 @@
 
 **Post-launch notering (2026-03-19):** publish/status-spliten är delvis stängd. `published` kan inte längre sättas via `/api/plans/[planId]/status`, och bulk publish är avstängd tills den kan skapa versionssnapshot. Kvarvarande planner-risker ligger nu främst i read/cache/AppShell-synk och övriga post-launch-förbättringar, inte i dubbla publiceringssemantiker.
 
+**Notering (2026-03-20):** planner-kalenderns `plan_schedules` är nu backfillad in i den levande migrationskedjan (`20260320120000_plan_schedules_backfill_and_runs_canonical_sync.sql`). Samma fix canonicaliserar play-API:erna mot `runs.plan_id` + `runs.current_step_index`, vilket återställer TS-synk mot genererade Supabase-typer.
+
 ---
 
 ## 1. Audit (Nuvarande läge)
@@ -347,6 +349,7 @@ Plan (plans-tabell)
 - [x] **plan_schedules**: Synkad med plans RLS (per-operation, borttagen inkonsistens)
 - [x] **plan_notes_tenant**: Åtstramad — kräver att planen är synlig
 - [x] **runs**: `tenant_id` sätts i start-API + backfill av befintliga runs
+- [x] **2026-03-20**: `plan_schedules` CREATE TABLE/FK/index/RLS tillbaka i kanonisk migration; play-API använder nu `runs.plan_id` + `runs.current_step_index`
 - [x] **Scope-tabs**: Org + Global aktiverade i ScopeSelector + PlanListPanel
 - [x] **RLS-migrering**: `20260305100000_tenant_rls_planner.sql` — wrapped i BEGIN/COMMIT
 - [ ] Produktfiltrering av globala planer (kräver `plan_product_tags`) — skjuten till MS5.1

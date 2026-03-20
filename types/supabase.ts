@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
-  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -3942,6 +3937,7 @@ export type Database = {
           duration_max: number | null
           energy_level: Database["public"]["Enums"]["energy_level_enum"] | null
           external_ref: string | null
+          game_content_schema_version: number
           game_content_version: string | null
           game_key: string | null
           holiday_tags: string[] | null
@@ -3987,6 +3983,7 @@ export type Database = {
           duration_max?: number | null
           energy_level?: Database["public"]["Enums"]["energy_level_enum"] | null
           external_ref?: string | null
+          game_content_schema_version?: number
           game_content_version?: string | null
           game_key?: string | null
           holiday_tags?: string[] | null
@@ -4032,6 +4029,7 @@ export type Database = {
           duration_max?: number | null
           energy_level?: Database["public"]["Enums"]["energy_level_enum"] | null
           external_ref?: string | null
+          game_content_schema_version?: number
           game_content_version?: string | null
           game_key?: string | null
           holiday_tags?: string[] | null
@@ -5225,20 +5223,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_tenant"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_user"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "interest_profiles_tenant_id_fkey"
             columns: ["tenant_id"]
@@ -8276,20 +8260,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_tenant"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_user"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "personalization_events_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -9754,20 +9724,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_tenant"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_user"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "recommendation_history_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -9868,46 +9824,59 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string | null
-          current_step: number | null
+          current_step_index: number | null
           elapsed_seconds: number | null
           id: string
           last_heartbeat_at: string | null
           metadata: Json | null
+          plan_id: string
           plan_version_id: string
           started_at: string | null
           status: Database["public"]["Enums"]["plan_run_status_enum"]
           tenant_id: string | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           completed_at?: string | null
           created_at?: string | null
-          current_step?: number | null
+          current_step_index?: number | null
           elapsed_seconds?: number | null
           id?: string
           last_heartbeat_at?: string | null
           metadata?: Json | null
+          plan_id: string
           plan_version_id: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["plan_run_status_enum"]
           tenant_id?: string | null
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           completed_at?: string | null
           created_at?: string | null
-          current_step?: number | null
+          current_step_index?: number | null
           elapsed_seconds?: number | null
           id?: string
           last_heartbeat_at?: string | null
           metadata?: Json | null
+          plan_id?: string
           plan_version_id?: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["plan_run_status_enum"]
           tenant_id?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "runs_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "runs_plan_version_id_fkey"
             columns: ["plan_version_id"]
@@ -9956,20 +9925,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_tenant"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_user"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "saved_items_tenant_id_fkey"
             columns: ["tenant_id"]
@@ -12093,30 +12048,36 @@ export type Database = {
           created_at: string
           hostname: string
           id: string
-          kind: string
+          is_primary: boolean
+          kind: string | null
           status: string
           tenant_id: string
           updated_at: string
+          verification_token: string | null
           verified_at: string | null
         }
         Insert: {
           created_at?: string
           hostname: string
           id?: string
-          kind?: string
+          is_primary?: boolean
+          kind?: string | null
           status?: string
           tenant_id: string
           updated_at?: string
+          verification_token?: string | null
           verified_at?: string | null
         }
         Update: {
           created_at?: string
           hostname?: string
           id?: string
-          kind?: string
+          is_primary?: boolean
+          kind?: string | null
           status?: string
           tenant_id?: string
           updated_at?: string
+          verification_token?: string | null
           verified_at?: string | null
         }
         Relationships: [
@@ -13326,6 +13287,35 @@ export type Database = {
           },
         ]
       }
+      user_achievement_showcase: {
+        Row: {
+          achievement_id: string
+          pinned_at: string
+          slot: number
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          pinned_at?: string
+          slot: number
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          pinned_at?: string
+          slot?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievement_showcase_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -14147,20 +14137,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_tenant"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_user"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "user_preferences_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -14230,7 +14206,6 @@ export type Database = {
         Row: {
           created_at: string
           current_xp: number
-          faction_id: string | null
           id: string
           level: number
           next_level_xp: number
@@ -14242,7 +14217,6 @@ export type Database = {
         Insert: {
           created_at?: string
           current_xp?: number
-          faction_id?: string | null
           id?: string
           level?: number
           next_level_xp?: number
@@ -14254,7 +14228,6 @@ export type Database = {
         Update: {
           created_at?: string
           current_xp?: number
-          faction_id?: string | null
           id?: string
           level?: number
           next_level_xp?: number
@@ -14576,7 +14549,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "tenant_memberships_seat_assignment_id_fkey"
+            foreignKeyName: "user_tenant_memberships_seat_assignment_id_fkey"
             columns: ["seat_assignment_id"]
             isOneToOne: false
             referencedRelation: "tenant_seat_assignments"
@@ -14764,7 +14737,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "tenant_memberships_seat_assignment_id_fkey"
+            foreignKeyName: "user_tenant_memberships_seat_assignment_id_fkey"
             columns: ["seat_assignment_id"]
             isOneToOne: false
             referencedRelation: "tenant_seat_assignments"
@@ -15092,6 +15065,17 @@ export type Database = {
           new_xp: number
         }[]
       }
+      assign_seat_if_available: {
+        Args: {
+          p_assigned_by?: string
+          p_billing_product_id: string
+          p_name?: string
+          p_subscription_id: string
+          p_tenant_id: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       attempt_keypad_unlock: {
         Args: {
           p_artifact_id: string
@@ -15107,6 +15091,43 @@ export type Database = {
           p_game_artifact_id: string
           p_participant_id: string
           p_participant_name?: string
+          p_session_id: string
+        }
+        Returns: Json
+      }
+      attempt_puzzle_counter_v2: {
+        Args: {
+          p_action: string
+          p_game_artifact_id: string
+          p_participant_id: string
+          p_session_id: string
+        }
+        Returns: Json
+      }
+      attempt_puzzle_multi_answer_v2: {
+        Args: {
+          p_game_artifact_id: string
+          p_item_id: string
+          p_participant_id: string
+          p_session_id: string
+        }
+        Returns: Json
+      }
+      attempt_puzzle_qr_gate_v2: {
+        Args: {
+          p_game_artifact_id: string
+          p_participant_id: string
+          p_scanned_value: string
+          p_session_id: string
+        }
+        Returns: Json
+      }
+      attempt_puzzle_riddle_v2: {
+        Args: {
+          p_game_artifact_id: string
+          p_is_correct: boolean
+          p_normalized_answer: string
+          p_participant_id: string
           p_session_id: string
         }
         Returns: Json
@@ -15161,9 +15182,7 @@ export type Database = {
         }[]
       }
       check_and_increment_no_expiry_quota: {
-        Args: {
-          p_tenant_id: string
-        }
+        Args: { p_tenant_id: string }
         Returns: boolean
       }
       check_cooldown_eligible_v1: {
@@ -15191,9 +15210,7 @@ export type Database = {
         }[]
       }
       check_session_join_allowed: {
-        Args: {
-          p_session_id: string
-        }
+        Args: { p_session_id: string }
         Returns: {
           allowed: boolean
           current_count: number
@@ -15237,6 +15254,25 @@ export type Database = {
           created: boolean
         }[]
       }
+      create_notification_v1: {
+        Args: {
+          p_action_label?: string
+          p_action_url?: string
+          p_category?: string
+          p_created_by?: string
+          p_event_key?: string
+          p_exclude_demo?: boolean
+          p_message?: string
+          p_related_entity_id?: string
+          p_related_entity_type?: string
+          p_scope: string
+          p_tenant_id?: string
+          p_title?: string
+          p_type?: string
+          p_user_ids?: string[]
+        }
+        Returns: Json
+      }
       create_session_with_snapshot: {
         Args: {
           p_game_id: string
@@ -15249,6 +15285,14 @@ export type Database = {
           session_id: string
           snapshot_id: string
         }[]
+      }
+      disable_all_triggers_v2: {
+        Args: { p_session_id: string }
+        Returns: number
+      }
+      disable_trigger_v2: {
+        Args: { p_game_trigger_id: string; p_session_id: string }
+        Returns: boolean
       }
       dismiss_notification: {
         Args: { p_delivery_id: string }
@@ -15276,6 +15320,15 @@ export type Database = {
           child_product_id: string
           entitlement_id: string
           quantity_granted: number
+        }[]
+      }
+      fire_trigger_v2: {
+        Args: { p_game_trigger_id: string; p_session_id: string }
+        Returns: {
+          fired_at: string
+          fired_count: number
+          new_status: string
+          success: boolean
         }[]
       }
       fire_trigger_v2_safe: {
@@ -15310,6 +15363,14 @@ export type Database = {
       }
       get_current_demo_session_id: { Args: never; Returns: string }
       get_effective_design: { Args: { p_tenant_id?: string }; Returns: Json }
+      get_game_reaction_counts: {
+        Args: { p_game_ids: string[] }
+        Returns: {
+          dislike_count: number
+          game_id: string
+          like_count: number
+        }[]
+      }
       get_game_reactions_batch: {
         Args: { p_game_ids: string[] }
         Returns: {
@@ -15333,6 +15394,29 @@ export type Database = {
       get_next_plan_version_number: {
         Args: { p_plan_id: string }
         Returns: number
+      }
+      get_notification_history_v1: {
+        Args: {
+          p_category?: string
+          p_days_back?: number
+          p_limit?: number
+          p_tenant_id?: string
+        }
+        Returns: {
+          action_url: string
+          category: string
+          created_at: string
+          created_by: string
+          event_key: string
+          message: string
+          notification_id: string
+          read_count: number
+          scope: string
+          title: string
+          total_deliveries: number
+          type: string
+          unread_count: number
+        }[]
       }
       get_scheduled_jobs_status: { Args: never; Returns: Json }
       get_session_event_stats: {
@@ -15444,6 +15528,7 @@ export type Database = {
       is_global_admin: { Args: never; Returns: boolean }
       is_system_admin: { Args: never; Returns: boolean }
       is_system_admin_jwt_only: { Args: never; Returns: boolean }
+      is_tenant_admin: { Args: { check_tenant_id: string }; Returns: boolean }
       is_tenant_member: { Args: { p_tenant_id: string }; Returns: boolean }
       learning_all_requirements_satisfied: {
         Args: {
@@ -15624,6 +15709,10 @@ export type Database = {
           purchase_id: string
         }[]
       }
+      rearm_trigger_v2: {
+        Args: { p_game_trigger_id: string; p_session_id: string }
+        Returns: boolean
+      }
       recalc_plan_total_time_minutes: {
         Args: { p_plan_id: string }
         Returns: undefined
@@ -15749,19 +15838,7 @@ export type Database = {
         }
         Returns: Json
       }
-      to_text_array_safe:
-        | {
-            Args: { input: string }
-            Returns: {
-              error: true
-            } & "Could not choose the best candidate function between: public.to_text_array_safe(input => text), public.to_text_array_safe(input => _text). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
-          }
-        | {
-            Args: { input: string[] }
-            Returns: {
-              error: true
-            } & "Could not choose the best candidate function between: public.to_text_array_safe(input => text), public.to_text_array_safe(input => _text). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
-          }
+      to_text_array_safe: { Args: { input: string }; Returns: string[] }
       upsert_game_content_v1: { Args: { p_payload: Json }; Returns: Json }
       upsert_game_reaction: {
         Args: { p_game_id: string; p_reaction?: string }
@@ -16092,3 +16169,4 @@ export const Constants = {
     },
   },
 } as const
+

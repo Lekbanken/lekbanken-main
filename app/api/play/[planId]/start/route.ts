@@ -106,7 +106,7 @@ export const POST = apiHandler({
 
   if (existingRun) {
     // Upsert run_session for current step if it requires a session
-    const currentStep = existingRun.current_step ?? 0
+    const currentStep = existingRun.current_step_index ?? 0
     const stepAtCurrent = snapshot.steps[currentStep]
     let runSession = null
 
@@ -124,7 +124,7 @@ export const POST = apiHandler({
       steps: snapshot.steps as RunStep[],
       blockCount: snapshot.stats.blockCount,
       totalDurationMinutes: snapshot.stats.totalTimeMinutes,
-      currentStepIndex: existingRun.current_step ?? 0,
+      currentStepIndex: existingRun.current_step_index ?? 0,
       startedAt: existingRun.started_at ?? existingRun.created_at ?? new Date().toISOString(),
       completedAt: existingRun.completed_at ?? null,
     }
@@ -134,7 +134,7 @@ export const POST = apiHandler({
       resumed: true,
       resumeReason: 'active_run_exists',
       resumeMeta: {
-        currentStep: existingRun.current_step ?? 0,
+        currentStep: existingRun.current_step_index ?? 0,
         totalSteps: snapshot.stats.totalSteps,
         versionNumber: snapshot.version.versionNumber,
         startedAt: existingRun.started_at ?? existingRun.created_at ?? new Date().toISOString(),
@@ -145,11 +145,12 @@ export const POST = apiHandler({
 
   // ── Create new run ────────────────────────────────────────────────
   const runPayload = {
+    plan_id: planId,
     plan_version_id: snapshot.version.id,
     user_id: userId,
     tenant_id: snapshot.plan.ownerTenantId ?? null,
     status: 'in_progress' as RunStatus,
-    current_step: 0,
+    current_step_index: 0,
     last_heartbeat_at: new Date().toISOString(),
     metadata: ({
       planId,

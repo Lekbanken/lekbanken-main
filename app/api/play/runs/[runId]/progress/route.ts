@@ -64,7 +64,7 @@ export const POST = apiHandler({
   }
 
   if (typeof payload.currentStepIndex === 'number') {
-    updatePayload.current_step = payload.currentStepIndex
+    updatePayload.current_step_index = payload.currentStepIndex
   }
 
   if (payload.status) {
@@ -95,7 +95,7 @@ export const POST = apiHandler({
     .update(updatePayload)
     .eq('id', runId)
     .eq('user_id', userId) // Ensure user owns the run
-    .select('id, tenant_id, plan_version_id, current_step, status, metadata, completed_at, created_at')
+    .select('id, tenant_id, plan_version_id, current_step_index, status, metadata, completed_at, created_at')
     .single()
 
   if (error) {
@@ -147,7 +147,7 @@ export const POST = apiHandler({
   return NextResponse.json({
     progress: {
       runId: run.id,
-      currentStepIndex: run.current_step,
+      currentStepIndex: run.current_step_index ?? 0,
       status: run.status,
       timerRemaining: runMetadata?.timerRemaining,
       timerTotal: runMetadata?.timerTotal,
@@ -181,7 +181,7 @@ export const GET = apiHandler({
 
   const { data: run, error } = await supabase
     .from('runs')
-    .select('id, current_step, status, metadata, created_at')
+    .select('id, current_step_index, status, metadata, created_at')
     .eq('id', runId)
     .eq('user_id', userId)
     .single()
@@ -199,7 +199,7 @@ export const GET = apiHandler({
   return NextResponse.json({
     progress: {
       runId: run.id,
-      currentStepIndex: run.current_step,
+      currentStepIndex: run.current_step_index ?? 0,
       status: run.status,
       timerRemaining: runMetadata?.timerRemaining,
       timerTotal: runMetadata?.timerTotal,

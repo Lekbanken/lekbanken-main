@@ -86,7 +86,7 @@ export const GET = apiHandler({
 
   const runResponse: Run = {
     id: run.id,
-    planId: version?.plan_id ?? (typeof runMetadata?.planId === 'string' ? runMetadata.planId : ''),
+    planId: run.plan_id ?? version?.plan_id ?? (typeof runMetadata?.planId === 'string' ? runMetadata.planId : ''),
     planVersionId: run.plan_version_id,
     versionNumber: version?.version_number ?? 0,
     name: version?.name ?? 'Okänd plan',
@@ -94,14 +94,14 @@ export const GET = apiHandler({
     steps: steps as RunStep[],
     blockCount: blocks.filter((b) => b.blockType !== 'section').length,
     totalDurationMinutes: version?.total_time_minutes || steps.reduce((sum, s) => sum + s.durationMinutes, 0),
-    currentStepIndex: run.current_step ?? 0,
+    currentStepIndex: run.current_step_index ?? 0,
     startedAt: run.started_at ?? run.created_at ?? new Date().toISOString(),
     completedAt: run.completed_at,
   }
 
   const progress = {
     runId: run.id,
-    currentStepIndex: run.current_step ?? 0,
+    currentStepIndex: run.current_step_index ?? 0,
     status: run.status,
     timerRemaining: runMetadata?.timerRemaining,
     timerTotal: runMetadata?.timerTotal,

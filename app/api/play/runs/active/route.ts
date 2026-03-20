@@ -8,8 +8,7 @@ import { apiHandler } from '@/lib/api/route-handler'
  * Returns the current user's active runs (status = 'in_progress').
  * Used by PlanListItem and ScheduleCard to show "Fortsätt" instead of "Starta".
  *
- * Since `runs` has no `plan_id` column, we left-join through `plan_versions`
- * to get it (with metadata fallback). Runs with missing planId are filtered out.
+ * `runs.plan_id` is canonical. Metadata fallback is retained for legacy rows.
  *
  * Stale-run filter (MS4.8): runs whose last_heartbeat_at is older than
  * STALE_THRESHOLD_HOURS are excluded. Runs with NULL heartbeat (legacy) are
@@ -42,9 +41,6 @@ export const GET = apiHandler({
     Date.now() - STALE_THRESHOLD_HOURS * 60 * 60 * 1000
   ).toISOString()
 
-  // Left join through plan_versions — use optional relation so runs with
-  // deleted/broken versions are not silently dropped.
-  //
   // Stale filter: last_heartbeat_at >= threshold OR last_heartbeat_at IS NULL (legacy runs).
   // Supabase doesn't support OR across columns in a single .or(), so we use
   // a raw or-filter string.
@@ -52,13 +48,13 @@ export const GET = apiHandler({
     .from('runs')
     .select(`
       id,
+      plan_id,
       plan_version_id,
       status,
-      current_step,
+      current_step_index,
       started_at,
       metadata,
-      last_heartbeat_at,
-      plan_versions(plan_id)
+      last_heartbeat_at
     `)
     .eq('user_id', userId)
     .eq('status', 'in_progress')
@@ -73,11 +69,9 @@ export const GET = apiHandler({
 
   const activeRuns: ActiveRun[] = (runs ?? [])
     .map((r) => {
-      // plan_versions is a left join — may be null if version was deleted
-      const pv = r.plan_versions as { plan_id?: string } | null
       const meta = r.metadata as Record<string, unknown> | null
 
-      const planId = pv?.plan_id ?? (meta?.planId as string | undefined)
+      const planId = r.plan_id ?? (meta?.planId as string | undefined)
 
       if (!planId) {
         console.warn('[runs/active] run missing planId, skipping', r.id)
@@ -89,7 +83,7 @@ export const GET = apiHandler({
         planId,
         planVersionId: r.plan_version_id,
         status: r.status,
-        currentStepIndex: r.current_step ?? 0,
+        currentStepIndex: r.current_step_index ?? 0,
         totalSteps: (meta?.stepsGenerated as number) ?? (meta?.steps as number) ?? 0,
         startedAt: r.started_at ?? new Date().toISOString(),
       }

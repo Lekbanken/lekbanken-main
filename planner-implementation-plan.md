@@ -1,10 +1,10 @@
 # Planner v2.0 — Komplett Implementeringsplan
 
-> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-19  
+> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-20  
 > **Status:** MS0–MS11 ✅ KLARA. PlanSnapshot Pipeline ✅ KLAR. 0 TS-errors.  
 > **Förutsättning:** Denna plan bygger på `planner-audit.md`. Se även `planner-architecture.md` för systemdesign.  
 > **Nästa:** Post-launch Priority 1 — Tenant-Custom Planner Blocks (se `launch-control.md` §11)  
-> **Kvarvarande:** Supabase type regeneration (TEMP casts → compile-time `RunSessionStatus` union hela vägen)
+> **Kvarvarande:** Cross-tenant isolation test för planner-RLS och produktfiltrering för globala planer
 
 **Notering (2026-03-19):** planner publish/status canonicalization är genomförd. `published` får endast sättas via `/api/plans/[planId]/publish`, och `/api/plans/[planId]/status` är begränsad till icke-publicerande övergångar. Bulk publish är uttryckligen avstängd tills den kan skapa snapshots på samma sätt som den individuella publish-vägen.
 
@@ -153,7 +153,7 @@ plan_versions
 plan_version_blocks
   id, plan_version_id, position, block_type, game_id, duration_minutes, title, notes, is_optional, metadata
 
-plan_schedules  ⚠️ Se verifieringsnotering nedan
+plan_schedules
   id, plan_id, scheduled_date, scheduled_time, recurrence_rule, status, notes, created_by
   group_id, group_name, location, completed_at  (extra kolumner i faktisk tabell)
 
@@ -167,9 +167,9 @@ run_steps
   id, run_id, index, block_id, block_type, title, description, duration_minutes, game_snapshot, metadata
 ```
 
-#### ⚠️ Verifiering: `plan_schedules`-tabellen
+#### ✅ Verifiering: `plan_schedules`-tabellen
 
-**Status:** Tabellen **EXISTERAR** i databasen och är fullt funktionell.
+**Status:** Tabellen är nu **kanoniskt definierad i migrationskedjan** och fungerar i fresh install.
 
 | Kontrollpunkt | Resultat |
 |---|---|
@@ -178,12 +178,16 @@ run_steps
 | RLS-policy | ✅ `plan_schedules_access` (ägare + tenant-visibility) — ALTER i migration 20260220 |
 | API-routes | ✅ `GET/POST /api/plans/schedules` + `PUT/DELETE /api/plans/schedules/[scheduleId]` — alla frågar `from('plan_schedules')` |
 | Klient-hook | ✅ `useSchedules` har fullständig CRUD |
-| `CREATE TABLE` migration | ⚠️ **Saknas i migreringsfiler** — tabellen skapades troligen via Supabase Dashboard eller en squashed migration |
+| `CREATE TABLE` migration | ✅ `20260320120000_plan_schedules_backfill_and_runs_canonical_sync.sql` återför tabellen till levande migrationskedja |
 
 **Kolumner (från `types/supabase.ts`):**
 `id`, `plan_id` (required), `scheduled_date` (required), `scheduled_time`, `status`, `recurrence_rule`, `notes`, `group_id`, `group_name`, `location`, `completed_at`, `created_by`, `created_at`, `updated_at`
 
-**Slutsats:** Tabellen fungerar. Kalenderfixen kan bygga på befintlig infrastruktur. Rekommendation: skapa en "backfill"-migration som dokumenterar tabellens schema (`CREATE TABLE IF NOT EXISTS`) för att ha ett komplett migreringshistorik.
+**Slutsats:** Tabellen fungerar och ingår nu i baseline/fresh install. Kalender-API:erna och genererade Supabase-typer kan därför verifieras i CI utan dashboard-beroende drift.
+
+**Noteringar:**
+- ✅ KLAR (2026-03-20) `plan_schedules` backfillad med CREATE TABLE, FK, index och RLS i `20260320120000_plan_schedules_backfill_and_runs_canonical_sync.sql`
+- ✅ KLAR (2026-03-20) play-API synkad mot `runs.plan_id` + `runs.current_step_index`, vilket återställde compile-time-synk efter `npm run db:types`
 
 ### 3.2 Nya tabeller (P1 — Post-beta)
 

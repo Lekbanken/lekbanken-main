@@ -96,6 +96,42 @@ export function clearBrowserCookieVariants(name: string, hostname?: string | nul
   })
 }
 
+export function setBrowserCookie(
+  name: string,
+  value: string,
+  options: {
+    path?: string
+    maxAge?: number
+    expires?: Date
+    sameSite?: 'lax' | 'strict' | 'none'
+    secure?: boolean
+    domain?: string
+  } = {},
+  hostname?: string | null
+) {
+  if (typeof document === 'undefined') {
+    return
+  }
+
+  const enhancedOptions = enhanceCookieOptions(options, hostname)
+  const parts = [
+    `${name}=${value}`,
+    `Path=${enhancedOptions.path ?? '/'}`,
+    enhancedOptions.maxAge ? `Max-Age=${enhancedOptions.maxAge}` : null,
+    enhancedOptions.expires ? `Expires=${enhancedOptions.expires.toUTCString()}` : null,
+    enhancedOptions.domain ? `Domain=${enhancedOptions.domain}` : null,
+    `SameSite=${enhancedOptions.sameSite ?? 'Lax'}`,
+    enhancedOptions.secure ? 'Secure' : null,
+  ].filter(Boolean)
+
+  const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:'
+  if (!enhancedOptions.secure && isHttps) {
+    parts.push('Secure')
+  }
+
+  document.cookie = parts.join('; ')
+}
+
 export function clearCookieVariants(
   cookieStore: CookieMutationStore,
   name: string,

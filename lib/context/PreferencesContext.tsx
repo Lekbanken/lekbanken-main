@@ -4,6 +4,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/supabase/auth'
+import { getBrowserHostname, setBrowserCookie } from '@/lib/supabase/cookie-domain'
 import type { Database } from '@/types/supabase'
 import { TenantContext } from './TenantContext'
 import { LOCALE_COOKIE, getLocaleFromLanguageCode } from '@/lib/i18n/config'
@@ -132,7 +133,16 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(LANGUAGE_KEY, language)
       // Sync to next-intl locale cookie
       const locale = getLocaleFromLanguageCode(language) ?? 'sv'
-      document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`
+      setBrowserCookie(
+        LOCALE_COOKIE,
+        locale,
+        {
+          path: '/',
+          maxAge: 60 * 60 * 24 * 365,
+          sameSite: 'lax',
+        },
+        getBrowserHostname()
+      )
     }
   }, [language])
 

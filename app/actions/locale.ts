@@ -7,8 +7,9 @@
  */
 'use server'
 
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { enhanceCookieOptions } from '@/lib/supabase/cookie-domain'
 import { 
   LOCALE_COOKIE, 
   isValidLocale, 
@@ -39,12 +40,21 @@ export async function setLocalePreference(
   try {
     // 1. Set cookie for next-intl (expires in 1 year)
     const cookieStore = await cookies()
-    cookieStore.set(LOCALE_COOKIE, validLocale, {
-      path: '/',
-      maxAge: 60 * 60 * 24 * 365, // 1 year
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    })
+    const headerStore = await headers()
+    const hostname = headerStore.get('host')?.split(':')[0] || null
+    cookieStore.set(
+      LOCALE_COOKIE,
+      validLocale,
+      enhanceCookieOptions(
+        {
+          path: '/',
+          maxAge: 60 * 60 * 24 * 365, // 1 year
+          sameSite: 'lax' as const,
+          secure: process.env.NODE_ENV === 'production',
+        },
+        hostname
+      )
+    )
 
     // 2. If authenticated, persist to database
     const supabase = await createServerRlsClient()

@@ -6,6 +6,7 @@ import { useTransition, useContext } from 'react';
 import { locales, localeNames, LOCALE_COOKIE, getLocaleFromLanguageCode, type Locale } from '@/lib/i18n/config';
 import { TenantContext } from '@/lib/context/TenantContext';
 import { setLocalePreference } from '@/app/actions/locale';
+import { getBrowserHostname, setBrowserCookie } from '@/lib/supabase/cookie-domain';
 
 /**
  * Hook to switch the current locale
@@ -24,7 +25,16 @@ export function useLocaleSwitcher() {
     if (newLocale === locale) return;
 
     // Set cookie immediately for instant feedback
-    document.cookie = `${LOCALE_COOKIE}=${newLocale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+    setBrowserCookie(
+      LOCALE_COOKIE,
+      newLocale,
+      {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: 'lax',
+      },
+      getBrowserHostname()
+    );
 
     // Persist to database via server action
     void setLocalePreference(newLocale, tenantId ?? undefined);

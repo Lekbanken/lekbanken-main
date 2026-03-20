@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
@@ -64,7 +64,8 @@ type GameContent = {
   }>;
 };
 
-const POLL_INTERVAL = 5000;
+const POLL_INTERVAL_DISCONNECTED_MS = 5000;
+const POLL_INTERVAL_CONNECTED_MS = 15000;
 
 export default function ParticipantViewPage() {
   const router = useRouter();
@@ -79,6 +80,7 @@ export default function ParticipantViewPage() {
   const [lastPollAt, setLastPollAt] = useState<string | null>(null);
   const [lastRealtimeAt, setLastRealtimeAt] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const fetchMeInFlightRef = useRef(false);
 
   const formatBroadcastMessage = (event: BroadcastEvent): string | null => {
     if (event.type === 'host_message') {
@@ -137,7 +139,7 @@ export default function ParticipantViewPage() {
     }
   };
   
-  useParticipantBroadcast({
+  const { connected: broadcastConnected } = useParticipantBroadcast({
     sessionId: sessionInfo?.sessionId || '',
     onEvent: handleBroadcastEvent,
     enabled: !!sessionInfo,
@@ -146,8 +148,25 @@ export default function ParticipantViewPage() {
   useEffect(() => {
     if (!sessionInfo) return;
     let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const clearTimer = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+
+    const getPollDelay = () => {
+      return broadcastConnected
+        ? POLL_INTERVAL_CONNECTED_MS
+        : POLL_INTERVAL_DISCONNECTED_MS;
+    };
 
     const fetchMe = async () => {
+      if (fetchMeInFlightRef.current) return;
+      fetchMeInFlightRef.current = true;
+
       try {
         const res = await fetch(`/api/play/me?session_code=${encodeURIComponent(sessionInfo.sessionCode)}`, {
           headers: { 'x-participant-token': sessionInfo.participantToken },
@@ -166,16 +185,44 @@ export default function ParticipantViewPage() {
           setError(err instanceof Error ? err.message : tLobby('couldNotGetSession'));
           setLastPollAt(new Date().toISOString());
         }
+      } finally {
+        fetchMeInFlightRef.current = false;
       }
     };
 
+    const scheduleNextPoll = () => {
+      if (cancelled || document.hidden) return;
+      clearTimer();
+      timer = setTimeout(() => {
+        void fetchMe().then(() => {
+          scheduleNextPoll();
+        });
+      }, getPollDelay());
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        clearTimer();
+        return;
+      }
+
+      if (fetchMeInFlightRef.current) return;
+
+      void fetchMe().then(() => {
+        scheduleNextPoll();
+      });
+    };
+
     void fetchMe();
-    const id = setInterval(fetchMe, POLL_INTERVAL);
+    scheduleNextPoll();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       cancelled = true;
-      clearInterval(id);
+      clearTimer();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [sessionInfo, tLobby]);
+  }, [broadcastConnected, sessionInfo, tLobby]);
 
   useEffect(() => {
     if (!sessionInfo) return;

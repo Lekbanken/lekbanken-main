@@ -56,6 +56,15 @@ export default function AccountSettingsPage() {
 
   const allPasswordChecksPass = Object.values(passwordChecks).every(Boolean);
 
+  const resetPasswordForm = useCallback(() => {
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setPasswordError(null);
+  }, []);
+
   const handleEmailChange = useCallback(async () => {
     if (!newEmail || !emailPassword) return;
 
@@ -127,9 +136,7 @@ export default function AccountSettingsPage() {
 
       setPasswordSuccess(true);
       setShowPasswordChange(false);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      resetPasswordForm();
 
       setTimeout(() => setPasswordSuccess(false), 5000);
     } catch (err) {
@@ -137,7 +144,7 @@ export default function AccountSettingsPage() {
     } finally {
       setIsChangingPassword(false);
     }
-  }, [currentPassword, newPassword, confirmPassword, allPasswordChecksPass, t]);
+  }, [currentPassword, newPassword, confirmPassword, allPasswordChecksPass, resetPasswordForm, t]);
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -287,7 +294,14 @@ export default function AccountSettingsPage() {
             </div>
             <Button
               variant="outline"
-              onClick={() => setShowPasswordChange(!showPasswordChange)}
+              onClick={() => {
+                const nextOpen = !showPasswordChange;
+                setShowPasswordChange(nextOpen);
+                resetPasswordForm();
+                if (nextOpen) {
+                  setPasswordSuccess(false);
+                }
+              }}
             >
               {t('sections.account.changePassword')}
             </Button>
@@ -419,10 +433,8 @@ export default function AccountSettingsPage() {
                   variant="ghost"
                   onClick={() => {
                     setShowPasswordChange(false);
-                    setCurrentPassword('');
-                    setNewPassword('');
-                    setConfirmPassword('');
-                    setPasswordError(null);
+                    resetPasswordForm();
+                    setPasswordSuccess(false);
                   }}
                 >
                   {t('sections.account.cancel')}

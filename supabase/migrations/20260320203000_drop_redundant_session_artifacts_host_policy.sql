@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "host_can_manage_session_artifacts" ON public.session_artifacts;

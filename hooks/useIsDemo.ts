@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 export interface DemoStatus {
@@ -41,7 +41,7 @@ export function useIsDemo(): UseDemoReturn {
   const [error, setError] = useState<string>();
 
   // Fetch demo status from API
-  const fetchDemoStatus = async () => {
+  const fetchDemoStatus = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(undefined);
@@ -64,12 +64,12 @@ export function useIsDemo(): UseDemoReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   // Initial fetch on mount
   useEffect(() => {
     fetchDemoStatus();
-  }, []);
+  }, [fetchDemoStatus]);
 
   // Poll for status updates every minute
   useEffect(() => {
@@ -78,7 +78,7 @@ export function useIsDemo(): UseDemoReturn {
     }, 60 * 1000); // 60 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchDemoStatus]);
 
   // Handle timeout warning and expiry
   useEffect(() => {

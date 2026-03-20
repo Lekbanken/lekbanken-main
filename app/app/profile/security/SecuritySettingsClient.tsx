@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { 
@@ -43,10 +43,6 @@ export function SecuritySettingsClient({
   userEmail,
 }: SecuritySettingsClientProps) {
   const t = useTranslations('auth.mfa.settings');
-  const [hasMFA, setHasMFA] = useState(initialHasMFA);
-  const [factorId, setFactorId] = useState(initialFactorId);
-  const [mfaStatus, setMfaStatus] = useState<MFAStatus | null>(null);
-  const [trustedDevices, setTrustedDevices] = useState<MFATrustedDevice[]>([]);
   const [isDisabling, setIsDisabling] = useState(false);
   const [showEnrollment, setShowEnrollment] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,22 +124,11 @@ export function SecuritySettingsClient({
     { timeout: 12000, skip: !userId }
   )
 
-  useEffect(() => {
-    if (!mfaData) return
-    setMfaStatus(mfaData.status)
-    setHasMFA(Boolean(mfaData.status?.is_enabled))
-    if (mfaData.factorId) setFactorId(mfaData.factorId)
-  }, [mfaData])
-
-  useEffect(() => {
-    if (!devicesData) return
-    setTrustedDevices(devicesData.devices)
-  }, [devicesData])
-
-  useEffect(() => {
-    if (!mfaFetchError) return
-    setError(mfaFetchError)
-  }, [mfaFetchError])
+  const mfaStatus = mfaData?.status ?? null
+  const hasMFA = mfaData ? Boolean(mfaData.status.is_enabled) : initialHasMFA
+  const factorId = mfaData?.factorId ?? initialFactorId
+  const trustedDevices = devicesData?.devices ?? []
+  const effectiveError = error ?? mfaFetchError ?? null
 
   // Disable MFA
   const handleDisableMFA = useCallback(async () => {
@@ -171,10 +156,9 @@ export function SecuritySettingsClient({
         const data = await res.json();
         throw new Error(data.error || 'Kunde inte inaktivera MFA');
       }
-      
-      setHasMFA(false);
-      setFactorId(undefined);
-      setMfaStatus(null);
+
+      retryMfa();
+      retryDevices();
       setSuccess('Tvåfaktorsautentisering har inaktiverats');
       
       setTimeout(() => setSuccess(null), 5000);
@@ -183,7 +167,7 @@ export function SecuritySettingsClient({
     } finally {
       setIsDisabling(false);
     }
-  }, [factorId]);
+  }, [factorId, retryDevices, retryMfa]);
 
   // Revoke trusted device
   const handleRevokeDevice = useCallback(async (deviceId: string) => {
@@ -203,15 +187,16 @@ export function SecuritySettingsClient({
       if (!res.ok) {
         throw new Error('Kunde inte ta bort enheten');
       }
-      
-      setTrustedDevices(prev => prev.filter(d => d.id !== deviceId));
+
+      retryDevices();
+      retryMfa();
       setSuccess('Enheten har tagits bort');
       
       setTimeout(() => setSuccess(null), 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');
     }
-  }, []);
+  }, [retryDevices, retryMfa]);
 
   // Handle enrollment success
   const handleEnrollmentSuccess = useCallback(() => {
@@ -274,10 +259,10 @@ export function SecuritySettingsClient({
       )}
       
       {/* Error message */}
-      {error && (
+      {effectiveError && (
         <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-center gap-2">
           <ExclamationTriangleIcon className="h-5 w-5 flex-shrink-0" />
-          {error}
+          {effectiveError}
         </div>
       )}
 

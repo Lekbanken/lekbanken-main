@@ -8,6 +8,7 @@ on:
       - 'claude/**'
     paths:
       - 'supabase/migrations/**'
+      - 'supabase/config.toml'
       - 'tests/rls/**'
       - '.github/workflows/rls-tests.yml'
   pull_request:
@@ -16,6 +17,7 @@ on:
       - develop
     paths:
       - 'supabase/migrations/**'
+      - 'supabase/config.toml'
       - 'tests/rls/**'
       - '.github/workflows/rls-tests.yml'
   workflow_dispatch:
@@ -47,14 +49,25 @@ jobs:
 
       - name: Run RLS policy tests
         id: rls_tests
+        shell: bash
         run: |
+          set -euo pipefail
+
           echo "Running RLS policy test harness..."
 
-          # Get local database URL
-          DB_URL=$(supabase status -o env | grep DATABASE_URL | cut -d '=' -f2-)
+          # Resolve the local database URL from Supabase CLI output.
+          DB_URL=$(supabase status -o env | awk -F '=' '/^(DB_URL|DATABASE_URL)=/ { gsub(/^"|"$/, "", $2); print $2; exit }')
 
-          # Run test suite
-          psql "$DB_URL" -f tests/rls/demo-policies.test.sql > test_output.log 2>&1
+          if [ -z "$DB_URL" ]; then
+            echo "❌ Could not resolve DB_URL from 'supabase status -o env'"
+            supabase status -o env
+            exit 1
+          fi
+
+          echo "Using DB_URL from Supabase status output"
+
+          # Run the automated demo-mode RLS harness.
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f tests/rls/demo-policies.test.sql > test_output.log 2>&1
 
           TEST_EXIT_CODE=$?
 

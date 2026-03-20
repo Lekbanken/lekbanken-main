@@ -1,12 +1,27 @@
 name: Database Baseline Check
 
 on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/seed.sql'
+      - 'supabase/config.toml'
+      - 'types/supabase.ts'
+      - '.github/workflows/baseline-check.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'supabase/migrations/**'
       - 'supabase/seed.sql'
+      - 'supabase/config.toml'
       - 'types/supabase.ts'
+      - '.github/workflows/baseline-check.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: baseline-check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   baseline-check:

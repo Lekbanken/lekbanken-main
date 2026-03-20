@@ -25,6 +25,7 @@ on:
       - hooks/**
       - scripts/i18n-audit*.mjs
       - scripts/i18n-audit*.json
+  workflow_dispatch:
 
 concurrency:
   group: i18n-audit-${{ github.event.pull_request.number || github.ref }}

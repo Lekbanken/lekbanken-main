@@ -13,13 +13,46 @@ Last validated: 2025-12-17
 ## Pipeline (GitHub Actions)
 
 ### Current state (as implemented)
-- The repo currently has a single CI workflow: `.github/workflows/typecheck.yml`.
-- It runs on push/PR to `main` and `develop`.
-- Steps: `npm ci` → `npm run type-check` → fail if `as any` is found under `app/` or `lib/` (excluding `types/supabase.ts`) → `npm run build`.
+- The repo currently uses multiple GitHub Actions workflows:
+	- `.github/workflows/validate.yml` — PR gate for lint, typecheck, workflow validation, i18n validation, vitest, integration tests, `as any` guard, and build.
+	- `.github/workflows/typecheck.yml` — post-merge `tsc` + build safety net on `push` to `main` / `develop`.
+	- `.github/workflows/unit-tests.yml` — post-merge Vitest safety net on `push` to `main` / `develop`.
+	- `.github/workflows/i18n-audit.yml` — i18n regression guard on relevant `push` / `pull_request` changes, plus manual dispatch.
+	- `.github/workflows/rls-tests.yml` — migration-scoped RLS policy harness on relevant `push` / `pull_request` changes, plus manual dispatch.
+	- `.github/workflows/baseline-check.yml` — baseline fresh-install and schema/type sync verification on relevant migration changes for `push` / `pull_request`, plus manual dispatch.
+- `validate.yml` is the primary pre-merge gate.
+- The post-merge workflows exist as safety nets for merge ordering, force-merges, and migration drift.
+- The baseline and RLS workflows are intentionally path-scoped to database-affecting changes, but can also be run manually.
+
+### Validate workflow
+- `.github/workflows/validate.yml`
+- Runs on `pull_request` to `main` and `develop`.
+- Steps: `npm ci` → ESLint → `npm run type-check` → `npm run check:workflows` → `npm run validate:i18n` → Vitest → integration tests → `as any` diff guard → `npm run build` with `SKIP_ENV_VALIDATION=true`.
+
+### Post-merge safety nets
+- `.github/workflows/typecheck.yml`
+	- Runs on `push` to `main` / `develop`.
+	- Runs `npm ci`, `npm run type-check`, and `npm run build`.
+- `.github/workflows/unit-tests.yml`
+	- Runs on `push` to `main` / `develop`.
+	- Runs `npm ci` and `npx vitest run --reporter=verbose`.
+
+### Database-scoped checks
+- `.github/workflows/rls-tests.yml`
+	- Runs on `push` / `pull_request` when migrations, RLS test files, or the workflow itself changes.
+	- Starts local Supabase, runs the automated demo-policy RLS SQL harness, uploads logs, and performs lightweight marker/documentation checks.
+- `.github/workflows/baseline-check.yml`
+	- Runs on `push` / `pull_request` when migrations, schema config, generated types, or the workflow itself changes.
+	- Verifies fresh install, generated type sync, and minimum schema counts.
+
+### Localization checks
+- `.github/workflows/i18n-audit.yml`
+	- Runs on `push` / `pull_request` for message and app code changes, plus manual dispatch.
+	- Runs `node scripts/i18n-audit.mjs --ci`, writes a summary, and uploads audit artifacts.
 - Build runs with `SKIP_ENV_VALIDATION=true` (so CI can build without production secrets).
 
 Notes:
-- The `as any` check in CI is implemented inline in the workflow (it does not call `scripts/find-any-casts.ps1`).
+- The `as any` check in CI is implemented inline in `validate.yml` (it does not call `scripts/find-any-casts.ps1`).
 - `scripts/find-any-casts.ps1` is used locally via `npm run db:check-any`.
 
 ### Deploys

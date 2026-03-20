@@ -9,6 +9,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { MFACodeInput } from '@/components/auth/MFACodeInput';
+import { useTransientValue } from '@/hooks/useTransientValue';
 import { 
   XMarkIcon,
   ShieldCheckIcon,
@@ -45,8 +46,16 @@ export function MFAEnrollmentModal({
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copiedSecret, setCopiedSecret] = useState(false);
-  const [copiedCodes, setCopiedCodes] = useState(false);
+  const {
+    value: copiedSecret,
+    show: showCopiedSecret,
+    clear: clearCopiedSecret,
+  } = useTransientValue(false);
+  const {
+    value: copiedCodes,
+    show: showCopiedCodes,
+    clear: clearCopiedCodes,
+  } = useTransientValue(false);
 
   // Start enrollment - get QR code
   const startEnrollment = useCallback(async () => {
@@ -129,8 +138,7 @@ export function MFAEnrollmentModal({
     
     try {
       await navigator.clipboard.writeText(enrollmentData.secret);
-      setCopiedSecret(true);
-      setTimeout(() => setCopiedSecret(false), 2000);
+      showCopiedSecret(true, 2000);
     } catch {
       // Fallback
       const textArea = document.createElement('textarea');
@@ -139,10 +147,9 @@ export function MFAEnrollmentModal({
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      setCopiedSecret(true);
-      setTimeout(() => setCopiedSecret(false), 2000);
+      showCopiedSecret(true, 2000);
     }
-  }, [enrollmentData?.secret]);
+  }, [enrollmentData?.secret, showCopiedSecret]);
 
   // Copy recovery codes to clipboard
   const copyRecoveryCodes = useCallback(async () => {
@@ -150,8 +157,7 @@ export function MFAEnrollmentModal({
     
     try {
       await navigator.clipboard.writeText(codesText);
-      setCopiedCodes(true);
-      setTimeout(() => setCopiedCodes(false), 2000);
+      showCopiedCodes(true, 2000);
     } catch {
       // Fallback
       const textArea = document.createElement('textarea');
@@ -160,10 +166,9 @@ export function MFAEnrollmentModal({
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      setCopiedCodes(true);
-      setTimeout(() => setCopiedCodes(false), 2000);
+      showCopiedCodes(true, 2000);
     }
-  }, [recoveryCodes]);
+  }, [recoveryCodes, showCopiedCodes]);
 
   // Download recovery codes
   const downloadRecoveryCodes = useCallback(() => {
@@ -188,9 +193,12 @@ export function MFAEnrollmentModal({
       setStep('start');
       setEnrollmentData(null);
       setRecoveryCodes([]);
+      setIsLoading(false);
       setError(null);
+      clearCopiedSecret();
+      clearCopiedCodes();
     }
-  }, [open]);
+  }, [open, clearCopiedCodes, clearCopiedSecret]);
 
   if (!open) return null;
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect, useMemo, useState } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { LanguageSwitcher } from '@/components/navigation/LanguageSwitcher'
@@ -27,52 +27,116 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const { language } = usePreferences()
   const copy = useMemo(() => getUiCopy(language), [language])
-  const { signIn, signInWithGoogle, isLoading, isAuthenticated, effectiveGlobalRole } = useAuth()
+  const { signIn, signInWithGoogle, isLoading, isAuthenticated } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isFinalizingRedirect, setIsFinalizingRedirect] = useState(false)
+  const hasStartedRedirectRef = useRef(false)
 
   const redirectParam = searchParams.get('redirect')
-  const isAdminRole = effectiveGlobalRole === 'system_admin'
-  const redirectTo = redirectParam || (isAdminRole ? '/admin' : '/app')
+  const redirectTo = redirectParam || '/app'
+
+  const finalizeAndRedirect = useCallback(async (target: string) => {
+    if (hasStartedRedirectRef.current) return
+
+    hasStartedRedirectRef.current = true
+
+    try {
+      // Finalize tenant cookie before leaving auth routes so the first /app
+      // request does not render with a server-selected tenant while middleware
+      // and APIs still see a stale or empty tenant cookie.
+      const response = await fetch('/auth/finalize-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ redirectTo: target }),
+      })
+
+      if (!response.ok) {
+        console.warn('[login] finalize-login returned non-OK status:', response.status)
+      }
+    } catch (finalizeError) {
+      console.warn('[login] Failed to finalize tenant before redirect:', finalizeError)
+    }
+
+    // Hard redirect so every server component re-renders with fresh cookies.
+    // We use window.location.href (not router.push) because router.push uses
+    // cached RSC payloads prefetched before login and won't include auth cookies.
+    window.location.href = target
+  }, [])
+
+  const beginRedirectTransition = useCallback(async (target: string) => {
+    setIsFinalizingRedirect(true)
+    await finalizeAndRedirect(target)
+  }, [finalizeAndRedirect])
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      // Hard redirect so every server component re-renders with fresh cookies.
-      // We use window.location.href (not router.push) because router.push uses
-      // cached RSC payloads prefetched before login and won't include auth cookies.
-      // This effect runs AFTER the re-render where effectiveGlobalRole is set,
-      // so redirectTo already reflects the user's real role (e.g. /admin for admins).
-      window.location.href = redirectTo
-    }
-  }, [isAuthenticated, isLoading, redirectTo])
+    if (isLoading || !isAuthenticated || hasStartedRedirectRef.current) return
+
+    void finalizeAndRedirect(redirectTo)
+  }, [finalizeAndRedirect, isAuthenticated, isLoading, redirectTo])
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (isSubmitting) return
+    if (isSubmitting || isFinalizingRedirect) return
     setError('')
     setIsSubmitting(true)
 
     try {
       await signIn(email, password)
-      // Do NOT redirect here — redirectTo is a stale closure value computed
-      // before login (when effectiveGlobalRole was null). The useEffect above
-      // fires after the auth state re-render and uses the correct redirectTo.
+      await beginRedirectTransition(redirectTo)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
       setIsSubmitting(false)
+      setIsFinalizingRedirect(false)
+      hasStartedRedirectRef.current = false
     }
   }
 
   const handleGoogleLogin = async () => {
+    if (isSubmitting || isFinalizingRedirect) return
     setError('')
+    setIsSubmitting(true)
     try {
       await signInWithGoogle()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google login failed')
+      setIsSubmitting(false)
+      setIsFinalizingRedirect(false)
     }
   }
+
+  if (isFinalizingRedirect) {
+    return (
+      <div className="min-h-screen bg-background px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-md flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2 rounded-lg px-2 py-1 transition hover:bg-muted">
+              <span className="text-sm font-semibold text-foreground">Lekbanken</span>
+            </Link>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <ThemeToggle />
+            </div>
+          </div>
+
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="text-center text-3xl font-extrabold text-foreground">{copy.auth.loginTitle}</CardTitle>
+              <p className="mt-2 text-center text-sm text-muted-foreground">{copy.auth.loginDescription}</p>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center gap-4 py-8 text-center">
+              <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" aria-hidden="true" />
+              <p className="text-sm font-medium text-foreground">Signing in...</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
+  const isBusy = isLoading || isSubmitting || isFinalizingRedirect
 
   return (
     <div className="min-h-screen bg-background px-4 py-12 sm:px-6 lg:px-8">
@@ -132,7 +196,7 @@ function LoginForm() {
                 </div>
               </div>
 
-              <Button type="submit" disabled={isLoading || isSubmitting} className="w-full">
+              <Button type="submit" disabled={isBusy} className="w-full">
                 {isSubmitting ? 'Signing in...' : copy.auth.loginAction}
               </Button>
             </form>
@@ -150,7 +214,7 @@ function LoginForm() {
               type="button"
               variant="outline"
               onClick={handleGoogleLogin}
-              disabled={isLoading}
+              disabled={isBusy}
               className="w-full"
             >
               <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">

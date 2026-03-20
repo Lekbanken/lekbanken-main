@@ -4,6 +4,7 @@ import { getLocale } from 'next-intl/server'
 import { TenantProvider } from '@/lib/context/TenantContext'
 import { getServerAuthContext } from '@/lib/auth/server-context'
 import { getPendingLegalDocuments } from '@/lib/legal/cached-legal'
+import { getDemoSession } from '@/lib/utils/demo-detection'
 import AppShellContent from './layout-client'
 
 type Props = {
@@ -12,6 +13,17 @@ type Props = {
 
 export default async function AppShell({ children }: Props) {
   const authContext = await getServerAuthContext('/app')
+  const demoSession = await getDemoSession()
+  const initialDemoStatus = demoSession
+    ? {
+        isDemoMode: true,
+        tier: demoSession.tier,
+        timeRemaining: demoSession.timeRemaining,
+        showTimeoutWarning: demoSession.timeRemaining < 10 * 60 * 1000,
+      }
+    : {
+        isDemoMode: false,
+      }
 
   if (!authContext.user) {
     // If auth is degraded (middleware timeout / network error), the session
@@ -32,7 +44,7 @@ export default async function AppShell({ children }: Props) {
         initialMemberships={[]}
         isSystemAdmin={false}
       >
-        <AppShellContent>{children}</AppShellContent>
+        <AppShellContent initialDemoStatus={initialDemoStatus}>{children}</AppShellContent>
       </TenantProvider>
     )
   }
@@ -55,7 +67,7 @@ export default async function AppShell({ children }: Props) {
       initialMemberships={memberships}
       isSystemAdmin={isSystemAdmin}
     >
-      <AppShellContent>{children}</AppShellContent>
+      <AppShellContent initialDemoStatus={initialDemoStatus}>{children}</AppShellContent>
     </TenantProvider>
   )
 }

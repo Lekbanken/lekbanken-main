@@ -49,6 +49,7 @@ export function ProfileModal({
           <DialogClose asChild>
             <Link
               href="/app/profile"
+              prefetch={false}
               className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -69,6 +70,7 @@ export function ProfileModal({
             <DialogClose asChild>
               <Link
                 href="/admin"
+                prefetch={false}
                 className="flex items-center gap-3 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-accent/20"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/20">
@@ -87,6 +89,7 @@ export function ProfileModal({
           <DialogClose asChild>
             <Link
               href="/app"
+              prefetch={false}
               className="flex items-center gap-3 rounded-xl bg-muted/50 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-muted"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
@@ -104,6 +107,7 @@ export function ProfileModal({
           <DialogClose asChild>
             <Link
               href="/"
+              prefetch={false}
               className="flex items-center gap-3 rounded-xl bg-muted/50 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-muted"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">

@@ -220,7 +220,7 @@ test.describe('Login Flow Audit', () => {
 
     await page.waitForURL(/\/(admin|app|legal\/accept)/, { timeout: 15000 })
     await handleLegalAcceptance(page)
-    await expect(page).toHaveURL(/\/(admin|app)/, { timeout: 15000 })
+    await expect(page).toHaveURL(/\/app/, { timeout: 15000 })
     finalUrls.login = page.url()
 
     if (page.url().includes('/app/profile/security') && page.url().includes('enroll=true')) {
@@ -238,6 +238,10 @@ test.describe('Login Flow Audit', () => {
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(1000)
     finalUrls.app = page.url()
+
+    const appCookies = await page.context().cookies()
+    const tenantCookie = appCookies.find((cookie) => cookie.name === 'lb_tenant')
+    expect(tenantCookie?.value).toBeTruthy()
 
     currentPhase = 'organizations'
     await page.goto('/app/profile/organizations')
@@ -278,7 +282,10 @@ test.describe('Login Flow Audit', () => {
     }
 
     expect(getCount('login', 'page:/auth/login')).toBeLessThanOrEqual(2)
+    expect(getCount('login', 'page:/auth/finalize-login')).toBeLessThanOrEqual(1)
     expect(getCount('app', 'page:/app')).toBeLessThanOrEqual(3)
+    expect(getCount('app', 'page:/app/browse')).toBe(0)
+    expect(finalUrls.login?.includes('/admin')).toBe(false)
     expect(getCount('organizations', 'page:/app/profile/organizations')).toBeLessThanOrEqual(2)
     expect(getCount('preferences', 'page:/app/profile/preferences')).toBeLessThanOrEqual(2)
 

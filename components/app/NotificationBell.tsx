@@ -23,6 +23,7 @@ import { BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { BellAlertIcon } from '@heroicons/react/24/solid';
 import { cn } from '@/lib/utils';
 import { useAppNotifications, type AppNotification } from '@/hooks/useAppNotifications';
+import { useAuth } from '@/lib/supabase/auth';
 
 // Bell image paths (public dir)
 const BELL_REST_SRC = '/icons/app-shell/bell_rest_V2.webp';
@@ -68,6 +69,7 @@ const typeStyles: Record<AppNotification['type'], string> = {
 export function NotificationBell({ className }: NotificationBellProps) {
   const t = useTranslations('app.notifications');
   const router = useRouter();
+  const { isLoading: isAuthLoading, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   // Track which bell state (active/rest) had an image error — auto-resets on switch
   const [imgErrorFor, setImgErrorFor] = useState<boolean | null>(null);
@@ -81,7 +83,9 @@ export function NotificationBell({ className }: NotificationBellProps) {
     markAsRead,
     markAllAsRead,
     dismiss,
-  } = useAppNotifications();
+  } = useAppNotifications(20, {
+    enabled: !isAuthLoading && isAuthenticated,
+  });
 
   // Reset image error flag when switching between active/rest bell
   const isActive = unreadCount > 0;

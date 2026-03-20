@@ -8,9 +8,16 @@
 
 import { useIsDemo, formatTimeRemaining, useConvertDemo } from '@/hooks/useIsDemo';
 import { XMarkIcon, ClockIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useLayoutEffect, useRef } from 'react';
 
-export function DemoBanner() {
+type DemoBannerInitialStatus = {
+  isDemoMode: boolean;
+  tier?: 'free' | 'premium';
+  timeRemaining?: number;
+  showTimeoutWarning?: boolean;
+};
+
+export function DemoBanner({ initialStatus }: { initialStatus?: DemoBannerInitialStatus }) {
   const {
     isDemoMode,
     tier,
@@ -22,10 +29,20 @@ export function DemoBanner() {
   const convertDemo = useConvertDemo();
   const [dismissed, setDismissed] = useState(false);
   const bannerRef = useRef<HTMLDivElement>(null);
+  const effectiveIsDemoMode = isLoading && initialStatus?.isDemoMode ? true : isDemoMode;
+  const effectiveTier = effectiveIsDemoMode && isLoading && initialStatus?.isDemoMode
+    ? initialStatus.tier
+    : tier;
+  const effectiveTimeRemaining = effectiveIsDemoMode && isLoading && initialStatus?.isDemoMode
+    ? initialStatus.timeRemaining
+    : timeRemaining;
+  const effectiveShowTimeoutWarning = effectiveIsDemoMode && isLoading && initialStatus?.isDemoMode
+    ? Boolean(initialStatus.showTimeoutWarning)
+    : showTimeoutWarning;
 
   // Set CSS variable for SideNav offset
-  useEffect(() => {
-    if (bannerRef.current && isDemoMode && !dismissed) {
+  useLayoutEffect(() => {
+    if (bannerRef.current && effectiveIsDemoMode && !dismissed) {
       const height = bannerRef.current.offsetHeight;
       document.documentElement.style.setProperty('--demo-banner-height', `${height}px`);
     } else {
@@ -34,16 +51,16 @@ export function DemoBanner() {
     return () => {
       document.documentElement.style.setProperty('--demo-banner-height', '0px');
     };
-  }, [isDemoMode, dismissed, isLoading]);
+  }, [effectiveIsDemoMode, dismissed]);
 
   // Don't show if not in demo or dismissed
-  if (!isDemoMode || dismissed || isLoading) {
+  if (!effectiveIsDemoMode || dismissed) {
     return null;
   }
 
-  const minutes = timeRemaining ? Math.floor(timeRemaining / 1000 / 60) : 0;
-  const isWarning = showTimeoutWarning && minutes < 10;
-  const isPremium = tier === 'premium';
+  const minutes = effectiveTimeRemaining ? Math.floor(effectiveTimeRemaining / 1000 / 60) : 0;
+  const isWarning = effectiveShowTimeoutWarning && minutes < 10;
+  const isPremium = effectiveTier === 'premium';
 
   const handleUpgradeClick = async () => {
     await convertDemo('contact_sales', undefined, {
@@ -111,7 +128,7 @@ export function DemoBanner() {
               <>
                 Limited features available.{' '}
                 <span className="hidden sm:inline">
-                  {timeRemaining && formatTimeRemaining(timeRemaining)} remaining
+                  {effectiveTimeRemaining && formatTimeRemaining(effectiveTimeRemaining)} remaining
                 </span>
               </>
             )}

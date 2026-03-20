@@ -82,6 +82,10 @@ export interface UseAppNotificationsResult {
   refresh: () => Promise<void>;
 }
 
+interface UseAppNotificationsOptions {
+  enabled?: boolean;
+}
+
 // =============================================================================
 // CONSTANTS
 // =============================================================================
@@ -453,7 +457,11 @@ function mapDirectRows(rows: DirectQueryRow[]): AppNotification[] {
 // HOOK
 // =============================================================================
 
-export function useAppNotifications(limit = 20): UseAppNotificationsResult {
+export function useAppNotifications(
+  limit = 20,
+  options?: UseAppNotificationsOptions
+): UseAppNotificationsResult {
+  const enabled = options?.enabled ?? true;
   // Per-instance refs
   const mountedRef = useRef(false);
 
@@ -504,9 +512,16 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
 
   const storeState = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
+  const effectiveStoreState = enabled
+    ? storeState
+    : {
+        ...INITIAL_STORE_STATE,
+        isLoading: false,
+      };
+
   // Derive per-instance view: slice to requested limit
-  const notifications = storeState.notifications.slice(0, limit);
-  const { unreadCount, isLoading, error, noSession } = storeState;
+  const notifications = effectiveStoreState.notifications.slice(0, limit);
+  const { unreadCount, isLoading, error, noSession } = effectiveStoreState;
 
   // =========================================================================
   // Helpers: attach AbortSignal to PostgREST builders (if method exists)
@@ -669,6 +684,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // sees it immediately.
   // =========================================================================
   const fetchNotifications = useCallback(async () => {
+    if (!enabled) return;
     if (!supabase) return;
 
     const store = storeRef.current;
@@ -827,7 +843,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         abortRef.current = null;
       }
     }
-  }, [supabase, limit, executeFetch, setStore]);
+  }, [enabled, supabase, limit, executeFetch, setStore]);
 
   // =========================================================================
   // Lifecycle: mount/unmount tracking + abort cleanup + user refcount
@@ -850,11 +866,13 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // Initial fetch
   // =========================================================================
   useEffect(() => {
+    if (!enabled) return;
     fetchNotifications();
-  }, [fetchNotifications]);
+  }, [enabled, fetchNotifications]);
 
   // Recover quickly when auth state changes after route transitions.
   useEffect(() => {
+    if (!enabled) return;
     if (!supabase) return;
 
     const {
@@ -894,7 +912,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
     });
 
     return () => subscription?.unsubscribe();
-  }, [supabase, fetchNotifications, setStore]);
+  }, [enabled, supabase, fetchNotifications, setStore]);
 
   // Ref so the visibility handler can restart polling after circuit breaker
   const restartPollingRef = useRef<(() => void) | null>(null);
@@ -906,6 +924,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // Also resets backoff + circuit breaker since the user is actively looking.
   // =========================================================================
   useEffect(() => {
+    if (!enabled) return;
     // Per-instance trigger with cooldown — prevents double-fire when Chrome
     // sends both visibilitychange + focus back-to-back on alt-tab.
     const triggerFetch = () => {
@@ -954,7 +973,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('online', onOnline);
     };
-  }, [fetchNotifications]);
+  }, [enabled, fetchNotifications]);
 
   // =========================================================================
   // Realtime subscription — instant bell updates when deliveries change.
@@ -962,6 +981,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // one fetch after 300ms of quiet.
   // =========================================================================
   useEffect(() => {
+    if (!enabled) return;
     if (!supabase) return;
 
     let channel: ReturnType<typeof supabase.channel> | null = null;
@@ -1002,7 +1022,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         supabase.removeChannel(channel);
       }
     };
-  }, [supabase, fetchNotifications]);
+  }, [enabled, supabase, fetchNotifications]);
 
   // =========================================================================
   // Fallback polling — keeps bell correct even if realtime misses.
@@ -1010,6 +1030,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
   // Uses exponential backoff on consecutive failures.
   // =========================================================================
   useEffect(() => {
+    if (!enabled) return;
     if (!supabase) return;
 
     let timerId: ReturnType<typeof setTimeout> | null = null;
@@ -1065,7 +1086,7 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
       if (timerId) clearTimeout(timerId);
       restartPollingRef.current = null;
     };
-  }, [supabase, fetchNotifications]);
+  }, [enabled, supabase, fetchNotifications]);
 
   // =========================================================================
   // Actions — optimistic-first: update UI instantly, fire RPC in background.

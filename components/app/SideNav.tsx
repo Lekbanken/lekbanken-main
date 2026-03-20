@@ -31,7 +31,7 @@ export function SideNav() {
           className="h-9 w-9 rounded-xl bg-primary/5 p-1"
         />
         <div>
-          <Link href="/app" className="text-lg font-semibold tracking-tight text-foreground">
+          <Link href="/app" prefetch={false} className="text-lg font-semibold tracking-tight text-foreground">
             Lekbanken
           </Link>
           <p className="text-xs font-medium text-primary">App</p>

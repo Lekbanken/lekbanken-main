@@ -60,7 +60,7 @@ const iconUserActive = (
 
 export const appNavItems: AppNavItem[] = [
   { href: "/app/gamification", labelKey: "app.nav.gamification", icon: iconLekvaluta, iconActive: iconLekvalutaActive, prefetch: false },
-  { href: "/app/browse", labelKey: "app.nav.browse", icon: iconBrowse, iconActive: iconBrowseActive, prefetch: true },
+  { href: "/app/browse", labelKey: "app.nav.browse", icon: iconBrowse, iconActive: iconBrowseActive, prefetch: false },
   { href: "/app/play/sessions", labelKey: "app.nav.play", icon: iconPlay, iconActive: iconPlayActive, isHero: true, prefetch: false },
   { href: "/app/planner/plans", labelKey: "app.nav.planner", icon: iconPlanning, iconActive: iconPlanningActive, prefetch: false },
   { href: "/app/profile", labelKey: "app.nav.profile", icon: iconUser, iconActive: iconUserActive, prefetch: false },

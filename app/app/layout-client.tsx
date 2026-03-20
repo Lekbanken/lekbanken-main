@@ -10,6 +10,13 @@ import { AppTopbar } from "@/components/app/AppTopbar";
 import { ToastProvider } from "@/components/ui/toast";
 import { DemoBanner } from "@/components/demo/DemoBanner";
 
+type InitialDemoStatus = {
+  isDemoMode: boolean;
+  tier?: 'free' | 'premium';
+  timeRemaining?: number;
+  showTimeoutWarning?: boolean;
+};
+
 /**
  * Root routes where back navigation should NOT be shown
  */
@@ -34,7 +41,13 @@ function isRootRoute(pathname: string | null): boolean {
   );
 }
 
-export default function AppShellContent({ children }: { children: ReactNode }) {
+export default function AppShellContent({
+  children,
+  initialDemoStatus,
+}: {
+  children: ReactNode;
+  initialDemoStatus?: InitialDemoStatus;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const { currentTenant, userTenants, isLoadingTenants, isSystemAdmin } = useTenant();
@@ -56,7 +69,7 @@ export default function AppShellContent({ children }: { children: ReactNode }) {
   return (
     <CartProvider>
       <ToastProvider>
-        <DemoBanner />
+        <DemoBanner initialStatus={initialDemoStatus} />
         {/* Main App Shell */}
         <Shell header={<AppTopbar canGoBack={canGoBack} />}>{children}</Shell>
       </ToastProvider>

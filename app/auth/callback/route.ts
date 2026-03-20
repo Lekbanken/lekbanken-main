@@ -5,6 +5,7 @@ import { cookies, headers } from 'next/headers'
 import type { Database } from '@/types/supabase'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { enhanceCookieOptions } from '@/lib/supabase/cookie-domain'
+import { finalizeLoginTenant } from '@/lib/tenant/finalize-login-tenant'
 
 /**
  * OAuth & Recovery Callback Handler
@@ -87,6 +88,14 @@ export async function GET(request: NextRequest) {
         last_login_at: now,
         last_seen_at: now,
       })
+
+      if (redirectTo.startsWith('/app') || redirectTo.startsWith('/admin')) {
+        await finalizeLoginTenant({
+          cookieStore,
+          hostname,
+          pathname: redirectTo,
+        })
+      }
     }
 
     // If this is a password recovery, redirect to recovery page

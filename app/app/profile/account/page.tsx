@@ -29,7 +29,7 @@ export default function AccountSettingsPage() {
   const [emailPassword, setEmailPassword] = useState('');
   const [isChangingEmail, setIsChangingEmail] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
-  const [emailSuccess, setEmailSuccess] = useState(false);
+  const [emailSuccessEmail, setEmailSuccessEmail] = useState<string | null>(null);
 
   // Password change state
   const [showPasswordChange, setShowPasswordChange] = useState(false);
@@ -61,14 +61,16 @@ export default function AccountSettingsPage() {
 
     setIsChangingEmail(true);
     setEmailError(null);
-    setEmailSuccess(false);
+    setEmailSuccessEmail(null);
 
     try {
+      const submittedEmail = newEmail;
+
       const res = await fetch('/api/accounts/auth/email/change', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          new_email: newEmail,
+          new_email: submittedEmail,
           password: emailPassword,
         }),
       });
@@ -78,10 +80,11 @@ export default function AccountSettingsPage() {
         throw new Error(data.error || t('common.errorGeneric'));
       }
 
-      setEmailSuccess(true);
+      setEmailSuccessEmail(submittedEmail);
       setShowEmailChange(false);
       setNewEmail('');
       setEmailPassword('');
+      setTimeout(() => setEmailSuccessEmail(null), 5000);
     } catch (err) {
       setEmailError(err instanceof Error ? err.message : t('common.errorGeneric'));
     } finally {
@@ -182,11 +185,24 @@ export default function AccountSettingsPage() {
             </div>
             <Button
               variant="outline"
-              onClick={() => setShowEmailChange(!showEmailChange)}
+              onClick={() => {
+                setShowEmailChange(!showEmailChange);
+                setEmailError(null);
+                setEmailSuccessEmail(null);
+              }}
             >
               {t('sections.account.changeEmail')}
             </Button>
           </div>
+
+          {emailSuccessEmail && (
+            <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+              <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                <CheckCircleIcon className="h-5 w-5" />
+                <p className="font-medium">{t('sections.account.emailChangeSuccess', { email: emailSuccessEmail })}</p>
+              </div>
+            </div>
+          )}
 
           {/* Email Change Form */}
           {showEmailChange && (
@@ -221,12 +237,6 @@ export default function AccountSettingsPage() {
                 <p className="text-sm text-destructive">{emailError}</p>
               )}
 
-              {emailSuccess && (
-                <p className="text-sm text-emerald-600">
-                  {t('sections.account.emailChangeSuccess', { email: newEmail })}
-                </p>
-              )}
-
               <div className="flex gap-2">
                 <Button
                   onClick={handleEmailChange}
@@ -241,6 +251,7 @@ export default function AccountSettingsPage() {
                     setNewEmail('');
                     setEmailPassword('');
                     setEmailError(null);
+                    setEmailSuccessEmail(null);
                   }}
                 >
                   {t('sections.account.cancel')}

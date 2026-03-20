@@ -2,15 +2,12 @@
  * Marketing Domain - API Functions
  * 
  * Server-side functions for fetching and managing marketing features and updates.
- * 
- * NOTE: The marketing_features and marketing_updates tables are defined in migration
- * 20260126100000_marketing_domain.sql. After running the migration and regenerating
- * types with `supabase gen types typescript`, the type casts below can be removed.
  */
 
 import 'server-only';
 
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import type { Tables, TablesInsert, TablesUpdate } from '@/types/supabase';
 import { unstable_cache } from 'next/cache';
 import { transformFeatureRow, transformUpdateRow, transformFeatureInput, transformUpdateInput } from './transformers';
 import type {
@@ -26,15 +23,23 @@ import type {
   MarketingUpdateRow,
 } from './types';
 
-// =============================================================================
-// Type-safe table accessors (workaround until types are regenerated)
-// =============================================================================
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabaseClient = any;
-
 const FEATURES_TABLE = 'marketing_features' as const;
 const UPDATES_TABLE = 'marketing_updates' as const;
+
+type MarketingFeatureDbRow = Tables<'marketing_features'>;
+type MarketingFeatureDbInsert = TablesInsert<'marketing_features'>;
+type MarketingFeatureDbUpdate = TablesUpdate<'marketing_features'>;
+type MarketingUpdateDbRow = Tables<'marketing_updates'>;
+type MarketingUpdateDbInsert = TablesInsert<'marketing_updates'>;
+type MarketingUpdateDbUpdate = TablesUpdate<'marketing_updates'>;
+
+function asMarketingFeatureRow(row: MarketingFeatureDbRow): MarketingFeatureRow {
+  return row as MarketingFeatureRow;
+}
+
+function asMarketingUpdateRow(row: MarketingUpdateDbRow): MarketingUpdateRow {
+  return row as MarketingUpdateRow;
+}
 
 // =============================================================================
 // Public Read Functions (cached — data is public so safe to share across requests)
@@ -54,9 +59,7 @@ export async function getPublishedFeatures(filters?: FeatureFilters): Promise<Fe
 const getPublishedFeaturesCached = unstable_cache(
   async (filterKey: string): Promise<FeaturesResponse> => {
     const filters: FeatureFilters | undefined = filterKey === 'none' ? undefined : JSON.parse(filterKey);
-    // Use service role for cached queries — data is public (RLS: status='published')
-    // and the cache is shared across requests/users.
-    const supabase = createServiceRoleClient() as AnySupabaseClient;
+    const supabase = createServiceRoleClient();
     
     let query = supabase
       .from(FEATURES_TABLE)
@@ -88,7 +91,7 @@ const getPublishedFeaturesCached = unstable_cache(
     }
 
     return {
-      features: (data as MarketingFeatureRow[]).map(transformFeatureRow),
+      features: (data ?? []).map((row) => transformFeatureRow(asMarketingFeatureRow(row))),
       total: count ?? 0,
     };
   },
@@ -113,7 +116,7 @@ export async function getPublishedUpdates(limit = 10): Promise<UpdatesResponse> 
 
 const getPublishedUpdatesCached = unstable_cache(
   async (limit: number): Promise<UpdatesResponse> => {
-    const supabase = createServiceRoleClient() as AnySupabaseClient;
+    const supabase = createServiceRoleClient();
     
     const { data, error, count } = await supabase
       .from(UPDATES_TABLE)
@@ -129,7 +132,7 @@ const getPublishedUpdatesCached = unstable_cache(
     }
 
     return {
-      updates: (data as MarketingUpdateRow[]).map(transformUpdateRow),
+      updates: (data ?? []).map((row) => transformUpdateRow(asMarketingUpdateRow(row))),
       total: count ?? 0,
     };
   },
@@ -145,7 +148,7 @@ const getPublishedUpdatesCached = unstable_cache(
  * Fetch all features for admin (includes draft/archived)
  */
 export async function getAllFeatures(filters?: FeatureFilters): Promise<FeaturesResponse> {
-  const supabase = createServiceRoleClient() as AnySupabaseClient;
+  const supabase = createServiceRoleClient();
   
   let query = supabase
     .from(FEATURES_TABLE)
@@ -174,7 +177,7 @@ export async function getAllFeatures(filters?: FeatureFilters): Promise<Features
   }
 
   return {
-    features: (data as MarketingFeatureRow[]).map(transformFeatureRow),
+    features: (data ?? []).map((row) => transformFeatureRow(asMarketingFeatureRow(row))),
     total: count ?? 0,
   };
 }
@@ -183,7 +186,7 @@ export async function getAllFeatures(filters?: FeatureFilters): Promise<Features
  * Get single feature by ID
  */
 export async function getFeatureById(id: string): Promise<MarketingFeature | null> {
-  const supabase = createServiceRoleClient() as AnySupabaseClient;
+  const supabase = createServiceRoleClient();
   
   const { data, error } = await supabase
     .from(FEATURES_TABLE)
@@ -197,18 +200,19 @@ export async function getFeatureById(id: string): Promise<MarketingFeature | nul
     throw new Error('Failed to fetch feature');
   }
 
-  return transformFeatureRow(data as MarketingFeatureRow);
+  return transformFeatureRow(asMarketingFeatureRow(data));
 }
 
 /**
  * Create a new feature
  */
 export async function createFeature(input: MarketingFeatureInput): Promise<MarketingFeature> {
-  const supabase = createServiceRoleClient() as AnySupabaseClient;
+  const supabase = createServiceRoleClient();
+  const featurePayload = transformFeatureInput(input) as MarketingFeatureDbInsert;
   
   const { data, error } = await supabase
     .from(FEATURES_TABLE)
-    .insert(transformFeatureInput(input))
+    .insert(featurePayload)
     .select()
     .single();
 
@@ -217,20 +221,19 @@ export async function createFeature(input: MarketingFeatureInput): Promise<Marke
     throw new Error('Failed to create feature');
   }
 
-  return transformFeatureRow(data as MarketingFeatureRow);
+  return transformFeatureRow(asMarketingFeatureRow(data));
 }
 
 /**
  * Update an existing feature
  */
 export async function updateFeature(id: string, input: Partial<MarketingFeatureInput>): Promise<MarketingFeature> {
-  const supabase = createServiceRoleClient() as AnySupabaseClient;
+  const supabase = createServiceRoleClient();
   
   const updateData = transformFeatureInput(input as MarketingFeatureInput);
-  // Remove undefined values
   const cleanData = Object.fromEntries(
     Object.entries(updateData).filter(([, v]) => v !== undefined)
-  );
+  ) as MarketingFeatureDbUpdate;
 
   const { data, error } = await supabase
     .from(FEATURES_TABLE)
@@ -244,14 +247,14 @@ export async function updateFeature(id: string, input: Partial<MarketingFeatureI
     throw new Error('Failed to update feature');
   }
 
-  return transformFeatureRow(data as MarketingFeatureRow);
+  return transformFeatureRow(asMarketingFeatureRow(data));
 }
 
 /**
  * Delete a feature
  */
 export async function deleteFeature(id: string): Promise<void> {
-  const supabase = createServiceRoleClient() as AnySupabaseClient;
+  const supabase = createServiceRoleClient();
   
   const { error } = await supabase
     .from(FEATURES_TABLE)
@@ -268,7 +271,7 @@ export async function deleteFeature(id: string): Promise<void> {
  * Fetch all updates for admin
  */
 export async function getAllUpdates(filters?: UpdateFilters): Promise<UpdatesResponse> {
-  const supabase = createServiceRoleClient() as AnySupabaseClient;
+  const supabase = createServiceRoleClient();
   
   let query = supabase
     .from(UPDATES_TABLE)
@@ -293,7 +296,7 @@ export async function getAllUpdates(filters?: UpdateFilters): Promise<UpdatesRes
   }
 
   return {
-    updates: (data as MarketingUpdateRow[]).map(transformUpdateRow),
+    updates: (data ?? []).map((row) => transformUpdateRow(asMarketingUpdateRow(row))),
     total: count ?? 0,
   };
 }
@@ -302,7 +305,7 @@ export async function getAllUpdates(filters?: UpdateFilters): Promise<UpdatesRes
  * Get single update by ID
  */
 export async function getUpdateById(id: string): Promise<MarketingUpdate | null> {
-  const supabase = createServiceRoleClient() as AnySupabaseClient;
+  const supabase = createServiceRoleClient();
   
   const { data, error } = await supabase
     .from(UPDATES_TABLE)
@@ -316,18 +319,19 @@ export async function getUpdateById(id: string): Promise<MarketingUpdate | null>
     throw new Error('Failed to fetch update');
   }
 
-  return transformUpdateRow(data as MarketingUpdateRow);
+  return transformUpdateRow(asMarketingUpdateRow(data));
 }
 
 /**
  * Create a new update
  */
 export async function createUpdate(input: MarketingUpdateInput): Promise<MarketingUpdate> {
-  const supabase = createServiceRoleClient() as AnySupabaseClient;
+  const supabase = createServiceRoleClient();
+  const updatePayload = transformUpdateInput(input) as MarketingUpdateDbInsert;
   
   const { data, error } = await supabase
     .from(UPDATES_TABLE)
-    .insert(transformUpdateInput(input))
+    .insert(updatePayload)
     .select()
     .single();
 
@@ -336,19 +340,19 @@ export async function createUpdate(input: MarketingUpdateInput): Promise<Marketi
     throw new Error('Failed to create update');
   }
 
-  return transformUpdateRow(data as MarketingUpdateRow);
+  return transformUpdateRow(asMarketingUpdateRow(data));
 }
 
 /**
  * Update an existing update
  */
 export async function updateUpdate(id: string, input: Partial<MarketingUpdateInput>): Promise<MarketingUpdate> {
-  const supabase = createServiceRoleClient() as AnySupabaseClient;
+  const supabase = createServiceRoleClient();
   
   const updateData = transformUpdateInput(input as MarketingUpdateInput);
   const cleanData = Object.fromEntries(
     Object.entries(updateData).filter(([, v]) => v !== undefined)
-  );
+  ) as MarketingUpdateDbUpdate;
 
   const { data, error } = await supabase
     .from(UPDATES_TABLE)
@@ -362,14 +366,14 @@ export async function updateUpdate(id: string, input: Partial<MarketingUpdateInp
     throw new Error('Failed to update update');
   }
 
-  return transformUpdateRow(data as MarketingUpdateRow);
+  return transformUpdateRow(asMarketingUpdateRow(data));
 }
 
 /**
  * Delete an update
  */
 export async function deleteUpdate(id: string): Promise<void> {
-  const supabase = createServiceRoleClient() as AnySupabaseClient;
+  const supabase = createServiceRoleClient();
   
   const { error } = await supabase
     .from(UPDATES_TABLE)

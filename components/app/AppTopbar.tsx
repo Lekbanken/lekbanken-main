@@ -7,23 +7,9 @@ import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/app/NotificationBell";
 
-/**
- * AppTopbar - Minimal, stable topbar for the app
- * 
- * Layout:
- * - Left: Back button (only when canGoBack is true)
- * - Center: Dice icon (always → home)
- * - Right: Empty (MVP) - notifications placeholder for future
- * 
- * Same behavior on mobile and desktop.
- */
-
 interface AppTopbarProps {
-  /** Whether back navigation is available */
   canGoBack?: boolean;
-  /** Custom back handler (default: router.back) */
   onBack?: () => void;
-  /** Custom back label for accessibility */
   backLabel?: string;
 }
 
@@ -45,7 +31,6 @@ export function AppTopbar({ canGoBack = false, onBack, backLabel }: AppTopbarPro
 
   return (
     <header className="relative flex h-12 items-center justify-between">
-      {/* Left: Back button (only when canGoBack) */}
       <div className="flex w-20 items-center">
         {canGoBack && (
           <button
@@ -64,7 +49,6 @@ export function AppTopbar({ canGoBack = false, onBack, backLabel }: AppTopbarPro
         )}
       </div>
 
-      {/* Center: Dice icon (always → home) */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <button
           type="button"
@@ -85,7 +69,6 @@ export function AppTopbar({ canGoBack = false, onBack, backLabel }: AppTopbarPro
         </button>
       </div>
 
-      {/* Right: Notification bell */}
       <div className="flex w-20 items-center justify-end">
         <NotificationBell />
       </div>
@@ -93,18 +76,7 @@ export function AppTopbar({ canGoBack = false, onBack, backLabel }: AppTopbarPro
   );
 }
 
-/**
- * Hook for pages to determine if they should show back navigation
- * 
- * Usage:
- * ```tsx
- * const { canGoBack, backLabel } = useAppNavigation();
- * return <AppTopbar canGoBack={canGoBack} backLabel={backLabel} />;
- * ```
- */
 export function useAppNavigation() {
-  // This would need to be enhanced with actual pathname logic
-  // For now, return false (root level)
   return {
     canGoBack: false,
     backLabel: undefined as string | undefined,

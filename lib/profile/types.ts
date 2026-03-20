@@ -672,14 +672,14 @@ export const PROFILE_NAV_ITEMS: ProfileNavItem[] = [
   {
     id: 'privacy',
     label: 'profile.nav.privacy',
-    href: '/app/profile/privacy',
+    href: '/app/preferences/privacy',
     icon: 'LockClosedIcon',
     description: 'profile.nav.privacyDesc',
   },
   {
     id: 'notifications',
     label: 'profile.nav.notifications',
-    href: '/app/profile/notifications',
+    href: '/app/notifications',
     icon: 'BellIcon',
     description: 'profile.nav.notificationsDesc',
   },

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTenant } from "@/lib/context/TenantContext";
 import { CartProvider } from "@/lib/cart";
 import { AppShell as Shell } from "@/components/app/AppShell";
-import { AppTopbar } from "./components/app-topbar";
+import { AppTopbar } from "@/components/app/AppTopbar";
 import { ToastProvider } from "@/components/ui/toast";
 import { DemoBanner } from "@/components/demo/DemoBanner";
 

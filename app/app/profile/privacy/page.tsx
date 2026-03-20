@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function PrivacyPage() {
-  redirect('/app/profile/account');
+  redirect('/app/preferences/privacy');
 }

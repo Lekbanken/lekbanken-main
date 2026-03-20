@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
+import { ProfileService, type CompleteProfile } from '@/lib/profile';
 import { uploadCustomAvatar } from './avatarActions.server';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { useProfileQuery } from '@/hooks/useProfileQuery';
 import {
   UserIcon,
   TrashIcon,
@@ -23,7 +25,24 @@ import { cn } from '@/lib/utils';
 
 export default function GeneralSettingsPage() {
   const t = useTranslations('app.profile');
-  const { user, userProfile, updateProfile, isLoading } = useAuth();
+  const { user, userProfile, updateProfile, isLoading: authLoading } = useAuth();
+  const profileService = useMemo(() => new ProfileService(), []);
+
+  const { data: completeProfile } = useProfileQuery<CompleteProfile | null>(
+    `general-profile-${user?.id ?? 'no-user'}`,
+    async () => {
+      if (!user?.id) {
+        throw new Error('Not ready');
+      }
+
+      return profileService.getCompleteProfile(user.id);
+    },
+    { userId: user?.id },
+    {
+      skip: authLoading || !user?.id,
+      timeout: 10000,
+    }
+  );
 
   const [fullName, setFullName] = useState(userProfile?.full_name || '');
   const [avatarUrl, setAvatarUrl] = useState(userProfile?.avatar_url || null);
@@ -34,14 +53,45 @@ export default function GeneralSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const lastSyncedProfileRef = useRef<{
+    fullName: string;
+    avatarUrl: string | null;
+    displayName: string;
+    phone: string;
+  } | null>(null);
 
-  // Initialize from userProfile when available
-  useState(() => {
-    if (userProfile) {
-      setFullName(userProfile.full_name || '');
-      setAvatarUrl(userProfile.avatar_url || null);
+  useEffect(() => {
+    const nextProfileState = {
+      fullName: completeProfile?.user.full_name ?? userProfile?.full_name ?? '',
+      avatarUrl: completeProfile?.profile?.avatar_url ?? completeProfile?.user.avatar_url ?? userProfile?.avatar_url ?? null,
+      displayName: completeProfile?.profile?.display_name ?? '',
+      phone: completeProfile?.profile?.phone ?? '',
+    };
+
+    const hasProfileData =
+      completeProfile !== null ||
+      userProfile !== null;
+
+    if (!hasProfileData) return;
+
+    const lastSyncedProfile = lastSyncedProfileRef.current;
+    const formMatchesLastSyncedProfile = !lastSyncedProfile || (
+      fullName === lastSyncedProfile.fullName &&
+      avatarUrl === lastSyncedProfile.avatarUrl &&
+      displayName === lastSyncedProfile.displayName &&
+      phone === lastSyncedProfile.phone
+    );
+
+    if (!formMatchesLastSyncedProfile) {
+      return;
     }
-  });
+
+    setFullName(nextProfileState.fullName);
+    setAvatarUrl(nextProfileState.avatarUrl);
+    setDisplayName(nextProfileState.displayName);
+    setPhone(nextProfileState.phone);
+    lastSyncedProfileRef.current = nextProfileState;
+  }, [completeProfile, userProfile, fullName, avatarUrl, displayName, phone]);
 
   const email = user?.email || '';
   const initials = fullName
@@ -110,7 +160,7 @@ export default function GeneralSettingsPage() {
     [user, updateProfile],
   );
 
-  if (isLoading) {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Avatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -10,8 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { usePreferences } from "@/lib/context/PreferencesContext";
-import { getUiCopy } from "@/lib/i18n/ui";
 import { useAuth } from "@/lib/supabase/auth";
 import { cn } from "@/lib/utils";
 
@@ -25,8 +24,7 @@ type ProfileMenuProps = {
 
 export function ProfileMenu({ context = "app", onNavigate, className }: ProfileMenuProps) {
   const router = useRouter();
-  const { language } = usePreferences();
-  const copy = getUiCopy(language).marketing.actions;
+  const t = useTranslations();
   const { user, userProfile, effectiveGlobalRole, signOut } = useAuth();
 
   if (!user) return null;
@@ -63,7 +61,7 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel>Signed in as</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('app.nav.loggedInAs')}</DropdownMenuLabel>
         <div className="px-3 py-2">
           <p className="text-sm font-semibold text-foreground">{displayName}</p>
           <p className="text-xs text-muted-foreground">{email}</p>
@@ -74,28 +72,28 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
             <circle cx="12" cy="8" r="4" />
             <path d="M5 20c0-3.3 3-6 7-6s7 2.7 7 6" />
           </svg>
-          Profile
+          {t('app.nav.profile')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleNavigate("/app/profile/security")} className="flex items-center gap-2">
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M12 3 4 7v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V7l-8-4Z" />
             <path d="m9 12 2 2 4-4" />
           </svg>
-          Security
+          {t('app.profile.security')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleNavigate("/app")} className="flex items-center gap-2">
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M3 12s2-4 9-4 9 4 9 4-2 4-9 4-9-4-9-4Z" />
             <circle cx="12" cy="12" r="2" />
           </svg>
-          {copy.goToApp}
+          {t('app.nav.dashboard')}
         </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem onClick={() => handleNavigate("/admin")} className="flex items-center gap-2">
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
               <path d="M12 3 4 7v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V7l-8-4Z" />
             </svg>
-            {copy.goToAdmin}
+            {t('app.nav.admin')}
           </DropdownMenuItem>
         )}
         {context !== "marketing" && (
@@ -104,7 +102,7 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
               <path d="M3 12l9-9 9 9" />
               <path d="M9 21V9h6v12" />
             </svg>
-            {copy.goToMarketing}
+            {t('app.nav.marketing')}
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
@@ -114,7 +112,7 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Log out
+          {t('app.nav.logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

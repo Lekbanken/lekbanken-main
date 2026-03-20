@@ -1,0 +1,1 @@
+drop function if exists public.to_text_array_safe(text[]);

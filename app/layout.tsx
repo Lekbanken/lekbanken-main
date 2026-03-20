@@ -23,7 +23,13 @@ const themeInitScript = `(() => {
     document.documentElement.style.colorScheme = resolved === 'dark' ? 'dark' : 'light';
     const storedLang = localStorage.getItem('lb-language');
     if (storedLang) {
-      document.documentElement.lang = storedLang.toLowerCase();
+      document.documentElement.lang = storedLang === 'SE'
+        ? 'sv'
+        : storedLang === 'NO'
+          ? 'no'
+          : storedLang === 'EN'
+            ? 'en'
+            : storedLang.toLowerCase();
     }
   } catch (e) {
     /* no-op */

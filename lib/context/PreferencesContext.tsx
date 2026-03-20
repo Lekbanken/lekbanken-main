@@ -2,12 +2,13 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useLocale } from 'next-intl'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/supabase/auth'
 import { getBrowserHostname, setBrowserCookie } from '@/lib/supabase/cookie-domain'
 import type { Database } from '@/types/supabase'
 import { TenantContext } from './TenantContext'
-import { LOCALE_COOKIE, getLocaleFromLanguageCode } from '@/lib/i18n/config'
+import { LOCALE_COOKIE, getLanguageCodeFromLocale, getLocaleFromLanguageCode, type Locale } from '@/lib/i18n/config'
 
 type ThemePreference = 'light' | 'dark' | 'system'
 type ResolvedTheme = 'light' | 'dark'
@@ -66,12 +67,14 @@ function useOptionalTenantId() {
 }
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {
+  const locale = useLocale() as Locale
+  const localeLanguage = getLanguageCodeFromLocale(locale) as LanguageCode
   const { user, userProfile, updateProfile } = useAuth()
   const tenantId = useOptionalTenantId()
 
   const [theme, setThemeState] = useState<ThemePreference>('system')
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('light')
-  const [language, setLanguageState] = useState<LanguageCode>('NO')
+  const [language, setLanguageState] = useState<LanguageCode>(localeLanguage)
   const [showThemeToggleInHeader, setShowThemeToggleState] = useState(true)
   const [userChangedTheme, setUserChangedTheme] = useState(false)
   const [userChangedLanguage, setUserChangedLanguage] = useState(false)
@@ -84,7 +87,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     const storedToggle = typeof window !== 'undefined' ? localStorage.getItem(TOGGLE_KEY) : null
 
     const initialTheme = storedTheme || 'system'
-    const initialLanguage = storedLanguage || 'NO'
+    const initialLanguage = localeLanguage
     const initialToggle = storedToggle === null ? true : storedToggle === 'true'
 
     setThemeState(initialTheme)
@@ -94,11 +97,11 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
 
     // Treat persisted choices as intentional so we sync them after login
     setUserChangedTheme(Boolean(storedTheme))
-    setUserChangedLanguage(Boolean(storedLanguage))
+    setUserChangedLanguage(Boolean(storedLanguage && storedLanguage === localeLanguage))
 
     applyLanguage(initialLanguage)
     initializedRef.current = true
-  }, [])
+  }, [localeLanguage])
 
   // Listen for system changes when using system preference
   useEffect(() => {
@@ -146,6 +149,13 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     }
   }, [language])
 
+  useEffect(() => {
+    if (!initializedRef.current) return
+    if (language !== localeLanguage) {
+      setLanguageState(localeLanguage)
+    }
+  }, [language, localeLanguage])
+
   // Persist header toggle visibility for logged out scenarios too
   useEffect(() => {
     if (!initializedRef.current) return
@@ -168,9 +178,6 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       setThemeState(userProfile.preferred_theme as ThemePreference)
     }
 
-    if (!userChangedLanguage && userProfile.language) {
-      setLanguageState(userProfile.language as LanguageCode)
-    }
   }, [userProfile, userChangedLanguage, userChangedTheme])
 
   // Check if user is a demo user (preferences should only be stored locally)

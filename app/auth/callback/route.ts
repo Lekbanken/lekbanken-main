@@ -1,9 +1,10 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import type { Database } from '@/types/supabase'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { enhanceCookieOptions } from '@/lib/supabase/cookie-domain'
 
 /**
  * OAuth & Recovery Callback Handler
@@ -27,6 +28,8 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const cookieStore = await cookies()
+    const headerStore = await headers()
+    const hostname = headerStore.get('host')?.split(':')[0] || null
     
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -38,7 +41,7 @@ export async function GET(request: NextRequest) {
           },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, enhanceCookieOptions(options, hostname))
             })
           },
         },

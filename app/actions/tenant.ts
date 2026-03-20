@@ -1,6 +1,6 @@
 'use server'
 
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { readTenantIdFromCookies, setTenantCookie, clearTenantCookie } from '@/lib/utils/tenantCookie'
 import type { Database } from '@/types/supabase'
@@ -10,13 +10,15 @@ type TenantRole = 'owner' | 'admin' | 'editor' | 'member'
 type TenantWithMembership = TenantRow & { membership: { tenant_id: string; role: TenantRole; is_primary?: boolean } }
 export async function resolveCurrentTenant() {
   const cookieStore = await cookies()
+  const headerStore = await headers()
+  const hostname = headerStore.get('host')?.split(':')[0] || null
   const supabase = await createServerRlsClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   if (!user) {
-    clearTenantCookie(cookieStore)
+    clearTenantCookie(cookieStore, { hostname })
     return { tenant: null as TenantWithMembership | null, role: null as TenantRole | null, tenants: [] as TenantWithMembership[] }
   }
 
@@ -64,9 +66,9 @@ export async function resolveCurrentTenant() {
   }
 
   if (selected?.tenant_id) {
-    await setTenantCookie(cookieStore, selected.tenant_id)
+    await setTenantCookie(cookieStore, selected.tenant_id, { hostname })
   } else {
-    clearTenantCookie(cookieStore)
+    clearTenantCookie(cookieStore, { hostname })
   }
 
   // Global admin fallback
@@ -93,13 +95,15 @@ export async function resolveCurrentTenant() {
 
 export async function selectTenant(tenantId: string) {
   const cookieStore = await cookies()
+  const headerStore = await headers()
+  const hostname = headerStore.get('host')?.split(':')[0] || null
   const supabase = await createServerRlsClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   if (!user) {
-    clearTenantCookie(cookieStore)
+    clearTenantCookie(cookieStore, { hostname })
     return { tenant: null, role: null }
   }
 
@@ -121,18 +125,18 @@ export async function selectTenant(tenantId: string) {
       .maybeSingle()
 
     if (tenant) {
-      await setTenantCookie(cookieStore, tenantId)
+      await setTenantCookie(cookieStore, tenantId, { hostname })
       return {
         tenant: { ...tenant, membership: { tenant_id: tenantId, role: 'admin' } } as TenantWithMembership,
         role: 'admin' as TenantRole,
       }
     }
 
-    clearTenantCookie(cookieStore)
+    clearTenantCookie(cookieStore, { hostname })
     return { tenant: null, role: null }
   }
 
-  await setTenantCookie(cookieStore, tenantId)
+  await setTenantCookie(cookieStore, tenantId, { hostname })
 
   return {
     tenant: { ...membership.tenant, membership: { tenant_id: tenantId, role: membership.role } } as TenantWithMembership,
@@ -145,6 +149,8 @@ export async function selectTenant(tenantId: string) {
  */
 export async function clearTenantSelection() {
   const cookieStore = await cookies()
-  clearTenantCookie(cookieStore)
+  const headerStore = await headers()
+  const hostname = headerStore.get('host')?.split(':')[0] || null
+  clearTenantCookie(cookieStore, { hostname })
   return { tenant: null, role: null }
 }

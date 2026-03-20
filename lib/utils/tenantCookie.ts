@@ -1,5 +1,6 @@
 import type { cookies } from 'next/headers'
 import type { NextRequest, NextResponse } from 'next/server'
+import { clearCookieVariants } from '@/lib/supabase/cookie-domain'
 
 type CookieStore = Awaited<ReturnType<typeof cookies>>
 
@@ -121,6 +122,9 @@ export async function setTenantCookie(
   cookieStore.set(COOKIE_NAME, value, cookieOptions)
 }
 
-export function clearTenantCookie(cookieStore: CookieStore | NextResponse['cookies']) {
-  cookieStore.delete(COOKIE_NAME)
+export function clearTenantCookie(
+  cookieStore: CookieStore | NextResponse['cookies'],
+  options?: SetTenantCookieOptions
+) {
+  clearCookieVariants(cookieStore, COOKIE_NAME, options?.hostname)
 }

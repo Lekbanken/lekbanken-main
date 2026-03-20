@@ -16,6 +16,12 @@
  */
 
 const PLATFORM_DOMAIN = '.lekbanken.no'
+const EXPIRED_COOKIE_DATE = new Date(0)
+
+type CookieMutationStore = {
+  set: (name: string, value: string, options?: Record<string, unknown>) => void
+  delete: (name: string) => void
+}
 
 /**
  * Determine if we should set a shared cookie domain.
@@ -46,10 +52,10 @@ export function getCookieDomain(hostname?: string | null): string | undefined {
  * @param hostname - The current request hostname
  * @returns Enhanced cookie options with domain if applicable
  */
-export function enhanceCookieOptions<T extends { domain?: string }>(
-  options: T,
+export function enhanceCookieOptions<T extends Record<string, unknown>>(
+  options: T & { domain?: string },
   hostname?: string | null
-): T {
+): T & { domain?: string } {
   const domain = getCookieDomain(hostname)
   if (domain) {
     return { ...options, domain }
@@ -63,4 +69,43 @@ export function enhanceCookieOptions<T extends { domain?: string }>(
 export function getBrowserHostname(): string | undefined {
   if (typeof window === 'undefined') return undefined
   return window.location.hostname
+}
+
+function isLocalHostname(hostname?: string | null): boolean {
+  return !hostname || hostname === 'localhost' || hostname === '127.0.0.1'
+}
+
+export function clearCookieVariants(
+  cookieStore: CookieMutationStore,
+  name: string,
+  hostname?: string | null
+) {
+  cookieStore.delete(name)
+
+  if (isLocalHostname(hostname)) {
+    return
+  }
+
+  const domains = new Set<string>()
+  if (hostname) {
+    domains.add(hostname)
+  }
+
+  const sharedDomain = getCookieDomain(hostname)
+  if (sharedDomain) {
+    domains.add(sharedDomain)
+  }
+
+  const secure = process.env.NODE_ENV === 'production'
+
+  domains.forEach((domain) => {
+    cookieStore.set(name, '', {
+      path: '/',
+      domain,
+      expires: EXPIRED_COOKIE_DATE,
+      maxAge: 0,
+      sameSite: 'lax',
+      secure,
+    })
+  })
 }

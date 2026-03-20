@@ -9,6 +9,7 @@ import { setupDemoUser, DEMO_TENANT_ID } from '@/lib/auth/ephemeral-users';
 import { cookies, headers } from 'next/headers';
 import { checkDemoRateLimit, getClientIP, getRateLimitHeaders } from '@/lib/rate-limit/demo-rate-limit';
 import { setTenantCookie } from '@/lib/utils/tenantCookie';
+import { clearCookieVariants, enhanceCookieOptions } from '@/lib/supabase/cookie-domain';
 import type { DemoTier } from '@/lib/auth/ephemeral-users';
 
 /**
@@ -154,23 +155,21 @@ export async function POST(request: Request) {
     if (typedDemoSession) {
       const expiresAt = new Date(typedDemoSession.expires_at);
       const cookieStore = await cookies();
+      const headerStore = await headers();
+      const hostname = headerStore.get('host')?.split(':')[0] || 'localhost';
 
       // Set demo session cookie
-      cookieStore.set('demo_session_id', typedDemoSession.id, {
+      cookieStore.set('demo_session_id', typedDemoSession.id, enhanceCookieOptions({
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'lax' as const,
         expires: expiresAt,
         path: '/',
-        // Enable cross-subdomain cookie for demo.lekbanken.no support
-        domain: process.env.NODE_ENV === 'production' ? '.lekbanken.no' : undefined,
-      });
+      }, hostname));
 
       // CRITICAL: Set tenant cookie so the app knows which tenant to use
       // Without this, user lands on "no tenant assigned" page
       // Use the proper setTenantCookie function which handles HMAC signing
-      const headerStore = await headers();
-      const hostname = headerStore.get('host')?.split(':')[0] || 'localhost';
       await setTenantCookie(cookieStore, DEMO_TENANT_ID, { hostname });
 
       console.log(`[POST /auth/demo] Demo session created: ${typedDemoSession.id}, tenant: ${DEMO_TENANT_ID}`);
@@ -221,6 +220,8 @@ export async function POST(request: Request) {
 export async function DELETE() {
   try {
     const cookieStore = await cookies();
+    const headerStore = await headers();
+    const hostname = headerStore.get('host')?.split(':')[0] || null;
     const demoSessionId = cookieStore.get('demo_session_id')?.value;
 
     if (!demoSessionId) {
@@ -232,7 +233,7 @@ export async function DELETE() {
 
     // Note: Actual session end is handled by demo-detection utilities
     // This just clears the cookie
-    cookieStore.delete('demo_session_id');
+    clearCookieVariants(cookieStore, 'demo_session_id', hostname);
 
     console.log(`[DELETE /auth/demo] Demo session ended: ${demoSessionId}`);
 

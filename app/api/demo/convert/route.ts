@@ -7,7 +7,8 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { clearCookieVariants } from '@/lib/supabase/cookie-domain';
 
 /**
  * POST /api/demo/convert
@@ -79,7 +80,9 @@ export async function POST(request: Request) {
     console.log(`[POST /api/demo/convert] Demo session converted: ${demoSessionId} (${type})`);
 
     // Clear demo session cookie (user is converting to real account)
-    cookieStore.delete('demo_session_id');
+    const headerStore = await headers();
+    const hostname = headerStore.get('host')?.split(':')[0] || null;
+    clearCookieVariants(cookieStore, 'demo_session_id', hostname);
 
     return NextResponse.json({
       success: true,

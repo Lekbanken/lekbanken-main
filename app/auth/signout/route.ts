@@ -1,8 +1,9 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import type { Database } from '@/types/supabase'
+import { clearCookieVariants, enhanceCookieOptions } from '@/lib/supabase/cookie-domain'
 
 /**
  * Server-side Sign Out Handler
@@ -20,6 +21,8 @@ import type { Database } from '@/types/supabase'
 
 export async function POST(request: NextRequest) {
   const cookieStore = await cookies()
+  const headerStore = await headers()
+  const hostname = headerStore.get('host')?.split(':')[0] || null
   
   // Create Supabase client with cookie access
   const supabase = createServerClient<Database>(
@@ -32,7 +35,7 @@ export async function POST(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options)
+            cookieStore.set(name, value, enhanceCookieOptions(options, hostname))
           })
         },
       },
@@ -47,17 +50,17 @@ export async function POST(request: NextRequest) {
   }
 
   // Explicitly delete the tenant cookie
-  cookieStore.delete('lb_tenant')
+  clearCookieVariants(cookieStore, 'lb_tenant', hostname)
   
   // Delete demo session cookie if exists
-  cookieStore.delete('demo_session_id')
+  clearCookieVariants(cookieStore, 'demo_session_id', hostname)
 
   // Delete any remaining Supabase cookies explicitly
   // This ensures httpOnly cookies are properly cleared
   const allCookies = cookieStore.getAll()
   for (const cookie of allCookies) {
     if (cookie.name.includes('sb-') || cookie.name.includes('supabase') || cookie.name.includes('demo')) {
-      cookieStore.delete(cookie.name)
+      clearCookieVariants(cookieStore, cookie.name, hostname)
     }
   }
 

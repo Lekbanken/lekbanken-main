@@ -84,6 +84,7 @@ export interface UseAppNotificationsResult {
 
 interface UseAppNotificationsOptions {
   enabled?: boolean;
+  enableLiveUpdates?: boolean;
 }
 
 // =============================================================================
@@ -462,6 +463,7 @@ export function useAppNotifications(
   options?: UseAppNotificationsOptions
 ): UseAppNotificationsResult {
   const enabled = options?.enabled ?? true;
+  const enableLiveUpdates = options?.enableLiveUpdates ?? true;
   // Per-instance refs
   const mountedRef = useRef(false);
 
@@ -872,6 +874,7 @@ export function useAppNotifications(
 
   // Recover quickly when auth state changes after route transitions.
   useEffect(() => {
+    if (!enableLiveUpdates) return;
     if (!enabled) return;
     if (!supabase) return;
 
@@ -912,7 +915,7 @@ export function useAppNotifications(
     });
 
     return () => subscription?.unsubscribe();
-  }, [enabled, supabase, fetchNotifications, setStore]);
+  }, [enableLiveUpdates, enabled, supabase, fetchNotifications, setStore]);
 
   // Ref so the visibility handler can restart polling after circuit breaker
   const restartPollingRef = useRef<(() => void) | null>(null);
@@ -924,6 +927,7 @@ export function useAppNotifications(
   // Also resets backoff + circuit breaker since the user is actively looking.
   // =========================================================================
   useEffect(() => {
+    if (!enableLiveUpdates) return;
     if (!enabled) return;
     // Per-instance trigger with cooldown — prevents double-fire when Chrome
     // sends both visibilitychange + focus back-to-back on alt-tab.
@@ -973,7 +977,7 @@ export function useAppNotifications(
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('online', onOnline);
     };
-  }, [enabled, fetchNotifications]);
+  }, [enableLiveUpdates, enabled, fetchNotifications]);
 
   // =========================================================================
   // Realtime subscription — instant bell updates when deliveries change.
@@ -981,6 +985,7 @@ export function useAppNotifications(
   // one fetch after 300ms of quiet.
   // =========================================================================
   useEffect(() => {
+    if (!enableLiveUpdates) return;
     if (!enabled) return;
     if (!supabase) return;
 
@@ -1022,7 +1027,7 @@ export function useAppNotifications(
         supabase.removeChannel(channel);
       }
     };
-  }, [enabled, supabase, fetchNotifications]);
+  }, [enableLiveUpdates, enabled, supabase, fetchNotifications]);
 
   // =========================================================================
   // Fallback polling — keeps bell correct even if realtime misses.
@@ -1030,6 +1035,7 @@ export function useAppNotifications(
   // Uses exponential backoff on consecutive failures.
   // =========================================================================
   useEffect(() => {
+    if (!enableLiveUpdates) return;
     if (!enabled) return;
     if (!supabase) return;
 
@@ -1086,7 +1092,7 @@ export function useAppNotifications(
       if (timerId) clearTimeout(timerId);
       restartPollingRef.current = null;
     };
-  }, [enabled, supabase, fetchNotifications]);
+  }, [enableLiveUpdates, enabled, supabase, fetchNotifications]);
 
   // =========================================================================
   // Actions — optimistic-first: update UI instantly, fire RPC in background.

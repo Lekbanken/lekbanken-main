@@ -60,7 +60,7 @@ export default function NotificationsPage() {
     markAllAsRead,
     dismiss,
     refresh,
-  } = useAppNotifications(100)
+  } = useAppNotifications(100, { enableLiveUpdates: false })
 
   const formatTimeAgo = useCallback(
     (date: Date) => {

@@ -28,6 +28,7 @@ export default function AuthDebugPanel({ serverSnapshot }: AuthDebugPanelProps) 
   const { isDemoMode, tier, timeRemaining, showTimeoutWarning, isLoading: isDemoLoading } = useIsDemo()
   const notificationState = useAppNotifications(20, {
     enabled: !isLoading && isAuthenticated,
+    enableLiveUpdates: false,
   })
 
   return (

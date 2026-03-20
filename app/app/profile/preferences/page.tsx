@@ -2,14 +2,16 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { usePreferences } from '@/lib/context/PreferencesContext';
 import { ProfileService, type UserPreferences } from '@/lib/profile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert } from '@/components/ui/alert';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
+import { getLanguageCodeFromLocale, type Locale } from '@/lib/i18n/config';
+import { useLocaleSwitcher } from '@/lib/i18n/useLocaleSwitcher';
 import {
   AdjustmentsHorizontalIcon,
   LanguageIcon,
@@ -39,14 +41,16 @@ const defaultPreferences: Partial<UserPreferences> = {
 
 export default function PreferencesPage() {
   const t = useTranslations('app.profile');
-  const locale = useLocale();
-  const router = useRouter();
+  const locale = useLocale() as Locale;
   const { user, isLoading: authLoading } = useAuth();
   const { currentTenant, isLoadingTenants } = useTenant();
+  const { theme, setTheme, setLanguage } = usePreferences();
+  const { switchLocale } = useLocaleSwitcher();
 
   const [preferences, setPreferences] = useState<Partial<UserPreferences>>({
     ...defaultPreferences,
     language: locale,
+    theme,
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -85,8 +89,22 @@ export default function PreferencesPage() {
     setPreferences({
       ...defaultPreferences,
       ...fetchedPreferences,
+      language: fetchedPreferences.language ?? locale,
+      theme: fetchedPreferences.theme ?? theme,
     })
-  }, [fetchedPreferences]);
+  }, [fetchedPreferences, locale, theme]);
+
+  useEffect(() => {
+    setPreferences((prev) => {
+      if (hasChanges) return prev
+
+      return {
+        ...prev,
+        language: locale,
+        theme,
+      }
+    })
+  }, [hasChanges, locale, theme])
 
   const stillLoading = isLoading || authLoading || isLoadingTenants;
 
@@ -102,12 +120,15 @@ export default function PreferencesPage() {
 
     setIsSaving(true);
     try {
-      await profileService.updatePreferences(currentTenant.id, user.id, preferences);
+      const nextTheme = preferences.theme;
+      if (nextTheme && nextTheme !== theme) {
+        await setTheme(nextTheme);
+      }
 
-      // If language changed, update the route
-      if (preferences.language !== locale) {
-        // This would trigger a locale change - handled by next-intl
-        router.refresh();
+      const nextLocale = preferences.language as Locale | undefined;
+      if (nextLocale && nextLocale !== locale) {
+        await setLanguage(getLanguageCodeFromLocale(nextLocale) as 'NO' | 'SE' | 'EN');
+        await switchLocale(nextLocale);
       }
 
       setSaveSuccess(true);
@@ -120,7 +141,7 @@ export default function PreferencesPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [user?.id, currentTenant?.id, preferences, locale, router, t, profileService]);
+  }, [currentTenant?.id, locale, preferences.language, preferences.theme, setLanguage, setTheme, switchLocale, t, theme, user?.id]);
 
   if (stillLoading) {
     return (

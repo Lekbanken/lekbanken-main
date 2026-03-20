@@ -66,15 +66,15 @@ jobs:
           POLICIES=$(psql "$PGCONN" -t -c "SELECT count(*) FROM pg_policies WHERE schemaname='public'" | tr -d ' ')
           ENUMS=$(psql "$PGCONN" -t -c "SELECT count(*) FROM pg_type t JOIN pg_namespace n ON t.typnamespace=n.oid WHERE n.nspname='public' AND t.typtype='e'" | tr -d ' ')
 
-          echo "Tables: $TABLES (expected >= 247)"
-          echo "Functions: $FUNCTIONS (expected >= 156)"
-          echo "Policies: $POLICIES (expected >= 545)"
+          echo "Tables: $TABLES (expected >= 248)"
+          echo "Functions: $FUNCTIONS (expected >= 152)"
+          echo "Policies: $POLICIES (expected >= 589)"
           echo "Enums: $ENUMS (expected >= 28)"
 
           # Fail if counts drop below baseline
-          if [ "$TABLES" -lt 247 ]; then echo "::error::Table count dropped below baseline (got $TABLES, expected >= 247)"; exit 1; fi
-          if [ "$FUNCTIONS" -lt 156 ]; then echo "::error::Function count dropped below baseline (got $FUNCTIONS, expected >= 156)"; exit 1; fi
-          if [ "$POLICIES" -lt 545 ]; then echo "::error::Policy count dropped below baseline (got $POLICIES, expected >= 545)"; exit 1; fi
+          if [ "$TABLES" -lt 248 ]; then echo "::error::Table count dropped below baseline (got $TABLES, expected >= 248)"; exit 1; fi
+          if [ "$FUNCTIONS" -lt 152 ]; then echo "::error::Function count dropped below baseline (got $FUNCTIONS, expected >= 152)"; exit 1; fi
+          if [ "$POLICIES" -lt 589 ]; then echo "::error::Policy count dropped below baseline (got $POLICIES, expected >= 589)"; exit 1; fi
           if [ "$ENUMS" -lt 28 ]; then echo "::error::Enum count dropped below baseline (got $ENUMS, expected >= 28)"; exit 1; fi
 
           echo "✅ All schema counts at or above baseline"

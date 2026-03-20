@@ -6,11 +6,14 @@
  */
 
 import { createServerRlsClient } from '@/lib/supabase/server'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import type { MFATrustedDevice } from '@/types/mfa'
+import type { Tables, TablesInsert } from '@/types/supabase'
 import { randomBytes, createHash } from 'crypto'
 import { logDeviceTrusted, logDeviceRevoked } from './mfaAudit.server'
 import { requireCanonicalMfaTenant } from '@/lib/auth/mfa-tenant'
+
+type TrustedDeviceRow = Tables<'mfa_trusted_devices'>
+type TrustedDeviceInsert = TablesInsert<'mfa_trusted_devices'>
 
 // ============================================================================
 // TYPES
@@ -74,6 +77,17 @@ function parseUserAgentOS(ua?: string | null): string {
   return 'Unknown'
 }
 
+function toNullableString(value: unknown): string | null {
+  return typeof value === 'string' ? value : null
+}
+
+function toTrustedDevice(row: TrustedDeviceRow): MFATrustedDevice {
+  return {
+    ...row,
+    ip_address: toNullableString(row.ip_address),
+  }
+}
+
 // ============================================================================
 // TRUST DEVICE
 // ============================================================================
@@ -90,8 +104,6 @@ export async function trustDevice(
   params: TrustDeviceParams
 ): Promise<TrustDeviceResult> {
   const supabase = await createServerRlsClient()
-  // Cast since mfa_trusted_devices types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
   const tenantId = requireCanonicalMfaTenant(params.tenant_id, 'trust')
 
   // Generate trust token
@@ -105,32 +117,30 @@ export async function trustDevice(
   const browser = parseUserAgentBrowser(params.user_agent)
   const os = parseUserAgentOS(params.user_agent)
   const deviceName = params.device_name || `${browser} on ${os}`
+  const trustedDevice: TrustedDeviceInsert = {
+    user_id: userId,
+    tenant_id: tenantId,
+    device_fingerprint: params.device_fingerprint,
+    device_name: deviceName,
+    user_agent: params.user_agent,
+    ip_address: params.ip_address,
+    browser,
+    os,
+    trust_token_hash: hash,
+    trusted_at: new Date().toISOString(),
+    expires_at: expiresAt.toISOString(),
+    last_used_at: new Date().toISOString(),
+    is_revoked: false,
+    revoked_at: null,
+    revoked_reason: null,
+  }
 
   // Upsert device (update if fingerprint exists)
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('mfa_trusted_devices')
-    .upsert(
-      {
-        user_id: userId,
-        tenant_id: tenantId,
-        device_fingerprint: params.device_fingerprint,
-        device_name: deviceName,
-        user_agent: params.user_agent,
-        ip_address: params.ip_address,
-        browser,
-        os,
-        trust_token_hash: hash,
-        trusted_at: new Date().toISOString(),
-        expires_at: expiresAt.toISOString(),
-        last_used_at: new Date().toISOString(),
-        is_revoked: false,
-        revoked_at: null,
-        revoked_reason: null,
-      },
-      {
-        onConflict: 'user_id,tenant_id,device_fingerprint',
-      }
-    )
+    .upsert(trustedDevice, {
+      onConflict: 'user_id,tenant_id,device_fingerprint',
+    })
     .select('id')
     .single()
 
@@ -165,14 +175,12 @@ export async function verifyTrustedDevice(
   tenantId: string
 ): Promise<VerifyDeviceResult> {
   const supabase = await createServerRlsClient()
-  // Cast since mfa_trusted_devices types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
   // Hash the provided token for lookup
   const tokenHash = createHash('sha256').update(trustToken).digest('hex')
 
   // Look up device — tenant-scoped to prevent cross-tenant MFA bypass (MFA-005)
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('mfa_trusted_devices')
     .select('*')
     .eq('user_id', userId)
@@ -188,14 +196,14 @@ export async function verifyTrustedDevice(
   }
 
   // Update last_used_at
-  await db
+  await supabase
     .from('mfa_trusted_devices')
     .update({ last_used_at: new Date().toISOString() })
     .eq('id', data.id)
 
   return {
     is_trusted: true,
-    device: data as MFATrustedDevice,
+    device: toTrustedDevice(data),
   }
 }
 
@@ -210,10 +218,8 @@ export async function getUserTrustedDevices(
   userId: string
 ): Promise<MFATrustedDevice[]> {
   const supabase = await createServerRlsClient()
-  // Cast since mfa_trusted_devices types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('mfa_trusted_devices')
     .select('*')
     .eq('user_id', userId)
@@ -226,7 +232,7 @@ export async function getUserTrustedDevices(
     return []
   }
 
-  return (data as MFATrustedDevice[]) ?? []
+  return data?.map(toTrustedDevice) ?? []
 }
 
 /**
@@ -236,10 +242,8 @@ export async function getTenantTrustedDevices(
   tenantId: string
 ): Promise<MFATrustedDevice[]> {
   const supabase = await createServerRlsClient()
-  // Cast since mfa_trusted_devices types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('mfa_trusted_devices')
     .select('*')
     .eq('tenant_id', tenantId)
@@ -251,7 +255,7 @@ export async function getTenantTrustedDevices(
     return []
   }
 
-  return (data as MFATrustedDevice[]) ?? []
+  return data?.map(toTrustedDevice) ?? []
 }
 
 // ============================================================================
@@ -267,11 +271,9 @@ export async function revokeDevice(
   reason: string = 'user_revoked'
 ): Promise<boolean> {
   const supabase = await createServerRlsClient()
-  // Cast since mfa_trusted_devices types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
   // First get the device to check ownership and get tenant_id
-  const { data: device, error: fetchError } = await db
+  const { data: device, error: fetchError } = await supabase
     .from('mfa_trusted_devices')
     .select('*')
     .eq('id', deviceId)
@@ -289,7 +291,7 @@ export async function revokeDevice(
   }
 
   // Revoke the device
-  const { error } = await db
+  const { error } = await supabase
     .from('mfa_trusted_devices')
     .update({
       is_revoked: true,
@@ -317,10 +319,8 @@ export async function revokeAllDevices(
   reason: string = 'user_revoked_all'
 ): Promise<boolean> {
   const supabase = await createServerRlsClient()
-  // Cast since mfa_trusted_devices types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
-  const { error } = await db
+  const { error } = await supabase
     .from('mfa_trusted_devices')
     .update({
       is_revoked: true,
@@ -347,11 +347,9 @@ export async function adminRevokeDevice(
   adminUserId: string
 ): Promise<boolean> {
   const supabase = await createServerRlsClient()
-  // Cast since mfa_trusted_devices types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
   // Verify the device belongs to the tenant
-  const { data: device, error: fetchError } = await db
+  const { data: device, error: fetchError } = await supabase
     .from('mfa_trusted_devices')
     .select('user_id')
     .eq('id', deviceId)
@@ -364,7 +362,7 @@ export async function adminRevokeDevice(
   }
 
   // Revoke the device
-  const { error } = await db
+  const { error } = await supabase
     .from('mfa_trusted_devices')
     .update({
       is_revoked: true,

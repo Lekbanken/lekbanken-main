@@ -6,7 +6,6 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { apiHandler } from '@/lib/api/route-handler';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
 interface MFAUserRow {
   user_id: string;
@@ -47,7 +46,6 @@ export const GET = apiHandler({
   }
 
   const supabase = await createServerRlsClient();
-  const db = supabase as unknown as SupabaseClient;
 
   try {
     const { searchParams } = new URL(req.url);
@@ -59,14 +57,14 @@ export const GET = apiHandler({
     const offset = (page - 1) * pageSize;
 
     // Get tenant MFA policy to determine requirements
-    const { data: policy } = await db
+    const { data: policy } = await supabase
       .from('tenant_mfa_policies')
       .select('is_enforced, enforcement_level, grace_period_days')
       .eq('tenant_id', tenantId)
       .maybeSingle();
 
     // MFA-001: Join users table (not profiles — that relation doesn't exist)
-    let query = db
+    let query = supabase
       .from('user_tenant_memberships')
       .select(`
         user_id,
@@ -106,13 +104,13 @@ export const GET = apiHandler({
     const userIds = typedMembers.map((m) => m.user_id);
 
     // Get MFA status for these users
-    const { data: mfaSettings } = await db
+    const { data: mfaSettings } = await supabase
       .from('user_mfa')
       .select('user_id, enrolled_at, grace_period_end')
       .in('user_id', userIds);
 
     // MFA-002: Column is is_revoked (not is_active)
-    const { data: trustedDevices } = await db
+    const { data: trustedDevices } = await supabase
       .from('mfa_trusted_devices')
       .select('user_id')
       .in('user_id', userIds)

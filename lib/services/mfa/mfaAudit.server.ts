@@ -1,14 +1,16 @@
 /**
  * MFA Audit Service - Logging all MFA-related events
  *
- * NOTE: Uses type casting because mfa_audit_log table types
- * will be regenerated after migration runs.
+ * NOTE: Uses generated Supabase types for MFA audit tables.
  */
 
 import { createServerRlsClient } from '@/lib/supabase/server'
 import type { MFAAuditEventType, MFAMethod } from '@/types/mfa'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Json, Tables, TablesInsert } from '@/types/supabase'
 import { headers } from 'next/headers'
+
+type MFAAuditLogRow = Tables<'mfa_audit_log'>
+type MFAAuditLogInsert = TablesInsert<'mfa_audit_log'>
 
 interface AuditEventData {
   userId: string
@@ -18,7 +20,7 @@ interface AuditEventData {
   success?: boolean
   failureReason?: string
   failureCount?: number
-  metadata?: Record<string, unknown>
+  metadata?: Json
 }
 
 /**
@@ -49,11 +51,8 @@ async function getClientInfo(): Promise<{
  */
 export async function logMFAAuditEvent(data: AuditEventData): Promise<boolean> {
   const supabase = await createServerRlsClient()
-  // Cast to any since mfa_audit_log table types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
   const clientInfo = await getClientInfo()
-
-  const { error } = await db.from('mfa_audit_log').insert({
+  const payload: MFAAuditLogInsert = {
     user_id: data.userId,
     tenant_id: data.tenantId || null,
     event_type: data.eventType,
@@ -65,7 +64,9 @@ export async function logMFAAuditEvent(data: AuditEventData): Promise<boolean> {
     failure_reason: data.failureReason || null,
     failure_count: data.failureCount || null,
     metadata: data.metadata || {},
-  })
+  }
+
+  const { error } = await supabase.from('mfa_audit_log').insert(payload)
 
   if (error) {
     console.error('[MFA Audit] Error logging event:', error)
@@ -302,10 +303,8 @@ export async function getUserMFAAuditLog(
   limit: number = 50
 ): Promise<Array<Record<string, unknown>>> {
   const supabase = await createServerRlsClient()
-  // Cast to any since mfa_audit_log table types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('mfa_audit_log')
     .select('*')
     .eq('user_id', userId)
@@ -317,7 +316,7 @@ export async function getUserMFAAuditLog(
     return []
   }
 
-  return (data as Array<Record<string, unknown>>) ?? []
+  return (data ?? []).map((row: MFAAuditLogRow) => ({ ...row }))
 }
 
 /**
@@ -328,10 +327,8 @@ export async function getTenantMFAAuditLog(
   limit: number = 100
 ): Promise<Array<Record<string, unknown>>> {
   const supabase = await createServerRlsClient()
-  // Cast to any since mfa_audit_log table types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
-  const { data, error } = await db
+  const { data, error } = await supabase
     .from('mfa_audit_log')
     .select('*')
     .eq('tenant_id', tenantId)
@@ -343,7 +340,7 @@ export async function getTenantMFAAuditLog(
     return []
   }
 
-  return (data as Array<Record<string, unknown>>) ?? []
+  return (data ?? []).map((row: MFAAuditLogRow) => ({ ...row }))
 }
 
 /**
@@ -354,13 +351,11 @@ export async function getRecentFailedAttempts(
   windowMinutes: number = 15
 ): Promise<number> {
   const supabase = await createServerRlsClient()
-  // Cast to any since mfa_audit_log table types not yet regenerated
-  const db = supabase as unknown as SupabaseClient
 
   const windowStart = new Date()
   windowStart.setMinutes(windowStart.getMinutes() - windowMinutes)
 
-  const { count, error } = await db
+  const { count, error } = await supabase
     .from('mfa_audit_log')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)

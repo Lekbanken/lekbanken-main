@@ -7,8 +7,8 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { apiHandler } from '@/lib/api/route-handler';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import type { TenantMFAPolicy } from '@/types/mfa';
+import type { TablesInsert } from '@/types/supabase';
 
 /**
  * GET /api/admin/tenant/[tenantId]/mfa/policy
@@ -30,11 +30,10 @@ export const GET = apiHandler({
   }
 
   const supabase = await createServerRlsClient();
-  const db = supabase as unknown as SupabaseClient;
 
   try {
     // Get or create policy
-    const { data: policy, error } = await db
+    const { data: policy, error } = await supabase
       .from('tenant_mfa_policies')
       .select('*')
       .eq('tenant_id', tenantId)
@@ -91,7 +90,6 @@ export const PUT = apiHandler({
   }
 
   const supabase = await createServerRlsClient();
-  const db = supabase as unknown as SupabaseClient;
 
   try {
     const body = await req.json();
@@ -120,7 +118,7 @@ export const PUT = apiHandler({
       return NextResponse.json({ error: 'trusted_device_duration_days must be between 1 and 365' }, { status: 400 });
     }
 
-    const updateData: Record<string, unknown> = {
+    const updateData: Partial<TablesInsert<'tenant_mfa_policies'>> = {
       updated_at: new Date().toISOString(),
     };
 
@@ -153,12 +151,14 @@ export const PUT = apiHandler({
     }
 
     // Upsert policy
-    const { data: policy, error } = await db
+    const policyPayload: TablesInsert<'tenant_mfa_policies'> = {
+      tenant_id: tenantId,
+      ...updateData,
+    };
+
+    const { data: policy, error } = await supabase
       .from('tenant_mfa_policies')
-      .upsert({
-        tenant_id: tenantId,
-        ...updateData,
-      }, { onConflict: 'tenant_id' })
+      .upsert(policyPayload, { onConflict: 'tenant_id' })
       .select()
       .single();
 

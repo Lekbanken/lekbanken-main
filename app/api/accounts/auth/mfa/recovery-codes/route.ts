@@ -3,7 +3,7 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 import { apiHandler } from '@/lib/api/route-handler'
 import { randomBytes, createHash } from 'crypto'
 import { logRecoveryCodesGenerated } from '@/lib/services/mfa/mfaAudit.server'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { TablesInsert } from '@/types/supabase'
 
 const RECOVERY_CODE_COUNT = 10
 
@@ -35,44 +35,39 @@ export const POST = apiHandler({
     const userId = auth!.user!.id
 
     const codes = generateCodes()
-  const hashed = hashCodes(codes)
+    const hashed = hashCodes(codes)
 
-  // Get user's tenant for audit logging (cast to bypass type issues until regenerated)
-  const db = supabase as unknown as SupabaseClient
-  const { data: userMfa } = await db
-    .from('user_mfa')
-    .select('tenant_id')
-    .eq('user_id', userId)
-    .maybeSingle()
+    const { data: userMfa } = await supabase
+      .from('user_mfa')
+      .select('tenant_id')
+      .eq('user_id', userId)
+      .maybeSingle()
 
-  const tenantId = (userMfa as { tenant_id?: string } | null)?.tenant_id
+    const tenantId = userMfa?.tenant_id ?? null
+    const recoveryCodePayload: TablesInsert<'user_mfa'> = {
+      user_id: userId,
+      recovery_codes_hashed: hashed,
+      recovery_codes_count: RECOVERY_CODE_COUNT,
+      recovery_codes_used: 0,
+      recovery_codes_generated_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
 
-  const { error } = await db
-    .from('user_mfa')
-    .upsert(
-      {
-        user_id: userId,
-        recovery_codes_hashed: hashed,
-        recovery_codes_count: RECOVERY_CODE_COUNT,
-        recovery_codes_used: 0,
-        recovery_codes_generated_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id' }
-    )
+    const { error } = await supabase
+      .from('user_mfa')
+      .upsert(recoveryCodePayload, { onConflict: 'user_id' })
 
-  if (error) {
-    console.error('[mfa/recovery-codes] upsert error', error)
-    return NextResponse.json({ error: 'Failed to generate codes' }, { status: 500 })
-  }
+    if (error) {
+      console.error('[mfa/recovery-codes] upsert error', error)
+      return NextResponse.json({ error: 'Failed to generate codes' }, { status: 500 })
+    }
 
-  // Log the generation
-  await logRecoveryCodesGenerated(userId, RECOVERY_CODE_COUNT, tenantId)
+    await logRecoveryCodesGenerated(userId, RECOVERY_CODE_COUNT, tenantId)
 
-  return NextResponse.json({
-    recovery_codes: codes,
-    count: codes.length,
-    message: 'Store these codes securely. Each code can only be used once.',
-  })
+    return NextResponse.json({
+      recovery_codes: codes,
+      count: codes.length,
+      message: 'Store these codes securely. Each code can only be used once.',
+    })
   },
 })

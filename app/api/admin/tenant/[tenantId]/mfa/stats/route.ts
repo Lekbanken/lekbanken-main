@@ -6,7 +6,6 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { apiHandler } from '@/lib/api/route-handler';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * GET /api/admin/tenant/[tenantId]/mfa/stats
@@ -28,11 +27,10 @@ export const GET = apiHandler({
   }
 
   const supabase = await createServerRlsClient();
-  const db = supabase as unknown as SupabaseClient;
 
   try {
     // Get total users in tenant
-    const { count: totalUsers, error: countError } = await db
+    const { count: totalUsers, error: countError } = await supabase
       .from('user_tenant_memberships')
       .select('*', { count: 'exact', head: true })
       .eq('tenant_id', tenantId);
@@ -42,7 +40,7 @@ export const GET = apiHandler({
     }
 
     // Get users with MFA enabled
-    const { data: mfaUsers, error: mfaError } = await db
+    const { data: mfaUsers, error: mfaError } = await supabase
       .from('user_tenant_memberships')
       .select('user_id')
       .eq('tenant_id', tenantId);
@@ -58,7 +56,7 @@ export const GET = apiHandler({
       const userIds = mfaUsers.map(u => u.user_id);
       
       // Get MFA enrollment status for these users
-      const { data: mfaSettings, error: settingsError } = await db
+      const { data: mfaSettings, error: settingsError } = await supabase
         .from('user_mfa')
         .select('user_id, enrolled_at, grace_period_end')
         .in('user_id', userIds);
@@ -79,7 +77,7 @@ export const GET = apiHandler({
     }
 
     // Get users who require MFA based on role
-    const { data: adminMembers, error: adminError } = await db
+    const { data: adminMembers, error: adminError } = await supabase
       .from('user_tenant_memberships')
       .select('user_id')
       .eq('tenant_id', tenantId)

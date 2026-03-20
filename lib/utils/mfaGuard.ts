@@ -1,5 +1,4 @@
 import { createServerRlsClient } from '@/lib/supabase/server'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import type { MFARequiredReason } from '@/types/mfa'
 
 export interface MFAGuardResult {
@@ -34,7 +33,6 @@ export async function requireMfaIfEnabled(): Promise<MFAGuardResult> {
   }
 
   const supabase = await createServerRlsClient()
-  const db = supabase as unknown as SupabaseClient
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -44,7 +42,7 @@ export async function requireMfaIfEnabled(): Promise<MFAGuardResult> {
   }
 
   // Use database function for consistent logic
-  const { data: requirementData, error: requirementError } = await db.rpc('user_requires_mfa', {
+  const { data: requirementData, error: requirementError } = await supabase.rpc('user_requires_mfa', {
     target_user_id: user.id,
   })
 
@@ -109,14 +107,13 @@ export async function requireMfaIfEnabled(): Promise<MFAGuardResult> {
  */
 export async function isPrivilegedAdmin(): Promise<boolean> {
   const supabase = await createServerRlsClient()
-  const db = supabase as unknown as SupabaseClient
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   if (!user) return false
 
-  const { data: roles } = await db.rpc('get_user_admin_roles', {
+  const { data: roles } = await supabase.rpc('get_user_admin_roles', {
     target_user_id: user.id,
   })
 
@@ -134,7 +131,6 @@ export async function getMFAEnrollmentStatus(): Promise<{
   enrolledAt: string | null
 }> {
   const supabase = await createServerRlsClient()
-  const db = supabase as unknown as SupabaseClient
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -144,14 +140,14 @@ export async function getMFAEnrollmentStatus(): Promise<{
   }
 
   // Check requirement
-  const { data: requirementData } = await db.rpc('user_requires_mfa', {
+  const { data: requirementData } = await supabase.rpc('user_requires_mfa', {
     target_user_id: user.id,
   })
 
   const requirement = requirementData?.[0]
 
   // Get enrollment status
-  const { data: mfaRow } = await db
+  const { data: mfaRow } = await supabase
     .from('user_mfa')
     .select('enrolled_at')
     .eq('user_id', user.id)

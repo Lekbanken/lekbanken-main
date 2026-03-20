@@ -648,8 +648,11 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         if (!countError && typeof countData === 'number') {
           dbUnreadCount = countData;
         }
-      } catch {
+      } catch (err) {
         // Non-critical — keep list-derived count
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[useAppNotifications] Unread count RPC failed, using list-derived count:', err);
+        }
       }
     }
 
@@ -709,7 +712,8 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
         setStore(getOrCreateStore(newUserId));
       }
       userIdRef.current = newUserId;
-    } catch {
+    } catch (err) {
+      console.warn('[useAppNotifications] Failed to read session:', err instanceof Error ? err.message : err);
       if (store && !store.getSnapshot().hasLoadedOnce) {
         store.setError('Kunde inte läsa session för notifikationer');
       }
@@ -739,10 +743,13 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
             currentStore.applyNotifications(result.notifications, result.dbUnreadCount);
           }
           return;
-        } catch {
-          // Existing fetch failed — fall through to start our own
+        } catch (err) {
+          // Existing fetch failed — fall through past this if-block to start our own fetch below
+          if (process.env.NODE_ENV === 'development') {
+            console.debug('[useAppNotifications] In-flight promise failed — starting own fetch:', err instanceof Error ? err.message : err);
+          }
         }
-        return;
+        // No return here — intentional fallthrough to "Start our own fetch" below
       } else if (!isStale && !isAborted && existing.limit < limit) {
         // Our limit is larger — let the existing fetch complete on its own
         // but start a new fetch with our larger limit.
@@ -800,10 +807,18 @@ export function useAppNotifications(limit = 20): UseAppNotificationsResult {
 
       consecutiveFailures.current = 0;
       currentStore.applyNotifications(result.notifications, result.dbUnreadCount);
-    } catch {
+    } catch (err) {
       if (ac.signal.aborted) return;
 
       consecutiveFailures.current += 1;
+      console.warn(
+        '[useAppNotifications] Fetch failed (attempt',
+        consecutiveFailures.current,
+        'of',
+        MAX_CONSECUTIVE_FAILURES,
+        '):',
+        err instanceof Error ? err.message : err
+      );
       if (!currentStore.getSnapshot().hasLoadedOnce) {
         currentStore.setError('Kunde inte hämta notifikationer');
       }

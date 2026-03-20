@@ -33,9 +33,7 @@ export const GET = apiHandler({
     return NextResponse.json({ error: 'Run not found' }, { status: 404 });
   }
 
-  // Fetch run_session for this step — TEMP: cast to bypass missing generated types
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TEMP: remove after supabase gen
-  const { data: runSession, error: rsError } = await (supabase as any)
+  const { data: runSession, error: rsError } = await supabase
     .from('run_sessions')
     .select('*')
     .eq('run_id', runId)
@@ -106,7 +104,7 @@ export const POST = apiHandler({
   // Verify run ownership via RLS
   const { data: run, error: runError } = await supabase
     .from('runs')
-    .select('id, plan_version_id, plan_versions!inner(plan_id)')
+    .select('id, plan_id, plan_version_id')
     .eq('id', runId)
     .single();
 
@@ -114,12 +112,10 @@ export const POST = apiHandler({
     return NextResponse.json({ error: 'Run not found' }, { status: 404 });
   }
 
-  // Extract plan_id from the joined plan_versions
-  const planId = (run.plan_versions as unknown as { plan_id: string })?.plan_id ?? null;
+  const planId = run.plan_id ?? null;
 
   // Check if there's already a run_session with an active participant_session
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TEMP: remove after supabase gen
-  const { data: existing } = await (supabase as any)
+  const { data: existing } = await supabase
     .from('run_sessions')
     .select('*')
     .eq('run_id', runId)
@@ -201,9 +197,7 @@ export const POST = apiHandler({
     );
   }
 
-  // Upsert run_session linking to the new participant_session — TEMP: cast
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TEMP: remove after supabase gen
-  const { data: runSession, error: upsertError } = await (supabase as any)
+  const { data: runSession, error: upsertError } = await supabase
     .from('run_sessions')
     .upsert(
       {

@@ -14,6 +14,9 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { apiHandler } from '@/lib/api/route-handler'
 import type { DashboardRunRow, DashboardSessionInfo, RunStatus, RunSessionStatus } from '@/features/play/types'
+import type { Tables } from '@/types/supabase'
+
+type RunSessionRow = Pick<Tables<'run_sessions'>, 'id' | 'run_id' | 'step_index' | 'session_id' | 'status'>
 
 /** Runs without a heartbeat in this many hours are considered stale. */
 const STALE_THRESHOLD_HOURS = 24
@@ -67,15 +70,14 @@ export const GET = apiHandler({
   // ── 2) Fetch run_sessions for these runs ───────────────────────────────────
   const runIds = runs.map((r) => r.id)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TEMP: remove after supabase gen
-  const { data: runSessions } = await (supabase as any)
+  const { data: runSessions } = await supabase
     .from('run_sessions')
     .select('id, run_id, step_index, session_id, status')
     .in('run_id', runIds)
 
   // ── 3) Fetch participant_sessions for linked sessions ──────────────────────
   const sessionIds = (runSessions ?? [])
-    .map((rs: { session_id: string | null }) => rs.session_id)
+    .map((rs) => rs.session_id)
     .filter((id: string | null): id is string => id != null)
 
   let participantSessions: Record<
@@ -129,34 +131,26 @@ export const GET = apiHandler({
 
       // Attach run_sessions
       const sessions: DashboardSessionInfo[] = (runSessions ?? [])
-        .filter((rs: { run_id: string }) => rs.run_id === r.id)
-        .map(
-          (rs: {
-            id: string
-            run_id: string
-            step_index: number
-            session_id: string | null
-            status: string
-          }) => {
-            const ps = rs.session_id
-              ? participantSessions[rs.session_id]
-              : null
-            return {
-              runSessionId: rs.id,
-              stepIndex: rs.step_index,
-              runSessionStatus: rs.status as RunSessionStatus,
-              participantSession: ps
-                ? {
-                    id: ps.id,
-                    sessionCode: ps.session_code,
-                    displayName: ps.display_name,
-                    status: ps.status,
-                    participantCount: ps.participant_count,
-                  }
-                : null,
-            }
+        .filter((rs): rs is RunSessionRow => rs.run_id === r.id)
+        .map((rs) => {
+          const ps = rs.session_id
+            ? participantSessions[rs.session_id]
+            : null
+          return {
+            runSessionId: rs.id,
+            stepIndex: rs.step_index,
+            runSessionStatus: rs.status as RunSessionStatus,
+            participantSession: ps
+              ? {
+                  id: ps.id,
+                  sessionCode: ps.session_code,
+                  displayName: ps.display_name,
+                  status: ps.status,
+                  participantCount: ps.participant_count,
+                }
+              : null,
           }
-        )
+        })
 
       return {
         id: r.id,

@@ -4,20 +4,22 @@ import { getPlanSnapshot } from '@/lib/planner/server/snapshot'
 import { apiHandler } from '@/lib/api/route-handler'
 import { requirePlanStartAccess } from '@/lib/planner/require-plan-access'
 import type { Run, RunStep, RunStatus } from '@/features/play/types'
-import type { Json } from '@/types/supabase'
+import type { Json, Tables } from '@/types/supabase'
+
+type ServerRlsClient = Awaited<ReturnType<typeof createServerRlsClient>>
+type RunSessionRow = Tables<'run_sessions'>
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
   return id?.trim() || null
 }
 
-/**
- * Upsert a run_session row for the given run + step index.
- * Uses type assertion because run_sessions isn't in generated Supabase types yet
- * (migration 20260305200000 needs to be applied first).
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function upsertRunSession(supabase: any, runId: string, stepIndex: number) {
+/** Upsert the run_session row for the given run + step index. */
+async function upsertRunSession(
+  supabase: ServerRlsClient,
+  runId: string,
+  stepIndex: number
+): Promise<RunSessionRow | null> {
   const { data, error } = await supabase
     .from('run_sessions')
     .upsert(

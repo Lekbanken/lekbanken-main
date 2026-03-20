@@ -57,8 +57,7 @@ export const POST = apiHandler({
   }
 
   // ── 2) Fetch run_session for this step ─────────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TEMP: remove after supabase gen
-  const { data: runSession, error: rsError } = await (supabase as any)
+  const { data: runSession, error: rsError } = await supabase
     .from('run_sessions')
     .select('id, session_id, status')
     .eq('run_id', runId)
@@ -136,8 +135,7 @@ export const POST = apiHandler({
   }
 
   // ── 4) Mark run_session as ended ───────────────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TEMP: remove after supabase gen
-  const { error: rsUpdateError } = await (supabase as any)
+  const { error: rsUpdateError } = await supabase
     .from('run_sessions')
     .update({ status: 'ended', updated_at: new Date().toISOString() })
     .eq('id', runSession.id)

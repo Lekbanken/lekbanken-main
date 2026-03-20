@@ -28,17 +28,6 @@ export default async function SecuritySettingsPage() {
     redirect('/');
   }
   
-  // Get MFA factors
-  const { data: factors } = await supabase.auth.mfa.listFactors();
-  
-  // Get MFA status from our API - variable is unused, remove to fix ESLint
-  // const mfaStatus = null; - removed
-  
-  const hasTOTP = factors?.totp?.some(f => f.status === 'verified') ?? false;
-  const hasPhone = factors?.phone?.some(f => f.status === 'verified') ?? false;
-  const totpFactor = factors?.totp?.find(f => f.status === 'verified');
-  const phoneFactor = factors?.phone?.find(f => f.status === 'verified');
-  
   return (
     <div className="space-y-6 sm:space-y-8">
         {/* Header */}
@@ -53,8 +42,6 @@ export default async function SecuritySettingsPage() {
         
         {/* Client component for interactive MFA management */}
         <SecuritySettingsClient 
-          hasMFA={hasTOTP || hasPhone}
-          factorId={totpFactor?.id ?? phoneFactor?.id}
           userId={user.id}
           userEmail={user.email}
         />

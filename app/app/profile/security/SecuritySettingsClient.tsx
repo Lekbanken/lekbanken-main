@@ -30,15 +30,11 @@ type MfaStatusApiResponse = MFAStatus & {
 }
 
 interface SecuritySettingsClientProps {
-  hasMFA: boolean;
-  factorId?: string;
   userId?: string;
   userEmail?: string;
 }
 
 export function SecuritySettingsClient({ 
-  hasMFA: initialHasMFA, 
-  factorId: initialFactorId,
   userId,
   userEmail,
 }: SecuritySettingsClientProps) {
@@ -54,7 +50,7 @@ export function SecuritySettingsClient({
   const {
     data: mfaData,
     error: mfaFetchError,
-    isLoading: _isLoadingMfa,
+    isLoading: isLoadingMfa,
     retry: retryMfa,
   } = useProfileQuery<{ status: MFAStatus; factorId?: string }>(
     statusFetchKey,
@@ -125,10 +121,11 @@ export function SecuritySettingsClient({
   )
 
   const mfaStatus = mfaData?.status ?? null
-  const hasMFA = mfaData ? Boolean(mfaData.status.is_enabled) : initialHasMFA
-  const factorId = mfaData?.factorId ?? initialFactorId
+  const hasMFA = Boolean(mfaData?.status.is_enabled)
+  const factorId = mfaData?.factorId
   const trustedDevices = devicesData?.devices ?? []
   const effectiveError = error ?? mfaFetchError ?? null
+  const isLoadingStatus = isLoadingMfa && !mfaData && !mfaFetchError
 
   // Disable MFA
   const handleDisableMFA = useCallback(async () => {
@@ -281,7 +278,9 @@ export function SecuritySettingsClient({
               {t('title')}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {hasMFA 
+              {isLoadingStatus
+                ? t('loading')
+                : hasMFA 
                 ? t('enabledDescription')
                 : t('disabledDescription')
               }
@@ -308,8 +307,9 @@ export function SecuritySettingsClient({
               <Button
                 variant="destructive"
                 onClick={handleDisableMFA}
-                loading={isDisabling}
+                loading={isDisabling || isLoadingStatus}
                 loadingText="Inaktiverar..."
+                disabled={isLoadingStatus}
               >
                 Inaktivera
               </Button>
@@ -317,6 +317,7 @@ export function SecuritySettingsClient({
               <Button
                 variant="primary"
                 onClick={() => setShowEnrollment(true)}
+                disabled={isLoadingStatus}
               >
                 Aktivera
               </Button>

@@ -28,83 +28,38 @@ export const POST = apiHandler({
       // Allow empty body for aggregate all
     }
 
-  const { tenantId, periodStart, periodEnd } = body
-
-  // Default to previous month if not specified
-  const now = new Date()
-  const defaultEnd = new Date(now.getFullYear(), now.getMonth(), 0) // Last day of previous month
-  const defaultStart = new Date(defaultEnd.getFullYear(), defaultEnd.getMonth(), 1) // First day of previous month
-
-  const start = periodStart || defaultStart.toISOString().split('T')[0]
-  const end = periodEnd || defaultEnd.toISOString().split('T')[0]
-
-    // Get active meters
-    const { data: meters } = await supabaseAdmin
-      .from('usage_meters')
-      .select('id, slug')
-      .eq('status', 'active')
-
-    if (!meters || meters.length === 0) {
-      return NextResponse.json({ message: 'No active meters' })
-    }
-
-    // Get tenants to aggregate
-    let tenantsQuery = supabaseAdmin
-      .from('tenants')
-      .select('id')
-      .eq('status', 'active')
+    const { tenantId, periodStart, periodEnd } = body
 
     if (tenantId) {
-      tenantsQuery = tenantsQuery.eq('id', tenantId)
+      return NextResponse.json(
+        { error: 'Tenant-scoped aggregation is not supported by the canonical billing aggregator' },
+        { status: 400 },
+      )
     }
 
-    const { data: tenants } = await tenantsQuery
+    const now = new Date()
+    const defaultEnd = new Date(now.getFullYear(), now.getMonth(), 0)
+    const defaultStart = new Date(defaultEnd.getFullYear(), defaultEnd.getMonth(), 1)
 
-    if (!tenants || tenants.length === 0) {
-      return NextResponse.json({ message: 'No tenants to aggregate' })
+    const start = periodStart || defaultStart.toISOString().split('T')[0]
+    const end = periodEnd || defaultEnd.toISOString().split('T')[0]
+
+    const { data: processedCount, error } = await supabaseAdmin.rpc('aggregate_usage_for_period', {
+      p_period_start: start,
+      p_period_end: end,
+    })
+
+    if (error) {
+      console.error('[usage aggregate API] Aggregate error:', error)
+      return NextResponse.json({ error: 'Failed to aggregate usage' }, { status: 500 })
     }
-
-    const results: { tenantId: string; meterId: string; success: boolean; error?: string }[] = []
-
-    // Aggregate for each tenant and meter
-    for (const tenant of tenants) {
-      for (const meter of meters) {
-        const { error } = await supabaseAdmin.rpc('aggregate_usage_for_period' as never, {
-          p_tenant_id: tenant.id,
-          p_meter_id: meter.id,
-          p_period_start: start,
-          p_period_end: end,
-        } as never)
-
-        if (error) {
-          results.push({
-            tenantId: tenant.id,
-            meterId: meter.id,
-            success: false,
-            error: 'Processing error',
-          })
-        } else {
-          results.push({
-            tenantId: tenant.id,
-            meterId: meter.id,
-            success: true,
-          })
-        }
-      }
-    }
-
-    const successCount = results.filter(r => r.success).length
-    const failCount = results.filter(r => !r.success).length
 
     return NextResponse.json({
-      message: `Aggregation complete`,
+      message: 'Aggregation complete',
       period: { start, end },
       summary: {
-        total: results.length,
-        success: successCount,
-        failed: failCount,
+        processed: processedCount ?? 0,
       },
-      errors: results.filter(r => !r.success),
     })
   },
 })
@@ -114,8 +69,8 @@ export const GET = apiHandler({
   auth: 'system_admin',
   handler: async ({ req }) => {
     const url = new URL(req.url)
-  const meterSlug = url.searchParams.get('meter')
-  const period = url.searchParams.get('period') || 'current'
+    const meterSlug = url.searchParams.get('meter')
+    const period = url.searchParams.get('period') || 'current'
 
     // Calculate period dates
     const now = new Date()

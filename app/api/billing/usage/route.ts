@@ -4,6 +4,7 @@ import { timingSafeEqual } from 'crypto'
 import { supabaseAdmin, createServerRlsClient } from '@/lib/supabase/server'
 import { apiHandler } from '@/lib/api/route-handler'
 import { requireAuth } from '@/lib/api/auth-guard'
+import type { Json } from '@/types/supabase'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -37,14 +38,13 @@ export const POST = apiHandler({
 
     const { tenantId, meterSlug, quantity, idempotencyKey, metadata } = body
 
-    // Call record_usage RPC (using type assertion since function may not be in generated types yet)
-    const { data, error } = await supabaseAdmin.rpc('record_usage' as never, {
+    const { data, error } = await supabaseAdmin.rpc('record_usage', {
       p_tenant_id: tenantId,
       p_meter_slug: meterSlug,
       p_quantity: quantity,
       p_idempotency_key: idempotencyKey ?? undefined,
-      p_metadata: metadata ?? undefined,
-    } as never)
+      p_metadata: (metadata as Json | undefined) ?? undefined,
+    })
 
     if (error) {
       console.error('[usage API] Record error:', error)

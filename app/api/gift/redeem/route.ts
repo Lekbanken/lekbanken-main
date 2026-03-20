@@ -33,20 +33,18 @@ export const POST = apiHandler({
   handler: async ({ auth, body }) => {
     const { code, tenantId } = body
 
-    // Call the redeem function (using 'as never' since types not yet generated)
-    const { data, error } = await supabaseAdmin.rpc('redeem_gift_code' as never, {
+    const { data, error } = await supabaseAdmin.rpc('redeem_gift_code', {
       p_code: code.toUpperCase(),
       p_user_id: auth!.user!.id,
-      p_tenant_id: tenantId || null,
-    } as never)
+      p_tenant_id: tenantId ?? undefined,
+    })
 
     if (error) {
       console.error('[gift/redeem] RPC error', error)
       return NextResponse.json({ error: 'Failed to redeem gift' }, { status: 500 })
     }
 
-    const resultArray = data as RedeemResult[] | null
-    const result = resultArray?.[0]
+    const result = data?.[0] as RedeemResult | undefined
     if (!result) {
       return NextResponse.json({ error: 'No result from redemption' }, { status: 500 })
     }

@@ -14894,60 +14894,6 @@ export type Database = {
           window_days: number
         }[]
       }
-      admin_get_gamification_analytics_v1: {
-        Args: { p_tenant_id: string; p_window_days?: number }
-        Returns: {
-          awards: Json
-          economy: Json
-          events: Json
-          shop: Json
-          since: string
-          tenant_id: string
-          window_days: number
-        }[]
-      }
-      admin_get_gamification_analytics_v2: {
-        Args: { p_tenant_id: string; p_window_days?: number }
-        Returns: {
-          awards: Json
-          campaigns: Json
-          economy: Json
-          events: Json
-          shop: Json
-          since: string
-          tenant_id: string
-          window_days: number
-        }[]
-      }
-      admin_get_gamification_analytics_v3: {
-        Args: { p_tenant_id: string; p_window_days?: number }
-        Returns: {
-          automations: Json
-          awards: Json
-          campaigns: Json
-          economy: Json
-          events: Json
-          shop: Json
-          since: string
-          tenant_id: string
-          window_days: number
-        }[]
-      }
-      admin_get_gamification_analytics_v4: {
-        Args: { p_tenant_id: string; p_window_days?: number }
-        Returns: {
-          anomalies: Json
-          automations: Json
-          awards: Json
-          campaigns: Json
-          economy: Json
-          events: Json
-          shop: Json
-          since: string
-          tenant_id: string
-          window_days: number
-        }[]
-      }
       admin_get_gamification_analytics_v5: {
         Args: { p_tenant_id: string; p_window_days?: number }
         Returns: {
@@ -15740,38 +15686,26 @@ export type Database = {
         }
         Returns: undefined
       }
-      record_usage:
-        | {
-            Args: {
-              p_idempotency_key?: string
-              p_metadata?: Json
-              p_meter_slug: string
-              p_quantity: number
-              p_tenant_id: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_metadata?: Json
-              p_metric_name: string
-              p_quantity?: number
-              p_tenant_id: string
-            }
-            Returns: string
-          }
-      redeem_gift_code:
-        | { Args: { p_code: string; p_user_id: string }; Returns: Json }
-        | {
-            Args: { p_code: string; p_tenant_id?: string; p_user_id: string }
-            Returns: {
-              entitlement_id: string
-              gift_id: string
-              message: string
-              product_id: string
-              success: boolean
-            }[]
-          }
+      record_usage: {
+        Args: {
+          p_idempotency_key?: string
+          p_metadata?: Json
+          p_meter_slug: string
+          p_quantity: number
+          p_tenant_id: string
+        }
+        Returns: string
+      }
+      redeem_gift_code: {
+        Args: { p_code: string; p_tenant_id?: string; p_user_id: string }
+        Returns: {
+          entitlement_id: string
+          gift_id: string
+          message: string
+          product_id: string
+          success: boolean
+        }[]
+      }
       refresh_gamification_daily_summaries_v1: {
         Args: { p_days?: number; p_tenant_id: string }
         Returns: number

@@ -83,7 +83,7 @@ export default function PlanLibraryPage() {
     }
   };
 
-  const plannerIcon = appNavItems.find((item) => item.href === '/app/planner')?.icon;
+  const plannerIcon = appNavItems.find((item) => item.href === '/app/planner/plans')?.icon;
 
   return (
     <PlannerPageLayout>

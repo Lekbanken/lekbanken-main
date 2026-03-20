@@ -18,7 +18,7 @@ export function CallToActionSection() {
       {/* CTA Cards */}
       <div className="space-y-3">
         <Link
-          href="/app/play"
+          href="/app/play/sessions"
           className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition-all hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--journey-accent,#8661ff)]/60"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--journey-accent)]/20">
@@ -31,7 +31,7 @@ export function CallToActionSection() {
         </Link>
 
         <Link
-          href="/app/planner"
+          href="/app/planner/plans"
           className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition-all hover:bg-white/10 hover:-translate-y-0.5 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--journey-accent,#8661ff)]/60"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10">

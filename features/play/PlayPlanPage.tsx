@@ -375,7 +375,7 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
     setCurrentStep(Math.max(totalSteps - 1, 0));
   };
 
-  const handleBack = () => router.push("/app/planner");
+  const handleBack = () => router.push("/app/planner/plans");
 
   const handleAbandon = useCallback(async () => {
     if (!run) return;
@@ -385,7 +385,7 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
       if (storageKey) {
         try { window.localStorage.removeItem(storageKey); } catch { /* noop */ }
       }
-      router.push("/app/planner");
+      router.push("/app/planner/plans");
     }
   }, [run, storageKey, router]);
 

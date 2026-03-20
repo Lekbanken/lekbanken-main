@@ -1866,7 +1866,7 @@ export function SessionCockpit({
                 onOpenDirectorMode={() => setDirectorModeOpen(true)}
                 onBack={() => {
                   // Navigate back to sessions list
-                  window.location.href = '/app/play';
+                  window.location.href = '/app/play/sessions';
                 }}
                 onEndSession={endSession}
                 onTakeOffline={unpublishSession}

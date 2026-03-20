@@ -140,7 +140,7 @@ export default function PlanWizardPage({ params }: PageProps) {
     );
   }
 
-  const plannerIcon = appNavItems.find((item) => item.href === '/app/planner')?.icon;
+  const plannerIcon = appNavItems.find((item) => item.href === '/app/planner/plans')?.icon;
 
   return (
     <PlannerPageLayout maxWidth="4xl">

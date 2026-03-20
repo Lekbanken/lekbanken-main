@@ -18,7 +18,7 @@ export default function PlanCalendarPage() {
   const t = useTranslations('planner.wizard.calendar');
   const tp = useTranslations('planner');
   const calendarEnabled = usePlannerFeature('planner_calendar');
-  const plannerIcon = appNavItems.find((item) => item.href === '/app/planner')?.icon;
+  const plannerIcon = appNavItems.find((item) => item.href === '/app/planner/plans')?.icon;
 
   return (
     <PlannerPageLayout>

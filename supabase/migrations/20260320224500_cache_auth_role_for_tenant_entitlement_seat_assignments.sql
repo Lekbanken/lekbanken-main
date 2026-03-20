@@ -1,0 +1,3 @@
+alter policy tenant_entitlement_seat_assignments_manage on public.tenant_entitlement_seat_assignments
+  using (((select auth.role()) = 'service_role') or is_system_admin() or has_tenant_role(tenant_id, array['owner'::tenant_role_enum, 'admin'::tenant_role_enum]))
+  with check (((select auth.role()) = 'service_role') or is_system_admin() or has_tenant_role(tenant_id, array['owner'::tenant_role_enum, 'admin'::tenant_role_enum]));

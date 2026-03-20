@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { useTransientValue } from '@/hooks/useTransientValue';
 import {
   AtSymbolIcon,
   KeyIcon,
@@ -29,7 +30,11 @@ export default function AccountSettingsPage() {
   const [emailPassword, setEmailPassword] = useState('');
   const [isChangingEmail, setIsChangingEmail] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
-  const [emailSuccessEmail, setEmailSuccessEmail] = useState<string | null>(null);
+  const {
+    value: emailSuccessEmail,
+    show: showEmailSuccess,
+    clear: clearEmailSuccess,
+  } = useTransientValue<string | null>(null);
 
   // Password change state
   const [showPasswordChange, setShowPasswordChange] = useState(false);
@@ -40,7 +45,11 @@ export default function AccountSettingsPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const {
+    value: passwordSuccess,
+    show: showPasswordSuccess,
+    clear: clearPasswordSuccess,
+  } = useTransientValue(false);
 
   const email = user?.email || '';
   const emailVerified = !!user?.email_confirmed_at;
@@ -70,7 +79,7 @@ export default function AccountSettingsPage() {
 
     setIsChangingEmail(true);
     setEmailError(null);
-    setEmailSuccessEmail(null);
+    clearEmailSuccess();
 
     try {
       const submittedEmail = newEmail;
@@ -89,17 +98,16 @@ export default function AccountSettingsPage() {
         throw new Error(data.error || t('common.errorGeneric'));
       }
 
-      setEmailSuccessEmail(submittedEmail);
+      showEmailSuccess(submittedEmail, 5000);
       setShowEmailChange(false);
       setNewEmail('');
       setEmailPassword('');
-      setTimeout(() => setEmailSuccessEmail(null), 5000);
     } catch (err) {
       setEmailError(err instanceof Error ? err.message : t('common.errorGeneric'));
     } finally {
       setIsChangingEmail(false);
     }
-  }, [newEmail, emailPassword, t]);
+  }, [newEmail, emailPassword, t, clearEmailSuccess, showEmailSuccess]);
 
   const handlePasswordChange = useCallback(async () => {
     if (!currentPassword || !newPassword || !confirmPassword) return;
@@ -116,7 +124,7 @@ export default function AccountSettingsPage() {
 
     setIsChangingPassword(true);
     setPasswordError(null);
-    setPasswordSuccess(false);
+  clearPasswordSuccess();
 
     try {
       // Verify current password + update in a single server call
@@ -134,17 +142,15 @@ export default function AccountSettingsPage() {
         throw new Error(data.error || t('common.errorGeneric'));
       }
 
-      setPasswordSuccess(true);
+      showPasswordSuccess(true, 5000);
       setShowPasswordChange(false);
       resetPasswordForm();
-
-      setTimeout(() => setPasswordSuccess(false), 5000);
     } catch (err) {
       setPasswordError(err instanceof Error ? err.message : t('common.errorGeneric'));
     } finally {
       setIsChangingPassword(false);
     }
-  }, [currentPassword, newPassword, confirmPassword, allPasswordChecksPass, resetPasswordForm, t]);
+  }, [currentPassword, newPassword, confirmPassword, allPasswordChecksPass, resetPasswordForm, t, clearPasswordSuccess, showPasswordSuccess]);
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -195,7 +201,7 @@ export default function AccountSettingsPage() {
               onClick={() => {
                 setShowEmailChange(!showEmailChange);
                 setEmailError(null);
-                setEmailSuccessEmail(null);
+                clearEmailSuccess();
               }}
             >
               {t('sections.account.changeEmail')}
@@ -258,7 +264,7 @@ export default function AccountSettingsPage() {
                     setNewEmail('');
                     setEmailPassword('');
                     setEmailError(null);
-                    setEmailSuccessEmail(null);
+                    clearEmailSuccess();
                   }}
                 >
                   {t('sections.account.cancel')}
@@ -299,7 +305,7 @@ export default function AccountSettingsPage() {
                 setShowPasswordChange(nextOpen);
                 resetPasswordForm();
                 if (nextOpen) {
-                  setPasswordSuccess(false);
+                  clearPasswordSuccess();
                 }
               }}
             >
@@ -434,7 +440,7 @@ export default function AccountSettingsPage() {
                   onClick={() => {
                     setShowPasswordChange(false);
                     resetPasswordForm();
-                    setPasswordSuccess(false);
+                    clearPasswordSuccess();
                   }}
                 >
                   {t('sections.account.cancel')}

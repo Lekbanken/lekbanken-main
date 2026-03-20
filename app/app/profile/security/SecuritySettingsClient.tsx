@@ -21,6 +21,7 @@ import {
 import type { MFAStatus, MFATrustedDevice } from '@/types/mfa';
 import { MFAEnrollmentModal } from './MFAEnrollmentModal';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
+import { useTransientValue } from '@/hooks/useTransientValue';
 import { profileCacheKeys } from '@/lib/profile/cacheKeys';
 
 type MfaStatusApiResponse = MFAStatus & {
@@ -42,7 +43,10 @@ export function SecuritySettingsClient({
   const [isDisabling, setIsDisabling] = useState(false);
   const [showEnrollment, setShowEnrollment] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const {
+    value: success,
+    show: showSuccess,
+  } = useTransientValue<string | null>(null);
 
   const statusFetchKey = useMemo(() => userId ? profileCacheKeys.mfaStatus(userId) : 'mfa-status-anon', [userId])
   const devicesFetchKey = useMemo(() => userId ? profileCacheKeys.mfaTrustedDevices(userId) : 'mfa-devices-anon', [userId])
@@ -156,15 +160,13 @@ export function SecuritySettingsClient({
 
       retryMfa();
       retryDevices();
-      setSuccess('Tvåfaktorsautentisering har inaktiverats');
-      
-      setTimeout(() => setSuccess(null), 5000);
+      showSuccess('Tvåfaktorsautentisering har inaktiverats', 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');
     } finally {
       setIsDisabling(false);
     }
-  }, [factorId, retryDevices, retryMfa]);
+  }, [factorId, retryDevices, retryMfa, showSuccess]);
 
   // Revoke trusted device
   const handleRevokeDevice = useCallback(async (deviceId: string) => {
@@ -187,22 +189,19 @@ export function SecuritySettingsClient({
 
       retryDevices();
       retryMfa();
-      setSuccess('Enheten har tagits bort');
-      
-      setTimeout(() => setSuccess(null), 5000);
+      showSuccess('Enheten har tagits bort', 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');
     }
-  }, [retryDevices, retryMfa]);
+  }, [retryDevices, retryMfa, showSuccess]);
 
   // Handle enrollment success
   const handleEnrollmentSuccess = useCallback(() => {
     setShowEnrollment(false);
     retryMfa();
     retryDevices();
-    setSuccess('Tvåfaktorsautentisering har aktiverats!');
-    setTimeout(() => setSuccess(null), 5000);
-  }, [retryMfa, retryDevices]);
+    showSuccess('Tvåfaktorsautentisering har aktiverats!', 5000);
+  }, [retryMfa, retryDevices, showSuccess]);
 
   // Generate new recovery codes
   const handleGenerateRecoveryCodes = useCallback(async () => {
@@ -235,15 +234,13 @@ export function SecuritySettingsClient({
       a.click();
       URL.revokeObjectURL(url);
       
-      setSuccess('Nya återställningskoder har genererats och laddats ner');
+      showSuccess('Nya återställningskoder har genererats och laddats ner', 5000);
       retryMfa();
       retryDevices();
-      
-      setTimeout(() => setSuccess(null), 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');
     }
-  }, [retryMfa, retryDevices]);
+  }, [retryMfa, retryDevices, showSuccess]);
 
   return (
     <div className="space-y-8">

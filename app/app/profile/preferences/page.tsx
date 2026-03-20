@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert } from '@/components/ui/alert';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
+import { useTransientValue } from '@/hooks/useTransientValue';
 import { getLanguageCodeFromLocale, type Locale } from '@/lib/i18n/config';
 import { useLocaleSwitcher } from '@/lib/i18n/useLocaleSwitcher';
 import {
@@ -53,9 +54,13 @@ export default function PreferencesPage() {
     theme,
   });
   const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const {
+    value: saveSuccess,
+    show: showSaveSuccess,
+    clear: clearSaveSuccess,
+  } = useTransientValue(false);
 
   const profileService = useMemo(() => new ProfileService(), []);
 
@@ -99,9 +104,9 @@ export default function PreferencesPage() {
   const handlePreferenceChange = useCallback((key: keyof UserPreferences, value: unknown) => {
     setPreferences((prev) => ({ ...prev, [key]: value }));
     setHasChanges(true);
-    setSaveSuccess(false);
+    clearSaveSuccess();
     setSaveError(null);
-  }, []);
+  }, [clearSaveSuccess]);
 
   const handleSave = useCallback(async () => {
     if (!user?.id || !currentTenant?.id) return;
@@ -119,17 +124,16 @@ export default function PreferencesPage() {
         await switchLocale(nextLocale);
       }
 
-      setSaveSuccess(true);
+      showSaveSuccess(true, 3000);
       setHasChanges(false);
       setSaveError(null);
-      setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('Failed to save preferences:', error);
       setSaveError(error instanceof Error ? error.message : t('sections.preferences.unexpectedError'));
     } finally {
       setIsSaving(false);
     }
-  }, [currentTenant?.id, locale, preferences.language, preferences.theme, setLanguage, setTheme, switchLocale, t, theme, user?.id]);
+  }, [currentTenant?.id, locale, preferences.language, preferences.theme, setLanguage, setTheme, switchLocale, t, theme, user?.id, showSaveSuccess]);
 
   if (stillLoading) {
     return (

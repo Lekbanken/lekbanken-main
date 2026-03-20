@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useProfileQuery } from '@/hooks/useProfileQuery';
+import { useTransientValue } from '@/hooks/useTransientValue';
 import {
   UserIcon,
   TrashIcon,
@@ -51,8 +52,12 @@ export default function GeneralSettingsPage() {
 
   const [showBuilder, setShowBuilder] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const {
+    value: saveSuccess,
+    show: showSaveSuccess,
+    clear: clearSaveSuccess,
+  } = useTransientValue(false);
   const lastSyncedProfileRef = useRef<{
     fullName: string;
     avatarUrl: string | null;
@@ -106,7 +111,7 @@ export default function GeneralSettingsPage() {
 
     setIsSaving(true);
     setError(null);
-    setSaveSuccess(false);
+    clearSaveSuccess();
 
     try {
       await updateProfile({
@@ -116,14 +121,13 @@ export default function GeneralSettingsPage() {
         phone: phone || undefined,
       });
 
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
+      showSaveSuccess(true, 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('common.errorGeneric'));
     } finally {
       setIsSaving(false);
     }
-  }, [user, fullName, avatarUrl, displayName, phone, updateProfile, t]);
+  }, [user, fullName, avatarUrl, displayName, phone, updateProfile, t, clearSaveSuccess, showSaveSuccess]);
 
   const handleAvatarSelect = (src: string | null) => {
     setAvatarUrl(src);

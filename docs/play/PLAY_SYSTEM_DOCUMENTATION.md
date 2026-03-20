@@ -1662,11 +1662,9 @@ app/app/play/
 │       ├── page.tsx           # Sessionsdetalj
 │       └── client.tsx         # Host-kontroller
 ├── plan/                      # Lektionsplaner
-└── [gameId]/                  # Legacy start route (redirect → /app/games/[gameId])
 
 **Obs:** Session startas numera från spelsidan:
 - `/app/games/[gameId]` (Starta session-CTA skapar session + går till cockpit Lobby)
-- `/app/play/[gameId]` finns kvar som legacy och redirectar.
 ```
 
 ### 9.2 Participant-vyer (`app/participants/`)

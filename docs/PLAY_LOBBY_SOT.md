@@ -31,7 +31,6 @@ This document covers the **host lobby experience** on `/app/play/sessions/[id]`:
 ### Host session lobby/cockpit (canonical)
 
  Host start: `/app/games/[gameId]` (creates session + routes to cockpit Lobby)
- Host start (legacy): `/app/play/[gameId]` (redirects to `/app/games/[gameId]`)
 - Drawer overlay → [features/play/components/DirectorModeDrawer.tsx](../features/play/components/DirectorModeDrawer.tsx)
 
 ## Current Behavior Summary

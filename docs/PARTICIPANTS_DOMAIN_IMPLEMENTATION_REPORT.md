@@ -172,7 +172,7 @@ app/app/play/
 └──────────────────────┘
 ```
 
-Note: `/app/play/[gameId]` is a legacy route and now redirects to `/app/games/[gameId]`.
+Note: Host start now goes via `/app/games/[gameId]`; the old `/app/play/[gameId]` compatibility route has been removed.
 
 **Critical Gap:** The current "Play" flow is a **single-user instruction viewer**, not a multi-participant session system.
 

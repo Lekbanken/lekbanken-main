@@ -32,7 +32,6 @@ All endpoints reuse the existing Supabase tables (`participant_sessions`, `parti
 - `/play/join/[code]` – redirects to `/play/session/[code]`.
 - `/play/session/[code]` – join/rejoin lobby using per-code localStorage token `lekbanken.participant.{code}`; shows session status and basic lobby info.
 - `/app/games/[gameId]` – canonical host start entrypoint (CTA on game detail) creates a session and routes to host cockpit.
-- `/app/play/[gameId]` – legacy route; redirects to `/app/games/[gameId]`.
 - `/app/play/sessions/[id]` – host control (polling every 3s) shows status, participants list, and Start/Pause/Resume/End actions.
 - `/admin/play/sessions` – simple host-owned session list (system-admin expansion can be added later).
 

@@ -40,7 +40,6 @@ Non-goals (owned by other domains):
 - UI:
   - `app/app/play/page.tsx` → redirects to `/app/play/sessions`
   - `app/app/games/[gameId]/page.tsx` + `app/app/games/[gameId]/start-session-cta.tsx` (create session then route to host cockpit)
-  - `app/app/play/[gameId]/page.tsx` (legacy route → redirects to `/app/games/[gameId]`)
 - API:
   - `POST /api/play/sessions` (creates `participant_sessions` for authenticated host)
 

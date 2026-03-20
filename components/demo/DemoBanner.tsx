@@ -29,15 +29,11 @@ export function DemoBanner({ initialStatus }: { initialStatus?: DemoBannerInitia
   const convertDemo = useConvertDemo();
   const [dismissed, setDismissed] = useState(false);
   const bannerRef = useRef<HTMLDivElement>(null);
-  const effectiveIsDemoMode = isLoading && initialStatus?.isDemoMode ? true : isDemoMode;
-  const effectiveTier = effectiveIsDemoMode && isLoading && initialStatus?.isDemoMode
-    ? initialStatus.tier
-    : tier;
-  const effectiveTimeRemaining = effectiveIsDemoMode && isLoading && initialStatus?.isDemoMode
-    ? initialStatus.timeRemaining
-    : timeRemaining;
-  const effectiveShowTimeoutWarning = effectiveIsDemoMode && isLoading && initialStatus?.isDemoMode
-    ? Boolean(initialStatus.showTimeoutWarning)
+  const effectiveIsDemoMode = isLoading ? (initialStatus?.isDemoMode ?? false) : isDemoMode;
+  const effectiveTier = isLoading ? initialStatus?.tier : tier;
+  const effectiveTimeRemaining = isLoading ? initialStatus?.timeRemaining : timeRemaining;
+  const effectiveShowTimeoutWarning = isLoading
+    ? Boolean(initialStatus?.showTimeoutWarning)
     : showTimeoutWarning;
 
   // Set CSS variable for SideNav offset

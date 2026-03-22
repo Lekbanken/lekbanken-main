@@ -45,6 +45,7 @@ Use this cluster to understand the games content domain, browse and publish boun
 - `GAMEDETAILS_IMPLEMENTATION_PLAN.md` — earlier implementation history for GameDetails + sandbox work
 - `GAMEDETAILS_SECTION_ANALYSIS.md` — deep section/data provenance analysis snapshot
 - `GAME_INTEGRITY_REPORT.md` — earlier end-to-end integrity audit snapshot
+- `archive/PUZZLE_MODULES_INTEGRATION_STATUS.md` — completed puzzle modules rollout snapshot across builder, runtime, and APIs
 
 ## Related docs outside this folder
 

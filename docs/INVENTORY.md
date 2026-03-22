@@ -79,7 +79,7 @@ Fält:
 | [docs/gamification/BADGE_BUILDER_UX_GUIDE.md](gamification/BADGE_BUILDER_UX_GUIDE.md) | B | draft | 2025-12-07 | - | UX/spec |
 | [docs/browse/BROWSE_DOMAIN.md](browse/BROWSE_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/browse/README.md](browse/README.md) | A | active | 2026-03-22 | - | Cluster entrypoint for browse domain docs |
-| [docs/BROWSE_REWORK_NOTES.md](BROWSE_REWORK_NOTES.md) | C | historical snapshot | 2025-12-09 | - | Notes |
+| [docs/browse/archive/BROWSE_REWORK_NOTES.md](browse/archive/BROWSE_REWORK_NOTES.md) | C | historical snapshot | 2025-12-09 | - | Notes |
 | [docs/builder/BUILDER_AUDIT.md](builder/BUILDER_AUDIT.md) | C | frozen audit | 2026-02-08 | - | Broad builder audit snapshot before V2 deepening |
 | [docs/builder/BUILDER_EVENT_MODEL.md](builder/BUILDER_EVENT_MODEL.md) | A | active | 2026-02-08 | - | Builder state, reducer, and autosave pipeline reference |
 | [docs/builder/BUILDER_IMPORT_COMPAT.md](builder/BUILDER_IMPORT_COMPAT.md) | A | active | 2026-02-08 | - | Builder import/export compatibility reference |
@@ -308,7 +308,7 @@ Fält:
 | [docs/plans/PRODUCT_CARD_UPGRADE_PLAN.md](plans/PRODUCT_CARD_UPGRADE_PLAN.md) | B | draft | 2026-01-08 | - | Product card upgrade plan |
 | [docs/plans/PROFILE_RESILIENCE_IMPLEMENTATION.md](plans/PROFILE_RESILIENCE_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-31 | - | Profile resilience implementation snapshot |
 | [docs/PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md) | B | draft | 2025-12-10 | - | Plan |
-| [docs/PUZZLE_MODULES_INTEGRATION_STATUS.md](PUZZLE_MODULES_INTEGRATION_STATUS.md) | C | historical snapshot | 2025-12-28 | - | Puzzle modules integration status snapshot |
+| [docs/games/archive/PUZZLE_MODULES_INTEGRATION_STATUS.md](games/archive/PUZZLE_MODULES_INTEGRATION_STATUS.md) | C | historical snapshot | 2025-12-28 | - | Puzzle modules integration status snapshot |
 | [docs/QA_APPSHELL_ANALYSIS.md](QA_APPSHELL_ANALYSIS.md) | C | draft | 2026-01-17 | - | AppShell QA and improvement analysis |
 | [docs/qa/director-triggers.md](qa/director-triggers.md) | B | draft | 2026-02-23 | Play domain | Director Mode triggers QA plan |
 | ~~docs/prompts/PROMPT_FOR_NEW_AI.md~~ | E | archived | 2026-03-15 | - | → `archive/PROMPT_FOR_NEW_AI.md` |
@@ -328,7 +328,7 @@ Fält:
 | [docs/TAILWIND_PLUS_COMPONENTS.md](TAILWIND_PLUS_COMPONENTS.md) | A | draft | 2025-11-30 | - | UI reference |
 | [docs/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md](TASK_11_12_TOKEN_SESSION_MANAGEMENT.md) | B | draft | 2025-12-11 | - | Task/spec |
 | [docs/TASK_9_LIVE_PROGRESS.md](TASK_9_LIVE_PROGRESS.md) | B | draft | 2025-12-10 | - | Task/spec |
-| [docs/TOOLKIT_ROADMAP.md](TOOLKIT_ROADMAP.md) | B | historical snapshot | 2025-12-28 | - | Toolkit roadmap snapshot |
+| [docs/toolkit/archive/TOOLKIT_ROADMAP.md](toolkit/archive/TOOLKIT_ROADMAP.md) | B | historical snapshot | 2025-12-28 | - | Toolkit roadmap snapshot |
 | [docs/TOOLS_COACH_DIAGRAM_IMPLEMENTATION.md](TOOLS_COACH_DIAGRAM_IMPLEMENTATION.md) | B | draft | 2026-01-02 | - | Coach Diagram Builder implementation spec |
 | [docs/TOOLS_MASTER_IMPLEMENTATION.md](TOOLS_MASTER_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-02 | - | Toolbelt MVP implementation snapshot |
 | [docs/TOOLS_TOOLBELT_SPEC_V1.md](TOOLS_TOOLBELT_SPEC_V1.md) | B | draft | 2026-01-02 | - | Toolbelt v1 UX specification |

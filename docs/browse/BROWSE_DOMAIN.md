@@ -5,7 +5,7 @@
 > **Status:** active
 > **Owner:** -
 > **Date:** 2025-12-18
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-22
 > **Last validated:** 2025-12-18
 
 ## Purpose
@@ -155,7 +155,7 @@ Det finns äldre browse-helpers som inte alltid är entitlement-aware:
 - `lib/services/gameService.ts` (sök/lista games)
 
 Historik/anteckningar:
-- `docs/BROWSE_REWORK_NOTES.md`
+- `archive/BROWSE_REWORK_NOTES.md`
 
 ## Tests
 

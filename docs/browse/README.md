@@ -24,6 +24,10 @@ This cluster covers game and activity discovery: browse UI, search, filters, fea
 
 - [BROWSE_DOMAIN.md](BROWSE_DOMAIN.md) — current browse/discovery domain reference
 
+## Historical snapshots
+
+- [archive/BROWSE_REWORK_NOTES.md](archive/BROWSE_REWORK_NOTES.md) — browse API/UI rework notes and migration guidance snapshot
+
 ## Related docs
 
 - [../games/GAMES_DOMAIN.md](../games/GAMES_DOMAIN.md) — canonical game/content domain reference

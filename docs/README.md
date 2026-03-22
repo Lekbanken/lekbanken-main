@@ -51,6 +51,7 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - Browse cluster: [browse/README.md](browse/README.md)
 - Content cluster: [content/README.md](content/README.md)
 - Import docs: [import/README.md](import/README.md)
+- Learning cluster: [learning/README.md](learning/README.md)
 - Journey cluster: [journey/README.md](journey/README.md)
 - Legal cluster: [legal/README.md](legal/README.md)
 - Marketing cluster: [marketing/README.md](marketing/README.md)

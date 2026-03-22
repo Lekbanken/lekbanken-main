@@ -150,11 +150,11 @@ export default function LearningSandboxPage() {
         <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4">
           <p className="text-sm text-muted-foreground">
             <strong>Dokumentation:</strong>{' '}
-            <Link href="/docs/LEARNING_MODULE_IMPLEMENTATION.md" className="text-primary hover:underline">
+            <Link href="/docs/learning/LEARNING_MODULE_IMPLEMENTATION.md" className="text-primary hover:underline">
               Implementation Guide
             </Link>
             {' • '}
-            <Link href="/docs/LEARNING_TEST_PLAN.md" className="text-primary hover:underline">
+            <Link href="/docs/learning/LEARNING_TEST_PLAN.md" className="text-primary hover:underline">
               Test Plan
             </Link>
           </p>

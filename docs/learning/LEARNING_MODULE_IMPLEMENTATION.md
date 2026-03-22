@@ -5,7 +5,7 @@
 - Owner: -
 - Status: draft
 - Date: 2026-01-04
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: -
 
 > Draft implementation guide for the learning module domain, including schema, routes, and operational scope.
@@ -272,7 +272,7 @@ Gating rules.
 
 ## 7. Test Plan
 
-See `docs/LEARNING_TEST_PLAN.md` for detailed test cases.
+See `docs/learning/LEARNING_TEST_PLAN.md` for detailed test cases.
 
 ### Key Acceptance Criteria
 - [ ] System admin can create course with quiz
@@ -317,8 +317,8 @@ See `docs/LEARNING_TEST_PLAN.md` for detailed test cases.
 ### Created Files
 - `supabase/migrations/20260104000000_learning_domain.sql`
 - `types/learning.ts`
-- `docs/LEARNING_MODULE_IMPLEMENTATION.md`
-- `docs/LEARNING_TEST_PLAN.md`
+- `docs/learning/LEARNING_MODULE_IMPLEMENTATION.md`
+- `docs/learning/LEARNING_TEST_PLAN.md`
 
 ### To Be Created
 - `app/sandbox/learning/page.tsx`

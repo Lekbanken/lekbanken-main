@@ -137,9 +137,10 @@ Fält:
 | [docs/LEGAL_PHASE2_VALIDATION_PLAN.md](LEGAL_PHASE2_VALIDATION_PLAN.md) | B | draft | 2026-01-11 | - | Validation plan |
 | [docs/play/LEGENDARY_PLAY_ADVANCED_FEATURES.md](play/LEGENDARY_PLAY_ADVANCED_FEATURES.md) | B | draft | 2025-12-24 | - | Advanced play immersion UX specification |
 | [docs/play/LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md](play/LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md) | B | historical snapshot | 2025-12-24 | - | Historical Legendary Play implementation plan |
-| [docs/LEARNING_ADMIN_PHASE1_IMPLEMENTATION.md](LEARNING_ADMIN_PHASE1_IMPLEMENTATION.md) | B | draft | 2026-01-10 | - | Implementation notes placeholder |
-| [docs/LEARNING_MODULE_IMPLEMENTATION.md](LEARNING_MODULE_IMPLEMENTATION.md) | B | draft | 2026-01-04 | - | Implementation guide |
-| [docs/LEARNING_TEST_PLAN.md](LEARNING_TEST_PLAN.md) | B | draft | 2026-01-04 | - | Test plan |
+| [docs/learning/README.md](learning/README.md) | A | active | 2026-03-22 | - | Sub-index for learning-domain drafts and test planning |
+| [docs/learning/LEARNING_ADMIN_PHASE1_IMPLEMENTATION.md](learning/LEARNING_ADMIN_PHASE1_IMPLEMENTATION.md) | B | draft | 2026-01-10 | - | Implementation notes placeholder |
+| [docs/learning/LEARNING_MODULE_IMPLEMENTATION.md](learning/LEARNING_MODULE_IMPLEMENTATION.md) | B | draft | 2026-01-04 | - | Implementation guide |
+| [docs/learning/LEARNING_TEST_PLAN.md](learning/LEARNING_TEST_PLAN.md) | B | draft | 2026-01-04 | - | Test plan |
 | [docs/billing/archive/LICENSING_SALES_EXECUTION_PLAN.md](billing/archive/LICENSING_SALES_EXECUTION_PLAN.md) | B | historical snapshot | 2026-01-21 | - | Licensing and product sales execution plan snapshot |
 | [docs/PLANNER_ANALYSIS_REPORT.md](PLANNER_ANALYSIS_REPORT.md) | C | historical snapshot | - | Planner | Analysis report |
 | [docs/PLANNER_IA_RULES.md](PLANNER_IA_RULES.md) | B | historical snapshot | - | Planner | IA rules snapshot |

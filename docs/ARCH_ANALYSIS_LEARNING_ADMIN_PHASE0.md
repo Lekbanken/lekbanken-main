@@ -92,7 +92,7 @@ if (!isSystemAdmin && !hasTenantAdminAccess) {
 
 **Is there a tenant-scoped variant?**
 
-**NO.** There is only one route. The design intent (per [LEARNING_MODULE_IMPLEMENTATION.md](docs/LEARNING_MODULE_IMPLEMENTATION.md)) is:
+**NO.** There is only one route. The design intent (per [LEARNING_MODULE_IMPLEMENTATION.md](learning/LEARNING_MODULE_IMPLEMENTATION.md)) is:
 - System admins create **global** courses (tenant_id = null)
 - Tenant admins create **tenant-specific** courses (tenant_id = their tenant)
 
@@ -660,8 +660,8 @@ From [20260104100000_learning_rewards_v1.sql](supabase/migrations/20260104100000
 - [lib/admin/nav.ts](lib/admin/nav.ts) — Nav config
 
 ### Documentation
-- [docs/LEARNING_MODULE_IMPLEMENTATION.md](docs/LEARNING_MODULE_IMPLEMENTATION.md) — Design doc
-- [docs/LEARNING_TEST_PLAN.md](docs/LEARNING_TEST_PLAN.md) — Test plan
+- [docs/learning/LEARNING_MODULE_IMPLEMENTATION.md](docs/learning/LEARNING_MODULE_IMPLEMENTATION.md) — Design doc
+- [docs/learning/LEARNING_TEST_PLAN.md](docs/learning/LEARNING_TEST_PLAN.md) — Test plan
 
 ### Comparable Feature (Achievements)
 - [app/actions/achievements-admin.ts](app/actions/achievements-admin.ts) — Admin CRUD pattern

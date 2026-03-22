@@ -47,7 +47,7 @@ Fält:
 | [docs/admin/ADMIN_DESIGN_SYSTEM.md](admin/ADMIN_DESIGN_SYSTEM.md) | A | active | 2025-12-17 | - | Admin design system |
 | [docs/admin/archive/ADMIN_AUDIT.md](admin/archive/ADMIN_AUDIT.md) | C | frozen audit | 2025-12-18 | - | Admin redesign audit snapshot |
 | [docs/admin/archive/ADMIN_AUTH_AUDIT.md](admin/archive/ADMIN_AUTH_AUDIT.md) | C | frozen audit | 2026-01-03 | - | Admin auth and RBAC integrity audit |
-| [docs/ORGANISATION_CARD_SPECIFICATION.md](ORGANISATION_CARD_SPECIFICATION.md) | B | draft | 2026-01-04 | System Admin Team | Organisation card specification |
+| [docs/admin/ORGANISATION_CARD_SPECIFICATION.md](admin/ORGANISATION_CARD_SPECIFICATION.md) | B | draft | 2026-01-04 | System Admin Team | Organisation card specification |
 | [docs/admin/ADMIN_GAMES_V2_ARCHITECTURE.md](admin/ADMIN_GAMES_V2_ARCHITECTURE.md) | A | active | 2026-01-08 | System Admin Team | Scalable admin games architecture |
 | [docs/admin/ADMIN_GAME_BUILDER_V1.md](admin/ADMIN_GAME_BUILDER_V1.md) | A | active | 2025-12-17 | - | Game Builder (current) |
 | [docs/admin/archive/ADMIN_GAMIFICATION_HUB_IA.md](admin/archive/ADMIN_GAMIFICATION_HUB_IA.md) | C | historical snapshot | 2026-01-04 | - | Gamification hub IA refactor snapshot |

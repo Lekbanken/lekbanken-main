@@ -36,6 +36,7 @@ Use this index to distinguish current admin design references from older audits 
 
 - `ADMIN_REDESIGN_PLAN.md` — approved redesign implementation plan for `/admin`
 - `ADMIN_IA_PROPOSAL.md` — IA proposal for system/tenant navigation and route grouping
+- `ORGANISATION_CARD_SPECIFICATION.md` — draft specification for the primary organisation card used in system-admin tenant management
 - `appshell.md` — app-shell architecture note that should be revalidated against current shell wiring
 - `GAME_PROMPTING_GUIDE.md` — specialized builder/game prompting guide tied to a specific integrity-report baseline
 
@@ -70,6 +71,7 @@ Use this index to distinguish current admin design references from older audits 
 - `ADMIN_NAVIGATION_MASTER.md`
 - `ADMIN_DESIGN_SYSTEM.md`
 - `ADMIN_IA_PROPOSAL.md`
+- `ORGANISATION_CARD_SPECIFICATION.md`
 - `ADMIN_GAME_BUILDER_V1.md`
 - `ADMIN_GAMES_V2_ARCHITECTURE.md`
 - `ADMIN_PLANNER_MASTER_IMPLEMENTATION.md`

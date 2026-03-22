@@ -25,3 +25,4 @@ Kluster i mappen:
 - Stripe och produkter: `STRIPE_*`, `PRODUCT_*`
 - Profil och timeout-diagnostik: `PROFILE_*`, `TIMEOUT_*`
 - System och QA: `SYSTEM_STATUS_RISK_OVERVIEW.md`, `GOLDEN_PATH_QA_CHECKLIST.md`
+- Generella snapshots: `CURRENCY_CONSISTENCY_REPORT.md`, `DEPENDENCY_AUDIT_2026-01-03.md`

@@ -96,7 +96,7 @@ Fält:
 | [docs/builder/SPRINT2_WIRING_PLAN.md](builder/SPRINT2_WIRING_PLAN.md) | B | historical snapshot | 2026-02-08 | - | Historical sprint wiring plan |
 | [docs/builder/SPRINT3_CONSOLIDATION_PLAN.md](builder/SPRINT3_CONSOLIDATION_PLAN.md) | B | active | 2026-02-08 | - | Active sprint consolidation and contract plan |
 | [docs/toolkit/CATALYST_UI_KIT.md](toolkit/CATALYST_UI_KIT.md) | A | draft | 2025-12-01 | - | Reference |
-| [docs/CURRENCY_CONSISTENCY_REPORT.md](CURRENCY_CONSISTENCY_REPORT.md) | C | historical snapshot | 2026-01-14 | - | Terminology report |
+| [docs/reports/CURRENCY_CONSISTENCY_REPORT.md](reports/CURRENCY_CONSISTENCY_REPORT.md) | C | historical snapshot | 2026-01-14 | - | Terminology report |
 | ~~docs/prompts/CHATGPT_GAME_CREATOR_PROMPT.md~~ | E | archived | 2026-03-15 | - | → `archive/CHATGPT_GAME_CREATOR_PROMPT.md` |
 | [docs/billing/README.md](billing/README.md) | A | active | 2026-03-22 | - | Billing cluster entrypoint |
 | [docs/billing/BILLING_LICENSING_DOMAIN.md](billing/BILLING_LICENSING_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
@@ -115,7 +115,7 @@ Fält:
 | [docs/database/rls-audit-2025-03-17.md](database/rls-audit-2025-03-17.md) | C | frozen audit | 2026-03-17 | - | RLS security audit snapshot |
 | [docs/api/consumer-data-contract-audit.md](api/consumer-data-contract-audit.md) | C | frozen audit | - | Data contracts | Consumer contract audit |
 | [docs/auth/CUSTOM_DOMAINS_TEST_PLAN.md](auth/CUSTOM_DOMAINS_TEST_PLAN.md) | B | draft | 2026-01-03 | - | Validation plan |
-| [docs/DEPENDENCY_AUDIT_2026-01-03.md](DEPENDENCY_AUDIT_2026-01-03.md) | C | frozen audit | 2026-01-03 | - | Dependency and Supabase call audit |
+| [docs/reports/DEPENDENCY_AUDIT_2026-01-03.md](reports/DEPENDENCY_AUDIT_2026-01-03.md) | C | frozen audit | 2026-01-03 | - | Dependency and Supabase call audit |
 | [docs/demo/README.md](demo/README.md) | A | active | 2026-03-22 | - | Demo cluster entrypoint |
 | [docs/demo/DEMO_SALES_GUIDE.md](demo/DEMO_SALES_GUIDE.md) | B | draft | 2026-01-13 | - | Internal sales guide for demo mode |
 | [docs/demo/archive/demo_current_state.md](demo/archive/demo_current_state.md) | C | historical snapshot | - | Demo | Current-state report |

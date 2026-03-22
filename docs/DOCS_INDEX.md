@@ -40,6 +40,7 @@ Regel:
 
 - auth/: se [auth/README.md](auth/README.md)
 - billing/: se [billing/README.md](billing/README.md)
+- browse/: se [browse/README.md](browse/README.md)
 - builder/: se [builder/README.md](builder/README.md)
 - content/: se [content/README.md](content/README.md)
 - database/: se [database/README.md](database/README.md)
@@ -48,6 +49,7 @@ Regel:
 - gamification/: se [gamification/README.md](gamification/README.md)
 - import/: se [import/README.md](import/README.md)
 - legal/: se [legal/README.md](legal/README.md)
+- marketing/: se [marketing/README.md](marketing/README.md)
 - media/: se [media/README.md](media/README.md)
 - notifications/: se [notifications/README.md](notifications/README.md)
 - ops/: se [ops/README.md](ops/README.md)

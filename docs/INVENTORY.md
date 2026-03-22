@@ -76,7 +76,8 @@ Fält:
 | [docs/AUTH_IMPLEMENTATION_TODO.md](AUTH_IMPLEMENTATION_TODO.md) | D | draft | - | - | Backlog |
 | [docs/AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) | C | archived | 2025-12-17 | - | Historical analysis / change log |
 | [docs/gamification/BADGE_BUILDER_UX_GUIDE.md](gamification/BADGE_BUILDER_UX_GUIDE.md) | B | draft | 2025-12-07 | - | UX/spec |
-| [docs/BROWSE_DOMAIN.md](BROWSE_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
+| [docs/browse/BROWSE_DOMAIN.md](browse/BROWSE_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
+| [docs/browse/README.md](browse/README.md) | A | active | 2026-03-22 | - | Cluster entrypoint for browse domain docs |
 | [docs/BROWSE_REWORK_NOTES.md](BROWSE_REWORK_NOTES.md) | C | historical snapshot | 2025-12-09 | - | Notes |
 | [docs/builder/BUILDER_AUDIT.md](builder/BUILDER_AUDIT.md) | C | frozen audit | 2026-02-08 | - | Broad builder audit snapshot before V2 deepening |
 | [docs/builder/BUILDER_EVENT_MODEL.md](builder/BUILDER_EVENT_MODEL.md) | A | active | 2026-02-08 | - | Builder state, reducer, and autosave pipeline reference |
@@ -205,7 +206,8 @@ Fält:
 | [docs/media/MEDIA_DOMAIN.md](media/MEDIA_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc |
 | [docs/MANUAL_VERIFICATION_IMPORT_FIX.md](MANUAL_VERIFICATION_IMPORT_FIX.md) | B | draft | 2026-02-08 | - | Manual verification guide for import-fix scenarios |
 | [docs/MIGRATIONS.md](MIGRATIONS.md) | A | active | 2025-12-17 | - | Core reference |
-| [docs/MARKETING_DOMAIN.md](MARKETING_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/marketing/MARKETING_DOMAIN.md](marketing/MARKETING_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/marketing/README.md](marketing/README.md) | A | active | 2026-03-22 | - | Cluster entrypoint for marketing domain docs |
 | [docs/demo/archive/MASTERPROMPT_DEMO_IMPLEMENTATION.md](demo/archive/MASTERPROMPT_DEMO_IMPLEMENTATION.md) | E | historical snapshot | 2026-01-13 | - | Enterprise demo implementation prompt snapshot |
 | [docs/NOTION.md](NOTION.md) | A | active | 2026-03-22 | - | Notion mirror rules and repo entrypoints |
 | [docs/NOTION_SYNC_PLAN.md](NOTION_SYNC_PLAN.md) | A | active | 2026-03-21 | - | Notion sync strategy |

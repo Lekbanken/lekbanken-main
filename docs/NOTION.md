@@ -65,11 +65,11 @@ Om en länk saknas eller blir inaktuell: utgå från repo först och uppdatera s
 |------|-------------|
 | [⭐ Domänstruktur: Lekbanken](https://www.notion.so/Johan-Schultzs-omr-de-Dom-nstruktur-Lekbanken-14ca3649dd9080e89b62d94db3502c82) | Fullständig domänarkitektur med DDD-principer och ansvarsområden |
 | [⭐ Platform Domain](https://www.notion.so/Johan-Schultzs-omr-de-Platform-Domain-Uppdaterad-med-Vercel-14ba3649dd908017af0bd5b87c2f37ed) | Vercel runtime, miljöer, deployment, routing, säkerhet, observability |
-| [Browse Domain](BROWSE_DOMAIN.md) | Sök, filter, rekommendationer, key tables |
+| [Browse Domain](browse/BROWSE_DOMAIN.md) | Sök, filter, rekommendationer, key tables |
 
 Rekommenderad spegling i repo:
 - [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
-- Browse (aktuellt): [BROWSE_DOMAIN.md](BROWSE_DOMAIN.md)
+- Browse (aktuellt): [browse/BROWSE_DOMAIN.md](browse/BROWSE_DOMAIN.md)
 - Data Model (aktuellt): [DATA_MODEL_DOMAIN.md](DATA_MODEL_DOMAIN.md)
 - Auth/RBAC: [auth/README.md](auth/README.md) (aktuellt) + [AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
 - Accounts (aktuellt): [ACCOUNTS_DOMAIN.md](ACCOUNTS_DOMAIN.md)
@@ -88,7 +88,7 @@ Rekommenderad spegling i repo:
 - Planner (aktuellt): [PLANNER_DOMAIN.md](PLANNER_DOMAIN.md)
 - Gamification (aktuellt): [GAMIFICATION_DOMAIN.md](GAMIFICATION_DOMAIN.md)
 - Journey (aktuellt): [JOURNEY_DOMAIN.md](JOURNEY_DOMAIN.md)
-- Marketing (aktuellt): [MARKETING_DOMAIN.md](MARKETING_DOMAIN.md)
+- Marketing (aktuellt): [marketing/MARKETING_DOMAIN.md](marketing/MARKETING_DOMAIN.md)
 - Media (aktuellt): [media/MEDIA_DOMAIN.md](media/MEDIA_DOMAIN.md)
 - Notifications (aktuellt): [notifications/NOTIFICATIONS_DOMAIN.md](notifications/NOTIFICATIONS_DOMAIN.md)
 - Support (aktuellt): [SUPPORT_DOMAIN.md](SUPPORT_DOMAIN.md)
@@ -233,7 +233,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [x] **Translation Engine Domain** – i18n-fallback och batch-översättning (se `docs/TRANSLATION_ENGINE_DOMAIN.md`)
 - [x] **Operations Domain** – Drift och monitoring (se `docs/ops/OPERATIONS_DOMAIN.md` + `docs/ops/*`)
 - [x] **API/Integration Domain** – endpoints & conventions (se `docs/API_INTEGRATION_DOMAIN.md`)
-- [x] **Marketing Domain** – Landningssidor och funnels (se `docs/MARKETING_DOMAIN.md`)
+- [x] **Marketing Domain** – Landningssidor och funnels (se `docs/marketing/MARKETING_DOMAIN.md`)
 - [x] **Notifications Domain** – In-app notiser (se `docs/notifications/NOTIFICATIONS_DOMAIN.md`)
 - [x] **Support Domain** – Feedback + tickets (se `docs/SUPPORT_DOMAIN.md`)
 - [x] **Content Management Domain (CMD)** – Bulk ops (CSV import/export) + builder + content planner primitives (se `docs/content/CONTENT_MANAGEMENT_DOMAIN.md`)

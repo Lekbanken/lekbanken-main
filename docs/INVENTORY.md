@@ -102,7 +102,7 @@ Fält:
 | [docs/billing/BILLING_LICENSING_DOMAIN.md](billing/BILLING_LICENSING_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/content/README.md](content/README.md) | A | active | 2026-03-22 | - | Content cluster entrypoint |
 | [docs/content/CONTENT_MANAGEMENT_DOMAIN.md](content/CONTENT_MANAGEMENT_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
-| [docs/CONVERSATION_CARDS_SYSTEM_FACIT.md](CONVERSATION_CARDS_SYSTEM_FACIT.md) | A | draft | 2026-01-03 | - | Conversation cards system facit/reference |
+| [docs/toolkit/CONVERSATION_CARDS_SYSTEM_FACIT.md](toolkit/CONVERSATION_CARDS_SYSTEM_FACIT.md) | A | draft | 2026-01-03 | - | Conversation cards system facit/reference |
 | [docs/import/CSV_IMPORT_FIELD_REFERENCE.md](import/CSV_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-17 | - | Contract/reference |
 | [docs/import/CSV_IMPORT_VERIFICATION_CHECKLIST.md](import/CSV_IMPORT_VERIFICATION_CHECKLIST.md) | A | active | 2025-12-26 | - | Verification checklist |
 | [docs/database/DATA_MODEL_DOMAIN.md](database/DATA_MODEL_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |

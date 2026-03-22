@@ -29,6 +29,7 @@ Welcome to the documentation for the Legendary Escape Room Toolkit. This guide c
 
 - `CATALYST_UI_KIT.md` — draft reference for adapting the Tailwind Plus Catalyst kit into the repo
 - `TAILWIND_PLUS_COMPONENTS.md` — UI reference library of Tailwind Plus component patterns and design tokens
+- `CONVERSATION_CARDS_SYSTEM_FACIT.md` — system reference for the Conversation Cards Toolbelt tool across data model, APIs, admin flows, and play wiring
 - `TOOLS_TOOLBELT_SPEC_V1.md` — draft Toolbelt UX spec for the Dice Roller MVP
 - `TOOLS_COACH_DIAGRAM_IMPLEMENTATION.md` — draft Coach Diagram Builder implementation/spec
 

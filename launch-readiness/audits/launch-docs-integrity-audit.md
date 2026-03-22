@@ -72,6 +72,8 @@
 
 **Root planner docs note:** `copilot-instructions.md` designates root-level `planner-architecture.md`, `planner-audit.md`, and `planner-implementation-plan.md` as SSoT for Planner domain work. These are separate from the launch-readiness audit file (`audits/planner-launch-audit.md`). Both are valid — root docs are for Planner development, audit docs are for launch program.
 
+**Launch root note:** Remaining root documents in `launch-readiness/` are no longer treated as generic overflow. After the March 2026 cleanup waves, the root is intentionally reserved for active control docs, stable architecture references, and still-live strategic workstreams such as `platform-operations-*` and `enterprise-isolation-*`. Historical verification snapshots and superseded execution records should continue to move into `audits/` or `implementation/` when safe.
+
 ### Tier 3 — Operational Docs (should exist and be current)
 
 | Document | Location | Purpose | Status |
@@ -81,7 +83,7 @@
 | `first-deploy-runbook.md` | `docs/ops/` | First deploy procedures | ✅ Exists |
 | `DEVELOPER_SETUP.md` | `docs/toolkit/developer-guide/` | Developer onboarding | ✅ Current (MFA section added 2026-03-15) |
 | `ENVIRONMENT_VARIABLES.md` | `docs/` | Env var documentation | ⚠️ Needs verification against current `.env.local.example` |
-| `README.md` | Root | Project README | ⚠️ Last modified 2026-01-08 — likely outdated |
+| `README.md` | Root | Project README | ✅ Current launch routing added 2026-03-22 |
 
 ---
 

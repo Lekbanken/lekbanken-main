@@ -34,6 +34,8 @@ Detta repo innehåller applikationskod, migrations, CI-konfiguration och den tek
 - Launch-programmets underlag finns i [launch-readiness/audits/README.md](launch-readiness/audits/README.md) och genomförandehistoriken i [launch-readiness/implementation/README.md](launch-readiness/implementation/README.md).
 - Incidentrutiner och rollback-spår finns i [launch-readiness/incident-playbook.md](launch-readiness/incident-playbook.md).
 - Tidig post-launch-observability finns i [launch-readiness/launch-telemetry-pack.md](launch-readiness/launch-telemetry-pack.md) och kompletterande ops-runbooks under [docs/ops/README.md](docs/ops/README.md).
+- Historiska launch-snapshots klustras löpande under `launch-readiness/audits/` och `launch-readiness/implementation/`; rootnivån i `launch-readiness/` ska främst bära aktiva kontroll-, arkitektur- och workstream-dokument.
+- Kvarvarande root-workstreams som `launch-readiness-architecture.md`, `next-execution-plan.md`, `platform-operations-*` och `enterprise-isolation-*` är avsiktliga tills deras status ändras eller en tydligare klusterstruktur behövs.
 
 ## Dokumentationsmodell
 

@@ -5,12 +5,14 @@
 - Owner: -
 - Status: active
 - Date: 2026-03-04
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-21
 
 > Aktiv implementerings- och backloggreferens för Planner-domänen. Denna plan bygger på `planner-audit.md` och kompletteras av `planner-architecture.md` för systemdesign.
 
-> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-21  
+> **Dokumentrouting (2026-03-22):** Planner-stöddokument som inte ingår i det kanoniska triplet ligger nu under `docs/planner/`. Denna plan och övriga root-triplet-dokument förblir aktiva ingångar för planner-arbete.
+
+> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-22  
 > **Senast validerad:** 2026-03-21  
 > **Status:** MS0–MS11 ✅ KLARA. PlanSnapshot Pipeline ✅ KLAR. 0 TS-errors.  
 > **Scope:** Planner wizard, planlista, kalender, play integration, tenant-RLS och post-launch backlog  

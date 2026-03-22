@@ -835,8 +835,8 @@ Mix of PowerShell, Python, JavaScript, TypeScript, and SQL scripts for:
 
 ### `docs/` — Documentation (297 files, 289 markdown)
 
-18 subdirectories covering every domain. Major categories:
-- Domain docs: `games/GAMES_DOMAIN.md`, `play/PLAY_DOMAIN.md`, `PLANNER_DOMAIN.md`, etc.
+19 subdirectories covering every domain. Major categories:
+- Domain docs: `games/GAMES_DOMAIN.md`, `play/PLAY_DOMAIN.md`, `planner/PLANNER_DOMAIN.md`, etc.
 - Architecture: `auth/AUTH_ARCHITECTURE_REDESIGN.md`, `play/sessions/SESSION_COCKPIT_ARCHITECTURE.md`
 - Implementation plans: `builder/GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md`, etc.
 - Audits: `database/DATABASE_SECURITY_AUDIT.md`, `PROFILE_AUDIT_2026-03-05.md`

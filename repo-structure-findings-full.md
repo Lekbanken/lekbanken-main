@@ -35,14 +35,14 @@ For the same domain (e.g., "planner"), documents exist in:
 - `planner-architecture.md` (root)
 - `planner-audit.md` (root)
 - `planner-implementation-plan.md` (root)
-- `docs/PLANNER_DOMAIN.md`
-- `docs/PLANNER_ANALYSIS_REPORT.md`
-- `docs/PLANNER_IA_RULES.md`
-- `docs/PLANNER_IMPROVEMENT_TODO.md`
-- `docs/PLANNER_INVENTORY_GAP_ANALYSIS.md`
-- `docs/PLANNER_REFACTOR_IMPLEMENTATION.md`
-- `docs/PLANNER_TARGET_ARCHITECTURE.md`
-- `docs/PLANNER_UI_UPGRADE_PLAN.md`
+- `docs/planner/PLANNER_DOMAIN.md`
+- `docs/planner/PLANNER_ANALYSIS_REPORT.md`
+- `docs/planner/PLANNER_IA_RULES.md`
+- `docs/planner/PLANNER_IMPROVEMENT_TODO.md`
+- `docs/planner/PLANNER_INVENTORY_GAP_ANALYSIS.md`
+- `docs/planner/PLANNER_REFACTOR_IMPLEMENTATION.md`
+- `docs/planner/PLANNER_TARGET_ARCHITECTURE.md`
+- `docs/planner/PLANNER_UI_UPGRADE_PLAN.md`
 - `docs/admin/ADMIN_PLANNER_MASTER_IMPLEMENTATION.md`
 - `launch-readiness/audits/planner-launch-audit.md`
 - `launch-readiness/audits/planner-regression-audit.md`

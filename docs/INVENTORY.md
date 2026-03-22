@@ -142,13 +142,14 @@ Fält:
 | [docs/learning/LEARNING_MODULE_IMPLEMENTATION.md](learning/LEARNING_MODULE_IMPLEMENTATION.md) | B | draft | 2026-01-04 | - | Implementation guide |
 | [docs/learning/LEARNING_TEST_PLAN.md](learning/LEARNING_TEST_PLAN.md) | B | draft | 2026-01-04 | - | Test plan |
 | [docs/billing/archive/LICENSING_SALES_EXECUTION_PLAN.md](billing/archive/LICENSING_SALES_EXECUTION_PLAN.md) | B | historical snapshot | 2026-01-21 | - | Licensing and product sales execution plan snapshot |
-| [docs/PLANNER_ANALYSIS_REPORT.md](PLANNER_ANALYSIS_REPORT.md) | C | historical snapshot | - | Planner | Analysis report |
-| [docs/PLANNER_IA_RULES.md](PLANNER_IA_RULES.md) | B | historical snapshot | - | Planner | IA rules snapshot |
-| [docs/PLANNER_IMPROVEMENT_TODO.md](PLANNER_IMPROVEMENT_TODO.md) | D | historical snapshot | - | Planner | Completed worklist |
-| [docs/PLANNER_INVENTORY_GAP_ANALYSIS.md](PLANNER_INVENTORY_GAP_ANALYSIS.md) | C | frozen audit | - | Planner | Inventory and gap audit |
-| [docs/PLANNER_REFACTOR_IMPLEMENTATION.md](PLANNER_REFACTOR_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-25 | - | Completed refactor plan |
-| [docs/PLANNER_TARGET_ARCHITECTURE.md](PLANNER_TARGET_ARCHITECTURE.md) | B | historical snapshot | 2025-12-30 | - | Target architecture snapshot |
-| [docs/PLANNER_UI_UPGRADE_PLAN.md](PLANNER_UI_UPGRADE_PLAN.md) | B | draft | 2026-01-25 | - | UI upgrade plan |
+| [docs/planner/README.md](planner/README.md) | A | active | 2026-03-22 | - | Planner support-doc cluster entrypoint |
+| [docs/planner/PLANNER_ANALYSIS_REPORT.md](planner/PLANNER_ANALYSIS_REPORT.md) | C | historical snapshot | - | Planner | Analysis report |
+| [docs/planner/PLANNER_IA_RULES.md](planner/PLANNER_IA_RULES.md) | B | historical snapshot | - | Planner | IA rules snapshot |
+| [docs/planner/PLANNER_IMPROVEMENT_TODO.md](planner/PLANNER_IMPROVEMENT_TODO.md) | D | historical snapshot | - | Planner | Completed worklist |
+| [docs/planner/PLANNER_INVENTORY_GAP_ANALYSIS.md](planner/PLANNER_INVENTORY_GAP_ANALYSIS.md) | C | frozen audit | - | Planner | Inventory and gap audit |
+| [docs/planner/PLANNER_REFACTOR_IMPLEMENTATION.md](planner/PLANNER_REFACTOR_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-25 | - | Completed refactor plan |
+| [docs/planner/PLANNER_TARGET_ARCHITECTURE.md](planner/PLANNER_TARGET_ARCHITECTURE.md) | B | historical snapshot | 2025-12-30 | - | Target architecture snapshot |
+| [docs/planner/PLANNER_UI_UPGRADE_PLAN.md](planner/PLANNER_UI_UPGRADE_PLAN.md) | B | draft | 2026-01-25 | - | UI upgrade plan |
 | [docs/play/play-structure-agent-risk.md](play/play-structure-agent-risk.md) | C | frozen audit | 2026-03-16 | - | Agent-risk guardrail for play-domain changes |
 | [docs/play/play-structure-audit.md](play/play-structure-audit.md) | C | frozen audit | 2026-03-16 | - | Structural audit guardrail for the play domain |
 | [docs/play/play-structure-canonical-map.md](play/play-structure-canonical-map.md) | C | frozen audit | 2026-03-16 | - | File classification map for play-related surfaces |
@@ -172,7 +173,7 @@ Fält:
 | [docs/legal/SVENSKA_KYRKAN_ONBOARDING.md](legal/SVENSKA_KYRKAN_ONBOARDING.md) | B | draft | 2026-01-13 | - | Onboarding guide |
 | [docs/DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md) | C | draft | 2025-12-08 | - | Learnings |
 | [docs/DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
-| [docs/DOMAIN_PLANNER_TODO.md](DOMAIN_PLANNER_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
+| [docs/planner/DOMAIN_PLANNER_TODO.md](planner/DOMAIN_PLANNER_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
 | [docs/DOMAIN_PRODUCT_LEARNINGS.md](DOMAIN_PRODUCT_LEARNINGS.md) | C | draft | 2025-12-08 | - | Learnings |
 | [docs/tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md](tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md) | C | draft | 2025-12-08 | - | Learnings |
 | [docs/tenant/DOMAIN_TENANT_TODO.md](tenant/DOMAIN_TENANT_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
@@ -291,7 +292,7 @@ Fält:
 | [docs/play/PLAY_UI_WIRING_AUDIT_REPORT.md](play/PLAY_UI_WIRING_AUDIT_REPORT.md) | C | historical snapshot | 2026-02-09 | - | Play wiring audit snapshot |
 | [docs/play/PLAY_UI_WIRING_AUDIT_REPORT_v2.md](play/PLAY_UI_WIRING_AUDIT_REPORT_v2.md) | C | active audit | 2026-03-21 | - | Active play wiring audit reference |
 | [docs/play/TRIGGER_ENGINE_CONTRACT.md](play/TRIGGER_ENGINE_CONTRACT.md) | A | active | 2026-02-09 | - | Trigger engine contract |
-| [docs/PLANNER_DOMAIN.md](PLANNER_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/planner/PLANNER_DOMAIN.md](planner/PLANNER_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/gamification/GAMIFICATION_DOMAIN.md](gamification/GAMIFICATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/journey/README.md](journey/README.md) | A | active | 2026-03-22 | - | Journey cluster entrypoint |
 | [docs/journey/JOURNEY_DOMAIN.md](journey/JOURNEY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |

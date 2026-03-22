@@ -100,7 +100,7 @@ Entry point for roadmap, planning, domain-level understanding, and product direc
 - https://github.com/Lekbanken/lekbanken-main/blob/main/PROJECT_CONTEXT.md
 - https://github.com/Lekbanken/lekbanken-main/blob/main/docs/platform/PLATFORM_DOMAIN.md
 - https://github.com/Lekbanken/lekbanken-main/blob/main/docs/games/GAMES_DOMAIN.md
-- https://github.com/Lekbanken/lekbanken-main/blob/main/docs/PLANNER_DOMAIN.md
+- https://github.com/Lekbanken/lekbanken-main/blob/main/docs/planner/PLANNER_DOMAIN.md
 - https://github.com/Lekbanken/lekbanken-main/blob/main/docs/journey/JOURNEY_DOMAIN.md
 
 ## Cross-hub rules

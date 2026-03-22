@@ -5,13 +5,15 @@
 - Owner: -
 - Status: active
 - Date: 2026-03-04
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-21
 
 > Aktiv referensarkitektur för Planner-domänen. Ändras sällan och ska användas som stabil systemdesign tillsammans med `planner-audit.md` och `planner-implementation-plan.md`.
 
+> **Dokumentrouting (2026-03-22):** Äldre planner-stöddokument är klustrade under `docs/planner/`. Detta root-triplet förblir den kanoniska startpunkten för aktiv planner-utveckling.
+
 > **Datum:** 2026-03-04  
-> **Senast uppdaterad:** 2026-03-21  
+> **Senast uppdaterad:** 2026-03-22  
 > **Senast validerad:** 2026-03-21  
 > **Scope:** `/app/planner`, `/admin/planner`, `/app/play/plan`, planner dataflöden och publiceringsmodell  
 > **Status:** Aktiv referensarkitektur

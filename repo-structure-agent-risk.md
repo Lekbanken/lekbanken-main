@@ -28,7 +28,7 @@ When starting work on this repo, read documents in this exact order:
 
 | Domain | Canonical source | Then check |
 |--------|-----------------|------------|
-| Planner | Root `planner-architecture.md` → `planner-audit.md` → `planner-implementation-plan.md` | `docs/PLANNER_DOMAIN.md` |
+| Planner | Root `planner-architecture.md` → `planner-audit.md` → `planner-implementation-plan.md` | `docs/planner/PLANNER_DOMAIN.md` |
 | Notifications | `docs/notifications/app-shell-notifications-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | `docs/notifications/NOTIFICATIONS_DOMAIN.md` |
 | Journey | `docs/journey/journey-activation-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | `docs/journey/JOURNEY_DOMAIN.md` |
 | Play | `launch-readiness/audits/play-*.md` | `docs/play/PLAY_DOMAIN.md` |
@@ -288,7 +288,7 @@ The `play` domain has **118+ components** split across two disconnected trees:
 
 | Domain | Start here | Then check |
 |--------|-----------|-----------|
-| Planner | Root triplet (`planner-architecture/audit/implementation-plan.md`) | `docs/PLANNER_DOMAIN.md` |
+| Planner | Root triplet (`planner-architecture/audit/implementation-plan.md`) | `docs/planner/PLANNER_DOMAIN.md` |
 | Play | `launch-readiness/audits/play-*.md` | Root `PLAY_SYSTEM_DOCUMENTATION.md` |
 | Notifications | `docs/notifications/app-shell-notifications-*.md` | `docs/notifications/NOTIFICATIONS_DOMAIN.md` |
 | Journey | `docs/journey/journey-activation-*.md` | `docs/journey/JOURNEY_DOMAIN.md` |
@@ -306,7 +306,7 @@ The `play` domain has **118+ components** split across two disconnected trees:
 | `MEDIA_DOMAIN_COMPLETE.md` | Looks like "complete" status | **COMPLETED** — the word "complete" is in the title |
 | `PROJECT_COMPLETION_SUMMARY.md` | Looks like project is done | Summary of a completed phase, not the whole project |
 | `notifications-architecture.md` vs `docs/notifications/app-shell-notifications-architecture.md` | Two arch docs for same domain | The `app-shell-notifications-*` set in `docs/notifications/` is **newer and canonical** |
-| `docs/PLANNER_TARGET_ARCHITECTURE.md` | Looks like the architecture doc | Root `planner-architecture.md` is canonical per copilot-instructions.md |
+| `docs/planner/PLANNER_TARGET_ARCHITECTURE.md` | Looks like the architecture doc | Root `planner-architecture.md` is canonical per copilot-instructions.md |
 
 ---
 

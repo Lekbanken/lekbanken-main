@@ -5,12 +5,14 @@
 - Owner: -
 - Status: active
 - Date: 2026-03-04
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-21
 
 > Aktiv audit- och riskreferens för Planner-domänen. Använd tillsammans med `planner-architecture.md` för stabil design och `planner-implementation-plan.md` för genomförande- och backloggstatus.
 
-> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-21  
+> **Dokumentrouting (2026-03-22):** Planner-stöddokument utanför triplet är nu klustrade under `docs/planner/`. Root-triplet är fortfarande den kanoniska källan för aktiv planner-verifiering.
+
+> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-22  
 > **Senast validerad:** 2026-03-21  
 > **Scope:** `/app/planner`, `/admin/planner`, `/app/play/plan/`, kalender, körning  
 > **Syfte:** Kartlägga nuvarande tillstånd, identifiera risker och föreslå en genomtänkt ändringsplan inför beta-launch.  

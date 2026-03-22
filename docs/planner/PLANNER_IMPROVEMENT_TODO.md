@@ -713,7 +713,7 @@ export const PlannerPlanDTOSchema = z.object({
 
 - [PLANNER_DOMAIN.md](PLANNER_DOMAIN.md) — Domändokumentation
 - [PLANNER_TARGET_ARCHITECTURE.md](PLANNER_TARGET_ARCHITECTURE.md) — Målarkitektur
-- [ADMIN_PLANNER_MASTER_IMPLEMENTATION.md](admin/ADMIN_PLANNER_MASTER_IMPLEMENTATION.md) — Admin-implementation
+- [ADMIN_PLANNER_MASTER_IMPLEMENTATION.md](../admin/ADMIN_PLANNER_MASTER_IMPLEMENTATION.md) — Admin-implementation
 
 ---
 

@@ -57,6 +57,7 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - Marketing cluster: [marketing/README.md](marketing/README.md)
 - Media cluster: [media/README.md](media/README.md)
 - Platform cluster: [platform/README.md](platform/README.md)
+- Planner cluster: [planner/README.md](planner/README.md)
 - Sandbox docs: [sandbox/README.md](sandbox/README.md)
 - Toolkit docs: [toolkit/README.md](toolkit/README.md)
 - Tenant cluster: [tenant/README.md](tenant/README.md)

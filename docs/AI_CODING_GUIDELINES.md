@@ -165,7 +165,7 @@ features/
 ├── planner/         ← Planner Domain
 ├── browse/          ← Browse Domain
 ├── profile/         ← Profile Domain
-└── participants/    ← Participants Domain (ny, se PARTICIPANTS_DOMAIN_ARCHITECTURE.md)
+└── participants/    ← Participants Domain (ny, se docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md)
 ```
 
 **❌ FEL:**
@@ -179,7 +179,7 @@ features/
 
 **Regel:** 
 - Håll dig **inom domängränser**
-- Läs `docs/PARTICIPANTS_DOMAIN_ARCHITECTURE.md` innan du bygger participants-funktionalitet
+- Läs `docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md` innan du bygger participants-funktionalitet
 - Shared kod går i `lib/` eller `components/layout/`, inte i `features/shared/`
 
 ---
@@ -212,7 +212,7 @@ function dynamicQuery(table: any) {  // Ingen comment, ingen eslint-disable
 
 **✅ RÄTT (När du bygger participants-funktionalitet):**
 ```typescript
-// Följ PARTICIPANTS_DOMAIN_ARCHITECTURE.md exakt!
+// Följ docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md exakt!
 
 // Host skapar session
 const { data: session } = await supabase
@@ -246,7 +246,7 @@ const { data } = await supabase
 **Regel:** 
 - `multiplayer_sessions` är **deprecated** för nya funktioner
 - Använd `participant_sessions` + `participants` för anonyma join-flows
-- **LÄS** `docs/PARTICIPANTS_DOMAIN_ARCHITECTURE.md` innan du börjar
+- **LÄS** `docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md` innan du börjar
 
 ---
 
@@ -254,7 +254,7 @@ const { data } = await supabase
 
 Innan du skriver kod, kontrollera:
 
-- [ ] Har jag läst relevant domän-dokumentation? (`PARTICIPANTS_DOMAIN_ARCHITECTURE.md`, etc.)
+- [ ] Har jag läst relevant domän-dokumentation? (`docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md`, etc.)
 - [ ] Har jag sökt efter befintlig användning av komponenten/tabellen?
 - [ ] Använder jag rätt Supabase client (`createBrowserClient` vs `createServerClient`)?
 - [ ] Följer jag Catalyst UI Kit conventions?
@@ -277,7 +277,7 @@ grep -r "participant_sessions" .
 ```
 
 ### Steg 3: Validera mot dokumentation
-Om du ska bygga i Participants Domain → **LÄS** `PARTICIPANTS_DOMAIN_ARCHITECTURE.md` först.
+Om du ska bygga i Participants Domain → **LÄS** `docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md` först.
 
 ### Steg 4: Fråga vid tvivel
 Om något är oklart → **FRÅGA** användaren innan du gissar.
@@ -303,8 +303,8 @@ Läs dessa dokument när relevant:
 
 | Dokument | När ska läsas |
 |----------|---------------|
-| `PARTICIPANTS_DOMAIN_ARCHITECTURE.md` | Bygger join-flow, sessions, roles |
-| `PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md` | Förstå vad som INTE finns implementerat |
+| `docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md` | Bygger join-flow, sessions, roles |
+| `docs/participants/PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md` | Förstå vad som INTE finns implementerat |
 | `CATALYST_UI_KIT.md` | Lägger till UI-komponenter |
 | `AUTH_SYSTEM_ANALYSIS.md` | Jobbar med auth/RLS |
 | `MIGRATIONS.md` | Skapar nya databastabeller |
@@ -316,7 +316,7 @@ Läs dessa dokument när relevant:
 **Scenario:** AI ska bygga "Join session via code"-funktionalitet
 
 1. ✅ Läser `AI_CODING_GUIDELINES.md` → ser regel #8 om Participants
-2. ✅ Öppnar `PARTICIPANTS_DOMAIN_ARCHITECTURE.md` → förstår arkitekturen
+2. ✅ Öppnar `docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md` → förstår arkitekturen
 3. ✅ Söker efter `participant_sessions` i koden → hittar schema
 4. ✅ Använder `createBrowserClient` från rätt import
 5. ✅ Skapar kod i `features/participants/` (rätt domän)

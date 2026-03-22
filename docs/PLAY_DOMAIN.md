@@ -33,7 +33,7 @@ Non-goals (owned by other domains):
 - Auth/RBAC primitives and tenant membership (Accounts/Auth/Tenant domains)
 
 ## Related docs
-- Participants (sessions/participants tables): `docs/PARTICIPANTS_DOMAIN.md`
+- Participants (sessions/participants tables): `docs/participants/PARTICIPANTS_DOMAIN.md`
 - Games content model (steps/phases/roles): `docs/GAMES_DOMAIN.md`
 - Play sessions UI spec (historical/spec): `docs/PLAY_SESSIONS_UI_SPEC.md`
 - Platform + auth: `docs/PLATFORM_DOMAIN.md`, `docs/auth/*`

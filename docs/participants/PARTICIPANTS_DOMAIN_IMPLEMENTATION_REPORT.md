@@ -503,7 +503,7 @@ No host control system:
 
 | Document | Status | Action |
 |----------|--------|--------|
-| `PARTICIPANTS_DOMAIN.md` | ❌ Missing | Create with implementation details |
+| `PARTICIPANTS_DOMAIN.md` | Historical finding only; superseded by the validated addendum above |
 | `API.md` | ⚠️ Partial | Add session/participant endpoints |
 | `SCHEMA.md` | ⚠️ Partial | Add participant tables |
 | `REALTIME.md` | ❌ Missing | Document real-time architecture |

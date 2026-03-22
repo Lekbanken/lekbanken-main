@@ -253,10 +253,11 @@ Fält:
 | [docs/reports/SYSTEM_STATUS_RISK_OVERVIEW.md](reports/SYSTEM_STATUS_RISK_OVERVIEW.md) | C | frozen audit | 2026-01-28 | - | Read-only architectural system status report |
 | [docs/reports/TIMEOUT_DIAGNOSTIC_REPORT.md](reports/TIMEOUT_DIAGNOSTIC_REPORT.md) | C | frozen audit | 2026-02-20 | - | Systemwide timeout diagnostic report |
 | [docs/reports/TYPE_MISMATCHES_ANALYSIS.md](reports/TYPE_MISMATCHES_ANALYSIS.md) | C | historical snapshot | 2025-12-10 | - | Type mismatches analysis snapshot |
-| [docs/PARTICIPANTS_DOMAIN.md](PARTICIPANTS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/PARTICIPANTS_DOMAIN_ARCHITECTURE.md](PARTICIPANTS_DOMAIN_ARCHITECTURE.md) | B | archived | 2025-12-17 | - | Historical architecture/spec (pseudo-schema) |
-| [docs/PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md](PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md) | C | archived | 2025-12-17 | - | Historical report (superseded by 2025-12-17 addendum) |
-| [docs/PARTICIPANTS_DOMAIN_MVP.md](PARTICIPANTS_DOMAIN_MVP.md) | B | archived | 2025-12-17 | - | Historical MVP/spec snapshot |
+| [docs/participants/PARTICIPANTS_DOMAIN.md](participants/PARTICIPANTS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md](participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md) | B | archived | 2025-12-17 | - | Historical architecture/spec (pseudo-schema) |
+| [docs/participants/PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md](participants/PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md) | C | archived | 2025-12-17 | - | Historical report (superseded by 2025-12-17 addendum) |
+| [docs/participants/PARTICIPANTS_DOMAIN_MVP.md](participants/PARTICIPANTS_DOMAIN_MVP.md) | B | archived | 2025-12-17 | - | Historical MVP/spec snapshot |
+| [docs/participants/README.md](participants/README.md) | A | active | 2026-03-22 | - | Cluster entrypoint for participants domain docs |
 | [docs/PHASE2_PREFLIGHT_ADMIN_TENANT.md](PHASE2_PREFLIGHT_ADMIN_TENANT.md) | C | frozen audit | 2026-01-10 | - | Preflight validation for admin tenant architecture |
 | [docs/PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc |
 | [docs/PLATFORM_DOMAIN_VALIDATION_REPORT.md](PLATFORM_DOMAIN_VALIDATION_REPORT.md) | C | draft | 2025-12-10 | - | Validation report |

@@ -181,7 +181,7 @@ GPT requested clarification on three items before closing Step 4.
 | [proxy.ts](../proxy.ts) L511 | `hostname !== PLATFORM_PRIMARY_HOST` | Excluded from RPC tenant resolution |
 | [docs/ops/first-deploy-runbook.md](../docs/ops/first-deploy-runbook.md) | `app.lekbanken.no` (12+ references) | Documented as canonical for health, readiness, Stripe webhooks, monitoring |
 | [docs/NOTION.md](../docs/NOTION.md) L192 | `app.lekbanken.no` | Listed as "Produktion (app)" |
-| [docs/PARTICIPANTS_DOMAIN_ARCHITECTURE.md](../docs/PARTICIPANTS_DOMAIN_ARCHITECTURE.md) | `app.lekbanken.no` | Host panel URLs |
+| [docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md](../docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md) | `app.lekbanken.no` | Host panel URLs |
 | [next.config.ts](../next.config.ts) L43 | `www.lekbanken.no` | Image remote pattern (static/marketing) |
 | [launch-readiness/launch-control.md](launch-control.md) L1106 | `app.lekbanken.no/api/health` | Claimed ✅ on 2026-03-13 |
 | Actual production (2026-03-15) | `www.lekbanken.no` | Currently serving all traffic |

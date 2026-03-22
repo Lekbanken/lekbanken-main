@@ -41,6 +41,7 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - Notifications cluster: [notifications/README.md](notifications/README.md)
 - Profile cluster: [profile/README.md](profile/README.md)
 - Play cluster: [play/README.md](play/README.md)
+- Participants cluster: [participants/README.md](participants/README.md)
 - Games cluster: [games/README.md](games/README.md)
 - Builder cluster: [builder/README.md](builder/README.md)
 - Billing cluster: [billing/README.md](billing/README.md)

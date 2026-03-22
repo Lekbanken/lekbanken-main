@@ -195,7 +195,7 @@ Enligt **`docs/PROJECT_EXECUTION_PLAN.md`**, börja med:
 docs/
 ├── SESSION_COMPLETION_REPORT.md          ← Var vi är NU
 ├── PROJECT_EXECUTION_PLAN.md             ← Hela planen framåt
-├── PARTICIPANTS_DOMAIN_ARCHITECTURE.md   ← Participants domain spec
+├── participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md   ← Participants domain spec
 ├── TASK_9_LIVE_PROGRESS.md               ← Task 9 dokumentation
 ├── TASK_11_12_TOKEN_SESSION_MANAGEMENT.md← Tasks 11 & 12 dokumentation
 ├── AI_CODING_GUIDELINES.md               ← Kodregler

@@ -88,7 +88,7 @@ The route handler (`app/api/billing/webhooks/stripe/route.ts`) validates Stripe'
 1. **`admin.lekbanken.no` is vaporware** — admin isolation is role-based (route + layout guards), not host-based
 2. **`app.lekbanken.no` adds zero functionality over `www.lekbanken.no`** — both resolve identically in middleware
 3. **`PLATFORM_PRIMARY_HOST` constant is stale** — points to a host with broken TLS
-4. **Documentation references `app.lekbanken.no` extensively** (first-deploy-runbook: 12+ refs, NOTION.md, PARTICIPANTS_DOMAIN_ARCHITECTURE.md) while production uses `www.`
+4. **Documentation references `app.lekbanken.no` extensively** (first-deploy-runbook: 12+ refs, NOTION.md, `docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md`) while production uses `www.`
 
 ---
 
@@ -200,7 +200,7 @@ Tenant subdomain resolution (`{tenant}.lekbanken.no`) does an RPC call to `get_t
 
 - `docs/ops/first-deploy-runbook.md` — 12+ refs to `app.lekbanken.no`
 - `docs/NOTION.md` — 1 ref
-- `docs/PARTICIPANTS_DOMAIN_ARCHITECTURE.md` — host panel URLs
+- `docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md` — host panel URLs
 - `docs/ops/prod-migration-workflow.md` — health check URL
 - `README.md` — remove `admin.lekbanken.no` line
 - Various launch-readiness docs

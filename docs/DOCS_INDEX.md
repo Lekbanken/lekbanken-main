@@ -53,6 +53,7 @@ Regel:
 - media/: se [media/README.md](media/README.md)
 - notifications/: se [notifications/README.md](notifications/README.md)
 - ops/: se [ops/README.md](ops/README.md)
+- participants/: se [participants/README.md](participants/README.md)
 - play/: se [play/README.md](play/README.md)
 - profile/: se [profile/README.md](profile/README.md)
 - admin/: se [admin/README.md](admin/README.md)

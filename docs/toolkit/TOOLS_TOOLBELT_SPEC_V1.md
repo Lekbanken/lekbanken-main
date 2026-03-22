@@ -14,7 +14,7 @@
 
 Defines the **exact MVP UX** for the Toolbelt system (Admin + Play) and the single MVP tool: **Dice Roller v1**.
 
-This file is the **UX spec**. Implementation details and progress live in [docs/TOOLS_MASTER_IMPLEMENTATION.md](docs/TOOLS_MASTER_IMPLEMENTATION.md).
+This file is the **UX spec**. Implementation details and progress live in [TOOLS_MASTER_IMPLEMENTATION.md](TOOLS_MASTER_IMPLEMENTATION.md).
 
 ## Core principles
 

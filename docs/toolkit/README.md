@@ -25,9 +25,15 @@ Welcome to the documentation for the Legendary Escape Room Toolkit. This guide c
 - For builder/import implementation truth, start at `docs/builder/README.md` and the import references linked from root docs.
 - For games-domain behavior, start at `docs/games/README.md`.
 
+## Internal design docs
+
+- `TOOLS_TOOLBELT_SPEC_V1.md` — draft Toolbelt UX spec for the Dice Roller MVP
+- `TOOLS_COACH_DIAGRAM_IMPLEMENTATION.md` — draft Coach Diagram Builder implementation/spec
+
 ## Historical snapshots
 
 - `archive/TOOLKIT_ROADMAP.md` — historical roadmap snapshot for the toolkit MVP rollout
+- `TOOLS_MASTER_IMPLEMENTATION.md` — historical Toolbelt MVP implementation snapshot
 
 ---
 

@@ -329,9 +329,9 @@ Fält:
 | [docs/participants/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md](participants/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md) | B | draft | 2025-12-11 | - | Task/spec |
 | [docs/participants/TASK_9_LIVE_PROGRESS.md](participants/TASK_9_LIVE_PROGRESS.md) | B | draft | 2025-12-10 | - | Task/spec |
 | [docs/toolkit/archive/TOOLKIT_ROADMAP.md](toolkit/archive/TOOLKIT_ROADMAP.md) | B | historical snapshot | 2025-12-28 | - | Toolkit roadmap snapshot |
-| [docs/TOOLS_COACH_DIAGRAM_IMPLEMENTATION.md](TOOLS_COACH_DIAGRAM_IMPLEMENTATION.md) | B | draft | 2026-01-02 | - | Coach Diagram Builder implementation spec |
-| [docs/TOOLS_MASTER_IMPLEMENTATION.md](TOOLS_MASTER_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-02 | - | Toolbelt MVP implementation snapshot |
-| [docs/TOOLS_TOOLBELT_SPEC_V1.md](TOOLS_TOOLBELT_SPEC_V1.md) | B | draft | 2026-01-02 | - | Toolbelt v1 UX specification |
+| [docs/toolkit/TOOLS_COACH_DIAGRAM_IMPLEMENTATION.md](toolkit/TOOLS_COACH_DIAGRAM_IMPLEMENTATION.md) | B | draft | 2026-01-02 | - | Coach Diagram Builder implementation spec |
+| [docs/toolkit/TOOLS_MASTER_IMPLEMENTATION.md](toolkit/TOOLS_MASTER_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-02 | - | Toolbelt MVP implementation snapshot |
+| [docs/toolkit/TOOLS_TOOLBELT_SPEC_V1.md](toolkit/TOOLS_TOOLBELT_SPEC_V1.md) | B | draft | 2026-01-02 | - | Toolbelt v1 UX specification |
 | [docs/templates/COMPONENT_INVENTORY_TEMPLATE.md](templates/COMPONENT_INVENTORY_TEMPLATE.md) | E | draft | 2025-12-10 | - | Component inventory template |
 | [docs/templates/DECISION_CRITERIA.md](templates/DECISION_CRITERIA.md) | E | draft | 2025-12-10 | - | Architecture and refactoring decision criteria template |
 | [docs/templates/DOMAIN_VALIDATION_TEMPLATE.md](templates/DOMAIN_VALIDATION_TEMPLATE.md) | E | draft | 2025-12-10 | - | Domain validation report template |

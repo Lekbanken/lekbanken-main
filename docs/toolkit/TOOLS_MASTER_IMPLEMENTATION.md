@@ -23,7 +23,7 @@ This document covers the **Toolbelt** system: a set of **session tools** (utilit
 
 If you have an external “master prompt/spec” for Toolbelt UX, it is not currently stored in this repo. Add it (or paste it into this doc) before we lock UI behaviors.
 
-**UX spec:** see [docs/TOOLS_TOOLBELT_SPEC_V1.md](docs/TOOLS_TOOLBELT_SPEC_V1.md).
+**UX spec:** see [TOOLS_TOOLBELT_SPEC_V1.md](TOOLS_TOOLBELT_SPEC_V1.md).
 
 ## Definitions
 

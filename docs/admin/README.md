@@ -51,6 +51,7 @@ Use this index to distinguish current admin design references from older audits 
 - `archive/ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md` — historical Phase 0 shop-rewards admin analysis
 - `archive/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md` — historical Phase 0 support/tickets admin analysis
 - `archive/ARCH_ANALYSIS_TRANSLATION_PHASE0.md` — historical Phase 0 translation/i18n admin analysis
+- `archive/TRANSLATION_ADMIN_ENTERPRISE_ANALYSIS.md` — historical enterprise translation and i18n admin architecture analysis
 
 ### Narrow test plans
 
@@ -100,6 +101,7 @@ Use this index to distinguish current admin design references from older audits 
 - `archive/ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md`
 - `archive/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md`
 - `archive/ARCH_ANALYSIS_TRANSLATION_PHASE0.md`
+- `archive/TRANSLATION_ADMIN_ENTERPRISE_ANALYSIS.md`
 - `test-plans/ADMIN_USERS_TEST_PLAN.md`
 - `test-plans/ADMIN_PRODUCTS_TEST_PLAN.md`
 - `test-plans/ADMIN_ORGANISATIONS_TEST_PLAN.md`

@@ -36,6 +36,7 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - Artifact UI specs (draft): se [ARTIFACT_COMPONENTS.md](ARTIFACT_COMPONENTS.md) + [ARTIFACT_MATRIX.md](ARTIFACT_MATRIX.md)
 - AI coding guardrails: se [AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md)
 - DB/migrations: se [MIGRATIONS.md](MIGRATIONS.md)
+- API cluster: [api/README.md](api/README.md)
 - Database cluster: [database/README.md](database/README.md)
 - Demo cluster: [demo/README.md](demo/README.md)
 - Notifications cluster: [notifications/README.md](notifications/README.md)

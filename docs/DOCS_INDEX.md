@@ -38,6 +38,7 @@ Regel:
 
 ## Cluster Entry Maps
 
+- api/: se [api/README.md](api/README.md)
 - auth/: se [auth/README.md](auth/README.md)
 - billing/: se [billing/README.md](billing/README.md)
 - browse/: se [browse/README.md](browse/README.md)

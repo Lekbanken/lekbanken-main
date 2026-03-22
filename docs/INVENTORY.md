@@ -298,7 +298,8 @@ Fält:
 | [docs/journey/journey-activation-implementation-plan.md](journey/journey-activation-implementation-plan.md) | B | active | 2026-03-06 | - | Journey activation implementation plan |
 | [docs/import/JSON_IMPORT_FIELD_REFERENCE.md](import/JSON_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-26 | - | Import field reference |
 | [docs/import/JSON_IMPORT_VERIFICATION_CHECKLIST.md](import/JSON_IMPORT_VERIFICATION_CHECKLIST.md) | A | active | 2025-12-26 | - | Verification checklist |
-| [docs/API_INTEGRATION_DOMAIN.md](API_INTEGRATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (API surface + conventions) |
+| [docs/api/README.md](api/README.md) | A | active | 2026-03-22 | - | Sub-index for internal API and integration docs |
+| [docs/api/API_INTEGRATION_DOMAIN.md](api/API_INTEGRATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (API surface + conventions) |
 | [docs/play/PLAY_SESSIONS_UI_SPEC.md](play/PLAY_SESSIONS_UI_SPEC.md) | B | draft | 2025-12-16 | - | Spec |
 | [docs/PERFORMANCE_ADVISOR_PROMPT.md](PERFORMANCE_ADVISOR_PROMPT.md) | E | active | 2026-01-08 | - | Prompt for Supabase Performance Advisor |
 | [docs/plans/PRODUCT_CARD_UPGRADE_PLAN.md](plans/PRODUCT_CARD_UPGRADE_PLAN.md) | B | draft | 2026-01-08 | - | Product card upgrade plan |

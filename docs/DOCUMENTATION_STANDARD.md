@@ -116,7 +116,7 @@ Use this order when documents disagree:
 
 - `docs/billing/README.md`
 - `docs/billing/BILLING_LICENSING_DOMAIN.md`
-- `docs/STRIPE.md`
+- `docs/billing/STRIPE.md`
 
 ### Media and asset management
 
@@ -133,7 +133,7 @@ Use this order when documents disagree:
 ### Notifications and app shell
 
 - `docs/notifications/README.md`
-- `docs/NOTIFICATIONS_DOMAIN.md`
+- `docs/notifications/NOTIFICATIONS_DOMAIN.md`
 - `app-shell-notifications-architecture.md`
 - `app-shell-notifications-audit.md`
 - `app-shell-notifications-implementation-plan.md`

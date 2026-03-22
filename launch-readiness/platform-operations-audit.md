@@ -226,7 +226,7 @@
 - ✅ `docs/ops/incident_response.md` — SEV classification, roles, process defined
 - ✅ `docs/ops/incidents.md` — incident log template (empty)
 - ✅ `docs/ENVIRONMENT_VARIABLES.md` — env var reference
-- ✅ `docs/OPERATIONS_DOMAIN.md` — operations domain overview
+- ✅ `docs/ops/OPERATIONS_DOMAIN.md` — operations domain overview
 - ✅ `launch-readiness/incident-playbook.md` — domain-specific playbooks
 
 **Assessment:** Good foundation. Templates exist for all critical ops areas. Main gap is filling in TBD sections and testing procedures.

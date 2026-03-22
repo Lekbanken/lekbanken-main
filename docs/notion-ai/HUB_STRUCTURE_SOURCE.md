@@ -70,7 +70,7 @@ Entry point for environments, deploy flow, incidents, runbooks, and operational 
 ### Key repo docs
 
 - https://github.com/Lekbanken/lekbanken-main/blob/main/docs/database/environments.md
-- https://github.com/Lekbanken/lekbanken-main/blob/main/docs/OPERATIONS_DOMAIN.md
+- https://github.com/Lekbanken/lekbanken-main/blob/main/docs/ops/OPERATIONS_DOMAIN.md
 - https://github.com/Lekbanken/lekbanken-main/tree/main/docs/ops
 - https://github.com/Lekbanken/lekbanken-main/blob/main/launch-readiness/launch-control.md
 

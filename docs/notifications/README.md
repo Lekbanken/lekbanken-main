@@ -8,7 +8,7 @@
 - Last updated: 2026-03-21
 - Last validated: 2026-03-21
 
-> Entry point for the notifications documentation cluster. Use this file to route between the stable domain model in `docs/` and the active app-shell notifications triplet at repo root.
+> Entry point for the notifications documentation cluster. Use this file to route between the stable domain model in this folder and the active app-shell notifications triplet at repo root.
 
 ## Purpose
 
@@ -16,7 +16,7 @@ This cluster covers the in-app notifications domain, notification preferences, a
 
 ## Start here
 
-1. `../NOTIFICATIONS_DOMAIN.md`
+1. `NOTIFICATIONS_DOMAIN.md`
 2. `../../app-shell-notifications-architecture.md`
 3. `../../app-shell-notifications-audit.md`
 4. `../../app-shell-notifications-implementation-plan.md`
@@ -26,7 +26,7 @@ This cluster covers the in-app notifications domain, notification preferences, a
 
 ### Active references
 
-- `../NOTIFICATIONS_DOMAIN.md` — stable domain responsibilities, schema, service layer, and UI boundaries
+- `NOTIFICATIONS_DOMAIN.md` — stable domain responsibilities, schema, service layer, and UI boundaries
 - `../../app-shell-notifications-architecture.md` — canonical app-shell component and routing architecture
 
 ### Active operational docs
@@ -40,4 +40,4 @@ This cluster covers the in-app notifications domain, notification preferences, a
 
 ## Working rule
 
-For product/domain boundaries, prefer `docs/NOTIFICATIONS_DOMAIN.md`. For app-shell runtime wiring and execution state, prefer the root-level app-shell notifications triplet. If those disagree, verify current code and update the audit first.
+For product/domain boundaries, prefer `docs/notifications/NOTIFICATIONS_DOMAIN.md`. For app-shell runtime wiring and execution state, prefer the root-level app-shell notifications triplet. If those disagree, verify current code and update the audit first.

@@ -84,7 +84,7 @@ This report captures a targeted “reality check” for the highest drift-risk a
 
 - Area: Billing
 - Reality: Stripe integration is implemented via `lib/stripe/config.ts` and billing API routes under `app/api/billing/*`.
-- Action taken: Added metadata + related-code anchors + checklist to `docs/STRIPE.md`.
+- Action taken: Added metadata + related-code anchors + checklist to `docs/billing/STRIPE.md`.
 - Status: OK (docs are now verifiable)
 
 ## Open follow-ups

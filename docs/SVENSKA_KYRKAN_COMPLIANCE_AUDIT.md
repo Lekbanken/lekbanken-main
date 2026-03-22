@@ -521,7 +521,7 @@ Sannolik │            │               │            │
 - [auth/archive/MFA_CURRENT_STATE_ANALYSIS.md](auth/archive/MFA_CURRENT_STATE_ANALYSIS.md) - MFA Status
 - [ops/backup_dr.md](ops/backup_dr.md) - Backup & DR
 - [ops/incident_response.md](ops/incident_response.md) - Incident Response
-- [STRIPE.md](STRIPE.md) - Payment Integration
+- [billing/STRIPE.md](billing/STRIPE.md) - Payment Integration
 
 ---
 

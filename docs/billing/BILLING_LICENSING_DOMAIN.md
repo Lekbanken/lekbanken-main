@@ -24,7 +24,7 @@ Non-goals:
 ## Related code (repo-anchored)
 
 ### Docs
-- Stripe integration (detailed): `docs/STRIPE.md`
+- Stripe integration (detailed): `docs/billing/STRIPE.md`
 - Admin UX references: `docs/admin/ADMIN_DESIGN_SYSTEM.md`
 
 ### API routes (App Router)
@@ -91,7 +91,7 @@ Treat the API routes under `app/api/billing/**` as the primary implementation su
 - Uses Stripe (`lib/stripe/config.ts`) to create a subscription and returns a PaymentIntent `client_secret`.
 - Inserts a row into `tenant_subscriptions` when the incoming Stripe price maps to `billing_products.stripe_price_id`.
 
-See `docs/STRIPE.md` for environment variables and local testing with Stripe CLI.
+See `docs/billing/STRIPE.md` for environment variables and local testing with Stripe CLI.
 
 ### 3) Keep local state in sync (Stripe webhook)
 - `POST /api/billing/webhooks/stripe`

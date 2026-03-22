@@ -10,7 +10,7 @@
 
 > Active runbook cluster for operational workflows and production procedures. Use this folder for repo-verifiable operations guidance and mark external dependencies explicitly.
 
-**Canonical overview (domain doc):** `docs/OPERATIONS_DOMAIN.md`
+**Canonical overview (domain doc):** `docs/ops/OPERATIONS_DOMAIN.md`
 
 Runbooks och operativa rutiner. Dessa dokument är **repo-förankrade** där det går (workflows, scripts, API routes), och markerar tydligt vad som kräver ops-beslut/extern konfiguration (hosting, on-call, Slack/PagerDuty, backup-retention).
 

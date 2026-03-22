@@ -214,9 +214,9 @@ Fält:
 | [docs/notion-ai/PROMPT_NOTION_AI_WORKSPACE_SETUP.md](notion-ai/PROMPT_NOTION_AI_WORKSPACE_SETUP.md) | A | active | 2026-03-21 | - | Prompt for Notion AI workspace setup |
 | [docs/notion-ai/README.md](notion-ai/README.md) | A | active | 2026-03-21 | - | Notion AI prompt pack usage |
 | [docs/notion-ai/WORKSPACE_ENTRY_PAGE_SOURCE.md](notion-ai/WORKSPACE_ENTRY_PAGE_SOURCE.md) | A | active | 2026-03-21 | - | Source brief for workspace entry page |
-| [docs/NOTIFICATIONS_DOMAIN.md](NOTIFICATIONS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/notifications/NOTIFICATIONS_DOMAIN.md](notifications/NOTIFICATIONS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/notifications/README.md](notifications/README.md) | A | active | 2026-03-21 | - | Sub-index for notifications domain and app-shell triplet docs |
-| [docs/OPERATIONS_DOMAIN.md](OPERATIONS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/ops/OPERATIONS_DOMAIN.md](ops/OPERATIONS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/ops/alerting.md](ops/alerting.md) | A | active | 2025-12-11 | - | Alerting runbook |
 | [docs/ops/anomaly-detection-playbook.md](ops/anomaly-detection-playbook.md) | A | active | 2026-03-14 | - | Launch anomaly detection and response playbook |
 | [docs/ops/backup_dr.md](ops/backup_dr.md) | A | active | 2025-12-11 | - | Backup and disaster recovery runbook |
@@ -298,7 +298,7 @@ Fält:
 | [docs/SESSION_COMPLETION_REPORT.md](SESSION_COMPLETION_REPORT.md) | C | historical snapshot | 2025-12-11 | - | Completed session report snapshot |
 | [docs/SECURITY_AUDIT_TODO.md](SECURITY_AUDIT_TODO.md) | D | ✅ done | 2026-01-08 | - | Security backlog (completed) |
 | [docs/SECURITY_AUDIT_PROMPT_V2.md](SECURITY_AUDIT_PROMPT_V2.md) | E | active | 2026-01-08 | - | Verification queries for security audit |
-| [docs/STRIPE.md](STRIPE.md) | A | active | 2025-12-17 | - | Billing reference |
+| [docs/billing/STRIPE.md](billing/STRIPE.md) | A | active | 2025-12-17 | - | Billing reference |
 | [docs/SUPPORT_DOMAIN.md](SUPPORT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/TAILWIND_PLUS_COMPONENTS.md](TAILWIND_PLUS_COMPONENTS.md) | A | draft | 2025-11-30 | - | UI reference |
 | [docs/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md](TASK_11_12_TOKEN_SESSION_MANAGEMENT.md) | B | draft | 2025-12-11 | - | Task/spec |

@@ -57,7 +57,7 @@ All Stripe integration work has been successfully completed and is production-re
 - ✅ Webhook forwarding ready for local testing
 
 #### 7. Documentation
-- ✅ Comprehensive `docs/STRIPE.md` guide
+- ✅ Comprehensive `docs/billing/STRIPE.md` guide
 - ✅ API documentation with examples
 - ✅ Testing procedures
 - ✅ Troubleshooting guide
@@ -164,7 +164,7 @@ All work committed and pushed to `main`:
 ## 📚 Documentation
 
 Complete documentation available in:
-- **`docs/STRIPE.md`** - Main integration guide (500+ lines)
+- **`docs/billing/STRIPE.md`** - Main integration guide (500+ lines)
   - Architecture overview
   - API reference
   - Frontend components
@@ -224,7 +224,7 @@ While the integration is complete and production-ready, consider these future en
 ## 📞 Support
 
 For questions or issues:
-1. Check `docs/STRIPE.md` for detailed documentation
+1. Check `docs/billing/STRIPE.md` for detailed documentation
 2. Review Stripe Dashboard for event logs
 3. Check `billing_events` table for webhook history
 4. Use Stripe CLI for local debugging

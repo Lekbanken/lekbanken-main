@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS payment_methods (
 
 ### FAS 3: CLEANUP
 1. ✅ Ta bort gammal `subscriptions` tabell (om oanvänd)
-2. ✅ Dokumentera i docs/stripe.md
+2. ✅ Dokumentera i docs/billing/STRIPE.md
 3. ✅ Lägg till tester
 
 ---

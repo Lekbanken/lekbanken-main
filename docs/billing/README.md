@@ -17,7 +17,7 @@ Use this cluster for billing/licensing domain truth, purchase-flow history, and 
 ## Read order
 
 1. [BILLING_LICENSING_DOMAIN.md](BILLING_LICENSING_DOMAIN.md)
-2. [../STRIPE.md](../STRIPE.md)
+2. [STRIPE.md](STRIPE.md)
 3. [archive/PURCHASE_FLOW_STATUS_REPORT.md](archive/PURCHASE_FLOW_STATUS_REPORT.md) when historical purchase-flow context is needed
 4. [archive/PURCHASE_FLOW_IMPLEMENTATION.md](archive/PURCHASE_FLOW_IMPLEMENTATION.md) for completion history
 5. [archive/LICENSING_SALES_EXECUTION_PLAN.md](archive/LICENSING_SALES_EXECUTION_PLAN.md) for sales-rollout history
@@ -25,6 +25,8 @@ Use this cluster for billing/licensing domain truth, purchase-flow history, and 
 ## Active docs
 
 - [BILLING_LICENSING_DOMAIN.md](BILLING_LICENSING_DOMAIN.md) — current billing/licensing domain reference
+- [STRIPE.md](STRIPE.md) — Stripe integration reference
+- [stripe-usage-example.tsx](stripe-usage-example.tsx) — reference example for wiring subscription checkout
 
 ## Historical docs
 
@@ -34,7 +36,6 @@ Use this cluster for billing/licensing domain truth, purchase-flow history, and 
 
 ## Related docs
 
-- [../STRIPE.md](../STRIPE.md) — Stripe integration details
 - [../admin/ADMIN_DESIGN_SYSTEM.md](../admin/ADMIN_DESIGN_SYSTEM.md) — admin UX patterns referenced by billing/admin surfaces
 
 ## Placement rule

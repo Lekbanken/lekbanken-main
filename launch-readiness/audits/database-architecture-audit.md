@@ -8,13 +8,13 @@
 - Last updated: 2026-03-21
 - Last validated: 2026-03-13
 
-> Closed database audit from the launch-readiness cycle. Use `launch-readiness/launch-control.md` for current program state and pair this file with `database-architecture-remediation-plan.md` and `database-rebuild-feasibility.md` for the full decision record.
+> Closed database audit from the launch-readiness cycle. Use `launch-readiness/launch-control.md` for current program state and pair this file with `../implementation/database-architecture-remediation-plan.md` and `database-rebuild-feasibility.md` for the full decision record.
 
 > **Status:** ✅ GENOMFÖRD — Audit klar, Alternativ B (Canonical Baseline) valt och verifierat  
 > **Datum:** 2026-03-13  
 > **Utlösare:** Sandbox-provisionering avslöjade 10 fresh-install-fel i migrationskedjan  
 > **Scope:** Schema-arkitektur (domän för domän) + migrationskedjans hälsa  
-> **Uppföljning:** Canonical Baseline genomförd — se `database-architecture-remediation-plan.md`
+> **Uppföljning:** Canonical Baseline genomförd — se `../implementation/database-architecture-remediation-plan.md`
 
 ---
 
@@ -339,4 +339,4 @@ Produktions-databasen fungerar (den fick migreringarna inkrementellt). Men en fr
 
 > **Ska Lekbanken fortsätta lappa 307 migreringar, eller skapa en ny canonical baseline som representerar dagens faktiska schema?**
 
-Svaret på denna fråga avgör remedierings-strategin. Se `database-architecture-remediation-plan.md` och `database-rebuild-feasibility.md` för detaljerad analys av alternativen.
+Svaret på denna fråga avgör remedierings-strategin. Se `../implementation/database-architecture-remediation-plan.md` och `database-rebuild-feasibility.md` för detaljerad analys av alternativen.

@@ -15,7 +15,7 @@
 > **Senast validerad:** 2026-03-21  
 > **Status:** Frozen audit  
 > **Exekveringsstatus:** ✅ GENOMFÖRD — Alternativ B verifierat  
-> **Input:** database-architecture-audit.md, database-architecture-remediation-plan.md  
+> **Input:** database-architecture-audit.md, ../implementation/database-architecture-remediation-plan.md  
 > **Syfte:** Bedöma genomförbarhet, risker och ROI för de tre alternativen  
 > **Slutsats:** Alternativ B (Canonical Baseline) framgångsrikt genomfört. Fresh install verifierad.  
 > **Notering:** Fryst besluts- och genomförandesnapshot. Använd aktuella miljö- och migrationsdokument för nuvarande arbetssätt.

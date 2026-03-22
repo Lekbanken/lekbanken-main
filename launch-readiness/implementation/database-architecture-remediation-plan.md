@@ -12,7 +12,7 @@
 
 > **Status:** ✅ GENOMFÖRD — Alternativ B valt och verifierat  
 > **Datum:** 2026-03-13  
-> **Input:** database-architecture-audit.md  
+> **Input:** ../audits/database-architecture-audit.md  
 > **Syfte:** Tre strategiska alternativ med tydlig rekommendation  
 > **Resultat:** Alternativ B (Canonical Baseline) genomfört. Fresh install verifierad: 247 tabeller, 156 funktioner, 545 policies, 28 enums. Baseline är nu canonical source för alla nya environments.
 

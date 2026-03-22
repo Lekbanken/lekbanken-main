@@ -50,9 +50,9 @@ This folder contains the bounded audit outputs produced during the launch-readin
 
 ### Database decision set
 
-- `../database-architecture-audit.md` — migration-chain and schema-architecture audit that triggered the canonical baseline decision
-- `../database-rebuild-feasibility.md` — closed feasibility and ROI assessment for the database alternatives
-- `../database-architecture-remediation-plan.md` — executed remediation plan for the chosen canonical-baseline path
+- `database-architecture-audit.md` — migration-chain and schema-architecture audit that triggered the canonical baseline decision
+- `database-rebuild-feasibility.md` — closed feasibility and ROI assessment for the database alternatives
+- `../implementation/database-architecture-remediation-plan.md` — executed remediation plan for the chosen canonical-baseline path
 
 ### Domain audit references
 

@@ -127,7 +127,7 @@ Run supabase link --project-ref vmpdejhgpsrfulimsoqn to setup IPv4 connection.
 
 ### 1.12 Dokumentation säger sandbox-scope = Vercel Preview
 
-**Källa:** [../../launch-readiness/sandbox-implementation-brief.md](../../launch-readiness/sandbox-implementation-brief.md), [../../launch-readiness/launch-control.md](../../launch-readiness/launch-control.md)  
+**Källa:** [../../launch-readiness/implementation/sandbox-implementation-brief.md](../../launch-readiness/implementation/sandbox-implementation-brief.md), [../../launch-readiness/launch-control.md](../../launch-readiness/launch-control.md)  
 **Observation:** Preview-scoped env vars i Vercel Dashboard pekar mot sandbox:
 ```
 NEXT_PUBLIC_SUPABASE_URL = https://vmpdejhgpsrfulimsoqn.supabase.co  (Preview scope)
@@ -173,7 +173,7 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qohhnufxid
 | Miljö | Supabase-projekt/databas | Ref ID | Hur det är bevisat | Säkerhetsgrad |
 |-------|--------------------------|--------|---------------------|---------------|
 | **Lokal utveckling** | Docker-container (`127.0.0.1:54322`) | N/A (lokal) | `.env.local` pekar `127.0.0.1:54321`, `supabase status` bekräftar, lokala nycklar matchar | **Bevisat** |
-| **Vercel Preview (PR-builds)** | lekbanken-sandbox | `vmpdejhgpsrfulimsoqn` | Dokumenterat i `sandbox-implementation-brief.md`, runtime-verifierat via `/api/health` (2026-03-14) | **Bevisat** |
+| **Vercel Preview (PR-builds)** | lekbanken-sandbox | `vmpdejhgpsrfulimsoqn` | Dokumenterat i `implementation/sandbox-implementation-brief.md`, runtime-verifierat via `/api/health` (2026-03-14) | **Bevisat** |
 | **Vercel Production** | lekbanken-main | `qohhnufxididbmzqnjwg` | `db-push-guard.mjs` hårdkodar ref, CLI-`link` pekar hit, `migration list` bekräftar synk | **Bevisat** |
 | **CI (GitHub Actions)** | Lokal Docker (per workflow-run) | N/A | `rls-tests.yml` och `baseline-check.yml` kör `supabase start` + `db reset --local` | **Bevisat** |
 | **Legacy** | Lekbanken Projekt | `zaufhdwajplipthjicts` | Finns i `projects list`, dokumenterat som "not in active use" i `environments.md` | **Bevisat — oanvänd** |

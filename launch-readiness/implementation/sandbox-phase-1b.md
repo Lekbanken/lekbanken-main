@@ -100,7 +100,7 @@ An `isProductionEnvironment()` helper is exported from `env.ts` (checks `appEnv 
 
 `env.deployment.appEnv`, `env.deployment.target`, and `isProductionEnvironment()` are defined but **zero TypeScript files** reference them outside `lib/config/env.ts`. The safety guard is entirely **declarative** — it exists only in:
 - SQL seed files (`current_setting('app.env')` → Postgres-level check)
-- Documentation patterns (bash scripts in sandbox-implementation-brief.md)
+- Documentation patterns (bash scripts in `sandbox-implementation-brief.md`)
 
 **This means:** No runtime code prevents dangerous operations based on environment. A developer could accidentally run destructive operations against production without any application-layer guard.
 
@@ -651,7 +651,7 @@ Rejected for now: Alt A (local-only), Alt D (branching)
 | `.github/workflows/baseline-check.yml` | Schema verification CI | Threshold checks |
 | `.github/workflows/rls-tests.yml` | RLS testing CI | SQL harness + security markers |
 | `launch-readiness/launch-control.md` | Progress tracker | L1017–1075: OPS-SAND-001 section |
-| `launch-readiness/sandbox-implementation-brief.md` | Implementation plan | Full preview isolation spec |
+| `launch-readiness/implementation/sandbox-implementation-brief.md` | Implementation plan | Full preview isolation spec |
 | `launch-readiness/launch-readiness-architecture.md` | Architecture doc | L47–70: ADR-005, L422: status table |
 | `launch-readiness/platform-operations-audit.md` | Ops audit | L62: OPS-SAND-001 |
 

@@ -5,7 +5,7 @@
 > **Status:** active
 > **Owner:** -
 > **Date:** 2026-01-08
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-22
 > **Last validated:** -
 > **Notes:** Enterprise-ready database security reference after the Supabase remediation pass.
 

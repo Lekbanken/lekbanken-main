@@ -328,7 +328,7 @@ Once migrations execute:
 | 021-023 | Policy consolidation | ✅ |
 | 024 | Missing FK index | ✅ |
 
-**Full details:** See [docs/DATABASE_SECURITY_DOMAIN.md](docs/DATABASE_SECURITY_DOMAIN.md)
+**Full details:** See [docs/database/DATABASE_SECURITY_DOMAIN.md](docs/database/DATABASE_SECURITY_DOMAIN.md)
 
 ---
 

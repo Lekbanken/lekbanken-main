@@ -23,22 +23,25 @@ Use it to answer:
 ## Read order
 
 1. `DATA_MODEL_DOMAIN.md`
-2. `environments.md`
-3. `../MIGRATIONS.md`
-4. `../ops/prod-migration-workflow.md`
-5. `migration-history.md` when you need the normalization timeline
-6. `rls-audit-2025-03-17.md` only for the dated RLS security snapshot
+2. `DATABASE_SECURITY_DOMAIN.md`
+3. `environments.md`
+4. `../MIGRATIONS.md`
+5. `../ops/prod-migration-workflow.md`
+6. `migration-history.md` when you need the normalization timeline
+7. `DATABASE_SECURITY_AUDIT.md` and `rls-audit-2025-03-17.md` only for dated security audit snapshots
 
 ## Status map
 
 ### Active
 
 - `DATA_MODEL_DOMAIN.md` — canonical schema-governance reference for migrations, typegen, and RLS conventions
+- `DATABASE_SECURITY_DOMAIN.md` — canonical database security reference for RLS, SECURITY DEFINER hardening, and verification queries
 - `environments.md` — canonical environment and database-target rules
 - `migration-history.md` — active normalization log for the current baseline/migration-history state
 
 ### Frozen audits
 
+- `DATABASE_SECURITY_AUDIT.md` — frozen audit snapshot of the resolved Supabase security/performance remediation cycle
 - `rls-audit-2025-03-17.md` — dated RLS security audit snapshot for the 2026-03-17 fix batch
 - `environment-database-audit.md` — broader frozen audit snapshot spanning local, sandbox, and production environment state
 

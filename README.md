@@ -109,7 +109,7 @@ Lekbanken har genomgått fullständig säkerhetsrevision och uppfyller **Enterpr
 | auth.uid() optimering | ✅ 100% |
 | Supabase Security Advisor | ✅ 0 varningar |
 
-📖 **[Se fullständig säkerhetsdokumentation →](docs/DATABASE_SECURITY_DOMAIN.md)**
+📖 **[Se fullständig säkerhetsdokumentation →](docs/database/DATABASE_SECURITY_DOMAIN.md)**
 
 ---
 

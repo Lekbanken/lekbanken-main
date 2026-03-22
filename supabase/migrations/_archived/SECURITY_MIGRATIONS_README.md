@@ -160,7 +160,7 @@ If issues occur after applying, use the rollback scripts in `migrations/rollback
 
 | File | Purpose |
 |------|---------|
-| `docs/DATABASE_SECURITY_AUDIT.md` | Full audit report |
+| `docs/database/DATABASE_SECURITY_AUDIT.md` | Full audit report |
 | `scripts/security-audit-queries.sql` | Queries for manual verification |
 | `scripts/db-inventory.sql` | Full database inventory queries |
 | `2026-01-07/*.csv` | Performance metrics from Supabase inspect |

@@ -97,6 +97,7 @@ Rekommenderad spegling i repo:
 	- Runbooks: [ops/README.md](ops/README.md)
 - API / Integration (aktuellt): [API_INTEGRATION_DOMAIN.md](API_INTEGRATION_DOMAIN.md)
 - AI (gated): [AI_DOMAIN.md](AI_DOMAIN.md)
+- Database Security (aktuellt): [database/DATABASE_SECURITY_DOMAIN.md](database/DATABASE_SECURITY_DOMAIN.md)
 - DOMAIN_* (där det finns)
 
 ---

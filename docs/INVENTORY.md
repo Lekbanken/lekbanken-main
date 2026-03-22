@@ -171,8 +171,8 @@ Fält:
 | [docs/DOCS_NAMING_CONVENTIONS.md](DOCS_NAMING_CONVENTIONS.md) | A | active | 2026-03-22 | - | Naming, placement, and cluster-first structure conventions |
 | [docs/legal/archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md](legal/archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md) | C | frozen audit | - | Compliance | Enterprise compliance audit |
 | [docs/legal/SVENSKA_KYRKAN_ONBOARDING.md](legal/SVENSKA_KYRKAN_ONBOARDING.md) | B | draft | 2026-01-13 | - | Onboarding guide |
-| [docs/DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md) | C | draft | 2025-12-08 | - | Learnings |
-| [docs/DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
+| [docs/games/DOMAIN_GAMES_LEARNINGS.md](games/DOMAIN_GAMES_LEARNINGS.md) | C | draft | 2025-12-08 | - | Learnings |
+| [docs/games/DOMAIN_GAMES_TODO.md](games/DOMAIN_GAMES_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
 | [docs/planner/DOMAIN_PLANNER_TODO.md](planner/DOMAIN_PLANNER_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
 | [docs/DOMAIN_PRODUCT_LEARNINGS.md](DOMAIN_PRODUCT_LEARNINGS.md) | C | draft | 2025-12-08 | - | Learnings |
 | [docs/tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md](tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md) | C | draft | 2025-12-08 | - | Learnings |

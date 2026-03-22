@@ -123,7 +123,7 @@ The current Planner:
 
 ## 6. Documentation must follow reality
 
-We already have `docs/DOMAIN_GAMES_TODO.md` and Notion domain docs, but parts of them are now outdated.
+We already have `docs/games/DOMAIN_GAMES_TODO.md` and Notion domain docs, but parts of them are now outdated.
 
 **Guideline for new domains:**
 

@@ -29,6 +29,11 @@ Use this cluster to understand the games content domain, browse and publish boun
 
 - `GAMES_DOMAIN.md` — canonical games-domain overview for content model, publish flow, browse access, and API boundaries
 
+### Domain learnings and backlog
+
+- `DOMAIN_GAMES_TODO.md` — games domain backlog and follow-up work
+- `DOMAIN_GAMES_LEARNINGS.md` — learnings from games domain exploration for future domain work
+
 ### Bounded GameDetails context work
 
 - `GAMEDETAILS_CONTEXT_ARCHITECTURE.md` — target architecture for GameDetails context handling

@@ -517,8 +517,8 @@ Sannolik │            │               │            │
 ## 📚 Relaterad Dokumentation
 
 - [DATABASE_SECURITY_DOMAIN.md](DATABASE_SECURITY_DOMAIN.md) - RLS & Security
-- [LEGAL_IMPLEMENTATION_STATUS.md](LEGAL_IMPLEMENTATION_STATUS.md) - Legal System
-- [MFA_CURRENT_STATE_ANALYSIS.md](MFA_CURRENT_STATE_ANALYSIS.md) - MFA Status
+- [legal/archive/LEGAL_IMPLEMENTATION_STATUS.md](legal/archive/LEGAL_IMPLEMENTATION_STATUS.md) - Legal System
+- [auth/archive/MFA_CURRENT_STATE_ANALYSIS.md](auth/archive/MFA_CURRENT_STATE_ANALYSIS.md) - MFA Status
 - [ops/backup_dr.md](ops/backup_dr.md) - Backup & DR
 - [ops/incident_response.md](ops/incident_response.md) - Incident Response
 - [STRIPE.md](STRIPE.md) - Payment Integration

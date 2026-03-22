@@ -5,8 +5,8 @@
 - Owner: -
 - Status: active
 - Date: 2025-12-18
-- Last updated: 2026-03-21
-- Last validated: 2026-03-21
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
 
 > Active reference for documentation naming and structure conventions. Use together with `DOCUMENTATION_STANDARD.md` when moving or renaming docs.
 
@@ -22,11 +22,14 @@ Mål: göra dokumentationen mer översiktlig utan att skapa onödiga breaking ch
 ## Rekommenderad struktur
 
 - `docs/*.md`
-  - domändokumentation och stabila referenser
-  - curated index: `docs/DOCS_INDEX.md`
-  - full inventory: `docs/INVENTORY.md`
+  - governance, tvärgående referenser och kvarvarande root-level canonical docs
+  - root start page: `docs/README.md`
+  - authoritative registry: `docs/INVENTORY.md`
+  - lightweight entry map: `docs/DOCS_INDEX.md`
 - `docs/<area>/*`
-  - sub-index per område, till exempel `docs/auth/*`, `docs/ops/*`, `docs/templates/*`
+  - aktiva områdesdocs och sub-index per område, till exempel `docs/auth/*`, `docs/ops/*`, `docs/templates/*`
+- `docs/<area>/history/*` eller `docs/<area>/archive/*`
+  - äldre områdesdocs som inte ska vara det första en agent eller människa läser
 - `docs/reports/*`
   - rapporter, analys, snapshots och historik
   - inte source of truth
@@ -57,8 +60,8 @@ Undvik att renama:
 
 ## Checklista vid flytt eller rename
 
-- uppdatera `docs/DOCS_INDEX.md`
 - uppdatera `docs/INVENTORY.md`
+- uppdatera `docs/DOCS_INDEX.md` bara om entrypoint-navigeringen ändras
 - uppdatera `docs/NOTION.md` om Notion-spegeln påverkas
 - sök och uppdatera interna markdown-länkar i repo
 - kontrollera att `docs/README.md` fortfarande pekar rätt om det var en viktig ingångsfil

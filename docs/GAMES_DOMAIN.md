@@ -21,8 +21,8 @@ Non-goals:
 
 ## Related docs
 - CSV contract reference: `docs/CSV_IMPORT_FIELD_REFERENCE.md`
-- Billing entitlements and product mapping: `docs/BILLING_LICENSING_DOMAIN.md` + `docs/STRIPE.md`
-- Media junction patterns: `docs/MEDIA_DOMAIN.md`
+- Billing entitlements and product mapping: `docs/billing/BILLING_LICENSING_DOMAIN.md` + `docs/STRIPE.md`
+- Media junction patterns: `docs/media/MEDIA_DOMAIN.md`
 
 ## Related code (repo-anchored)
 

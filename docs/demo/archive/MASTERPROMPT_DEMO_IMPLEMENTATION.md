@@ -20,7 +20,7 @@
 
 ## 📋 EXECUTIVE SUMMARY
 
-Du ska implementera ett enterprise-grade demo-läge i Lekbanken baserat på omfattande analys (docs/demo_current_state.md) och teknisk specifikation (docs/demo_technical_spec.md).
+Du ska implementera ett enterprise-grade demo-läge i Lekbanken baserat på omfattande analys (docs/demo/archive/demo_current_state.md) och teknisk specifikation (docs/demo/demo_technical_spec.md).
 
 **Nuläge:** ✅ KOMPLETT - Alla 3 sprints implementerade
 **Status:** Production-ready demo mode med rate limiting, monitoring och sales dokumentation
@@ -352,7 +352,7 @@ Dessa MÅSTE implementeras först (P0 blockers):
 - Ändra demo tenant settings
 - Accessa känslig data
 
-**Implementation:** Se `docs/demo_technical_spec.md` Section "RLS Security Model"
+**Implementation:** Se `docs/demo/demo_technical_spec.md` Section "RLS Security Model"
 
 **Required policies:** ✅ Skapade i `20260114100001_demo_rls_policies.sql`
 ```sql
@@ -598,7 +598,7 @@ app/app/layout.tsx
 - [x] Demo expired page ✅ `app/demo-expired/page.tsx`
 - [x] Legal review complete → Privacy Policy updated ✅ `messages/sv.json`, `messages/no.json`, `messages/en.json` (demoSessions section)
 - [x] Error handling (pool exhausted, auth failed, etc.) ✅ `app/demo/error.tsx`, `app/demo/loading.tsx`
-- [x] Demo documentation för sales team ✅ `docs/DEMO_SALES_GUIDE.md`
+- [x] Demo documentation för sales team ✅ `docs/demo/DEMO_SALES_GUIDE.md`
 - [x] Monitoring dashboard (demo sessions, conversion rate) ✅ `app/admin/demo/page.tsx`, `app/admin/demo/components/`
 
 ---
@@ -847,7 +847,7 @@ NEXT_PUBLIC_POSTHOG_HOST=
 - [x] Legal review complete, Privacy Policy updated ✅ messages/*.json
 - [x] Error states handled gracefully ✅ `app/demo/error.tsx`, `app/demo/loading.tsx`
 - [x] Monitoring dashboard configured ✅ `app/admin/demo/page.tsx`
-- [x] Sales team documentation ready ✅ `docs/DEMO_SALES_GUIDE.md`
+- [x] Sales team documentation ready ✅ `docs/demo/DEMO_SALES_GUIDE.md`
 - [x] Ready for public launch ✅
 
 ---
@@ -880,10 +880,10 @@ NEXT_PUBLIC_POSTHOG_HOST=
 
 All context you need:
 
-1. **docs/demo_current_state.md** - Nulägesanalys, vad som finns idag
-2. **docs/demo_technical_spec.md** - Full arkitektur, RLS policies, API specs
-3. **docs/demo_implementation_plan.md** - Original 5-sprint plan (reviderad ovan)
-4. **docs/demo_decisions_needed.md** - Beslutsdokument (COMPLETED med svar)
+1. **docs/demo/archive/demo_current_state.md** - Nulägesanalys, vad som finns idag
+2. **docs/demo/demo_technical_spec.md** - Full arkitektur, RLS policies, API specs
+3. **docs/demo/archive/demo_implementation_plan.md** - Original 5-sprint plan (reviderad ovan)
+4. **docs/demo/archive/demo_decisions_needed.md** - Beslutsdokument (COMPLETED med svar)
 
 **Key sections to reference:**
 - RLS Policies: `demo_technical_spec.md` Section "RLS Security Model"
@@ -904,7 +904,7 @@ All context you need:
 
 2. **Review beslut:**
    ```bash
-   cat docs/demo_decisions_needed.md
+  cat docs/demo/archive/demo_decisions_needed.md
    # Verify decisions match: C, A, B, B, A, B, A
    ```
 

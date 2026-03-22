@@ -182,8 +182,8 @@ For this repo specifically:
 If a new canonical triplet is introduced, update these in the same change when relevant:
 
 - [README.md](README.md)
-- [DOCS_INDEX.md](DOCS_INDEX.md)
 - [INVENTORY.md](INVENTORY.md)
+- [DOCS_INDEX.md](DOCS_INDEX.md) when entrypoint navigation changes
 - [DOCUMENTATION_STANDARD.md](DOCUMENTATION_STANDARD.md)
 - [.github/copilot-instructions.md](../.github/copilot-instructions.md)
 

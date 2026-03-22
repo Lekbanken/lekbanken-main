@@ -20,7 +20,7 @@ Use this cluster to understand the games content domain, browse and publish boun
 2. `GAMEDETAILS_CONTEXT_ARCHITECTURE.md`
 3. `GAMEDETAILS_CONTEXT_AUDIT.md`
 4. `GAMEDETAILS_CONTEXT_IMPLEMENTATION_PLAN.md`
-5. `../ADMIN_GAME_BUILDER_V1.md`
+5. `../admin/ADMIN_GAME_BUILDER_V1.md`
 6. `../CSV_IMPORT_FIELD_REFERENCE.md`
 
 ## Status map
@@ -44,7 +44,7 @@ Use this cluster to understand the games content domain, browse and publish boun
 ## Related docs outside this folder
 
 - `../admin/README.md` — builder UI and admin-domain references
-- `../ADMIN_GAME_BUILDER_V1.md` — canonical builder UI/API reference under the admin cluster
+- `../admin/ADMIN_GAME_BUILDER_V1.md` — canonical builder UI/API reference under the admin cluster
 - `../CSV_IMPORT_FIELD_REFERENCE.md` — CSV field contract reference
 - `../GAME_BUILDER_UI_SPEC.md` — builder UI draft/spec material
 - `../TESTPLAN_GAME_BUILDER_P0.md` — builder validation/test plan

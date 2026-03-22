@@ -20,11 +20,11 @@ Aktuell arbetsmodell:
 
 Startpunkter i repo:
 - docs start: [README.md](README.md)
-- docs inventering/index: [DOCS_INDEX.md](DOCS_INDEX.md)
-- docs full inventory (alla docs): [INVENTORY.md](INVENTORY.md)
+- docs entry map: [DOCS_INDEX.md](DOCS_INDEX.md)
+- docs authoritative registry: [INVENTORY.md](INVENTORY.md)
 - docs naming/structure: [DOCS_NAMING_CONVENTIONS.md](DOCS_NAMING_CONVENTIONS.md)
 - docs reports (archive): [reports/README.md](reports/README.md)
-- docs prompts (archive): [prompts/README.md](prompts/README.md)
+- docs archive: [archive/README.md](archive/README.md)
 - AI/human-wiki: [sandbox/wiki/README.md](../sandbox/wiki/README.md)
 
 Målet är att undvika "code vibe drift": om något står i Notion men inte kan verifieras i repo så är det per definition misstänkt och ska uppdateras eller tas bort.
@@ -78,18 +78,18 @@ Rekommenderad spegling i repo:
 - Tenant (aktuellt): [TENANT_DOMAIN.md](TENANT_DOMAIN.md)
 	- Roadmap: [DOMAIN_TENANT_TODO.md](DOMAIN_TENANT_TODO.md)
 	- Learnings: [DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md](DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md)
-- Billing & Licensing (aktuellt): [BILLING_LICENSING_DOMAIN.md](BILLING_LICENSING_DOMAIN.md)
+- Billing & Licensing (aktuellt): [billing/BILLING_LICENSING_DOMAIN.md](billing/BILLING_LICENSING_DOMAIN.md)
 	- Stripe integration (detail): [STRIPE.md](STRIPE.md)
 - Games (aktuellt): [GAMES_DOMAIN.md](GAMES_DOMAIN.md)
 	- Roadmap: [DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md)
 	- Learnings: [DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md)
-- Content Management (aktuellt): [CONTENT_MANAGEMENT_DOMAIN.md](CONTENT_MANAGEMENT_DOMAIN.md)
+- Content Management (aktuellt): [content/CONTENT_MANAGEMENT_DOMAIN.md](content/CONTENT_MANAGEMENT_DOMAIN.md)
 - Play (aktuellt): [PLAY_DOMAIN.md](PLAY_DOMAIN.md)
 - Planner (aktuellt): [PLANNER_DOMAIN.md](PLANNER_DOMAIN.md)
 - Gamification (aktuellt): [GAMIFICATION_DOMAIN.md](GAMIFICATION_DOMAIN.md)
 - Journey (aktuellt): [JOURNEY_DOMAIN.md](JOURNEY_DOMAIN.md)
 - Marketing (aktuellt): [MARKETING_DOMAIN.md](MARKETING_DOMAIN.md)
-- Media (aktuellt): [MEDIA_DOMAIN.md](MEDIA_DOMAIN.md)
+- Media (aktuellt): [media/MEDIA_DOMAIN.md](media/MEDIA_DOMAIN.md)
 - Notifications (aktuellt): [NOTIFICATIONS_DOMAIN.md](NOTIFICATIONS_DOMAIN.md)
 - Support (aktuellt): [SUPPORT_DOMAIN.md](SUPPORT_DOMAIN.md)
 - Translation Engine (aktuellt): [TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md)
@@ -224,7 +224,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [x] **Data Model Domain** – Central schema-governance (se `docs/DATA_MODEL_DOMAIN.md`)
 - [x] **Accounts Domain** – Auth-flöden och roller (se `docs/ACCOUNTS_DOMAIN.md` + `docs/auth/*`)
 - [x] **Tenant Domain** – Multi-tenancy-setup (se `docs/TENANT_DOMAIN.md`)
-- [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/BILLING_LICENSING_DOMAIN.md` + `docs/STRIPE.md`)
+- [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/billing/BILLING_LICENSING_DOMAIN.md` + `docs/STRIPE.md`)
 - [x] **Games Domain** – Lekstruktur och metadata (se `docs/GAMES_DOMAIN.md`)
 - [x] **Planner Domain** – Planer, block/tidslinje, synlighet, anteckningar, play-projection (se `docs/PLANNER_DOMAIN.md`)
 - [ ] **Planner Domain** – AI-generering och templates
@@ -236,7 +236,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [x] **Marketing Domain** – Landningssidor och funnels (se `docs/MARKETING_DOMAIN.md`)
 - [x] **Notifications Domain** – In-app notiser (se `docs/NOTIFICATIONS_DOMAIN.md`)
 - [x] **Support Domain** – Feedback + tickets (se `docs/SUPPORT_DOMAIN.md`)
-- [x] **Content Management Domain (CMD)** – Bulk ops (CSV import/export) + builder + content planner primitives (se `docs/CONTENT_MANAGEMENT_DOMAIN.md`)
+- [x] **Content Management Domain (CMD)** – Bulk ops (CSV import/export) + builder + content planner primitives (se `docs/content/CONTENT_MANAGEMENT_DOMAIN.md`)
 
 ---
 

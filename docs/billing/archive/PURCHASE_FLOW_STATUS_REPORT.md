@@ -456,7 +456,7 @@ const [purchaseType, setPurchaseType] = useState<'personal' | 'organization'>('o
 | Return polling | `app/(marketing)/checkout/return/page.tsx` |
 | Entitlements schema | `supabase/migrations/20260121140000_entitlements_and_intents.sql` |
 | Demo user schema | `supabase/migrations/20260114100000_demo_foundation.sql` |
-| Billing domain docs | `docs/BILLING_LICENSING_DOMAIN.md` |
+| Billing domain docs | `docs/billing/BILLING_LICENSING_DOMAIN.md` |
 | Stripe docs | `docs/STRIPE.md` |
 
 ---

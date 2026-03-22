@@ -420,4 +420,4 @@ None - V2 is additive and the original components remain unchanged.
 
 - [ADMIN_GAME_BUILDER_V1.md](./ADMIN_GAME_BUILDER_V1.md) - Game Builder documentation
 - [GAMES_DOMAIN.md](./GAMES_DOMAIN.md) - Games domain architecture
-- [ADMIN_DESIGN_SYSTEM.md](./ADMIN_DESIGN_SYSTEM.md) - Admin UI patterns
+- [ADMIN_DESIGN_SYSTEM.md](admin/ADMIN_DESIGN_SYSTEM.md) - Admin UI patterns

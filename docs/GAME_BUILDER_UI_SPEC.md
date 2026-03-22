@@ -852,7 +852,7 @@ GameBuilderPage
 
 ### 9.1 Layout & Spacing
 
-Follow existing [ADMIN_DESIGN_SYSTEM.md](ADMIN_DESIGN_SYSTEM.md):
+Follow existing [ADMIN_DESIGN_SYSTEM.md](admin/ADMIN_DESIGN_SYSTEM.md):
 
 - Page padding: `px-4 lg:px-8`, `pt-6 pb-10`
 - Section gaps: `gap-6` or `gap-8`

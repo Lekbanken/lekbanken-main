@@ -155,4 +155,4 @@ Gaps:
 
 ---
 
-Next: see `docs/ADMIN_IA_PROPOSAL.md` for the proposed new IA + mapping (no route disappears).
+Next: see `docs/admin/ADMIN_IA_PROPOSAL.md` for the proposed new IA + mapping (no route disappears).

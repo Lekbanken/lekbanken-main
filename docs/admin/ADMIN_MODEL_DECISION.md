@@ -43,7 +43,7 @@ The codebase was **designed** for Model A (`/admin/tenant/*` accessible to tenan
 | Layout guard | `app/admin/tenant/[tenantId]/layout.tsx` | 27-35 | Allows `isSystemAdmin OR hasTenantAccess` |
 | Test expectations | `tests/e2e/admin-auth.spec.ts` | 115-137 | Tests expect tenant admins to access `/admin/tenant/*` |
 | Test setup comment | `tests/e2e/auth.setup.tenant-admin.ts` | 38 | "tenant admins may go to /admin/tenant/[id]" |
-| IA Proposal | `docs/ADMIN_IA_PROPOSAL.md` | 23 | "Audience: tenant owner/admin/editor (and system_admin when 'acting as tenant')" |
+| IA Proposal | `docs/admin/ADMIN_IA_PROPOSAL.md` | 23 | "Audience: tenant owner/admin/editor (and system_admin when 'acting as tenant')" |
 
 ### 1.2 What "showActingAsBanner" Means
 
@@ -113,7 +113,7 @@ All tenant admin navigation in `lib/admin/nav.ts` points to `/admin/tenant/[tena
 
 ### 2.4 Documentation
 
-From `docs/ADMIN_IA_PROPOSAL.md`:
+From `docs/admin/ADMIN_IA_PROPOSAL.md`:
 > "Tenant mode: Audience: tenant owner/admin/editor (and system_admin when 'acting as tenant')"
 
 ### 2.5 Conclusion
@@ -361,9 +361,9 @@ CREATE POLICY achievement_awards_tenant_admin_select
 |----------|---------|
 | `docs/ARCH_REALITY_CHECK_ADMIN_TENANT.md` | Detailed proxy vs layout analysis |
 | `docs/ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md` | Initial validation report |
-| `docs/ADMIN_IA_PROPOSAL.md` | Original IA design intent |
+| `docs/admin/ADMIN_IA_PROPOSAL.md` | Original IA design intent |
 | `docs/admin/appshell.md` | AppShell architecture docs |
-| `docs/ADMIN_AUTH_AUDIT.md` | API auth patterns |
+| `docs/admin/archive/ADMIN_AUTH_AUDIT.md` | API auth patterns |
 
 ---
 
@@ -381,7 +381,7 @@ CREATE POLICY achievement_awards_tenant_admin_select
 - `app/admin/page.tsx` lines 1-21
 - `tests/e2e/admin-auth.spec.ts` lines 50-170
 - `tests/e2e/auth.setup.tenant-admin.ts` lines 1-42
-- `docs/ADMIN_IA_PROPOSAL.md` lines 1-162
+- `docs/admin/ADMIN_IA_PROPOSAL.md` lines 1-162
 - `docs/admin/appshell.md` lines 1-129
 
 ### Grep Searches Performed

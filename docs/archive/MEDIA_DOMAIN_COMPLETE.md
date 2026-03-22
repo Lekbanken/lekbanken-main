@@ -115,7 +115,7 @@ The Media Domain has been **fully implemented** with all MUST, SHOULD, and COULD
 
 ### Documentation
 
-16. **`docs/MEDIA_DOMAIN.md`**
+16. **`docs/media/MEDIA_DOMAIN.md`**
     - 500+ lines comprehensive guide
     - Architecture overview
     - API documentation

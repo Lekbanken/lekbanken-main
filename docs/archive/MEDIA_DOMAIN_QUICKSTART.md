@@ -125,7 +125,7 @@ export default function MediaPage() {
 
 ## 📚 Full Documentation
 
-See `docs/MEDIA_DOMAIN.md` for comprehensive documentation including:
+See `docs/media/MEDIA_DOMAIN.md` for comprehensive documentation including:
 - Architecture overview
 - API reference
 - Integration patterns

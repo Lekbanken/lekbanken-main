@@ -87,7 +87,7 @@ if (!isSystemAdmin && !hasTenantAdminAccess) {
 
 **Is there a tenant-scoped variant?**
 
-**NO.** There is only one route. The design intent (per [ADMIN_GAMIFICATION_HUB_IA.md](docs/ADMIN_GAMIFICATION_HUB_IA.md)) is that tenant admins manage their own shop items.
+**NO.** There is only one route. The design intent (per [ADMIN_GAMIFICATION_HUB_IA.md](admin/archive/ADMIN_GAMIFICATION_HUB_IA.md)) is that tenant admins manage their own shop items.
 
 **Is this feature global, tenant-scoped, or mixed?**
 
@@ -649,7 +649,7 @@ The participant shop at `/app/shop` is **fully functional**:
 
 ### Navigation
 - [lib/admin/nav.ts](lib/admin/nav.ts) — Nav config
-- [docs/ADMIN_GAMIFICATION_HUB_IA.md](docs/ADMIN_GAMIFICATION_HUB_IA.md) — IA design doc
+- [docs/admin/archive/ADMIN_GAMIFICATION_HUB_IA.md](admin/archive/ADMIN_GAMIFICATION_HUB_IA.md) — IA design doc
 
 ### Comparable Feature (Achievements)
 - [app/actions/achievements-admin.ts](app/actions/achievements-admin.ts) — Server actions pattern

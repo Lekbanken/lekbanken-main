@@ -615,13 +615,13 @@ const handleManageBilling = async () => {
 Document and implement lifecycle rules for private tenants.
 
 ### Files Modified
-- [x] `docs/BILLING_LICENSING_DOMAIN.md` (added lifecycle documentation)
+- [x] `docs/billing/BILLING_LICENSING_DOMAIN.md` (added lifecycle documentation)
 - [x] `app/api/billing/webhooks/stripe/route.ts` (handle cancellation)
 
 ### Implementation Steps
 
 #### Step 1.7.1: Document policy
-Add to BILLING_LICENSING_DOMAIN.md:
+Add to docs/billing/BILLING_LICENSING_DOMAIN.md:
 ```markdown
 ## Private Tenant Lifecycle
 
@@ -658,14 +658,14 @@ case 'customer.subscription.deleted': {
 ```
 
 ### Definition of Done
-- [x] Policy documented in BILLING_LICENSING_DOMAIN.md
+- [x] Policy documented in docs/billing/BILLING_LICENSING_DOMAIN.md
 - [x] Cancellation deactivates entitlements, not tenant
 - [x] Tenant remains accessible for data export
 - [x] No automatic hard-deletes
 
 ### Notes
 **Implemented 2026-01-27:**
-- Added comprehensive lifecycle documentation to BILLING_LICENSING_DOMAIN.md
+- Added comprehensive lifecycle documentation to docs/billing/BILLING_LICENSING_DOMAIN.md
 - Extended `customer.subscription.deleted` handler to deactivate `tenant_product_entitlements`
 - Entitlements linked via `metadata->>stripe_subscription_id`
 - Tenant status NOT changed on subscription cancellation
@@ -1393,7 +1393,7 @@ export default async function CheckoutSuccessPage({ searchParams }) {
 4. âœ… Duplicate Prevention - Unique index + graceful session reuse
 5. âœ… Entitlement Check - Returns 409 `ALREADY_OWNED` if product owned
 6. âœ… Stripe Portal - New API endpoint for subscription management
-7. âœ… Tenant Lifecycle - Documented in BILLING_LICENSING_DOMAIN.md
+7. âœ… Tenant Lifecycle - Documented in docs/billing/BILLING_LICENSING_DOMAIN.md
 8. âœ… Demo Modal - Created `DemoConversionModal` component
 
 **Pending UI Work (non-blocking):**

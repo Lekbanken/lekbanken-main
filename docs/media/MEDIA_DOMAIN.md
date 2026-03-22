@@ -267,6 +267,6 @@ Track:
 3. Check RLS policies on `media_templates`
 
 ## Related Documentation
-- [Achievements Asset Model](./ACHIEVEMENTS_ASSET_MODEL.md)
+- [Achievements Asset Model](./gamification/ACHIEVEMENTS_ASSET_MODEL.md)
 - [Games Domain](./DOMAIN_GAMES_TODO.md)
 - [Tenant Domain](./DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md)

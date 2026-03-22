@@ -54,7 +54,7 @@ export default async function AdminDemoPage() {
               <div className="text-sm text-muted-foreground">{t('quickActions.testUpgradeDesc')}</div>
             </a>
             <a 
-              href="/docs/DEMO_SALES_GUIDE.md" 
+              href="/docs/demo/DEMO_SALES_GUIDE.md" 
               className="block p-3 rounded-md border hover:bg-muted transition-colors"
             >
               <div className="font-medium">{t('quickActions.salesGuide')}</div>

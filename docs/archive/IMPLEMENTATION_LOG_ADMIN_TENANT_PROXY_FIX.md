@@ -204,9 +204,9 @@ Only needed if Phase 2 work depended on these - but they should not have been us
 
 ## Related Documents
 
-- [ADMIN_MODEL_DECISION.md](ADMIN_MODEL_DECISION.md) - Canonical admin access model
+- [ADMIN_MODEL_DECISION.md](../admin/ADMIN_MODEL_DECISION.md) - Canonical admin access model
 - [ARCH_REALITY_CHECK_ADMIN_TENANT.md](ARCH_REALITY_CHECK_ADMIN_TENANT.md) - Detailed proxy analysis
-- [ADMIN_IA_PROPOSAL.md](ADMIN_IA_PROPOSAL.md) - Original IA design intent
+- [ADMIN_IA_PROPOSAL.md](../admin/ADMIN_IA_PROPOSAL.md) - Original IA design intent
 
 ---
 

@@ -60,7 +60,7 @@ Make Map/Hotspot + Audio artifacts usable end-to-end:
 	- [components/ui/media-picker.tsx](components/ui/media-picker.tsx): hard-codes upload bucket `tenant-media`.
 	- [features/admin/media/TenantMediaBank.tsx](features/admin/media/TenantMediaBank.tsx): also uploads to `tenant-media`.
 - Docs confirm this design:
-	- [docs/MEDIA_DOMAIN.md](docs/MEDIA_DOMAIN.md) notes confirm returns `getPublicUrl` and that private buckets should use signed download URLs instead.
+	- [docs/media/MEDIA_DOMAIN.md](docs/media/MEDIA_DOMAIN.md) notes confirm returns `getPublicUrl` and that private buckets should use signed download URLs instead.
 
 #### Media DB model (existing)
 - `media` table stores `{ id, url, type ('template'|'upload'|'ai'), tenant_id, ... }`.

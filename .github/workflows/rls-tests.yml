@@ -206,9 +206,9 @@ jobs:
           echo "Checking for demo implementation documentation..."
 
           REQUIRED_DOCS=(
-            "docs/demo_current_state.md"
-            "docs/demo_technical_spec.md"
-            "docs/MASTERPROMPT_DEMO_IMPLEMENTATION.md"
+            "docs/demo/archive/demo_current_state.md"
+            "docs/demo/demo_technical_spec.md"
+            "docs/demo/archive/MASTERPROMPT_DEMO_IMPLEMENTATION.md"
           )
 
           MISSING_DOCS=()

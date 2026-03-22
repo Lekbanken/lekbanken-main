@@ -4,7 +4,8 @@
 
 - Owner: -
 - Status: active
-- Last validated: 2026-03-21
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
 
 ## Purpose
 
@@ -18,6 +19,22 @@ Use this file to reduce documentation drift and avoid reading stale reports as i
 - Notion is a portal and mirror, not primary implementation truth.
 - Historical reports, plans, and audits must not override current canonical docs.
 - Agents should prefer the smallest correct canonical set for the task instead of reading many loosely related files.
+
+## Registry model
+
+- `docs/INVENTORY.md` is the only authoritative classified registry for `docs/**/*.md`.
+- `docs/DOCS_INDEX.md` is a lightweight human navigation map, not a second registry.
+- `docs/README.md` is the root start page, not a full file catalog.
+- Cluster `README.md` files are the primary discovery surfaces for active docs inside each area.
+
+Do not maintain duplicate per-file status matrices in both `DOCS_INDEX.md` and `INVENTORY.md`.
+
+## Placement model
+
+- Root `docs/` should be reserved for cross-cutting governance docs, canonical root domain docs that have not yet been migrated, and a small number of repo-wide references.
+- Active area-specific docs should prefer cluster folders such as `docs/auth/`, `docs/ops/`, `docs/play/`, `docs/games/`, `docs/builder/`, and similar.
+- Historical area-specific docs should move deeper into the same cluster when practical, for example `history/`, `archive/`, `audits/`, or another clearly low-trust subfolder.
+- The global `docs/archive/` remains valid for non-domain leftovers, superseded one-off material, and cross-cutting archived artifacts.
 
 ## Recommended status vocabulary
 
@@ -55,8 +72,8 @@ Use this order when documents disagree:
 ### Docs governance and navigation
 
 - `docs/README.md`
-- `docs/DOCS_INDEX.md`
 - `docs/INVENTORY.md`
+- `docs/DOCS_INDEX.md`
 - `docs/DOCS_NAMING_CONVENTIONS.md`
 - `docs/AI_CODING_GUIDELINES.md`
 
@@ -72,7 +89,14 @@ Use this order when documents disagree:
 - `docs/auth/routes.md`
 - `docs/auth/tenant.md`
 - `docs/auth/roles.md`
+- `docs/auth/MFA_SECURITY.md`
+- `docs/auth/MFA_TECHNICAL_SPEC.md`
 - `docs/AUTH_DATABASE_SCHEMA.md`
+
+### Profile and account settings history
+
+- `docs/profile/README.md`
+- `docs/ACCOUNTS_DOMAIN.md`
 
 ### Database and migrations
 
@@ -80,6 +104,31 @@ Use this order when documents disagree:
 - `docs/database/environments.md`
 - `docs/ops/prod-migration-workflow.md`
 - `docs/ops/release-promotion-checklist.md`
+
+### Legal, privacy, and policy docs
+
+- `docs/legal/README.md`
+- `docs/legal/DPA_TEMPLATE.md`
+- `docs/legal/SLA.md`
+- `docs/gdpr/tenant-anonymization.md`
+
+### Billing, licensing, and purchase flow
+
+- `docs/billing/README.md`
+- `docs/billing/BILLING_LICENSING_DOMAIN.md`
+- `docs/STRIPE.md`
+
+### Media and asset management
+
+- `docs/media/README.md`
+- `docs/media/MEDIA_DOMAIN.md`
+
+### Content authoring and bulk content ops
+
+- `docs/content/README.md`
+- `docs/content/CONTENT_MANAGEMENT_DOMAIN.md`
+- `docs/builder/README.md`
+- `docs/import/README.md`
 
 ### Notifications and app shell
 
@@ -94,8 +143,18 @@ Use this order when documents disagree:
 - `docs/games/README.md`
 - `docs/GAMES_DOMAIN.md`
 - `docs/admin/README.md`
-- `docs/ADMIN_GAME_BUILDER_V1.md`
+- `docs/admin/ADMIN_DESIGN_SYSTEM.md`
+- `docs/admin/ADMIN_MODEL_DECISION.md`
+- `docs/admin/ADMIN_NAVIGATION_MASTER.md`
+- `docs/admin/ADMIN_GAME_BUILDER_V1.md`
+- `docs/admin/ADMIN_GAMES_V2_ARCHITECTURE.md`
 - `docs/CSV_IMPORT_FIELD_REFERENCE.md`
+
+### Demo and evaluation flows
+
+- `docs/demo/README.md`
+- `docs/demo/demo_technical_spec.md`
+- `docs/demo/DEMO_SALES_GUIDE.md`
 
 ### Sandbox and developer harnesses
 
@@ -239,8 +298,8 @@ When you work in a domain with an active triplet:
 When you create or materially change a canonical document:
 
 1. update `docs/README.md` if it affects navigation
-2. update `docs/DOCS_INDEX.md`
-3. update `docs/INVENTORY.md`
+2. update `docs/INVENTORY.md`
+3. update `docs/DOCS_INDEX.md` only if the human entry-map navigation changed
 4. update `docs/NOTION.md` if the Notion portal or mirror rules are affected
 5. update `.github/copilot-instructions.md` if agents must change what they read first
 
@@ -251,6 +310,7 @@ Avoid:
 - writing a new “summary” that conflicts with a canonical doc
 - using plans or reports as if they were current operating rules
 - leaving multiple docs to describe the same exact workflow without declaring scope
+- maintaining two live file registries with overlapping per-file metadata
 - linking agents to broad doc collections when 2 to 4 specific docs would do
 - adding new source-of-truth claims outside the repo
 

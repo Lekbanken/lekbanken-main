@@ -526,10 +526,10 @@ After completing checks, provide a report:
 
 Reference if needed:
 
-1. **docs/demo_current_state.md** - What existed before
-2. **docs/demo_technical_spec.md** - Complete architecture
-3. **docs/MASTERPROMPT_DEMO_IMPLEMENTATION.md** - Implementation guide
-4. **docs/demo_decisions_needed.md** - Decisions (all completed)
+1. **docs/demo/archive/demo_current_state.md** - What existed before
+2. **docs/demo/demo_technical_spec.md** - Complete architecture
+3. **docs/demo/archive/MASTERPROMPT_DEMO_IMPLEMENTATION.md** - Implementation guide
+4. **docs/demo/archive/demo_decisions_needed.md** - Decisions (all completed)
 
 ---
 

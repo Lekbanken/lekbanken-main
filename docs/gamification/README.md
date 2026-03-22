@@ -32,6 +32,7 @@ Use this index to avoid reading older design or migration summaries as if they w
 - `GAMIFICATION_RECONCILIATION_RUNBOOK.md` — operational recovery and investigation runbook for wallet vs ledger mismatches
 - `ECONOMY_GOVERNANCE.md` — economy-critical governance rules and change constraints
 - `ADMIN_DASHBOARD_DESIGN.md` — current admin dashboard design reference for shipped MVP monitoring features
+- `ACHIEVEMENTS_ASSET_MODEL.md` — current asset registry and icon-model reference for achievements badge-builder flows
 - `AWARD_BUILDER_EXPORT_SCHEMA_V1.md` — canonical export/import contract for award builder flows
 - `BURN_FOUNDATION_DESIGN.md` — current burn-foundation design and infrastructure reference
 - `LEADERBOARD_DESIGN.md` — current leaderboard behavior and anti-gaming reference
@@ -48,6 +49,8 @@ Use this index to avoid reading older design or migration summaries as if they w
 
 ### Drafts
 
+- `ACHIEVEMENTS_ADMIN_DESIGN.md` — draft design/spec for the achievements admin builder experience
+- `BADGE_BUILDER_UX_GUIDE.md` — draft UX guidance for stacked badge layers and tinting
 - `SOFTCAP_DESIGN.md` — implementation-ready design reference, but not documented here as a shipped feature
 - `GAMIFICATION_TEST_PLAN.md` — planned test coverage and acceptance criteria, not an execution log
 
@@ -56,7 +59,10 @@ Use this index to avoid reading older design or migration summaries as if they w
 These are design/reference documents and should be read with care against current code and active docs:
 
 - `ADMIN_DASHBOARD_DESIGN.md`
+- `ACHIEVEMENTS_ADMIN_DESIGN.md`
+- `ACHIEVEMENTS_ASSET_MODEL.md`
 - `AWARD_BUILDER_EXPORT_SCHEMA_V1.md`
+- `BADGE_BUILDER_UX_GUIDE.md`
 - `BURN_FOUNDATION_DESIGN.md`
 - `LEADERBOARD_DESIGN.md`
 - `SOFTCAP_DESIGN.md`

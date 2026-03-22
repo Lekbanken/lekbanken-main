@@ -2371,7 +2371,7 @@ After each sprint, document:
 ## 📚 Resources
 
 - [Current State Report](./demo_current_state.md)
-- [Technical Specification](./demo_technical_spec.md)
+- [Technical Specification](../demo_technical_spec.md)
 - Supabase RLS Docs: https://supabase.com/docs/guides/auth/row-level-security
 - Next.js Middleware: https://nextjs.org/docs/app/building-your-application/routing/middleware
 - Catalyst UI Kit: (your internal docs)

@@ -20,8 +20,8 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - Root product context: [../PROJECT_CONTEXT.md](../PROJECT_CONTEXT.md)
 - Root inventory governance: [../INVENTORY_RULES.md](../INVENTORY_RULES.md) + [../INVENTORY_DECISIONS.md](../INVENTORY_DECISIONS.md)
 - Systemöversikt (för humans + AI): se [../sandbox/wiki/README.md](../sandbox/wiki/README.md)
-- Full inventory (alla docs): se [INVENTORY.md](INVENTORY.md)
-- Quick docs index: se [DOCS_INDEX.md](DOCS_INDEX.md)
+- Authoritative docs registry: se [INVENTORY.md](INVENTORY.md)
+- Quick docs entry map: se [DOCS_INDEX.md](DOCS_INDEX.md)
 - Naming/struktur: se [DOCS_NAMING_CONVENTIONS.md](DOCS_NAMING_CONVENTIONS.md)
 - Canonical doc map: se [DOCUMENTATION_STANDARD.md](DOCUMENTATION_STANDARD.md)
 - Dateringsstandard: se [DOCUMENT_DATING_STANDARD.md](DOCUMENT_DATING_STANDARD.md)
@@ -37,15 +37,21 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - AI coding guardrails: se [AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md)
 - DB/migrations: se [MIGRATIONS.md](MIGRATIONS.md)
 - Database cluster: [database/README.md](database/README.md)
+- Demo cluster: [demo/README.md](demo/README.md)
 - Notifications cluster: [notifications/README.md](notifications/README.md)
+- Profile cluster: [profile/README.md](profile/README.md)
 - Play cluster: [play/README.md](play/README.md)
 - Games cluster: [games/README.md](games/README.md)
 - Builder cluster: [builder/README.md](builder/README.md)
+- Billing cluster: [billing/README.md](billing/README.md)
+- Content cluster: [content/README.md](content/README.md)
 - Import docs: [import/README.md](import/README.md)
+- Legal cluster: [legal/README.md](legal/README.md)
+- Media cluster: [media/README.md](media/README.md)
 - Sandbox docs: [sandbox/README.md](sandbox/README.md)
 - Toolkit docs: [toolkit/README.md](toolkit/README.md)
 - Auth/RBAC cluster: [auth/README.md](auth/README.md) + AUTH_SYSTEM_ANALYSIS.md (historisk/archived)
-- Admin cluster: [admin/README.md](admin/README.md) + root `ADMIN_*` docs
+- Admin cluster: [admin/README.md](admin/README.md)
 - Ops/runbooks: ops/
 - Validation snapshots: validation/README.md
 - Release path: [ops/release-promotion-checklist.md](ops/release-promotion-checklist.md)
@@ -62,6 +68,9 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - Varje “core doc” ska ha en tydlig scope, och kunna valideras mot kod/DB.
 - Dokument som är historiska (plan/rapport/todo) ska tydligt markeras som sådana.
 - Om flera dokument beskriver samma område ska ett av dem tydligt vara den kanoniska ingången.
+- `INVENTORY.md` är enda auktoritativa filregistret för `docs/**/*.md`.
+- `DOCS_INDEX.md` är en lättviktig entry map, inte en andra metadataregisteryta.
+- Aktiv områdesdokumentation ska över tid flytta in i klustermappar; historik ska hamna djupare i samma kluster när det är praktiskt säkert.
 
 ### Fält (rekommenderat)
 

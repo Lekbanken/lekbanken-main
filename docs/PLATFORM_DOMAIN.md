@@ -19,7 +19,7 @@
 - `lib/supabase/client.ts`
 - `app/api/health/route.ts`
 - `app/api/media/*`
-- `docs/MEDIA_DOMAIN.md`
+- `docs/media/MEDIA_DOMAIN.md`
 - `.github/workflows/typecheck.yml`
 - `supabase/migrations/`
 - `supabase/verify_rls_coverage.sql`
@@ -238,7 +238,7 @@ Buckets and access rules are configured in Supabase. In this repo:
 - The app uses a **signed upload URL** flow via `app/api/media/upload/route.ts` (and confirmation via `app/api/media/upload/confirm/route.ts`).
 - Bucket names should be treated as code/config and verified in the upload route (avoid duplicating full bucket inventories here).
 
-See `docs/MEDIA_DOMAIN.md` for the current, repo-validated media/storage flow.
+See `docs/media/MEDIA_DOMAIN.md` for the current, repo-validated media/storage flow.
 
 ### 5.2 Media Management
 
@@ -250,7 +250,7 @@ See `docs/MEDIA_DOMAIN.md` for the current, repo-validated media/storage flow.
 
 **Media API surface:**
 - Canonical implementation lives under `app/api/media/*`.
-- Canonical documentation lives in `docs/MEDIA_DOMAIN.md`.
+- Canonical documentation lives in `docs/media/MEDIA_DOMAIN.md`.
 
 ---
 

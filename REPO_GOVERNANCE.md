@@ -111,7 +111,7 @@ If shared across domains — it goes in `components/`.
 | Journey | `journey-activation-architecture.md` → `*-audit.md` → `*-implementation-plan.md` |
 | Play | `launch-readiness/audits/play-*.md` |
 | Games | `docs/GAMES_DOMAIN.md` |
-| Admin | `docs/ADMIN_OVERVIEW_REPORT.md` |
+| Admin | `docs/admin/archive/ADMIN_OVERVIEW_REPORT.md` |
 | Auth | `docs/AUTH_SYSTEM_ANALYSIS.md` |
 | Gamification | `docs/GAMIFICATION_DOMAIN.md` |
 | Security | `launch-readiness/audits/` |

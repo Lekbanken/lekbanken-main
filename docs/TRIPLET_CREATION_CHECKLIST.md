@@ -4,7 +4,8 @@
 
 - Owner: -
 - Status: active
-- Last validated: 2026-03-21
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
 
 ## Purpose
 
@@ -61,8 +62,8 @@ This checklist prevents ad hoc document creation, missing metadata, and broken n
 
 - [ ] Add the new canonical entrypoint to [DOCUMENTATION_STANDARD.md](DOCUMENTATION_STANDARD.md) if needed.
 - [ ] Add navigation to [README.md](README.md) if it should be discoverable from docs start.
-- [ ] Add the new docs to [DOCS_INDEX.md](DOCS_INDEX.md) if they are part of the curated docs map.
 - [ ] Add the new docs to [INVENTORY.md](INVENTORY.md).
+- [ ] Update [DOCS_INDEX.md](DOCS_INDEX.md) only if the human entry map must point to a new cluster or canonical entrypoint.
 - [ ] Update [.github/copilot-instructions.md](../.github/copilot-instructions.md) if agent read-order must change.
 - [ ] Update [REPO_GOVERNANCE.md](../REPO_GOVERNANCE.md) if the canonical location or trust model changes.
 

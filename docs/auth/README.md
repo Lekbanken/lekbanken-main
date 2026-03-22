@@ -16,6 +16,8 @@ Scope: Auth, RBAC, tenant-access och routing.
 - [tenant.md](tenant.md) — tenant resolution + cookie/header behavior
 - [routes.md](routes.md) — route protection + redirects (proxy)
 - [architecture.md](architecture.md) — server-first auth architecture
+- [MFA_SECURITY.md](MFA_SECURITY.md) — MFA threat model, mitigations, and security review checklist
+- [MFA_TECHNICAL_SPEC.md](MFA_TECHNICAL_SPEC.md) — MFA schema, policy, API, and Supabase integration design
 - [debugging.md](debugging.md) — practical debugging checklist
 
 ## DB reference
@@ -25,6 +27,8 @@ Scope: Auth, RBAC, tenant-access och routing.
 ## Historical
 
 - [AUTH_SYSTEM_ANALYSIS.md](../AUTH_SYSTEM_ANALYSIS.md) — historical/archived analysis; do not treat as source of truth
+- [archive/MFA_CURRENT_STATE_ANALYSIS.md](archive/MFA_CURRENT_STATE_ANALYSIS.md) — historical MFA rollout snapshot
+- [archive/MFA_IMPLEMENTATION_PLAN.md](archive/MFA_IMPLEMENTATION_PLAN.md) — historical MFA sprint plan
 
 ## Validation checklist
 

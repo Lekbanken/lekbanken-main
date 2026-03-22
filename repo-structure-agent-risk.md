@@ -33,7 +33,7 @@ When starting work on this repo, read documents in this exact order:
 | Journey | Root `journey-activation-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | — |
 | Play | `launch-readiness/audits/play-*.md` | `docs/PLAY_DOMAIN.md` |
 | Games | `docs/GAMES_DOMAIN.md` | `docs/builder/` |
-| Admin | `docs/ADMIN_OVERVIEW_REPORT.md` | `docs/admin/` |
+| Admin | `docs/admin/archive/ADMIN_OVERVIEW_REPORT.md` | `docs/admin/` |
 | Auth | `docs/AUTH_SYSTEM_ANALYSIS.md` | `docs/auth/` |
 | Gamification | `docs/GAMIFICATION_DOMAIN.md` | `docs/gamification/` |
 | Any security question | `launch-readiness/audits/` | — |

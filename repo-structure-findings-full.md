@@ -43,7 +43,7 @@ For the same domain (e.g., "planner"), documents exist in:
 - `docs/PLANNER_REFACTOR_IMPLEMENTATION.md`
 - `docs/PLANNER_TARGET_ARCHITECTURE.md`
 - `docs/PLANNER_UI_UPGRADE_PLAN.md`
-- `docs/ADMIN_PLANNER_MASTER_IMPLEMENTATION.md`
+- `docs/admin/ADMIN_PLANNER_MASTER_IMPLEMENTATION.md`
 - `launch-readiness/audits/planner-launch-audit.md`
 - `launch-readiness/audits/planner-regression-audit.md`
 

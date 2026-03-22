@@ -507,7 +507,7 @@ export function useFormatters() {
 
 ### 4.1 Information Architecture
 
-Based on [ADMIN_NAVIGATION_MASTER.md](ADMIN_NAVIGATION_MASTER.md), translation belongs in **System** group:
+Based on [ADMIN_NAVIGATION_MASTER.md](admin/ADMIN_NAVIGATION_MASTER.md), translation belongs in **System** group:
 
 ```
 System (system_admin only)
@@ -1315,7 +1315,7 @@ export function pickTranslation<T extends { locale?: string | null }>(
 | Planner i18n utilities | `lib/planner/i18n.ts` |
 | Game translation loader | `lib/services/planner.server.ts` |
 | Admin navigation config | `components/navigation/admin-nav-config.tsx` |
-| Admin navigation IA | `docs/ADMIN_NAVIGATION_MASTER.md` |
+| Admin navigation IA | `docs/admin/ADMIN_NAVIGATION_MASTER.md` |
 
 ### B.2 Database References
 

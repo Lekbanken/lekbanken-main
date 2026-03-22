@@ -282,7 +282,7 @@ ENDED (status='inactive')
 
 ### TODO 5.3: Documentation
 - [x] `PERSONAL_LICENSE_IMPLEMENTATION.md` uppdaterad med fullständig status
-- [x] API-dokumentation finns i: `docs/BILLING_LICENSING_DOMAIN.md`, `docs/PURCHASE_FLOW_IMPLEMENTATION.md`
+- [x] API-dokumentation finns i: `docs/billing/BILLING_LICENSING_DOMAIN.md`, `docs/billing/archive/PURCHASE_FLOW_IMPLEMENTATION.md`
 
 ### TODO 5.4: Final verification
 - [x] TypeScript check: Endast pre-existerande fel kvarstår (ej relaterade till personal license)

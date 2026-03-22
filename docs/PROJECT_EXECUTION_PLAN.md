@@ -467,7 +467,7 @@ list_code_usages "ComponentName"
 ## 🎨 PHASE 3: ADMIN REFACTORING
 
 ### Goal
-Unify all admin pages to follow `ADMIN_DESIGN_SYSTEM.md` and Catalyst UI Kit.
+Unify all admin pages to follow `admin/ADMIN_DESIGN_SYSTEM.md` and Catalyst UI Kit.
 
 ### Scope
 
@@ -497,7 +497,7 @@ app/admin/
 - Check RLS policies
 
 **2. Design Review (1h)**
-- Compare to ADMIN_DESIGN_SYSTEM.md
+- Compare to admin/ADMIN_DESIGN_SYSTEM.md
 - Identify deviations
 - Plan layout changes
 

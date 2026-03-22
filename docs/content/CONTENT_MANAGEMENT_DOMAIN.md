@@ -26,7 +26,7 @@ Non-goals:
 ## Related docs
 - Games model + publishing rules: `docs/GAMES_DOMAIN.md`
 - CSV contract (source-of-truth for fields): `docs/CSV_IMPORT_FIELD_REFERENCE.md`
-- Builder overview (current admin builder): `docs/ADMIN_GAME_BUILDER_V1.md`
+- Builder overview (current admin builder): `docs/admin/ADMIN_GAME_BUILDER_V1.md`
 - Data model governance (migrations/typegen/RLS): `docs/DATA_MODEL_DOMAIN.md`
 
 ## Related code (repo-anchored)
@@ -174,5 +174,5 @@ There are **two** admin surfaces related to “content planning” right now:
 
 ## Change checklist (when modifying CMD)
 - If you change CSV columns/format: update `docs/CSV_IMPORT_FIELD_REFERENCE.md` and `types/csv-import.ts`.
-- If you change builder payload/schema: update `docs/ADMIN_GAME_BUILDER_V1.md` and ensure migrations + typegen are in sync.
+- If you change builder payload/schema: update `docs/admin/ADMIN_GAME_BUILDER_V1.md` and ensure migrations + typegen are in sync.
 - If you wire content planner UI to DB tables: ensure RLS policies allow the intended tenant roles.

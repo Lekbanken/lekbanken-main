@@ -25,7 +25,7 @@ Non-goals:
 
 ### Docs
 - Stripe integration (detailed): `docs/STRIPE.md`
-- Admin UX references: `docs/ADMIN_DESIGN_SYSTEM.md`
+- Admin UX references: `docs/admin/ADMIN_DESIGN_SYSTEM.md`
 
 ### API routes (App Router)
 - Products:
@@ -197,4 +197,4 @@ Private tenant owners access Stripe Customer Portal via:
 - `POST /api/billing/portal` with their tenantId
 - Portal allows: cancel subscription, update payment method, view invoices
 
-See: [PURCHASE_FLOW_STATUS_REPORT.md](./PURCHASE_FLOW_STATUS_REPORT.md) for architecture details.
+See: [archive/PURCHASE_FLOW_STATUS_REPORT.md](archive/PURCHASE_FLOW_STATUS_REPORT.md) for architecture details.

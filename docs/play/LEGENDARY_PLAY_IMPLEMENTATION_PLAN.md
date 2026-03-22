@@ -567,7 +567,7 @@ Sprint 7 (Weeks 13-14): Triggers Advanced    → Demo: Complex automation
 ## 📚 Related Documents
 
 - [LEGENDARY_PLAY_ADVANCED_FEATURES.md](LEGENDARY_PLAY_ADVANCED_FEATURES.md) – Full UX specification
-- [../DESIGN_IMPLEMENTATION_TODO.md](../DESIGN_IMPLEMENTATION_TODO.md) – UI components reference
+- [../archive/DESIGN_IMPLEMENTATION_TODO.md](../archive/DESIGN_IMPLEMENTATION_TODO.md) – UI components reference
 - [../games/GAMES_DOMAIN.md](../games/GAMES_DOMAIN.md) – Game engine architecture
 
 ---

@@ -123,7 +123,7 @@ AND qual::text NOT LIKE '%SELECT auth.uid()%';
 ## Related Documentation
 
 - [DATABASE_SECURITY_DOMAIN.md](DATABASE_SECURITY_DOMAIN.md) - Security architecture overview
-- [SECURITY_AUDIT_TODO.md](SECURITY_AUDIT_TODO.md) - Migration tracking
+- [SECURITY_AUDIT_TODO.md](../archive/SECURITY_AUDIT_TODO.md) - Migration tracking
 - [PERFORMANCE_ADVISOR_PROMPT.md](PERFORMANCE_ADVISOR_PROMPT.md) - Performance analysis queries
 
 ---

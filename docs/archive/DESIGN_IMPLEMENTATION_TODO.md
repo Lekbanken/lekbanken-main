@@ -5,7 +5,7 @@
 - Owner: -
 - Status: draft
 - Date: 2025-11-30
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: -
 
 > Draft design backlog and implementation checklist covering the broader UI system work.
@@ -138,7 +138,7 @@
 - [x] All App pages now use semantic design tokens
 - [x] No hardcoded gray-*/slate-* colors in user-facing pages
 - [x] components/GameCard.tsx updated
-- [x] Documentation: docs/DESIGN_CONSISTENCY_TODO.md
+- [x] Documentation: docs/archive/DESIGN_CONSISTENCY_TODO.md
 
 ### Admin Implementation
 - [x] /admin - Dashboard med KPI cards, activity feed, alerts

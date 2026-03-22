@@ -122,8 +122,8 @@ Fält:
 | [docs/demo/archive/demo_decisions_needed.md](demo/archive/demo_decisions_needed.md) | B | historical snapshot | - | Demo | Decision log |
 | [docs/demo/archive/demo_implementation_plan.md](demo/archive/demo_implementation_plan.md) | B | historical snapshot | - | Demo | Implementation plan |
 | [docs/demo/demo_technical_spec.md](demo/demo_technical_spec.md) | B | draft | - | Demo | Technical specification |
-| [docs/DESIGN_CONSISTENCY_TODO.md](DESIGN_CONSISTENCY_TODO.md) | D | draft | 2025-11-30 | - | Backlog |
-| [docs/DESIGN_IMPLEMENTATION_TODO.md](DESIGN_IMPLEMENTATION_TODO.md) | D | draft | 2025-11-30 | - | Backlog |
+| [docs/archive/DESIGN_CONSISTENCY_TODO.md](archive/DESIGN_CONSISTENCY_TODO.md) | D | draft | 2025-11-30 | - | Backlog |
+| [docs/archive/DESIGN_IMPLEMENTATION_TODO.md](archive/DESIGN_IMPLEMENTATION_TODO.md) | D | draft | 2025-11-30 | - | Backlog |
 | [docs/DOCUMENTATION_STANDARD.md](DOCUMENTATION_STANDARD.md) | A | active | 2026-03-22 | - | Canonical documentation map, registry model, and trust hierarchy |
 | [docs/DOCUMENT_DATING_STANDARD.md](DOCUMENT_DATING_STANDARD.md) | A | active | 2026-03-21 | - | Rules for how Date, Last updated, and Last validated must be used |
 | [docs/auth/archive/MFA_CURRENT_STATE_ANALYSIS.md](auth/archive/MFA_CURRENT_STATE_ANALYSIS.md) | C | historical snapshot | - | Security/Auth | Current-state report |
@@ -320,7 +320,7 @@ Fält:
 | [docs/play/sessions/SESSION_COCKPIT_ARCHITECTURE.md](play/sessions/SESSION_COCKPIT_ARCHITECTURE.md) | C | historical snapshot | 2025-12-28 | - | Session cockpit architecture snapshot |
 | [docs/play/sessions/SESSION_COCKPIT_MIGRATION.md](play/sessions/SESSION_COCKPIT_MIGRATION.md) | B | historical snapshot | 2025-12-28 | - | Session cockpit migration guide snapshot |
 | [docs/SESSION_COMPLETION_REPORT.md](SESSION_COMPLETION_REPORT.md) | C | historical snapshot | 2025-12-11 | - | Completed session report snapshot |
-| [docs/SECURITY_AUDIT_TODO.md](SECURITY_AUDIT_TODO.md) | D | ✅ done | 2026-01-08 | - | Security backlog (completed) |
+| [docs/archive/SECURITY_AUDIT_TODO.md](archive/SECURITY_AUDIT_TODO.md) | D | ✅ done | 2026-01-08 | - | Security backlog (completed) |
 | [docs/SECURITY_AUDIT_PROMPT_V2.md](SECURITY_AUDIT_PROMPT_V2.md) | E | active | 2026-01-08 | - | Verification queries for security audit |
 | [docs/billing/STRIPE.md](billing/STRIPE.md) | A | active | 2025-12-17 | - | Billing reference |
 | [docs/support/README.md](support/README.md) | A | active | 2026-03-22 | - | Sub-index for support domain docs |

@@ -170,6 +170,6 @@ AND (qual::text ~ 'auth\.uid\(\)' AND qual::text NOT LIKE '%SELECT auth.uid()%')
 
 ## Relaterad Dokumentation
 
-- [SECURITY_AUDIT_TODO.md](SECURITY_AUDIT_TODO.md) - Detaljerad migrationsspårning
+- [SECURITY_AUDIT_TODO.md](../archive/SECURITY_AUDIT_TODO.md) - Detaljerad migrationsspårning
 - [DATABASE_SECURITY_AUDIT.md](DATABASE_SECURITY_AUDIT.md) - Initial säkerhetsanalys
 - [PERFORMANCE_ADVISOR_PROMPT.md](PERFORMANCE_ADVISOR_PROMPT.md) - Prestandaanalys

@@ -5,7 +5,7 @@
 - Owner: -
 - Status: active
 - Date: 2026-03-15
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: -
 
 > Active provenance manifest for archived files. Use it to trace original location, archival reason, and move context for low-trust historical documents.
@@ -72,3 +72,17 @@
 **Total:** 36 files, ~352.5 KB  
 **Empty directory removed:** `docs/prompts/` (all contents archived)  
 **Tier B/C files:** Intentionally not archived — require individual review after Observe Mode
+
+## Batch 2 — Root Backlog Archival (2026-03-22)
+
+**Executed by:** GitHub Copilot  
+**Move type:** docs/ -> docs/archive/  
+**Post-move verification:** `npm run verify:quick` = passed
+
+### docs/ → docs/archive/ (3 files)
+
+| # | File | Original path | Reason | Tier |
+|---|------|---------------|--------|------|
+| 37 | DESIGN_CONSISTENCY_TODO.md | `docs/DESIGN_CONSISTENCY_TODO.md` | Completed design-token backlog snapshot | D |
+| 38 | DESIGN_IMPLEMENTATION_TODO.md | `docs/DESIGN_IMPLEMENTATION_TODO.md` | Historical design implementation backlog | D |
+| 39 | SECURITY_AUDIT_TODO.md | `docs/SECURITY_AUDIT_TODO.md` | Completed security backlog snapshot | D |

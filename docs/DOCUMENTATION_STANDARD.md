@@ -75,7 +75,7 @@ Use this order when documents disagree:
 - `docs/INVENTORY.md`
 - `docs/DOCS_INDEX.md`
 - `docs/DOCS_NAMING_CONVENTIONS.md`
-- `docs/AI_CODING_GUIDELINES.md`
+- `docs/ai/AI_CODING_GUIDELINES.md`
 
 ### Local workflow and environments
 

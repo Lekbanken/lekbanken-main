@@ -41,7 +41,7 @@
 Before making changes to this codebase, read:
 
 ```text
-docs/AI_CODING_GUIDELINES.md
+docs/ai/AI_CODING_GUIDELINES.md
 PROJECT_CONTEXT.md
 launch-readiness/launch-control.md
 docs/database/environments.md
@@ -54,7 +54,7 @@ docs/VS_CODE_WORKFLOW.md
 
 Why this exists:
 
-- `docs/AI_CODING_GUIDELINES.md` prevents common implementation mistakes.
+- `docs/ai/AI_CODING_GUIDELINES.md` prevents common implementation mistakes.
 - `PROJECT_CONTEXT.md` explains the product and domain intent.
 - `launch-readiness/launch-control.md` explains current operational state.
 - `docs/database/environments.md` explains what is local, preview, and production.

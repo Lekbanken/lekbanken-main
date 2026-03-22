@@ -5,7 +5,7 @@
 - Owner: -
 - Status: active
 - Date: 2025-12-10
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-21
 
 > Active AI-agent coding guardrail reference. Read together with `.github/copilot-instructions.md`, `REPO_GOVERNANCE.md`, and domain-specific canonical docs.

@@ -139,7 +139,7 @@ These files are still relevant but contain **stale content**.
 | `docs/DOCS_INDEX.md` | docs/ index | Redundant with `docs/README.md` — consolidate |
 | `docs/I18N_GUIDE.md` | i18n guide | Verify against current next-intl setup |
 | `docs/billing/STRIPE.md` | Stripe integration guide | Verify against billing-audit findings |
-| `docs/AI_CODING_GUIDELINES.md` | AI coding conventions | Verify; may be superseded by `.github/copilot-instructions.md` |
+| `docs/ai/AI_CODING_GUIDELINES.md` | AI coding conventions | Verify; may be superseded by `.github/copilot-instructions.md` |
 
 ---
 
@@ -190,7 +190,7 @@ Files that describe the **same topic** with potentially conflicting information:
 | Topic | Files | Conflict |
 |-------|-------|----------|
 | Docs index | `docs/README.md` + `docs/DOCS_INDEX.md` | Two index files |
-| AI guidelines | `docs/AI_CODING_GUIDELINES.md` + `.github/copilot-instructions.md` | Potential divergence |
+| AI guidelines | `docs/ai/AI_CODING_GUIDELINES.md` + `.github/copilot-instructions.md` | Potential divergence |
 | Planner domain | `docs/PLANNER_DOMAIN.md` + root `planner-architecture.md` + `docs/PLANNER_TARGET_ARCHITECTURE.md` + `docs/PLANNER_REFACTOR_IMPLEMENTATION.md` + `docs/PLANNER_ANALYSIS_REPORT.md` + `docs/PLANNER_IA_RULES.md` + `docs/PLANNER_IMPROVEMENT_TODO.md` + `docs/PLANNER_INVENTORY_GAP_ANALYSIS.md` + `docs/PLANNER_UI_UPGRADE_PLAN.md` + `docs/admin/ADMIN_PLANNER_MASTER_IMPLEMENTATION.md` | **10 planner docs** across root + docs/ |
 | Play domain | `docs/play/PLAY_DOMAIN.md` + root `PLAY_SYSTEM_DOCUMENTATION.md` + `launch-readiness/play-architecture.md` | 3+ play architecture docs |
 | Auth system | `docs/AUTH_*.md` (4 files) + `launch-readiness/audits/security-auth-audit.md` | Pre-audit vs post-audit auth docs |

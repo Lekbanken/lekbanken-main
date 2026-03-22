@@ -96,7 +96,7 @@ Rekommenderad spegling i repo:
 - Operations (aktuellt): [ops/OPERATIONS_DOMAIN.md](ops/OPERATIONS_DOMAIN.md)
 	- Runbooks: [ops/README.md](ops/README.md)
 - API / Integration (aktuellt): [api/API_INTEGRATION_DOMAIN.md](api/API_INTEGRATION_DOMAIN.md)
-- AI (gated): [AI_DOMAIN.md](AI_DOMAIN.md)
+- AI (gated): [ai/AI_DOMAIN.md](ai/AI_DOMAIN.md)
 - Database Security (aktuellt): [database/DATABASE_SECURITY_DOMAIN.md](database/DATABASE_SECURITY_DOMAIN.md)
 - DOMAIN_* (där det finns)
 

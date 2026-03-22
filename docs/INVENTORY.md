@@ -61,8 +61,9 @@ Fält:
 | [docs/admin/archive/ADMIN_PRODUCTS_CONTENT_IA.md](admin/archive/ADMIN_PRODUCTS_CONTENT_IA.md) | C | historical snapshot | 2026-01-04 | - | Products/content IA refactor snapshot |
 | [docs/admin/test-plans/ADMIN_PRODUCTS_TEST_PLAN.md](admin/test-plans/ADMIN_PRODUCTS_TEST_PLAN.md) | B | draft | 2026-01-04 | - | Products/content test checklist |
 | [docs/admin/test-plans/ADMIN_USERS_TEST_PLAN.md](admin/test-plans/ADMIN_USERS_TEST_PLAN.md) | B | draft | 2026-01-04 | - | Users admin test checklist |
-| [docs/AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md) | A | active | 2025-12-10 | - | Process/guidelines |
-| [docs/AI_DOMAIN.md](AI_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (feature-flag-first) |
+| [docs/ai/README.md](ai/README.md) | A | active | 2026-03-22 | - | Sub-index for AI domain and agent guardrails |
+| [docs/ai/AI_CODING_GUIDELINES.md](ai/AI_CODING_GUIDELINES.md) | A | active | 2025-12-10 | - | Process/guidelines |
+| [docs/ai/AI_DOMAIN.md](ai/AI_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (feature-flag-first) |
 | [docs/auth/ACCOUNTS_DOMAIN.md](auth/ACCOUNTS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md) | B | draft | 2025-12-28 | - | Accessibility checklist |
 | [docs/auth/architecture.md](auth/architecture.md) | A | active | 2026-03-21 | - | Auth architecture |

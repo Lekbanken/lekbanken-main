@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Status: draft
  * Date: 2025-12-10
@@ -9,7 +11,7 @@
 // Example: Using Stripe Subscription Checkout in Your App
 // ========================================================
 
-import { SubscriptionCheckout } from '@/components/billing/SubscriptionCheckout'
+import { SubscriptionCheckout } from '../../components/billing/SubscriptionCheckout'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -41,11 +43,11 @@ export default function SubscribePage() {
         tenantId={tenantId}
         priceId={priceId}
         quantity={5}
-        onSuccess={(subscriptionId) => {
+        onSuccess={(subscriptionId: string) => {
           console.log('Subscription created:', subscriptionId)
           router.push('/billing/success')
         }}
-        onError={(errorMessage) => {
+        onError={(errorMessage: string) => {
           console.error('Payment failed:', errorMessage)
           setError(errorMessage)
         }}

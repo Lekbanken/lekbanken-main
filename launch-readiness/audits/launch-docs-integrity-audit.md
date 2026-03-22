@@ -38,7 +38,7 @@
 | Document | Location | Purpose | Status | Last verified accurate |
 |----------|----------|---------|--------|----------------------|
 | `launch-control.md` | `launch-readiness/` | Master program tracker | ⚠️ Numbers stale | 2026-03-14 (content), 2026-03-12 (metrics) |
-| `launch-readiness-implementation-plan.md` | `launch-readiness/` | Phase roadmap | ⚠️ Phase states mischaracterized | 2026-03-14 |
+| `launch-readiness-implementation-plan.md` | `launch-readiness/` | Phase roadmap | ✅ Current after 2026-03-23 baseline/docs sync | 2026-03-23 |
 | `launch-readiness-audit-program.md` | `launch-readiness/audits/` | Audit methodology | ✅ Stable | 2026-03-14 (Level 2 methodology added) |
 | `launch-readiness-architecture.md` | `launch-readiness/` | Environment/test/deploy strategy | ⚠️ Partially outdated | 2026-03-13 |
 | `launch-snapshot-2026-03.md` | `launch-readiness/` | Frozen system state at launch | ✅ Intentionally frozen | 2026-03-12 |
@@ -49,10 +49,10 @@
 | Issue | Document | Detail | Severity |
 |-------|----------|--------|----------|
 | Stale wrapper coverage | `launch-control.md` | Reports 247/287 (86.1%) throughout; actual is 252/288 (87.5%) | Medium |
-| Phase 5 labeled "Deferred" | `implementation-plan.md` | 16/16 regressions completed + 4 L2 audits done. Should be ✅. | High — causes AI agent confusion |
-| Phase 2 labeled "Skipped" | `implementation-plan.md` | 261 test files exist, CI runs 7 checks. Should be 🟡 "Partial". | Medium |
-| Phase 1B items unchecked | `implementation-plan.md` | Header says "✅ IMPLEMENTERAT" but 8 sub-items show ⬜ | Medium — self-contradictory |
-| Phase 7 gate criteria unchecked | `implementation-plan.md` | 25+ items ⬜ but verdict is ✅ READY | Low — verdict is pragmatic, checklist is aspirational |
+| ~~Phase 5 labeled "Deferred"~~ | `implementation-plan.md` | ✅ **Resolved 2026-03-23** — plan now reflects completed regression phase. | Closed |
+| ~~Phase 2 labeled "Skipped"~~ | `implementation-plan.md` | ✅ **Resolved 2026-03-23** — plan now describes verified baseline with systematic coverage still deferred. | Closed |
+| ~~Phase 1B items unchecked~~ | `implementation-plan.md` | ✅ **Resolved 2026-03-15** — sub-items were already synced to the implemented sandbox track. | Closed |
+| ~~Phase 7 gate criteria unchecked~~ | `implementation-plan.md` | ✅ **Reduced 2026-03-23** — verdict/checklist relationship is now explained explicitly and high-confidence checks are marked. | Closed |
 | §6 "Observability: Okänt" | `architecture.md` | Telemetry pack exists; observability audit was done | Low — stale but not misleading |
 | §2 "dev pekar mot prod" | `architecture.md` | Resolved — staging Supabase + local Docker both working | Medium — could mislead new developers |
 

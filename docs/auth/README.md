@@ -29,6 +29,7 @@ Scope: Auth, RBAC, tenant-access och routing.
 
 - [AUTH_ARCHITECTURE_REDESIGN.md](AUTH_ARCHITECTURE_REDESIGN.md) — draft redesign proposal for server-first auth, tenant resolution, and role handling across surfaces
 - [AUTH_IMPLEMENTATION_TODO.md](AUTH_IMPLEMENTATION_TODO.md) — draft auth/tenant backlog tied to the redesign work
+- [CUSTOM_DOMAINS_TEST_PLAN.md](CUSTOM_DOMAINS_TEST_PLAN.md) — draft manual validation plan for custom-domain and hostname-based tenant resolution behavior
 
 ## Historical
 

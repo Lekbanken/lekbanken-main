@@ -31,6 +31,7 @@ This folder contains remediation plans, execution briefs, and domain follow-up r
 ### Executed implementation records
 
 - `api-consistency-remediation.md` — executed API consistency remediation record (Batches 1-6d complete; Batch 7 deferred to per-domain audits)
+- `canonical-baseline-execution.md` — executed runbook for the canonical-baseline consolidation and fresh-install verification
 - `demo-remediation.md` — demo-domain remediation record
 - `mfa-trusted-device-remediation.md` — executed MFA remediation record (all 5 findings closed 2026-03-22)
 - `next-phase-execution-plan.md` — historical execution-plan snapshot from before the Observe Mode alignment; kept only as bounded planning history

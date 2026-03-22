@@ -155,8 +155,8 @@ Migration guide filenames listed below were part of the original root-level audi
 | `MFA_TECHNICAL_SPEC.md` | Same — verify if still authoritative |
 | `MFA_SECURITY.md` | Same |
 | `STRIPE.md` | May contain active integration notes |
-| `I18N_GUIDE.md` | May be referenced by developers |
-| `I18N_MIGRATION_PLAN.md` | May be active migration plan |
+| `content/I18N_GUIDE.md` | May be referenced by developers |
+| `content/I18N_MIGRATION_PLAN.md` | May be active migration plan |
 | `legal/archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md` | Business-critical — verify if still needed for kyrkan partnership |
 | `legal/SVENSKA_KYRKAN_ONBOARDING.md` | Same |
 | Various `*_DOMAIN.md` files (15+) | Domain docs — some may still be active architecture references |
@@ -350,7 +350,7 @@ Migration guide filenames in this reclassification table now resolve under `docs
 | `*_DOMAIN.md` files | **C** | ~15 | Domain docs — may be active architecture references for AI agents |
 | `MFA_*.md` files | **C** | 3 | Recently created — likely still active SSoT |
 | `STRIPE.md` | **C** | 1 | May contain active integration notes |
-| `I18N_GUIDE.md` / `I18N_MIGRATION_PLAN.md` | **C** | 2 | May be referenced by developers |
+| `content/I18N_GUIDE.md` / `content/I18N_MIGRATION_PLAN.md` | **C** | 2 | May be referenced by developers |
 | `SVENSKA_KYRKAN_*.md` | **C** | 2 | Business-critical — verify partnership status |
 
 **docs/ summary:**

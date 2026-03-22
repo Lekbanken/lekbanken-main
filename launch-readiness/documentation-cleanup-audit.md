@@ -137,7 +137,7 @@ These files are still relevant but contain **stale content**.
 | `docs/MIGRATIONS.md` | Migration guide | Verify against current 304-migration state |
 | `docs/README.md` | docs/ index | Update to reflect current structure |
 | `docs/DOCS_INDEX.md` | docs/ index | Redundant with `docs/README.md` — consolidate |
-| `docs/I18N_GUIDE.md` | i18n guide | Verify against current next-intl setup |
+| `docs/content/I18N_GUIDE.md` | i18n guide | Verify against current next-intl setup |
 | `docs/billing/STRIPE.md` | Stripe integration guide | Verify against billing-audit findings |
 | `docs/ai/AI_CODING_GUIDELINES.md` | AI coding conventions | Verify; may be superseded by `.github/copilot-instructions.md` |
 

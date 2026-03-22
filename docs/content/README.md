@@ -26,10 +26,12 @@ Use this cluster when the task spans structured game authoring, bulk content ope
 
 - [CONTENT_MANAGEMENT_DOMAIN.md](CONTENT_MANAGEMENT_DOMAIN.md) — current content-management domain reference for builder, bulk ops, and content-planner primitives
 - [TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md) — translation-engine domain reference for language preferences, content locales, and fallback rules
+- [I18N_GUIDE.md](I18N_GUIDE.md) — active guide for next-intl locale architecture, message sources, and locale-aware UI patterns
 
 ## Historical snapshots
 
 - [TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md](TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md) — earlier validation snapshot for the translation-engine domain
+- [I18N_MIGRATION_PLAN.md](I18N_MIGRATION_PLAN.md) — historical snapshot of the repo-wide i18n rollout status and migration progress
 
 ## Related docs
 

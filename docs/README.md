@@ -30,7 +30,7 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - Launch program status: se [../launch-readiness/launch-control.md](../launch-readiness/launch-control.md)
 - Launch audits: se [../launch-readiness/audits/README.md](../launch-readiness/audits/README.md)
 - Launch remediation records: se [../launch-readiness/implementation/README.md](../launch-readiness/implementation/README.md)
-- Internationalization guide: se [I18N_GUIDE.md](I18N_GUIDE.md)
+- Internationalization guide: se [content/I18N_GUIDE.md](content/I18N_GUIDE.md)
 - VS Code/session workflow: se [VS_CODE_WORKFLOW.md](VS_CODE_WORKFLOW.md)
 - CLI/MCP tool policy: se [TOOLING_MATRIX.md](TOOLING_MATRIX.md)
 - Artifact UI specs (draft): se [play/ARTIFACT_COMPONENTS.md](play/ARTIFACT_COMPONENTS.md) + [play/ARTIFACT_MATRIX.md](play/ARTIFACT_MATRIX.md) + [play/ARTIFACT_UI_CONTRACT.md](play/ARTIFACT_UI_CONTRACT.md)

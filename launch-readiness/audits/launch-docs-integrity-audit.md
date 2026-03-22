@@ -13,7 +13,7 @@
 > **Date:** 2026-03-15  
 > **Author:** Claude Opus 4.6 (automated analysis)  
 > **Purpose:** Audit the documentation layer itself. Identify obsolete, duplicated, and missing documentation. Determine which files are SSoT, which should be archived, and which are missing.  
-> **Method:** File inventory, content analysis, cross-reference verification against `documentation-cleanup-audit.md` (2026-03-13), codebase verification.
+> **Method:** File inventory, content analysis, cross-reference verification against `audits/documentation-cleanup-audit.md` (2026-03-13), codebase verification.
 
 ---
 

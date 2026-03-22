@@ -34,7 +34,7 @@
 | 3 — Domain Audits | ✅ Complete | ✅ **Verified** | Verified in docs | 23/23 audit files exist in `launch-readiness/audits/`, all substantial (100-600+ lines). 36 audit files total including regressions and L2 audits |
 | 4 — Remediation | ✅ Complete | ✅ **Verified** | Verified in code + docs | 13/13 P0 resolved, 0 actionable P1 remaining, 2 non-actionable follow-ups (SEC-002b, SYS-001). Launch-scope remediation records now read as executed or intentionally deferred history. |
 | 5 — Regression Audits | ⏭️ Deferred | ⚠️ **Actually done informally** | Verified in docs | 7 regression audit files exist: `play-regression-audit.md`, `sessions-regression-audit.md`, `games-regression-audit.md`, `planner-regression-audit.md`, `journey-gamification-regression-audit.md`, `demo-regression-audit.md`, `batch-regression-tier2-tier3.md`. 16/16 domains passed. Phase 5 is effectively complete. |
-| 6 — Documentation Refresh | ⏭️ Deferred | ⚠️ **Partially started** | Verified in docs | `documentation-cleanup-audit.md` exists with full inventory (397 files, 180 archivable identified). Work was started but not executed. |
+| 6 — Documentation Refresh | ⏭️ Deferred | ⚠️ **Partially started** | Verified in docs | `audits/documentation-cleanup-audit.md` exists with full inventory (397 files, 180 archivable identified). Work was started but not executed. |
 | 7 — Release Readiness Gate | ✅ READY | ⚠️ **Conditionally verified** | Verified in docs | Launch verdict issued 2026-03-12, conditions documented. However, several gate criteria items remain unchecked in the implementation plan. |
 
 ### Key Finding: Phase 5 is mis-labeled

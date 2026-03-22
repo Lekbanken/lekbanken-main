@@ -208,4 +208,4 @@ Mostly correct. Contains achievement SVGs, avatars, coach-diagram assets, SFX so
 |------|----------|----------|
 | Three documentation surfaces with no unified index | **HIGH** | Root + docs/ + launch-readiness/ |
 | docs/ declares SSoT but is mostly 3+ months stale | MEDIUM | `docs/README.md` claim vs reality |
-| No archival has been executed despite completed cleanup audit | MEDIUM | `launch-readiness/documentation-cleanup-audit.md` |
+| No archival has been executed despite completed cleanup audit | MEDIUM | `launch-readiness/audits/documentation-cleanup-audit.md` |

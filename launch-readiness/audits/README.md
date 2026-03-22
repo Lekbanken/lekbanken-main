@@ -30,6 +30,7 @@ This folder contains the bounded audit outputs produced during the launch-readin
 - `architecture-audit.md` — foundational architecture audit for boundaries, ownership, and route patterns
 - `api-consistency-audit.md` — API wrapper, auth, validation, and error-format consistency audit
 - `mfa-trusted-device-audit.md` — targeted auth hardening audit for MFA and trusted-device flows
+- `documentation-cleanup-audit.md`, `launch-docs-integrity-audit.md` — bounded documentation-layer audits that drove the markdown cleanup and SSoT verification work
 
 ### Security and isolation audit set
 

@@ -43,7 +43,7 @@ Audit OS    Arkitektur + Sandbox          Audit → Fix → Regression cycle    
 | # | Uppgift | Status | Datum |
 |---|---------|--------|-------|
 | 0.1 | Skapa `launch-control.md` | ✅ KLAR | 2026-03-10 |
-| 0.2 | Skapa `launch-readiness-audit-program.md` | ✅ KLAR | 2026-03-10 |
+| 0.2 | Skapa `audits/launch-readiness-audit-program.md` | ✅ KLAR | 2026-03-10 |
 | 0.3 | Skapa `launch-readiness-implementation-plan.md` | ✅ KLAR | 2026-03-10 |
 | 0.4 | Skapa `launch-readiness-architecture.md` | ✅ KLAR | 2026-03-10 |
 | 0.5 | Validera taxonomi och severity-modell | ✅ KLAR | 2026-03-10 |
@@ -307,7 +307,7 @@ Level 2 audits **aktiveras selektivt** — inte som en komplett backlog:
 3. **Cross-domain** — när samma byggsten används i flera domäner med olika krav
 4. **Vid misstanke** — när ett fynd verkar "lokalt" men sannolikt är systemiskt
 
-Full metodik: se `launch-readiness-audit-program.md` §7.
+Full metodik: se `audits/launch-readiness-audit-program.md` §7.
 
 ### Gate-kriterier
 - [x] Alla domäner passerar regression (inga nya P0/P1)

@@ -56,7 +56,7 @@ This L2 audit targets the **feature gate chain** and **upgrade path** in the dem
 
 ### Methodology
 
-Per `launch-readiness-audit-program.md` §7 (Level 2 procedure):
+Per `launch-readiness/audits/launch-readiness-audit-program.md` §7 (Level 2 procedure):
 
 1. **Definition:** Feature gate chain — the mechanism that restricts free-tier demo features and drives upgrade conversions.
 2. **Inventory:** All gate components, detection utilities, API routes, and upgrade pages.

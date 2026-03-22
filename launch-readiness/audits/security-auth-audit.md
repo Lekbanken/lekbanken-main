@@ -15,7 +15,7 @@
 > **Audit #2** in launch-readiness queue  
 > **Date:** 2026-03-10  
 > **Scope:** Auth flows, auth guard patterns, tenant auth, participant tokens, rate limiting, error consistency, public route inventory  
-> **Methodology:** `launch-readiness-audit-program.md` Section 3 format  
+> **Methodology:** `launch-readiness/audits/launch-readiness-audit-program.md` Section 3 format  
 > **Data source:** Automated scan of all 287 API route files + manual deep-dive of 50+ routes
 
 ---

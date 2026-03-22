@@ -15,7 +15,7 @@
 > **Date:** 2026-03-10  
 > **Auditor:** Claude (automated scan + targeted code reads)  
 > **Scope:** All 287 `app/api/**/route.ts` files — auth, validation, error format, rate limiting, wrapper adoption  
-> **Source:** `launch-readiness/launch-readiness-audit-program.md` audit #4  
+> **Source:** `launch-readiness/audits/launch-readiness-audit-program.md` audit #4  
 > **Prerequisites:** Security & Auth Audit (#2), Tenant Isolation Audit (#3), `lib/api/route-handler.ts` wrapper  
 
 ---

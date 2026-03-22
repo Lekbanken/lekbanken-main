@@ -17,7 +17,7 @@ This folder contains the bounded audit outputs produced during the launch-readin
 ## Start here
 
 1. `../launch-control.md`
-2. `../launch-readiness-audit-program.md`
+2. `launch-readiness-audit-program.md`
 3. `architecture-audit.md`
 4. `api-consistency-audit.md`
 5. `play-audit.md`

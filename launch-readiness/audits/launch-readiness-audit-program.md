@@ -577,7 +577,7 @@ Varje audit-session bör instruera Claude att:
 ```
 Du ska genomföra en launch-readiness audit av domänen {DOMAIN} i Lekbanken.
 
-Följ metodiken i launch-readiness/launch-readiness-audit-program.md.
+Följ metodiken i launch-readiness/audits/launch-readiness-audit-program.md.
 
 1. Läs alla filer i: {lista relevanta kataloger}
 2. Följ dataflöden end-to-end

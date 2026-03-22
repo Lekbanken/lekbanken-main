@@ -39,7 +39,7 @@
 |----------|----------|---------|--------|----------------------|
 | `launch-control.md` | `launch-readiness/` | Master program tracker | ⚠️ Numbers stale | 2026-03-14 (content), 2026-03-12 (metrics) |
 | `launch-readiness-implementation-plan.md` | `launch-readiness/` | Phase roadmap | ⚠️ Phase states mischaracterized | 2026-03-14 |
-| `launch-readiness-audit-program.md` | `launch-readiness/` | Audit methodology | ✅ Stable | 2026-03-14 (Level 2 methodology added) |
+| `launch-readiness-audit-program.md` | `launch-readiness/audits/` | Audit methodology | ✅ Stable | 2026-03-14 (Level 2 methodology added) |
 | `launch-readiness-architecture.md` | `launch-readiness/` | Environment/test/deploy strategy | ⚠️ Partially outdated | 2026-03-13 |
 | `launch-snapshot-2026-03.md` | `launch-readiness/` | Frozen system state at launch | ✅ Intentionally frozen | 2026-03-12 |
 | `launch-telemetry-pack.md` | `launch-readiness/` | Observability signals + alerts | ✅ Current | 2026-03-14 |
@@ -234,7 +234,7 @@ These files are **never archivable** — they are the living memory of the syste
 |------|---------|-----------------|
 | `launch-readiness/launch-control.md` | Master program tracker | Per change |
 | `launch-readiness/launch-readiness-implementation-plan.md` | Phase roadmap | Per phase change |
-| `launch-readiness/launch-readiness-audit-program.md` | Audit methodology | Rarely (stable) |
+| `launch-readiness/audits/launch-readiness-audit-program.md` | Audit methodology | Rarely (stable) |
 | `launch-readiness/launch-readiness-architecture.md` | Environment/deploy strategy | Per env change |
 | `launch-readiness/launch-snapshot-2026-03.md` | Frozen launch state | Never (frozen) |
 | `launch-readiness/launch-telemetry-pack.md` | Observability signals | Per signal change |

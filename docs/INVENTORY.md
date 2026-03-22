@@ -95,7 +95,7 @@ Fält:
 | [docs/builder/README.md](builder/README.md) | A | active | 2026-03-21 | - | Builder documentation sub-index and status map |
 | [docs/builder/SPRINT2_WIRING_PLAN.md](builder/SPRINT2_WIRING_PLAN.md) | B | historical snapshot | 2026-02-08 | - | Historical sprint wiring plan |
 | [docs/builder/SPRINT3_CONSOLIDATION_PLAN.md](builder/SPRINT3_CONSOLIDATION_PLAN.md) | B | active | 2026-02-08 | - | Active sprint consolidation and contract plan |
-| [docs/CATALYST_UI_KIT.md](CATALYST_UI_KIT.md) | A | draft | 2025-12-01 | - | Reference |
+| [docs/toolkit/CATALYST_UI_KIT.md](toolkit/CATALYST_UI_KIT.md) | A | draft | 2025-12-01 | - | Reference |
 | [docs/CURRENCY_CONSISTENCY_REPORT.md](CURRENCY_CONSISTENCY_REPORT.md) | C | historical snapshot | 2026-01-14 | - | Terminology report |
 | ~~docs/prompts/CHATGPT_GAME_CREATOR_PROMPT.md~~ | E | archived | 2026-03-15 | - | → `archive/CHATGPT_GAME_CREATOR_PROMPT.md` |
 | [docs/billing/README.md](billing/README.md) | A | active | 2026-03-22 | - | Billing cluster entrypoint |
@@ -325,7 +325,7 @@ Fält:
 | [docs/billing/STRIPE.md](billing/STRIPE.md) | A | active | 2025-12-17 | - | Billing reference |
 | [docs/support/README.md](support/README.md) | A | active | 2026-03-22 | - | Sub-index for support domain docs |
 | [docs/support/SUPPORT_DOMAIN.md](support/SUPPORT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/TAILWIND_PLUS_COMPONENTS.md](TAILWIND_PLUS_COMPONENTS.md) | A | draft | 2025-11-30 | - | UI reference |
+| [docs/toolkit/TAILWIND_PLUS_COMPONENTS.md](toolkit/TAILWIND_PLUS_COMPONENTS.md) | A | draft | 2025-11-30 | - | UI reference |
 | [docs/participants/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md](participants/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md) | B | draft | 2025-12-11 | - | Task/spec |
 | [docs/participants/TASK_9_LIVE_PROGRESS.md](participants/TASK_9_LIVE_PROGRESS.md) | B | draft | 2025-12-10 | - | Task/spec |
 | [docs/toolkit/archive/TOOLKIT_ROADMAP.md](toolkit/archive/TOOLKIT_ROADMAP.md) | B | historical snapshot | 2025-12-28 | - | Toolkit roadmap snapshot |

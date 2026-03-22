@@ -200,7 +200,7 @@ docs/
 ├── participants/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md← Tasks 11 & 12 dokumentation
 ├── AI_CODING_GUIDELINES.md               ← Kodregler
 ├── VS_CODE_WORKFLOW.md                   ← Arbetsflöde
-├── CATALYST_UI_KIT.md                    ← UI-komponenter
+├── toolkit/CATALYST_UI_KIT.md            ← UI-komponenter
 └── HANDOVER_2024-12-07.md                ← Historisk kontext
 ```
 

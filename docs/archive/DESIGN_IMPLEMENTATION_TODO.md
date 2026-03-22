@@ -311,7 +311,7 @@ components/
 
 - **Sandbox**: `http://localhost:3000/sandbox`
 - **Design Tokens**: `app/globals.css`
-- **TailwindPLUS Reference**: `docs/TAILWIND_PLUS_COMPONENTS.md`
+- **TailwindPLUS Reference**: `docs/toolkit/TAILWIND_PLUS_COMPONENTS.md`
 - **UI Index**: `components/ui/index.tsx`
 
 ---

@@ -309,7 +309,7 @@ Fält:
 | [docs/plans/PROFILE_RESILIENCE_IMPLEMENTATION.md](plans/PROFILE_RESILIENCE_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-31 | - | Profile resilience implementation snapshot |
 | [docs/PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md) | B | draft | 2025-12-10 | - | Plan |
 | [docs/games/archive/PUZZLE_MODULES_INTEGRATION_STATUS.md](games/archive/PUZZLE_MODULES_INTEGRATION_STATUS.md) | C | historical snapshot | 2025-12-28 | - | Puzzle modules integration status snapshot |
-| [docs/QA_APPSHELL_ANALYSIS.md](QA_APPSHELL_ANALYSIS.md) | C | draft | 2026-01-17 | - | AppShell QA and improvement analysis |
+| [docs/notifications/QA_APPSHELL_ANALYSIS.md](notifications/QA_APPSHELL_ANALYSIS.md) | C | draft | 2026-01-17 | - | AppShell QA and improvement analysis |
 | [docs/qa/director-triggers.md](qa/director-triggers.md) | B | draft | 2026-02-23 | Play domain | Director Mode triggers QA plan |
 | ~~docs/prompts/PROMPT_FOR_NEW_AI.md~~ | E | archived | 2026-03-15 | - | → `archive/PROMPT_FOR_NEW_AI.md` |
 | [docs/README.md](README.md) | A | active | 2026-03-22 | - | Docs start and route into launch-readiness + archive entrypoints |

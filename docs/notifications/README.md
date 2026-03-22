@@ -33,6 +33,7 @@ This cluster covers the in-app notifications domain, notification preferences, a
 
 - `app-shell-notifications-audit.md` — current app-shell + notification-surface audit
 - `app-shell-notifications-implementation-plan.md` — current execution state and follow-up milestones
+- `QA_APPSHELL_ANALYSIS.md` — QA checklist and improvement analysis for app-shell navigation, safe-area handling, and page-level UX consistency
 
 ### Draft / bounded next-step spec
 

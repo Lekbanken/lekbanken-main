@@ -585,7 +585,7 @@ Atlas (`/sandbox/atlas`) tracks the system graph (287 routes, components, domain
 
 Manuell verifiering i browser/network tab innan launch markeras som komplett:
 
-> **Supplerande runtime-verifiering (2026-03-19):** Efter canonicalization-rundan för auth/profile/planner/admin ska även [canonicalization-e2e-checklist.md](canonicalization-e2e-checklist.md) köras. Den checklistan fokuserar på state convergence efter login, MFA, tenant switch, profile/avatar updates, notifications, planner publish och admin access.
+> **Supplerande runtime-verifiering (2026-03-19):** Efter canonicalization-rundan för auth/profile/planner/admin ska även [audits/canonicalization-e2e-checklist.md](audits/canonicalization-e2e-checklist.md) köras. Den checklistan fokuserar på state convergence efter login, MFA, tenant switch, profile/avatar updates, notifications, planner publish och admin access.
 
 | # | Test | Route/Flöde | Förväntat |
 |---|------|-------------|-----------|

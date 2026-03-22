@@ -70,6 +70,7 @@ This folder contains the bounded audit outputs produced during the launch-readin
 - `play-regression-audit.md`, `games-regression-audit.md`, `planner-regression-audit.md`, `sessions-regression-audit.md`, `journey-gamification-regression-audit.md`, `demo-regression-audit.md` — normalized core domain regression passes
 - `wave1-extension-verification.md`, `batch-d-rejoin-host-action-verification.md` — historical pre/post-implementation verification snapshots for focused bug families
 - `batch-a1-host-architecture-verification.md` — historical verification snapshot for the early host-routing decision work
+- `canonicalization-e2e-checklist.md`, `canonicalization-e2e-test-log-template.md` — draft runtime-verification checklist and evidence template for the auth/profile/planner/admin canonicalization follow-up
 
 ### Postfix verification snapshots
 

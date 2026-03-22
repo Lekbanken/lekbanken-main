@@ -18,15 +18,17 @@ Use this cluster for legal/public-policy documents, enterprise contract template
 
 1. [DPA_TEMPLATE.md](DPA_TEMPLATE.md)
 2. [SLA.md](SLA.md)
-3. [SVENSKA_KYRKAN_ONBOARDING.md](SVENSKA_KYRKAN_ONBOARDING.md) when enterprise onboarding/compliance due diligence is needed
-4. [archive/LEGAL_IMPLEMENTATION_STATUS.md](archive/LEGAL_IMPLEMENTATION_STATUS.md) when historical rollout context is needed
-5. [archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md](archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md) when detailed enterprise readiness context is needed
-6. [archive/COOKIE_CONSENT_CURRENT_STATE.md](archive/COOKIE_CONSENT_CURRENT_STATE.md) when cookie-consent gap analysis is needed
+3. [LEGAL_PHASE2_VALIDATION_PLAN.md](LEGAL_PHASE2_VALIDATION_PLAN.md) when legal-system validation scope or checklist coverage is needed
+4. [SVENSKA_KYRKAN_ONBOARDING.md](SVENSKA_KYRKAN_ONBOARDING.md) when enterprise onboarding/compliance due diligence is needed
+5. [archive/LEGAL_IMPLEMENTATION_STATUS.md](archive/LEGAL_IMPLEMENTATION_STATUS.md) when historical rollout context is needed
+6. [archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md](archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md) when detailed enterprise readiness context is needed
+7. [archive/COOKIE_CONSENT_CURRENT_STATE.md](archive/COOKIE_CONSENT_CURRENT_STATE.md) when cookie-consent gap analysis is needed
 
 ## Active docs
 
 - [DPA_TEMPLATE.md](DPA_TEMPLATE.md) — enterprise DPA template
 - [SLA.md](SLA.md) — service level agreement draft
+- [LEGAL_PHASE2_VALIDATION_PLAN.md](LEGAL_PHASE2_VALIDATION_PLAN.md) — draft validation checklist for legal-system phase 2 behavior
 - [SVENSKA_KYRKAN_ONBOARDING.md](SVENSKA_KYRKAN_ONBOARDING.md) — draft onboarding guide for Svenska Kyrkan stakeholders and due diligence
 
 ## Historical docs

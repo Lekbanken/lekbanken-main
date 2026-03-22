@@ -151,7 +151,7 @@ Phase 4 (GDPR user rights, enterprise documents) is now complete.
 - ⏳ Verify `/app/preferences/privacy` in UI
 - ⏳ Verify `/legal/subprocessors` public page
 - ⏳ Enable MFA enforcement in production: `MFA_ENFORCE_ADMINS=true`
-- Full validation checklist: `docs/LEGAL_PHASE2_VALIDATION_PLAN.md`
+- Full validation checklist: `docs/legal/LEGAL_PHASE2_VALIDATION_PLAN.md`
 
 ## Next Steps (Phase 5 - Optional Enhancements)
 ### Special Category Consent (GDPR Art. 9)

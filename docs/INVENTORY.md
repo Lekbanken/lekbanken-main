@@ -134,7 +134,7 @@ Fält:
 | [docs/legal/SLA.md](legal/SLA.md) | A | draft | 2026-01-13 | CTO | Enterprise service level agreement |
 | [docs/legal/README.md](legal/README.md) | A | active | 2026-03-22 | - | Legal cluster entrypoint |
 | [docs/legal/archive/LEGAL_IMPLEMENTATION_STATUS.md](legal/archive/LEGAL_IMPLEMENTATION_STATUS.md) | C | historical snapshot | 2026-01-11 | - | Legal system implementation status snapshot |
-| [docs/LEGAL_PHASE2_VALIDATION_PLAN.md](LEGAL_PHASE2_VALIDATION_PLAN.md) | B | draft | 2026-01-11 | - | Validation plan |
+| [docs/legal/LEGAL_PHASE2_VALIDATION_PLAN.md](legal/LEGAL_PHASE2_VALIDATION_PLAN.md) | B | draft | 2026-01-11 | - | Validation plan |
 | [docs/play/LEGENDARY_PLAY_ADVANCED_FEATURES.md](play/LEGENDARY_PLAY_ADVANCED_FEATURES.md) | B | draft | 2025-12-24 | - | Advanced play immersion UX specification |
 | [docs/play/LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md](play/LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md) | B | historical snapshot | 2025-12-24 | - | Historical Legendary Play implementation plan |
 | [docs/learning/README.md](learning/README.md) | A | active | 2026-03-22 | - | Sub-index for learning-domain drafts and test planning |

@@ -40,7 +40,7 @@
 | `launch-control.md` | `launch-readiness/` | Master program tracker | ⚠️ Numbers stale | 2026-03-14 (content), 2026-03-12 (metrics) |
 | `launch-readiness-implementation-plan.md` | `launch-readiness/` | Phase roadmap | ✅ Current after 2026-03-23 baseline/docs sync | 2026-03-23 |
 | `launch-readiness-audit-program.md` | `launch-readiness/audits/` | Audit methodology | ✅ Stable | 2026-03-14 (Level 2 methodology added) |
-| `launch-readiness-architecture.md` | `launch-readiness/` | Environment/test/deploy strategy | ⚠️ Partially outdated | 2026-03-13 |
+| `launch-readiness-architecture.md` | `launch-readiness/` | Environment/test/deploy strategy | ✅ Current after 2026-03-23 environment/ops sync | 2026-03-23 |
 | `launch-snapshot-2026-03.md` | `launch-readiness/` | Frozen system state at launch | ✅ Intentionally frozen | 2026-03-12 |
 | `launch-telemetry-pack.md` | `launch-readiness/` | Observability signals + alerts | ✅ Current | 2026-03-14 |
 
@@ -48,13 +48,13 @@
 
 | Issue | Document | Detail | Severity |
 |-------|----------|--------|----------|
-| Stale wrapper coverage | `launch-control.md` | Reports 247/287 (86.1%) throughout; actual is 252/288 (87.5%) | Medium |
+| Stale wrapper coverage | `launch-control.md` | Reports 247/287 (86.1%) throughout; actual is 253/288 (87.8%) and 369/410 handlers (90.0%) | Medium |
 | ~~Phase 5 labeled "Deferred"~~ | `implementation-plan.md` | ✅ **Resolved 2026-03-23** — plan now reflects completed regression phase. | Closed |
 | ~~Phase 2 labeled "Skipped"~~ | `implementation-plan.md` | ✅ **Resolved 2026-03-23** — plan now describes verified baseline with systematic coverage still deferred. | Closed |
 | ~~Phase 1B items unchecked~~ | `implementation-plan.md` | ✅ **Resolved 2026-03-15** — sub-items were already synced to the implemented sandbox track. | Closed |
 | ~~Phase 7 gate criteria unchecked~~ | `implementation-plan.md` | ✅ **Reduced 2026-03-23** — verdict/checklist relationship is now explained explicitly and high-confidence checks are marked. | Closed |
-| §6 "Observability: Okänt" | `architecture.md` | Telemetry pack exists; observability audit was done | Low — stale but not misleading |
-| §2 "dev pekar mot prod" | `architecture.md` | Resolved — staging Supabase + local Docker both working | Medium — could mislead new developers |
+| ~~§6 "Observability: Okänt"~~ | `architecture.md` | ✅ **Resolved 2026-03-23** — operations and telemetry references are explicit and current. | Closed |
+| ~~§2 "dev pekar mot prod"~~ | `architecture.md` | ✅ **Resolved 2026-03-23** — architecture now states the verified environment model: local Docker for development, sandbox via preview env vars, explicit guarded prod pushes only. | Closed |
 
 ### Tier 2 — Domain Architecture (should be accurate)
 

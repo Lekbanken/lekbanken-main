@@ -5,16 +5,16 @@
 - Owner: -
 - Status: active
 - Date: 2026-03-13
-- Last updated: 2026-03-22
-- Last validated: 2026-03-22
+- Last updated: 2026-03-23
+- Last validated: 2026-03-23
 
 > Active architecture and environment reference for the launch-readiness program. Use this as the stable system and environment overview together with `launch-control.md` and the linked audit and implementation records.
 
-> **Version:** 1.2  
+> **Version:** 1.3  
 > **Created:** 2026-03-10  
-> **Last updated:** 2026-03-22  
+> **Last updated:** 2026-03-23  
 > **Purpose:** Målbild för sandbox, test foundation, miljöer, databaser, migrationssäkerhet, release/rollback och framtidssäkring.  
-> **Status:** LAUNCH READY — API wrapper, rate limiting, auth standardization, and scaling hardening done. Environment isolation implemented (local Docker + staging Supabase). Test foundation exists ad-hoc (261 test files, CI 7 checks) and the latest local Playwright full-suite baseline is verified at 60 passed, 43 skipped, 0 failed.
+> **Status:** LAUNCH READY — API wrapper, rate limiting, auth standardization, and scaling hardening done. Environment isolation is implemented and verified: local development uses Docker Supabase, preview deployments use sandbox Supabase (`vmpdejhgpsrfulimsoqn`), and production stays isolated behind explicit guarded remote operations. Test foundation exists ad-hoc (261 test files, CI 7 checks) and the latest local Playwright full-suite baseline is verified at 60 passed, 43 skipped, 0 failed.
 
 ---
 
@@ -48,7 +48,7 @@
 | Preview (Vercel) | *.vercel.app | Staging Supabase (`vmpdejhgpsrfulimsoqn`) | ✅ Isolerad |
 | Sandbox (Atlas) | localhost:3000/sandbox/atlas | — | ✅ Dev only |
 
-**Status:** ✅ LÖST (2026-03-13) — Utveckling och preview-deploys pekar nu mot isolerade databaser. ADR-005 (Alt B remote sandbox) implementerat. Lokal Supabase via Docker CLI för development.
+**Status:** ✅ LÖST (2026-03-23 verifierat) — Utveckling och preview-deploys pekar nu mot isolerade databaser. ADR-005 (Alt B remote sandbox) implementerat. Lokal utveckling använder Supabase via Docker CLI; preview använder sandbox-projektet via Vercel environment variables.
 
 ---
 
@@ -82,7 +82,7 @@
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
-**Status:** ✅ DECIDED (2026-03-13) — Alt B (remote staging) implementerat. Preview + Development Vercel-scopes pekar mot staging Supabase. Lokal dev kör Docker CLI.
+**Status:** ✅ DECIDED (2026-03-23 verifierat) — Alt B (remote staging/sandbox) implementerat. Preview-deploys pekar mot staging Supabase via Vercel environment variables. Daglig lokal utveckling kör Docker CLI och pekar inte mot prod som standard.
 
 ### Implementeringsplan för Hybrid-setup
 
@@ -147,10 +147,10 @@ Migrations skapas manuellt som SQL-filer i `supabase/migrations/`. De appliceras
    └── Reviewer verifierar i preview
 
 4. Merge till main
-   └── Migration appliceras automatiskt på sandbox
+   └── Sandbox/staging verifieras via preview-miljön och explicit seed/SQL-workflow vid behov
 
 5. Release till prod
-   ├── Manuell applicering via Supabase Dashboard / CLI
+   ├── Explicit remote applicering via guarded workflow (`npm run db:push` från `main`)
    ├── Verifiering innan flagg-switch
    └── Rollback-plan redo
 ```
@@ -245,7 +245,7 @@ Dessa utreddes i Phase 1A (Architecture Audit) — **alla lösta utom B och D:**
 
 #### A. API-lager konsolidering
 
-**Problem:** 287 API-routes med inkonsistenta mönster (auth guards, error handling, response format).
+**Problem:** 288 API-routes med inkonsistenta mönster (auth guards, error handling, response format).
 
 **Status: ✅ LÖST.** `apiHandler()` wrapper implementerad i `lib/api/route-handler.ts`. 253/288 filer (87.8%) migrerade. Auth-nivåer: `'user'`, `'system_admin'`, `'participant'`, `'public'`. Zod input-validering via `input:`, centraliserad felformat, audit-logging på mutationer.
 
@@ -309,6 +309,7 @@ Dessa ska INTE göras nu utan dokumenteras inför framtida beslut:
 - `launch-readiness/launch-telemetry-pack.md` — Signals + alerts definition
 - `docs/ops/production-signals-dashboard.md` — Signal query reference
 - `docs/ops/anomaly-detection-playbook.md` — Alert response procedures
+- `docs/ops/first-deploy-runbook.md` — First deploy and verification sequence
 - `launch-readiness/incident-playbook.md` — Rollback, kill-switches, domain playbooks
 
 ### Rekommenderad minimum för launch
@@ -362,7 +363,7 @@ Dessa ska INTE göras nu utan dokumenteras inför framtida beslut:
 
 | Risk | Severity | Status |
 |------|----------|--------|
-| API routes utan auth check | P0 | ✅ Triaged — 5 true concerns, all P0 fixed. 86.1% now use apiHandler. |
+| API routes utan auth check | P0 | ✅ Triaged — 5 true concerns, all P0 fixed. 87.8% now use apiHandler. |
 | ServiceRole routes utan explicit auth | P0 | ✅ Triaged — SEC-001 fixed, remaining are RLS-protected or intentional. |
 | Rate limiting | P1 | 🟡 Kritiska routes ratelimitade. SEC-002b (serverless limiter arkitektur) öppen P1. |
 | Upload abuse | P1 | ✅ Media audit complete — cross-tenant upload blocked, upload pipeline secured. Server-side MIME validation deferred (P1 post-launch). |
@@ -373,7 +374,7 @@ Dessa ska INTE göras nu utan dokumenteras inför framtida beslut:
 
 1. **API auth audit** — ✅ KLAR — Klassificerat alla 287 routes (se Security & Auth Audit)
 2. **Rate limiting** — ✅ Standardiserad rate limit i apiHandler() wrapper (DD-3). Kritiska routes täckta.
-3. **Input validation** — ✅ Zod-schemas på API boundaries via wrapper `input:`. 86.1% routes täckta.
+3. **Input validation** — ✅ Zod-schemas på API boundaries via wrapper `input:`. 87.8% routes täckta.
 4. **GDPR compliance** — Verifiera delete/anonymize-flöden
 5. **CSP headers** — Content Security Policy i next.config.ts
 6. **Secret management** — Verifiera att inga secrets läcker i client bundles
@@ -451,6 +452,7 @@ Alla arkitekturbeslut som behöver fattas under Phase 1:
 
 | Datum | Ändring |
 |-------|---------|
+| 2026-03-23 | Synced environment and operations wording with the verified repo model. Clarified that local dev uses Docker Supabase, preview uses sandbox via Vercel env vars, remote production schema pushes are explicit via `npm run db:push`, and updated stale wrapper/security coverage figures from 86.1% to 87.8%. |
 | 2026-03-10 | Initial creation — environment, test, security, deploy strategy |
 | 2026-03-22 | Synced environment/test status with current launch baseline. Added verified local Playwright result (60 passed, 43 skipped, 0 failed) and marked old sandbox setup steps as historical/completed state. |
 | 2025-07-24 | Updated security model, API wrapper status, ADR-007/010 decided, rate limiting + audit trail status |

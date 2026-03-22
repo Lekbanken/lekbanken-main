@@ -271,7 +271,7 @@ Fält:
 | [docs/participants/PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md](participants/PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md) | C | archived | 2025-12-17 | - | Historical report (superseded by 2025-12-17 addendum) |
 | [docs/participants/PARTICIPANTS_DOMAIN_MVP.md](participants/PARTICIPANTS_DOMAIN_MVP.md) | B | archived | 2025-12-17 | - | Historical MVP/spec snapshot |
 | [docs/participants/README.md](participants/README.md) | A | active | 2026-03-22 | - | Cluster entrypoint for participants domain docs |
-| [docs/PHASE2_PREFLIGHT_ADMIN_TENANT.md](PHASE2_PREFLIGHT_ADMIN_TENANT.md) | C | frozen audit | 2026-01-10 | - | Preflight validation for admin tenant architecture |
+| [docs/admin/archive/PHASE2_PREFLIGHT_ADMIN_TENANT.md](admin/archive/PHASE2_PREFLIGHT_ADMIN_TENANT.md) | C | frozen audit | 2026-01-10 | - | Preflight validation for admin tenant architecture |
 | [docs/platform/README.md](platform/README.md) | A | active | 2026-03-22 | - | Platform cluster entrypoint |
 | [docs/platform/PLATFORM_DOMAIN.md](platform/PLATFORM_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc |
 | [docs/platform/PLATFORM_DOMAIN_VALIDATION_REPORT.md](platform/PLATFORM_DOMAIN_VALIDATION_REPORT.md) | C | draft | 2025-12-10 | - | Validation report |

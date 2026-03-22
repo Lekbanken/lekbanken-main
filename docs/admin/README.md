@@ -46,6 +46,7 @@ Use this index to distinguish current admin design references from older audits 
 - `archive/ADMIN_GAMIFICATION_HUB_IA.md` — completed IA refactor snapshot for the gamification hub regrouping
 - `archive/ARCH_REALITY_CHECK_ADMIN_TENANT.md` — frozen admin-vs-tenant access-control reality check
 - `archive/ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md` — frozen validation snapshot for admin and tenant separation
+- `archive/PHASE2_PREFLIGHT_ADMIN_TENANT.md` — frozen preflight audit for the Phase 2 admin tenant architecture handoff
 - `archive/ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md` — historical Phase 0 learning-admin analysis
 - `archive/ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md` — historical Phase 0 shop-rewards admin analysis
 - `archive/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md` — historical Phase 0 support/tickets admin analysis
@@ -94,6 +95,7 @@ Use this index to distinguish current admin design references from older audits 
 - `archive/ADMIN_GAMIFICATION_HUB_IA.md`
 - `archive/ARCH_REALITY_CHECK_ADMIN_TENANT.md`
 - `archive/ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md`
+- `archive/PHASE2_PREFLIGHT_ADMIN_TENANT.md`
 - `archive/ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md`
 - `archive/ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md`
 - `archive/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md`

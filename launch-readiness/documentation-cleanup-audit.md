@@ -5,7 +5,7 @@
 - Owner: -
 - Status: frozen audit
 - Date: 2026-03-13
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-13
 
 > Closed audit of markdown sprawl and archive candidates across the repository. Treat this as the bounded audit snapshot behind the documentation cleanup work.
@@ -194,7 +194,7 @@ Files that describe the **same topic** with potentially conflicting information:
 | Planner domain | `docs/planner/PLANNER_DOMAIN.md` + root `planner-architecture.md` + `docs/planner/PLANNER_TARGET_ARCHITECTURE.md` + `docs/planner/PLANNER_REFACTOR_IMPLEMENTATION.md` + `docs/planner/PLANNER_ANALYSIS_REPORT.md` + `docs/planner/PLANNER_IA_RULES.md` + `docs/planner/PLANNER_IMPROVEMENT_TODO.md` + `docs/planner/PLANNER_INVENTORY_GAP_ANALYSIS.md` + `docs/planner/PLANNER_UI_UPGRADE_PLAN.md` + `docs/admin/ADMIN_PLANNER_MASTER_IMPLEMENTATION.md` | **10 planner docs** across root + docs/planner/ |
 | Play domain | `docs/play/PLAY_DOMAIN.md` + root `PLAY_SYSTEM_DOCUMENTATION.md` + `launch-readiness/play-architecture.md` | 3+ play architecture docs |
 | Auth system | `docs/AUTH_*.md` (4 files) + `launch-readiness/audits/security-auth-audit.md` | Pre-audit vs post-audit auth docs |
-| Migration docs | root `MIGRATION_MANUAL_GUIDE.md` + `MIGRATIONS_QUICK_START.md` + `EXECUTE_MIGRATIONS_NOW.md` + `AUTOMATED_MIGRATION_OPTION_B.md` + `docs/MIGRATIONS.md` | **5 migration docs**, all different |
+| Migration docs | archived `docs/archive/MIGRATION_MANUAL_GUIDE.md` + `docs/archive/MIGRATIONS_QUICK_START.md` + `docs/archive/EXECUTE_MIGRATIONS_NOW.md` + `docs/archive/AUTOMATED_MIGRATION_OPTION_B.md` + canonical `docs/MIGRATIONS.md` | **5 migration docs**, with 4 archived one-time guides plus 1 active canonical guide |
 | Game builder | `docs/builder/*.md` (15 files) + `docs/GAME_BUILDER_*.md` (4 files) | 19 builder-related docs |
 | Gamification/Journey | root Journey_v2_*.md (5 files) + root journey-activation-*.md (3 files) + `docs/gamification/*.md` (13 files) + root `GAMIFICATION_JOURNEY_AUDIT.md` | **22 gamification docs** |
 

@@ -6,7 +6,7 @@
 - Status: historical snapshot
 - Date: 2025-11-29
 - Snapshot date: 2026-01-08
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2025-11-29
 
 > Historical snapshot only. Do not use this file as current operational truth.
@@ -193,7 +193,7 @@ All 14 migration files are in `supabase/migrations/`:
 3. Copy each migration file (00-13 in order)
 4. Paste & execute each one
 5. **Estimated time**: 5 minutes
-6. **Documentation**: `MIGRATIONS_QUICK_START.md`
+6. **Documentation**: `docs/archive/MIGRATIONS_QUICK_START.md`
 
 #### Option B: Supabase CLI (Recommended)
 ```powershell
@@ -209,7 +209,7 @@ supabase db push
 - Requires psql or pgAdmin
 - **Documentation**: `docs/MIGRATIONS.md`
 
-**See**: `MIGRATIONS_QUICK_START.md` for detailed instructions
+**See**: `docs/archive/MIGRATIONS_QUICK_START.md` for historical quick-start instructions
 
 ### Then: Senior AI Code Review ⏳
 
@@ -250,7 +250,7 @@ a03b1dd - Feature: Personalization - user preferences, recommendations, interest
 
 ### Documentation
 - [x] Migration guide created (`docs/MIGRATIONS.md`)
-- [x] Quick start guide created (`MIGRATIONS_QUICK_START.md`)
+- [x] Quick start guide created (now archived at `docs/archive/MIGRATIONS_QUICK_START.md`)
 - [x] Service layer functions documented in code
 - [x] Type definitions created (`lib/supabase/types.ts`)
 
@@ -335,7 +335,7 @@ Once migrations execute:
 ## 📞 Support & Troubleshooting
 
 **Migration Issues?**
-- See `MIGRATIONS_QUICK_START.md` (Quick fix)
+- See `docs/archive/MIGRATIONS_QUICK_START.md` (historical quick fix)
 - See `docs/MIGRATIONS.md` (Detailed guide)
 
 **Code Issues?**

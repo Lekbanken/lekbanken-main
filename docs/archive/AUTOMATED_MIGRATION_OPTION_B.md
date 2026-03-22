@@ -5,7 +5,7 @@
 - Owner: -
 - Status: archived
 - Date: 2025-11-30
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: -
 
 > Archived one-time migration execution guide. Keep as historical reference only; current migration workflows live outside `archive/`.
@@ -219,7 +219,7 @@ psql "your_connection_string"
 # ... etc for all 14 files
 ```
 
-Or use the Supabase Dashboard SQL Editor (see `EXECUTE_MIGRATIONS_NOW.md`)
+Or use the Supabase Dashboard SQL Editor (see `docs/archive/EXECUTE_MIGRATIONS_NOW.md`)
 
 ---
 

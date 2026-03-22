@@ -5,7 +5,7 @@
 - Owner: -
 - Status: frozen audit
 - Date: 2026-03-15
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-15
 
 > Closed audit of the launch-readiness documentation layer. Treat this as the bounded audit snapshot behind the ongoing documentation cleanup work.
@@ -88,6 +88,8 @@
 ## 3. Obsolete Files — Root Level
 
 These 30 root-level files have been confirmed as safe to archive by both `documentation-cleanup-audit.md` (2026-03-13) and this audit. They are completed work products, superseded versions, one-shot prompts, or duplicates.
+
+Migration guide filenames listed below were part of the original root-level audit set and now live under `docs/archive/` in the current repository layout.
 
 | # | File | Type | Reason archivable | Size |
 |---|------|------|--------------------|------|
@@ -291,6 +293,8 @@ These files are **never archivable** — they are the living memory of the syste
 | **D — Permanent SSoT** | Living memory of the system. Never archive. | Maintain accuracy. See §8. |
 
 ### Root-level files reclassified
+
+Migration guide filenames in this reclassification table now resolve under `docs/archive/`; the filenames are retained here because this section records the original root-level audit result.
 
 | # | File | Previous | Revised | Notes |
 |---|------|----------|---------|-------|

@@ -112,7 +112,7 @@ If shared across domains — it goes in `components/`.
 | Play | `launch-readiness/audits/play-*.md` |
 | Games | `docs/games/GAMES_DOMAIN.md` |
 | Admin | `docs/admin/archive/ADMIN_OVERVIEW_REPORT.md` |
-| Auth | `docs/AUTH_SYSTEM_ANALYSIS.md` |
+| Auth | `docs/auth/archive/AUTH_SYSTEM_ANALYSIS.md` |
 | Gamification | `docs/gamification/GAMIFICATION_DOMAIN.md` |
 | Security | `launch-readiness/audits/` |
 

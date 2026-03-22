@@ -75,7 +75,7 @@ Fält:
 | [docs/auth/AUTH_ARCHITECTURE_REDESIGN.md](auth/AUTH_ARCHITECTURE_REDESIGN.md) | B | draft | - | - | Spec/plan |
 | [docs/auth/AUTH_DATABASE_SCHEMA.md](auth/AUTH_DATABASE_SCHEMA.md) | A | active | 2025-12-17 | - | DB schema reference |
 | [docs/auth/AUTH_IMPLEMENTATION_TODO.md](auth/AUTH_IMPLEMENTATION_TODO.md) | D | draft | - | - | Backlog |
-| [docs/AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) | C | archived | 2025-12-17 | - | Historical analysis / change log |
+| [docs/auth/archive/AUTH_SYSTEM_ANALYSIS.md](auth/archive/AUTH_SYSTEM_ANALYSIS.md) | C | archived | 2025-12-17 | - | Historical analysis / change log |
 | [docs/gamification/BADGE_BUILDER_UX_GUIDE.md](gamification/BADGE_BUILDER_UX_GUIDE.md) | B | draft | 2025-12-07 | - | UX/spec |
 | [docs/browse/BROWSE_DOMAIN.md](browse/BROWSE_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/browse/README.md](browse/README.md) | A | active | 2026-03-22 | - | Cluster entrypoint for browse domain docs |

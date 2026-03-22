@@ -306,7 +306,7 @@ Läs dessa dokument när relevant:
 | `docs/participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md` | Bygger join-flow, sessions, roles |
 | `docs/participants/PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md` | Förstå vad som INTE finns implementerat |
 | `CATALYST_UI_KIT.md` | Lägger till UI-komponenter |
-| `AUTH_SYSTEM_ANALYSIS.md` | Jobbar med auth/RLS |
+| `auth/archive/AUTH_SYSTEM_ANALYSIS.md` | Jobbar med auth/RLS |
 | `MIGRATIONS.md` | Skapar nya databastabeller |
 
 ---

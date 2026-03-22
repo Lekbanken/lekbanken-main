@@ -61,7 +61,7 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - Sandbox docs: [sandbox/README.md](sandbox/README.md)
 - Toolkit docs: [toolkit/README.md](toolkit/README.md)
 - Tenant cluster: [tenant/README.md](tenant/README.md)
-- Auth/RBAC cluster: [auth/README.md](auth/README.md) + AUTH_SYSTEM_ANALYSIS.md (historisk/archived)
+- Auth/RBAC cluster: [auth/README.md](auth/README.md) + [auth/archive/AUTH_SYSTEM_ANALYSIS.md](auth/archive/AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
 - Admin cluster: [admin/README.md](admin/README.md)
 - Ops/runbooks: ops/
 - Validation snapshots: validation/README.md

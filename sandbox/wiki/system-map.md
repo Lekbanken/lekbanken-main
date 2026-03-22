@@ -16,5 +16,5 @@ Syfte: ge en snabb mental modell av Lekbanken.
 
 Se även:
 - ../../docs/platform/PLATFORM_DOMAIN.md
-- ../../docs/AUTH_SYSTEM_ANALYSIS.md
+- ../../docs/auth/archive/AUTH_SYSTEM_ANALYSIS.md
 - ../../docs/MIGRATIONS.md

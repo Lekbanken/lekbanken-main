@@ -32,7 +32,7 @@ Scope: Auth, RBAC, tenant-access och routing.
 
 ## Historical
 
-- [AUTH_SYSTEM_ANALYSIS.md](../AUTH_SYSTEM_ANALYSIS.md) — historical/archived analysis; do not treat as source of truth
+- [archive/AUTH_SYSTEM_ANALYSIS.md](archive/AUTH_SYSTEM_ANALYSIS.md) — historical/archived analysis; do not treat as source of truth
 - [archive/MFA_CURRENT_STATE_ANALYSIS.md](archive/MFA_CURRENT_STATE_ANALYSIS.md) — historical MFA rollout snapshot
 - [archive/MFA_IMPLEMENTATION_PLAN.md](archive/MFA_IMPLEMENTATION_PLAN.md) — historical MFA sprint plan
 

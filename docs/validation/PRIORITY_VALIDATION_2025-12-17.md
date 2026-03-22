@@ -19,7 +19,7 @@
 - Client auth + RBAC: [lib/supabase/auth.tsx](../../lib/supabase/auth.tsx), [features/admin/shared/hooks/useRbac.ts](../../features/admin/shared/hooks/useRbac.ts)
 - DB migrations: [supabase/migrations](../../supabase/migrations)
 - CSV API + utils: [app/api/games/csv-import/route.ts](../../app/api/games/csv-import/route.ts), [app/api/games/csv-export/route.ts](../../app/api/games/csv-export/route.ts), [features/admin/games/utils/csv-parser.ts](../../features/admin/games/utils/csv-parser.ts), [features/admin/games/utils/csv-generator.ts](../../features/admin/games/utils/csv-generator.ts), [features/admin/games/utils/game-validator.ts](../../features/admin/games/utils/game-validator.ts)
-- Docs: [docs/MIGRATIONS.md](../MIGRATIONS.md), [docs/import/CSV_IMPORT_FIELD_REFERENCE.md](../import/CSV_IMPORT_FIELD_REFERENCE.md), [docs/auth/roles.md](../auth/roles.md), [docs/auth/routes.md](../auth/routes.md), [docs/AUTH_SYSTEM_ANALYSIS.md](../AUTH_SYSTEM_ANALYSIS.md)
+- Docs: [docs/MIGRATIONS.md](../MIGRATIONS.md), [docs/import/CSV_IMPORT_FIELD_REFERENCE.md](../import/CSV_IMPORT_FIELD_REFERENCE.md), [docs/auth/roles.md](../auth/roles.md), [docs/auth/routes.md](../auth/routes.md), [docs/auth/archive/AUTH_SYSTEM_ANALYSIS.md](../auth/archive/AUTH_SYSTEM_ANALYSIS.md)
 
 ---
 

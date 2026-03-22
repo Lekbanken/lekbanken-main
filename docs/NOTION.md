@@ -71,7 +71,7 @@ Rekommenderad spegling i repo:
 - [platform/PLATFORM_DOMAIN.md](platform/PLATFORM_DOMAIN.md)
 - Browse (aktuellt): [browse/BROWSE_DOMAIN.md](browse/BROWSE_DOMAIN.md)
 - Data Model (aktuellt): [database/DATA_MODEL_DOMAIN.md](database/DATA_MODEL_DOMAIN.md)
-- Auth/RBAC: [auth/README.md](auth/README.md) (aktuellt) + [AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
+- Auth/RBAC: [auth/README.md](auth/README.md) (aktuellt) + [auth/archive/AUTH_SYSTEM_ANALYSIS.md](auth/archive/AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
 - Accounts (aktuellt): [auth/ACCOUNTS_DOMAIN.md](auth/ACCOUNTS_DOMAIN.md)
 - Participants (aktuellt): [participants/PARTICIPANTS_DOMAIN.md](participants/PARTICIPANTS_DOMAIN.md)
 	- Legacy spec: [participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md](participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md)

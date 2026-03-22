@@ -188,7 +188,7 @@ All drift items identified below have been **fixed** as of 2026-03-13:
 
 | Drift Item | Documents Fixed | Resolution |
 |------------|----------------|------------|
-| ADR-005 status | `launch-readiness-architecture.md` (L422 → ✅ DECIDED: B), `next-phase-execution-plan.md` (L63 → struck through + decision note), `launch-control.md` (L600 → config isolation done), `launch-readiness-implementation-plan.md` (L83 → ✅ IMPLEMENTERAT), `platform-operations-architecture.md` (L94, L110, L172, L377 → updated to reflect sandbox) | All documents now reflect ADR-005 decided: Alt B (remote sandbox first) |
+| ADR-005 status | `launch-readiness-architecture.md` (L422 → ✅ DECIDED: B), `implementation/next-phase-execution-plan.md` (L63 → struck through + decision note), `launch-control.md` (L600 → config isolation done), `launch-readiness-implementation-plan.md` (L83 → ✅ IMPLEMENTERAT), `platform-operations-architecture.md` (L94, L110, L172, L377 → updated to reflect sandbox) | All documents now reflect ADR-005 decided: Alt B (remote sandbox first) |
 | `.env.local.example` | `platform-operations-audit.md` OPS-DEV-002 → marked resolved | File exists with 73 lines + `APP_ENV`/`DEPLOY_TARGET` added |
 | OPS-SAND-001 status | `platform-operations-audit.md` → downgraded to "Config isolation done, runtime/data-plane verification pending" | Reflects reality: config done, RLS errors unresolved |
 | `audits/system-verification-2026.md` | L229 → updated to "still points to prod DB (should be updated)" | Reflects that local dev isolation is a known remaining action |
@@ -199,7 +199,7 @@ All drift items identified below have been **fixed** as of 2026-03-13:
 | Document | Claims | Actual |
 |----------|--------|--------|
 | `launch-snapshot-2026-03.md` L25 | 307 Supabase migrations | 7 active + 304 archived = 311 total files |
-| `next-phase-execution-plan.md` L49 | 304 migrations | 304 archived (correct for pre-baseline) |
+| `implementation/next-phase-execution-plan.md` L49 | 304 migrations | 304 archived (correct for pre-baseline) |
 
 Cosmetic — the "307 migrations" refers to the original count before canonical baseline consolidation. The current active set is 7 files.
 
@@ -242,7 +242,7 @@ All documentation drift has been fixed:
 | D1 | Fix `launch-readiness-architecture.md` — ADR-005 → ✅ DECIDED: B | ✅ Done |
 | D2 | Fix `platform-operations-audit.md` — OPS-SAND-001 downgraded to config-done/runtime-pending | ✅ Done |
 | D3 | Fix OPS-DEV-002 — `.env.local.example` exists, marked resolved | ✅ Done |
-| D4 | Fix `next-phase-execution-plan.md` — ADR-005 "never decided" → struck through + decision note | ✅ Done |
+| D4 | Fix `implementation/next-phase-execution-plan.md` — ADR-005 "never decided" → struck through + decision note | ✅ Done |
 | D5 | Fix `launch-control.md` L600 — Phase 1B status → config isolation done | ✅ Done |
 | D6 | Fix `launch-readiness-implementation-plan.md` L83 — Status → ✅ IMPLEMENTERAT | ✅ Done |
 | D7 | Fix `platform-operations-architecture.md` — 4 stale references → updated to sandbox | ✅ Done |
@@ -578,7 +578,7 @@ OPS-SAND-001 (Preview deploys point at production Supabase) has two layers:
 
 - `launch-readiness-architecture.md`: 🟡 PROPOSED: C (hybrid)
 - `launch-control.md`: ✅ Accepted
-- `next-phase-execution-plan.md`: "proposed but never decided"
+- `implementation/next-phase-execution-plan.md`: "proposed but never decided"
 
 ### Required Update
 
@@ -633,7 +633,7 @@ Rejected for now: Alt A (local-only), Alt D (branching)
 - [x] ADR-005 status consistent across all documents (6 docs updated 2026-03-13)
 - [x] OPS-SAND-001 status accurate in `platform-operations-audit.md` (downgraded to config-done/runtime-pending)
 - [x] OPS-DEV-002 finding updated (`.env.local.example` exists)
-- [x] `next-phase-execution-plan.md` ADR-005 reference updated
+- [x] `implementation/next-phase-execution-plan.md` ADR-005 reference updated
 - [x] Naming drift fixed (`local-dev` → canonical `local`/`development`)
 
 ---

@@ -90,7 +90,7 @@ What was "skipped" is a *systematic test strategy* with coverage targets and cri
 | `launch-snapshot-2026-03.md` | Frozen by design, but should reference `audits/system-verification-2026.md` for current numbers |
 | Root `planner-audit.md` | Still exists at root — duplicates/predates `audits/planner-launch-audit.md` |
 | Root `planner-architecture.md` | Root-level — may conflict with `copilot-instructions.md` SSoT expectations (which references root docs as current) |
-| `next-phase-execution-plan.md` | Historical snapshot preserved intentionally. It now includes an explicit superseded-facts warning, so it should not be treated as a current planning source. |
+| `implementation/next-phase-execution-plan.md` | Historical snapshot preserved intentionally. It now includes an explicit superseded-facts warning, so it should not be treated as a current planning source. |
 
 ### 2.4 Level 2 Audits — Undocumented in Implementation Plan
 

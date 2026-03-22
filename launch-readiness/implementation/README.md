@@ -33,6 +33,7 @@ This folder contains remediation plans, execution briefs, and domain follow-up r
 - `api-consistency-remediation.md` — executed API consistency remediation record (Batches 1-6d complete; Batch 7 deferred to per-domain audits)
 - `demo-remediation.md` — demo-domain remediation record
 - `mfa-trusted-device-remediation.md` — executed MFA remediation record (all 5 findings closed 2026-03-22)
+- `next-phase-execution-plan.md` — historical execution-plan snapshot from before the Observe Mode alignment; kept only as bounded planning history
 - `play-runtime-remediation.md` — executed Play runtime remediation record (M1-M5 complete; M6 deferred post-launch)
 - `security-auth-remediation.md` — executed security/auth remediation record (all actionable P0/P1 work complete; SEC-002b deferred as infra follow-up)
 - `sessions-remediation.md` — executed sessions-domain remediation record (M1-M3 complete; M4 deferred post-launch)

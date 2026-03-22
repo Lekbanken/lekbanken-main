@@ -44,7 +44,7 @@ Three strategic workstreams are active. They are related but have distinct scope
 │  • Create sandbox Supabase + Vercel project             │
 │  • Resolves OPS-SAND-001 (P1)                           │
 │  • Owner: Engineering                                   │
-│  • Docs: next-phase-execution-plan.md                   │
+│  • Docs: implementation/next-phase-execution-plan.md    │
 └──────────────────────────────┴─────────────────────────────┘
                                │
                         enables ▼

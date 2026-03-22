@@ -70,7 +70,7 @@ Remaining work is **final Step 1 closure, observe-mode operation, and selective 
 | Document | Fix needed |
 |------|----------|-------|
 | `launch-program-state-analysis.md` | Keep residual drift notes aligned with the now-updated implementation and audit indexes |
-| `next-phase-execution-plan.md` | Keep it clearly historical; do not let it re-enter active planning |
+| `implementation/next-phase-execution-plan.md` | Keep it clearly historical; do not let it re-enter active planning |
 | `launch-readiness-architecture.md` | Verify remaining environment/observability notes only if they still conflict with launch-control |
 
 **Not in scope:** Broad archive work or a new documentation restructuring pass.
@@ -80,7 +80,7 @@ Remaining work is **final Step 1 closure, observe-mode operation, and selective 
 **Effort:** Low.  
 **Risk reduction:** Medium.
 
-**Status update (2026-03-22):** The high-risk residual drift in `launch-program-state-analysis.md`, `launch-readiness-architecture.md`, and `next-phase-execution-plan.md` has been cleaned up. Step 2 is now effectively complete for this execution cycle; only broader Phase 6 cleanup remains deferred.
+**Status update (2026-03-22):** The high-risk residual drift in `launch-program-state-analysis.md`, `launch-readiness-architecture.md`, and `implementation/next-phase-execution-plan.md` has been cleaned up. Step 2 is now effectively complete for this execution cycle; only broader Phase 6 cleanup remains deferred.
 
 ---
 

@@ -133,8 +133,8 @@ Fält:
 | [docs/legal/README.md](legal/README.md) | A | active | 2026-03-22 | - | Legal cluster entrypoint |
 | [docs/legal/archive/LEGAL_IMPLEMENTATION_STATUS.md](legal/archive/LEGAL_IMPLEMENTATION_STATUS.md) | C | historical snapshot | 2026-01-11 | - | Legal system implementation status snapshot |
 | [docs/LEGAL_PHASE2_VALIDATION_PLAN.md](LEGAL_PHASE2_VALIDATION_PLAN.md) | B | draft | 2026-01-11 | - | Validation plan |
-| [docs/LEGENDARY_PLAY_ADVANCED_FEATURES.md](LEGENDARY_PLAY_ADVANCED_FEATURES.md) | B | draft | 2025-12-24 | - | Advanced play immersion UX specification |
-| [docs/LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md](LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md) | B | historical snapshot | 2025-12-24 | - | Historical Legendary Play implementation plan |
+| [docs/play/LEGENDARY_PLAY_ADVANCED_FEATURES.md](play/LEGENDARY_PLAY_ADVANCED_FEATURES.md) | B | draft | 2025-12-24 | - | Advanced play immersion UX specification |
+| [docs/play/LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md](play/LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md) | B | historical snapshot | 2025-12-24 | - | Historical Legendary Play implementation plan |
 | [docs/LEARNING_ADMIN_PHASE1_IMPLEMENTATION.md](LEARNING_ADMIN_PHASE1_IMPLEMENTATION.md) | B | draft | 2026-01-10 | - | Implementation notes placeholder |
 | [docs/LEARNING_MODULE_IMPLEMENTATION.md](LEARNING_MODULE_IMPLEMENTATION.md) | B | draft | 2026-01-04 | - | Implementation guide |
 | [docs/LEARNING_TEST_PLAN.md](LEARNING_TEST_PLAN.md) | B | draft | 2026-01-04 | - | Test plan |
@@ -146,7 +146,7 @@ Fält:
 | [docs/PLANNER_REFACTOR_IMPLEMENTATION.md](PLANNER_REFACTOR_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-25 | - | Completed refactor plan |
 | [docs/PLANNER_TARGET_ARCHITECTURE.md](PLANNER_TARGET_ARCHITECTURE.md) | B | historical snapshot | 2025-12-30 | - | Target architecture snapshot |
 | [docs/PLANNER_UI_UPGRADE_PLAN.md](PLANNER_UI_UPGRADE_PLAN.md) | B | draft | 2026-01-25 | - | UI upgrade plan |
-| [docs/PLAY_LOBBY_SOT.md](PLAY_LOBBY_SOT.md) | C | frozen audit | 2026-01-23 | - | Host lobby source-of-truth snapshot |
+| [docs/play/PLAY_LOBBY_SOT.md](play/PLAY_LOBBY_SOT.md) | C | frozen audit | 2026-01-23 | - | Host lobby source-of-truth snapshot |
 | [docs/profile/README.md](profile/README.md) | A | active | 2026-03-22 | - | Profile cluster entrypoint |
 | [docs/profile/archive/PROFILE_AUDIT_2026-03-05.md](profile/archive/PROFILE_AUDIT_2026-03-05.md) | C | frozen audit | - | Profile | Audit snapshot |
 | [docs/profile/archive/PROFILE_IMPLEMENTATION_PLAN.md](profile/archive/PROFILE_IMPLEMENTATION_PLAN.md) | B | historical snapshot | - | Profile | Completed implementation plan |
@@ -283,7 +283,7 @@ Fält:
 | [docs/JSON_IMPORT_FIELD_REFERENCE.md](JSON_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-26 | - | Import field reference |
 | [docs/JSON_IMPORT_VERIFICATION_CHECKLIST.md](JSON_IMPORT_VERIFICATION_CHECKLIST.md) | A | active | 2025-12-26 | - | Verification checklist |
 | [docs/API_INTEGRATION_DOMAIN.md](API_INTEGRATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (API surface + conventions) |
-| [docs/PLAY_SESSIONS_UI_SPEC.md](PLAY_SESSIONS_UI_SPEC.md) | B | draft | 2025-12-16 | - | Spec |
+| [docs/play/PLAY_SESSIONS_UI_SPEC.md](play/PLAY_SESSIONS_UI_SPEC.md) | B | draft | 2025-12-16 | - | Spec |
 | [docs/PERFORMANCE_ADVISOR_PROMPT.md](PERFORMANCE_ADVISOR_PROMPT.md) | E | active | 2026-01-08 | - | Prompt for Supabase Performance Advisor |
 | [docs/plans/PRODUCT_CARD_UPGRADE_PLAN.md](plans/PRODUCT_CARD_UPGRADE_PLAN.md) | B | draft | 2026-01-08 | - | Product card upgrade plan |
 | [docs/plans/PROFILE_RESILIENCE_IMPLEMENTATION.md](plans/PROFILE_RESILIENCE_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-31 | - | Profile resilience implementation snapshot |

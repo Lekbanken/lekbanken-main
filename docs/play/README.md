@@ -33,17 +33,21 @@ The root-level play structure audits remain the guardrails for large-scale refac
 - `PLAY_UI_CONTRACT.md` — canonical surface/layout contract for play UIs
 - `TRIGGER_ENGINE_CONTRACT.md` — canonical trigger-engine contract
 - `PARTICIPANT_PLAY_UI_LAWS.md` — immutable participant UI laws for the mobile-first play view
+- `LEGENDARY_PLAY_ADVANCED_FEATURES.md` — advanced immersion UX draft for Legendary Play
+- `PLAY_SESSIONS_UI_SPEC.md` — draft UI/UX spec across participant, host, and admin play surfaces
 
 ### Active audits
 
 - `PARTICIPANT_PLAY_AUDIT.md` — participant play architecture and contract audit
 - `PLAY_MODE_UI_AUDIT.md` — play-mode routing and UI audit
 - `PLAY_UI_WIRING_AUDIT_REPORT_v2.md` — current verified wiring audit reference
+- `PLAY_LOBBY_SOT.md` — frozen host-lobby source-of-truth snapshot
 
 ### Historical snapshots
 
 - `PLAY_IMPLEMENTATION_GUIDE_P0.md` — bounded P0 implementation guide
 - `PLAY_UI_WIRING_AUDIT_REPORT.md` — earlier wiring audit snapshot superseded by v2
+- `LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md` — historical Legendary Play rollout plan
 
 ## Related guardrails
 

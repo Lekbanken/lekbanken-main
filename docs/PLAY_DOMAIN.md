@@ -35,7 +35,7 @@ Non-goals (owned by other domains):
 ## Related docs
 - Participants (sessions/participants tables): `docs/participants/PARTICIPANTS_DOMAIN.md`
 - Games content model (steps/phases/roles): `docs/GAMES_DOMAIN.md`
-- Play sessions UI spec (historical/spec): `docs/PLAY_SESSIONS_UI_SPEC.md`
+- Play sessions UI spec (historical/spec): `docs/play/PLAY_SESSIONS_UI_SPEC.md`
 - Platform + auth: `docs/PLATFORM_DOMAIN.md`, `docs/auth/*`
 
 ## Primary user journeys (as implemented)

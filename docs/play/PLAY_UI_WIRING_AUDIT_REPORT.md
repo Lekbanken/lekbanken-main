@@ -657,10 +657,10 @@ LIMIT 10;
 
 ### Related Documentation
 
-- [PLAY_SYSTEM_DOCUMENTATION.md](../PLAY_SYSTEM_DOCUMENTATION.md) - Full system spec
-- [PLAY_MODE_UI_AUDIT.md](../PLAY_MODE_UI_AUDIT.md) - UI routing audit
-- [docs/PLAY_DOMAIN.md](PLAY_DOMAIN.md) - Domain overview
-- [docs/PLAY_LOBBY_SOT.md](PLAY_LOBBY_SOT.md) - Lobby state spec
+- [PLAY_SYSTEM_DOCUMENTATION.md](PLAY_SYSTEM_DOCUMENTATION.md) - Full system spec
+- [PLAY_MODE_UI_AUDIT.md](PLAY_MODE_UI_AUDIT.md) - UI routing audit
+- [../PLAY_DOMAIN.md](../PLAY_DOMAIN.md) - Domain overview
+- [PLAY_LOBBY_SOT.md](PLAY_LOBBY_SOT.md) - Lobby state spec
 
 ---
 

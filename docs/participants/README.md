@@ -30,6 +30,9 @@ This cluster covers anonymous participant identity, participant sessions, join a
 - [PARTICIPANTS_DOMAIN_ARCHITECTURE.md](PARTICIPANTS_DOMAIN_ARCHITECTURE.md) — historical architecture/spec snapshot
 - [PARTICIPANTS_DOMAIN_MVP.md](PARTICIPANTS_DOMAIN_MVP.md) — historical MVP/spec snapshot
 - [PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md](PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md) — historical implementation report snapshot
+- [SESSION_COMPLETION_REPORT.md](SESSION_COMPLETION_REPORT.md) — historical implementation session wrap-up for participants deliverables
+- [TASK_9_LIVE_PROGRESS.md](TASK_9_LIVE_PROGRESS.md) — historical task spec for live progress tracking
+- [TASK_11_12_TOKEN_SESSION_MANAGEMENT.md](TASK_11_12_TOKEN_SESSION_MANAGEMENT.md) — historical task spec for token expiry and session archiving
 
 ## Related docs
 

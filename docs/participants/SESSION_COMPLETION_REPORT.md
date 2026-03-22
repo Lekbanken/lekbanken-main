@@ -90,7 +90,7 @@ This session completed the **entire Participants Domain** (71 planned hours of w
    - `achievement_unlocked` - Name/points/rarity/timestamp
 
 6. **Documentation:**
-   - Created: `docs/TASK_9_LIVE_PROGRESS.md` (~400 lines)
+   - Created: `docs/participants/TASK_9_LIVE_PROGRESS.md` (~400 lines)
 
 **Files Created:** 8
 **Lines of Code:** ~800

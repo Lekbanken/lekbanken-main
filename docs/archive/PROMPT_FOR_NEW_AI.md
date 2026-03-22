@@ -14,7 +14,7 @@ Historical onboarding prompt retained for provenance. Use current session prompt
 
 **INNAN DU GÖR NÅGOT - LÄS DESSA I ORDNING:**
 
-1. **`docs/SESSION_COMPLETION_REPORT.md`** — VAR VI ÄR NU (Participants Domain komplett!)
+1. **`docs/participants/SESSION_COMPLETION_REPORT.md`** — VAR VI ÄR NU (Participants Domain komplett!)
 2. **`docs/PROJECT_EXECUTION_PLAN.md`** — HELA PLANEN FRAMÅT (7 faser)
 3. **`docs/AI_CODING_GUIDELINES.md`** — Kritiska kodregler
 4. **`docs/VS_CODE_WORKFLOW.md`** — Utvecklingsworkflow
@@ -28,7 +28,7 @@ Historical onboarding prompt retained for provenance. Use current session prompt
 **Participants Domain - 100% KOMPLETT!** (Commit: `a621a25`)
 - Alla 12 tasks implementerade (71 timmar arbete)
 - 22 nya filer, ~2,600 LOC funktionell kod
-- Full dokumentation: `TASK_9_LIVE_PROGRESS.md`, `TASK_11_12_TOKEN_SESSION_MANAGEMENT.md`
+- Full dokumentation: `docs/participants/TASK_9_LIVE_PROGRESS.md`, `docs/participants/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md`
 - Token management: cleanup, extend, revoke APIs
 - Session archiving: archive, restore, permanent delete
 - Live progress tracking: game progress, achievements
@@ -193,11 +193,11 @@ Enligt **`docs/PROJECT_EXECUTION_PLAN.md`**, börja med:
 ### Dokumentation (LÄS DESSA!)
 ```
 docs/
-├── SESSION_COMPLETION_REPORT.md          ← Var vi är NU
+├── participants/SESSION_COMPLETION_REPORT.md          ← Var vi är NU
 ├── PROJECT_EXECUTION_PLAN.md             ← Hela planen framåt
 ├── participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md   ← Participants domain spec
-├── TASK_9_LIVE_PROGRESS.md               ← Task 9 dokumentation
-├── TASK_11_12_TOKEN_SESSION_MANAGEMENT.md← Tasks 11 & 12 dokumentation
+├── participants/TASK_9_LIVE_PROGRESS.md               ← Task 9 dokumentation
+├── participants/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md← Tasks 11 & 12 dokumentation
 ├── AI_CODING_GUIDELINES.md               ← Kodregler
 ├── VS_CODE_WORKFLOW.md                   ← Arbetsflöde
 ├── CATALYST_UI_KIT.md                    ← UI-komponenter
@@ -561,7 +561,7 @@ const errorMsg = "Session not found";
 ## ⚠️ VARNINGAR & MISSTAG ATT UNDVIKA
 
 ### Vanliga Fel
-1. **Glöm INTE läsa SESSION_COMPLETION_REPORT.md först!**
+1. **Glöm INTE läsa docs/participants/SESSION_COMPLETION_REPORT.md först!**
 2. **Skapa INTE nya domain implementations** - vi validerar befintliga
 3. **Bygg INTE features** - vi dokumenterar och fixar
 4. **Skippa INTE RLS-verifiering** - kritiskt för security
@@ -597,7 +597,7 @@ const errorMsg = "Session not found";
 
 Innan du börjar, verifiera:
 
-- [ ] Jag har läst SESSION_COMPLETION_REPORT.md
+- [ ] Jag har läst docs/participants/SESSION_COMPLETION_REPORT.md
 - [ ] Jag har läst PROJECT_EXECUTION_PLAN.md
 - [ ] Jag förstår att Participants Domain är KLAR
 - [ ] Jag ska börja med Platform Domain validation
@@ -613,7 +613,7 @@ Innan du börjar, verifiera:
 **Starta med:**
 
 ```
-1. Läs SESSION_COMPLETION_REPORT.md (5 min)
+1. Läs docs/participants/SESSION_COMPLETION_REPORT.md (5 min)
 2. Läs PROJECT_EXECUTION_PLAN.md sektion om Platform Domain (10 min)
 3. Börja Platform Domain Discovery:
    - Sök efter platform/infrastructure-relaterad kod

@@ -319,15 +319,15 @@ Fält:
 | [docs/play/sessions/README.md](play/sessions/README.md) | A | active | 2026-03-22 | - | Sub-index for historical session cockpit docs within the play cluster |
 | [docs/play/sessions/SESSION_COCKPIT_ARCHITECTURE.md](play/sessions/SESSION_COCKPIT_ARCHITECTURE.md) | C | historical snapshot | 2025-12-28 | - | Session cockpit architecture snapshot |
 | [docs/play/sessions/SESSION_COCKPIT_MIGRATION.md](play/sessions/SESSION_COCKPIT_MIGRATION.md) | B | historical snapshot | 2025-12-28 | - | Session cockpit migration guide snapshot |
-| [docs/SESSION_COMPLETION_REPORT.md](SESSION_COMPLETION_REPORT.md) | C | historical snapshot | 2025-12-11 | - | Completed session report snapshot |
+| [docs/participants/SESSION_COMPLETION_REPORT.md](participants/SESSION_COMPLETION_REPORT.md) | C | historical snapshot | 2025-12-11 | - | Completed session report snapshot |
 | [docs/archive/SECURITY_AUDIT_TODO.md](archive/SECURITY_AUDIT_TODO.md) | D | ✅ done | 2026-01-08 | - | Security backlog (completed) |
 | [docs/ops/SECURITY_AUDIT_PROMPT_V2.md](ops/SECURITY_AUDIT_PROMPT_V2.md) | E | active | 2026-01-08 | - | Verification queries for security audit |
 | [docs/billing/STRIPE.md](billing/STRIPE.md) | A | active | 2025-12-17 | - | Billing reference |
 | [docs/support/README.md](support/README.md) | A | active | 2026-03-22 | - | Sub-index for support domain docs |
 | [docs/support/SUPPORT_DOMAIN.md](support/SUPPORT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/TAILWIND_PLUS_COMPONENTS.md](TAILWIND_PLUS_COMPONENTS.md) | A | draft | 2025-11-30 | - | UI reference |
-| [docs/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md](TASK_11_12_TOKEN_SESSION_MANAGEMENT.md) | B | draft | 2025-12-11 | - | Task/spec |
-| [docs/TASK_9_LIVE_PROGRESS.md](TASK_9_LIVE_PROGRESS.md) | B | draft | 2025-12-10 | - | Task/spec |
+| [docs/participants/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md](participants/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md) | B | draft | 2025-12-11 | - | Task/spec |
+| [docs/participants/TASK_9_LIVE_PROGRESS.md](participants/TASK_9_LIVE_PROGRESS.md) | B | draft | 2025-12-10 | - | Task/spec |
 | [docs/toolkit/archive/TOOLKIT_ROADMAP.md](toolkit/archive/TOOLKIT_ROADMAP.md) | B | historical snapshot | 2025-12-28 | - | Toolkit roadmap snapshot |
 | [docs/TOOLS_COACH_DIAGRAM_IMPLEMENTATION.md](TOOLS_COACH_DIAGRAM_IMPLEMENTATION.md) | B | draft | 2026-01-02 | - | Coach Diagram Builder implementation spec |
 | [docs/TOOLS_MASTER_IMPLEMENTATION.md](TOOLS_MASTER_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-02 | - | Toolbelt MVP implementation snapshot |

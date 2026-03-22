@@ -89,7 +89,7 @@ Based on naming patterns and known completion status, the following categories i
 | `IMPLEMENTATION_LOG_*.md` | 8 | `IMPLEMENTATION_LOG_ACHIEVEMENTS_PHASE1.md` etc. | Completed implementation logs |
 | `*_TODO.md` | 7 | `DOMAIN_GAMES_TODO.md`, `DESIGN_IMPLEMENTATION_TODO.md` | Old todo lists |
 | `*_TEST_PLAN.md` files (pre-audit-program) | 6 | `ADMIN_USERS_TEST_PLAN.md`, `LEARNING_TEST_PLAN.md` | Superseded by launch-readiness audits |
-| `TASK_*.md` | 2 | `TASK_9_LIVE_PROGRESS.md`, `TASK_11_12_TOKEN_SESSION_MANAGEMENT.md` | Completed tasks |
+| `TASK_*.md` | 0 | — | Completed task specs moved into `docs/participants/` |
 | `PHASE2_PREFLIGHT_*.md` | 1 | `PHASE2_PREFLIGHT_ADMIN_TENANT.md` | Completed preflight |
 | `ARCH_ANALYSIS_*_PHASE0.md` | 4 | `ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md` etc. | Completed architectural analyses |
 | `*_PROMPT*.md` | 3 | `PERFORMANCE_ADVISOR_PROMPT.md`, `VERIFICATION_PROMPT.md`, `MASTERPROMPT_DEMO_IMPLEMENTATION.md` | One-shot AI prompts |

@@ -69,6 +69,7 @@ This folder contains the bounded audit outputs produced during the launch-readin
 - `batch-regression-tier2-tier3.md` — shared regression verification across tier-2 and tier-3 domains
 - `play-regression-audit.md`, `games-regression-audit.md`, `planner-regression-audit.md`, `sessions-regression-audit.md`, `journey-gamification-regression-audit.md`, `demo-regression-audit.md` — normalized core domain regression passes
 - `wave1-extension-verification.md`, `batch-d-rejoin-host-action-verification.md` — historical pre/post-implementation verification snapshots for focused bug families
+- `batch-a1-host-architecture-verification.md` — historical verification snapshot for the early host-routing decision work
 
 ### Postfix verification snapshots
 

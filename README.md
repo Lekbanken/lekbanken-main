@@ -21,9 +21,19 @@ Detta repo innehåller applikationskod, migrations, CI-konfiguration och den tek
 - Produktkontext först: [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)
 - Dokumentationsingång: [docs/README.md](docs/README.md)
 - VS Code-arbetsmodell: [docs/VS_CODE_WORKFLOW.md](docs/VS_CODE_WORKFLOW.md)
+- Nuvarande launchläge: [launch-readiness/launch-control.md](launch-readiness/launch-control.md)
+- Launch-audits: [launch-readiness/audits/README.md](launch-readiness/audits/README.md)
+- Launch-implementation: [launch-readiness/implementation/README.md](launch-readiness/implementation/README.md)
 - Miljöer och databasmål: [docs/database/environments.md](docs/database/environments.md)
 - Release-flöde: [docs/ops/release-promotion-checklist.md](docs/ops/release-promotion-checklist.md)
 - Notion-strategi: [docs/NOTION.md](docs/NOTION.md)
+
+## Launch & Drift
+
+- Aktuell operativ status läses från [launch-readiness/launch-control.md](launch-readiness/launch-control.md), inte från historiska snapshots.
+- Launch-programmets underlag finns i [launch-readiness/audits/README.md](launch-readiness/audits/README.md) och genomförandehistoriken i [launch-readiness/implementation/README.md](launch-readiness/implementation/README.md).
+- Incidentrutiner och rollback-spår finns i [launch-readiness/incident-playbook.md](launch-readiness/incident-playbook.md).
+- Tidig post-launch-observability finns i [launch-readiness/launch-telemetry-pack.md](launch-readiness/launch-telemetry-pack.md) och kompletterande ops-runbooks under [docs/ops/README.md](docs/ops/README.md).
 
 ## Dokumentationsmodell
 

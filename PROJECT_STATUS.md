@@ -10,7 +10,7 @@
 - Last validated: 2025-11-29
 
 > Historical snapshot only. Do not use this file as current operational truth.
-> Use `PROJECT_CONTEXT.md`, `launch-readiness/launch-control.md`, and `docs/DOCUMENTATION_STANDARD.md` for current guidance.
+> Use `PROJECT_CONTEXT.md`, `launch-readiness/launch-control.md`, `launch-readiness/audits/README.md`, `launch-readiness/implementation/README.md`, and `docs/DOCUMENTATION_STANDARD.md` for current guidance.
 
 ---
 

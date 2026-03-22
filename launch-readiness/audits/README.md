@@ -80,6 +80,7 @@ This folder contains the bounded audit outputs produced during the launch-readin
 ### Incident and follow-up snapshots
 
 - `bug-022-legacy-resolution.md` — normalized historical issue-resolution snapshot
+- `multi-surface-architecture-decision.md` — historical architecture decision exploration for the canonical-host and surface-separation question
 - `post-launch-cluster-triage.md` — normalized historical post-launch triage snapshot
 - `participant-state-machine-hardening-audit.md` — normalized historical issue-family audit paired with postfix verification
 - `step4-observe-mode-deliverable.md`, `step5-backlog-triage-deliverable.md` — historical deliverables from the earlier Observe Mode and post-launch triage sequence

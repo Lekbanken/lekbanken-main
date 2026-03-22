@@ -48,6 +48,7 @@ Use this index to avoid reading older design or migration summaries as if they w
 - `GAMIFICATION_COMPLETE_REPORT.md` — point-in-time v2 implementation summary
 - `GAMIFICATION_V2_MIGRATION_SUMMARY.md` — migration-specific implementation record
 - `GAMIFICATION_TRIGGER_REPORT.md` — design/report snapshot for a larger trigger taxonomy and earlier expansion planning
+- `SANDBOX_GAMIFICATION_REPORT.md` — sandbox coverage report for gamification routes, APIs, and manual test paths
 
 ### Drafts
 

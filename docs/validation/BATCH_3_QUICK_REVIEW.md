@@ -146,7 +146,7 @@ Batch 3 consists of **11 previously validated domains** with existing TODO/LEARN
 ---
 
 ### 7. Accounts Domain ✓
-**Documentation:** `reports/AUTHORIZATION_SYSTEM_REPORT.md` (381 lines), `AUTH_DATABASE_SCHEMA.md` (411 lines)  
+**Documentation:** `reports/AUTHORIZATION_SYSTEM_REPORT.md` (381 lines), `auth/AUTH_DATABASE_SCHEMA.md` (411 lines)  
 **Implementation Status:** Complete  
 **Key Features:**
 - 167 RLS policies documented

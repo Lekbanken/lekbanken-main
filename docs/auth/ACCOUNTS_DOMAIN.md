@@ -5,7 +5,7 @@
 > **Status:** active
 > **Owner:** -
 > **Date:** 2025-12-17
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-22
 > **Last validated:** -
 > **Source of truth:** Repo code + `supabase/migrations/*` (schema) + `types/supabase.ts` (generated)
 
@@ -72,7 +72,7 @@ Rule of thumb:
 Tenant roles live in `user_tenant_memberships` and are used as the primary authorization input for tenant-scoped APIs.
 
 ## Data model (high level)
-See `docs/auth/README.md` and `docs/AUTH_DATABASE_SCHEMA.md` for the DB reference.
+See `docs/auth/README.md` and `docs/auth/AUTH_DATABASE_SCHEMA.md` for the DB reference.
 
 Tables commonly involved:
 - `users` (Supabase Auth)

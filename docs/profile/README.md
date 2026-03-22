@@ -22,7 +22,7 @@ Use this cluster for profile-specific cleanup history, audits, and implementatio
 
 ## Current implementation routing
 
-- Use [../ACCOUNTS_DOMAIN.md](../ACCOUNTS_DOMAIN.md) for the broader accounts domain.
+- Use [../auth/ACCOUNTS_DOMAIN.md](../auth/ACCOUNTS_DOMAIN.md) for the broader accounts domain.
 - Use [../auth/README.md](../auth/README.md) for auth, MFA, and tenant-access behavior.
 - Verify current profile/account behavior against `app/app/profile/**`, `features/profile/**`, and `/api/accounts/**` before treating historical profile docs as current truth.
 

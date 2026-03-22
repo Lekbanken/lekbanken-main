@@ -27,7 +27,7 @@ Non-goals:
 
 ## Related docs
 - Play Domain sessions/runtime: `docs/PLAY_DOMAIN.md`
-- Accounts/auth/RBAC: `docs/ACCOUNTS_DOMAIN.md`
+- Accounts/auth/RBAC: `docs/auth/ACCOUNTS_DOMAIN.md`
 
 ## Related code (repo-anchored)
 

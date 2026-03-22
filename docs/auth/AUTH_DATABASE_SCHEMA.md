@@ -5,7 +5,7 @@
 > **Status:** active
 > **Owner:** -
 > **Date:** 2025-12-03
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-22
 > **Last validated:** 2025-12-17
 
 ## Related code (source of truth)

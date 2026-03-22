@@ -91,12 +91,12 @@ Use this order when documents disagree:
 - `docs/auth/roles.md`
 - `docs/auth/MFA_SECURITY.md`
 - `docs/auth/MFA_TECHNICAL_SPEC.md`
-- `docs/AUTH_DATABASE_SCHEMA.md`
+- `docs/auth/AUTH_DATABASE_SCHEMA.md`
 
 ### Profile and account settings history
 
 - `docs/profile/README.md`
-- `docs/ACCOUNTS_DOMAIN.md`
+- `docs/auth/ACCOUNTS_DOMAIN.md`
 
 ### Database and migrations
 

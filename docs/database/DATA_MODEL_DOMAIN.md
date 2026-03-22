@@ -112,5 +112,5 @@ Det finns två centrala server-side mönster:
 ## Related docs
 
 - `docs/MIGRATIONS.md` – execution guide + typegen krav
-- `docs/AUTH_DATABASE_SCHEMA.md` – auth/membership schema + helper functions
+- `docs/auth/AUTH_DATABASE_SCHEMA.md` – auth/membership schema + helper functions
 - Domänspecifika docs (Games/Planner/Support/Notifications/etc) – beskriver data i kontext, men refererar alltid tillbaka till migrations + types för detaljer

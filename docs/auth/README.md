@@ -5,13 +5,14 @@
 - Owner: -
 - Status: active
 - Date: 2025-12-17
-- Last updated: 2026-03-21
-- Last validated: 2026-03-21
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
 
 Scope: Auth, RBAC, tenant-access och routing.
 
 ## Start here (current)
 
+- [ACCOUNTS_DOMAIN.md](ACCOUNTS_DOMAIN.md) — broader accounts domain boundary for identity, sessions, and authorization primitives
 - [roles.md](roles.md) — global roles + tenant roles, admin gating (canonical helper: `lib/auth/role.ts`)
 - [tenant.md](tenant.md) — tenant resolution + cookie/header behavior
 - [routes.md](routes.md) — route protection + redirects (proxy)
@@ -22,7 +23,7 @@ Scope: Auth, RBAC, tenant-access och routing.
 
 ## DB reference
 
-- [AUTH_DATABASE_SCHEMA.md](../AUTH_DATABASE_SCHEMA.md) — DB schema overview (migrations + generated types are canonical)
+- [AUTH_DATABASE_SCHEMA.md](AUTH_DATABASE_SCHEMA.md) — DB schema overview (migrations + generated types are canonical)
 
 ## Historical
 

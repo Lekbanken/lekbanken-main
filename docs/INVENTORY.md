@@ -63,16 +63,16 @@ Fält:
 | [docs/admin/test-plans/ADMIN_USERS_TEST_PLAN.md](admin/test-plans/ADMIN_USERS_TEST_PLAN.md) | B | draft | 2026-01-04 | - | Users admin test checklist |
 | [docs/AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md) | A | active | 2025-12-10 | - | Process/guidelines |
 | [docs/AI_DOMAIN.md](AI_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (feature-flag-first) |
-| [docs/ACCOUNTS_DOMAIN.md](ACCOUNTS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/auth/ACCOUNTS_DOMAIN.md](auth/ACCOUNTS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md) | B | draft | 2025-12-28 | - | Accessibility checklist |
 | [docs/auth/architecture.md](auth/architecture.md) | A | active | 2026-03-21 | - | Auth architecture |
 | [docs/auth/debugging.md](auth/debugging.md) | A | active | 2026-03-21 | - | Runbook |
-| [docs/auth/README.md](auth/README.md) | A | active | 2026-03-21 | - | Sub-index |
+| [docs/auth/README.md](auth/README.md) | A | active | 2026-03-22 | - | Sub-index |
 | [docs/auth/roles.md](auth/roles.md) | A | active | 2026-03-21 | - | RBAC/roles |
 | [docs/auth/routes.md](auth/routes.md) | A | active | 2026-03-21 | - | Route protection |
 | [docs/auth/tenant.md](auth/tenant.md) | A | active | 2026-03-21 | - | Tenant model |
 | [docs/AUTH_ARCHITECTURE_REDESIGN.md](AUTH_ARCHITECTURE_REDESIGN.md) | B | draft | - | - | Spec/plan |
-| [docs/AUTH_DATABASE_SCHEMA.md](AUTH_DATABASE_SCHEMA.md) | A | active | 2025-12-17 | - | DB schema reference |
+| [docs/auth/AUTH_DATABASE_SCHEMA.md](auth/AUTH_DATABASE_SCHEMA.md) | A | active | 2025-12-17 | - | DB schema reference |
 | [docs/AUTH_IMPLEMENTATION_TODO.md](AUTH_IMPLEMENTATION_TODO.md) | D | draft | - | - | Backlog |
 | [docs/AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) | C | archived | 2025-12-17 | - | Historical analysis / change log |
 | [docs/gamification/BADGE_BUILDER_UX_GUIDE.md](gamification/BADGE_BUILDER_UX_GUIDE.md) | B | draft | 2025-12-07 | - | UX/spec |

@@ -72,7 +72,7 @@ Rekommenderad spegling i repo:
 - Browse (aktuellt): [browse/BROWSE_DOMAIN.md](browse/BROWSE_DOMAIN.md)
 - Data Model (aktuellt): [database/DATA_MODEL_DOMAIN.md](database/DATA_MODEL_DOMAIN.md)
 - Auth/RBAC: [auth/README.md](auth/README.md) (aktuellt) + [AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
-- Accounts (aktuellt): [ACCOUNTS_DOMAIN.md](ACCOUNTS_DOMAIN.md)
+- Accounts (aktuellt): [auth/ACCOUNTS_DOMAIN.md](auth/ACCOUNTS_DOMAIN.md)
 - Participants (aktuellt): [participants/PARTICIPANTS_DOMAIN.md](participants/PARTICIPANTS_DOMAIN.md)
 	- Legacy spec: [participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md](participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md)
 - Tenant (aktuellt): [TENANT_DOMAIN.md](TENANT_DOMAIN.md)
@@ -222,7 +222,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 ### Domäner som behöver fyllas i:
 
 - [x] **Data Model Domain** – Central schema-governance (se `docs/database/DATA_MODEL_DOMAIN.md`)
-- [x] **Accounts Domain** – Auth-flöden och roller (se `docs/ACCOUNTS_DOMAIN.md` + `docs/auth/*`)
+- [x] **Accounts Domain** – Auth-flöden och roller (se `docs/auth/ACCOUNTS_DOMAIN.md` + `docs/auth/*`)
 - [x] **Tenant Domain** – Multi-tenancy-setup (se `docs/TENANT_DOMAIN.md`)
 - [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/billing/BILLING_LICENSING_DOMAIN.md` + `docs/billing/STRIPE.md`)
 - [x] **Games Domain** – Lekstruktur och metadata (se `docs/games/GAMES_DOMAIN.md`)

@@ -47,6 +47,7 @@ The play structure audits in this folder remain the guardrails for large-scale r
 - `play-structure-audit.md` — frozen structural guardrail for the deliberate 4-layer play architecture
 - `play-structure-agent-risk.md` — frozen agent-risk guardrail for play-domain changes
 - `play-structure-canonical-map.md` — frozen file classification map for play-related surfaces
+- `ACCESSIBILITY_AUDIT.md` — draft WCAG checklist and audit worklist for the participant-facing play UI
 - `PARTICIPANT_PLAY_AUDIT.md` — participant play architecture and contract audit
 - `PLAY_MODE_UI_AUDIT.md` — play-mode routing and UI audit
 - `PLAY_UI_WIRING_AUDIT_REPORT_v2.md` — current verified wiring audit reference

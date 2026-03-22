@@ -91,7 +91,7 @@ Rekommenderad spegling i repo:
 - Marketing (aktuellt): [marketing/MARKETING_DOMAIN.md](marketing/MARKETING_DOMAIN.md)
 - Media (aktuellt): [media/MEDIA_DOMAIN.md](media/MEDIA_DOMAIN.md)
 - Notifications (aktuellt): [notifications/NOTIFICATIONS_DOMAIN.md](notifications/NOTIFICATIONS_DOMAIN.md)
-- Support (aktuellt): [SUPPORT_DOMAIN.md](SUPPORT_DOMAIN.md)
+- Support (aktuellt): [support/SUPPORT_DOMAIN.md](support/SUPPORT_DOMAIN.md)
 - Translation Engine (aktuellt): [TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md)
 - Operations (aktuellt): [ops/OPERATIONS_DOMAIN.md](ops/OPERATIONS_DOMAIN.md)
 	- Runbooks: [ops/README.md](ops/README.md)
@@ -235,7 +235,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [x] **API/Integration Domain** – endpoints & conventions (se `docs/API_INTEGRATION_DOMAIN.md`)
 - [x] **Marketing Domain** – Landningssidor och funnels (se `docs/marketing/MARKETING_DOMAIN.md`)
 - [x] **Notifications Domain** – In-app notiser (se `docs/notifications/NOTIFICATIONS_DOMAIN.md`)
-- [x] **Support Domain** – Feedback + tickets (se `docs/SUPPORT_DOMAIN.md`)
+- [x] **Support Domain** – Feedback + tickets (se `docs/support/SUPPORT_DOMAIN.md`)
 - [x] **Content Management Domain (CMD)** – Bulk ops (CSV import/export) + builder + content planner primitives (se `docs/content/CONTENT_MANAGEMENT_DOMAIN.md`)
 
 ---

@@ -30,6 +30,7 @@ Use it to answer:
 
 ### Drafts
 
+- `DOMAIN_PRODUCT_LEARNINGS.md` — draft learnings reference for how the current product domain should inform future domain design
 - `LEARNING_MODULE_IMPLEMENTATION.md` — draft implementation guide for the learning-domain schema, routes, and scope
 - `LEARNING_TEST_PLAN.md` — draft validation and test plan for the learning module
 - `LEARNING_ADMIN_PHASE1_IMPLEMENTATION.md` — draft placeholder for admin-side phase 1 implementation notes

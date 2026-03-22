@@ -174,7 +174,7 @@ Fält:
 | [docs/games/DOMAIN_GAMES_LEARNINGS.md](games/DOMAIN_GAMES_LEARNINGS.md) | C | draft | 2025-12-08 | - | Learnings |
 | [docs/games/DOMAIN_GAMES_TODO.md](games/DOMAIN_GAMES_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
 | [docs/planner/DOMAIN_PLANNER_TODO.md](planner/DOMAIN_PLANNER_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
-| [docs/DOMAIN_PRODUCT_LEARNINGS.md](DOMAIN_PRODUCT_LEARNINGS.md) | C | draft | 2025-12-08 | - | Learnings |
+| [docs/learning/DOMAIN_PRODUCT_LEARNINGS.md](learning/DOMAIN_PRODUCT_LEARNINGS.md) | C | draft | 2025-12-08 | - | Learnings |
 | [docs/tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md](tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md) | C | draft | 2025-12-08 | - | Learnings |
 | [docs/tenant/DOMAIN_TENANT_TODO.md](tenant/DOMAIN_TENANT_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
 | [docs/ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md) | A | active | 2025-12-17 | - | Core reference |

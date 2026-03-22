@@ -51,7 +51,7 @@ Batch 3 consists of **11 previously validated domains** with existing TODO/LEARN
 ---
 
 ### 2. Products Domain ✓
-**Documentation:** `DOMAIN_PRODUCT_LEARNINGS.md` (118 lines)  
+**Documentation:** `learning/DOMAIN_PRODUCT_LEARNINGS.md` (118 lines)  
 **Implementation Status:** Partially complete  
 **Key Features:**
 - Global `products` table (not tenant-scoped)

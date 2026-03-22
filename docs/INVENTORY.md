@@ -172,8 +172,8 @@ Fält:
 | [docs/DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
 | [docs/DOMAIN_PLANNER_TODO.md](DOMAIN_PLANNER_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
 | [docs/DOMAIN_PRODUCT_LEARNINGS.md](DOMAIN_PRODUCT_LEARNINGS.md) | C | draft | 2025-12-08 | - | Learnings |
-| [docs/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md](DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md) | C | draft | 2025-12-08 | - | Learnings |
-| [docs/DOMAIN_TENANT_TODO.md](DOMAIN_TENANT_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
+| [docs/tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md](tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md) | C | draft | 2025-12-08 | - | Learnings |
+| [docs/tenant/DOMAIN_TENANT_TODO.md](tenant/DOMAIN_TENANT_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
 | [docs/ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md) | A | active | 2025-12-17 | - | Core reference |
 | [docs/examples/README-legendary-play-example.md](examples/README-legendary-play-example.md) | B | draft | 2025-12-26 | - | Golden example for Legendary Play CSV imports |
 | [docs/GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md](GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md) | B | historical snapshot | 2025-12-16 | - | Historical P2 implementation plan |
@@ -274,7 +274,8 @@ Fält:
 | [docs/billing/archive/PURCHASE_FLOW_IMPLEMENTATION.md](billing/archive/PURCHASE_FLOW_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-27 | - | Purchase-flow implementation plan snapshot |
 | [docs/billing/archive/PURCHASE_FLOW_STATUS_REPORT.md](billing/archive/PURCHASE_FLOW_STATUS_REPORT.md) | C | historical snapshot | 2026-01-27 | - | Purchase-flow status report snapshot |
 | [docs/TENANT_MEMBERSHIP_CONSOLIDATION.md](TENANT_MEMBERSHIP_CONSOLIDATION.md) | C | historical snapshot | 2026-01-03 | - | Tenant-membership naming consolidation snapshot |
-| [docs/TENANT_DOMAIN.md](TENANT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/tenant/README.md](tenant/README.md) | A | active | 2026-03-22 | - | Tenant cluster entrypoint |
+| [docs/tenant/TENANT_DOMAIN.md](tenant/TENANT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/TESTPLAN_GAME_BUILDER_P0.md](TESTPLAN_GAME_BUILDER_P0.md) | B | draft | 2025-12-17 | - | Testplan |
 | [docs/play/PLAY_DOMAIN.md](play/PLAY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/play/README.md](play/README.md) | A | active | 2026-03-22 | - | Sub-index for play contracts, audits, and reference docs |

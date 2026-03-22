@@ -32,7 +32,7 @@ Batch 3 consists of **11 previously validated domains** with existing TODO/LEARN
 ## Domain-by-Domain Status
 
 ### 1. Tenant Domain ✓
-**Documentation:** `DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md` (135 lines)  
+**Documentation:** `tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md` (135 lines)  
 **Implementation Status:** Complete  
 **Key Features:**
 - Multi-tenancy with `tenants` + `user_tenant_memberships`

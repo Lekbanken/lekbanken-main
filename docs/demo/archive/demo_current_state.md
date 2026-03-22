@@ -256,18 +256,18 @@ Utvecklingsverktyg för att testa demo-funktionalitet utan att skapa riktiga dem
 
 | Dokument | Innehåll | Komplett |
 |----------|----------|----------|
-| TENANT_DOMAIN.md | Demo type, status, API guards | ✅ |
-| DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md | "Demo tenants are first-class concept" | ✅ |
+| tenant/TENANT_DOMAIN.md | Demo type, status, API guards | ✅ |
+| tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md | "Demo tenants are first-class concept" | ✅ |
 | auth/roles.md | Demo roles och permissions | ✅ |
 | API_VALIDATION_REPORT.md | Demo protection validation | ✅ |
 
 **Viktiga insikter från docs:**
 
 > "Demo tenants are a first-class concept: We use demo_flag, and enforce protections at the API level. However, RLS policies do not yet enforce demo restrictions."
-> — DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md:80-99
+> — tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md:80-99
 
 > "Important: some RLS policies may still be permissive (see the roadmap doc)."
-> — TENANT_DOMAIN.md:81
+> — tenant/TENANT_DOMAIN.md:81
 
 ---
 

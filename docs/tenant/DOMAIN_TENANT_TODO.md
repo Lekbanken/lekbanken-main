@@ -8,7 +8,7 @@
 - Last updated: 2026-03-21
 - Last validated: -
 
-> Draft tenant-domain backlog and roadmap. Canonical tenant guidance lives in `TENANT_DOMAIN.md`.
+> Draft tenant-domain backlog and roadmap. Canonical tenant guidance lives in `tenant/TENANT_DOMAIN.md`.
 
 > Canonical domain documentation (source of truth): **[TENANT_DOMAIN.md](TENANT_DOMAIN.md)**
 

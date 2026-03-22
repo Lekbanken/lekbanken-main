@@ -58,6 +58,7 @@ Regel:
 - play/: se [play/README.md](play/README.md)
 - profile/: se [profile/README.md](profile/README.md)
 - support/: se [support/README.md](support/README.md)
+- tenant/: se [tenant/README.md](tenant/README.md)
 - admin/: se [admin/README.md](admin/README.md)
 - sandbox/: se [sandbox/README.md](sandbox/README.md)
 - toolkit/: se [toolkit/README.md](toolkit/README.md)

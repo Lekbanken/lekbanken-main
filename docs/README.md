@@ -55,6 +55,7 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - Media cluster: [media/README.md](media/README.md)
 - Sandbox docs: [sandbox/README.md](sandbox/README.md)
 - Toolkit docs: [toolkit/README.md](toolkit/README.md)
+- Tenant cluster: [tenant/README.md](tenant/README.md)
 - Auth/RBAC cluster: [auth/README.md](auth/README.md) + AUTH_SYSTEM_ANALYSIS.md (historisk/archived)
 - Admin cluster: [admin/README.md](admin/README.md)
 - Ops/runbooks: ops/

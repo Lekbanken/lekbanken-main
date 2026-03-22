@@ -5,7 +5,7 @@
 > **Status:** active
 > **Owner:** -
 > **Date:** 2025-12-17
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-22
 > **Last validated:** -
 > **Source of truth:** Repo code + `supabase/migrations/*` (schema) + `types/supabase.ts` (generated)
 
@@ -207,7 +207,7 @@ Known drift (per roadmap docs):
 - Some tables may still allow overly-broad mutation via RLS (`tenant_settings`, `tenant_branding`, `tenant_features`).
 
 See supporting roadmap docs:
-- `docs/DOMAIN_TENANT_TODO.md`
+- `docs/tenant/DOMAIN_TENANT_TODO.md`
 
 ## Validation checklist
 - `npm run type-check`
@@ -219,5 +219,5 @@ See supporting roadmap docs:
   - Ensure demo tenant guards trigger as expected
 
 ## Supporting docs
-- Roadmap / known gaps: `docs/DOMAIN_TENANT_TODO.md`
-- Cross-domain learnings: `docs/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md`
+- Roadmap / known gaps: `docs/tenant/DOMAIN_TENANT_TODO.md`
+- Cross-domain learnings: `docs/tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md`

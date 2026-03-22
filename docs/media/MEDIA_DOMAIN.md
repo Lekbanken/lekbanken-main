@@ -269,4 +269,4 @@ Track:
 ## Related Documentation
 - [Achievements Asset Model](./gamification/ACHIEVEMENTS_ASSET_MODEL.md)
 - [Games Domain](./DOMAIN_GAMES_TODO.md)
-- [Tenant Domain](./DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md)
+- [Tenant Domain](../tenant/DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md)

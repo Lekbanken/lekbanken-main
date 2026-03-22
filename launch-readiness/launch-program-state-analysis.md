@@ -80,14 +80,14 @@ What was "skipped" is a *systematic test strategy* with coverage targets and cri
 | Migrations | 307 | 310+ | +3 (MFA/RLS fixes this session) |
 | Level 2 audits | Not mentioned | 4 completed (L2-1 through L2-4) | New capability |
 
-> **Source:** `system-verification-2026.md` documented drift to 250/288 on 2026-03-13. Current session added 2+ more wrappers. Level 2 audits were added to `launch-control.md` §5 but not to the snapshot.
+> **Source:** `audits/system-verification-2026.md` documented drift to 250/288 on 2026-03-13. Current session added 2+ more wrappers. Level 2 audits were added to `launch-control.md` §5 but not to the snapshot.
 
 ### 2.3 Documentation Layer Inconsistencies
 
 | Document | Issue |
 |----------|-------|
 | `launch-readiness-architecture.md` | §6 "Observability" says "Okänt — behöver utredas" but telemetry pack exists and observability audit was done |
-| `launch-snapshot-2026-03.md` | Frozen by design, but should reference `system-verification-2026.md` for current numbers |
+| `launch-snapshot-2026-03.md` | Frozen by design, but should reference `audits/system-verification-2026.md` for current numbers |
 | Root `planner-audit.md` | Still exists at root — duplicates/predates `audits/planner-launch-audit.md` |
 | Root `planner-architecture.md` | Root-level — may conflict with `copilot-instructions.md` SSoT expectations (which references root docs as current) |
 | `next-phase-execution-plan.md` | Historical snapshot preserved intentionally. It now includes an explicit superseded-facts warning, so it should not be treated as a current planning source. |

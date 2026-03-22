@@ -7,7 +7,7 @@
 > **Last validated:** 2026-03-21  
 > **Status:** historical snapshot  
 > **Author:** Claude Opus 4.6 (automated analysis)  
-> **Based on:** system-verification-2026.md + launch-readiness implementation plan  
+> **Based on:** audits/system-verification-2026.md + launch-readiness implementation plan  
 > **Note:** Historical plan snapshot from before the post-launch Observe Mode alignment. Treat `next-execution-plan.md` and `launch-control.md` as the current planning references.
 > **Superseded facts warning:** Repository evidence in this document reflects pre-resolution state. Statements such as `Docker not installed`, `.env.local` pointing to prod, and preview/dev sharing prod data-plane are no longer current.
 

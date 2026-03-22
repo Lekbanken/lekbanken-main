@@ -191,7 +191,7 @@ All drift items identified below have been **fixed** as of 2026-03-13:
 | ADR-005 status | `launch-readiness-architecture.md` (L422 → ✅ DECIDED: B), `next-phase-execution-plan.md` (L63 → struck through + decision note), `launch-control.md` (L600 → config isolation done), `launch-readiness-implementation-plan.md` (L83 → ✅ IMPLEMENTERAT), `platform-operations-architecture.md` (L94, L110, L172, L377 → updated to reflect sandbox) | All documents now reflect ADR-005 decided: Alt B (remote sandbox first) |
 | `.env.local.example` | `platform-operations-audit.md` OPS-DEV-002 → marked resolved | File exists with 73 lines + `APP_ENV`/`DEPLOY_TARGET` added |
 | OPS-SAND-001 status | `platform-operations-audit.md` → downgraded to "Config isolation done, runtime/data-plane verification pending" | Reflects reality: config done, RLS errors unresolved |
-| `system-verification-2026.md` | L229 → updated to "still points to prod DB (should be updated)" | Reflects that local dev isolation is a known remaining action |
+| `audits/system-verification-2026.md` | L229 → updated to "still points to prod DB (should be updated)" | Reflects that local dev isolation is a known remaining action |
 | Naming drift (`local-dev`) | `lib/config/env.ts` defaults → `local`/`development`, `.env.local.example` → same | Aligned with canonical enum from `launch-control.md` L1208 |
 
 ### DOCUMENT DRIFT DETECTED — Migration Count (cosmetic, not fixed)
@@ -246,7 +246,7 @@ All documentation drift has been fixed:
 | D5 | Fix `launch-control.md` L600 — Phase 1B status → config isolation done | ✅ Done |
 | D6 | Fix `launch-readiness-implementation-plan.md` L83 — Status → ✅ IMPLEMENTERAT | ✅ Done |
 | D7 | Fix `platform-operations-architecture.md` — 4 stale references → updated to sandbox | ✅ Done |
-| D8 | Fix `system-verification-2026.md` — Local dev → clarified as "should be updated" | ✅ Done |
+| D8 | Fix `audits/system-verification-2026.md` — Local dev → clarified as "should be updated" | ✅ Done |
 | D9 | Fix naming drift (`local-dev` → canonical `local`/`development`) in env.ts + .env.local.example | ✅ Done |
 
 ---

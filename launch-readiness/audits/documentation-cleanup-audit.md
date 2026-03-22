@@ -156,7 +156,7 @@ All files in `launch-readiness/` are canonical and actively maintained:
 | Incident playbook | 1 | `incident-playbook.md` |
 | Domain audits | 23 | `audits/*.md` — one per audit |
 | Implementation specs | 7 | `implementation/*.md` — remediation plans, DD specs |
-| **This file** | 1 | `system-verification-2026.md` |
+| **This file** | 1 | `audits/system-verification-2026.md` |
 
 ### Root-level canonical
 

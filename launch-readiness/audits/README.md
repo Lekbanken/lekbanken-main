@@ -31,6 +31,7 @@ This folder contains the bounded audit outputs produced during the launch-readin
 - `api-consistency-audit.md` — API wrapper, auth, validation, and error-format consistency audit
 - `mfa-trusted-device-audit.md` — targeted auth hardening audit for MFA and trusted-device flows
 - `documentation-cleanup-audit.md`, `launch-docs-integrity-audit.md` — bounded documentation-layer audits that drove the markdown cleanup and SSoT verification work
+- `system-verification-2026.md` — frozen repository-verification snapshot used to compare the March launch snapshot against code-scanned reality
 
 ### Security and isolation audit set
 

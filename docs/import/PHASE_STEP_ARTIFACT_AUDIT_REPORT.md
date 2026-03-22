@@ -1,9 +1,19 @@
 # Import Fail-Fast Audit Report: Phases, Steps & Artifacts
 
-**Date:** 2025-02-08  
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-02-08
+
+> Closed audit of fail-fast behavior for phase, step, role, and artifact validation during import preflight. Use `docs/import/README.md` as the cluster entrypoint and verify current runtime behavior in the import route and builder validators before treating this report as current truth.
+
 **Author:** Copilot Agent  
-**Status:** ✅ CLOSED - APPROVED FOR MERGE  
+**Execution status:** ✅ CLOSED - APPROVED FOR MERGE  
 **Decision:** Option A (No changes) - System is production-safe  
+**Canonical entrypoint:** `docs/import/README.md`
 
 ---
 

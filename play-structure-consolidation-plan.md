@@ -3,6 +3,16 @@
 > Generated 2026-03-16. Prioritised action items for the play domain.  
 > Prerequisite: Read `play-structure-audit.md` for context.
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-16
+
+> Historical action-plan snapshot from the 2026-03-16 play structure audit. Use `play-structure-audit.md` and later play cluster docs as the current guidance.
+
 ---
 
 ## Verdict

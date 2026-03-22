@@ -1,5 +1,13 @@
 # Sandbox Smoke Tests
 
+## Metadata
+- Status: active
+- Date: 2025-12-09
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: sandbox
+- Scope: Smoke-test overview for sandbox modules
+
 This directory contains lightweight smoke tests for the Lekbanken sandbox modules.
 The tests are generated from `sandbox-modules.ts` configuration.
 

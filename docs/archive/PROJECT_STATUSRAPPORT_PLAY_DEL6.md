@@ -1,6 +1,14 @@
-# STATUSRAPPORT / CHANGELOG — Play (DEL 6)
+# Statusrapport / Changelog - Play (Del 6)
 
-Datum: 2025-12-20
+## Metadata
+- Status: archived
+- Date: 2025-12-20
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: play
+- Scope: Archived play status report snapshot
+
+Historical status snapshot retained for provenance. Use active play audits and plans instead of this archived report for current implementation status.
 
 ## Levererat (DEL 1–DEL 4, nuvarande repo-läge)
 

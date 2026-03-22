@@ -4,12 +4,19 @@
 
 - Owner: -
 - Status: active
-- Last validated: 2025-12-18
+- Date: 2025-11-29
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
 
 Notion är kopplad till GitHub, men **repo:t är Single Source of Truth** för aktuell dokumentation.
 
 - **Repo (docs/ + sandbox/wiki)**: det som gäller här och nu (implementation, invariants, flöden, runbooks, DB/migrations, adminflöden).
 - **Notion**: spegel/portal (bra för browse, onboarding, beslutshistorik) men ska inte innehålla “egna sanningar” som avviker från repo.
+
+Aktuell arbetsmodell:
+- verktygsansvar: `docs/TOOLING_MATRIX.md`
+- Notion-syncstrategi: `docs/NOTION_SYNC_PLAN.md`
+- operativ checklista: `docs/NOTION_UPDATE_CHECKLIST.md`
 
 Startpunkter i repo:
 - docs start: [README.md](README.md)
@@ -44,11 +51,11 @@ Målet är att undvika "code vibe drift": om något står i Notion men inte kan 
 
 | Länk | Beskrivning |
 |------|-------------|
-| [🎯 Lekbanken Dashboard]() | Central översikt med snabbnavigering till alla hubs och databaser |
-| [🏛️ Master Structure v1.0]() | Komplett systemöversikt med alla domäner och inline-databaser |
-| [🎉 Welcome to Lekbanken Workspace]() | Workspace entry point |
+| [🎯 Lekbanken Dashboard](https://www.notion.so/Johan-Schultzs-omr-de-Lekbanken-Dashboard-14ca3649dd9080fdaeb3e8c067e1eb2e) | Central översikt med snabbnavigering till alla hubs och databaser |
+| [🏛️ Master Structure v1.0](https://www.notion.so/Johan-Schultzs-omr-de-Lekbanken-Master-Structure-v1-0-14ca3649dd908087a1bfc94b89ea2a07) | Komplett systemöversikt med alla domäner och inline-databaser |
+| [🎉 Welcome to Lekbanken Workspace](https://www.notion.so/a2aede16b55a4924bb1bb8ccb66e568d) | Workspace entry point |
 
-⚠️ OBS: Fyll i länkarna när du har page IDs/URLs. Tills dess: utgå från repo.
+Om en länk saknas eller blir inaktuell: utgå från repo först och uppdatera sedan Notion-länken via repo-styrd process.
 
 ---
 
@@ -56,8 +63,8 @@ Målet är att undvika "code vibe drift": om något står i Notion men inte kan 
 
 | Länk | Beskrivning |
 |------|-------------|
-| [⭐ Domänstruktur: Lekbanken]() | Fullständig domänarkitektur med DDD-principer och ansvarsområden |
-| [⭐ Platform Domain]() | Vercel runtime, miljöer, deployment, routing, säkerhet, observability |
+| [⭐ Domänstruktur: Lekbanken](https://www.notion.so/Johan-Schultzs-omr-de-Dom-nstruktur-Lekbanken-14ca3649dd9080e89b62d94db3502c82) | Fullständig domänarkitektur med DDD-principer och ansvarsområden |
+| [⭐ Platform Domain](https://www.notion.so/Johan-Schultzs-omr-de-Platform-Domain-Uppdaterad-med-Vercel-14ba3649dd908017af0bd5b87c2f37ed) | Vercel runtime, miljöer, deployment, routing, säkerhet, observability |
 | [Browse Domain](BROWSE_DOMAIN.md) | Sök, filter, rekommendationer, key tables |
 
 Rekommenderad spegling i repo:
@@ -98,28 +105,28 @@ Rekommenderad spegling i repo:
 
 | Hub | Länk | Innehåll |
 |-----|------|----------|
-| **📦 Product Hub** | [Product Hub]() | Produktspecifikationer, roadmap, feature requests |
-| **⚙️ Engineering Hub** | [Engineering Hub]() | Teknisk dokumentation, API-bibliotek, release notes |
-| **🎨 Design Hub** | [Design Hub]() | Design system, UI-komponenter, style guide |
-| **💼 Operations Hub** | [Operations Hub]() | Drift, processer, workflows, monitoring |
+| **📦 Product Hub** | Pending URL verification | Produktspecifikationer, roadmap, feature requests |
+| **⚙️ Engineering Hub** | [Engineering Hub](https://www.notion.so/Johan-Schultzs-omr-de-Engineering-Hub-14ca3649dd908085ba50e9c43d7a4a31) | Teknisk dokumentation, API-bibliotek, release notes |
+| **🎨 Design Hub** | Pending URL verification | Design system, UI-komponenter, style guide |
+| **💼 Operations Hub** | Pending URL verification | Drift, processer, workflows, monitoring |
 
 ### Sub-pages från hubs:
 
 **Product Hub:**
-- [Product Overview]()
+- Pending URL verification
 
 **Engineering Hub:**
-- [API Library]()
-- [Release Notes]()
+- API Library — pending URL verification
+- Release Notes — pending URL verification
 
 **Operations Hub:**
-- [Workflows]()
+- Workflows — pending URL verification
 
 ---
 
 ## 🏗️ Fullständig domänarkitektur
 
-Enligt [⭐ Domänstruktur: Lekbanken]():
+Enligt [⭐ Domänstruktur: Lekbanken](https://www.notion.so/Johan-Schultzs-omr-de-Dom-nstruktur-Lekbanken-14ca3649dd9080e89b62d94db3502c82):
 
 | Domän | Ansvar | Status |
 |-------|--------|--------|
@@ -154,7 +161,7 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 
 ### Core Databases
 
-Enligt [Master Structure v1.0]():
+Enligt [Master Structure v1.0](https://www.notion.so/Johan-Schultzs-omr-de-Lekbanken-Master-Structure-v1-0-14ca3649dd908087a1bfc94b89ea2a07):
 
 | Database | Beskrivning | Notion-länk |
 |----------|-------------|-------------|
@@ -177,7 +184,7 @@ Enligt [Master Structure v1.0]():
 | **Invoices DB** | Fakturor och betalningshistorik |
 | **Payments DB** | Betalningar via Stripe/Vipps |
 
-**Alla databaser med inline-views finns i:** [Master Structure v1.0]()
+**Alla databaser med inline-views finns i:** [Master Structure v1.0](https://www.notion.so/Johan-Schultzs-omr-de-Lekbanken-Master-Structure-v1-0-14ca3649dd908087a1bfc94b89ea2a07)
 
 ---
 
@@ -282,5 +289,4 @@ Och ett beslut om *vad* som synkas (förslag: endast index + “System Map”, i
 
 ---
 
-**Maintainer:** Johan Schultz – johan@formgiver.no  
-**Last updated:** 2025-12-17
+**Maintainer:** Johan Schultz – johan@formgiver.no

@@ -1,5 +1,15 @@
 # React Server/Client Boundary Audit — Lekbanken
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed React boundary audit from the launch-readiness cycle. Treat this as a bounded architectural quality snapshot rather than an active operating guide.
+
 > **Auditor:** Claude (AI)  
 > **Date:** 2026-03-12  
 > **Scope:** 849 `'use client'` files, 31 `'use server'` files, all page.tsx/layout.tsx in app/ tree  

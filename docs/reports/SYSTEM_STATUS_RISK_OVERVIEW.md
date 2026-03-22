@@ -1,5 +1,15 @@
 # Lekbanken – System Status & Risk Overview
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-01-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Fryst arkitekturanalys av systemstatus och risker vid ett givet tillfälle. Kräver ny verifiering innan den används som aktuell readiness- eller cleanup-sanning.
+
 **Generated**: 2026-01-27  
 **Type**: READ-ONLY Architectural Analysis  
 **Purpose**: Trustworthy cleanup status report for future master prompt

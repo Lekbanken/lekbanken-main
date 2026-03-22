@@ -1,5 +1,15 @@
 # MFA Security Documentation för Lekbanken
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft MFA security reference covering threat model, mitigations, and review checklist.
+
 **Datum:** 2026-01-13  
 **Version:** 1.0  
 **Status:** Enterprise Security Review

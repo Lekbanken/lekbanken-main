@@ -1,5 +1,15 @@
 # Participant State-Machine Hardening — Post-Fix Verification
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-19
+- Last updated: 2026-03-21
+- Last validated: 2026-03-19
+
+> Historical postfix verification snapshot for the participant state-machine hardening fixes. Use this as bounded closure evidence rather than an active operating guide.
+
 > Created: 2026-03-19
 > Author: Claude (implementation + verification agent)
 > Scope: BUG-079, BUG-081, BUG-083, BUG-084 (Cluster 19 — participant state-machine family)

@@ -1,9 +1,15 @@
 # Badge Builder UX Guide
+
+## Metadata
+
 ## Achievements Admin – Stacking Layers & Tinting System
 
-> **Last Updated:** 2025-12-07  
-> **Status:** Design Reference  
-> **Scope:** Visual badge editor with stackable layers and blend-mode tinting  
+> **Status:** draft
+> **Owner:** -
+> **Date:** 2025-12-07
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+> **Scope:** Visual badge editor with stackable layers and blend-mode tinting
 
 ---
 

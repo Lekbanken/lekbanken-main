@@ -1,5 +1,15 @@
 # Consumer Data Contract Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Frozen audit snapshot verifying browse and planner consumer contracts against their API mappers.
+
 **Sprint 4.7 — Browse & Planner Data Correctness**
 
 > Status: ✅ COMPLETE  

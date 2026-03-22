@@ -1,8 +1,17 @@
 # Game Integrity Report
 
-**Generated:** 2026-01-19  
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-01-19
+- Last updated: 2026-03-21
+- Last validated: 2026-01-19
+
+> Frozen end-to-end consistency audit for game logic and snapshot/runtime flow. Revalidate against current code before using it as current-state evidence.
+
 **Scope:** End-to-end game logic consistency audit  
-**Status:** Complete
+**Canonical entrypoint:** `docs/games/README.md`
 
 ---
 

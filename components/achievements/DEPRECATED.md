@@ -1,5 +1,13 @@
 # ⚠️ DEPRECATED - Sandbox Badge Builder
 
+## Metadata
+- Status: archived
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: achievements
+- Scope: Historical deprecation notice for the sandbox badge builder
+
 **Status:** Deprecated as of 2026-01-08  
 **Reason:** Consolidation with production admin builder
 

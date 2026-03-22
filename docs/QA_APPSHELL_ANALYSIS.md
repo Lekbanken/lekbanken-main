@@ -1,5 +1,15 @@
 # Lekbanken App – Kvalitetssäkring & Förbättringsanalys
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-17
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft QA analysis of the app shell, navigation consistency, safe-area handling, and page-level UX improvements.
+
 **Datum:** 2026-01-17  
 **Analyserad av:** GitHub Copilot  
 **Versionshistorik:** Initial analys

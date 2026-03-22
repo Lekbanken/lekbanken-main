@@ -4,7 +4,9 @@
 
 - Owner: -
 - Status: active
-- Last validated: 2026-01-03
+- Date: 2025-12-15
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
 
 ## Related code (source of truth)
 
@@ -37,7 +39,7 @@ Tenant is resolved in the following order. Priority depends on whether user is l
    - Single membership (auto-select if only one)
 
 5. **Redirects** (when memberships known):
-   - Multiple memberships, no selection -> `/app/select-tenant`
+   - If memberships exist but no explicit tenant is selected, resolver auto-selects the first available tenant (preferring primary)
    - No memberships -> `/app/no-access`
 
 ### Hostname resolution applies to:
@@ -84,9 +86,8 @@ Malformed headers (containing commas, whitespace, or invalid characters) are rej
 - `x-tenant-id`: Added in proxy when tenant is resolved
 - Client fetchers should include it for tenant-scoped APIs
 
-## Picker Pages
+## Fallback Pages
 
-- `/app/select-tenant`: Choose between multiple tenants
 - `/app/no-access`: No memberships found
 
 ## Membership Data

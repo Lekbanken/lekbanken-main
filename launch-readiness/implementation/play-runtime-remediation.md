@@ -1,9 +1,15 @@
 # Play Runtime Remediation Plan
 
+## Metadata
+
 > **Date:** 2026-03-11  
+> **Last updated:** 2026-03-22  
+> **Last validated:** 2026-03-22  
+> **Status:** historical snapshot  
 > **Source:** `audits/play-audit.md` — 14 findings (2 P0, 4 P1, 5 P2, 3 P3)  
 > **Scope:** Runtime mutation integrity, state transition safety, concurrency fixes, broadcast completeness  
-> **Approver:** GPT (pending)
+> **Approver:** GPT (pending)  
+> **Note:** Executed launch-scope remediation record. M1-M5 are complete; M6 remains a documented post-launch hardening roadmap. Use `launch-control.md` for launch-program state and this file for bounded play-runtime history.
 
 ---
 

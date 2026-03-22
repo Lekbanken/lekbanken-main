@@ -4,6 +4,16 @@
 **Total source files (ts/tsx/js/jsx):** ~1 951  
 **Excluded from listing:** `node_modules/`, `.next/`, `.git/`, `playwright-report/`, `test-results/`
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-16
+
+> Frozen repo tree snapshot from the 2026-03-16 structure audit. Treat it as a historical map, not a current exhaustive source without re-checking the file system.
+
 ---
 
 ## Root Directory

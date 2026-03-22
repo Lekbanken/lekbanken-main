@@ -7,6 +7,8 @@ import { finishLoginFlow, waitForPostLoginRedirect } from './utils/auth-flow';
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local'), override: true });
 
 const authFile = path.join(__dirname, '../.auth/regular-user.json');
+const defaultRegularUserEmail = 'test-regular-user@lekbanken.no';
+const defaultRegularUserPassword = 'TestUser123!';
 
 /**
  * Regular User Authentication Setup
@@ -15,15 +17,8 @@ const authFile = path.join(__dirname, '../.auth/regular-user.json');
  * Used by tests that verify regular users cannot access admin.
  */
 setup('authenticate regular user', async ({ page }) => {
-  const email = process.env.TEST_REGULAR_USER_EMAIL;
-  const password = process.env.TEST_REGULAR_USER_PASSWORD;
-
-  if (!email || !password) {
-    console.warn('⚠️  TEST_REGULAR_USER_EMAIL and TEST_REGULAR_USER_PASSWORD not set. Skipping regular user auth setup (no regular user to test).');
-    // Create empty auth state to prevent test failures
-    await page.context().storageState({ path: authFile });
-    return;
-  }
+  const email = process.env.TEST_REGULAR_USER_EMAIL || defaultRegularUserEmail;
+  const password = process.env.TEST_REGULAR_USER_PASSWORD || defaultRegularUserPassword;
 
   // Navigate to login page
   await page.goto('/auth/login');

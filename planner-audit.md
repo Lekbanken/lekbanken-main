@@ -1,6 +1,17 @@
 # Planner/Planläggaren — Audit, Riskanalys & Förbättringsförslag
 
-> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-04 (efter MS5 Tenant RLS implementation)  
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-04
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Aktiv audit- och riskreferens för Planner-domänen. Använd tillsammans med `planner-architecture.md` för stabil design och `planner-implementation-plan.md` för genomförande- och backloggstatus.
+
+> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-21  
+> **Senast validerad:** 2026-03-21  
 > **Scope:** `/app/planner`, `/admin/planner`, `/app/play/plan/`, kalender, körning  
 > **Syfte:** Kartlägga nuvarande tillstånd, identifiera risker och föreslå en genomtänkt ändringsplan inför beta-launch.  
 > **Status:** MS0–MS5 implementerade. Se `planner-architecture.md` för stabil systemöversikt.
@@ -8,6 +19,8 @@
 **Post-launch notering (2026-03-19):** publish/status-spliten är delvis stängd. `published` kan inte längre sättas via `/api/plans/[planId]/status`, och bulk publish är avstängd tills den kan skapa versionssnapshot. Kvarvarande planner-risker ligger nu främst i read/cache/AppShell-synk och övriga post-launch-förbättringar, inte i dubbla publiceringssemantiker.
 
 **Notering (2026-03-20):** planner-kalenderns `plan_schedules` är nu backfillad in i den levande migrationskedjan (`20260320120000_plan_schedules_backfill_and_runs_canonical_sync.sql`). Samma fix canonicaliserar play-API:erna mot `runs.plan_id` + `runs.current_step_index`, vilket återställer TS-synk mot genererade Supabase-typer.
+
+**Notering (2026-03-21):** sista döda artefakten från den gamla 5-stegswizarden, `features/planner/wizard/steps/StepKor.tsx`, är nu borttagen. Planner-wizarden består därmed också i filsystemet endast av den aktiva 2-stegsmodellen (`StepBuildPlan` + `StepSaveAndRun`).
 
 ---
 

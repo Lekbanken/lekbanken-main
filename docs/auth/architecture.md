@@ -4,7 +4,9 @@
 
 - Owner: -
 - Status: active
-- Last validated: 2025-12-17
+- Date: 2025-12-15
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
 
 ## Related code (source of truth)
 
@@ -19,6 +21,7 @@
 ## Overview
 
 - Server context: `lib/auth/server-context.ts` fetches user, profile, memberships, resolves tenant; used in layouts and server components.
+- Server context: `lib/auth/server-context.ts` fetches user, profile, memberships, resolves tenant; used in layouts and server components. User/profile/membership fetches are request-cached and tenant resolution is the pathname-dependent step.
 - Proxy middleware: `proxy.ts` enforces auth for `/app` and `/admin`, guards guest-only auth routes, applies admin gate via JWT claims, sets `x-request-id`, refreshes signed httpOnly `lb_tenant`, and attaches `x-tenant-id` when known.
 - Client provider: `lib/supabase/auth.tsx` accepts initial server data to avoid flicker; listens only for auth state changes.
 - Tenant provider: `lib/context/TenantContext.tsx` can hydrate from server data and refresh on auth changes.

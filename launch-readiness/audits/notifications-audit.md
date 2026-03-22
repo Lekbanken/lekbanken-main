@@ -1,5 +1,15 @@
 # Notifications Audit (#13) — Domain
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed launch-readiness audit for the notifications domain. Use this as a bounded audit snapshot and refer to current notifications docs or launch-control for present operating state.
+
 **Status:** ✅ GPT-calibrated  
 **Date:** 2026-03-12  
 **GPT Calibration:** 2026-03-12 — NOTIF-005 P2→P3. All other severities confirmed.  

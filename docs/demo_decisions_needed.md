@@ -1,4 +1,15 @@
 # Lekbanken Demo-läge - Kritiska Beslut
+
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the demo domain decision log prepared before implementation began.
+
 **Datum:** 2026-01-13
 **Status:** AWAITING DECISIONS
 **Beslutfattare:** Product Owner / CTO / Stakeholders

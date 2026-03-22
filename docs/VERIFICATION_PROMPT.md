@@ -1,5 +1,15 @@
 # 🔍 Demo Implementation Verification Prompt
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical branch-specific verification prompt for reviewing the Sprint 1 demo-mode implementation.
+
 **Purpose:** Use this prompt in VS Code Claude to verify Sprint 1 implementation
 **Branch:** `claude/lekbanken-demo-analysis-Iomf5`
 **Status:** Sprint 1 Complete - Ready for Verification

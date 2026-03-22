@@ -1,5 +1,15 @@
 # Play Lobby (Host) — Single Source of Truth
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-01-23
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Frozen snapshot of the host lobby source-of-truth document for the play cockpit at that point in time.
+
 Date: 2026-01-23
 
 ## Goal

@@ -1,9 +1,15 @@
 # API Wrapper Pilot — Migration Report
 
+## Metadata
+
 > **Date:** 2026-03-10  
-> **Status:** Complete  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** historical snapshot  
+> **Execution status:** Complete  
 > **Wrapper:** `lib/api/route-handler.ts` → `apiHandler()`  
-> **TypeScript:** `npx tsc --noEmit` = **0 errors**
+> **TypeScript:** `npx tsc --noEmit` = **0 errors**  
+> **Note:** Historical snapshot of the wrapper pilot that informed later migration work. Do not treat it as the current migration tracker.
 
 ---
 

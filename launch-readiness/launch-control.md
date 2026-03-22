@@ -1,8 +1,20 @@
 # Lekbanken Launch Control
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-13
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Canonical operating summary for the launch-readiness program. Use this file for current status, phase posture, and links into the underlying audit and implementation records.
+
 > **Status:** LAUNCH READY — Post-launch operational phase  
-> **Last updated:** 2026-03-15  
+> **Last updated:** 2026-03-22  
 > **Current Phase:** Post-launch Observe Mode. All phases complete (Phase 2 formal execution skipped; Phase 6 deferred). Awaiting production traffic data.  
+> **Audit index:** `launch-readiness/audits/README.md`
+> **Implementation index:** `launch-readiness/implementation/README.md`
 
 ---
 
@@ -36,7 +48,8 @@ No architectural changes will be implemented before real production traffic has 
 > **Note:** Phases 3 and 4 ran concurrently per domain: Audit → Implement → Regression before moving to next domain. Phase 1 produced the API wrapper infrastructure and architectural decisions that enabled all subsequent work.
 >
 > **Phase deviations:**
-> - **Phase 2 (Test Foundation):** Formal Phase 2 execution was skipped. Ad-hoc test assets exist (261 test files: 72 unit, 12 E2E specs, RLS tests) and CI runs 7 checks including `tsc --noEmit`. E2E test coverage remains a post-launch investment.
+> - **Phase 2 (Test Foundation):** Formal Phase 2 execution was skipped. Ad-hoc test assets exist (261 test files: 72 unit, 12 E2E specs, RLS tests) and CI runs 7 checks including `tsc --noEmit`. **Baseline verification update (2026-03-22):** `npx vitest run` passed locally, `npm test` passed locally, `supabase start` + `npm run db:reset` succeeded, and the active local RLS harnesses `tests/rls/demo-policies.test.sql` plus `supabase/tests/test_tenant_rls_isolation.sql` passed after aligning the manual tenant script with the current schema. `tests/rls/game-reactions-policies.test.sql` remains a SQL Editor manual script that requires authenticated user context rather than the CI-style container path.
+- **Playwright baseline (2026-03-22):** local E2E baseline is now verified. Auth/setup drift was removed by aligning the local demo seed with the canonical `DEMO_TENANT_ID`, bypassing non-production in-memory `demo` plus `auth`/`strict` rate-limit interference, and updating planner/profile/login audits to wait on visible app state instead of brittle full-load events. The latest full run (`npx playwright test`) finished at **60 passed / 43 skipped / 0 failed**. The 43 skipped cases remain intentionally excluded clusters, not active red failures.
 > - **Phase 5 (Regression):** ✅ Complete — 16/16 domain regressions executed inline during audit→implement cycle. 4 Level 2 building-block audits completed. All regressions passed. See Regression Progress Summary below.
 > - **Phase 6 (Docs Refresh):** Deferred — documentation kept current during audit cycle. Bulk cleanup of root-level .md files planned post-launch.
 > - **Phase 7 (Release Gate):** Verdict READY issued 2026-03-12 (see §6).
@@ -47,7 +60,7 @@ No architectural changes will be implemented before real production traffic has 
 
 | Domain | Audit | Remediation | Regression | i18n | Tests | Docs | Status |
 |--------|-------|-------------|------------|------|-------|------|--------|
-| Auth / Onboarding | ✅ | ✅ | ✅ | — | — | — | Covered by Security & Auth Audit (17 findings). All original P0/P1 resolved. **MFA sub-audit (2026-03-18):** MFA-001/002/004/005 ✅ closed by 2026-03-19. Only MFA-003 (pagination/filter ordering, P2) remains open. See `audits/mfa-trusted-device-audit.md` and `implementation/mfa-trusted-device-remediation.md`. |
+| Auth / Onboarding | ✅ | ✅ | ✅ | — | — | — | Covered by Security & Auth Audit (17 findings). All original P0/P1 resolved. **MFA sub-audit (2026-03-18):** all 5 findings closed by 2026-03-22. See `audits/mfa-trusted-device-audit.md` and `implementation/mfa-trusted-device-remediation.md`. |
 | Tenants / Multi-tenancy | ✅ | ✅ | ✅ | — | — | — | Audit complete — 10 findings. TI-001 P0 fixed. TI-002/TI-NEW-1c resolved (product decisions). Regression covered by per-domain tenant boundary checks (Games, Planner, Journey, Media). |
 | Games / Library | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | Audit complete + GPT-calibrated — 14 findings (0 P0, 3 P1, 8 P2, 3 P3). **M1 ✅** **M2 ✅** **M3 ✅** — 0 P0, 0 P1 remaining. **Remediation complete for launch scope.** M4 deferred post-launch. **Regression ✅ (2026-03-14)** — all 8 areas pass, all 7 M1–M3 fixes verified intact, 18 handlers verified, 0 new findings. Test-group-ready for current scope. See `audits/games-regression-audit.md`. |
 | Game Authoring (Admin) | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | Covered by Games System Audit (builder routes, publish, snapshots included). Regression verified in Games regression (2026-03-14). |
@@ -95,7 +108,7 @@ No architectural changes will be implemented before real production traffic has 
 
 | Area | Audit | Remediation | Status |
 |------|-------|-------------|--------|
-| API Security & Auth (287 routes) | ✅ | 🟡 | 17 original findings. All original P0/P1 resolved. SEC-002b open (infra — non-actionable). **MFA sub-audit (2026-03-18):** 4 of 5 findings closed (MFA-001/002/004/005); MFA-003 remains as a P2 follow-up. |
+| API Security & Auth (287 routes) | ✅ | 🟡 | 17 original findings. All original P0/P1 resolved. SEC-002b open (infra — non-actionable). **MFA sub-audit (2026-03-18):** all 5 findings closed by 2026-03-22. |
 | API Consistency (288 routes) | ✅ | ✅ | 14 findings. APC-003/011 resolved (RLS policy). Wrapper: **253/288 (87.8%)**, 369/410 (90.0%). |
 | Tenant Isolation | ✅ | ✅ | 10 findings. TI-001 P0 fixed. TI-002/TI-NEW-1c product decisions resolved. |
 | i18n | ✅ | ✅ | 7 findings (0 P0, 0 P1, 2 P2, 5 P3). GPT-calibrated. sv complete, en/no synced (2026-03-15): 932 en + 1104 no keys added, 430 en + 997 no orphans removed. All 3 locales at 11,927 keys. |
@@ -122,10 +135,10 @@ No architectural changes will be implemented before real production traffic has 
 |----------|-------|----------|-----------|
 | P0 — Launch blocker | 15 | 15 | 0 — All P0s closed (MFA-004 2026-03-18, MFA-005 2026-03-19) |
 | P1 — Must fix before launch | 49 + 24 new | 47 | 2 legacy + 24 new Codex — see below |
-| P2 — Should fix, not blocker | 136 + 3 new | 15 | 121 legacy + MFA-003, BUG-009, BUG-021 |
+| P2 — Should fix, not blocker | 136 + 3 new | 16 | 121 legacy + BUG-009 + BUG-021 |
 | P3 — Nice to have | 90 | 0 | 90 — post-launch backlog |
 
-> **MFA sub-audit (2026-03-18):** 5 new findings discovered by Codex, verified by Claude. **Status: MFA-004 ✅ CLOSED (2026-03-18), MFA-005 ✅ CLOSED (2026-03-19).** DD-MFA-1 resolved: tenant-scoped trust via server-canonical cookie. See `audits/mfa-trusted-device-audit.md`.
+> **MFA sub-audit (2026-03-18):** 5 new findings discovered by Codex, verified by Claude. **Status: all 5 findings closed as of 2026-03-22.** DD-MFA-1 resolved: tenant-scoped trust via server-canonical cookie. See `audits/mfa-trusted-device-audit.md`.
 
 > **⚠️ Codex Cluster Triage (2026-03-18):** 24 additional findings (BUG-006 through BUG-029) discovered by Codex across 6 clusters: Tenant Admin (C1), Account Management (C2), Participant/Session (C3), Billing/Stripe (C4), Entitlement/Access (C5), Games Catalog (C6). 11 of 29 total findings independently verified by Claude; remaining 18 marked "VERIFIED (Codex)" — high confidence based on code proof but not yet re-verified. All 29 findings triaged into 8 root-cause families and 3 remediation waves. **No implementation started.** See:
 > - `audits/post-launch-cluster-triage.md` — master triage table + root-cause families + wave assignments
@@ -239,7 +252,7 @@ Order of audits to execute. Each audit follows the cycle: **Audit → Implement 
 | 22 | React Server/Client Boundary | 'use client' boundaries, hydration mismatches, RSC data flow | ✅ Complete — 7 findings (0 P0, 0 P1, 3 P2, 4 P3). GPT-calibrated. No launch remediation needed. | `audits/react-boundary-audit.md` |
 | 23 | Migration Safety | 330+ migrations, rollback strategy, destructive DDL, data backfill | ✅ Complete — 14 findings (0 P0, 1 P1, 9 P2, 4 P3). GPT-calibrated. | `audits/migration-safety-audit.md` |
 | 24 | Demo | Ephemeral users, demo sessions, feature gating, conversion tracking, cleanup, abuse tolerance | ✅ Complete — 18 findings (0 P0, 3 P1, 10 P2, 5 P3). Own domain per GPT directive. | `audits/demo-audit.md` |
-| 25 | MFA & Trusted Devices | MFA admin listing, admin reset, trusted device trust/verify/revoke, tenant isolation | 🟡 Audit complete, remediation pending — 5 findings (2 P0, 2 P1, 1 P2). Codex discovery, Claude verification. | `audits/mfa-trusted-device-audit.md` |
+| 25 | MFA & Trusted Devices | MFA admin listing, admin reset, trusted device trust/verify/revoke, tenant isolation | ✅ Audit complete, remediation executed — 5 findings (2 P0, 2 P1, 1 P2), all closed by 2026-03-22. Codex discovery, Claude verification. | `audits/mfa-trusted-device-audit.md` |
 | 26 | Codex Cluster Triage | Cross-domain findings from Codex static analysis — admin, accounts, participants, billing, games | 🟡 Triage complete, remediation pending — 24 findings (0 P0, 21 P1, 3 P2) across 6 clusters, 8 root-cause families, 3 waves. | `audits/post-launch-cluster-triage.md` |
 
 ### Audit Cycle Rule
@@ -1404,6 +1417,13 @@ Before any production deploy, verify:
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-03-22 | Claude | **v2.73 — EXACT MANUAL DASHBOARD VERIFICATION PACKET ADDED.** Expanded `docs/ops/first-deploy-runbook.md` with a concrete manual verification packet for the remaining host/config checks that cannot be proven from repo state alone. The packet now specifies the exact expected Vercel production env values (`APP_ENV=production`, `DEPLOY_TARGET=prod`, `NEXT_PUBLIC_SITE_URL=https://www.lekbanken.no`, production Supabase URL, matching Stripe live webhook secret), the expected Supabase Auth URL configuration (`www` and `demo` callback URLs), the expected Stripe webhook endpoint (`https://www.lekbanken.no/api/billing/webhooks/stripe`), and a fixed result-recording template. This turns the remaining Step 4 config work into a bounded manual checklist instead of an open-ended note. |
+| 2026-03-22 | Claude | **v2.72 — RUNBOOK HOST-DRIFT WARNING ADDED.** Verified again that `https://www.lekbanken.no/api/health` is the live production health surface while `app.lekbanken.no` remains a documented drift point. Updated `docs/ops/first-deploy-runbook.md` with an explicit warning that `app.lekbanken.no` references are historical until the canonical-host decision is made, and changed the runbook’s deploy verification steps to use `https://<actual-production-host>` plus manual dashboard verification for Supabase auth redirects and Stripe webhooks. This avoids operationally unsafe copy-paste while preserving the unresolved owner decision. |
+| 2026-03-22 | Claude | **v2.71 — STEP 4 TRIAGE GATED BY TRAFFIC TRIGGERS.** Updated `next-execution-plan.md` after the first production baseline pass to make the current decision explicit: the system is `healthy but idle`, so no telemetry automation, distributed rate limiter work, or post-launch sprint sequencing is justified yet. Step 4 now stays trigger-gated until there is either non-zero production traffic, a real alert threshold crossing, or an owner-driven host/config decision. The Week 1 manual telemetry success criterion is now marked complete based on the documented baseline pass. |
+| 2026-03-22 | Claude | **v2.70 — FIRST PRODUCTION BASELINE PASS RECORDED.** Executed the first read-only Observe Mode baseline pass against production. Verified via authenticated `vercel curl` that `/api/health` returns `ok` with `deployTarget=prod`, `appEnv=production`, and `supabaseProjectRef=qohhnufxididbmzqnjwg`. Queried S1-S4 directly in production Supabase plus `error_tracking` for S5: sessions created 1h/24h = 0/0, joins 1h/24h = 0/0, active sessions/live participants = 0/0, economy activity 1h = 0, achievements 1h = 0, and no session/join/error anomalies recorded in the last 24h. Interpretation: production currently appears healthy but idle; no alert thresholds crossed. Remaining gap: `/api/readiness` and `/api/system/metrics` still require app-level `system_admin` auth for a richer follow-up pass. |
+| 2026-03-22 | Claude | **v2.69 — PRODUCTION ENDPOINT ACCESS VERIFIED FOR OBSERVE MODE.** Verified the actual production endpoint access path against the current Vercel deployment using authenticated `vercel curl`. `/api/health` returned `{"status":"ok","environment":{"deployTarget":"prod","appEnv":"production","supabaseProjectRef":"qohhnufxididbmzqnjwg"}}`, confirming the live site is wired to the documented production Supabase project. `/api/readiness` returned `401 Unauthorized` without app-level `system_admin` auth, which matches the route contract. Updated `docs/ops/production-signals-dashboard.md` to document the required Vercel-authenticated access method and the expected auth split between `/api/health` and `/api/readiness`. |
+| 2026-03-22 | Claude | **v2.68 — OBSERVE MODE BASELINE CAPTURE TEMPLATE.** Added a concrete Week 1 baseline capture template to `docs/ops/production-signals-dashboard.md` so the first manual telemetry pass has a single recording format for readiness, S1-S5 metrics, alert evaluation, and the automation decision. Documentation-only update. |
+| 2026-03-22 | Claude | **v2.67 — EXECUTION PLAN SHARPENING FOR OBSERVE MODE.** Documentation-only update after local baseline verification. `next-execution-plan.md` now reflects that residual SSoT cleanup is effectively complete for this cycle, Step 1 CI evidence is anchored to the 6 active GitHub workflows (`validate`, `unit-tests`, `typecheck`, `rls-tests`, `i18n-audit`, `baseline-check`), and Step 3 gained a concrete Week 1 manual run order tied to `launch-telemetry-pack.md`, `production-signals-dashboard.md`, and `anomaly-detection-playbook.md`. No code or infrastructure changes. |
 | 2026-03-15 | Claude | **v2.66 — SECURITY P1 VERIFICATION ROUND + SIGN-OFF.** GPT-requested critical review of all 12 security P1 fixes. Automated verification scripts confirmed: ABUSE-003 (12/12 MFA routes rate-limited ✅), ABUSE-004 (chat+signals ✅), UPLOAD-001 (14 MIME types ✅), UPLOAD-003 (quota enforcement ✅), LEAK-002/003 (0 `select(*)` in 6 files ✅), ENUM-001 (strict tier ✅), ENUM-002 (uniform errors ✅). **Found 2 real issues:** (1) LEAK-001 incomplete — 4 `coinError.message`/`insertError.message` leaks remaining in `gamification/events/route.ts` → fixed with `console.error` preserved. (2) ENUM-002 frontend breakage — `app/participants/join/page.tsx` checked old error strings (`'Session is full'`, `'Session is locked'`, `SESSION_OFFLINE`, status 410) that API no longer returns → updated to `code`-based checks (`SESSION_FULL`+403, else 404). Added §10 Final Sign-Off with verification results table, found/fixed deviations, documented post-launch debt (i18n fallbacks, admin error.message, quota race condition), and 14-item pre-launch smoke test checklist. Section numbering updated (§11-§17). `tsc --noEmit` = 0 errors. |
 | 2026-03-15 | Claude | **v2.65 — SSoT RECONCILIATION MICRO-PASS (GPT feedback).** Three stale headers fixed: (1) launch-control.md Current Phase: "Phase 3+4 COMPLETE" → "Post-launch Observe Mode. All phases complete (Phase 2 formal execution skipped; Phase 6 deferred). Awaiting production traffic data." (2) architecture.md status: "Environment isolation and test foundation still proposed" → "Environment isolation implemented (local Docker + staging Supabase). Test foundation exists ad-hoc." (3) implementation-plan.md Phase 3 gate: "Alla 8 cross-cutting audits klara (6 genomförda + 6 deferred)" → "Cross-cutting audit scope tillräckligt täckt för launch (6 genomförda, 2 deferred med acceptabel täckning via domänaudits)." Documentation-only — no code changes. |
 | 2026-03-15 | Claude | **v2.64 — SSoT RECONCILIATION.** Documentation-only update — no code changes. Phase 5: ⏭️ Deferred → ✅ Complete (16/16 regressions + 4 L2 audits all passed inline). Phase 2: ⏭️ Skipped → 🟡 "Formal execution skipped; ad-hoc test assets and CI coverage exist." Phase 1B: sub-items updated to reflect actual completion (ADR-005 Alt B, 7/8 tasks done). Wrapper coverage: 247/287→253/288 (87.8%), 360/408→369/410 (90.0%). Architecture §2 environment table: dev/preview ⚠️ → ✅ isolated. Architecture §6 observability: "Okänt" → documented (telemetry pack + incident playbook). All stale references updated across all 3 SSoT docs. Changelog entries left as historical records. |

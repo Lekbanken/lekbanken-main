@@ -1,7 +1,14 @@
 # Implementation Log: Achievements Admin Phase 1
 
-**Started**: 2026-01-10
-**Status**: ✅ Complete
+## Metadata
+- Status: archived
+- Date: 2026-01-10
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: gamification
+- Scope: Archived achievements admin phase 1 log
+
+Historical implementation log retained for provenance. Current guidance should come from active gamification docs, not this archived phase record.
 
 ---
 

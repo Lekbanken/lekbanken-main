@@ -1,8 +1,17 @@
 # Metadata Contract Map
 
-> **Syfte**: Dokumentera exakt vilka metadata-keys Play faktiskt läser per `artifact_type`.  
-> **Policy**: Endast evidens från kod. Inga gissningar.  
-> **Datum**: 2025-01-27
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Frozen evidence-based metadata contract map. The canonical active interpretation lives in `BUILDER_METADATA_CONTRACT_CANONICAL.md`, but this file remains useful as raw evidence and comparison material.
+
+**Syfte**: Dokumentera exakt vilka metadata-keys Play faktiskt läser per `artifact_type`.  
+**Policy**: Endast evidens från kod. Inga gissningar.
 
 ---
 

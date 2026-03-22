@@ -1,4 +1,14 @@
-# Media Domain – Quick Start Guide
+# Media Domain Quick Start Guide
+
+## Metadata
+- Status: archived
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: media
+- Scope: Archived media domain quickstart
+
+Historical quickstart retained for provenance. Use current media and database workflow docs instead of this archived guide for live setup steps.
 
 ## 🚀 Execute Migrations
 

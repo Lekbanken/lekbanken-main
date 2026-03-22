@@ -1,5 +1,15 @@
 # Platform Operations & Enterprise Readiness — Audit
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active operational-readiness audit for the platform-operations workstream. Use `launch-readiness/launch-control.md` for the current program state and read this together with `platform-operations-architecture.md` and `platform-operations-implementation-plan.md` as one bounded operating-model set.
+
 > **Status:** Code-Verified Audit  
 > **Date:** 2026-03-15  
 > **Author:** Claude Opus 4.6  

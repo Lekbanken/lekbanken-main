@@ -2,6 +2,16 @@
 
 > Generated 2026-03-16. For AI coding agents working in this repo.
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-16
+
+> Frozen agent-risk snapshot. Use `.github/copilot-instructions.md`, `REPO_GOVERNANCE.md`, and `docs/DOCUMENTATION_STANDARD.md` as the current source of working rules.
+
 ---
 
 ## Canonical Doc Entrypoint — Agent Start Path

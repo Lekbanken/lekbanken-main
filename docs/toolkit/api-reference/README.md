@@ -1,5 +1,17 @@
 # API Reference
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft public API reference for the toolkit surface. Treat it as narrative product/API documentation, not as a verified contract without runtime validation.
+
+**Related:** [README.md](../README.md) · [README.md](../developer-guide/README.md)
+
 This document describes the public API for the Legendary Escape Room Toolkit.
 
 ## Base URL

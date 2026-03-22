@@ -1,4 +1,15 @@
 # Lekbanken Demo-läge - Nulägesrapport
+
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the demo domain current-state assessment during the 2026-01 implementation cycle.
+
 **Datum:** 2026-01-28
 **Version:** 2.0
 **Status:** Fas 2 - Implementation ~85% Komplett

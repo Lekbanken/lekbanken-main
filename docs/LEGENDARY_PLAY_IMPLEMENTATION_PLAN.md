@@ -1,5 +1,15 @@
 # 🚀 Legendary Play – Implementation Plan
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-24
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical implementation-plan snapshot for the original Legendary Play rollout phases, sprint breakdown, and MVP-to-Phase-2 roadmap.
+
 > MVP & Phase 2 Roadmap  
 > Version 1.0 | December 2024
 

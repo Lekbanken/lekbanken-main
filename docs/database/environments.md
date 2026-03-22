@@ -1,5 +1,15 @@
 # Database Environments
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-16
+
+> Canonical environment reference for local, sandbox, and production database targeting. This is the first database doc to read before any migration or environment-sensitive work.
+
 ## Overview
 
 | Environment | Supabase Project | Ref ID | Purpose |
@@ -10,6 +20,8 @@
 | **Legacy** | Lekbanken Projekt | `zaufhdwajplipthjicts` | Original project, not in active use |
 
 > **Note:** Staging was previously a Supabase Branch (`cxkfcqyasszjmxvvhkxt`). It was deleted 2026-03-17 because it referenced a non-existent `staging` git branch. Recreate when a real staging git branch exists on origin.
+
+**See also:** [../DEVELOPER_SETUP.md](../DEVELOPER_SETUP.md) for app-level environment naming (`APP_ENV`, `DEPLOY_TARGET`).
 
 ## Git Branch → Database Target
 
@@ -32,13 +44,15 @@ The guardrail script (`scripts/db-push-guard.mjs`) blocks push from non-`main` b
 |----------|----------------|------------|-------------------|------|
 | **Local dev** (default) | Local Supabase (Docker) | Local | Local URL + local anon/service keys | Day-to-day development |
 | **Remote migration op** | — (CLI only, no app) | Production | N/A | `npm run db:push` from `main` |
-| **CI / Vercel preview** | Preview branch DB | Auto | Set by Vercel env vars | PR deploys |
+| **CI / Vercel preview** | Sandbox project (`vmpdejhgpsrfulimsoqn`) | External preview config | Set by Vercel env vars | PR deploys |
 | **Production** | Production DB | Production | Set by Vercel env vars | Live site |
 
 ### Core principle
 
 > **Local development always runs against local Supabase.**
 > Production is reached only through explicit, guarded CLI operations.
+
+Current preview deployments do not rely on a per-PR Supabase branch database. They connect to the sandbox project via Vercel preview environment variables.
 
 ### What this means in practice
 
@@ -72,7 +86,7 @@ The project has Supabase Branching enabled on `lekbanken-main`.
 
 - **Supabase branches must only reference git branches that exist on `origin`.** A branch pointing to a non-existent git ref will fail on every clone attempt.
 - **Persistent `CREATING_PROJECT` or `MIGRATIONS_FAILED` after a config fix should be resolved by recreating the branch**, not by further debugging the stuck instance.
-- Preview branches are automatically created by Supabase when a PR is opened (if the GitHub integration is active).
+- Supabase branches may exist for branch-based experiments, but the current app preview flow does not depend on them.
 
 ### Status (2026-03-17)
 
@@ -89,4 +103,5 @@ The project has Supabase Branching enabled on `lekbanken-main`.
 
 ## Related
 
+- [README.md](README.md) — Database docs index
 - [migration-history.md](migration-history.md) — History normalization log

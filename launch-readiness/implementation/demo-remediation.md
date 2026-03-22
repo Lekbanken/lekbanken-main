@@ -1,9 +1,15 @@
 # Demo Remediation Plan
 
+## Metadata
+
 **Domain:** Demo  
 **Scope:** M1 + M2 — Fix P1 findings from demo-audit.md + follow-up fixes from regression  
 **Date:** 2025-07-14  
-**Status:** M1 ✅ KLAR | M2 ✅ KLAR
+**Last updated:** 2026-03-21  
+**Last validated:** 2026-03-21  
+**Status:** frozen audit  
+**Execution status:** M1 ✅ KLAR | M2 ✅ KLAR  
+**Note:** Frozen remediation record for the completed demo launch-scope work. Use `launch-control.md` for current launch-program state.
 
 ---
 

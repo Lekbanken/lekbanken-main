@@ -1,8 +1,14 @@
 # Alerting
 
-Status: active  
-Owner: Ops/Platform  
-Last validated: 2025-12-17
+## Metadata
+
+- Owner: Ops/Platform
+- Status: active
+- Date: 2025-12-11
+- Last updated: 2026-03-21
+- Last validated: 2025-12-17
+
+> Active runbook for operational alert routing, thresholds, and response mapping. Verify external alert destinations separately from repo-traceable signals.
 
 ## Related code (source of truth)
 

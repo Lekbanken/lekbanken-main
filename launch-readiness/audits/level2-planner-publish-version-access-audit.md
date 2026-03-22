@@ -1,5 +1,15 @@
 # Level 2 Audit — Planner Publish / Progress / Version / Access Chain
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed level-2 audit for the planner publish, progress, version, and access chain. Use this as a bounded building-block verification snapshot rather than an active operating guide.
+
 > **Audit type:** Level 2 Building Block Audit (per §7 audit-program.md)  
 > **Date:** 2026-03-15  
 > **Auditor:** Claude  

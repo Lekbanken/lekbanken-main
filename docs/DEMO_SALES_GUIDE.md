@@ -1,5 +1,15 @@
 # 📋 Demo Mode - Säljarguide
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft internal sales guide for demo mode, premium demo sharing, and sales follow-up workflows.
+
 **Dokument:** Intern guide för säljteamet
 **Version:** 1.0
 **Senast uppdaterad:** 2026-01-13

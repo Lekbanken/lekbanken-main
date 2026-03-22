@@ -1,11 +1,21 @@
 # GameDetails Context Audit
 
-> **Datum:** 2026-03-10  
-> **Version:** 2.0 (evidence-driven rewrite)  
-> **Scope:** All contexts consuming game data — display, play, board, sandbox  
-> **Method:** Code inspection with exact file/line references  
-> **Status:** ✅ **STÄNGD (2026-03-10)** — All identified preview-context exposures fixed  
-> **Fixade findings:** F1, F3, F4, F5 (Block 1), F8/F8b (Block 3), F7 (Option B) — F12 partially addressed
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-10
+- Last updated: 2026-03-21
+- Last validated: 2026-03-10
+
+> Closed audit snapshot for GameDetails context exposure and sanitization work. Use it as verified historical reality at the audit point, not as a live status doc without revalidation.
+
+**Version:** 2.0 (evidence-driven rewrite)  
+**Scope:** All contexts consuming game data — display, play, board, sandbox  
+**Method:** Code inspection with exact file/line references  
+**Execution status:** ✅ **STÄNGD (2026-03-10)** — All identified preview-context exposures fixed  
+**Canonical entrypoint:** `docs/games/README.md`  
+**Fixade findings:** F1, F3, F4, F5 (Block 1), F8/F8b (Block 3), F7 (Option B) — F12 partially addressed
 
 ---
 

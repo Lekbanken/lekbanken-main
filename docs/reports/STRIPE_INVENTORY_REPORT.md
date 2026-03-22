@@ -1,4 +1,15 @@
 # STRIPE INTEGRATION - INVENTERINGSRAPPORT
+
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk inventeringsrapport för Stripe-integrationen. Behåll som tidigare nulägesbild, inte som aktuell integrationsoöversikt.
+
 *Datum: 2025-12-10*
 
 ## ✅ VAD SOM FINNS IMPLEMENTERAT

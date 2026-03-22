@@ -1,5 +1,15 @@
 # Enterprise Translation / i18n Architecture Analysis
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-11
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical Phase 0 analysis for the enterprise translation and i18n admin architecture.
+
 > **Phase 0: Architecture & Reality Analysis — Translation / i18n Admin**  
 > **Date:** 2026-01-11  
 > **Status:** ANALYSIS ONLY — No implementation  

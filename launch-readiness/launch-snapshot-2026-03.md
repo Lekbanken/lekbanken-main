@@ -1,8 +1,22 @@
 # Lekbanken Launch Freeze Snapshot
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Frozen point-in-time launch snapshot. Do not treat metrics or configuration details here as current operational truth without revalidation.
+
 > **Date:** 2026-03-12  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** frozen audit  
 > **Author:** Claude (automated) + GPT (calibration)  
 > **Purpose:** Exact system state at launch decision. Reference point for post-launch analysis.  
+> **Note:** Frozen point-in-time launch snapshot. Do not treat metrics or configuration details here as current operational truth without revalidation.
 
 ---
 

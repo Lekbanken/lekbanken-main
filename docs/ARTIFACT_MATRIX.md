@@ -4,8 +4,17 @@
 > Rows = artifact types. Columns = requirements.
 > ✅ = implemented, 🔲 = needed but missing, ➖ = not applicable, 🟡 = partial.
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-02-27
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft coverage matrix for artifact capabilities and implementation gaps across director and participant flows.
+
 **Version:** 1.0
-**Datum:** 2026-02-23
 
 ---
 

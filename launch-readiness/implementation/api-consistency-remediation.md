@@ -1,9 +1,24 @@
 # API Consistency Remediation Plan
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-13
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Historical snapshot of the executed API consistency remediation work. Use `launch-readiness/implementation/README.md` as the implementation entrypoint, `launch-readiness/audits/api-consistency-audit.md` for the bounded findings snapshot, and `launch-readiness/launch-control.md` for the current program status.
+
 > **Date:** 2026-03-10  
+> **Last updated:** 2026-03-22  
+> **Last validated:** 2026-03-22  
+> **Status:** historical snapshot  
 > **Source:** `audits/api-consistency-audit.md` — 14 findings (0 P0, 4 P1, 7 P2, 3 P3)  
 > **Scope:** P1 fixes, P2 fixes, wrapper migration batches, verification strategy  
-> **Goal:** Turn audit findings into actionable batches grouped by root cause and risk
+> **Goal:** Turn audit findings into actionable batches grouped by root cause and risk  
+> **Execution status:** Launch-scope remediation executed — Batches 1-6d are complete; Batch 7 remains intentionally deferred to per-domain audits and post-launch convergence.  
+> **Note:** Executed implementation record. Use `launch-control.md` for current launch-program status and this file for the bounded remediation history below.
 
 ---
 
@@ -1039,14 +1054,14 @@ Batch 7: Mixed/public/special-case (47 routes)       ⬜ Per domain audit
 | 5c — `resolveSessionViewer` | 3 | 75.6% | ✅ KLAR (2026-03-11) | — |
 | 5d — `inline:getUser` stragglers | 6 | 77.7% | ✅ KLAR (2026-03-11) | — |
 | 6 — Participant-token | 10 | 81.2% (6d) | ✅ KLAR | APC-009 |
-| 7 — Mixed/public/special-case | 47 | — | Per domain audit | — |
+| 7 — Mixed/public/special-case | 47 | — | Deferred to per-domain audits | — |
 | Remove | 3 | — | Caller verification | APC-012 |
 
-> **Coverage note:** Previous per-batch “Coverage After” percentages (15.0%…53.0%) were rolling-sum estimates. Canonical coverage is code-scanned (`.NET ReadAllText`): **229/287 files (79.8%)**, **338/408 handlers (82.8%)**. See `launch-control.md` for methodology.
+> **Coverage note:** Previous per-batch “Coverage After” percentages (15.0%…53.0%) were rolling-sum estimates. Canonical coverage, verified against current launch-control state, is **253/288 files (87.8%)**, **369/410 handlers (90.0%)** after Batches 1-6d.
 
 **APC-001 (error format):** Resolved progressively — each batch converges more routes to canonical shape.
 
-**Immediate next step:** Batch 7 — 47 mixed/public/special-case routes. Addressed per domain audit. Next major focus: Play Runtime audit (#6) + Sessions/Participants audit.
+**Remaining follow-up:** Batch 7 stays deferred to per-domain audits and post-launch convergence work. This file is no longer the active driver for execution sequencing.
 
 **Batch 6b notes:** 2 files migrated, 2 handlers wrapped. **Transport fix:** `participant_token` removed from request body — now via `x-participant-token` header (DD-2 standard). Client hooks updated: `useParticipantProgress.ts`, `useAchievementUnlock.ts` (both send token in header, body contains only business fields). Routes: participants/progress/update (POST), participants/progress/unlock-achievement (POST). Per-route verification:
 

@@ -1,5 +1,15 @@
 # Phase 2 Validation Plan - Legal System
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-11
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft validation plan for legal-system phase 2 covering publish, acceptance, RLS, and locale fallback behavior.
+
 Date: 2026-01-13  
 Scope: Legal system Phase 2 (draft/publish, admin hub/editor, tenant scope, audit)  
 Goal: Prove correctness, security, and tenant scoping before moving forward.

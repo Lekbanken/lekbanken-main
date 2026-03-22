@@ -1,5 +1,15 @@
 # VALIDATION CHECKLIST – Quality Gates for All Phases
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft quality-gate checklist template for validation and refactoring phases. Use it as a reusable checklist scaffold, not as proof that a current workstream passed review.
+
 **Purpose:** Ensure consistent quality standards across all validation and refactoring work.
 
 ---

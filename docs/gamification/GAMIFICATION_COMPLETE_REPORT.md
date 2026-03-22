@@ -1,8 +1,17 @@
 # Gamification System - Complete Implementation Report
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Historical implementation snapshot for the v2 gamification rollout. Keep for architecture and migration history, not as the current operating guide.
+
 **Project:** Lekbanken  
-**Date:** January 8, 2026  
-**Status:** ✅ Core Implementation Complete  
+**Execution status:** ✅ Core Implementation Complete  
 **Classification:** 🔒 Economy-Critical System (v2 Frozen)
 
 > ⚠️ **Governance:** See [ECONOMY_GOVERNANCE.md](ECONOMY_GOVERNANCE.md) for operational rules, change procedures, and KPI monitoring.

@@ -1,8 +1,17 @@
 # 🚀 Browse Scaling Implementation Plan
 
-> **Datum:** 2026-01-30  
-> **Status:** Audit Complete, Ready for Implementation  
-> **Prioritet:** Kritisk – Blockerande för import av 150+ lekar
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-01-30
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived browse-scaling implementation plan. Keep as historical performance/scaling planning context rather than as an active roadmap.
+
+**Status vid arkivering:** Audit Complete, Ready for Implementation  
+**Prioritet:** Kritisk – Blockerande för import av 150+ lekar
 
 ---
 

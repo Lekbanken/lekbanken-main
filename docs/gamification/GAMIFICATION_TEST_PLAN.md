@@ -1,8 +1,17 @@
 # LEKBANKEN — GAMIFICATION TEST PLAN
 
-**Datum:** 2026-01-08  
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Utkast till teststrategi och testfall. Detta är inte ett bevis på att testerna nedan finns implementerade eller körda.
+
 **Syfte:** Test cases, sprint breakdown, and acceptance criteria for gamification system  
-**Status:** Active Development
+**Exekveringsstatus:** Active Development
 
 ---
 

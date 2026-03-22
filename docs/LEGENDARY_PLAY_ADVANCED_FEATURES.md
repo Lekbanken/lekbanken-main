@@ -1,5 +1,15 @@
 # 🎮 Legendary Play – Advanced Gameplay & Immersion Features
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-24
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft UX/spec document for advanced Legendary Play immersion features such as typewriter reveal, keypad puzzles, triggers, lobby redesign, and countdown overlays.
+
 > UX Specification & System Design  
 > Version 1.0 | December 2024
 

@@ -1,9 +1,14 @@
 # Notifications Architecture
 
-**Date:** 2026-03-16  
-**Updated:** 2026-03-17 — Sharpened after second verification pass  
-**Scope:** Canonical architecture for the Notifications domain in Lekbanken  
-**Approach:** Minimal-invasion design that formalises the existing architecture rather than proposing a rewrite
+## Metadata
+- Status: archived
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: notifications
+- Scope: Archived notifications architecture draft
+
+Superseded architecture snapshot retained for provenance. Use the active notifications architecture instead of this archived draft for current design decisions.
 
 ---
 

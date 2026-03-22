@@ -1,5 +1,15 @@
 # Produktsynkronisering med Stripe - Implementeringsplan
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk implementeringsplan för Stripe-produktsynk. Behåll som genomförandehistorik, inte som aktiv plan utan ny verifiering.
+
 **Datum:** 2026-01-08  
 **Baserat på:** [PRODUCT_STRIPE_SYNC_PLAN.md](./PRODUCT_STRIPE_SYNC_PLAN.md)  
 **Uppskattad tid:** 30-46 timmar  

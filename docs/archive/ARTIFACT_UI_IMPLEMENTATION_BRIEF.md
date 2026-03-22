@@ -1,9 +1,19 @@
 # Artifact UI — Implementation Brief
 
-> Claude's contract. One file, one truth.
-> Read this FIRST. Reference `ARTIFACT_COMPONENTS.md` for detailed props/specs.
-> Reference `ARTIFACT_MATRIX.md` for coverage verification.
-> Reference `ARTIFACT_UI_CONTRACT.md` for data model and state machine.
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-02-27
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived execution brief for an earlier artifact UI implementation pass. Keep as historical implementation context, not as an active UI contract.
+
+Claude's contract. One file, one truth.
+Read this FIRST. Reference `ARTIFACT_COMPONENTS.md` for detailed props/specs.
+Reference `ARTIFACT_MATRIX.md` for coverage verification.
+Reference `ARTIFACT_UI_CONTRACT.md` for data model and state machine.
 
 **Version:** 1.0
 **Datum:** 2026-02-23

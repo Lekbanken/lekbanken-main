@@ -1,8 +1,17 @@
 # Gamification — DiceCoin Reconciliation Runbook (Wallet vs Ledger)
 
-Last updated: 2026-01-01
-Audience: Ops / Engineering
-Scope: `user_coins` (wallet materialization) vs `coin_transactions` (append-only ledger)
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-01
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active runbook for investigating and correcting wallet-versus-ledger mismatches. Verify query compatibility against the current schema before incident use.
+
+**Audience:** Ops / Engineering
+**Scope:** `user_coins` (wallet materialization) vs `coin_transactions` (append-only ledger)
 
 ## Goal
 - Detect and correct inconsistencies between `public.user_coins.balance` and the balance implied by `public.coin_transactions`.

@@ -1,5 +1,13 @@
 # Developer Guardrails
 
+## Metadata
+- Status: active
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: repo-governance
+- Scope: Local git-hook quality guardrails
+
 Lekbanken använder tre nivåer av kvalitetskontroll — **lokalt innan commit, lokalt innan push, och i GitHub Actions på PR**. Målet: **fel ska fångas innan de når main**.
 
 ## Nivåmodell

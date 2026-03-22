@@ -1,5 +1,13 @@
 # Supabase Security & Performance Advisor - Verifieringsprompt
 
+## Metadata
+
+> **Status:** active
+> **Owner:** -
+> **Date:** 2026-01-07
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+
 ## Bakgrund
 
 Vi har applicerat migrationer 010-022 för att åtgärda säkerhets- och prestandavarningar från Supabase Performance Advisor. Nu behöver vi verifiera att alla åtgärder fungerat och identifiera eventuella kvarvarande problem.

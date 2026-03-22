@@ -1,8 +1,17 @@
 # Journey v2.0 — Implementationsplan
 
-> **Datum:** 2026-03-06 (rev 3)  
-> **Status:** ✅ Steg 1–8 implementerade. Commit `40dba3b` pushed to main.  
-> **Beroende av:** `Journey_v2_Audit.md`, `Journey_v2_Architecture.md`
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-03-06
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived implementation plan from the superseded Journey v2 workstream. Keep as execution history rather than as an active plan.
+
+**Status vid arkivering:** ✅ Steg 1–8 implementerade. Commit `40dba3b` pushed to main.  
+**Beroende av:** `Journey_v2_Audit.md`, `Journey_v2_Architecture.md`
 
 ---
 

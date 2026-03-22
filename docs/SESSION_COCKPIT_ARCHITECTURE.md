@@ -1,6 +1,16 @@
 # 🎮 LEKBANKEN SESSION COCKPIT ARCHITECTURE
 ## Unified Design & Implementation Plan
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the session cockpit architecture and implementation plan from the 2025-12 control-surface work.
+
 **Version**: 1.1  
 **Created**: 2025-12-28  
 **Updated**: 2025-12-28  

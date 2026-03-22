@@ -1,5 +1,15 @@
 # Artefakter & Triggers V2: Implementeringsplan
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-25
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the completed Artifacts + Triggers V2 implementation plan and execution record.
+
 > **Status**: ✅ Klar  
 > **Skapad**: 2026-01-25  
 > **Senast uppdaterad**: 2026-01-25 (Artifacts + Triggers V2 klara)

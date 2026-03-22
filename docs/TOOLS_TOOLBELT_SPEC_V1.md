@@ -2,8 +2,13 @@
 
 ## Metadata
 
+- Owner: -
 - Status: draft
+- Date: 2026-01-02
+- Last updated: 2026-03-21
 - Last validated: 2026-01-02
+
+> Draft UX specification for Toolbelt v1 and the Dice Roller MVP behavior across Admin and Play.
 
 ## Purpose
 

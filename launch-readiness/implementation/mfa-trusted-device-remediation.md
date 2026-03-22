@@ -1,9 +1,15 @@
 # MFA Stabilization Brief
 
-> **Status:** PARTIALLY COMPLETE — MFA-001, MFA-002, MFA-004, MFA-005 fixed on 2026-03-19; MFA-003 remains open  
-> **Created:** 2026-03-18  
+## Metadata
+
+> **Date:** 2026-03-18  
+> **Last updated:** 2026-03-22  
+> **Last validated:** 2026-03-22  
+> **Status:** active  
+> **Execution status:** COMPLETE — MFA-001/002/004/005 fixed by 2026-03-19; MFA-003 fixed on 2026-03-22  
 > **Audit:** `audits/mfa-trusted-device-audit.md`  
 > **Findings:** 5 (2 P0, 2 P1, 1 P2) — all verified against code + generated types + live DB schema  
+> **Note:** Executed remediation record. Use `launch-control.md` for overall launch-program state and this file for MFA remediation specifics.
 
 ---
 
@@ -15,13 +21,15 @@
 | MFA-005 | **P0** | `verifyTrustedDevice()` missing `tenant_id` filter → cross-tenant MFA bypass; admin reset deletes across all tenants | **✅ FIXED (2026-03-19)** |
 | MFA-001 | **P1** | `profiles!inner(email, display_name)` join — no `profiles` relation exists on `user_tenant_memberships` → entire endpoint returns 400 | **✅ FIXED (2026-03-19)** |
 | MFA-002 | **P1** | `.eq('is_active', true)` — column is `is_revoked`, not `is_active` → trusted device count query returns 400 | **✅ FIXED (2026-03-19)** |
-| MFA-003 | **P2** | Status filter applied JS-side after DB `.range()` pagination → inconsistent page sizes when filtering | **OPEN — Wave 3 / follow-up** |
+| MFA-003 | **P2** | Status filter applied JS-side after DB `.range()` pagination → inconsistent page sizes when filtering | **✅ FIXED (2026-03-22)** |
 
-**Implemented summary (2026-03-19):**
+**Implemented summary (2026-03-22):**
 - `trustDevice()` now requires explicit canonical `tenant_id`; fallback membership and placeholder-UUID resolution removed.
 - MFA trust/verify routes read tenant context from the signed tenant cookie only.
 - Admin MFA user listing now uses the real `users` relation and `is_revoked = false` for active-device counts.
-- Remaining work is isolated to pagination/filter ordering in the admin MFA users list.
+- Admin MFA user listing now applies computed MFA-status filtering before pagination, so `users`, `total`, and `totalPages` stay correct for filtered views.
+
+**Execution note (2026-03-22):** M3 is implemented in code. `app/api/admin/tenant/[tenantId]/mfa/users/route.ts` no longer paginates before computed MFA-status filtering. The local `as unknown as MFAUserRow[]` cast remains as separate type-safety debt outside the closed audit findings.
 
 ---
 
@@ -84,7 +92,7 @@ Rationale:
 | **M1a** — Fix `user_mfa` field names + error handling | MFA-004 | **DONE** | Closed 2026-03-18. |
 | **M2a** — Fix `profiles` join | MFA-001 | **DONE** | Closed 2026-03-19. |
 | **M2b** — Fix `is_active` column | MFA-002 | **DONE** | Closed 2026-03-19. |
-| **M3** — Fix pagination logic | MFA-003 | **YES** | Logic bug independent of any contract decision. |
+| **M3** — Fix pagination logic | MFA-003 | **DONE — ✅ KLAR (2026-03-22)** | Route now computes MFA status for the full result set, applies `statusFilter`, then paginates the filtered list. |
 
 ## 4. Requires-Decision Items
 
@@ -138,7 +146,7 @@ Rationale:
 - GET to `/api/admin/tenant/{tid}/mfa/users` with valid admin auth → returns user list with email and display_name
 - Trusted device counts > 0 for users with active (non-revoked, non-expired) devices
 
-### Step 3: M3 — Fix pagination (MFA-003) ← EXECUTE NOW (bundle with Step 2)
+### Step 3: M3 — Fix pagination (MFA-003) ✅ EXECUTED (2026-03-22)
 
 **File:** `app/api/admin/tenant/[tenantId]/mfa/users/route.ts`
 
@@ -155,6 +163,8 @@ Rationale:
 **Regression checks:**
 - GET with `?status=enabled&page=1&pageSize=5` → returns exactly 5 (or fewer if < 5 match), correct `total` and `totalPages`
 - GET with `?status=all` → same behavior as before (all users, correct pagination)
+
+**Current status (2026-03-22):** Executed. The route fetches all search-matching members, computes MFA status for the full set, filters by `status`, then slices the filtered array for pagination.
 
 ### Step 4: M1b — Tenant-scope trusted device verification (MFA-005) ← AFTER DD-MFA-1
 
@@ -185,7 +195,7 @@ Rationale:
 
 | Check | Covers | Method |
 |-------|--------|--------|
-| `npx tsc --noEmit` | Type safety restored (no more `as unknown` casts in fixed files) | Automated |
+| `npx tsc --noEmit` | Type safety preserved for the touched route and MFA handlers | Automated |
 | Admin MFA users list | MFA-001, MFA-002, MFA-003 | Manual: GET endpoint returns data, correct pagination, device counts |
 | Admin MFA reset | MFA-004 | Manual: POST clears `user_mfa` row, returns failure on DB error |
 | Trusted device verify | MFA-005 (after DD-MFA-1) | Manual: verify respects tenant scope |
@@ -199,6 +209,6 @@ Rationale:
 | File | Step | Changes |
 |------|------|---------|
 | `app/api/admin/tenant/[tenantId]/mfa/users/[userId]/reset/route.ts` | 1, 4 | Fix field names + error handling (Step 1), scope delete to tenant (Step 4) |
-| `app/api/admin/tenant/[tenantId]/mfa/users/route.ts` | 2, 3 | Fix join + column + pagination |
+| `app/api/admin/tenant/[tenantId]/mfa/users/route.ts` | 2, 3 | Fix join + column + pagination complete (2026-03-22) |
 | `lib/services/mfa/mfaDevices.server.ts` | 4 | Add `tenant_id` to verify |
 | `app/api/accounts/auth/mfa/devices/verify/route.ts` | 4 | Accept + pass `tenant_id` |

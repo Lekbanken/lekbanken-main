@@ -1,5 +1,13 @@
 # Task 9: Live Progress Tracking
 
+## Metadata
+
+> **Status:** draft
+> **Owner:** -
+> **Date:** 2025-12-10
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+
 Real-time game progress synchronization, achievement unlocking, and live statistics dashboard for participant sessions.
 
 ## Features

@@ -4,6 +4,16 @@
 > **Skapad:** 2025-12-26  
 > **Syfte:** Systematisk verifiering av JSON-import för Legendary Play
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2025-12-26
+- Last updated: 2026-03-21
+- Last validated: 2025-12-26
+
+> Canonical builder/import entrypoint: `docs/builder/README.md`
+
 ---
 
 ## Förutsättningar

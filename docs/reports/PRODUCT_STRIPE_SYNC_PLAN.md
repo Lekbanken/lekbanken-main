@@ -1,5 +1,15 @@
 # Produktsynkronisering med Stripe - Teknisk Plan
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk teknisk plan för Stripe-produktsynk. Använd som tidigare beslutsunderlag, inte som aktiv canonical billing-plan.
+
 **Datum:** 2026-01-08  
 **Status:** Granskad och godkänd  
 **Målgrupp:** Utvecklare  

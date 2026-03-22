@@ -1,9 +1,18 @@
 # Journey v2.0 — Final Architecture Review
 
-> **Datum:** 2026-03-06  
-> **Granskare:** Claude (architecture verification)  
-> **Granskade dokument:** `Journey_v2_Audit.md`, `Journey_v2_Architecture.md`, `Journey_v2_ImplementationPlan.md` (alla rev 2)  
-> **Syfte:** Design freeze review — identifiera blockerande problem, risker och inkonsekvenser innan implementation
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-03-06
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived final review for the superseded Journey v2 design cycle. Keep as review history, not as a current architecture gate.
+
+**Granskare:** Claude (architecture verification)  
+**Granskade dokument:** `Journey_v2_Audit.md`, `Journey_v2_Architecture.md`, `Journey_v2_ImplementationPlan.md` (alla rev 2)  
+**Syfte:** Design freeze review — identifiera blockerande problem, risker och inkonsekvenser innan implementation
 
 ---
 

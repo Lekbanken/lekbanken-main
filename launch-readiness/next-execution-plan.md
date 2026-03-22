@@ -1,11 +1,25 @@
 # Next Execution Plan
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-15
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Active roadmap for the current post-launch execution cycle. `launch-control.md` remains the authoritative tracker for overall launch-program status.
+
 > **Date:** 2026-03-15  
-> **Revised:** 2026-03-15 (post-GPT calibration)  
+> **Last updated:** 2026-03-22  
+> **Last validated:** 2026-03-22  
+> **Status:** active  
+> **Revision baseline:** 2026-03-15 (post-GPT calibration)  
 > **Author:** Claude Opus 4.6  
 > **Based on:** `launch-program-state-analysis.md`, GPT feedback (2 rounds)  
 > **Purpose:** Define the next execution cycle for the Lekbanken launch program.  
-> **Governing principle:** **Observe Mode** — `launch-control.md` states that after v2.25 the system enters Observe Mode. No architectural changes or new implementation before real production traffic has been measured, unless there is a production incident, security vulnerability, or P0 bug. Optimization decisions must be based on measured traffic.
+> **Governing principle:** **Observe Mode** — `launch-control.md` states that after v2.25 the system enters Observe Mode. No architectural changes or new implementation before real production traffic has been measured, unless there is a production incident, security vulnerability, or P0 bug. Optimization decisions must be based on measured traffic.  
+> **Note:** Active roadmap for the current post-launch execution cycle. `launch-control.md` remains the authoritative tracker for overall launch-program status.
 
 ---
 
@@ -15,144 +29,169 @@ The launch program is **post-Phase 7** (launch verdict issued 2026-03-12). The s
 
 Phase status:
 - Phase 0–4: ✅ Complete
-- Phase 5: ✅ Complete in practice (16/16 regressions + 4 L2 audits) — tracking not updated
-- Phase 6: 🟡 Audited but not executed
-- Phase 2: 🟡 Formally skipped — ad-hoc tests exist but unverified
+- Phase 5: ✅ Complete and reflected in current launch docs
+- Phase 6: 🟡 Partially executed — truth-sync done, broader cleanup still deferred
+- Phase 2: 🟡 Formal execution skipped — ad-hoc tests exist; unit baseline verified and local RLS baseline partially verified on 2026-03-22
 - Phase 7: ✅ READY verdict issued with 3 conditions
 
-Remaining work is **verification and alignment**, not new implementation.
+Remaining work is **final Step 1 closure, observe-mode operation, and selective post-launch cleanup** — not new feature implementation.
 
 ---
 
 ## Execution Cycle — 5 Steps
 
-### Step 1 — SSoT Reconciliation
+### Step 1 — Targeted Test Verification
 
-**Goal:** Align launch documents so they reflect actual program state. Remove contradictions that cause AI agent drift.
+**Goal:** Verify that the existing test assets actually pass and establish a baseline that future post-launch work can trust.
+
+**What:**
+
+| Task | Priority | Notes |
+|----------|-----------|
+| 1.1 — Run `npx vitest run` and verify all unit tests pass | P0 | ✅ Verified 2026-03-22: 78 files passed, 2 skipped; 1805 tests passed, 48 skipped |
+| 1.2 — Run local Supabase + RLS tests and verify they pass | P0 | 🟡 Partially verified 2026-03-22: `supabase start` + `npm run db:reset` green; `tests/rls/demo-policies.test.sql` and `supabase/tests/test_tenant_rls_isolation.sql` pass locally; `tests/rls/game-reactions-policies.test.sql` remains a SQL Editor manual script requiring authenticated user context |
+| 1.3 — Run Playwright E2E specs against local dev and document results | P1 | ✅ Verified 2026-03-22: latest full run is **60 passed / 43 skipped / 0 failed**. The remaining 43 are intentionally skipped clusters, not active failures. |
+| 1.4 — Fix broken tests if failures are deterministic and in scope | P1 | ✅ Completed 2026-03-22: fixed deterministic local auth/setup drift, stale profile route assertions, localhost auth-rate-limit collisions, demo local seed mismatch (`DEMO_TENANT_ID` drift in `supabase/seed.sql`), planner setup/navigation drift, share-link route handling, and tenant-admin full-suite timeout behavior. |
+| 1.5 — Verify CI still rejects failures | P1 | CI verification surface confirmed 2026-03-22: `.github/workflows/validate.yml`, `unit-tests.yml`, `typecheck.yml`, `rls-tests.yml`, `i18n-audit.yml`, `baseline-check.yml`. Existing failure-gate evidence is documented; no synthetic failure run performed in this cycle. |
+
+**Why first:** The major SSoT contradictions have now been cleaned up across launch-control, implementation indexes, audits indexes, and docs entrypoints. The next highest-value uncertainty is whether the existing test assets still hold.
+
+**Effort:** Medium.  
+**Risk reduction:** High — establishes a real regression safety net.
+
+---
+
+### Step 2 — Residual SSoT Cleanup
+
+**Goal:** Close the smaller remaining status/document drifts without reopening broad documentation cleanup.
 
 **What:**
 
 | Document | Fix needed |
-|----------|-----------|
-| `launch-readiness-implementation-plan.md` | Mark Phase 5 as ✅ (not ⏭️ Deferred). Update 5.1–5.4 to reflect 16/16 regression + 4 L2 audits complete. Mark Phase 2 as 🟡 "Partial — ad-hoc coverage" (not ⏭️ Skipped). Fix Phase 1B sub-items (1B.1–1B.8) to reflect actual completion. |
-| `launch-control.md` | Update wrapper coverage from 247/287 (86.1%) to 252/288 (87.5%). Reference `system-verification-2026.md` for canonical numbers. Add note about 4 Level 2 audits completing Phase 5 scope. |
-| `launch-readiness-architecture.md` | §2: Update environment diagram (staging Supabase active, local Docker working). §6: Update "Okänt" to reference `launch-telemetry-pack.md`. |
-| `next-phase-execution-plan.md` | Mark as historical context — Phase 1B is done. "Docker not installed" and ".env.local → prod" findings are resolved. |
+|------|----------|-------|
+| `launch-program-state-analysis.md` | Keep residual drift notes aligned with the now-updated implementation and audit indexes |
+| `next-phase-execution-plan.md` | Keep it clearly historical; do not let it re-enter active planning |
+| `launch-readiness-architecture.md` | Verify remaining environment/observability notes only if they still conflict with launch-control |
 
-**Why first:** Every subsequent step depends on agents having an accurate picture. Mischaracterized phases cause agents to re-plan work that's already done.
+**Not in scope:** Broad archive work or a new documentation restructuring pass.
 
-**Effort:** Low (document edits only).  
-**Risk reduction:** Medium — eliminates AI context drift.
+**Why second:** Most high-risk SSoT drift is already fixed. What remains should be cleaned up opportunistically after the test baseline is known.
+
+**Effort:** Low.  
+**Risk reduction:** Medium.
+
+**Status update (2026-03-22):** The high-risk residual drift in `launch-program-state-analysis.md`, `launch-readiness-architecture.md`, and `next-phase-execution-plan.md` has been cleaned up. Step 2 is now effectively complete for this execution cycle; only broader Phase 6 cleanup remains deferred.
 
 ---
 
-### Step 2 — Test Verification (Phase 2 — Targeted)
+### Step 3 — Observe Mode / Production Learning
 
-**Goal:** Verify that existing tests actually pass. Establish a baseline. Do NOT write a full test pyramid — verify what exists first.
+**Goal:** Operate the launched system as designed and collect real production data before making optimization decisions.
 
 **What:**
 
 | Task | Priority | Notes |
 |------|----------|-------|
-| 2.1 — Run `npx vitest run` and verify all 72 unit tests pass | P0 | May need fixture updates after audit-cycle code changes |
-| 2.2 — Run local Supabase + RLS tests and verify they pass | P0 | `supabase db reset` → run RLS test files |
-| 2.3 — Run Playwright E2E specs against local dev and document results | P1 | 12 specs exist — how many actually pass? Record baseline. |
-| 2.4 — Fix broken tests (if any) | P1 | Don't write new tests — fix existing ones first |
-| 2.5 — Verify CI catches failures | P1 | Push a deliberate type error on a branch, confirm CI rejects |
+| 3.1 — Run telemetry-pack signal queries manually against production | P1 | Follow `launch-telemetry-pack.md` v1 design |
+| 3.2 — Document observed baselines | P1 | Session health, join funnel, realtime, economy, error pressure |
+| 3.3 — Verify incident playbook readiness | P1 | Kill-switches, rollback, DSAR manual process |
+| 3.4 — Identify which signals actually justify automation | P2 | Only after real observation |
+| 3.5 — Decide telemetry automation scope if warranted | P2 | Avoid premature endpoint/cron work |
 
-**Not in scope:** Writing new E2E smoke tests. That decision should wait until existing test results are known. If the existing 12 specs mostly pass, new smoke tests are unnecessary.
+**Why third:** Observe Mode is now the real operational posture. Production learning should happen before backlog reprioritization.
 
-**Why second:** Tests provide a harder safety net than documentation changes. Test results are binary and irrefutable. A verified passing suite gives confidence for any subsequent changes — including documentation cleanup.
+**Effort:** Low-Medium.  
+**Risk reduction:** High.
 
-**Effort:** Medium (running tests, debugging failures, fixing fixtures).  
-**Risk reduction:** High — establishes a proven regression safety net.
+**Current status (2026-03-22):** First production baseline pass executed. Observed result so far is `healthy but idle`: `/api/health` returned `ok` on the live production deployment and confirmed `deployTarget=prod`, `appEnv=production`, `supabaseProjectRef=qohhnufxididbmzqnjwg`. Read-only SQL checks for S1-S4 plus `error_tracking` for S5 all returned zero activity in the last 24h and no recorded anomaly pressure. `/api/readiness` and `/api/system/metrics` remain app-authenticated surfaces, so deeper readiness details and API latency still require a real `system_admin` session during a later pass.
+
+#### Step 3a — Week 1 Manual Run Order
+
+Use this exact sequence for the first observe-mode pass:
+
+1. Run the five signal queries from `launch-telemetry-pack.md` and `docs/ops/production-signals-dashboard.md`.
+2. Record the raw baseline values for S1-S5 in a dated ops note or directly in `launch-control.md` changelog if the pass is brief.
+3. Check `/api/readiness` and `/api/health` before interpreting anomalies.
+4. If any threshold is crossed, follow `docs/ops/anomaly-detection-playbook.md` in alert order (A, B, C).
+5. Only after at least one real observation window: decide whether any signal justifies automation, cron, or dashboard work.
+
+**Week 1 output:** one documented baseline pass, one confirmation that the incident playbook is usable, and zero architecture changes unless a real incident or P0 appears.
+
+**Week 1 output status (2026-03-22):** Baseline pass 1 documented with zero observed production traffic, no alert thresholds crossed, and no evidence of infrastructure breakage. One remaining gap for a richer pass is authenticated access to `/api/readiness` and `/api/system/metrics` as a real `system_admin`.
 
 ---
 
-### Step 3 — Minimal Documentation Integrity Fixes
+### Step 4 — Post-Launch Backlog Triage
 
-**Goal:** Fix the 3 dangerous inconsistencies identified in `launch-docs-integrity-audit.md`. Archive only the highest-confidence noise files. Do NOT execute a broad cleanup yet.
+**Goal:** Prioritize the remaining deferred work based on observed production behavior and the verified test baseline.
 
 **What:**
 
 | Task | Priority | Notes |
 |------|----------|-------|
-| 3.1 — Fix the 3 dangerous inconsistencies (Phase 5 label, Phase 1B checkboxes, wrapper numbers) | P0 | Overlaps with Step 1 — verify these are actually fixed |
-| 3.2 — Archive "safe to archive now" files only (~30 highest-confidence root files) | P1 | Exact duplicates, v1 superseded files, completed one-shot prompts. See `launch-docs-integrity-audit.md` addendum §10 for classification. |
-| 3.3 — Verify backlinks before each batch move | P1 | 5-point checklist from `documentation-cleanup-audit.md` |
-| 3.4 — Do NOT archive "probably archivable later" or "keep until verified" files | — | Wait until backlinks and agent workflows are confirmed through real usage |
+| 4.1 — Group P2/P3 findings by business impact | P1 | GDPR, input validation, rate limiting, operational risk |
+| 4.2 — Sequence the first post-launch sprint | P1 | Use production observations and test baseline |
+| 4.3 — Decide SEC-002b timing | P2 | Only after traffic data shows in-memory limits are insufficient |
+| 4.4 — Decide broader docs cleanup scope | P2 | Based on real agent usage after the truth-sync pass |
 
-**Why third:** Documentation cleanup is lower priority than test verification. Only the dangerous inconsistencies (which risk agent drift) are urgent. Broad cleanup waits until the system has been observed in production and agent workflows have been exercised against the remaining docs.
+**Why fourth:** Backlog order should be informed by actual runtime behavior, not pre-launch assumptions.
 
-**Effort:** Low (limited file moves + verification).  
-**Risk reduction:** Low-Medium — resolves the dangerous inconsistencies without risking semantic anchor loss.
+**Effort:** Low.  
+**Risk reduction:** Medium.
+
+**Current status (2026-03-22):** Step 4 is now sharpened by the first production baseline, but not fully “actionable” in the sense of starting a post-launch sprint. The observed system state is still `healthy but idle`, which means there is not yet enough runtime evidence to justify telemetry automation, distributed rate limiting, performance work, or backlog reprioritization based on production pressure.
+
+**Current Step 4 decision (2026-03-22):**
+
+- Do **not** start telemetry automation, cron-based signal collection, or a new observability implementation batch yet.
+- Do **not** start SEC-002b / Upstash-style rate limiter infrastructure work yet.
+- Treat `step5-backlog-triage-deliverable.md` as a historical shortlist, not as an auto-approved sprint.
+- If work must continue before real traffic exists, constrain it to config correctness and operator clarity items only, especially canonical host, Supabase auth redirect URLs, and Stripe webhook host verification.
+- Re-open Step 4 for true prioritization only when one of these triggers occurs: first non-zero production traffic, first alert threshold crossing, or an owner decision that forces host/config cleanup regardless of traffic.
 
 ---
 
-### Step 4 — Observe Mode / Production Learning
+### Step 5 — Limited Documentation Cleanup
 
-**Goal:** Operate the launched system. Use the telemetry pack manually as designed. Collect real production data before making optimization decisions.
+**Goal:** Archive only the highest-confidence documentation noise after backlinks and workflow usage have been confirmed.
 
 **What:**
 
 | Task | Priority | Notes |
 |------|----------|-------|
-| 4.1 — Run telemetry-pack signal queries manually against production (Week 1) | P1 | Per `launch-telemetry-pack.md` v1 design — manual daily checks against production DB |
-| 4.2 — Document observed baselines | P1 | Record actual values for the 5 signals: session health, join funnel, realtime, economy, error pressure |
-| 4.3 — Verify incident playbook readiness | P1 | Confirm kill-switches work, rollback procedures are understood, GDPR DSAR manual process is operational |
-| 4.4 — Identify which signals actually need automation | P2 | Based on observed values — which signals change enough to warrant automated checks? |
-| 4.5 — Decide on telemetry automation scope (if any) | P2 | Only after Week 1–2 of manual observation. May include `/api/system/signals` endpoint + Vercel cron, but **only if manual observation shows this is needed** |
+| 5.1 — Archive only highest-confidence files | P1 | Exact duplicates, superseded prompts, one-shot briefs |
+| 5.2 — Verify backlinks before each batch move | P1 | Follow the conservative archive checklist |
+| 5.3 — Do not archive uncertain semantic anchors | — | Preserve anything still referenced by current workflows |
 
-**Why fourth, not earlier:** `launch-control.md` Observe Mode principle requires production traffic data before optimization. `launch-telemetry-pack.md` explicitly designs Week 1–3 as manual monitoring, with automation as Week 4+ work. Building signal endpoints and cron jobs before seeing real traffic data would produce automation tuned to guesses rather than measurements.
-
-**Effort:** Low-Medium (manual queries, documentation).  
-**Risk reduction:** High — real data replaces assumptions.
-
----
-
-### Step 5 — Post-Launch Backlog Triage
-
-**Goal:** Prioritize the remaining P2/P3 findings for the first post-launch development cycle. Informed by production observations from Step 4.
-
-**What:**
-
-| Task | Priority | Notes |
-|------|----------|-------|
-| 5.1 — Group P2s by business impact | P1 | GDPR (6), Upload validation (3), Error leakage (3), Rate limiting (10), Input validation (15), other |
-| 5.2 — Sequence first post-launch sprint | P1 | Informed by production observations — actual traffic patterns may reprioritize items |
-| 5.3 — Decide SEC-002b (rate limiter architecture) | P2 | Only after traffic data shows whether in-memory limiter is sufficient |
-| 5.4 — Decide broader docs cleanup scope | P2 | Based on agent experience during Steps 1–4 — which docs caused confusion? Which semantic anchors helped? |
-| 5.5 — Decide telemetry automation implementation | P2 | Based on Step 4 observations — which signals need automation vs manual spot-checks? |
-
-**Why last:** Backlog triage should be informed by production learning. Sequencing a sprint before seeing real usage patterns risks misallocation.
+**Why last:** Documentation cleanup has the lowest immediate operational value once the major truth surfaces are accurate.
 
 **Effort:** Low (analysis and documentation).  
-**Risk reduction:** Low-Medium — ensures post-launch velocity is well-directed.
+**Risk reduction:** Low-Medium.
 
 ---
 
 ## Execution Sequence Rationale
 
 ```
-Step 1 (SSoT fix)        ─ LOW effort ──► Removes agent drift
+Step 1 (Test verify)     ─ MEDIUM effort ──► Establishes regression baseline
     │
     ▼
-Step 2 (Test verify)     ─ MEDIUM effort ──► Establishes regression safety net
+Step 2 (Residual SSoT)   ─ LOW effort ──► Removes remaining documentation drift
     │
     ▼
-Step 3 (Minimal docs fix)─ LOW effort ──► Fixes dangerous inconsistencies only
+Step 3 (Observe mode)    ─ LOW-MED effort ──► Collects real production data
     │
     ▼
-Step 4 (Observe Mode)    ─ LOW-MED effort ──► Collects real production data
+Step 4 (Backlog triage)  ─ LOW effort ──► Data-informed sprint sequencing
     │
     ▼
-Step 5 (Backlog triage)  ─ LOW effort ──► Data-informed first sprint
+Step 5 (Docs cleanup)    ─ LOW effort ──► Reduces noise without risking anchors
 ```
 
-Steps 1 and 3 can partially overlap (both involve SSoT document edits).  
-Step 2 requires running the dev server and test runners.  
-Step 4 requires production to be live with real users.  
-Step 5 depends on Step 4 data.
+Steps 1 and 2 can partially overlap when a test run exposes stale planning assumptions.  
+Step 3 requires production to be live with real users.  
+Step 4 depends on Step 3 observations.  
+Step 5 should remain intentionally conservative.
 
 ---
 
@@ -165,8 +204,8 @@ This plan explicitly respects the Observe Mode principle from `launch-control.md
 | Build `/api/system/signals` endpoint | **Deferred** — manual queries first. Automate only after production baselines are known. |
 | Add Vercel cron for signal checks | **Deferred** — same reason. Cron tuning requires real threshold data. |
 | Alert wiring via `error_tracking` | **Deferred** — alert thresholds need observed baselines, not guesses. |
-| Archive 160 docs files | **Reduced to ~30** highest-confidence files. Broader cleanup after agent workflows are exercised. |
-| New smoke tests for golden paths | **Deferred** — verify existing tests first. Decide on new tests after baseline is known. |
+| Archive 160 docs files | **Reduced to ~30** highest-confidence files, and only after the current truth-sync pass plus real workflow usage. |
+| New smoke tests for golden paths | **Deferred** — verify existing tests first. Decide on new tests only if the current baseline is insufficient. |
 
 **The operating model for Weeks 1–3 is manual telemetry checks using the SQL queries in `launch-telemetry-pack.md`.** This matches the telemetry pack's own v1 design. Automation is a Week 4+ decision, triggered by observed need.
 
@@ -192,13 +231,16 @@ This plan explicitly respects the Observe Mode principle from `launch-control.md
 
 At the end of this execution cycle:
 
-- [ ] SSoT documents accurately reflect program state (0 contradictions between launch docs)
-- [ ] Existing unit tests verified passing (`vitest run` = green)
-- [ ] Existing E2E tests verified and baseline documented (pass/fail per spec)
-- [ ] CI confirmed to catch real failures
+- [ ] Existing unit and RLS tests verified against the current codebase
+- [x] Existing E2E specs run and baseline documented (`npx playwright test` = 60 passed, 43 skipped, 0 failed on 2026-03-22)
+- [x] Residual launch-doc contradictions reduced to zero or explicitly deferred
+- [x] Existing unit tests verified passing (`vitest run` = green)
+- [ ] Local RLS baseline verified against active harnesses and manual scripts triaged
+- [x] Existing E2E tests verified and baseline documented (current baseline: 60 passed, 43 skipped, 0 failed; skipped tests remain intentionally excluded)
+- [ ] CI confirmed to catch real failures (workflow surface verified; no synthetic failure test run in this cycle)
 - [ ] ~30 highest-confidence noise files archived (exact duplicates, v1 files, one-shot prompts)
-- [ ] 3 dangerous inconsistencies resolved
-- [ ] Manual telemetry checks executed for Week 1 — baselines documented
+- [ ] Only conservative archive moves executed
+- [x] Manual telemetry checks executed for Week 1 — first baseline pass documented (`healthy but idle`, 2026-03-22)
 - [ ] Incident playbook readiness confirmed
 - [ ] Post-launch backlog triaged and sequenced (informed by production data)
 - [ ] All changes committed and documented in `launch-control.md` changelog

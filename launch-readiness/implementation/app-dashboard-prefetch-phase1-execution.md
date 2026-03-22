@@ -1,5 +1,14 @@
 # App Dashboard Prefetch Phase 1
 
+## Metadata
+
+> **Date:** 2026-03-20  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** active  
+> **Scope:** Phase 1 route-prefetch reduction for `/app` dashboard and shell navigation  
+> **Note:** Active implementation brief. Use `launch-control.md` and the current app performance workstream for broader execution priority.
+
 ## Goal
 
 Reduce startup route churn on `/app` by disabling non-essential route prefetch on the dashboard and app shell.

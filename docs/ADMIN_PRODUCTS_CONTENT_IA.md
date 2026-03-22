@@ -1,7 +1,16 @@
 # Admin IA Refactor: Produkter & Innehåll
 
-> **Status**: ✅ Implementerad
-> **Datum**: 2025-01-XX
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-04
+- Last updated: 2026-03-21
+- Last validated: 2026-01-04
+
+> Historisk snapshot av en genomförd IA-refaktor för produkter och innehåll. Läs som förändringshistorik, inte som ensam nuvarande navigationssanning.
+
+> **Execution status**: ✅ Implementerad
 
 ## Sammanfattning
 

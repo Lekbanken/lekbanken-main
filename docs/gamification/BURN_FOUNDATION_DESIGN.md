@@ -1,7 +1,16 @@
 # LEKBANKEN — DICECOIN BURN FOUNDATION
 
-**Date:** 2026-01-08  
-**Status:** Infrastructure Ready (Shop Not Implemented)  
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active design and infrastructure reference for the burn foundation. Treat shop-specific UX as deferred unless later docs explicitly supersede this state.
+
+**Execution status:** Infrastructure Ready (Shop Not Implemented)  
 **Objective:** Lay foundation for coin sinks without building shop UI
 
 ---

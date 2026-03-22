@@ -1,5 +1,13 @@
 # Auth State Files
 
+## Metadata
+- Status: active
+- Date: 2026-01-03
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: qa
+- Scope: Playwright auth-state file guidance
+
 This directory stores Playwright authentication state for different user roles.
 
 **Files created by auth setup:**

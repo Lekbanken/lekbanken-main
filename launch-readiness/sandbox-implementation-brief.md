@@ -1,11 +1,24 @@
 # Preview Isolation — Implementation Brief
 
-> **Status:** Ready to Execute  
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Frozen implementation snapshot for the preview-isolation workstream. Use `docs/database/environments.md`, `docs/DEVELOPER_SETUP.md`, and `launch-readiness/launch-control.md` for current environment truth.
+
 > **Date:** 2026-03-13 (revised)  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** frozen audit  
 > **Author:** Claude Opus 4.6 (code-verified)  
 > **Resolves:** OPS-SAND-001 (P1) — preview/dev hitting production data plane  
 > **Scope:** Sandbox Supabase + Preview env vars in existing Vercel project  
-> **Principle:** Första exekverbara operationsmål = få bort preview/dev från prod-data-plane.
+> **Principle:** Första exekverbara operationsmål = få bort preview/dev från prod-data-plane.  
+> **Note:** Frozen implementation snapshot for the preview-isolation workstream. Current environment truth should be read from `docs/database/environments.md`, `docs/DEVELOPER_SETUP.md`, and `launch-control.md`.
 
 ---
 

@@ -1,5 +1,15 @@
 # Internationalization (i18n) Guide
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-11
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active guide for locale architecture, translation message sources, and locale-aware UI patterns.
+
 Lekbanken uses **next-intl** for internationalization with a cookie-based locale strategy (no URL prefixes).
 
 ## Supported Locales

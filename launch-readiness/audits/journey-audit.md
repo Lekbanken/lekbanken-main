@@ -1,5 +1,15 @@
 # Journey & Gamification Launch Audit (#9)
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed launch-readiness audit for the journey and gamification domain. Use `launch-readiness/launch-control.md` for current program status and consult remediation or regression artifacts for the latest follow-up state.
+
 **Date:** 2026-03-12  
 **Status:** ✅ Launch-scope complete (2026-03-12). M1+M2 GPT-approved. M3/M4 deferred post-launch.  
 **Scope:** Factions, cosmetics, XP, achievements, loadout, shop, leaderboard, burn economy, campaigns, admin dashboard  

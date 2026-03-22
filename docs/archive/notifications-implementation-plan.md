@@ -1,9 +1,14 @@
 # Notifications Implementation Plan
 
-**Date:** 2026-03-16  
-**Updated:** 2026-03-17 — Implementation complete for Blocks A.1, B.1, B.2, B.3, C.1  
-**Based on:** `notifications-e2e-audit.md`  
-**Goal:** Take notifications from "architecturally sound but incomplete" to a **fully working end-to-end feature**.
+## Metadata
+- Status: archived
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: notifications
+- Scope: Archived notifications implementation plan
+
+Superseded implementation-plan snapshot retained for provenance. Use the active notifications plan instead of this archived record for current execution status.
 
 ### Verification Status
 

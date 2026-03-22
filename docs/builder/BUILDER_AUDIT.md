@@ -1,7 +1,16 @@
 # Game Builder Audit
 
-**Datum:** 2026-02-01  
-**Status:** KOMPLETT AUDIT (7 delar)
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Frozen broad builder audit snapshot from before the later V2/import deepening. Use newer V2 audits and plans when working on the active builder track.
+
+**Exekveringsstatus:** KOMPLETT AUDIT (7 delar)
 
 ---
 

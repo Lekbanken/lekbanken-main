@@ -1,7 +1,16 @@
 # Archive Manifest
 
-> **Created:** 2026-03-15  
-> **Purpose:** Provenance record for archived files. Tracks original path, reason, tier classification, and execution context.
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-15
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Active provenance manifest for archived files. Use it to trace original location, archival reason, and move context for low-trust historical documents.
+
+**Purpose:** Provenance record for archived files. Tracks original path, reason, tier classification, and execution context.
 
 ---
 

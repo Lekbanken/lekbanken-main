@@ -1,5 +1,15 @@
 # L2-3: Demo Feature Gates + Upgrade Path Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed level-2 audit for the demo feature-gate and upgrade-path chain. Treat this as a bounded building-block verification snapshot rather than an active operating guide.
+
 **Domain:** Demo — feature gates, upgrade/conversion path, tier differentiation  
 **Scope:** Level 2 building block audit — trace feature gate chain server→client→component→RPC, upgrade/conversion E2E flows, demo content filtering alignment  
 **Date:** 2026-03-15  

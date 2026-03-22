@@ -1,5 +1,15 @@
 # MFA Nulägesanalys för Lekbanken
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the MFA domain current-state assessment during the 2026-01 rollout.
+
 **Datum:** 2026-01-13  
 **Version:** 1.1  
 **Status:** ✅ Enterprise-ready implementation

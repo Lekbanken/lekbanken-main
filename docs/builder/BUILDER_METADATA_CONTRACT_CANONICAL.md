@@ -1,9 +1,18 @@
 # Canonical Metadata Contract
 
-> **Syfte**: Definiera *en* kanonisk key-struktur per artifact_type för import.  
-> **Policy**: Endast evidens från kod. Policy-beslut markeras explicit.  
-> **Källa**: [BUILDER_METADATA_CONTRACT.md](BUILDER_METADATA_CONTRACT.md)  
-> **Datum**: 2025-01-27
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active contract reference for canonical metadata keys used by import and downstream play surfaces. Revalidate policy and evidence boundaries before schema changes.
+
+**Syfte**: Definiera *en* kanonisk key-struktur per artifact_type för import.  
+**Policy**: Endast evidens från kod. Policy-beslut markeras explicit.  
+**Källa**: [BUILDER_METADATA_CONTRACT.md](BUILDER_METADATA_CONTRACT.md)
 
 ---
 

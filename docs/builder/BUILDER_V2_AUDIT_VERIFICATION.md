@@ -1,8 +1,17 @@
 # Game Builder V2 Audit – Verification & Evidence Pack
 
-> **Syfte**: Verifiera att BUILDER_V2_AUDIT.md stämmer mot koden  
-> **Datum**: 2026-02-01  
-> **Metod**: Kodgranskning mot audit-claims
+## Metadata
+
+- Owner: -
+- Status: active audit
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active verification reference for the Builder V2 audit. If audit claims change, this file must be kept in sync in the same workstream.
+
+**Syfte**: Verifiera att BUILDER_V2_AUDIT.md stämmer mot koden  
+**Metod**: Kodgranskning mot audit-claims
 
 ---
 
@@ -12,9 +21,9 @@
 
 | Claim | Status | Evidence | Notes |
 |-------|--------|----------|-------|
-| Entrypoint `/admin/games/builder/[id]` | ✅ Verified | [GameBuilderPage.tsx](../../app/admin/games/builder/GameBuilderPage.tsx) rad 1-80: `export function GameBuilderPage({ gameId }: GameBuilderPageProps)` | Prop `gameId` optional för new vs edit |
-| State hook `useGameBuilder.ts` | ✅ Verified | [hooks/useGameBuilder.ts](../../hooks/useGameBuilder.ts) rad 283-290: `export function useGameBuilder(options: UseGameBuilderOptions = {}): UseGameBuilderReturn` | 478 rader totalt |
-| API route `/api/games/builder/[id]` | ✅ Verified | [app/api/games/builder/[id]/route.ts](../../app/api/games/builder/[id]/route.ts) rad 262-420: `export async function GET` + rad 430+: `export async function PUT` | 832 rader totalt |
+| Entrypoints `/admin/games/new` + `/admin/games/[gameId]/edit` | ✅ Verified | [new/page.tsx](../../app/admin/games/new/page.tsx) imports `GameBuilderPage`; [[gameId]/edit/page.tsx](../../app/admin/games/%5BgameId%5D/edit/page.tsx) wraps `GameBuilderPage gameId={gameId}` | `GameBuilderPage` is shared by create vs edit |
+| State hook `useGameBuilder.ts` | ✅ Verified | [hooks/useGameBuilder.ts](../../hooks/useGameBuilder.ts) exports `useGameBuilder(options)` | 452 rader totalt |
+| API route `/api/games/builder/[id]` | ✅ Verified | [app/api/games/builder/[id]/route.ts](../../app/api/games/builder/[id]/route.ts) defines GET + PUT handlers | 816 rader totalt |
 | Client-side rendering ('use client') | ✅ Verified | GameBuilderPage.tsx rad 1: `'use client';` | Builder är client-only |
 
 ### 2. GET /api/games/builder/[id]
@@ -121,10 +130,15 @@
 
 | Aspect | Location |
 |--------|----------|
-| **Fil** | [app/admin/games/builder/GameBuilderPage.tsx](../../app/admin/games/builder/GameBuilderPage.tsx) (1492 rader) |
+| **Fil** | [app/admin/games/builder/GameBuilderPage.tsx](../../app/admin/games/builder/GameBuilderPage.tsx) (1379 rader) |
 | **Huvudkomponent** | `GameBuilderPage({ gameId })` – rad 81 |
 | **Load trigger** | rad 270-486: `useEffect(() => { if (!gameId) return; ... fetch(\`/api/games/builder/${gameId}\`) })` |
 | **Save trigger** | Hanteras av useGameBuilder hook autosave, inte direkt i page |
+
+### 1b) Verification Update 2026-03-21
+
+- Active routing is `new` + `edit`; the earlier shorthand `/admin/games/builder/[id]` was misleading and has been corrected.
+- The active audit still holds architecturally, but file inventory counts have drifted and are now synced to current code.
 
 ### 2) State Management
 

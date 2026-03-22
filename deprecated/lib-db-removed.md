@@ -1,5 +1,13 @@
 # lib/db Removal Notice
 
+## Metadata
+- Status: archived
+- Date: 2026-01-28
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: repo-governance
+- Scope: Historical removal notice for deprecated lib/db module
+
 **Removed**: 2026-01-28  
 **Reason**: Entire module was unused - no external imports found  
 **Verified by**: grep search across all .ts/.tsx files

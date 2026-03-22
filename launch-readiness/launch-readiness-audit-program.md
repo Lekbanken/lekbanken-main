@@ -1,5 +1,15 @@
 # Lekbanken Launch Readiness — Audit Program
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Historical audit-method reference for the launch-readiness execution cycle. Use `launch-readiness/launch-control.md` for current program state and `launch-readiness/audits/README.md` to navigate the resulting audit artifacts.
+
 > **Version:** 1.0  
 > **Created:** 2026-03-10  
 > **Purpose:** Definiera exakt hur hela Lekbanken ska auditas systematiskt inför launch.  

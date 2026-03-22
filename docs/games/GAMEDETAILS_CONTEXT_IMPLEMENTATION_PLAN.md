@@ -1,11 +1,21 @@
 # GameDetails Context Implementation Plan
 
-> **Datum:** 2026-03-10  
-> **Version:** 2.0 (execution-focused rewrite)  
-> **Förutsättning:** GAMEDETAILS_CONTEXT_AUDIT.md v2.0 + GAMEDETAILS_CONTEXT_ARCHITECTURE.md v2.0 (godkända)  
-> **Syfte:** Exekverbar sekvensering med minimal blast radius  
-> **Status:** ✅ **SÄKERHETSARBETET STÄNGT (2026-03-10)** — Block 1 KLAR, Block 3 KLAR, F7 KLAR. Alla preview-context-exponeringar fixade.  
-> **Kvarvarande:** Block 2 BESLUTSPUNKT, Block 4–6 ej påbörjade (icke-säkerhet)
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-10
+- Last updated: 2026-03-21
+- Last validated: 2026-03-10
+
+> Historical implementation snapshot for the GameDetails context security workstream. Use it as execution history, not as an active plan unless the workstream is explicitly reopened.
+
+**Version:** 2.0 (execution-focused rewrite)  
+**Förutsättning:** GAMEDETAILS_CONTEXT_AUDIT.md v2.0 + GAMEDETAILS_CONTEXT_ARCHITECTURE.md v2.0 (godkända)  
+**Syfte:** Exekverbar sekvensering med minimal blast radius  
+**Execution status:** ✅ **SÄKERHETSARBETET STÄNGT (2026-03-10)** — Block 1 KLAR, Block 3 KLAR, F7 KLAR. Alla preview-context-exponeringar fixade.  
+**Canonical entrypoint:** `docs/games/README.md`  
+**Kvarvarande:** Block 2 BESLUTSPUNKT, Block 4–6 ej påbörjade (icke-säkerhet)
 
 ---
 

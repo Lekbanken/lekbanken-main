@@ -1,5 +1,15 @@
 # Gamification Sandbox Report
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-03
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the gamification sandbox coverage, routes, APIs, and manual test paths.
+
 ## Summary
 Gamification is implemented across app-facing pages (DiceCoin overview, achievements, event log, coin history, shop) and admin tooling (awards, automation rules, levels, campaigns, analytics, marketplace, badge library). Most UI surfaces are present but depend on Supabase data, tenant context, and authenticated sessions.  
 

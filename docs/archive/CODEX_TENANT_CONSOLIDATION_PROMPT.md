@@ -1,5 +1,15 @@
 # CODEX PROMPT: Tenant/Membership Naming Consolidation & RLS Audit
 
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-01-03
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived one-shot tenant consolidation prompt. Keep as process history, not as active auth or RLS guidance.
+
 ## BAKGRUND
 
 Det finns en historisk inkonsistens i namngivningen av tenant-relaterade tabeller och funktioner i projektet. Detta orsakar RLS-problem och förvirring. Vissa migrations refererar till `tenant_memberships` (som är en VIEW) medan koden använder `user_tenant_memberships` (som är den faktiska tabellen).

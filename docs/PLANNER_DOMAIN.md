@@ -1,9 +1,13 @@
 # PLANNER DOMAIN
 
 ## Metadata
-- **Status:** Active
-- **Last updated:** 2025-12-17
-- **Source of truth:** Repo code (`app/app/planner/**`, `app/api/plans/**`, `features/planner/**`, `lib/services/planner.server.ts`) + Supabase migrations (`supabase/migrations/*planner*` + initial schema)
+
+> **Status:** active
+> **Owner:** -
+> **Date:** 2025-12-17
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+> **Source of truth:** Repo code (`app/app/planner/**`, `app/api/plans/**`, `features/planner/**`, `lib/services/planner.server.ts`) + Supabase migrations (`supabase/migrations/*planner*` + initial schema)
 
 ## Scope
 Planner Domain owns:

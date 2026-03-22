@@ -2,9 +2,11 @@
 
 ## Metadata
 
-- Owner: -
-- Status: archived
-- Last validated: 2025-12-17
+> **Status:** archived
+> **Owner:** -
+> **Date:** 2025-12-16
+> **Last updated:** 2026-03-21
+> **Last validated:** 2025-12-17
 
 This document is an MVP/spec snapshot.
 

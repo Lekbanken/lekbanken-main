@@ -1,5 +1,13 @@
 # Inventory Playbook (v2.0 - Partitioned)
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-17
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
 ## Overview
 
 This playbook describes how to maintain the Lekbanken system inventory using the **partitioned** 

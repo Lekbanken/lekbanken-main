@@ -7,6 +7,8 @@ import { finishLoginFlow, resetMfaFactorsForTestUser, waitForPostLoginRedirect }
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local'), override: true });
 
 const authFile = path.join(__dirname, '../.auth/tenant-admin.json');
+const defaultTenantAdminEmail = 'test-tenant-admin@lekbanken.no';
+const defaultTenantAdminPassword = 'TestAdmin123!';
 
 /**
  * Tenant Admin Authentication Setup
@@ -15,15 +17,8 @@ const authFile = path.join(__dirname, '../.auth/tenant-admin.json');
  * Used by tests that verify tenant-scoped admin functionality.
  */
 setup('authenticate tenant admin', async ({ page }) => {
-  const email = process.env.TEST_TENANT_ADMIN_EMAIL;
-  const password = process.env.TEST_TENANT_ADMIN_PASSWORD;
-
-  if (!email || !password) {
-    console.warn('⚠️  TEST_TENANT_ADMIN_EMAIL and TEST_TENANT_ADMIN_PASSWORD not set. Skipping tenant admin auth setup.');
-    // Create empty auth state to prevent test failures
-    await page.context().storageState({ path: authFile });
-    return;
-  }
+  const email = process.env.TEST_TENANT_ADMIN_EMAIL || defaultTenantAdminEmail;
+  const password = process.env.TEST_TENANT_ADMIN_PASSWORD || defaultTenantAdminPassword;
 
   await resetMfaFactorsForTestUser(email);
 

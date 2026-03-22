@@ -1,5 +1,15 @@
 # Supabase Database Migration Guide
 
+## Metadata
+- Status: archived
+- Date: 2025-11-30
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: database
+- Scope: Archived manual migration guide
+
+Historical migration guide retained for provenance. Use current database environment and migration docs instead of this archived manual guide for live execution steps.
+
 ## Status
 - ✅ Completed: 3/14 migrations
   - 00: initial_schema.sql

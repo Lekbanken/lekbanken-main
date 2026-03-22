@@ -1,5 +1,15 @@
 # DOMAIN: GAMES - KEY LEARNINGS FOR NEXT DOMAINS
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft learnings document derived from the games domain and intended as guidance for future domains.
+
 Canonical documentation (repo source of truth):
 - `docs/GAMES_DOMAIN.md`
 

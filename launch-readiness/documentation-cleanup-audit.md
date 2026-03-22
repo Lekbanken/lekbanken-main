@@ -1,5 +1,15 @@
 # Documentation Cleanup Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed audit of markdown sprawl and archive candidates across the repository. Treat this as the bounded audit snapshot behind the documentation cleanup work.
+
 > **Date:** 2026-03-13  
 > **Author:** Claude Opus 4.6 (automated analysis)  
 > **Purpose:** Identify outdated, duplicated, and obsolete markdown files across the repository.  

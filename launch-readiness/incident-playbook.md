@@ -1,8 +1,22 @@
 # Lekbanken Incident Playbook
 
-> **Created:** 2026-03-12  
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active incident-response runbook. Use together with `launch-control.md` for incident tracking and the current launch-program state.
+
+> **Date:** 2026-03-13  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** active  
 > **Purpose:** Standardized response procedures for production incidents  
 > **Audience:** On-call engineers, team leads  
+> **Note:** Active operational runbook. Use together with `launch-control.md` for incident tracking and current launch-program state.
 
 ---
 

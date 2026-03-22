@@ -1,10 +1,16 @@
 # Ops / runbooks
 
-Canonical overview (domain doc): `docs/OPERATIONS_DOMAIN.md`
+## Metadata
 
-Status: active  
-Owner: Ops/Platform  
-Last validated: 2025-12-17
+- Owner: Ops/Platform
+- Status: active
+- Date: 2025-12-17
+- Last updated: 2026-03-21
+- Last validated: 2025-12-17
+
+> Active runbook cluster for operational workflows and production procedures. Use this folder for repo-verifiable operations guidance and mark external dependencies explicitly.
+
+**Canonical overview (domain doc):** `docs/OPERATIONS_DOMAIN.md`
 
 Runbooks och operativa rutiner. Dessa dokument är **repo-förankrade** där det går (workflows, scripts, API routes), och markerar tydligt vad som kräver ops-beslut/extern konfiguration (hosting, on-call, Slack/PagerDuty, backup-retention).
 
@@ -16,6 +22,7 @@ Runbooks och operativa rutiner. Dessa dokument är **repo-förankrade** där det
 - [Incident response](incident_response.md)
 - [Incident log template](incidents.md)
 - [Production migration workflow](prod-migration-workflow.md)
+- [Release promotion checklist](release-promotion-checklist.md)
 - [First production deploy runbook](first-deploy-runbook.md)
 
 ## Source of truth

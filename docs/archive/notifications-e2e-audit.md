@@ -1,9 +1,14 @@
 # Notifications E2E Audit
 
-**Date:** 2026-03-16  
-**Updated:** 2026-03-17 — Implementation complete (A.1, B.1, B.2, B.3, C.1)  
-**Method:** Full static code analysis — every file in the notifications domain read and cross-referenced  
-**Scope:** Admin send → DB → RLS → RPC → hook → bell/page rendering
+## Metadata
+- Status: archived
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: notifications
+- Scope: Archived notifications end-to-end audit
+
+Superseded audit snapshot retained for provenance. Use the active notifications audit instead of this archived record for current risk and verification status.
 
 ---
 

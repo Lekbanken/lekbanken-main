@@ -1,5 +1,15 @@
 # Admin Audit (/admin)
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2025-12-18
+- Last updated: 2026-03-21
+- Last validated: 2025-12-18
+
+> Frozen audit snapshot for the admin redesign workstream. Re-validate against current admin routes and guards before using it as implementation truth.
+
 > Scope: Current state inventory + root problems to address in the admin redesign.
 > 
 > Ground truth sources: route files under `app/admin/**`, current layout/auth gate in `app/admin/layout.tsx`, current shell in `components/admin/*`, and RBAC model in `features/admin/shared/hooks/useRbac.ts`.

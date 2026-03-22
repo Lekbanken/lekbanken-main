@@ -1,5 +1,13 @@
 # Developer Setup — Lekbanken
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-15
+- Last updated: 2026-03-21
+- Last validated: -
+
 ## Prerequisites
 
 | Tool | Version | Install |
@@ -55,14 +63,16 @@ The project uses two environment identifiers. These are the **only** allowed val
 | Environment | `APP_ENV` | `DEPLOY_TARGET` | Supabase |
 |-------------|-----------|-----------------|----------|
 | **Local** | `local` | `development` | Docker CLI (`127.0.0.1:54321`) |
-| **Vercel Preview** | `staging` | `preview` | Staging project (`vmpdejhgpsrful…`) |
+| **Vercel Preview** | `staging` | `preview` | Sandbox project (`vmpdejhgpsrful…`) via Vercel env vars |
 | **Vercel Production** | `production` | `prod` | Production project (`qohhnufxidid…`) |
+
+`APP_ENV=staging` is a preview label in the app configuration. It does not mean there is a persistent Supabase staging branch. Current preview deployments connect to the sandbox Supabase project.
 
 ### Rules
 
 - `APP_ENV` describes **which data environment** you're connected to
 - `DEPLOY_TARGET` describes **how the code was deployed**
-- The word **"sandbox"** refers only to the local design sandbox (`app/sandbox/`) — never to a deploy environment
+- **"Sandbox"** can refer to two different things in this repo: the local UI sandbox (`app/sandbox/`) and the remote sandbox Supabase project used by preview deployments. Use context explicitly.
 - Invalid `APP_ENV` values cause a **startup error** (enforced in `lib/config/env.ts`)
 - `TENANT_COOKIE_SECRET` must be set to a real secret in `APP_ENV=production` — the dev default is blocked at startup
 
@@ -76,7 +86,7 @@ The project uses two environment identifiers. These are the **only** allowed val
 │    development   │    │    preview        │    │  DEPLOY_TARGET= │
 │                  │    │                   │    │    prod         │
 │  Supabase:       │    │  Supabase:        │    │  Supabase:      │
-│  Docker CLI      │    │  Staging project  │    │  Prod project   │
+│  Docker CLI      │    │  Sandbox project  │    │  Prod project   │
 │  127.0.0.1:54321 │    │  vmpdejhg…        │    │  qohhnu…        │
 └────────┬─────────┘    └────────┬──────────┘    └────────┬────────┘
          │ git push              │ PR merge               │ auto
@@ -134,7 +144,7 @@ feature/my-change  ──push──▶  GitHub PR  ──CI green──▶  merg
 
 1. Create feature branch from `main`
 2. Push → PR opens automatically
-3. Vercel builds a preview deployment (uses staging Supabase)
+3. Vercel builds a preview deployment (uses sandbox Supabase via Vercel env vars)
 4. CI (Nivå C) must pass: lint, types, tests, RLS, baseline
 5. Verify the preview URL works correctly
 6. Merge to `main` → triggers production deployment
@@ -151,15 +161,16 @@ supabase migration new my_migration_name
 npm run db:reset
 
 # Push branch — CI runs baseline-check (validates schema counts)
-# After merge, apply to production:
-supabase link --project-ref qohhnufxididbmzqnjwg
-supabase db push
+# After merge, use the guarded production flow:
+npm run db:push:dry
+npm run db:push
 ```
 
 **Migration safety rules:**
 - Always use `IF NOT EXISTS` / `DROP IF EXISTS` for idempotency
 - Test with `npm run db:reset` before pushing
 - `baseline-check.yml` in CI validates minimum schema counts (tables, functions, policies, enums)
+- Never use bare `supabase db push` for production migrations
 
 ---
 

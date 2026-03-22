@@ -1,5 +1,15 @@
 # 🎨 Design Implementation TODO
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-11-30
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft design backlog and implementation checklist covering the broader UI system work.
+
 > Översikt över hela UI/Design-implementationen för Lekbanken.  
 > Uppdaterad: 2025-11-30
 

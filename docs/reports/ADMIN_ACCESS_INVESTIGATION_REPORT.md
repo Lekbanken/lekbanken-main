@@ -1,4 +1,15 @@
 # 🔍 Admin Access Investigation Report
+
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-12
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk utredningssnapshot av ett specifikt admin access-fall. Använd som felsökningshistorik, inte som aktuell auth- eller accesskälla.
+
 ## Användare: johan@formgiver.no
 
 **Datum:** 2025-12-12  

@@ -1,5 +1,15 @@
 # Lekbanken Deep Dive Analysis - Prompt för Claude Opus
 
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2025-11-30
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived deep-dive prompt for an earlier repo analysis pass. Keep as prompt history, not as active process guidance.
+
 ## Projektöversikt
 
 **Projektnamn:** Lekbanken - En gamifikerad inlärningsplattform för barn

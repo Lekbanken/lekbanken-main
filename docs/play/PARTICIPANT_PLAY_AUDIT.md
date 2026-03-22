@@ -1,8 +1,19 @@
 # Participant Play Audit — Full Report
 
-> **Date:** 2026-02-21  
-> **Scope:** `/play/session/[code]` participant view — routing, data flow, visibility, performance, contract, architecture.  
-> **Goal:** Lock architecture + contract before UI rebuild.
+## Metadata
+
+- Owner: -
+- Status: active audit
+- Date: 2026-02-22
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Aktiv audit för participant play-surface och dess kontrakt. Revalidera mot aktuell participant-view-kod innan du använder den som exakt nutidsbeskrivning.
+
+**Revalidering 2026-03-21:** Route-/komponentkartan och säkerhetsgränserna håller fortfarande. Gap S2 är delvis mildrad genom att PlayMode-pollern nu körs som en 60s recovery-only safety net i stället för en tätare allmän refresh. S3–S4 kvarstår som verklig teknisk skuld.
+
+**Scope:** `/play/session/[code]` participant view — routing, data flow, visibility, performance, contract, architecture.  
+**Goal:** Lock architecture + contract before UI rebuild.
 
 ---
 
@@ -307,7 +318,7 @@ interface ParticipantCockpitContract {
 | # | Issue | Detail | Impact |
 |---|---|---|---|
 | **S1** | **`leader_only` variants not filtered server-side** | Audit initially flagged this, but code review confirmed: `artifacts/route.ts` already uses `resolveSessionViewer()` with proper host/participant branching. Participant path skips `visibility === 'leader_only'` at line ~288. | **Already handled** ✅ |
-| **S2** | **Dual polling: orchestrator + PlayMode** | `ParticipantSessionWithPlay` polls every 3s (session status). `ParticipantPlayMode` re-fetches full game data every 30s. The 30s poller re-fetches steps/phases/roles even though realtime covers step changes. | Unnecessary network load. The 30s poll is redundant for steps (covered by `useLiveSession`) — only useful as a "stale state recovery" mechanism. |
+| **S2** | **Dual polling: orchestrator + PlayMode** | `ParticipantSessionWithPlay` polls session/runtime state adaptively. `ParticipantPlayMode` still re-fetches full game data, but now only every 60s as a recovery-only stale-state safety net after missed realtime events. | Lower network pressure than before, but still duplicated refresh responsibility and more moving parts than necessary. |
 | **S3** | **No lazy-loading of heavy components** | `ParticipantPlayView` (1441 lines) imports ALL artifact renderers, CountdownOverlay, StoryOverlay, ConversationCards, PuzzleRenderer, Toolbelt — all eagerly loaded even if the game uses none of them. | Larger bundle on mobile. First paint delayed. |
 | **S4** | **ParticipantPlayView is a 1441-line monolith** | All state (artifacts, decisions, keypad, signals, secrets, overlays, body lock) lives in a single component with 20+ `useState` hooks. No state reducer or context. | Hard to reason about, test, and extend. Re-renders cascade. |
 | **S5** | **Legacy system not deprecated** | `/participants/join` + `/participants/view` is a parallel, unmaintained system (353-line inline page). Users could still land there. | Confusion + maintenance burden. |
@@ -321,7 +332,7 @@ interface ParticipantCockpitContract {
 | **M3** | **No fullscreen API integration** | `ActiveSessionShell` uses CSS fixed positioning, not the browser Fullscreen API. No immersive mode on mobile. | Not truly immersive on mobile. |
 | **M4** | **No keyboard shortcuts / accessibility** | No keybinds for next step, signal, vote. No ARIA landmarks. | Accessibility gap. |
 | **M5** | **Feature flags checked per-render** | `isFeatureEnabled('timeBank')` and `isFeatureEnabled('signals')` called inline in JSX (not memoized). Config is likely static, but pattern is messy. | Minor perf concern. |
-| **M6** | **5 concurrent timers in active play** | Adaptive poll chain + heartbeat interval + 30s data refresh + countdown tick + signal toast dismiss. All independent `setTimeout`/`setInterval`. | Timer cleanup complexity. Not critical but increases cognitive load. |
+| **M6** | **Several concurrent timers in active play** | Adaptive poll chain + heartbeat interval + 60s recovery refresh + countdown tick + signal toast dismiss. Multiple independent `setTimeout`/`setInterval` loops still coexist. | Timer cleanup complexity. Not critical but increases cognitive load. |
 
 ---
 

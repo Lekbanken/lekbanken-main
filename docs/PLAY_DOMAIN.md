@@ -1,9 +1,13 @@
 # PLAY DOMAIN
 
 ## Metadata
-- **Status:** Active
-- **Last updated:** 2025-12-19
-- **Source of truth:** Repo code (`app/app/play/**`, `app/(marketing)/play/**`, `app/api/play/**`, `features/play/**`, `features/play-participant/**`) + Supabase migrations (`supabase/migrations/*play*`)
+
+> **Status:** active
+> **Owner:** -
+> **Date:** 2025-12-17
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+> **Source of truth:** Repo code (`app/app/play/**`, `app/(marketing)/play/**`, `app/api/play/**`, `features/play/**`, `features/play-participant/**`) + Supabase migrations (`supabase/migrations/*play*`)
 
 ## Scope
 Play Domain owns the “run the activity” experience:

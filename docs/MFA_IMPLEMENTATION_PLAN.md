@@ -1,8 +1,18 @@
 # MFA Implementation Plan för Lekbanken
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the original MFA implementation plan and sprint tracking.
+
 **Datum:** 2026-01-13  
 **Version:** 1.7 (Sprint 5 Complete)  
-**Status:** Sprint 1 KLAR ✅ | Sprint 2 KLAR ✅ | Sprint 3 KLAR ✅ | Sprint 4 KLAR ✅ | Sprint 5 KLAR ✅ | Sprint 6 NÄSTA 🔜  
+**Status:** Sprint 1 KLAR ✅ | Sprint 2 KLAR ✅ | Sprint 3 KLAR ✅ | Sprint 4 KLAR ✅ | Sprint 5 KLAR ✅ | Sprint 6 NASTA 🔜  
 **Uppskattad tid:** 6 sprints (~6 veckor)
 
 ---

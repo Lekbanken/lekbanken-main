@@ -1,7 +1,13 @@
 # 🔐 Database Security Domain
 
-> **Senast uppdaterad:** 2026-01-08  
-> **Status:** ✅ **ENTERPRISE READY** - Alla säkerhetsvarningar åtgärdade
+## Metadata
+
+> **Status:** active
+> **Owner:** -
+> **Date:** 2026-01-08
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+> **Notes:** Enterprise-ready database security reference after the Supabase remediation pass.
 
 ---
 

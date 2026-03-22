@@ -1,8 +1,21 @@
 # Trigger Engine Contract
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-09
+- Last updated: 2026-03-21
+- Last validated: 2026-02-08
+
+> Aktiv canonical contract för Trigger Engine V2.1. Om trigger-beteende, RPC-kontrakt eller guardrails ändras ska detta dokument uppdateras i samma change.
+
 **Version:** 1.0  
 **Date:** 2026-02-08  
-**Status:** Enforced  
+**Last updated:** 2026-03-21  
+**Last validated:** 2026-02-08  
+**Status:** active  
+**Contract status:** Enforced  
 **Migration:** `20260208000001_trigger_engine_hardening.sql`
 
 ---

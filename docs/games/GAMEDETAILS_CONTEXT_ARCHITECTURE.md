@@ -1,10 +1,19 @@
 # GameDetails Context Architecture
 
-> **Datum:** 2026-03-10  
-> **Version:** 2.0  
-> **Förutsättning:** GAMEDETAILS_CONTEXT_AUDIT.md v2.0 (godkänd)  
-> **Syfte:** Önskat stabilt målläge för kontexthantering — inte nuläge  
-> **Status:** Målarkitektur — ej implementerad
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-10
+- Last updated: 2026-03-21
+- Last validated: 2026-03-10
+
+> Active target architecture for GameDetails context handling. Use this document for the intended stable design, not as a literal description of current runtime state.
+
+**Version:** 2.0  
+**Förutsättning:** GAMEDETAILS_CONTEXT_AUDIT.md v2.0 (godkänd)  
+**Syfte:** Önskat stabilt målläge för kontexthantering — inte nuläge  
+**Canonical entrypoint:** `docs/games/README.md`
 
 ---
 

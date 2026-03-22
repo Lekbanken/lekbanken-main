@@ -1,5 +1,15 @@
 # Sessions & Participants Architecture
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Active architecture reference for the sessions and participants domain. Use this as the stable design overview together with `launch-readiness/launch-control.md` and the bounded audit/remediation records.
+
 > **Version:** 1.0  
 > **Date:** 2026-03-11  
 > **Source:** Sessions & Participants audit (`audits/sessions-audit.md`)  

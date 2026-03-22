@@ -1,8 +1,12 @@
 # Journey Activation — Audit
 
+## Metadata
+
 > **Datum:** 2026-03-06 (rev 4)  
+> **Senast uppdaterad:** 2026-03-21  
+> **Senast validerad:** 2026-03-21  
 > **Scope:** `/app/gamification`, `/app/profile`, `user_journey_preferences`, Journey-komponenter  
-> **Status:** Revision 4 — ✅ implementation complete, QA verified (2026-03-06)
+> **Status:** Revision 4 — implementation complete; codevägar återvaliderade 2026-03-21, ursprunglig QA verifierad 2026-03-06
 
 ---
 

@@ -1,5 +1,15 @@
 # Lekbanken Inventory Rules (v1.1)
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-17
+- Last updated: 2026-03-21
+- Last validated: 2026-01-17
+
+> Active root-level governance reference for repository inventory work. Use together with `INVENTORY_DECISIONS.md` and current repo governance docs.
+
 ## 1. Purpose
 This inventory exists to:
 - Enable safe cleanup (identify dead/orphaned code and data structures with evidence).

@@ -1,8 +1,14 @@
-# PLAY — Implementation Guide (P0)
-**Date:** 2026-01-18  
-**Source of truth:** `PLAY SYSTEM DOCUMENTATION v1.1 (2026-01-17)`  
-**Scope:** Golden Flows GF1–GF3 only  
-**Rule:** This file is the implementation playbook. The documentation file remains the reference truth.
+# PLAY - Implementation Guide (P0)
+
+## Metadata
+- Status: archived
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: play
+- Scope: Archived duplicate implementation guide
+
+Historical implementation guide retained for provenance. Use active play documentation instead of this archived duplicate for current implementation decisions.
 
 ---
 

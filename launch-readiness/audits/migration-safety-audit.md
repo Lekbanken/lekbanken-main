@@ -1,5 +1,15 @@
 # Migration Safety Audit — Lekbanken
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed migration-safety audit from the launch-readiness cycle. Use current database environment and migration docs for operational guidance; this file is the bounded audit snapshot behind that guidance.
+
 > **Auditor:** Claude (AI)  
 > **Date:** 2026-03-12  
 > **Scope:** 304 Supabase SQL migrations, rollback strategy, destructive DDL, enum handling, data backfills, deploy safety  

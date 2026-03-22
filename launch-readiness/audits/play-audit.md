@@ -1,5 +1,15 @@
 # Play Runtime Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed original Play runtime audit from the launch-readiness cycle. For current launch posture use `launch-readiness/launch-control.md`; for Play domain guidance prefer the Play docs cluster and the paired regression audit when relevant.
+
 > **Domain:** Play / Run (#6 in audit queue)  
 > **Status:** ✅ Complete  
 > **Date:** 2026-03-11  

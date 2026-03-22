@@ -1,7 +1,16 @@
 # Block 1 Verification Checklist
 
-> **Datum:** 2026-03-10  
-> **Status:** Code-complete — manuell verifiering kvar
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-03-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived manual verification checklist for the completed Block 1 workstream. Keep as closure evidence, not as a live validation checklist.
+
+**Status vid arkivering:** Code-complete — manuell verifiering kvar
 
 Alla kodändringar och automatiserade tester är klara. Denna checklista täcker de manuella verifieringar som krävs innan Block 1 kan betraktas som helt stängt.
 

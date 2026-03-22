@@ -1,8 +1,17 @@
 # Phase 0: Architecture & Reality Analysis — Learning Admin
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-10
+- Last updated: 2026-03-21
+- Last validated: 2026-01-10
+
+> Historical Phase 0 analysis. Keep for context, but re-validate against current learning/admin code before using it as active guidance.
+
 **Document Status:** Complete  
 **Feature Area:** `/admin/learning` (inkl. alla undersidor)  
-**Date:** 2026-01-10  
 **Purpose:** READ-ONLY ANALYSIS — Surface facts, risks, and constraints before Phase 1/2
 
 ---

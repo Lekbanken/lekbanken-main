@@ -1,5 +1,15 @@
 # Planner Domain TODOs
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft backlog for planner follow-up work. Canonical planner guidance lives in the root planner triplet.
+
 ## Database / Supabase
 - Migration `20251208120000_planner_modernization.sql` is applied remote. Regenerate `types/supabase.ts` when DB changes (supabase gen types).
 - Add RPC or trigger to keep `plans.total_time_minutes` updated server-side (currently computed in API).

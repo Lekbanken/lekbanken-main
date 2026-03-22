@@ -1,4 +1,5 @@
 import { notFound, redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { cookies } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
@@ -18,7 +19,12 @@ async function loadPlanWithPermissions(planId: string): Promise<{
   plan: PlannerPlan | null
   canEdit: boolean
 }> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/api/plans/${planId}`, {
+  const requestHeaders = await headers()
+  const host = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host')
+  const proto = requestHeaders.get('x-forwarded-proto') ?? (host?.startsWith('localhost') ? 'http' : 'https')
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? (host ? `${proto}://${host}` : 'http://localhost:3000')
+
+  const res = await fetch(`${baseUrl}/api/plans/${planId}`, {
     cache: 'no-store',
     headers: {
       Cookie: (await cookies()).toString(),

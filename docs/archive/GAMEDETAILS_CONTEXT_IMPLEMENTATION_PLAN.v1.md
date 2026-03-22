@@ -1,9 +1,14 @@
 # GameDetails Context Implementation Plan
 
-> **Datum:** 2026-03-10  
-> **Förutsättning:** GAMEDETAILS_CONTEXT_AUDIT.md (läs den först)  
-> **Syfte:** Genomförbar plan för att lösa identifierade problem — utan implementation  
-> **Status:** Plan — ej påbörjad
+## Metadata
+- Status: archived
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: play
+- Scope: Superseded GameDetails context implementation plan v1
+
+Superseded v1 implementation-plan snapshot retained for provenance. Use the active GameDetails context implementation plan instead of this archived version.
 
 ---
 

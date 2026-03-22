@@ -1,5 +1,15 @@
 # Sessions / Participants — Regression Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed regression audit for sessions and participant lifecycle flows after launch-readiness remediation. Use `launch-readiness/launch-control.md` for current program status and the original audit plus remediation records for upstream context.
+
 > **Domain:** Sessions & Participants  
 > **Type:** Phase 2 Regression Audit  
 > **Date:** 2026-03-14  

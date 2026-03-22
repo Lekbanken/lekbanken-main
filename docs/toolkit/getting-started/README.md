@@ -1,5 +1,17 @@
 # Getting Started
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft onboarding guide for first-time toolkit usage. Keep it as introductory guidance rather than as a runtime-verified operations manual.
+
+**Related:** [README.md](../README.md) · [concepts.md](concepts.md) · [README.md](../host-guide/README.md)
+
 This guide will help you get up and running with the Legendary Escape Room Toolkit in just a few minutes.
 
 ## Prerequisites

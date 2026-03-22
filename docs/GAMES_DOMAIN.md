@@ -2,8 +2,11 @@
 
 ## Metadata
 - **Status:** Active
-- **Last updated:** 2025-12-17
+- **Date:** 2025-12-17
+- **Last updated:** 2026-03-21
 - **Source of truth:** Repo code + `supabase/migrations/*` (schema) + `types/supabase.ts` (generated)
+
+> Canonical cluster entrypoint: `docs/games/README.md`
 
 ## Scope
 Games Domain owns:

@@ -1,7 +1,16 @@
 # Game Builder Inventory
 
-**Datum:** 2026-02-01  
-**Status:** KOMPLETT FIL-FÖR-FIL INVENTORY
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Frozen file-by-file builder inventory snapshot from the 2026-02-08 audit batch. Useful as a structure map, but re-audit ownership and risk before large-scale reorganization.
+
+**Exekveringsstatus:** KOMPLETT FIL-FÖR-FIL INVENTORY
 
 ---
 

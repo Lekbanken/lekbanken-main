@@ -1,5 +1,15 @@
 # Play / Run — Regression Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed regression audit for the Play / Run domain after launch-readiness remediation. Use this as bounded verification history together with the original play audit and remediation records.
+
 > **Domain:** Play / Run  
 > **Type:** Phase 2 Regression Audit  
 > **Date:** 2026-03-14  

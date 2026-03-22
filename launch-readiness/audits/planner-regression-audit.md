@@ -1,8 +1,18 @@
 # Planner Regression Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed regression audit for the planner domain after the launch-readiness remediation milestones. Use `launch-readiness/launch-control.md` for current program status and the original planner audit plus implementation records for upstream context.
+
 **Domain:** Planner (plans, blocks, versions, schedules, notes, progress)  
 **Scope:** Verify M1-M3 remediations intact + scan for new gaps  
-**Date:** 2025-07-14  
+**Date:** 2026-03-14  
 **Verdict:** ✅ PASS — No P0/P1 regressions. 2 new findings (1 P2, 1 P3) on post-audit routes.
 
 ---

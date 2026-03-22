@@ -1,5 +1,15 @@
 # Participant State-Machine Hardening Audit
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-19
+- Last updated: 2026-03-21
+- Last validated: 2026-03-19
+
+> Historical issue-family audit for the participant state-machine hardening work. Use this as bounded verification history alongside the paired postfix verification snapshot.
+
 > Created: 2026-03-19
 > Author: Claude (verification agent)
 > Scope: Cluster 19 — BUG-079, BUG-081, BUG-083, BUG-084

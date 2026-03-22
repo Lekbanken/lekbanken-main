@@ -182,7 +182,7 @@ export function HeroV2() {
             <Button
               size="lg"
               href="/demo"
-              className="w-full bg-[#8661ff] shadow-lg shadow-[#8661ff]/25 transition-all duration-200 hover:bg-[#7551ef] hover:shadow-xl hover:shadow-[#8661ff]/30 hover:scale-[1.02] sm:w-auto"
+              className="w-full bg-[#6f46ff] shadow-lg shadow-[#6f46ff]/25 transition-all duration-200 hover:bg-[#5f36ef] hover:shadow-xl hover:shadow-[#6f46ff]/30 hover:scale-[1.02] sm:w-auto"
             >
               {t('hero.cta')}
             </Button>

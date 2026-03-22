@@ -1,8 +1,22 @@
 # Play UI Wiring Audit Report v2
+
+## Metadata
+
+- Owner: -
+- Status: active audit
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Aktiv wiringaudit-referens för play-domänen. Läs den tillsammans med `PLAY_UI_CONTRACT.md` och trigger-/mode-kontrakten när wiring eller realtime-beteende ändras.
+
 ## UI → API → DB Field Mapping (SSoT + Evidence)
 
 **Date:** 2026-02-08  
-**Status:** Verified Reference Document  
+**Last updated:** 2026-03-21  
+**Last validated:** 2026-03-21  
+**Status:** active audit  
+**Execution status:** Verified Reference Document  
 **Previous:** v1 (2026-01-24)
 
 ---
@@ -26,17 +40,17 @@
 
 | Section | v1 Claim | v2 Correction | Evidence |
 |---------|----------|---------------|----------|
-| Board phase lookup | "by phase_order" | **BUG:** Uses `.eq('phase_order', current_phase_index)` - treats index as order | [route.ts#L54-60](../app/api/play/board/[code]/route.ts) |
+| Board phase lookup | "by phase_order" | ✅ Fetches all phases ordered by `phase_order`, then resolves current phase by array index | [route.ts#L57-L65](../app/api/play/board/[code]/route.ts) |
 | Board step lookup | "by step_order" | ✅ Correct: Fetches all steps ordered, uses array index | [route.ts#L67-78](../app/api/play/board/[code]/route.ts) |
-| Step.phaseId in API | Not mentioned | **GAP:** `/game` endpoint does NOT return `phase_id` for steps | [route.ts#L385-402](../app/api/play/sessions/[id]/game/route.ts) |
-| Step→Phase linkage | Unclear | Phase shown via independent `current_phase_index`, NOT derived from step.phase_id | See Section 5 |
+| Step.phaseId in API | Not mentioned | ✅ `/game` now exposes `phaseId` per step for debugging/future derivation | [route.ts#L408](../app/api/play/sessions/[id]/game/route.ts) |
+| Step→Phase linkage | Unclear | Phase is still driven by independent `current_phase_index`, but step payload now includes `phaseId` for future convergence | See Section 5 |
 
-### ❌ Bugs Found
+### ✅ Previously flagged gaps now resolved in code
 
 | Bug | Severity | Location | Impact |
 |-----|----------|----------|--------|
-| **Phase name off-by-one** | 🔴 HIGH | `/api/play/board/[code]` | If `phase_order` is 1-based and `current_phase_index` is 0-based, board shows wrong phase name |
-| **Step.phase_id not exposed** | 🟡 MEDIUM | `/api/play/sessions/[id]/game` | UI cannot auto-derive phase from current step; relies on manual `current_phase_index` |
+| **Phase name off-by-one** | ~~🔴 HIGH~~ | `/api/play/board/[code]` | ~~Board phase lookup treated index as order~~ ✅ Fixed via ordered fetch + array indexing |
+| **Step.phase_id not exposed** | ~~🟡 MEDIUM~~ | `/api/play/sessions/[id]/game` | ~~UI lacked access to step-phase linkage~~ ✅ `phaseId` now included in host response |
 
 ---
 
@@ -120,7 +134,7 @@
 | Duration (seconds) | `GET /game` | `steps[i].duration` | `game_steps.duration_seconds` | None |
 | Display Mode | `GET /game` | `steps[i].display_mode` | `game_steps.display_mode` | None |
 | Step Index | `GET /game` | `steps[i].index` | DERIVED (array position) | 0-based |
-| **Phase ID** | ❌ NOT EXPOSED | N/A | `game_steps.phase_id` | **GAP** |
+| **Phase ID** | `steps[i].phaseId` | `phaseId` | `game_steps.phase_id` | Exposed for host/debug/future phase derivation |
 
 **Evidence:** [route.ts#L373-402](../app/api/play/sessions/[id]/game/route.ts)
 
@@ -135,7 +149,7 @@
 | Status | `session.status` | `participant_sessions.status` | ✅ |
 | Current Step Index | `session.current_step_index` | `participant_sessions.current_step_index` | ✅ 0-based |
 | Current Phase Index | `session.current_phase_index` | `participant_sessions.current_phase_index` | ✅ 0-based |
-| Current Phase Name | `session.current_phase_name` | `game_phases WHERE phase_order = current_phase_index` | ⚠️ **BUG:** Treats index as order |
+| Current Phase Name | `session.current_phase_name` | Ordered `game_phases[]`, then array lookup by `current_phase_index` | ✅ Avoids index/order mismatch |
 | Current Step Title | `session.current_step_title` | `game_steps[current_step_index]` after ORDER BY step_order | ✅ Uses array index |
 | Current Step Board Text | `session.current_step_board_text` | `game_steps.board_text ?? game_steps.body` | ✅ Fallback verified |
 | Timer State | `session.timer_state` | `participant_sessions.timer_state` | ✅ JSONB |
@@ -171,15 +185,9 @@
 | Current Step | `current_step_index` | 0-based | 0-based |
 | Current Phase | `current_phase_index` | 0-based | 0-based |
 
-**⚠️ Critical Bug in Board API:**
+**Current board API rule:**
 ```typescript
-// BUG: Treats current_phase_index (0-based) as phase_order (1-based)
-.eq('phase_order', session.current_phase_index ?? 0)
-```
-
-**Correct approach (as used for steps):**
-```typescript
-// CORRECT: Fetch all phases ordered, then use index
+// Correct: fetch ordered phases, then resolve by 0-based runtime index
 const phase = (phases ?? [])[session.current_phase_index ?? 0];
 ```
 
@@ -193,14 +201,13 @@ const phase = (phases ?? [])[session.current_phase_index ?? 0];
 |--------|----------|----------|
 | Phase navigation | **Independent** from step navigation | [StepPhaseNavigation.tsx#L39-51](../features/play/components/StepPhaseNavigation.tsx) |
 | Phase display source | `current_phase_index` from `participant_sessions` | [useSessionState.ts#L254](../features/play/hooks/useSessionState.ts) |
-| Step→Phase derivation | **Not implemented** in Play UI | `/game` endpoint doesn't return `phase_id` |
-| Phase name on Board | Queried by `phase_order` = `current_phase_index` (BUG) | [route.ts#L54-60](../app/api/play/board/[code]/route.ts) |
+| Step→Phase derivation | **Not implemented yet in Play UI** | `/game` endpoint now returns `phaseId`, but runtime still trusts `current_phase_index` |
+| Phase name on Board | Resolved from ordered phases via array index | [route.ts#L57-L65](../app/api/play/board/[code]/route.ts) |
 
 ### What's Missing
 
-1. **API Gap:** `/api/play/sessions/[id]/game` does NOT return `step.phase_id`
-2. **UI Gap:** No logic to auto-advance `current_phase_index` when step changes to a step in a different phase
-3. **Board Bug:** Phase lookup uses index as order (off-by-one potential)
+1. **UI Gap:** No logic yet auto-derives `current_phase_index` from `step.phaseId` when step changes
+2. **Contract convergence gap:** Runtime still treats phase navigation as independent even though step payload now exposes linkage
 
 ### How It Should Work (Recommended)
 

@@ -1,8 +1,23 @@
 # System Verification — 2026-03-13
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Frozen verification snapshot comparing the repository state against `launch-snapshot-2026-03.md`. Do not treat counts or deltas here as current truth without re-running the underlying verification.
+
+> **Date:** 2026-03-13  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** frozen audit  
 > **Purpose:** Code-verified system status compared against `launch-snapshot-2026-03.md`.  
 > **Method:** All metrics below were verified by scanning the actual repository files using `.NET System.IO.File.ReadAllText()` and PowerShell `Get-ChildItem`, not by reading documentation.  
-> **Verified by:** Claude Opus 4.6 (automated)
+> **Verified by:** Claude Opus 4.6 (automated)  
+> **Note:** Frozen verification snapshot. Do not treat counts or deltas here as current truth without re-running the underlying verification.
 
 ---
 

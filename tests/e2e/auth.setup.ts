@@ -7,20 +7,16 @@ import { finishLoginFlow, waitForPostLoginRedirect } from './utils/auth-flow';
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local'), override: true });
 
 const authFile = path.join(__dirname, '../.auth/user.json');
+const defaultRegularUserEmail = 'test-regular-user@lekbanken.no';
+const defaultRegularUserPassword = 'TestUser123!';
 
 /**
  * Authentication setup - runs once before all tests
  * Stores auth state for reuse across tests
  */
 setup('authenticate', async ({ page }) => {
-  const email = process.env.TEST_REGULAR_USER_EMAIL || process.env.AUTH_TEST_EMAIL;
-  const password = process.env.TEST_REGULAR_USER_PASSWORD || process.env.AUTH_TEST_PASSWORD;
-
-  if (!email || !password) {
-    console.warn('⚠️  No generic auth setup credentials configured. Skipping auth setup.');
-    await page.context().storageState({ path: authFile });
-    return;
-  }
+  const email = process.env.TEST_REGULAR_USER_EMAIL || defaultRegularUserEmail;
+  const password = process.env.TEST_REGULAR_USER_PASSWORD || defaultRegularUserPassword;
 
   // Navigate to login page
   await page.goto('/auth/login');

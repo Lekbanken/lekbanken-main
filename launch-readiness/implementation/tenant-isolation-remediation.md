@@ -1,8 +1,14 @@
 # Tenant Isolation Remediation
 
+## Metadata
+
 > **Date:** 2026-03-11  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** frozen audit  
 > **Source:** `audits/tenant-isolation-audit.md` — 10 findings (1 P0, 3 P1, 3 P2, 3 P3)  
-> **Scope:** TI-001 P0 fix (games builder cross-tenant CRUD)
+> **Scope:** TI-001 P0 fix (games builder cross-tenant CRUD)  
+> **Note:** Frozen remediation record for the tenant-isolation launch-scope fix. Revalidate against current code and `launch-control.md` before using this as active execution guidance.
 
 ---
 

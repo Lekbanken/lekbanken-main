@@ -1,5 +1,15 @@
 # Golden Path QA Checklist — Participant Play
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-22
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Aktiv QA-checklista för participant play-flödet. Innehållet är användbart operativt, men checklistans steg behöver fortfarande köras mot aktuell runtime.
+
 > **Date:** 2026-02-21  
 > **Scope:** Core participant loop: Step → Timer → Artifact highlight → Decision blocking → Story overlay → Signals  
 > **Goal:** Verify "premium mobile-first fullscreen" experience on the standard game path.

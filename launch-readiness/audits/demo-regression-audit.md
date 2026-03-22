@@ -1,5 +1,15 @@
 # Demo Regression Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed regression audit for the demo domain after launch-readiness remediation. Use this as bounded verification history rather than an active operating guide.
+
 **Domain:** Demo (ephemeral users, demo sessions, feature gating, conversion tracking)  
 **Scope:** Full regression — verify M1 remediation, all demo flows, session lifecycle, feature gates, telemetry  
 **Date:** 2026-03-14  

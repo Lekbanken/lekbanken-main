@@ -1,5 +1,15 @@
 # Learning Module Implementation Guide
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-04
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft implementation guide for the learning module domain, including schema, routes, and operational scope.
+
 ## 1. Vision & Scope
 
 ### Overview

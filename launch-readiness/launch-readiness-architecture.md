@@ -1,10 +1,20 @@
 # Lekbanken Launch Readiness — Architecture & Environment
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-13
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Active architecture and environment reference for the launch-readiness program. Use this as the stable system and environment overview together with `launch-control.md` and the linked audit and implementation records.
+
 > **Version:** 1.2  
 > **Created:** 2026-03-10  
-> **Last updated:** 2026-03-15  
+> **Last updated:** 2026-03-22  
 > **Purpose:** Målbild för sandbox, test foundation, miljöer, databaser, migrationssäkerhet, release/rollback och framtidssäkring.  
-> **Status:** LAUNCH READY — API wrapper, rate limiting, auth standardization, and scaling hardening done. Environment isolation implemented (local Docker + staging Supabase). Test foundation exists ad-hoc (261 test files, CI 7 checks).
+> **Status:** LAUNCH READY — API wrapper, rate limiting, auth standardization, and scaling hardening done. Environment isolation implemented (local Docker + staging Supabase). Test foundation exists ad-hoc (261 test files, CI 7 checks) and the latest local Playwright full-suite baseline is verified at 60 passed, 43 skipped, 0 failed.
 
 ---
 
@@ -46,7 +56,7 @@
 
 ### ADR-005: Environment Isolation
 
-**Problem:** Idag delar development, preview och production samma Supabase-instans. Det gör det farligt att testa migrations och omöjligt att köra destructive tests.
+**Historical problem statement:** Development, preview och production delade tidigare samma Supabase-instans. Det gjorde det farligt att testa migrations och omöjligt att köra destructive tests.
 
 **Alternativ utvärderade:**
 
@@ -91,25 +101,26 @@ supabase db seed       # Kör seed-filer
 - `NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY=<lokal nyckel>`
 
-**Behov:**
-- [ ] Verifiera att `supabase start` fungerar med 330+ migrations
-- [ ] Skapa/uppdatera seed-filer i `supabase/seeds/`
-- [ ] Skapa `.env.local.example` med lokala Supabase-variabler
-- [ ] Dokumentera setup i README
+**Verifierad status (2026-03-22):**
+- [x] Lokal `.env.local` pekar mot `localhost:54321`
+- [x] Lokal Supabase används för development
+- [x] Seed-baseline uppdaterad för aktuell demo-tenant och lokal E2E-körning
+- [ ] README och exemplarisk lokal env-dokumentation kan fortfarande förbättras separat
 
 #### Steg 2: Remote Sandbox
 
-- [ ] Skapa nytt Supabase-projekt: `lekbanken-sandbox`
-- [ ] Synka alla migrations dit
-- [ ] Konfigurera Vercel preview environment variables att peka mot sandbox
-- [ ] Sätt upp seed data
-- [ ] Testa auth flows mot sandbox
+**Verifierad status (2026-03-22):**
+- [x] Staging Supabase finns: `vmpdejhgpsrfulimsoqn`
+- [x] Vercel preview environment pekar mot staging Supabase
+- [x] Auth- och appflöden verifieras nu mot isolerade miljöer i stället för prod-data-plane
+- [ ] Seed- och preview-dokumentation kan förtydligas ytterligare vid behov
 
 #### Steg 3: CI-integration
 
-- [ ] GitHub Actions: E2E-tester körs mot lokal Supabase
-- [ ] Vercel previews: pekar mot sandbox DB
-- [ ] Migration verification: `supabase db diff` i CI innan merge
+**Nuvarande läge:**
+- [x] Vercel previews pekar mot staging/sandbox DB
+- [x] CI kör redan flera verifieringssteg för lint, typer, tester och i18n
+- [ ] Full lokal/CI-policy för Playwright skip-budget och kritiska flöden återstår som test-programarbete, inte som miljöblockerare
 
 ---
 
@@ -441,4 +452,5 @@ Alla arkitekturbeslut som behöver fattas under Phase 1:
 | Datum | Ändring |
 |-------|---------|
 | 2026-03-10 | Initial creation — environment, test, security, deploy strategy |
+| 2026-03-22 | Synced environment/test status with current launch baseline. Added verified local Playwright result (60 passed, 43 skipped, 0 failed) and marked old sandbox setup steps as historical/completed state. |
 | 2025-07-24 | Updated security model, API wrapper status, ADR-007/010 decided, rate limiting + audit trail status |

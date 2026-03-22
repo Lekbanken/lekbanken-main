@@ -1,5 +1,15 @@
 # Tenant Isolation Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed tenant-isolation audit from the launch-readiness cycle. Use `launch-readiness/launch-control.md` for current program status and treat this file as the bounded audit snapshot behind later tenant-boundary remediation and verification work.
+
 > **Date:** 2026-03-10
 > **Auditor:** Claude (automated)
 > **Scope:** All API routes, services, and database policies related to tenant boundary enforcement

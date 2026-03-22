@@ -1,7 +1,16 @@
 # Game Builder Event Model
 
-**Datum:** 2026-02-01  
-**Status:** KOMPLETT EVENT/STATE PIPELINE
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active reference for the builder state machine, reducer flow, history model, and autosave pipeline. Keep it aligned with runtime changes to builder state handling.
+
+**Exekveringsstatus:** KOMPLETT EVENT/STATE PIPELINE
 
 ---
 

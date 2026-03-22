@@ -1,5 +1,15 @@
 # Gamification Event Integrity Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed audit for gamification event idempotency and reward-integrity behavior. Treat this as a bounded audit snapshot behind later launch-readiness references and not as an active operating guide.
+
 > **Date:** 2025-01-25
 > **Scope:** Event amplification, duplicate reward protection, idempotency enforcement
 > **Verdict:** 🟢 **DB-layer idempotency is strong and launch-sufficient.** No confirmed double-reward bugs in audited paths. Minor hygiene issues identified.

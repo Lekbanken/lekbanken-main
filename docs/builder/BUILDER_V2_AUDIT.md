@@ -1,9 +1,18 @@
 # Game Builder Full Audit (Pre-Import Hardening)
 
-> **Syfte**: Defensiv audit av Game Builder före implementation av bulk import.  
-> **Läsare**: Utvecklare, teknisk PM  
-> **Omfattning**: Endast befintlig implementation; inga ändringsförslag.  
-> **Datum**: 2026-01-XX
+## Metadata
+
+- Owner: -
+- Status: active audit
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active foundational audit for the Builder V2 workstream. Use it together with the verification document and later import/contract docs, not in isolation.
+
+**Syfte**: Defensiv audit av Game Builder före implementation av bulk import.  
+**Läsare**: Utvecklare, teknisk PM  
+**Omfattning**: Endast befintlig implementation; inga ändringsförslag.
 
 ---
 
@@ -48,9 +57,9 @@ Buildern är ett **author-time redigeringsverktyg** som:
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                           BUILDER ENTRYPOINT                            │
 ├─────────────────────────────────────────────────────────────────────────┤
-│ URL:   /admin/games/builder/[id]                                        │
-│ File:  app/admin/games/builder/GameBuilderPage.tsx (1100 lines)         │
-│ State: hooks/useGameBuilder.ts (478 lines)                              │
+│ URL:   /admin/games/new | /admin/games/[gameId]/edit                    │
+│ File:  app/admin/games/builder/GameBuilderPage.tsx (1379 lines)         │
+│ State: hooks/useGameBuilder.ts (452 lines)                              │
 └─────────────────────────────────────────────────────────────────────────┘
                                   │
                      ┌────────────┴────────────┐
@@ -67,9 +76,9 @@ Buildern är ett **author-time redigeringsverktyg** som:
 
 | Fil | Rader | Ansvar | Risk |
 |-----|-------|--------|------|
-| [app/api/games/builder/[id]/route.ts](../../app/api/games/builder/[id]/route.ts) | 832 | GET/PUT persistence | **Hög** |
-| [hooks/useGameBuilder.ts](../../hooks/useGameBuilder.ts) | 478 | State management + undo/redo | **Hög** |
-| [GameBuilderPage.tsx](../../app/admin/games/builder/GameBuilderPage.tsx) | 1100 | Orchestration + autosave | **Hög** |
+| [app/api/games/builder/[id]/route.ts](../../app/api/games/builder/[id]/route.ts) | 816 | GET/PUT persistence | **Hög** |
+| [hooks/useGameBuilder.ts](../../hooks/useGameBuilder.ts) | 452 | State management + undo/redo | **Hög** |
+| [GameBuilderPage.tsx](../../app/admin/games/builder/GameBuilderPage.tsx) | 1379 | Orchestration + autosave | **Hög** |
 | [types/game-builder-state.ts](../../types/game-builder-state.ts) | 303 | State types + actions | Medel |
 | [types/games.ts](../../types/games.ts) | 408 | ArtifactType union, form data | Medel |
 | [types/trigger.ts](../../types/trigger.ts) | 619 | TriggerCondition/TriggerAction unions | Medel |

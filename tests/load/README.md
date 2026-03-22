@@ -1,5 +1,13 @@
 # Load/Performance Smoke
 
+## Metadata
+- Status: draft
+- Date: 2025-12-11
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: qa
+- Scope: Lightweight load-smoke guidance
+
 Lightweight k6-based smoke to run before releases or weekly.
 
 ## Prereqs

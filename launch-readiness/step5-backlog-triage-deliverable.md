@@ -1,8 +1,22 @@
 # Step 5 — Post-Launch Backlog Triage — Deliverable
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-15
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Historical triage snapshot tied to the Step 1-5 deliverable sequence. Reconcile with `launch-control.md` and `post-launch-remediation-waves.md` before using it as current backlog guidance.
+
 **Date:** 2026-03-15  
+**Last updated:** 2026-03-21  
+**Last validated:** 2026-03-21  
+**Status:** historical snapshot  
 **Scope:** Tight triage of first post-launch batch. Informed by Steps 1–4.  
-**Constraint:** No system-wide replan. Only classify credible first-batch candidates from verified findings.
+**Constraint:** No system-wide replan. Only classify credible first-batch candidates from verified findings.  
+**Note:** Historical triage snapshot tied to the Step 1-5 deliverable sequence. Reconcile with `launch-control.md` and `post-launch-remediation-waves.md` before using it as current backlog guidance.
 
 ---
 

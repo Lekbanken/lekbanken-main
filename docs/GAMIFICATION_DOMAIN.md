@@ -1,9 +1,13 @@
 # GAMIFICATION DOMAIN
 
 ## Metadata
-- **Status:** Active (partial implementation)
-- **Last updated:** 2025-12-17
-- **Source of truth:** Repo code (`app/app/gamification/**`, `app/api/gamification/**`, `features/gamification/**`, `lib/services/*Service.ts`) + Supabase migrations (achievements, coins, streaks, progress, challenges, events, leaderboards)
+
+> **Status:** active
+> **Owner:** -
+> **Date:** 2025-12-17
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+> **Source of truth:** Repo code (`app/app/gamification/**`, `app/api/gamification/**`, `features/gamification/**`, `lib/services/*Service.ts`) + Supabase migrations (achievements, coins, streaks, progress, challenges, events, leaderboards)
 
 ## Scope
 Gamification Domain owns:

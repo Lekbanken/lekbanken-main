@@ -1,6 +1,16 @@
 # Service Level Agreement (SLA)
 ## Lekbanken Enterprise
 
+## Metadata
+
+- Owner: CTO
+- Status: draft
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft enterprise SLA covering uptime, support, backup, and incident handling.
+
 **Version:** 1.0  
 **Gäller från:** 2025-01-13  
 **Dokumentägare:** CTO

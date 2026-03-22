@@ -1,5 +1,15 @@
 # 🏢 Organisationskort (Organisation Card) – Complete Specification
 
+## Metadata
+
+- Owner: System Admin Team
+- Status: draft
+- Date: 2026-01-04
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft specification for the organisation card as the primary system-admin tenant management view.
+
 > **Primary admin view for tenant management in Lekbanken**
 
 ## Metadata

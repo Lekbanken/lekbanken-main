@@ -1,6 +1,15 @@
 # Lekbanken Cleanup Master Prompt (v1.0)
 
-**Created**: 2026-01-28  
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-01-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived cleanup orchestration prompt from an earlier repo-cleanup phase. Keep as historical process context only.
+
 **Purpose**: Safe, controlled cleanup of duplicated/outdated code and low-risk DB optimizations
 
 ---

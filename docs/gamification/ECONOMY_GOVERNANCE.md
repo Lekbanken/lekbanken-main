@@ -1,8 +1,16 @@
 # Gamification Economy Governance
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active governance reference for economy-critical gamification code. Verify listed code paths and controls against current implementation before making structural changes.
+
 **Project:** Lekbanken  
-**Created:** January 8, 2026  
-**Status:** 🔒 Economy-Critical System  
 **Version:** v2 (Frozen)
 
 ---
@@ -271,7 +279,7 @@ As of 2026-01-08, the following event contracts are **frozen**:
 2. ☐ Estimate impact on mint/burn ratio
 3. ☐ Write tests for new behavior
 4. ☐ Review with another team member
-5. ☐ Deploy to staging and verify
+5. ☐ Deploy to preview and verify
 6. ☐ Monitor for 24h post-deploy
 
 ### Emergency Procedures

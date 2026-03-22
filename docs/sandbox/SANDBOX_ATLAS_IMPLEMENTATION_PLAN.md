@@ -1,5 +1,15 @@
 ﻿# Sandbox Atlas Implementation Plan
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-10
+- Last updated: 2026-03-21
+- Last validated: 2026-01-10
+
+> Draft sandbox plan for Atlas-style visualization work. Treat this as a bounded implementation proposal until the corresponding sandbox route and registry land in code.
+
 Date: 2026-01-10
 Status: Draft (review before build)
 Owner: TBD

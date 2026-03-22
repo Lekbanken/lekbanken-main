@@ -1,5 +1,15 @@
 # Produktsynkronisering: Fältanalys & Utökningsförslag
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk fältanalys för Stripe-produktsynk. Behåll som tidigare specifikations- och implementationsunderlag, inte som nuvarande canonical sync-kontrakt.
+
 **Datum:** 2026-01-08  
 **Status:** Implementerad och verifierad ✅ | Granskad av ChatGPT ✅  
 **Syfte:** Specifikation för vilka fält som ska synkroniseras till Stripe

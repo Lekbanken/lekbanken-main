@@ -1,5 +1,15 @@
 # Deprecated / Quarantined Code
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Aktiv policy för karantänzonen `deprecated/`. Innehållet här är avsiktligt icke-kanoniskt för runtime-utveckling.
+
 This folder contains code scheduled for removal.
 
 ## Purpose
@@ -54,5 +64,3 @@ deprecatedImportWarning('<module-name>');
 | (none yet) | — | — | — |
 
 ---
-
-*Last updated: 2026-01-28*

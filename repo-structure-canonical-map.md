@@ -2,6 +2,16 @@
 
 > Generated 2026-03-16. Classifications based on import analysis, route wiring, and layout hierarchy verification.
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-16
+
+> Frozen structural classification snapshot from the 2026-03-16 repo audit. Use current governance docs for working rules, not this map alone.
+
 Legend:
 - **CR** = Canonical Runtime (part of production app)
 - **SUI** = Shared UI (imported by multiple surfaces)

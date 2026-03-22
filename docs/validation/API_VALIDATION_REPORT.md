@@ -1,9 +1,18 @@
 # API VALIDATION REPORT – Phase 2: Backend ↔ Frontend
 
-**Date:** 2025-12-11  
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-11
+- Last updated: 2026-03-21
+- Last validated: 2025-12-11
+
+> Historical validation snapshot from the 2025-12-11 backend/frontend pass. Endpoint counts and conclusions here must be revalidated against the current API surface before being used operationally.
+
 **Phase:** 2 – Backend ↔ Frontend Validation  
 **Total Endpoints Inventoried:** 85  
-**Status:** ✅ COMPLETE (85/85 = 100%)
+**Execution status:** ✅ COMPLETE (85/85 = 100%)
 
 ---
 

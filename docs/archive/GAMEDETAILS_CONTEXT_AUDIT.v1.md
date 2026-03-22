@@ -1,9 +1,14 @@
-# GameDetails Context Audit — Djupanalys
+# GameDetails Context Audit - Djupanalys
 
-> **Datum:** 2026-03-10  
-> **Scope:** Alla ytor som konsumerar speldata: Library, Director Preview, Host/Admin, Participant Play, Facilitator, Sandbox, Board, Planner  
-> **Syfte:** Kartlägga om komponenter, information och interaktivitet är korrekt anpassade per kontext och roll  
-> **Verifieringsgrad:** 🟢 Verifierat = läst från kod | 🟡 Sannolikt = indikationer i kod | 🔴 Antagande = ej verifierat
+## Metadata
+- Status: archived
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: play
+- Scope: Superseded GameDetails context audit v1
+
+Superseded v1 audit snapshot retained for provenance. Use the active GameDetails context audit instead of this archived version for current findings.
 
 ---
 

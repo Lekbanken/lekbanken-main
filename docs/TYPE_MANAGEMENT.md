@@ -1,5 +1,13 @@
 # TypeScript Type Management Guide
 
+## Metadata
+
+> **Status:** draft
+> **Owner:** -
+> **Date:** 2025-12-10
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+
 ## 🎯 Översikt
 
 Detta projekt använder auto-genererade TypeScript types från Supabase-databasen. Det är **kritiskt** att dessa types hålls synkroniserade med databasschemat.

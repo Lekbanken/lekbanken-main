@@ -1,8 +1,13 @@
 # App Shell / Navigation / Notifications — Architecture
 
+## Metadata
+
 **Date:** 2026-03-16  
+**Last updated:** 2026-03-21  
+**Last validated:** 2026-03-21  
 **Status:** Verified against codebase — reflects actual runtime wiring  
 **Scope:** App-zone only (`/app/*`). Admin zone has its own shell (`AdminShellV2`).
+**Canonical entrypoint:** `docs/notifications/README.md`
 
 ---
 
@@ -20,7 +25,7 @@
 │              ├── <DemoBanner>                                 │
 │              └── <AppShell>          [components/app/]        │
 │                    ├── <SideNav>     [components/app/] (lg+)  │
-│                    ├── <AppTopbar>   [app/app/components/]    │
+│                    ├── <AppTopbar>   [components/app/]        │
 │                    │     ├── Back button (conditional)        │
 │                    │     ├── Logo (→ /app)                    │
 │                    │     └── <NotificationBell>               │
@@ -40,15 +45,13 @@
 ```
 components/app/          ← Shared app-zone UI components
   AppShell.tsx            ← Root shell (layout + nav + header slot)
+  AppTopbar.tsx           ← Topbar (back + logo + bell)
   BottomNav.tsx           ← Mobile bottom navigation
   SideNav.tsx             ← Desktop side navigation
   NotificationBell.tsx    ← Bell icon + notification dropdown
   ProfileModal.tsx        ← Quick profile action sheet
   PageTitleHeader.tsx     ← Standard page title block (icon + eyebrow + h1)
   nav-items.tsx           ← Navigation item definitions (shared by BottomNav + SideNav)
-
-app/app/components/      ← Route-specific layout components (MINIMAL — only topbar)
-  app-topbar.tsx          ← Topbar (back + logo + bell) — layout-specific composition
 
 hooks/                   ← Shared hooks
   useAppNotifications.ts ← Notification data management (shared store pattern)
@@ -59,18 +62,12 @@ hooks/                   ← Shared hooks
 | Component Type | Canonical Path | Import Alias |
 |---------------|---------------|--------------|
 | App shell components | `components/app/*.tsx` | `@/components/app/*` |
-| Route-specific layout | `app/app/components/*.tsx` | `./components/*` (relative) |
 | Shared hooks | `hooks/*.ts` | `@/hooks/*` |
 | Feature components | `features/{domain}/*.tsx` | `@/features/{domain}/*` |
 
-### What Goes Where
+### Current Placement Rule
 
-| `components/app/` | `app/app/components/` |
-|---|---|
-| Reusable across multiple pages | Specific to app-zone layout composition |
-| Self-contained UI components | Composes components from `components/app/` |
-| No route-specific logic | May use route-aware hooks (`usePathname`) |
-| Example: `NotificationBell`, `BottomNav` | Example: `app-topbar.tsx` |
+All active app-shell components now live in `components/app/`. Do not recreate `app/app/components/` for app-shell code unless a future route-local layout concern cannot be expressed cleanly in the shared shell.
 
 ---
 
@@ -102,7 +99,7 @@ components/app/SideNav.tsx
 ### Topbar
 
 ```
-app/app/components/app-topbar.tsx
+components/app/AppTopbar.tsx
   ├── Left:   Back button (conditional via canGoBack prop)
   ├── Center: Dice logo (→ /app)
   └── Right:  <NotificationBell />
@@ -219,7 +216,7 @@ These are **fully independent shells** sharing no layout components. This is cor
 - Edit `components/app/NotificationBell.tsx` for bell behavior
 - Edit `hooks/useAppNotifications.ts` for notification data/state logic
 - Edit `app/app/notifications/page.tsx` for notification page UI
-- Edit `app/app/components/app-topbar.tsx` for topbar layout changes
+- Edit `components/app/AppTopbar.tsx` for topbar layout changes
 - Use `PageTitleHeader` for new page headers
 
 ### DO NOT
@@ -228,5 +225,5 @@ These are **fully independent shells** sharing no layout components. This is cor
 - Touch `components/app/PageHeader.tsx` — it is legacy
 - Touch `components/admin/AdminNotificationsCenter.tsx` — it is orphaned
 - Touch `components/admin/useRealAdminNotifications.ts` — it is orphaned
-- Create new files in `app/app/components/` unless route-layout-specific
+- Recreate `app/app/components/` for app-shell code without a verified route-local need
 - Assume admin zone has notification consumption — it does not

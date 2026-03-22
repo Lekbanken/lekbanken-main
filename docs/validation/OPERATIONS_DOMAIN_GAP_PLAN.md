@@ -1,8 +1,14 @@
 # Operations Domain – Gap Plan
 
-Status: needs_work  
-Date: 2025-12-11  
-Owner: Ops/Platform
+## Metadata
+
+- Owner: Ops/Platform
+- Status: historical snapshot
+- Date: 2025-12-11
+- Last updated: 2026-03-21
+- Last validated: 2025-12-11
+
+> Historical ops gap plan from before the current `docs/ops/` runbooks were established. Use the active ops docs for present-tense guidance.
 
 ## Findings
 - Backups / DR: no documented backup schedule or tested restore runbook.

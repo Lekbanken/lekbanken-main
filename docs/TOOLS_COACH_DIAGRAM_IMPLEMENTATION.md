@@ -2,10 +2,16 @@
 
 ## Metadata
 
+- Owner: -
 - Status: draft
+- Date: 2026-01-02
 - Last updated: 2026-01-02
+- Last validated: -
+- Last updated: 2026-03-21
 - Tool key: `coach_diagram`
 - Asset type: `training_diagram` (MVP)
+
+> Draft implementation/spec document for the Coach Diagram Builder tool and its MVP data model, UI flows, and test checklist.
 
 ## 1) Syfte & use cases
 

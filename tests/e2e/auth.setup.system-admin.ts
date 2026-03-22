@@ -7,6 +7,8 @@ import { finishLoginFlow, resetMfaFactorsForTestUser, waitForPostLoginRedirect }
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local'), override: true });
 
 const authFile = path.join(__dirname, '../.auth/system-admin.json');
+const defaultSystemAdminEmail = 'test-system-admin@lekbanken.no';
+const defaultSystemAdminPassword = 'TestAdmin123!';
 
 /**
  * System Admin Authentication Setup
@@ -15,16 +17,8 @@ const authFile = path.join(__dirname, '../.auth/system-admin.json');
  * Used by tests that verify system-admin-only functionality.
  */
 setup('authenticate system admin', async ({ page }) => {
-  // Use existing AUTH_TEST_EMAIL/PASSWORD (admin@lekbanken.no is system_admin)
-  const email = process.env.AUTH_TEST_EMAIL;
-  const password = process.env.AUTH_TEST_PASSWORD;
-
-  if (!email || !password) {
-    console.warn('⚠️  AUTH_TEST_EMAIL and AUTH_TEST_PASSWORD not set. Skipping system admin auth setup.');
-    // Create empty auth state to prevent test failures
-    await page.context().storageState({ path: authFile });
-    return;
-  }
+  const email = process.env.AUTH_TEST_EMAIL || defaultSystemAdminEmail;
+  const password = process.env.AUTH_TEST_PASSWORD || defaultSystemAdminPassword;
 
   await resetMfaFactorsForTestUser(email);
 

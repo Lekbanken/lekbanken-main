@@ -1,8 +1,23 @@
 # Security & Auth Remediation
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-13
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Historical snapshot of the executed security/auth remediation work for the launch-readiness program. Use `launch-readiness/implementation/README.md` as the implementation entrypoint, `launch-readiness/audits/security-auth-audit.md` for the audit snapshot, and `launch-readiness/launch-control.md` for the current launch posture.
+
 > **Date:** 2026-03-10  
+> **Last updated:** 2026-03-22  
+> **Last validated:** 2026-03-22  
+> **Status:** historical snapshot  
 > **Source:** `audits/security-auth-audit.md` — 17 findings (2 P0, 5 P1, 6 P2, 4 P3)  
-> **Scope:** P0 fixes, first batch critical rate limiting, design decisions DD-1 through DD-4
+> **Scope:** P0 fixes, first batch critical rate limiting, design decisions DD-1 through DD-4  
+> **Execution status:** COMPLETE — SEC-001 and SEC-002a are implemented; SEC-002b remains a documented post-launch infrastructure decision.  
+> **Note:** Executed remediation/design-decision record. Use `launch-control.md` for the current launch-program summary and treat this file as the bounded implementation history for security/auth launch work.
 
 ---
 

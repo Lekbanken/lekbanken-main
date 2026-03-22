@@ -1,5 +1,15 @@
 # Sandbox Artifacts – Implementation Log
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2025-12-29
+- Last updated: 2026-03-21
+- Last validated: 2025-12-29
+
+> Active sandbox implementation log for artifact harness work. Verify current status against `app/sandbox/` before relying on checklist progress as current runtime truth.
+
 > **Scope rule (mandatory):** This file is updated continuously while implementing the Sandbox Artifacts initiative.
 >
 > - Add a short entry **before** starting a major task.

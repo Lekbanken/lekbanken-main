@@ -1,12 +1,14 @@
-\# Admin Game Builder (builder API + v2 content)
+# Admin Game Builder (builder API + v2 content)
 
 Goal: Ett enhetligt Game Builder-flöde i `/admin/games` som stödjer både enkla lekar och mer avancerade upplägg (faser/roller/board-config) utan separata “wizards”.
 
 ## Metadata
 
-- Owner: -
-- Status: active
-- Last validated: 2025-12-17
+> **Status:** active
+> **Owner:** -
+> **Date:** 2025-12-16
+> **Last updated:** 2026-03-21
+> **Last validated:** 2025-12-17
 
 ## Related code (source of truth)
 

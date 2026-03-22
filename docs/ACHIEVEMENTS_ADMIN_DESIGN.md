@@ -1,5 +1,15 @@
 # Achievements Admin Design Document
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-03
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft design/spec document for the Achievements Admin badge-builder experience.
+
 ## Visual Concept Narrative
 
 The **Achievements Admin** page is a precision-crafted badge/icon builder that blends Scandinavian simplicity with the playful energy of premium collectibles. The experience is designed for desktop-first workflows where administrators construct layered badges with surgical precision.

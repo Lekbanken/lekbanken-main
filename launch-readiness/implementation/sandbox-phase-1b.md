@@ -1,10 +1,16 @@
 # Phase 1B — Environment Isolation Implementation
 
+## Metadata
+
 > **Date:** 2026-03-13  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** historical snapshot  
 > **Author:** Claude Opus 4.6 (code-verified)  
 > **Scope:** Complete Phase 1B — isolate preview/dev from production Supabase  
 > **Resolves:** OPS-SAND-001 (P1)  
 > **Method:** Every claim verified against repository files, CI workflows, and configuration  
+> **Note:** Historical snapshot of the Phase 1B environment-isolation workstream. Current environment truth lives in `docs/database/environments.md`, `docs/DEVELOPER_SETUP.md`, and `launch-control.md`.
 
 ---
 

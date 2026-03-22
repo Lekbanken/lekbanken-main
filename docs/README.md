@@ -1,5 +1,15 @@
 # Lekbanken docs (Source of Truth)
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2025-12-17
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Active entrypoint for the `docs/` tree. Use this file to route into canonical clusters and governance docs.
+
 Detta är den **aktuella** dokumentationen för Lekbanken.
 
 - Repo:t (docs/ + sandbox/wiki) är **Single Source of Truth**.
@@ -7,33 +17,66 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 
 ## Start här
 
+- Root product context: [../PROJECT_CONTEXT.md](../PROJECT_CONTEXT.md)
+- Root inventory governance: [../INVENTORY_RULES.md](../INVENTORY_RULES.md) + [../INVENTORY_DECISIONS.md](../INVENTORY_DECISIONS.md)
 - Systemöversikt (för humans + AI): se [../sandbox/wiki/README.md](../sandbox/wiki/README.md)
 - Full inventory (alla docs): se [INVENTORY.md](INVENTORY.md)
+- Quick docs index: se [DOCS_INDEX.md](DOCS_INDEX.md)
 - Naming/struktur: se [DOCS_NAMING_CONVENTIONS.md](DOCS_NAMING_CONVENTIONS.md)
-- DB/migrations: MIGRATIONS.md
-- Auth/RBAC: auth/* (aktuellt) + AUTH_SYSTEM_ANALYSIS.md (historisk/archived)
-- Admin: ADMIN_OVERVIEW_REPORT.md + admin/
-- Games / Game Builder / CSV: ADMIN_GAME_BUILDER_V1.md, TESTPLAN_GAME_BUILDER_P0.md, GAME_BUILDER_UI_SPEC.md, CSV_IMPORT_FIELD_REFERENCE.md
+- Canonical doc map: se [DOCUMENTATION_STANDARD.md](DOCUMENTATION_STANDARD.md)
+- Dateringsstandard: se [DOCUMENT_DATING_STANDARD.md](DOCUMENT_DATING_STANDARD.md)
+- Triplet workflow: se [TRIPLET_WORKFLOW_STANDARD.md](TRIPLET_WORKFLOW_STANDARD.md)
+- Triplet creation checklist: se [TRIPLET_CREATION_CHECKLIST.md](TRIPLET_CREATION_CHECKLIST.md)
+- Launch program status: se [../launch-readiness/launch-control.md](../launch-readiness/launch-control.md)
+- Launch audits: se [../launch-readiness/audits/README.md](../launch-readiness/audits/README.md)
+- Launch remediation records: se [../launch-readiness/implementation/README.md](../launch-readiness/implementation/README.md)
+- Internationalization guide: se [I18N_GUIDE.md](I18N_GUIDE.md)
+- VS Code/session workflow: se [VS_CODE_WORKFLOW.md](VS_CODE_WORKFLOW.md)
+- CLI/MCP tool policy: se [TOOLING_MATRIX.md](TOOLING_MATRIX.md)
+- Artifact UI specs (draft): se [ARTIFACT_COMPONENTS.md](ARTIFACT_COMPONENTS.md) + [ARTIFACT_MATRIX.md](ARTIFACT_MATRIX.md)
+- AI coding guardrails: se [AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md)
+- DB/migrations: se [MIGRATIONS.md](MIGRATIONS.md)
+- Database cluster: [database/README.md](database/README.md)
+- Notifications cluster: [notifications/README.md](notifications/README.md)
+- Play cluster: [play/README.md](play/README.md)
+- Games cluster: [games/README.md](games/README.md)
+- Builder cluster: [builder/README.md](builder/README.md)
+- Import docs: [import/README.md](import/README.md)
+- Sandbox docs: [sandbox/README.md](sandbox/README.md)
+- Toolkit docs: [toolkit/README.md](toolkit/README.md)
+- Auth/RBAC cluster: [auth/README.md](auth/README.md) + AUTH_SYSTEM_ANALYSIS.md (historisk/archived)
+- Admin cluster: [admin/README.md](admin/README.md) + root `ADMIN_*` docs
 - Ops/runbooks: ops/
+- Validation snapshots: validation/README.md
+- Release path: [ops/release-promotion-checklist.md](ops/release-promotion-checklist.md)
+- Notion AI pack: notion-ai/
 - Rapporter/analys (arkiv): se [reports/README.md](reports/README.md)
-- Prompts (arkiv): se [prompts/README.md](prompts/README.md)
+- Arkivindex: se [archive/README.md](archive/README.md)
 
 ## Dokumentationskontrakt
 
 ### Regler
 
 - Om en ändring påverkar beteende/struktur ska docs uppdateras i samma PR.
+- Om området använder `architecture + audit + implementation plan` ska [TRIPLET_WORKFLOW_STANDARD.md](TRIPLET_WORKFLOW_STANDARD.md) följas.
 - Varje “core doc” ska ha en tydlig scope, och kunna valideras mot kod/DB.
 - Dokument som är historiska (plan/rapport/todo) ska tydligt markeras som sådana.
+- Om flera dokument beskriver samma område ska ett av dem tydligt vara den kanoniska ingången.
 
 ### Fält (rekommenderat)
 
 För nya eller uppdaterade core-dokument:
 
 - Owner:
-- Status: active | draft | deprecated
+- Status: active | draft | deprecated | frozen audit | historical snapshot
 - Last validated: YYYY-MM-DD
+
+För exakt betydelse av datumfält: se [DOCUMENT_DATING_STANDARD.md](DOCUMENT_DATING_STANDARD.md)
 
 ## Notion
 
-Se NOTION.md för strategi och synk.
+Se [NOTION.md](NOTION.md) för strategi och synk.
+
+Operativt stöd:
+- [NOTION_SYNC_PLAN.md](NOTION_SYNC_PLAN.md)
+- [NOTION_UPDATE_CHECKLIST.md](NOTION_UPDATE_CHECKLIST.md)

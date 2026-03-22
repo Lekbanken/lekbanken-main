@@ -1,5 +1,15 @@
 # Tenant Anonymization — GDPR Compliance
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-02
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Active source-of-truth for the tenant anonymization lifecycle, purge process, and recovery rules.
+
 > SSoT for the anonymization lifecycle. Updated 2026-03-02.
 
 ## Status definitions

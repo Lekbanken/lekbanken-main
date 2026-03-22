@@ -1,5 +1,15 @@
 # Accessibility Audit Checklist - Play UI
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft WCAG checklist and audit worklist for the participant-facing play UI.
+
 This document provides a WCAG 2.1 AA compliance checklist for the participant-facing play experience.
 
 ## Status Legend

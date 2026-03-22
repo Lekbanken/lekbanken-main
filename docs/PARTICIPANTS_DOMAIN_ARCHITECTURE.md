@@ -1,15 +1,15 @@
 # PARTICIPANTS DOMAIN – ARCHITECTURE SPECIFICATION
 
-**Version:** 2.0  
-**Date:** 2025-12-10  
-**Status:** Design Phase (historical spec; not source of truth)  
-**Based on:** DDD v1.0 Specification + Revised Design Discussion
-
 ## Metadata
 
-- Owner: -
-- Status: archived
-- Last validated: 2025-12-17
+> **Status:** archived
+> **Owner:** -
+> **Date:** 2025-12-10
+> **Last updated:** 2026-03-21
+> **Last validated:** 2025-12-17
+> **Version:** 2.0
+> **Based on:** DDD v1.0 Specification + Revised Design Discussion
+> **Notes:** Historical design spec; not source of truth.
 
 This document is a **design/architecture spec** and contains pseudo-schema and planned behavior.
 

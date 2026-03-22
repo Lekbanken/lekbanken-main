@@ -1,5 +1,15 @@
 # Migration History
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-16
+
+> Active migration-history normalization log for the canonical baseline transition. Use this as operational history, not as a replacement for the current migration workflow docs.
+
 ## 2026-03-16 — Migration history normalized
 
 ### Background

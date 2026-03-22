@@ -1,5 +1,15 @@
 ﻿# API Route Security Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-02-21
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Fryst säkerhetsaudit-snapshot av API-rutter vid genereringstillfället. Kräver ny körning eller verifiering mot aktuell kod innan slutsatser återanvänds operativt.
+
 **Generated:** 2026-02-20
 **Total routes:** 261
 

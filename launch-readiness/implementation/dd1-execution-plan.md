@@ -1,9 +1,15 @@
 # DD-1 Execution Plan: tenantAuth → Wrapper Migration
 
+## Metadata
+
 > **Date:** 2025-07-18  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** active  
 > **Prerequisite for:** Batch 4 (tenantAuth, 52 routes)  
 > **Depends on:** DD-1 decision (✅ decided: `deriveEffectiveGlobalRole` is canonical, `tenantAuth.isSystemAdmin` deprecated)  
-> **Goal:** Map every tenantAuth auth pattern to a wrapper `AuthLevel`, identify required infrastructure changes, define sub-batch execution order
+> **Goal:** Map every tenantAuth auth pattern to a wrapper `AuthLevel`, identify required infrastructure changes, define sub-batch execution order  
+> **Note:** Active execution plan for remaining wrapper migration work. Use `launch-control.md` for the program-level status.
 
 ### Route Count Reconciliation (source of truth)
 

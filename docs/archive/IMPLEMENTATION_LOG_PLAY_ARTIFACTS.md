@@ -1,6 +1,14 @@
-# Implementation Log — Play Artifacts (Media Upload + Hotspots + Audio)
+# Implementation Log - Play Artifacts (Media Upload + Hotspots + Audio)
 
-Date started: 2025-12-29
+## Metadata
+- Status: archived
+- Date: 2025-12-30
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: play
+- Scope: Archived play artifacts implementation log
+
+Historical implementation log retained for provenance. Current artifact guidance should come from active play docs, not this archived work log.
 
 ## Goal
 Make Map/Hotspot + Audio artifacts usable end-to-end:

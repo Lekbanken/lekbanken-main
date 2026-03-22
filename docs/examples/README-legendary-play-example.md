@@ -1,5 +1,15 @@
 # Golden Example: Legendary Play Complete CSV
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-26
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft golden-example reference for the complete Legendary Play CSV import format.
+
 > **File:** `example-legendary-play-complete.csv`
 > **Version:** 1.0
 > **Created:** 2025-12-26

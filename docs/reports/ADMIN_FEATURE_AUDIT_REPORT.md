@@ -1,4 +1,15 @@
 # 📊 Admin Feature Audit Report
+
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-12
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk jämförelsesnapshot mellan admin-dokumentation och implementation. Använd som auditspår, inte som ensam källa för nuvarande adminstruktur.
+
 ## Jämförelse: Dokumentation vs Implementation
 
 **Datum:** 2025-12-12  

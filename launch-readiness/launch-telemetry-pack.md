@@ -1,10 +1,23 @@
 # Launch Telemetry Pack
 
-> **Created:** 2026-03-14
-> **Status:** ACTIVE
+## Metadata
+
+- Owner: Platform / Ops
+- Status: active
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active monitoring reference for the early post-launch window. Reconcile any alerting or telemetry changes here with `launch-control.md` and current ops docs.
+
+> **Date:** 2026-03-14
+> **Last updated:** 2026-03-21
+> **Last validated:** 2026-03-21
+> **Status:** active
 > **Owner:** Platform / Ops
 > **Scope:** First 30 days after launch
 > **Related:** [production-signals-dashboard.md](../docs/ops/production-signals-dashboard.md) · [anomaly-detection-playbook.md](../docs/ops/anomaly-detection-playbook.md)
+> **Note:** Active monitoring reference for the early post-launch window. Reconcile any alerting or telemetry changes here with `launch-control.md` and current ops docs.
 
 ---
 

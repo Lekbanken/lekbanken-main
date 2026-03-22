@@ -1,8 +1,16 @@
 # Award Builder — Canonical Export Schema (v1)
 
-Last updated: 2026-01-01
-Status: Canonical (decision 2026-01-01)
-Audience: Product / Engineering
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-01
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active canonical contract for award-builder export/import flows. If the schema changes, update this file and any dependent builder docs in the same workstream.
+
+**Audience:** Product / Engineering
 
 ## Purpose
 Define a single canonical, versioned export format for achievements/awards that:

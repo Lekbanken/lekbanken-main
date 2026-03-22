@@ -4,8 +4,17 @@
 > Every component has: purpose, states, required props, placement, and accessibility.
 > This is the implementation backlog for Claude.
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-02-27
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft artifact UI layout specification and implementation backlog for director and participant surfaces.
+
 **Version:** 1.1
-**Datum:** 2026-02-27
 
 ---
 

@@ -1,5 +1,13 @@
 # SFX Assets — Sound Design v1
 
+## Metadata
+- Status: active
+- Date: 2026-02-22
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: play
+- Scope: Sound-effect asset override guidance
+
 Drop short mp3 files here to override the WebAudio fallback tones:
 
 | File | Purpose | Duration |

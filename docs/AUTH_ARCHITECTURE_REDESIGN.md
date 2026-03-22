@@ -1,5 +1,15 @@
 # Authentication & Authorization Architecture Redesign
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-15
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft auth and authorization redesign proposal for server-first auth, tenant resolution, and multi-surface role handling.
+
 **Version:** 1.0  
 **Date:** 2025-12-15  
 **Status:** Proposal  

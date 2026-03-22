@@ -1,8 +1,17 @@
 # Journey v2.0 — Implementation Prompt
 
-> **Datum:** 2026-03-06  
-> **Status:** Design-frozen — alla designdokument är rev 3 och godkända  
-> **Instruktion:** Utför steg 1–8 exakt som specificerat. Improvisera INTE utanför dokumenten.
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-03-06
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived one-shot implementation prompt for the superseded Journey v2 cycle. Keep as prompt history only.
+
+**Status vid arkivering:** Design-frozen — alla designdokument är rev 3 och godkända  
+**Instruktion:** Utför steg 1–8 exakt som specificerat. Improvisera INTE utanför dokumenten.
 
 ---
 

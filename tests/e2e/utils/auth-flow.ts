@@ -202,7 +202,7 @@ export async function ensureMfaEnrollment(page: Page) {
     await inputs.nth(index).fill(digit)
   }
 
-  const continueButton = page.locator('button').filter({ hasText: /jeg har lagret kodene mine|fortsett|fortsätt|continue/i }).last()
+  const continueButton = page.locator('button').filter({ hasText: /i have saved my codes|saved my codes|jeg har lagret kodene mine|jag har sparat mina koder|fortsett|fortsätt|continue/i }).last()
   await expect(continueButton).toBeVisible({ timeout: 15000 })
   await continueButton.click()
 

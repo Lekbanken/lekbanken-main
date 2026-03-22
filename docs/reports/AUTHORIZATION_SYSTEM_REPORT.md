@@ -1,5 +1,15 @@
 # 🔐 Lekbanken Authorization System – Complete Report
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-02
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk systemrapport över auktoriseringsflöden och roller. Behåll som referens för tidigare analys, inte som aktuell auth-SSoT.
+
 **Datum:** 2025-12-02  
 **Undersökt av:** GitHub Copilot (Claude Opus 4.5)
 

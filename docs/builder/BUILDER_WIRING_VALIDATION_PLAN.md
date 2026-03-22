@@ -1,10 +1,19 @@
 # Builder Wiring & Validation Plan
 
-> **Syfte**: Industrial-grade validering och wiring för Game Builder  
-> **Datum**: 2026-02-02  
-> **Status**: PLAN — ej implementerad  
-> **Källa**: [BUILDER_EVENT_MODEL.md](BUILDER_EVENT_MODEL.md), Import Atomicity patterns  
-> **Policy**: Samma rigor som import-systemet. Typed errors. Inga gissningar.
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active plan for the builder validation and wiring layer. If parts of the plan are implemented, update the status and decisions here, not only in code or sprint notes.
+
+**Syfte**: Industrial-grade validering och wiring för Game Builder  
+**Planstatus**: PLAN — ej implementerad  
+**Källa**: [BUILDER_EVENT_MODEL.md](BUILDER_EVENT_MODEL.md), Import Atomicity patterns  
+**Policy**: Samma rigor som import-systemet. Typed errors. Inga gissningar.
 
 ---
 

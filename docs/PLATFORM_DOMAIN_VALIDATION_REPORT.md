@@ -1,5 +1,15 @@
 # PLATFORM DOMAIN VALIDATION REPORT
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft platform-domain validation report covering deployment, environment, runtime, security, and observability infrastructure.
+
 **Date:** 2025-12-11 (Updated)  
 **Previous Validation:** 2025-12-10  
 **Validator:** GitHub Copilot  

@@ -1,5 +1,15 @@
 # Wave 1 Extension — Priority Verification Batch
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-19
+- Last updated: 2026-03-21
+- Last validated: 2026-03-19
+
+> Historical pre-implementation verification snapshot for the Wave 1 extension bug set. Use this as bounded verification history rather than an active operating guide.
+
 > Created: 2026-03-18
 > Author: Claude (post-fix verification agent)
 > Status: VERIFICATION COMPLETE — ready for implementation decision

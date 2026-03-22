@@ -1,6 +1,16 @@
 # PLAY SYSTEM DOCUMENTATION
 ## Komplett teknisk dokumentation av Lekbankens /play-ekosystem
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-18
+- Last updated: 2026-03-21
+- Last validated: 2026-01-18
+
+> Aktiv bred referens för play-ekosystemet och dess dokumenterade workstream-logg. Använd tillsammans med play-kontrakten och root-level struktur-audits för nuvarande vägledning.
+
 **Version:** 1.1  
 **Datum:** 2026-01-17  
 **Status:** Referensdokument

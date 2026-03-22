@@ -1,53 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
 # Lekbanken
+
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2025-11-28
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active root-level repo entrypoint. Use this file for quick repo orientation and setup routing; use `PROJECT_CONTEXT.md` for deeper product understanding.
 
 Lekbanken är en modern multi-tenant SaaS-plattform för lekpedagogik och aktivitetsplanering, byggd med Next.js, Supabase och Vercel.
 
 Plattformen riktar sig mot idrottsledare, föreningar, skolor och föräldrar, och erbjuder ett bibliotek av lekaktiviteter, planer, AI-förslag, gamification och rollstyrda arbetsytor.
 
-Detta repo innehåller hela applikationen för `app.lekbanken.no`.  
-**All domänlogik och arkitekturbeslut dokumenteras i Notion.**
+Detta repo innehåller applikationskod, migrations, CI-konfiguration och den tekniska dokumentationen.
+
+## Start här
+
+- Produktkontext först: [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)
+- Dokumentationsingång: [docs/README.md](docs/README.md)
+- VS Code-arbetsmodell: [docs/VS_CODE_WORKFLOW.md](docs/VS_CODE_WORKFLOW.md)
+- Miljöer och databasmål: [docs/database/environments.md](docs/database/environments.md)
+- Release-flöde: [docs/ops/release-promotion-checklist.md](docs/ops/release-promotion-checklist.md)
+- Notion-strategi: [docs/NOTION.md](docs/NOTION.md)
+
+## Dokumentationsmodell
+
+- Repo:t är source of truth för implementation, migrations, miljöregler, workflows och operativ dokumentation.
+- Notion är portal och spegel, inte primär implementation truth.
+- Om repo och Notion säger olika saker gäller repo:t.
 
 ## DB & migrations
 
-- Quick start (manual + CLI): [MIGRATIONS_QUICK_START.md](MIGRATIONS_QUICK_START.md)
-- Full guide: [docs/MIGRATIONS.md](docs/MIGRATIONS.md)
+- Migration guide: [docs/MIGRATIONS.md](docs/MIGRATIONS.md)
+- Environment rules: [docs/database/environments.md](docs/database/environments.md)
+- Production safety: [docs/ops/prod-migration-workflow.md](docs/ops/prod-migration-workflow.md)
 - Verification (run in Supabase SQL Editor): [scripts/verify-migrations.sql](scripts/verify-migrations.sql)
 
 Note: If you execute migrations manually in Supabase SQL Editor, the schema can be updated even if
@@ -56,25 +44,13 @@ registration snippet.
 
 ---
 
-## 📚 Notion as Strategic Source of Truth
+## Notion
 
-Lekbanken använder **Notion som den centrala källan** för:
-- Domänarkitektur och systemdesign (Domain-Driven Design)
-- Datamodeller, relationer och tabellscheman
-- Produktspecifikationer och strategiska beslut
-- Engineering workflows och team-processer
+Notion används som portal, översikt och kunskapsyta.
 
-**GitHub-repot implementerar besluten som dokumenteras i Notion.**
-
-### Viktiga länkar
-
-- **[🎯 Lekbanken Dashboard](https://www.notion.so/Johan-Schultzs-omr-de-Lekbanken-Dashboard-14ca3649dd9080fdaeb3e8c067e1eb2e)** – Central översikt och snabbnavigering
-- **[🏛️ Master Structure v1.0](https://www.notion.so/Johan-Schultzs-omr-de-Lekbanken-Master-Structure-v1-0-14ca3649dd908087a1bfc94b89ea2a07)** – Komplett systemöversikt med alla domäner
-- **[⭐ Domänstruktur: Lekbanken](https://www.notion.so/Johan-Schultzs-omr-de-Domänstruktur-Lekbanken-14ca3649dd9080e89b62d94db3502c82)** – Fullständig domänarkitektur
-- **[⭐ Platform Domain](https://www.notion.so/Johan-Schultzs-omr-de-Platform-Domain-Uppdaterad-med-Vercel-14ba3649dd908017af0bd5b87c2f37ed)** – Vercel, deployment, routing, säkerhet
-- **[⚙️ Engineering Hub](https://www.notion.so/Johan-Schultzs-omr-de-Engineering-Hub-14ca3649dd908085ba50e9c43d7a4a31)** – Teknisk dokumentation och processer
-
-📖 **[Se fullständig dokumentation och alla länkar i docs/NOTION.md →](docs/NOTION.md)**
+- Spegelstrategi: [docs/NOTION.md](docs/NOTION.md)
+- Sync-strategi: [docs/NOTION_SYNC_PLAN.md](docs/NOTION_SYNC_PLAN.md)
+- Operativ uppdateringsregel: [docs/NOTION_UPDATE_CHECKLIST.md](docs/NOTION_UPDATE_CHECKLIST.md)
 
 ---
 
@@ -84,12 +60,12 @@ Lekbanken använder **Notion som den centrala källan** för:
 - **Database:** Supabase (PostgreSQL)
 - **CI/CD:** GitHub → Vercel (automatiska previews per PR)
 - **Hosting:** Edge Functions, CDN, ISR/SSR
-- **Domäner:**
-  - `lekbanken.no` – Marketing site
-  - `app.lekbanken.no` – Huvudapplikation
-  - `admin.lekbanken.no` – Administrationspanel
-  - `demo.lekbanken.no` – Offentlig demo
-  - `api.lekbanken.no` – API endpoints
+
+Aktuell host- och deploytopologi ska alltid läsas från repo-dokumentationen, inte från hårdkodade README-sammanfattningar:
+
+- [docs/PLATFORM_DOMAIN.md](docs/PLATFORM_DOMAIN.md)
+- [docs/database/environments.md](docs/database/environments.md)
+- [docs/ops/README.md](docs/ops/README.md)
 
 ---
 
@@ -118,7 +94,7 @@ Projektet är organiserat enligt **Domain-Driven Design** med tydligt avgränsad
 - **API/Integration** – REST/GraphQL endpoints
 - **Marketing** – Landningssidor och demo
 
-📖 **[Se fullständig domänarkitektur med ansvarsområden →](docs/NOTION.md)**
+📖 **[Se repo-förankrad domändokumentation →](docs/README.md)**
 
 ---
 

@@ -1,5 +1,15 @@
 # Admin Planner Master Implementation
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-03
+- Last updated: 2026-03-21
+- Last validated: 2026-01-03
+
+> Active implementation reference for the `/admin/planner` surface. Keep this aligned with the planner domain docs and current admin routes if planner admin behavior changes.
+
 ## Goals and scope
 - Replace the incorrect /admin/content "Content Planner" page with a real Admin Planner surface.
 - Use existing Planner domain endpoints and capability rules.

@@ -1,8 +1,16 @@
 # Implementeringsaudit: Journey som design för /app/gamification
 
-> **Datum:** 2026-02-15  
-> **Status:** 🔒 v3.1 SHIPPED — visual upgrades (P3-P6) + skill tree interactive + avatar-tap + badge showcase. v1/v2/v2.5/v2.6/v3.0/v3.0.1 LÅST.  
-> **Mål:** Uppgradera `/app/gamification` med Journey-designspråk och funktionalitet
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-02-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Fryst audit-snapshot för den skickade v3.1-ytan. Revalidera mot aktuell `/app/gamification`-implementation innan dokumentet används som nutidsbeskrivning.
+
+**Mål:** Uppgradera `/app/gamification` med Journey-designspråk och funktionalitet
 
 ### Arkitekturbeslut (2026-02-13)
 

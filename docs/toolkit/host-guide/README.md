@@ -1,5 +1,17 @@
 # Host Guide
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft host-facing operating guide for running toolkit sessions. Treat it as user guidance, not as a fully verified operational runbook.
+
+**Related:** [README.md](../README.md) · [README.md](../getting-started/README.md)
+
 Welcome to the Host Guide! This section covers everything you need to know about creating games and running sessions.
 
 ## Table of Contents

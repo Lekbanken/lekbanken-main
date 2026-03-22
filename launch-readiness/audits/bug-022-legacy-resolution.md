@@ -1,5 +1,15 @@
 # DD-LEGACY-1 / BUG-022 — Legacy Billing Resolution
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-19
+- Last updated: 2026-03-21
+- Last validated: 2026-03-19
+
+> Historical issue-resolution snapshot for DD-LEGACY-1 and BUG-022. Use this as bounded decision history rather than an active operating guide.
+
 > Created: 2026-03-19  
 > Author: Claude (analysis + implementation agent)  
 > Decision: **Option A — Hard Cleanup (Strict Consolidation)**  

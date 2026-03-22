@@ -3,8 +3,12 @@
 ## Metadata
 
 - Owner: -
-- Status: active
+- Status: frozen audit
+- Date: 2025-12-17
+- Last updated: 2026-03-21
 - Last validated: 2025-12-17
+
+> Frozen reality-check snapshot for a targeted December 2025 docs-vs-code pass. Use it as evidence of prior drift fixes, not as current canonical routing or environment guidance.
 
 ## Scope
 

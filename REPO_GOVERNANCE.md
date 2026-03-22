@@ -3,6 +3,14 @@
 > Canonical structural rules for the Lekbanken repository.  
 > Read this before making structural changes. Updated 2026-03-16.
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
 ---
 
 ## 1. Repo Zones
@@ -88,7 +96,10 @@ If shared across domains — it goes in `components/`.
 ```
 1. PROJECT_CONTEXT.md              ← What is this product?
 2. launch-readiness/launch-control.md  ← Current system state
-3. Domain canonical doc            ← Your specific domain
+3. docs/DOCUMENTATION_STANDARD.md  ← Canonical doc map and trust rules
+4. docs/DOCUMENT_DATING_STANDARD.md ← Required when active canonical docs are updated
+5. docs/TRIPLET_WORKFLOW_STANDARD.md ← Required when the domain uses a triplet
+6. Domain canonical doc            ← Your specific domain
 ```
 
 ### Domain document lookup
@@ -105,11 +116,37 @@ If shared across domains — it goes in `components/`.
 | Gamification | `docs/GAMIFICATION_DOMAIN.md` |
 | Security | `launch-readiness/audits/` |
 
+### Documentation lifecycle rule
+
+If a domain uses an active `architecture + audit + implementation plan` triplet, the working order is mandatory:
+
+1. verify the current audit before coding
+2. update the implementation plan before coding when needed
+3. implement the planned change
+4. update the implementation plan after coding
+5. update the audit after coding
+6. update the architecture doc when stable structure changed
+
+Do not leave a code change behind without updating its active audit/plan pair when the change materially affects that domain.
+
+### Documentation dating rule
+
+Active canonical docs must follow `docs/DOCUMENT_DATING_STANDARD.md`.
+
+In particular:
+
+- `Date` is the document origin or revision baseline
+- `Last updated` means the content changed materially
+- `Last validated` means the doc was checked against reality
+
+Do not collapse those meanings into a single timestamp.
+
 ### Document trust hierarchy
 
 | Priority | Surface | Trust level |
 |----------|---------|-------------|
-| 1 | Root domain triplets | Current |
+| 0 | `docs/DOCUMENTATION_STANDARD.md` + `.github/copilot-instructions.md` | Canonical routing rules |
+| 1 | `docs/TRIPLET_WORKFLOW_STANDARD.md` + active domain triplets | Current working rules |
 | 2 | `launch-readiness/` audits | Current |
 | 3 | `docs/*_DOMAIN.md` | Stable but may be old |
 | 4 | Other root `.md` | Stale — treat as historical |
@@ -122,7 +159,7 @@ If shared across domains — it goes in `components/`.
 | Task | Canonical method |
 |------|-----------------|
 | Migration (local) | `supabase db reset` |
-| Migration (remote) | `supabase db push` |
+| Migration (remote) | `npm run db:push` |
 | Generate DB types | `npm run db:types` |
 | Lint | `npm run lint` |
 | Typecheck | `npx tsc --noEmit` |
@@ -180,7 +217,8 @@ Stop and re-audit if:
 3. **Distinguish fact from inference** — mark unverified claims clearly
 4. **Use canonical surfaces** — never import from orphaned or legacy files
 5. **Follow doc entrypoint** — read governance docs before starting domain work
-6. **Update docs after structural changes** — mark items ✅ KLAR with date
+6. **Follow triplet lifecycle** — verify audit first, then sync plan/audit after implementation
+7. **Update docs after structural changes** — mark items ✅ KLAR with date
 
 ---
 

@@ -24,7 +24,7 @@ INSERT INTO auth.users (
     '00000000-0000-0000-0000-000000000001',
     '00000000-0000-0000-0000-000000000000',
     'test-system-admin@lekbanken.no',
-    crypt('Rapid$teel261', gen_salt('bf')),
+    crypt('TestAdmin123!', gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"],"global_role":"system_admin"}',
     '{"full_name":"Test System Admin","global_role":"system_admin"}',
@@ -36,7 +36,7 @@ INSERT INTO auth.users (
     '00000000-0000-0000-0000-000000000002',
     '00000000-0000-0000-0000-000000000000',
     'test-tenant-admin@lekbanken.no',
-    crypt('Rapid$teel261', gen_salt('bf')),
+    crypt('TestAdmin123!', gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"Test Tenant Admin"}',
@@ -48,7 +48,7 @@ INSERT INTO auth.users (
     '00000000-0000-0000-0000-000000000003',
     '00000000-0000-0000-0000-000000000000',
     'test-regular-user@lekbanken.no',
-    crypt('Rapid$teel261', gen_salt('bf')),
+    crypt('TestUser123!', gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"Test Regular User"}',
@@ -94,9 +94,10 @@ INSERT INTO public.users (id, email, full_name, role, global_role) VALUES
   ('00000000-0000-0000-0000-000000000003', 'test-regular-user@lekbanken.no', 'Test Regular User', 'member', 'member')
 ON CONFLICT (id) DO NOTHING;
 
--- 3) Create a demo tenant
+-- 3) Create the canonical demo tenant
+-- Must stay aligned with lib/auth/ephemeral-users.ts DEMO_TENANT_ID.
 INSERT INTO public.tenants (id, tenant_key, name, type, slug, description) VALUES
-  ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'demo-tenant', 'Demo Förskola', 'preschool', 'demo-forskola', 'Lokal testmiljö-tenant')
+  ('00000000-0000-0000-0000-00000000de01', 'demo-tenant', 'Lekbanken Demo', 'demo', 'demo', 'Public demo tenant for local demo sessions')
 ON CONFLICT (id) DO NOTHING;
 
 -- A second tenant for cross-tenant isolation testing
@@ -107,11 +108,11 @@ ON CONFLICT (id) DO NOTHING;
 -- 4) Create memberships (who belongs to which tenant)
 INSERT INTO public.user_tenant_memberships (user_id, tenant_id, role, is_primary) VALUES
   -- System admin is owner of demo tenant
-  ('00000000-0000-0000-0000-000000000001', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'owner', true),
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000de01', 'owner', true),
   -- Tenant admin is admin of demo tenant
-  ('00000000-0000-0000-0000-000000000002', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'admin', true),
+  ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-00000000de01', 'admin', true),
   -- Regular user is member of demo tenant
-  ('00000000-0000-0000-0000-000000000003', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'member', true)
+  ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-00000000de01', 'member', true)
 ON CONFLICT (user_id, tenant_id) DO NOTHING;
 
 -- 5) Realtime publication fix

@@ -1,6 +1,15 @@
 # Architecture Reality Check: Admin vs Tenant Access Control
 
-**Date**: 2025-01-XX  
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-01-10
+- Last updated: 2026-03-21
+- Last validated: 2026-01-10
+
+> Frozen reality-check snapshot. The original in-file date placeholder was invalid and has been replaced with the document's git origin date; re-validate against current admin access code before using as current truth.
+
 **Scope**: Verification of ACTUAL access patterns vs INTENDED design  
 **Method**: Code archaeology with direct evidence  
 

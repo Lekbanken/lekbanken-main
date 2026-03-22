@@ -1,8 +1,18 @@
 # Lekbanken Launch Readiness — Implementation Plan
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-13
+- Last updated: 2026-03-22
+- Last validated: 2026-03-15
+
+> Active phase-based implementation roadmap for the launch-readiness program. Use together with `launch-control.md`, which remains the canonical progress tracker.
+
 > **Version:** 2.11  
 > **Created:** 2026-03-10  
-> **Last updated:** 2026-03-15  
+> **Last updated:** 2026-03-22  
 > **Purpose:** Fasindelad plan med ordning, beroenden, milstolpar och gates för hela launch-programmet.  
 > **Kontroll:** Progress trackas i `launch-control.md`.
 
@@ -235,7 +245,7 @@ Domäner auditeras i prioritetsordning. Varje audit producerar en fil i `/launch
 |-------|-----------------|--------|
 | API Security | `implementation/security-auth-remediation.md` | ✅ P0 fixed, SEC-003/004 resolved |
 | Tenant Isolation | `implementation/tenant-isolation-remediation.md` | ✅ P0 fixed, TI-003 downgraded |
-| API Consistency | `implementation/api-consistency-remediation.md` | ✅ Batches 1–6d (253/288 files, 87.8%) |
+| API Consistency | `implementation/api-consistency-remediation.md` | ✅ Batches 1–6d complete (253/288 files, 87.8%); Batch 7 deferred to per-domain audits |
 | Play Runtime | `implementation/play-runtime-remediation.md` | ✅ M1–M5 done. Launch-scope complete. |
 | Sessions / Participants | — | ✅ M1–M3 done. Launch-scope complete. |
 | Games / Library | — | ✅ M1–M3 done. Launch-scope complete. |

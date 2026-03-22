@@ -1,8 +1,16 @@
 # LEKBANKEN — GAMIFICATION DOMAIN (ENTERPRISE MASTER PLAN)
 
-Last updated: 2026-01-01
-Owner: Gamification (bounded context)
-Audience: Product, Engineering, Design, Ops
+## Metadata
+
+- Owner: Gamification (bounded context)
+- Status: active
+- Date: 2026-01-01
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active gamification planning reference. Use together with current launch and domain docs rather than treating it as a standalone source of product truth.
+
+**Audience:** Product, Engineering, Design, Ops
 
 ## Decision Log (Canonical)
 

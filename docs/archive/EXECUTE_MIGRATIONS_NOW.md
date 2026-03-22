@@ -1,4 +1,14 @@
-# 🚀 Execute Migrations via Supabase Dashboard (Easiest Method)
+# Execute Migrations via Supabase Dashboard (Easiest Method)
+
+## Metadata
+- Status: archived
+- Date: 2025-11-29
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: database
+- Scope: Archived one-time migration execution guide
+
+Historical execution guide retained for provenance. Use current database environment and migration docs instead of this archived one-time runbook.
 
 ## ✅ No Installation Required - Just Copy & Paste
 

@@ -1,5 +1,15 @@
 # 🔐 Admin Authentication Investigation Report
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-02
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk undersökningsrapport för adminautentisering. Behåll som incident- och felsökningshistorik, inte som nuvarande auth-spec.
+
 **Datum:** 2025-12-02  
 **Undersökt av:** GitHub Copilot (Claude Opus 4.5)
 

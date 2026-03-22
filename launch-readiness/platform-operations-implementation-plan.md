@@ -1,5 +1,15 @@
 # Platform Operations & Enterprise Readiness — Implementation Plan
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active implementation plan for the platform-operations workstream. Use `launch-readiness/launch-control.md` for current program status and treat this file, `platform-operations-architecture.md`, and `platform-operations-audit.md` as the coordinated plan set for environment and operational readiness.
+
 > **Status:** Design-Ready  
 > **Date:** 2026-03-13  
 > **Author:** Claude Opus 4.6  

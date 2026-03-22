@@ -1,5 +1,15 @@
 # Lekbanken Wiki (för AI + humans)
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-15
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Lättläst sekundär referens. `docs/` och repo-gov-dokumenten är fortfarande kanonisk källa.
+
 Det här är en **lättläst kunskapsbank** som kompletterar docs/.
 
 Principer:

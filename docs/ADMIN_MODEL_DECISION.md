@@ -1,7 +1,15 @@
 # Admin Model Decision: System Admin vs Tenant Admin
 
-**Date**: 2026-01-10  
-**Status**: DECISION DOCUMENT  
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-10
+- Last updated: 2026-03-21
+- Last validated: 2026-01-10
+
+> Active decision reference for the canonical admin access model. Revalidate against the current `app/admin` layout and route guards before making access-control changes.
+
 **Scope**: Canonical model for admin access control + Phase 2 readiness  
 
 ---

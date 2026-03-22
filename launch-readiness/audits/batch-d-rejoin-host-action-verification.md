@@ -1,5 +1,15 @@
 # Batch D Verification — Rejoin Policy Gaps + Host Action Integrity
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-19
+- Last updated: 2026-03-21
+- Last validated: 2026-03-19
+
+> Historical issue-family verification snapshot for Batch D before and alongside the postfix closure pass. Use this as bounded verification history rather than an active operating guide.
+
 > Created: 2026-03-19  
 > Author: Claude (verification agent)  
 > Scope: BUG-056, BUG-057, BUG-060, BUG-061, BUG-085  

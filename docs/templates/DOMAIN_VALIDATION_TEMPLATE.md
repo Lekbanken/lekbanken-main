@@ -1,5 +1,15 @@
 # [DOMAIN NAME] VALIDATION REPORT
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft template for domain validation reports. Copy and tailor it per domain instead of treating the placeholder content as verified documentation.
+
 **Date:** YYYY-MM-DD  
 **Validator:** GitHub Copilot  
 **Status:** [COMPLETE / PARTIAL / NEEDS_WORK]  

@@ -1,8 +1,13 @@
 # Journey Activation — Arkitektur
 
+## Metadata
+
 > **Datum:** 2026-03-06 (rev 4)  
+> **Senast uppdaterad:** 2026-03-21  
+> **Senast validerad:** 2026-03-21  
+> **Scope:** `/app/gamification`, `/app/profile`, journey preference routing och feature-gated UI  
 > **Beroende av:** `journey-activation-audit.md`  
-> **Status:** Revision 4 — ✅ implementation complete, QA verified (2026-03-06)
+> **Status:** Revision 4 — implementation complete; kodarkitekturen återvaliderad 2026-03-21, ursprunglig QA verifierad 2026-03-06
 
 ---
 

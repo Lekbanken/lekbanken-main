@@ -1,9 +1,18 @@
 # Block 3 Execution Brief — Artifacts API Sanitering
 
-> **Datum:** 2026-03-10  
-> **Scope:** Block 3 only — F8 (Artifacts API returns all variants regardless of visibility)  
-> **Goal:** Preview/library API returns only public variants; non-public variants never reach the browser  
-> **Status:** Ready for implementation
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-03-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived Block 3 execution brief for artifacts API sanitization. Keep as implementation history, not as a current action brief.
+
+**Scope:** Block 3 only — F8 (Artifacts API returns all variants regardless of visibility)  
+**Goal:** Preview/library API returns only public variants; non-public variants never reach the browser  
+**Status vid arkivering:** Ready for implementation
 
 ---
 

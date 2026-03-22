@@ -1,7 +1,16 @@
 # Gamification — Monitoring & Alerts (v1)
 
-Last updated: 2026-01-01
-Audience: Ops / Engineering
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-01
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active operational reference for gamification monitoring. Reconcile changes here with current ops monitoring and alerting surfaces.
+
+**Audience:** Ops / Engineering
 
 ## Purpose
 Define what to monitor for the gamification economy (DiceCoin), admin awards workflow, and event ingestion so abuse/bugs are caught quickly.

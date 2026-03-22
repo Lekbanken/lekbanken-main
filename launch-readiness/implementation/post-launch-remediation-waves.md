@@ -1,10 +1,23 @@
 # Post-Launch Remediation Waves
 
-> **Status:** WAVE 1 COMPLETE — 23 closed (2026-03-19). DD-LEGACY-1 resolved: Option A (hard cleanup).  
-> **Created:** 2026-03-18  
-> **Updated:** 2026-03-19  
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-19
+- Last updated: 2026-03-22
+- Last validated: 2026-03-21
+
+> Active post-launch execution tracker for remediation waves after the main launch-readiness cycle. Use `launch-readiness/implementation/README.md` for implementation navigation and `launch-readiness/launch-control.md` for the overall program state.
+
+> **Date:** 2026-03-18  
+> **Last updated:** 2026-03-22  
+> **Last validated:** 2026-03-21  
+> **Status:** active  
+> **Execution status:** WAVE 1 COMPLETE — 23 closed (2026-03-19). DD-LEGACY-1 resolved: Option A (hard cleanup).  
 > **Source:** `audits/post-launch-cluster-triage.md`, `audits/wave1-extension-verification.md`  
 > **Rule:** Do not start Wave N+1 until Wave N is green. Do not skip verification.
+> **Note:** Active post-launch execution tracker. Use `launch-control.md` for the overall program state and this file for wave sequencing.
 >
 > **Errata (2026-03-19):** Commit `3966ae6` subject says "18 bugs" — canonical count was **20 closed** at that point. BUG-022 was erroneously listed under "Bugs closed" in that commit but was only partially remediated then. All 23 Wave 1 items now fully closed as of 2026-03-19 (MFA-005, BUG-020, BUG-022 closed in follow-up commits).
 
@@ -385,12 +398,12 @@ After all Wave 1 fixes:
 
 ## Wave 3 — Structural Hardening
 
-**Scope:** 5 findings — P2 polish + lower-blast-radius P1s  
+**Scope:** 4 open findings — P2 polish + lower-blast-radius P1s  
 **Gate:** Wave 2 green
 
 | ID | File | Fix | Notes |
 |----|------|-----|-------|
-| MFA-003 | `mfa/users/route.ts` | Move filter before pagination | Bundle with MFA-001/002 if not already done |
+| MFA-003 | `mfa/users/route.ts` | Move filter before pagination | ~~Bundle with MFA-001/002 if not already done~~ ✅ KLAR (2026-03-22) |
 | BUG-008 | `tenant-achievements-admin.ts` | Add pagination to recipient query | UX-only impact |
 | BUG-009 | `members/page.tsx` | Call router.refresh() in retry handler | One-line fix |
 | BUG-014 | `accounts/profile/notifications/route.ts` | Depends on DD-NOTIF-1 | May be intentional |

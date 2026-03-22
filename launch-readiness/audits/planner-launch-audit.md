@@ -1,5 +1,15 @@
 # Planner System Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed launch-readiness audit for the planner domain. Use `launch-readiness/launch-control.md` for current status and the paired regression or implementation records for the latest follow-up state.
+
 > **Status:** Complete (GPT-calibrated) — all severities confirmed  
 > **Date:** 2026-03-13  
 > **Calibrated:** 2026-03-13 — GPT confirmed all severity classifications. Score: 9.5/10. Key insight endorsed: "Planner security is RLS-first, API checks are defense-in-depth."  

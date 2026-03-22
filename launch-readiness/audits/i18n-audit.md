@@ -1,5 +1,15 @@
 # i18n Audit (#18) — Cross-cutting
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed cross-cutting internationalization audit from the launch-readiness cycle. Treat this as a bounded quality snapshot and verify against current locale files before using it as current truth.
+
 **Status:** ✅ GPT-calibrated  
 **Date:** 2026-03-12  
 **GPT Calibration:** 2026-03-12 — I18N-001 P2→P3, I18N-004 P2→P3. All other severities confirmed.  

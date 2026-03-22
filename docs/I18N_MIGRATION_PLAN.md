@@ -1,5 +1,15 @@
 # Lekbanken i18n Migration Plan
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-11
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical migration snapshot covering the i18n rollout status, migrated areas, and remaining work at that point in time.
+
 > **Senast uppdaterad:** 2026-01-14
 > **Status:** ✅ Fas 2 + 3 (~100%) - features/admin ~98% klart, app/admin ~99% klart, features/tools 100% klart
 

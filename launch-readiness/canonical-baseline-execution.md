@@ -1,9 +1,16 @@
 # Canonical Baseline — Execution Runbook
 
-> **Status:** ✅ GENOMFÖRD — Baseline verifierad 2026-03-13
+## Metadata
+
+> **Date:** 2026-03-13
+> **Last updated:** 2026-03-21
+> **Last validated:** 2026-03-21
+> **Status:** frozen audit
+> **Execution status:** ✅ GENOMFÖRD — Baseline verifierad 2026-03-13
 > **Beslut:** Alternativ B — Canonical Baseline (GPT-godkänt)
 > **Canonical file:** `supabase/migrations/00000000000000_baseline.sql`
 > **Arkiv:** `supabase/migrations/_archived/` (304 filer)
+> **Note:** Frozen execution record for the baseline consolidation. Use current migration and environment docs for present-tense operational guidance.
 
 ---
 

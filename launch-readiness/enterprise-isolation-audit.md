@@ -1,5 +1,15 @@
 # Enterprise Isolation Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed code-verified audit of enterprise-isolation readiness. Treat this as the bounded audit snapshot behind the enterprise-isolation design set.
+
 > **Status:** Code-Verified Audit  
 > **Date:** 2026-03-13  
 > **Author:** Claude Opus 4.6  

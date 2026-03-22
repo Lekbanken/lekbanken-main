@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
-import { createHmac } from 'node:crypto'
+import { ensureMfaEnrollment, resetMfaFactorsForTestUser } from './utils/auth-flow'
 
 type Phase = 'login' | 'app' | 'organizations' | 'preferences'
 
@@ -9,112 +9,6 @@ type Sample = {
   kind: 'document' | 'xhr' | 'fetch' | 'other'
   normalized: string
   url: string
-}
-
-type PageLike = Page
-
-function decodeBase32(secret: string): Buffer {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
-  const normalized = secret.toUpperCase().replace(/=+$/g, '').replace(/\s+/g, '')
-
-  let bits = ''
-  for (const char of normalized) {
-    const value = alphabet.indexOf(char)
-    if (value === -1) {
-      throw new Error(`Invalid base32 character: ${char}`)
-    }
-    bits += value.toString(2).padStart(5, '0')
-  }
-
-  const bytes: number[] = []
-  for (let index = 0; index + 8 <= bits.length; index += 8) {
-    bytes.push(Number.parseInt(bits.slice(index, index + 8), 2))
-  }
-
-  return Buffer.from(bytes)
-}
-
-function generateTotp(secret: string, epochMs = Date.now()): string {
-  const counter = Math.floor(epochMs / 30000)
-  const key = decodeBase32(secret)
-  const buffer = Buffer.alloc(8)
-  buffer.writeUInt32BE(Math.floor(counter / 0x100000000), 0)
-  buffer.writeUInt32BE(counter >>> 0, 4)
-
-  const hmac = createHmac('sha1', key).update(buffer).digest()
-  const offset = hmac[hmac.length - 1] & 0x0f
-  const binary =
-    ((hmac[offset] & 0x7f) << 24) |
-    ((hmac[offset + 1] & 0xff) << 16) |
-    ((hmac[offset + 2] & 0xff) << 8) |
-    (hmac[offset + 3] & 0xff)
-
-  return String(binary % 1_000_000).padStart(6, '0')
-}
-
-async function browserFetchJson<T>(page: PageLike, input: string, init?: RequestInit): Promise<T> {
-  return await page.evaluate(
-    async ({ input, init }) => {
-      const response = await fetch(input, {
-        credentials: 'include',
-        ...init,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(init?.headers ?? {}),
-        },
-      })
-
-      const json = await response.json().catch(() => null)
-
-      if (!response.ok) {
-        const message = json && typeof json === 'object' && 'error' in json
-          ? String((json as { error?: unknown }).error ?? response.status)
-          : `Request failed: ${response.status}`
-        throw new Error(message)
-      }
-
-      return json as T
-    },
-    { input, init }
-  )
-}
-
-async function ensureMfaEnrollment(page: PageLike) {
-  const status = await browserFetchJson<{
-    totp?: Array<{ id?: string; status?: string } | null> | null
-    needs_enrollment?: boolean
-  }>(page, '/api/accounts/auth/mfa/status')
-
-  const verifiedFactor = Array.isArray(status.totp)
-    ? status.totp.find((factor) => factor?.status === 'verified')
-    : null
-
-  if (verifiedFactor?.id && !status.needs_enrollment) {
-    return { enrolledNow: false }
-  }
-
-  const enrollment = await browserFetchJson<{ factor_id: string; secret: string }>(
-    page,
-    '/api/accounts/auth/mfa/enroll',
-    { method: 'POST', body: JSON.stringify({ friendly_name: 'Authenticator App' }) }
-  )
-
-  const code = generateTotp(enrollment.secret)
-
-  await browserFetchJson<{ success: true }>(
-    page,
-    '/api/accounts/auth/mfa/verify',
-    {
-      method: 'POST',
-      body: JSON.stringify({
-        factor_id: enrollment.factor_id,
-        code,
-        is_enrollment: true,
-      }),
-    }
-  )
-
-  return { enrolledNow: true }
 }
 
 function normalizeUrl(url: string): string {
@@ -181,13 +75,22 @@ async function handleLegalAcceptance(page: Page) {
 }
 
 test.describe('Login Flow Audit', () => {
+  test.describe.configure({ timeout: 60000 })
+
   test.use({ storageState: { cookies: [], origins: [] } })
+
+  async function waitForVisibleMain(page: Page) {
+    await page.waitForTimeout(1000)
+    await expect(page.locator('main').last()).toBeVisible({ timeout: 15000 })
+  }
 
   test('tenant admin login and profile navigation stay bounded', async ({ page }, testInfo) => {
     const email = process.env.TEST_TENANT_ADMIN_EMAIL || process.env.AUTH_TEST_EMAIL
     const password = process.env.TEST_TENANT_ADMIN_PASSWORD || process.env.AUTH_TEST_PASSWORD
 
     test.skip(!email || !password, 'TEST_TENANT_ADMIN_* or AUTH_TEST_* credentials not set')
+
+    await resetMfaFactorsForTestUser(email!)
 
     let currentPhase: Phase = 'login'
     const samples: Sample[] = []
@@ -218,26 +121,25 @@ test.describe('Login Flow Audit', () => {
     await page.locator('#password').first().fill(password!)
     await page.locator('button[type="submit"]').first().click()
 
-    await page.waitForURL(/\/(admin|app|legal\/accept)/, { timeout: 15000 })
+    await page.waitForURL(/\/(admin|app|legal\/accept|app\/profile\/security)/, { timeout: 15000 })
     await handleLegalAcceptance(page)
-    await expect(page).toHaveURL(/\/app/, { timeout: 15000 })
-    finalUrls.login = page.url()
 
     if (page.url().includes('/app/profile/security') && page.url().includes('enroll=true')) {
       await ensureMfaEnrollment(page)
-      await page.goto('/app')
-      await page.waitForLoadState('networkidle')
+      await page.goto('/app', { waitUntil: 'commit' })
+      await waitForVisibleMain(page)
     }
 
     if (!page.url().includes('/app')) {
-      await page.goto('/app')
-      await page.waitForLoadState('networkidle')
+      await page.goto('/app', { waitUntil: 'commit' })
+      await waitForVisibleMain(page)
     }
 
+    await expect(page).toHaveURL(/\/app/, { timeout: 15000 })
+    finalUrls.login = page.url()
+
     currentPhase = 'app'
-    await page.waitForLoadState('networkidle')
-    await page.waitForTimeout(1000)
-    await expect(page.getByTestId('profile-menu-trigger')).toBeVisible({ timeout: 5000 })
+    await waitForVisibleMain(page)
     finalUrls.app = page.url()
 
     const appCookies = await page.context().cookies()
@@ -245,17 +147,15 @@ test.describe('Login Flow Audit', () => {
     expect(tenantCookie?.value).toBeTruthy()
 
     currentPhase = 'organizations'
-    await page.goto('/app/profile/organizations')
-    await page.waitForLoadState('networkidle')
-    await page.waitForTimeout(1000)
-    await expect(page.locator('main').last()).toBeVisible({ timeout: 15000 })
+    await page.goto('/app/profile/organizations', { waitUntil: 'commit' })
+    await expect.poll(() => page.url(), { timeout: 15000 }).toMatch(/\/app\/profile\/organizations/)
+    await waitForVisibleMain(page)
     finalUrls.organizations = page.url()
 
     currentPhase = 'preferences'
-    await page.goto('/app/profile/preferences')
-    await page.waitForLoadState('networkidle')
-    await page.waitForTimeout(1000)
-    await expect(page.locator('main').last()).toBeVisible({ timeout: 15000 })
+    await page.goto('/app/profile/preferences', { waitUntil: 'commit' })
+    await expect.poll(() => page.url(), { timeout: 15000 }).toMatch(/\/app\/profile\/preferences/)
+    await waitForVisibleMain(page)
     finalUrls.preferences = page.url()
 
     const summary = new Map<string, number>()

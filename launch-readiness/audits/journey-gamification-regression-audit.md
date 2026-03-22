@@ -1,5 +1,15 @@
 # Journey & Gamification — Regression Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed regression audit for the journey and gamification domain after the launch-readiness remediation slices. Use `launch-readiness/launch-control.md` for current program status and the original audit plus follow-up records for upstream context.
+
 > **Domain:** Journey & Gamification (Audit #9 + Event Integrity)  
 > **Type:** Regression Audit (Phase 5)  
 > **Date:** 2026-03-14  

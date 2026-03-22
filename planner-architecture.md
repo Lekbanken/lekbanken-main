@@ -1,6 +1,20 @@
 # Planner v2.0 — Arkitektur & Systemöversikt
 
-> **Senast uppdaterad:** 2026-03-19 (Publish/status canonicalization: only `/api/plans/[planId]/publish` may produce `published` state)
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-04
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Aktiv referensarkitektur för Planner-domänen. Ändras sällan och ska användas som stabil systemdesign tillsammans med `planner-audit.md` och `planner-implementation-plan.md`.
+
+> **Datum:** 2026-03-04  
+> **Senast uppdaterad:** 2026-03-21  
+> **Senast validerad:** 2026-03-21  
+> **Scope:** `/app/planner`, `/admin/planner`, `/app/play/plan`, planner dataflöden och publiceringsmodell  
+> **Status:** Aktiv referensarkitektur
 > **Syfte:** Stabil referens för systemdesign. Ändras sällan — bara vid arkitekturella förändringar.
 > **Arkitektur-guardrails:** (ADR-K1) `plan_blocks.metadata` (JSONB) ska hållas flexibelt. Nya blocktyper ska bli tenant-definierade via metadata, inte fler hardcoded enum-värden. (ADR-K2) Framtida kursförbättringar ska konvergera mot block-modell, inte fördjupa JSON-mönstret.
 

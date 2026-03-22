@@ -1,14 +1,13 @@
 # Platform Domain Documentation
 
-**Version:** 1.0  
-**Last Updated:** 2025-12-17  
-**Status:** Active (repo-anchored; avoid hardcoded ops/provider details)
-
 ## Metadata
 
-- Owner: -
-- Status: active
-- Last validated: 2025-12-17
+> **Status:** active
+> **Owner:** -
+> **Date:** 2025-12-10
+> **Last updated:** 2026-03-21
+> **Last validated:** 2025-12-17
+> **Notes:** Repo-anchored platform reference; avoid hardcoded ops or provider details.
 
 ## Related code (source of truth)
 

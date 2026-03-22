@@ -1,8 +1,22 @@
 # Step 4 — Observe Mode / Production Learning — Deliverable
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-15
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Historical deliverable from an earlier Observe Mode pass. Revalidate every operational claim here before using it for current production decisions.
+
 **Date:** 2025-07-22  
+**Last updated:** 2026-03-21  
+**Last validated:** 2026-03-21  
+**Status:** historical snapshot  
 **Scope:** Use the telemetry pack as the manual operating model. Document baselines, verify incident readiness, classify gaps.  
-**Constraint:** No new telemetry implementation, no Step 5 backlog reprioritization, no Tier B/C archive expansion.
+**Constraint:** No new telemetry implementation, no Step 5 backlog reprioritization, no Tier B/C archive expansion.  
+**Note:** Historical deliverable from an earlier Observe Mode pass. Revalidate every operational claim here before using it for current production decisions.
 
 ---
 

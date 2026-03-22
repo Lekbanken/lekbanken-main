@@ -1,5 +1,15 @@
 # Play UI Contract
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-22
+- Last updated: 2026-03-21
+- Last validated: 2026-02-22
+
+> Aktiv canonical contract för Director- och Participant-play-ytorna. Guardrail-tester och detta dokument ska hållas synkade i samma workstream.
+
 Canonical constraints for Director and Participant play surfaces.
 
 Violations must either:

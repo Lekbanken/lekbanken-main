@@ -1,5 +1,15 @@
 # Planner UI Upgrade Plan
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-25
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft planner UI upgrade plan focused on AppShell alignment, mobile-first redesign, and calendar improvements.
+
 > **Status**: Planning Phase  
 > **Prioritet**: P1 - UX Critical  
 > **Uppskattad tid**: 3-4 sprints  

@@ -1,9 +1,18 @@
 # First Production Deploy — Ops Runbook
 
-> **Status:** active  
-> **Owner:** Engineering  
-> **Created:** 2026-03-14  
-> **Related:** `launch-readiness/incident-playbook.md` (incident response), `docs/ops/prod-migration-workflow.md` (migration safety)
+## Metadata
+
+- Owner: Engineering
+- Status: active
+- Date: 2026-03-14
+- Last updated: 2026-03-22
+- Last validated: -
+
+> Active runbook for the first production deployment, covering prerequisite checks, infrastructure state, and rollback readiness.
+
+> **Operational warning (2026-03-22):** This runbook still contains historical references to `app.lekbanken.no`, but the currently verified live production host is `https://www.lekbanken.no`. `app.lekbanken.no` remains a documented drift point with broken TLS in the launch-readiness material. Until an owner makes a formal canonical-host decision, treat all `app.lekbanken.no` references in this runbook as items to verify manually before use, especially auth redirect URLs and Stripe webhook configuration.
+
+**Related:** [incident-playbook.md](../../launch-readiness/incident-playbook.md) · [prod-migration-workflow.md](prod-migration-workflow.md)
 
 ---
 
@@ -19,10 +28,71 @@ Before the first production deploy, verify these items:
   - `SUPABASE_SERVICE_ROLE_KEY` → production service role
   - `APP_ENV` → `production`
   - `DEPLOY_TARGET` → `prod`
-- [ ] Stripe webhook endpoint: `https://app.lekbanken.no/api/billing/webhooks/stripe`
+- [ ] Stripe webhook endpoint matches the actual production host
+  - Historical runbook value: `https://app.lekbanken.no/api/billing/webhooks/stripe`
+  - Current live host evidence points to `https://www.lekbanken.no/api/billing/webhooks/stripe`
   - Verify in Stripe Dashboard → Developers → Webhooks → correct endpoint + correct secret
-- [ ] DNS: `app.lekbanken.no` resolves to Vercel
-- [ ] HTTPS certificate: valid and not expiring within 30 days
+- [ ] DNS / TLS for the intended canonical production host are correct
+  - Current live host evidence: `https://www.lekbanken.no`
+  - Drift to resolve manually: `app.lekbanken.no` is still referenced in docs/code but has broken TLS in launch-readiness verification
+
+### Manual dashboard verification packet (host / auth / webhook)
+
+Use this packet for the remaining config-correctness checks that cannot be fully verified from the repo alone.
+
+#### A. Vercel production env
+
+Verify in Vercel Dashboard → Project → Settings → Environment Variables:
+
+| Key | Expected value | Why it matters |
+|-----|----------------|----------------|
+| `APP_ENV` | `production` | Required for correct runtime environment tagging |
+| `DEPLOY_TARGET` | `prod` | Expected by health/readiness metadata |
+| `NEXT_PUBLIC_SUPABASE_URL` | production project URL for `qohhnufxididbmzqnjwg` | Must match the live data plane |
+| `NEXT_PUBLIC_SITE_URL` | `https://www.lekbanken.no` | Used by server-side flows such as admin password reset email redirects |
+| `STRIPE_LIVE_WEBHOOK_SECRET` | matches Stripe production endpoint signing secret | Required for webhook signature verification |
+
+#### B. Supabase Auth URL Configuration
+
+Verify in Supabase Dashboard → Authentication → URL Configuration:
+
+| Field | Expected value | Evidence |
+|------|----------------|----------|
+| Site URL | `https://www.lekbanken.no` | Current live production host |
+| Additional Redirect URLs | includes `https://www.lekbanken.no/auth/callback` | Production auth callback must work on the live host |
+| Additional Redirect URLs | includes `https://demo.lekbanken.no/auth/callback` | Demo auth flow uses demo subdomain routing |
+
+Notes:
+
+- `app/auth/callback/route.ts` redirects using `requestUrl.origin`, so the callback handler already adapts to the host the user arrived on.
+- The remaining risk is dashboard configuration drift, not callback code behavior.
+
+#### C. Stripe production webhook endpoint
+
+Verify in Stripe Dashboard → Developers → Webhooks:
+
+| Field | Expected value |
+|------|----------------|
+| Endpoint URL | `https://www.lekbanken.no/api/billing/webhooks/stripe` |
+| Signing secret | matches Vercel Production `STRIPE_LIVE_WEBHOOK_SECRET` |
+| Recent deliveries | no persistent failures caused by host mismatch or TLS |
+
+Notes:
+
+- `app/api/billing/webhooks/stripe/route.ts` is host-agnostic; the operational risk is the dashboard endpoint URL, not route logic.
+- If the dashboard still points to `https://app.lekbanken.no/api/billing/webhooks/stripe`, production webhook delivery is misconfigured until fixed.
+
+#### D. Record the result
+
+Record the outcome in this exact form:
+
+```md
+Canonical production host = {www.lekbanken.no | app.lekbanken.no | undecided}
+NEXT_PUBLIC_SITE_URL = {verified correct | needs update}
+Supabase auth redirect URLs = {verified correct | needs update}
+Stripe webhook endpoint = {verified correct | needs update}
+Follow-up action = {none | update env | update auth config | update Stripe webhook | owner decision required}
+```
 
 ### Database
 
@@ -63,9 +133,9 @@ Run these checks immediately after deploy completes:
 
 | Check | Command / URL | Expected |
 |-------|--------------|----------|
-| App reachable | `curl https://app.lekbanken.no` | 200 OK, page loads |
-| Health endpoint | `curl https://app.lekbanken.no/api/health` | `{ "status": "ok" }` — verifies DB connectivity |
-| Readiness endpoint | `curl -H "Authorization: Bearer <admin-token>" https://app.lekbanken.no/api/readiness` | All checks pass (db, stripe, auth, encryption, rateLimiter) |
+| App reachable | `curl https://<actual-production-host>` | 200 OK, page loads |
+| Health endpoint | `curl https://<actual-production-host>/api/health` | `{ "status": "ok" }` — verifies DB connectivity |
+| Readiness endpoint | `curl -H "Authorization: Bearer <admin-token>" https://<actual-production-host>/api/readiness` | All checks pass (db, stripe, auth, encryption, rateLimiter) |
 | Smoke test | Run RLS verification (§3 below) + functional smoke tests (§3 below) | All pass |
 
 ### RLS verification
@@ -84,7 +154,7 @@ SELECT * FROM user_sessions LIMIT 1;
 SELECT * FROM legal_documents LIMIT 1;  -- service role only
 
 -- 3. Verify health endpoint exercises DB access
-curl https://app.lekbanken.no/api/health/db-access
+curl https://<actual-production-host>/api/health
 ```
 
 **Common RLS failure pattern:** Policy uses `auth.uid() = user_id` but the request runs via service role, server action, cron, or webhook — where `auth.uid()` is NULL. Fix: add `OR is_system_admin()` to policies that must allow system access.
@@ -138,7 +208,7 @@ During the first hour, actively monitor:
 
 ### Every 15 minutes
 
-- [ ] `curl https://app.lekbanken.no/api/health` → `ok`
+- [ ] `curl https://<actual-production-host>/api/health` → `ok`
 - [ ] Vercel logs: no 500 error spikes
 - [ ] Supabase Dashboard: no connection pool exhaustion
 
@@ -199,7 +269,7 @@ During the first hour, actively monitor:
 2. Check redirect URLs: Supabase Dashboard → Auth → URL Configuration
 3. Verify `NEXT_PUBLIC_SUPABASE_URL` matches the project auth is configured on
 
-**Fix:** Ensure redirect URLs in Supabase Auth config include `https://app.lekbanken.no`.
+**Fix:** Ensure redirect URLs in Supabase Auth config include the actual production host. Historical docs use `https://app.lekbanken.no`, but current live-host evidence points to `https://www.lekbanken.no`.
 ### 5f. Cookie / auth domain mismatch
 
 **Symptoms:** Login works but session disappears on page reload, or redirect loops on preview deployments.
@@ -231,7 +301,7 @@ If the deploy causes issues that can't be quickly fixed:
 1. Vercel Dashboard → Deployments
 2. Find last known-good deployment (before this deploy)
 3. Click "..." → "Promote to Production"
-4. Verify: curl https://app.lekbanken.no/api/health → ok
+4. Verify: curl https://<actual-production-host>/api/health → ok
 ```
 
 Rollback is a DNS swap, not a rebuild. Takes ~30 seconds.
@@ -287,6 +357,6 @@ These baselines inform Phase 2 (Production Learning) in `launch-control.md` §10
 | Supabase (Prod) | supabase.com/dashboard/project/qohhnufxididbmzqnjwg | DB, Auth, Realtime |
 | Supabase (Sandbox) | supabase.com/dashboard/project/vmpdejhgpsrfulimsoqn | Test environment |
 | Stripe Dashboard | dashboard.stripe.com | Payments, webhooks |
-| App health | https://app.lekbanken.no/api/health | Quick availability check |
-| App readiness | https://app.lekbanken.no/api/readiness | Full system check (requires admin auth) |
-| Error tracking | https://app.lekbanken.no/admin/analytics/errors | Application error log |
+| App health | https://<actual-production-host>/api/health | Quick availability check. Current live-host evidence points to `www.lekbanken.no`. |
+| App readiness | https://<actual-production-host>/api/readiness | Full system check (requires admin auth) |
+| Error tracking | https://<actual-production-host>/admin/analytics/errors | Application error log |

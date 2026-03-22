@@ -1,9 +1,15 @@
 # DD-2 Specification: `auth: 'participant'` Wrapper Mode
 
+## Metadata
+
 > **Date:** 2025-07-19  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** active  
 > **Prerequisite for:** Batch 6 (participant-token routes, 10 files)  
 > **Depends on:** Phase 5 complete ✅, `resolveSessionViewer` / `resolveParticipant` infrastructure stable  
-> **Goal:** Define how the `apiHandler` wrapper resolves participant-token auth, what the handler contract looks like, and exactly which routes migrate in Batch 6
+> **Goal:** Define how the `apiHandler` wrapper resolves participant-token auth, what the handler contract looks like, and exactly which routes migrate in Batch 6  
+> **Note:** Active implementation specification for the participant auth wrapper path. Pair with `launch-control.md` for current launch-program priority.
 
 ---
 

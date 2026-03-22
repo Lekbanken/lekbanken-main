@@ -3,6 +3,16 @@
 > **Version:** 1.0  
 > **Created:** 2025-12-26
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2025-12-26
+- Last updated: 2026-03-21
+- Last validated: 2025-12-26
+
+> Canonical builder/import entrypoint: `docs/builder/README.md`
+
 ## Pre-Import Verification
 
 ### 1. Golden CSV Validation

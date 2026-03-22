@@ -1,5 +1,15 @@
 # Abuse & Privacy Audit — Lekbanken
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed cross-cutting abuse and privacy audit snapshot from the launch-readiness cycle. Use `launch-readiness/launch-control.md` for current launch state and current privacy/process docs for the live operating posture.
+
 > **Auditor:** Claude (AI)  
 > **Date:** 2026-03-14  
 > **Scope:** Rate limiting, UUID enumeration, file upload abuse, GDPR compliance, API response data exposure, spam/DoS abuse vectors  

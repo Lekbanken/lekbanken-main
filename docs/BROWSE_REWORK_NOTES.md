@@ -1,5 +1,15 @@
 # Browse Rework Notes
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-09
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the browse API/UI rework notes and migration guidance at that point in time.
+
 **Updated:** 2025-12-09
 
 ## What changed

@@ -1,5 +1,15 @@
 # Profile & Settings Audit (#14)
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed launch-readiness audit for the profile and settings domain. Use `launch-readiness/launch-control.md` for current program status and related abuse/privacy findings for overlapping privacy hardening context.
+
 > **Scope:** User profile pages, preferences, avatar upload, password/email change, account management, privacy settings  
 > **Auditor:** Claude (automated, independently verified)  
 > **Status:** ✅ GPT-calibrated  

@@ -1,8 +1,14 @@
 # Lekbanken System Inventory Summary (Claude Analysis)
 
-**Generated:** 2026-01-17  
-**Agent:** Claude (independent analysis per INVENTORY_PLAYBOOK.md)  
-**Inventory Version:** 1.1.0
+## Metadata
+- Status: archived
+- Date: 2026-01-17
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: repo-governance
+- Scope: Archived Claude-generated process summary
+
+Historical process-analysis snapshot retained for provenance. Use current inventory and governance docs instead of this archived summary for live repository state.
 
 ---
 

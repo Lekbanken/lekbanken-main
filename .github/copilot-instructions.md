@@ -4,6 +4,18 @@
 
 ## Documentation Sync Rule
 
+When working in a domain that has an active `architecture + audit + implementation plan` triplet, you **MUST** follow `docs/TRIPLET_WORKFLOW_STANDARD.md`.
+
+Minimum loop:
+
+1. Read the domain architecture, audit, and implementation plan.
+2. Verify the audit against current reality before coding.
+3. Update the implementation plan before coding when scope or status changed.
+4. Implement the planned work.
+5. Update the implementation plan after coding.
+6. Update the audit after coding.
+7. Update the architecture doc if the stable design changed.
+
 When making architectural changes to the **Planner** domain (`features/planner/`, `lib/planner/`, `app/app/planner/`), you **MUST** update these documents:
 
 | Document | Purpose | Update when |
@@ -46,7 +58,22 @@ When starting work on any domain:
 
 1. Read `PROJECT_CONTEXT.md` — understand the product
 2. Read `launch-readiness/launch-control.md` — current system state
-3. Read the domain's canonical docs (see `repo-structure-agent-risk.md` for lookup table)
+3. Read `docs/DOCUMENTATION_STANDARD.md` — canonical documentation map and trust hierarchy
+4. Read `docs/DOCUMENT_DATING_STANDARD.md` when you create or update active canonical docs
+5. Read `docs/TRIPLET_WORKFLOW_STANDARD.md` when the domain uses an active triplet
+6. Read the domain's canonical docs (see `repo-structure-agent-risk.md` for lookup table)
+7. Read `docs/VS_CODE_WORKFLOW.md` when the task touches local workflow, environments, prompts, tool usage, or start/stop procedures
+
+Documentation rules:
+
+- Prefer canonical docs over reports, plans, and historical notes.
+- Do not treat `docs/archive/` or one-off reports as current instructions unless a canonical doc explicitly points to them.
+- When docs conflict, follow the trust hierarchy in `docs/DOCUMENTATION_STANDARD.md`.
+- When updating dates in active canonical docs, use the current session date if provided by the environment; otherwise verify the system date first.
+- Never bump `Last validated` unless the document was actually verified against current code, schema, routes, or runtime state.
+- Never treat `Last updated` as proof of verification; follow `docs/DOCUMENT_DATING_STANDARD.md`.
+- When a domain has an active triplet, keep audit and implementation status synchronized in the same workstream as the code change.
+- If you materially change a canonical workflow or reference doc, update docs navigation and indexes in the same change when relevant.
 
 Do not read `docs/archive/` unless explicitly asked.
 

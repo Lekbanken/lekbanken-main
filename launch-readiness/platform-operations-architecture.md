@@ -1,5 +1,15 @@
 # Platform Operations & Enterprise Readiness — Architecture
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Draft architecture study for platform operations, environment topology, and enterprise isolation. Use `launch-readiness/launch-control.md` for current program state and treat this file as design guidance until the related operating model is fully implemented and revalidated.
+
 > **Status:** Design Study  
 > **Date:** 2026-03-13  
 > **Author:** Claude Opus 4.6 (code-verified)  

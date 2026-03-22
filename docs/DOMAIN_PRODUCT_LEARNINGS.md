@@ -1,5 +1,15 @@
 # PRODUCT DOMAIN – KEY LEARNINGS FOR FUTURE DOMAINS
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft learnings document derived from the product domain implementation and intended as guidance for later domains.
+
 This document summarises the architectural, structural and behavioural learnings from the current Product Domain implementation. It should be used as a guidance layer when designing or implementing future domains in Lekbanken.
 
 ---

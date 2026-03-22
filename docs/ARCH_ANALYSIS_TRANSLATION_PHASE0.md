@@ -1,8 +1,17 @@
 # Phase 0: Architecture & Reality Analysis — Translation / i18n Admin
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-11
+- Last updated: 2026-03-21
+- Last validated: 2026-01-11
+
+> Historical Phase 0 analysis. Useful for context and earlier constraints, but not current canonical implementation guidance.
+
 **Document Status:** READ-ONLY ANALYSIS  
 **Feature Area (candidate):** `/admin/translation` (Översättningar)  
-**Date:** 2026-01-11  
 **Purpose:** Surface facts, constraints, risks, and IA decisions BEFORE Phase 1/2 work
 
 ---

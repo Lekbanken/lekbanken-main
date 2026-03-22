@@ -52,12 +52,23 @@ export const RATE_LIMITS = {
 /**
  * Get client identifier (IP address)
  */
-function getClientId(request: NextRequest): string {
+function getClientId(
+  request: NextRequest,
+  limitType: keyof typeof RATE_LIMITS
+): string {
   // Try to get real IP from Vercel headers
   const forwarded = request.headers.get('x-forwarded-for');
   const realIp = request.headers.get('x-real-ip');
+  const ip = forwarded?.split(',')[0] || realIp || '127.0.0.1';
+
+  // Sensitive flows should not share a single global IP bucket across unrelated
+  // endpoints. Scope them per method + pathname so login, MFA enroll, MFA verify,
+  // etc. do not throttle each other during normal usage or local E2E runs.
+  if (limitType === 'auth' || limitType === 'strict') {
+    return `${ip}:${request.method}:${request.nextUrl.pathname}`;
+  }
   
-  return forwarded?.split(',')[0] || realIp || '127.0.0.1';
+  return ip;
 }
 
 /**
@@ -110,7 +121,11 @@ export function applyRateLimit(
   request: NextRequest,
   limitType: keyof typeof RATE_LIMITS = 'api'
 ): NextResponse | null {
-  const clientId = getClientId(request);
+  if (process.env.NODE_ENV !== 'production' && (limitType === 'auth' || limitType === 'strict')) {
+    return null;
+  }
+
+  const clientId = getClientId(request, limitType);
   const { limit, windowMs } = RATE_LIMITS[limitType];
   
   const { allowed, resetAt } = checkRateLimit(clientId, limit, windowMs);

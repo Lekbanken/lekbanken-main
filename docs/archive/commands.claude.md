@@ -1,6 +1,15 @@
 # Inventory Commands (Claude Analysis)
 
-**Generated:** 2026-01-17  
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-01-17
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived Claude-generated command artifact from an inventory analysis pass. Keep as process provenance, not as current workflow guidance.
+
 **Platform:** Windows PowerShell  
 **Agent:** Claude (independent analysis)
 

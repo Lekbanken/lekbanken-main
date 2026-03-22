@@ -1,10 +1,24 @@
 # Canonicalization E2E Checklist
 
-> **Created:** 2026-03-19
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-03-19
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Draft verification checklist for the canonicalization round completed on 2026-03-19. Do not assume the flows below were executed or passed until a dated execution log exists.
+
+> **Date:** 2026-03-19
+> **Last updated:** 2026-03-21
+> **Last validated:** 2026-03-21
+> **Status:** draft
 > **Purpose:** Manual browser and network-tab verification for the canonicalization round completed on 2026-03-19.
 > **Scope:** Auth, MFA, tenant context, profile write path, avatar propagation, notifications, planner publish semantics, and admin access.
-> **Status:** ⬜ Not executed
+> **Execution status:** ⬜ Not executed
 > **Execution log:** Record results in [canonicalization-e2e-test-log-template.md](canonicalization-e2e-test-log-template.md)
+> **Note:** Draft verification checklist. Do not assume the flows below were executed or passed until a dated execution log exists.
 
 ## 1. Preconditions
 

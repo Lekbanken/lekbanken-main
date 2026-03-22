@@ -1,5 +1,15 @@
 # Multi-Surface Host Architecture — Decision Note
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-15
+- Last updated: 2026-03-21
+- Last validated: 2026-03-15
+
+> Historical architecture analysis note. This was an analysis-only decision exploration and should not be treated as an active implementation or operating guide.
+
 **Date:** 2025-07-18  
 **Scope:** Analysis only — no implementation  
 **Trigger:** GPT reframed the canonical-host question into a deeper architecture investigation

@@ -1,5 +1,15 @@
 # Level 2 Audit — Play / Session Authoring Chain
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed level-2 audit for the play and session-authoring chain. Treat this as a bounded building-block verification snapshot behind the launch-readiness runtime work.
+
 > **Audit type:** Level 2 Building Block Audit (per §7 audit-program.md)  
 > **Date:** 2026-03-16  
 > **Auditor:** Claude  

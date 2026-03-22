@@ -1,5 +1,15 @@
 # Produktkort Analys - Komplett Fältinventering
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk fältinventering för produktkortet. Behåll som tidigare analys- och implementationsunderlag, inte som aktuell produktspec.
+
 **Datum:** 2025-01-08  
 **Status:** ✅ Komplett
 

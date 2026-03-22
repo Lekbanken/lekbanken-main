@@ -1,5 +1,17 @@
 # Security & Auth Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Closed cross-cutting security and auth audit from the launch-readiness cycle. Use `launch-readiness/launch-control.md` for the current program state and pair this with the remediation record or MFA follow-up artifacts for later execution state.
+
+> **2026-03-22 verification note:** This file remains a frozen snapshot of the original findings. Current code still matches the expected follow-up state: SEC-001 and SEC-002a are implemented, SEC-002b remains a documented infrastructure decision, and the MFA follow-up audit is fully closed.
+
 > **Audit #2** in launch-readiness queue  
 > **Date:** 2026-03-10  
 > **Scope:** Auth flows, auth guard patterns, tenant auth, participant tokens, rate limiting, error consistency, public route inventory  

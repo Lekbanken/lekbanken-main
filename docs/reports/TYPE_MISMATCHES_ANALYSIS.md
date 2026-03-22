@@ -1,5 +1,15 @@
 # TypeScript Type Mismatches - Detaljerad Analys & Lösningar
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk analys av tidigare typmismatchar. Behåll som felsöknings- och bakgrundsreferens, inte som aktuell typstatus utan ny kontroll mot genererade typer.
+
 **Datum:** 2024-12-10  
 **Status:** Temporärt fixat med `as any` casts  
 **Långsiktig lösning:** Regenerera Supabase types efter migrations

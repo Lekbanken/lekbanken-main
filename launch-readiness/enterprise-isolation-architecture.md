@@ -1,5 +1,15 @@
 # Enterprise Isolation Architecture
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Draft architecture study for hybrid and enterprise-isolated deployment models. Use this as design guidance together with the paired audit and implementation plan, not as proof that enterprise delivery is already operationally complete.
+
 > **Status:** Design Study (ADR-E1)  
 > **Date:** 2026-03-13  
 > **Author:** Claude Opus 4.6 (code-verified architecture study)  

@@ -1,8 +1,13 @@
 # Journey Activation — Implementationsplan
 
+## Metadata
+
 > **Datum:** 2026-03-06 (rev 4)  
+> **Senast uppdaterad:** 2026-03-21  
+> **Senast validerad:** 2026-03-21  
+> **Scope:** Datamodell, API-lager, onboarding, profile toggle, standardvy, gated loading, användarmigrering  
 > **Beroende av:** `journey-activation-audit.md`, `journey-activation-architecture.md`  
-> **Status:** Revision 4 — ✅ implementation complete, QA verified (2026-03-06)
+> **Status:** Revision 4 — implementation complete; kodvägar återvaliderade 2026-03-21, ursprunglig QA verifierad 2026-03-06
 
 ---
 
@@ -30,13 +35,15 @@ Utöka `user_journey_preferences` med Journey-aktiveringsstate.
 
 ### Åtgärder
 
-- [x] Skapa migration: `ALTER TABLE user_journey_preferences` ✅ `supabase/migrations/20260306100000_journey_activation_columns.sql`
+- [x] Skapa migration: `ALTER TABLE user_journey_preferences` ✅ Ursprunglig migrationsfil finns i `supabase/migrations/_archived/20260306100000_journey_activation_columns.sql`; kolumnerna är nu konsoliderade i `supabase/migrations/00000000000000_baseline.sql`
   - Lägg till `journey_enabled BOOLEAN NOT NULL DEFAULT false`
   - Lägg till `journey_decision_at TIMESTAMPTZ NULL`
 - [x] Uppdatera TypeScript-typer ✅ `features/gamification/types.ts` + `types/supabase.ts`
   - Lägg till `journeyEnabled: boolean`
   - Lägg till `journeyDecisionAt: string | null`
 - [x] Verifiera att befintliga RLS-policies täcker nya kolumner (SELECT/UPDATE) ✅ Column-level — existing row-level policies apply
+
+**Notering 2026-03-21:** Den separata kolumnmigreringen är historisk och ligger i `_archived/`. Den aktiva schemasanningen i repot är baseline-filen, där båda kolumnerna redan ingår.
 
 ### Datamodell efter migration
 

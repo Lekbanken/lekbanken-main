@@ -1,8 +1,17 @@
 # LEKBANKEN — ADMIN GAMIFICATION DASHBOARD DESIGN
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active design reference for the shipped admin gamification dashboard MVP. Revalidate details against current admin UI before using it as exact implementation truth.
+
 **Version:** 1.0  
-**Created:** 2026-01-08  
-**Status:** MVP Implemented  
+**Execution status:** MVP Implemented  
 
 ---
 

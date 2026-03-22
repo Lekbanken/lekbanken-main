@@ -1,5 +1,15 @@
 # Lekbanken Partitioned Inventory System
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-27
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Intern verktygsreferens för inventory-systemet. Detta är inte en domänkälla för produktbeteende.
+
 ## Overview
 
 This directory contains a **partitioned inventory system** that replaces the monolithic `inventory.json`. 

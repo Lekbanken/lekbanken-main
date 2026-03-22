@@ -3,6 +3,16 @@
 **Generated:** 2026-03-16  
 **Companion:** `repo-file-structure-full.md` (tree map), `repo-structure-recommendations.md` (action plan)
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-16
+
+> Frozen findings snapshot from the 2026-03-16 repo structure audit. Use later governance and cleanup docs for current operating guidance.
+
 ---
 
 ## A. Structural Risks

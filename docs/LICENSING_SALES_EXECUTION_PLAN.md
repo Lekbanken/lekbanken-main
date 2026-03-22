@@ -1,9 +1,17 @@
 # Lekbanken – Licensing & Product Sales Execution Plan (Enterprise)
 
 ## Metadata
-- **Status:** In progress (DB schema + types synced; core flows pending re-apply)
-- **Audience:** Product/Tech/Admin
-- **Goal:** Ship a conversion-safe, admin-manageable shop + licensing system where organisations/tenants are provisioned only after Stripe payment confirmation.
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-21
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical execution-plan snapshot for the licensing and product sales rollout.
+
+- Audience: Product/Tech/Admin
+- Goal: Ship a conversion-safe, admin-manageable shop + licensing system where organisations/tenants are provisioned only after Stripe payment confirmation.
 
 ## Progress log
 - **2026-01-21:** Synced DB schema/types for licensing work: pushed remote migration(s) and regenerated `types/supabase.ts` from the linked Supabase project.

@@ -1,5 +1,15 @@
 ﻿# Tenant/Membership Naming Consolidation
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-03
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical consolidation note for canonical tenant-membership naming across schema, policies, and generated types.
+
 ## Summary
 - Canonical table: `user_tenant_memberships`
 - Compatibility view: `tenant_memberships`

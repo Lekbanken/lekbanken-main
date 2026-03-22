@@ -1,8 +1,14 @@
 # CI/CD Pipeline & Rollback
 
-Status: active  
-Owner: Ops/Platform  
-Last validated: 2025-12-17
+## Metadata
+
+- Owner: Ops/Platform
+- Status: active
+- Date: 2025-12-11
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active runbook for CI/CD flow, GitHub Actions gates, and rollback procedures tied to the current repository workflows.
 
 ## Related code (source of truth)
 
@@ -58,6 +64,7 @@ Notes:
 ### Deploys
 - This repo does **not** define a deploy workflow.
 - Hosting/provider deploys are configured outside this repo and must be verified in the hosting platform.
+- Current operational flow is external Vercel integration: feature branches and PRs create preview deployments, merge to `main` triggers production deployment.
 - Environment variables/secrets should be managed in the hosting platform / secret manager (not committed to git).
 
 ## Validation checklist
@@ -73,9 +80,20 @@ Notes:
 4) Re-enable progressively with feature flags if available.
 
 ## Promotion Flow
-- This section is **proposed** and depends on how you run environments.
-- Typical pattern: deploy to staging, run smoke, then promote to production.
-- Prefer feature flags for risky changes.
+
+Current promotion flow:
+
+```
+Feature branch -> PR -> Vercel preview -> merge to main -> Vercel production deploy
+```
+
+- Verify changes locally first.
+- Use the PR as the preview gate.
+- Verify the Vercel preview before merge.
+- Merge to `main` only when preview is acceptable.
+- Use feature flags for risky changes instead of assuming a separate persistent staging environment.
+
+For the tactical day-to-day checklist, see [release-promotion-checklist.md](release-promotion-checklist.md).
 
 ## Testing Expectations
 - At minimum: `npm run type-check`, targeted smoke for auth/accounts, participants join/rejoin, billing webhook handler.

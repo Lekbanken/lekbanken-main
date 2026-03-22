@@ -1,9 +1,18 @@
 # Import Metadata Risk Report
 
-> **Syfte**: Sammanfatta risker och kritiska valideringspunkter för game-import.  
-> **Källa**: [BUILDER_METADATA_CONTRACT.md](BUILDER_METADATA_CONTRACT.md), [BUILDER_METADATA_CONTRACT_CANONICAL.md](BUILDER_METADATA_CONTRACT_CANONICAL.md)  
-> **Datum**: 2025-01-27  
-> **Policy**: Endast evidens. Inga gissningar.
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Historical risk snapshot that informed later atomicity and contract work. Use newer builder plans and verification docs for active work.
+
+**Syfte**: Sammanfatta risker och kritiska valideringspunkter för game-import.  
+**Källa**: [BUILDER_METADATA_CONTRACT.md](BUILDER_METADATA_CONTRACT.md), [BUILDER_METADATA_CONTRACT_CANONICAL.md](BUILDER_METADATA_CONTRACT_CANONICAL.md)  
+**Policy**: Endast evidens. Inga gissningar.
 
 ---
 

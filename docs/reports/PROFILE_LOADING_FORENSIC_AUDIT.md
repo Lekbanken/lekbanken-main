@@ -1,5 +1,15 @@
 # Profile Loading – Forensic End-to-End Audit (Expanded)
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-01-31
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Fryst forensic audit-snapshot för profile loading-problemen. Läs som incident- och analysunderlag, inte som verifierad nutidsstatus utan ny kontroll mot koden.
+
 **Status:** Complete (v3.0 – GPT feedback addressed)  
 **Date:** 2026-01-31  
 **Author:** Copilot (forensic audit mode)  

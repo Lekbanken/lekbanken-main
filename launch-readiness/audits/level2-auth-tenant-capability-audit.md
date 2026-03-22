@@ -1,5 +1,15 @@
 # Level 2 Audit — Auth / Tenant / Capability Helper Stack
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed level-2 building-block audit for the auth, tenant, and capability helper stack. Use this as a bounded helper-layer verification snapshot rather than an active operating guide.
+
 > **Audit type:** Level 2 Building Block Audit (per §7 audit-program.md)  
 > **Date:** 2026-03-15  
 > **Auditor:** Claude  

@@ -1,7 +1,13 @@
 # TailwindPLUS Components Reference
 
-> **Syfte:** Denna fil innehåller alla TailwindPLUS-kodblock som används i Lekbanken.
-> Agenter och utvecklare kan referera till denna fil för konsistent implementation.
+## Metadata
+
+> **Status:** draft
+> **Owner:** -
+> **Date:** 2025-11-30
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+> **Purpose:** Denna fil innehåller TailwindPLUS-kodblock som används som UI-referens i Lekbanken.
 
 ---
 

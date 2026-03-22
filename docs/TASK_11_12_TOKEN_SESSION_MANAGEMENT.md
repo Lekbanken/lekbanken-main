@@ -1,5 +1,13 @@
 # Task 11 & 12: Token Management and Session Archiving
 
+## Metadata
+
+> **Status:** draft
+> **Owner:** -
+> **Date:** 2025-12-11
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+
 Implementation of token expiry management and session cleanup/archiving system.
 
 ## Task 11: Token Expiry Management (6h)

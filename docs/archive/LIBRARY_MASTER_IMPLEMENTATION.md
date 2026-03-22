@@ -1,9 +1,14 @@
-# Lekbanken Admin — Library (Bibliotek) Master Implementation
+# Lekbanken Admin Library Master Implementation
 
-Last updated: 2026-01-01
-Status: IN PROGRESS (tenant-scope MVP complete; global-scope deferred)
-Owner: Admin (Library module)
-Scope: Library-first IA for Badges only (MVP)
+## Metadata
+- Status: archived
+- Date: 2026-01-01
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: admin
+- Scope: Archived library master implementation plan
+
+Historical implementation plan retained for provenance. Use active admin and library docs instead of this archived plan for current scope and routing decisions.
 
 ## Locked decisions (must not change)
 - Library is a first-class Admin module (separate menu entry).

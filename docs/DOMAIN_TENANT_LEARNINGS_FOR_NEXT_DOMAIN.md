@@ -1,5 +1,15 @@
 # DOMAIN: TENANT – KEY LEARNINGS FOR NEXT DOMAINS
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft learnings document derived from the tenant domain and intended as guidance for future domains.
+
 > Canonical Tenant domain documentation (source of truth): **[TENANT_DOMAIN.md](TENANT_DOMAIN.md)**
 
 This document summarizes the main architectural and security learnings from the current TENANT domain implementation. It should be used as guidance when designing and implementing future domains in Lekbanken.

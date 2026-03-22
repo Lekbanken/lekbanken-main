@@ -1,6 +1,16 @@
 # 📊 Lekbanken MVP - Project Status Report
-**Date**: January 8, 2026  
-**Status**: ✅ **ENTERPRISE READY - Security Audit Complete**
+
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-11-29
+- Snapshot date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2025-11-29
+
+> Historical snapshot only. Do not use this file as current operational truth.
+> Use `PROJECT_CONTEXT.md`, `launch-readiness/launch-control.md`, and `docs/DOCUMENTATION_STANDARD.md` for current guidance.
 
 ---
 

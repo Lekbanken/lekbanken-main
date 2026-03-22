@@ -1,5 +1,13 @@
 # System Map
 
+## Metadata
+- Status: draft
+- Date: 2025-12-17
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: sandbox
+- Scope: Sandbox wiki system overview
+
 Syfte: ge en snabb mental modell av Lekbanken.
 
 - Frontend: Next.js (app router)

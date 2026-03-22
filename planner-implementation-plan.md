@@ -1,7 +1,19 @@
 # Planner v2.0 — Komplett Implementeringsplan
 
-> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-20  
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-04
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Aktiv implementerings- och backloggreferens för Planner-domänen. Denna plan bygger på `planner-audit.md` och kompletteras av `planner-architecture.md` för systemdesign.
+
+> **Datum:** 2026-03-04 | **Senast uppdaterad:** 2026-03-21  
+> **Senast validerad:** 2026-03-21  
 > **Status:** MS0–MS11 ✅ KLARA. PlanSnapshot Pipeline ✅ KLAR. 0 TS-errors.  
+> **Scope:** Planner wizard, planlista, kalender, play integration, tenant-RLS och post-launch backlog  
 > **Förutsättning:** Denna plan bygger på `planner-audit.md`. Se även `planner-architecture.md` för systemdesign.  
 > **Nästa:** Post-launch Priority 1 — Tenant-Custom Planner Blocks (se `launch-control.md` §11)  
 > **Kvarvarande:** Cross-tenant isolation test för planner-RLS och produktfiltrering för globala planer
@@ -492,7 +504,7 @@ Application-level (lib/planner/scope.ts):
    - `StepGrund.tsx` → **raderad** (funktionaliteten lever i CreatePlanDialog)
    - `StepAnteckningar.tsx` → **raderad** (ihopslagen med StepBuildPlan)
    - `StepGranska.tsx` → **raderad** (ersätt av StepSaveAndRun)
-   - `StepKor.tsx` → **raderad** (ersätt av "Spara & Utför"-knapp)
+  - `StepKor.tsx` → **raderad 2026-03-21** (sista kvarvarande legacy-artefakten; ersätts av "Spara & Utför"-knapp)
    - `StepByggPlan.tsx` → **raderad** (ersätt av ny StepBuildPlan.tsx)
 6. **Uppdatera `usePlanWizard.ts`:**
    - Ändra steg-logik från 5 → 2 steg
@@ -626,13 +638,14 @@ Delat (lib/planner/):
 - [x] CreatePlanDialog: namn + beskrivning, ingen synlighetsval
 - [x] PlannerTabs: "Planer" + "Kalender" (ingen "Edit"-tab)
 - [x] Befintliga planer öppnas korrekt i ny wizard (gammal `?step=` URL hanteras via `resolveStep()`)
-- [x] StepGrund.tsx, StepAnteckningar.tsx, StepGranska.tsx, StepKor.tsx, StepByggPlan.tsx **raderade** (inte arkiverade — död kod)
+- [x] StepGrund.tsx, StepAnteckningar.tsx, StepGranska.tsx, StepByggPlan.tsx **raderade** (inte arkiverade — död kod)
+- [x] StepKor.tsx **slutligt raderad** ✅ KLAR (2026-03-21) — sista kvarvarande legacyfilen från 5-stegswizarden
 - [x] Nya filer: `StepBuildPlan.tsx` och `StepSaveAndRun.tsx` (engelska filnamn, svenska UI-text via i18n)
 - [x] i18n-nycklar uppdaterade för nya steg-namn i alla 3 locales
 - [x] E2e-tester uppdaterade för 2-steg + legacy URL-test tillagt
 
 **Noteringar:**
-- Gamla steg-filer raderades helt (ej arkiverade) — all relevant logik samlad i StepBuildPlan + StepSaveAndRun
+- Gamla steg-filer raderades helt (ej arkiverade) — all relevant logik samlad i StepBuildPlan + StepSaveAndRun. `StepKor.tsx` låg kvar som död artefakt utan imports och togs bort 2026-03-21.
 - Legacy URL-mapping: `resolveStep()` i types.ts mappar `grund|bygg|anteckningar|granska|kor → build`
 - WizardStep type: `'build' | 'save-and-run'`
 - Auto-publicering använder befintlig publish-infrastruktur (transparent i StepSaveAndRun)
@@ -784,7 +797,7 @@ UPDATE runs SET last_heartbeat_at = started_at
 - [x] `sendRunHeartbeat(runId)` fire-and-forget i `features/play/api.ts`
 - [x] i18n: `play.playPlanPage.actions.abandonRun` + `abandonConfirm` i sv/en/no
 - [x] Supabase-typer uppdaterade (`types/supabase.ts`: `last_heartbeat_at` i runs Row/Insert/Update)
-- [x] Bonus: fixat pre-existing TS-errors i StepKor.tsx (legacy step names)
+- [x] Bonus: fixade tidigare TS-errors i StepKor.tsx under legacyfasen; filen är nu helt borttagen ✅ KLAR (2026-03-21)
 - [x] 0 TS-errors (`npx tsc --noEmit`)
 
 **Noteringar:**
@@ -1485,7 +1498,7 @@ Samtliga open questions har besvarats och besluten är låsta:
 | Q3 | Org/Global-tabs i beta? | ✅ **Visa tabs, disabled + "Kommer snart (Beta)".** Ingen backend/RLS-ändring i beta. | LÅST |
 | Q4 | Kalender-scope? | ✅ **Create + Delete i beta.** Edit-dialog kan vänta till P1. | LÅST |
 | Q5 | Session-block i beta? | ✅ **Nej, post-beta (P2).** I beta: blockera tydligt i UI om block kräver session. | LÅST |
-| Q6 | Gamla wizard-steg — radera eller arkivera? | ✅ **Raderade.** Ursprungligt beslut var "arkivera" men filerna var 100% död kod utan aktiva imports, så de raderades helt. All relevant logik finns i StepBuildPlan + StepSaveAndRun. | LÅST (uppdaterat) |
+| Q6 | Gamla wizard-steg — radera eller arkivera? | ✅ **Raderade.** Ursprungligt beslut var "arkivera" men filerna var 100% död kod utan aktiva imports, så de raderades helt. Sista restfilen `StepKor.tsx` togs bort 2026-03-21. All relevant logik finns i StepBuildPlan + StepSaveAndRun. | LÅST (uppdaterat) |
 | Q7 | `lib/planner/locales.json` — ta bort? | ✅ **Raderade.** Både `locales.json` och `i18n.ts` — 100% död kod (noll runtime-imports). Alla nycklar redan i `messages/*.json`. | LÅST (uppdaterat) |
 | Q8 | PlannerTabs — behåll kalender-tab? | ✅ **Ja. "Planer \| Kalender" är en naturlig indelning.** | LÅST |
 | Q9 | RLS: `FOR ALL` eller per-operation? | ✅ **Per-operation (SELECT/INSERT/UPDATE/DELETE).** `FOR ALL` riskerar att en SELECT-korrekt policy blir för bred för INSERT. Alla child-tabeller har separata policies. | LÅST |

@@ -1,5 +1,15 @@
 # Demo Domain Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed launch-readiness audit for the demo domain. Use this as the bounded audit snapshot behind later demo remediation and regression verification.
+
 **Domain:** Demo (ephemeral users, demo sessions, feature gating, conversion tracking)  
 **Scope:** Full domain audit — security, isolation, abuse tolerance, UX dead ends, telemetry  
 **Date:** 2025-07-14  

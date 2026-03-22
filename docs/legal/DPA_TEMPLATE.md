@@ -1,6 +1,16 @@
 # Personuppgiftsbiträdesavtal (PUB)
 ## Data Processing Agreement (DPA)
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft DPA template for enterprise customers and regulated deployments.
+
 **Version:** 1.0  
 **Datum:** 2026-01-13  
 **Status:** Mall för signering

@@ -1,4 +1,14 @@
-# 🚀 Quick Start: Execute Migrations NOW
+# Quick Start: Execute Migrations Now
+
+## Metadata
+- Status: archived
+- Date: 2025-11-29
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: database
+- Scope: Archived migrations quick start
+
+Historical migration quickstart retained for provenance. Use current database environment and migration docs instead of this archived guide for live execution steps.
 
 ## ⚡ Fastest Way (2 minutes)
 

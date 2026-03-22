@@ -3,8 +3,11 @@
 ## Metadata
 - **Owner**: System Admin Team
 - **Status**: Active
-- **Created**: 2026-01-08
-- **Last Updated**: 2026-01-08
+- **Date**: 2026-01-08
+- **Last updated**: 2026-03-21
+- **Last validated**: 2026-01-08
+
+> Active architecture reference for the scalable `/admin/games` V2 surface. Validate listed directories, APIs, and route responsibilities against current code before implementing from it.
 
 ## Overview
 

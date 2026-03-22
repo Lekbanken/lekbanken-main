@@ -1,11 +1,27 @@
 # Game CSV Import/Export - Implementeringsplan
+# Game CSV Import/Export - Implementeringsplan
 
-> **Status:** ✅ IMPLEMENTATION KLAR  
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-16
+- Last updated: 2026-03-21
+- Last validated: 2025-12-16
+
+> Historical snapshot of the completed CSV import/export implementation plan. Canonical routing starts at `docs/builder/README.md`.
+
+> **Status:** historical snapshot  
+> **Execution status:** ✅ IMPLEMENTATION KLAR  
 > **Prioritet:** P0 - Kritisk för massproduktion  
+---
 > **Författare:** AI Assistant  
 > **Datum:** 2025-12-16  
+> **Senast uppdaterad:** 2026-03-21  
+> **Senast validerad:** 2025-12-16  
 > **Codex Review:** 2025-12-16 - Godkänd med förtydliganden  
 > **Implementation:** 2025-12-16 - Alla sessioner slutförda
+> **Canonical entrypoint:** `docs/builder/README.md`
 
 ## 1. Bakgrund och mål
 

@@ -1,14 +1,20 @@
 # App Shell / Navigation / Notifications Surface — Audit
 
+## Metadata
+
 **Date:** 2026-03-16  
+**Last updated:** 2026-03-21  
+**Last validated:** 2026-03-21  
 **Scope:** App-zone shell, navigation components, and notification surfaces  
 **Method:** Static analysis of imports, exports, route wiring, and component composition  
+**Status:** Active audit
+**Canonical entrypoint:** `docs/notifications/README.md`
 
 ---
 
 ## 1. Executive Summary
 
-The app-zone shell has **one clean canonical chain** — this is good. However, there are **4 orphaned components** and **1 dead duplicate** that create confusion and risk for AI agents and humans alike. The notifications surface is **structurally sound**: bell and page share the same hook and data flow. The core hypothesis of "two parallel component families" is **partially confirmed**: a dead `bottom-nav.tsx` duplicate exists, but it is not causing runtime bugs. The real notification issues are hook/state-level, not structural.
+The app-zone shell has **one clean canonical chain**. The previous dead duplicate and orphaned notification-adjacent files have been removed, and the topbar now lives with the rest of the active shell under `components/app/`. The notifications surface is **structurally sound**: bell and page share the same hook and data flow. Remaining work is hook/state-level and scheduled-path cleanup, not shell architecture cleanup.
 
 ### Update 2026-03-19: Notifications V2 Batch 1 Stabilized
 
@@ -32,7 +38,7 @@ app/app/layout.tsx (Server Component)
               └── <DemoBanner>
               └── <AppShell>                    ← components/app/AppShell.tsx
                     ├── <SideNav>               ← components/app/SideNav.tsx (desktop: lg+)
-                    ├── header={<AppTopbar>}     ← app/app/components/app-topbar.tsx
+                    ├── header={<AppTopbar>}     ← components/app/AppTopbar.tsx
                     │     └── <NotificationBell> ← components/app/NotificationBell.tsx
                     ├── <main>{children}</main>
                     └── <BottomNav>             ← components/app/BottomNav.tsx (mobile: <lg)
@@ -43,8 +49,8 @@ app/app/layout.tsx (Server Component)
 | File | Role | Imported By | Status |
 |------|------|-------------|--------|
 | `components/app/AppShell.tsx` | Root layout shell | `app/app/layout-client.tsx` | ✅ **Canonical** |
-| `app/app/components/app-topbar.tsx` | Topbar (back, logo, bell) | `app/app/layout-client.tsx` | ✅ **Canonical** |
-| `components/app/NotificationBell.tsx` | Bell icon + dropdown | `app/app/components/app-topbar.tsx` | ✅ **Canonical** |
+| `components/app/AppTopbar.tsx` | Topbar (back, logo, bell) | `app/app/layout-client.tsx` | ✅ **Canonical** |
+| `components/app/NotificationBell.tsx` | Bell icon + dropdown | `components/app/AppTopbar.tsx` | ✅ **Canonical** |
 | `components/app/BottomNav.tsx` | Mobile bottom nav | `components/app/AppShell.tsx` | ✅ **Canonical** |
 | `components/app/SideNav.tsx` | Desktop side nav | `components/app/AppShell.tsx` | ✅ **Canonical** |
 | `components/app/ProfileModal.tsx` | Quick profile actions | `BottomNav.tsx`, `SideNav.tsx` | ✅ **Canonical** |
@@ -56,18 +62,16 @@ app/app/layout.tsx (Server Component)
 
 ---
 
-## 3. Dead / Orphaned Components
+## 3. Removed Structural Noise / Remaining Legacy
 
-### 3.1. `app/app/components/bottom-nav.tsx` — ❌ DEAD DUPLICATE
+### 3.1. Removed in cleanup batch
 
-- **Content:** Minimal rounded-pill bottom nav with hardcoded Swedish labels
-- **Imports:** Zero. Not imported anywhere in the codebase.
-- **Shadowed by:** `components/app/BottomNav.tsx` (the actual runtime component)
-- **Risk:** An agent asked to "fix the bottom nav" may edit this file instead of the canonical one
-- **Naming collision:** Same export name `BottomNav` as the canonical component
-- **Confirmed dead via:** No `import` statement referencing this file path exists
+- `app/app/components/bottom-nav.tsx` — removed
+- `components/admin/AdminNotificationsCenter.tsx` — removed
+- `components/admin/useRealAdminNotifications.ts` — removed
+- `components/app/TenantSwitcher.tsx` — removed
 
-**Classification:** 🗑️ **Candidate for deletion**
+These files were the main source of false structural signals in the earlier audit. They no longer exist in the active codebase.
 
 ### 3.2. `components/app/PageHeader.tsx` — ⚠️ NEAR-LEGACY
 
@@ -78,31 +82,6 @@ app/app/layout.tsx (Server Component)
 - **Risk:** An agent looking for "page header" may choose this over `PageTitleHeader`
 
 **Classification:** ⚠️ **Legacy — remove when JourneyPage is cleaned up**
-
-### 3.3. `components/admin/AdminNotificationsCenter.tsx` — ❌ ORPHANED
-
-- **Content:** Admin bell icon + dropdown component
-- **Imports:** Zero runtime imports. Only type-imported by `useRealAdminNotifications.ts`
-- **Why orphaned:** `AdminTopbarV2.tsx` has explicit comment: `"Notifications removed from admin - admin only creates, app consumes"`
-- **Risk:** Agent might wire this into admin topbar thinking it should be there
-
-**Classification:** 🗑️ **Candidate for deletion** (with `useRealAdminNotifications.ts`)
-
-### 3.4. `components/admin/useRealAdminNotifications.ts` — ❌ ORPHANED
-
-- **Content:** Hook wrapping `useAppNotifications` and mapping to `AdminNotification` type
-- **Imports:** Zero. Not imported by any component.
-- **Risk:** Creates false appearance that admin has notification consumption. It doesn't.
-
-**Classification:** 🗑️ **Candidate for deletion** (with `AdminNotificationsCenter.tsx`)
-
-### 3.5. `components/app/TenantSwitcher.tsx` — ❌ ORPHANED
-
-- **Content:** Dropdown for switching between tenants
-- **Imports:** Zero. Referenced only in docs (`USER_PROFILE_CURRENT_STATE_ANALYSIS.md`)
-- **Risk:** Agent may try to wire this in thinking it's needed
-
-**Classification:** 🗑️ **Candidate for deletion** (or keep if planned for future use)
 
 ---
 
@@ -158,42 +137,29 @@ The notifications surface is **architecturally clean**:
 
 ## 5. Structural Risk Analysis
 
-### RISK 1: Two-folder split (`app/app/components/` vs `components/app/`)
+### RISK 1: Legacy docs can still imply the old two-folder split
 
 | Aspect | Finding |
 |--------|---------|
-| **Severity** | MEDIUM (causes confusion, not runtime bugs) |
-| **Pattern** | `app/app/components/` has 2 files; `components/app/` has 9 files |
-| **Runtime impact** | None — the dead duplicate is never imported |
-| **Agent risk** | HIGH — AI agents given "fix bottom nav" will find both files |
-| **Root cause** | `app-topbar.tsx` was placed in route-local `app/app/components/` while it could live in `components/app/` |
+| **Severity** | LOW |
+| **Pattern** | Active shell components are now consolidated under `components/app/` |
+| **Runtime impact** | None |
+| **Agent risk** | Medium if agents read stale docs instead of current code |
+| **Root cause** | Documentation lag after the completed topbar consolidation |
 
 ### RISK 2: Naming confusion
 
 | File A | File B | Confusion |
 |--------|--------|-----------|
-| `app/app/components/bottom-nav.tsx` (kebab-case) | `components/app/BottomNav.tsx` (PascalCase) | Same `BottomNav` export name |
 | `components/app/PageHeader.tsx` | `components/app/PageTitleHeader.tsx` | "PageHeader" vs "PageTitleHeader" — which is current? |
 
-### RISK 3: Orphaned code creating false architecture signals
+### RISK 3: Legacy `PageHeader` still creates a mild API-choice trap
 
-The 4 orphaned files create a false impression of:
-- An admin notification consumption system (doesn't exist)
-- A tenant switching UI (doesn't exist)
-- A second bottom nav (doesn't exist)
-- An older page header API (legacy)
+`components/app/PageHeader.tsx` still exists for one legacy journey page, while `PageTitleHeader.tsx` is the active standard everywhere else. An agent scanning by filename can still pick the wrong header primitive.
 
-An agent reading the codebase will waste time understanding dead components and may try to integrate them.
+### RISK 4: Notification issues are no longer structural
 
-### RISK 4: `app-topbar.tsx` placement
-
-`app-topbar.tsx` lives in `app/app/components/` but imports from `components/app/`:
-```
-app/app/components/app-topbar.tsx
-  → import { NotificationBell } from "@/components/app/NotificationBell"
-```
-
-This cross-folder import is the **only reason** `app/app/components/` exists as a folder. The topbar could live in `components/app/` alongside its peers.
+The remaining meaningful risks sit in `hooks/useAppNotifications.ts` and the scheduled notification path, not in app-shell composition.
 
 ---
 
@@ -206,23 +172,23 @@ This cross-folder import is the **only reason** `app/app/components/` exists as 
 | `components/app/AppShell.tsx` | Root shell |
 | `components/app/BottomNav.tsx` | Mobile nav |
 | `components/app/SideNav.tsx` | Desktop nav |
+| `components/app/AppTopbar.tsx` | Topbar (back/logo/bell) |
 | `components/app/NotificationBell.tsx` | Bell + dropdown |
 | `components/app/ProfileModal.tsx` | Profile quick actions |
 | `components/app/PageTitleHeader.tsx` | Page title block |
 | `components/app/nav-items.tsx` | Nav definitions |
-| `app/app/components/app-topbar.tsx` | Topbar (back/logo/bell) |
 | `app/app/layout-client.tsx` | Client layout wrapper |
 | `hooks/useAppNotifications.ts` | Notification hook |
 | `app/app/notifications/page.tsx` | Notifications full page |
 
-### 🗑️ Candidates for Deletion
+### ✅ Removed from Active Codebase
 
 | File | Reason |
 |------|--------|
-| `app/app/components/bottom-nav.tsx` | Dead duplicate, zero imports |
-| `components/admin/AdminNotificationsCenter.tsx` | Orphaned, admin removed notifications |
-| `components/admin/useRealAdminNotifications.ts` | Orphaned, zero imports |
-| `components/app/TenantSwitcher.tsx` | Orphaned, zero imports |
+| `app/app/components/bottom-nav.tsx` | Dead duplicate removed |
+| `components/admin/AdminNotificationsCenter.tsx` | Orphaned admin consumer removed |
+| `components/admin/useRealAdminNotifications.ts` | Orphaned hook removed |
+| `components/app/TenantSwitcher.tsx` | Orphaned switcher removed |
 
 ### ⚠️ Legacy (Monitor)
 
@@ -234,18 +200,15 @@ This cross-folder import is the **only reason** `app/app/components/` exists as 
 
 ## 7. Conclusion
 
-**The hypothesis was partially right, partially wrong:**
+**Current conclusion:**
 
-✅ There IS a dead duplicate (`bottom-nav.tsx`) — confirmed  
-✅ There IS naming confusion between folders — confirmed  
-✅ There ARE orphaned components creating false signals — confirmed  
-❌ There is NOT a parallel component family causing notification bugs — refuted  
-❌ The bell and page ARE part of the same coherent shell — confirmed sound  
-❌ The notification issues are NOT structural routing problems — they were hook-level state bugs  
+✅ The app-shell now has one canonical component family under `components/app/`  
+✅ The removed duplicate/orphan files are no longer part of the active architecture  
+✅ The bell and page remain part of the same coherent shell  
+✅ The notification issues are not shell-routing problems  
+⚠️ The remaining structural ambiguity is limited to legacy `PageHeader` usage and stale documentation risk  
 
-**The app-shell architecture is fundamentally sound.** The cleanup needed is:
-1. Delete ~4 dead files
-2. Optionally consolidate `app-topbar.tsx` location
-3. Continue with hook-level notification fixes
-
-This is a **small cleanup**, not a rewrite.
+**The app-shell architecture is sound.** Remaining work is:
+1. Keep active docs synchronized with the completed shell cleanup
+2. Continue hook-level notification hardening
+3. Execute Batch 2 scheduled-path consolidation

@@ -1,5 +1,15 @@
 ﻿# Disputes
 
+## Metadata
+- Status: archived
+- Date: 2026-01-17
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: repo-governance
+- Scope: Archived dual-agent dispute tracking artifact
+
+Historical process artifact retained for provenance. Use current governance and inventory docs instead of this archived dispute tracker for live classification work.
+
 ## Template
 - Node ID:
 - Agent A classification:

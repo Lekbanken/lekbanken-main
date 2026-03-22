@@ -1,5 +1,15 @@
 # 🏛️ Svenska Kyrkan Enterprise Compliance Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Frozen audit snapshot of enterprise compliance readiness and gap analysis for Svenska Kyrkan.
+
 **Datum:** 2026-01-13  
 **Version:** 1.1  
 **Status:** Implementation Phase In Progress  

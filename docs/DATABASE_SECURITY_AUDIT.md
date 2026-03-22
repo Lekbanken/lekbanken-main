@@ -1,5 +1,15 @@
 # Database Security & Performance Audit Report
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-01-07
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Frozen audit snapshot of the database security remediation cycle and its resolved findings.
+
 **Date:** 2026-01-08  
 **Project:** lekbanken-main (qohhnufxididbmzqnjwg)  
 **Status:** ✅ **RESOLVED** - All security issues fixed

@@ -1,6 +1,15 @@
 # LEKBANKEN — GAMIFICATION TRIGGER RAPPORT
 
-**Datum:** 2026-01-08  
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Historisk design- och analysrapport för ett tidigare trigger-expansionsspår. Använd som referensmaterial, inte som aktuell implementation- eller roadmap-sanning.
+
 **Syfte:** Komplett analys av gamification-systemet med 100 trigger-förslag för DiceCoin/XP rewards  
 **Målgrupp:** ChatGPT-planering, produktteam, utvecklare
 

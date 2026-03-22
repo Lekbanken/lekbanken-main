@@ -1,5 +1,15 @@
 # Svenska Kyrkan Onboarding Guide
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft onboarding guide for Svenska Kyrkan stakeholders covering due diligence, setup, and operational expectations.
+
 **Version:** 1.0  
 **Datum:** 2026-01-13  
 **Målgrupp:** Svenska Kyrkan IT-ansvariga och beslutfattare

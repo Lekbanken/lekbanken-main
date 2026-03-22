@@ -1,8 +1,14 @@
 # Phase 4.1: Security Hardening for Achievement APIs
 
-**Document Status:** Complete  
-**Phase:** 4.1 (Hardening)  
-**Date:** 2025-01-10
+## Metadata
+- Status: archived
+- Date: 2026-01-10
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: gamification
+- Scope: Archived achievements phase 4 hardening log
+
+Historical implementation log retained for provenance. Current guidance should come from active gamification docs, not this archived phase record.
 
 ---
 

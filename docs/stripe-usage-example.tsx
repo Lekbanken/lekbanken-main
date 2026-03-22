@@ -1,3 +1,11 @@
+/**
+ * Status: draft
+ * Date: 2025-12-10
+ * Last updated: 2026-03-21
+ * Last validated: -
+ * Purpose: Reference example for wiring Stripe subscription checkout in app code.
+ */
+
 // Example: Using Stripe Subscription Checkout in Your App
 // ========================================================
 

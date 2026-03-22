@@ -1,9 +1,18 @@
 # Sprint 3: Consolidation & Contracts
 
-> **Datum**: 2026-02-02  
-> **Status**: PLAN  
-> **Källa**: GPT QA feedback på Sprint 2  
-> **Fokus**: Eliminera dual mode, konsolidera trigger registry, låsa contracts
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active sprint and consolidation plan as long as its goals have not been explicitly replaced or closed in later builder documents.
+
+**Planstatus**: PLAN  
+**Källa**: GPT QA feedback på Sprint 2  
+**Fokus**: Eliminera dual mode, konsolidera trigger registry, låsa contracts
 
 ---
 

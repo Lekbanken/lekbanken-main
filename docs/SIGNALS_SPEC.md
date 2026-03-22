@@ -1,5 +1,15 @@
 # Signals System – Architecture Spec
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-02-23
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft architecture specification for the two-way signals system in Legendary Play.
+
 > Single-page reference for the two-way tactical signal system in Legendary Play.
 
 ---

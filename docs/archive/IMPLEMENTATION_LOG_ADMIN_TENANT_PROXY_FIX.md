@@ -1,8 +1,14 @@
 # Implementation Log: Admin Tenant Proxy Fix
 
-**Date**: 2026-01-10  
-**Status**: COMPLETE  
-**Scope**: Enable tenant admins to access `/admin/tenant/*` routes  
+## Metadata
+- Status: archived
+- Date: 2026-01-10
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: admin
+- Scope: Archived admin tenant proxy fix log
+
+Historical implementation log retained for provenance. Current routing guidance should come from active admin and architecture docs, not this archived fix record.
 
 ---
 

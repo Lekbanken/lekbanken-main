@@ -1,9 +1,13 @@
 # JOURNEY DOMAIN
 
 ## Metadata
-- **Status:** Active (read/composition domain)
-- **Last updated:** 2025-12-17
-- **Source of truth:** Repo code (Journey UI + BFF endpoints) + sandbox references
+
+> **Status:** active
+> **Owner:** -
+> **Date:** 2025-12-17
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+> **Source of truth:** Repo code (Journey UI + BFF endpoints) + sandbox references
 
 ## Scope
 Journey Domain (“Din lekresa”) owns **read models and presentation composition**:

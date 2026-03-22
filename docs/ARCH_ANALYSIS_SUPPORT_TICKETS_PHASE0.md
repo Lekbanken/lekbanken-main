@@ -1,9 +1,18 @@
 # Phase 0: Architecture & Reality Analysis — Support & Tickets Admin
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-11
+- Last updated: 2026-03-21
+- Last validated: 2026-01-11
+
+> Historical Phase 0 analysis. Keep as context for earlier support/tickets decisions, not as current canonical admin guidance.
+
 **Document Status:** READ-ONLY ANALYSIS  
 **Feature Area (current):** `/admin/tickets`  
 **Candidate Domain:** `/admin/support/*`  
-**Date:** 2026-01-11  
 **Purpose:** Surface facts, constraints, risks, and IA decisions BEFORE Phase 1/2 work
 
 ---

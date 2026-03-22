@@ -1,7 +1,16 @@
 # LEKBANKEN — LEADERBOARD DESIGN
 
-**Date:** 2026-01-08  
-**Status:** Implementation Complete  
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active leaderboard behavior reference. Verify concrete route and component names against current code before using this document for implementation changes.
+
+**Execution status:** Implementation Complete  
 **Objective:** Default inclusion with user opt-out and anti-gaming measures
 
 ---

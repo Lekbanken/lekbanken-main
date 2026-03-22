@@ -1,9 +1,16 @@
 # Anomaly Detection Playbook
 
-> **Created:** 2026-03-14
-> **Status:** ACTIVE
-> **Owner:** Platform / On-call
-> **Related:** [launch-telemetry-pack.md](../../launch-readiness/launch-telemetry-pack.md) · [production-signals-dashboard.md](production-signals-dashboard.md) · [incident-playbook.md](../../launch-readiness/incident-playbook.md)
+## Metadata
+
+- Owner: Platform / On-call
+- Status: active
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Active launch anomaly-detection playbook for identifying, triaging, and responding to operational degradations from production signals.
+
+**Related:** [launch-telemetry-pack.md](../../launch-readiness/launch-telemetry-pack.md) · [production-signals-dashboard.md](production-signals-dashboard.md) · [incident-playbook.md](../../launch-readiness/incident-playbook.md)
 
 ---
 

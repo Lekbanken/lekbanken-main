@@ -1,5 +1,17 @@
 # Core Concepts
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft conceptual overview for toolkit users. Use it to explain product vocabulary and flow, not as a canonical schema or state-machine specification.
+
+**Related:** [README.md](README.md) · [README.md](../host-guide/README.md)
+
 Understanding these core concepts will help you make the most of the Legendary Escape Room Toolkit.
 
 ---

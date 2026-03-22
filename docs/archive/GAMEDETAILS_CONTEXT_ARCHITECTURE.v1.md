@@ -1,9 +1,14 @@
-# GameDetails Context Architecture — Målarkitektur
+# GameDetails Context Architecture - MalarKitektur
 
-> **Datum:** 2026-03-10  
-> **Förutsättning:** GAMEDETAILS_CONTEXT_AUDIT.md + GAMEDETAILS_CONTEXT_IMPLEMENTATION_PLAN.md  
-> **Syfte:** Definiera den stabila målarkitekturen för kontext- och rollmedveten speldata-presentation  
-> **Status:** Referensdokument — uppdateras vid arkitekturella förändringar
+## Metadata
+- Status: archived
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: play
+- Scope: Superseded GameDetails context architecture v1
+
+Superseded v1 architecture snapshot retained for provenance. Use the active GameDetails context architecture instead of this archived version.
 
 ---
 

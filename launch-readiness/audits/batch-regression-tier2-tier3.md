@@ -1,5 +1,15 @@
 # Batch Regression Audit — Tier 2 + Tier 3 Domains
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed shared regression snapshot for tier-2 and tier-3 launch domains. Use `launch-readiness/audits/README.md` for folder navigation and `launch-readiness/launch-control.md` for the active launch posture.
+
 > **Domains:** Atlas/Sandbox, Media/Assets, Notifications, Support/Tickets, Profile/Settings, Marketing/Landing, Calendar  
 > **Type:** Regression Audit (Phase 5)  
 > **Date:** 2026-03-14  

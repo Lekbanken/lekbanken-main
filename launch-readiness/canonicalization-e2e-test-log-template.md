@@ -1,5 +1,15 @@
 # Canonicalization E2E Test Log Template
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-03-19
+- Last updated: 2026-03-21
+- Last validated: 2026-03-19
+
+> Draft execution-log template for the canonicalization runtime verification round. Use together with `canonicalization-e2e-checklist.md`.
+
 > **Created:** 2026-03-19
 > **Use with:** [canonicalization-e2e-checklist.md](canonicalization-e2e-checklist.md)
 > **Purpose:** Capture execution evidence for the canonicalization runtime verification round.

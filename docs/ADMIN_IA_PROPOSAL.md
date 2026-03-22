@@ -1,5 +1,15 @@
 # Admin IA Proposal (System ↔ Tenant)
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-18
+- Last updated: 2026-03-21
+- Last validated: 2025-12-18
+
+> Draft IA proposal for regrouping admin navigation while keeping current routes reachable. Use together with `ADMIN_MODEL_DECISION.md`, not as a replacement for the active access model.
+
 > Goal: a scalable admin information architecture where **every existing admin page remains reachable** and the sidebar stays at **max 2 levels**.
 
 ## Principles

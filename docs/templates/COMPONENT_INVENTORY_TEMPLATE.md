@@ -1,5 +1,15 @@
 # COMPONENT INVENTORY
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft template for repository-wide component and artifact inventories. Use it as a scaffolding document, not as a canonical inventory itself.
+
 **Date:** YYYY-MM-DD  
 **Project:** Lekbanken  
 **Purpose:** Complete inventory of all code artifacts categorized by domain

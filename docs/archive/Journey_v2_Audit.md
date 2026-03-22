@@ -1,8 +1,17 @@
 # Journey v2.0 — Audit
 
-> **Datum:** 2026-03-06 (rev 2)  
-> **Status:** Draft — revision 2 after GPT review  
-> **Beroende av:** Journey v1.0 implementation, `journey-activation-implementation-plan.md`
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-03-06
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived Journey v2 audit snapshot from a superseded design cycle. Use only as historical context for earlier Journey planning.
+
+**Status vid arkivering:** Draft — revision 2 after GPT review  
+**Beroende av:** Journey v1.0 implementation, `journey-activation-implementation-plan.md`
 
 ---
 

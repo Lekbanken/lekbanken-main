@@ -3,6 +3,16 @@
 **Generated:** 2026-03-16  
 **Companion:** `repo-file-structure-full.md` (tree map), `repo-structure-findings-full.md` (analysis)
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-16
+
+> Historical recommendation set from the 2026-03-16 structure audit. Do not treat every recommendation here as current policy without checking `REPO_GOVERNANCE.md` and later cleanup decisions.
+
 ---
 
 ## Guiding Principles

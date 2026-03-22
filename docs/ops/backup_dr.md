@@ -1,8 +1,14 @@
 # Backups & Disaster Recovery
 
-Status: active  
-Owner: Ops/Platform  
-Last validated: 2025-12-17
+## Metadata
+
+- Owner: Ops/Platform
+- Status: active
+- Date: 2025-12-11
+- Last updated: 2026-03-21
+- Last validated: 2025-12-17
+
+> Active runbook for backup and disaster-recovery expectations, restore drills, and repo-verifiable recovery steps.
 
 ## Related code (source of truth)
 
@@ -24,17 +30,17 @@ What this repo can verify:
 - **Encryption:** At-rest/in-transit is provider-specific (verify for your setup).
 
 ## Restore & Verification
-- **Quarterly restore test (recommended):** Restore latest backup to a staging project/DB, run `npm run type-check` + critical smoke (accounts, participants join/rejoin) against staging.
+- **Quarterly restore test (recommended):** Restore latest backup to a dedicated restore target or temporary non-production project/DB, run `npm run type-check` + critical smoke (accounts, participants join/rejoin) against that restore target.
 - **RPO/RTO:** **TBD** (set targets and validate them with restore drills).
 - **Runbook (high level):**
-  1) Trigger restore from Supabase dashboard to a staging project (or a restored DB instance).
-  2) Re-point staging env vars in the hosting platform (or local) to the restored project’s keys.
+  1) Trigger restore from Supabase dashboard to a temporary restore project or restored DB instance.
+  2) Re-point non-production env vars in the hosting platform (or local) to the restored project's keys.
   3) Validate schema alignment:
     - Confirm migrations in `supabase/migrations/` are applied.
     - Regenerate types: `npm run db:types:remote` (or `scripts/regenerate-types.ps1`).
     - Run `npm run type-check`.
   4) Validate RLS coverage by running `supabase/verify_rls_coverage.sql` in Supabase SQL Editor.
-  5) Run smoke tests; validate tenant isolation on staging.
+  5) Run smoke tests; validate tenant isolation on the restore target.
 
 ## Access & Permissions
 - Backup/restore limited to platform admins with access to Supabase project + secrets.

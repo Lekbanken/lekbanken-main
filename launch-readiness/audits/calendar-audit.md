@@ -1,5 +1,15 @@
 # Calendar Domain Audit (#17)
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed launch-readiness audit for the calendar sub-feature within the planner domain. Use this as a bounded audit snapshot and defer to planner domain docs and launch-control for current operational state.
+
 **Date:** 2026-03-12
 **Auditor:** Claude (Opus)
 **Status:** ✅ Complete — GPT-calibrated (2026-03-12)

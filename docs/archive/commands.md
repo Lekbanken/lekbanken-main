@@ -1,5 +1,15 @@
 ﻿# Commands and heuristics used (Iteration 2)
 
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-01-17
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived process command artifact from the inventory workstream. Keep as provenance only, not as an active workflow standard.
+
 ## Entrypoints
 - Get-ChildItem -Path 'd:\Dokument\GitHub\Lekbanken\lekbanken-main\\app' -Recurse -Filter 'page.tsx'
 - Get-ChildItem -Path 'd:\Dokument\GitHub\Lekbanken\lekbanken-main\\app' -Recurse -Filter 'route.ts'

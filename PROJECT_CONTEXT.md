@@ -2,6 +2,16 @@
 
 > **Syfte:** Ge AI-agenter (och nya utvecklare) snabb förståelse för produkten, inte bara koden.
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-04
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active root-level product entrypoint. Read this before domain docs when you need product intent, user roles, and core domain framing.
+
 ## Product
 
 **Lekbanken** är en SaaS-plattform för att upptäcka, organisera och köra strukturerade lekar och aktiviteter med deltagare.

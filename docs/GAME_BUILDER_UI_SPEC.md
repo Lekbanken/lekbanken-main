@@ -1,10 +1,23 @@
 # Game Builder – Unified Admin Editor
 ## UX/UI Design Specification
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-16
+- Last updated: 2026-03-21
+- Last validated: 2025-12-16
+
+> Draft builder UI specification. Canonical routing for the builder domain starts at `docs/builder/README.md`.
+
 **Version:** 1.0  
 **Date:** 2025-12-16  
-**Status:** Design Phase  
+**Last updated:** 2026-03-21  
+**Last validated:** 2025-12-16  
+**Status:** draft  
 **Author:** Claude Opus 4.5  
+**Canonical entrypoint:** `docs/builder/README.md`
 
 ---
 

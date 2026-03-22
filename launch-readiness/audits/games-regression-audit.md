@@ -1,5 +1,15 @@
 # Games / Library — Regression Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Closed regression audit for the games domain after launch-readiness remediation. Use `launch-readiness/launch-control.md` for current program status and the original games audit plus remediation records for upstream context.
+
 **Domain:** Games / Library  
 **Audit Date:** 2026-03-14  
 **Auditor:** Claude (AI)  

@@ -1,7 +1,16 @@
 # Admin IA Refactor: Gamification hub
 
-> **Status**: ✅ Implementerad
-> **Datum**: 2026-01-04
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-04
+- Last updated: 2026-03-21
+- Last validated: 2026-01-04
+
+> Historisk snapshot av den genomförda IA-refaktorn för gamification-hubben. Använd som designhistorik och jämförelsematerial, inte som ensam aktuell navigationskälla.
+
+> **Execution status**: ✅ Implementerad
 
 ## Sammanfattning
 

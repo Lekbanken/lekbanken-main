@@ -1,5 +1,17 @@
 # Sessions & Participants Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Closed launch-readiness audit for sessions and participant lifecycle behavior. Use `launch-readiness/launch-control.md` for current launch status and the corresponding remediation or regression records for follow-up state.
+
+> **2026-03-22 verification note:** This file remains a frozen snapshot of the original findings. Current code still matches the expected follow-up state: M1-M3 are implemented, and M4 remains deferred post-launch.
+
 > **Domain:** Sessions & Participants (#8 in audit queue)  
 > **Status:** ✅ Complete  
 > **Date:** 2026-03-11  

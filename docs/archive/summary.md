@@ -1,6 +1,14 @@
 ﻿# Lekbanken System Inventory Summary (v3 - Partitioned)
 
-Generated: 2026-01-27
+## Metadata
+- Status: archived
+- Date: 2026-01-17
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: repo-governance
+- Scope: Archived inventory process summary
+
+Historical inventory-process snapshot retained for provenance. Use current inventory and governance docs instead of this archived summary for live repository state.
 
 ## Overview
 

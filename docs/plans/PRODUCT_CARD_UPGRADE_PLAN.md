@@ -1,5 +1,15 @@
 # ProductCard IA/UX/UI + Stripe Governance Upgrade Plan
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft upgrade plan for ProductCard IA, UX, UI, and Stripe governance.
+
 **Datum:** 2026-01-08  
 **Status:** 🔄 Pågående (Sprint 1-4 klart)  
 **Prioritet:** Hög

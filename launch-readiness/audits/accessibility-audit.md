@@ -1,5 +1,15 @@
 # Accessibility Audit (#20) — Cross-cutting
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed cross-cutting accessibility audit from the launch-readiness cycle. Use this as a bounded quality snapshot rather than an active operating document.
+
 **Status:** ✅ GPT-calibrated  
 **Date:** 2026-03-12  
 **GPT Calibration:** 2026-03-12 — A11Y-001 P2→P3, A11Y-004 P2→P3. All other severities confirmed.  

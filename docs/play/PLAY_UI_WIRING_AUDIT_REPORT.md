@@ -1,10 +1,18 @@
 # Play UI Wiring Audit Report
+
+## Metadata
+
 ## UI → API → DB Field Mapping (SSoT + Evidence)
 
 **Version:** 2.7  
 **Date:** 2026-02-09  
-**Status:** Reference Document (Verified + Full Contract Tests + **Staging Verified**)  
+**Last updated:** 2026-03-21  
+**Last validated:** 2026-02-09  
+**Status:** historical snapshot  
+**Execution status:** Reference Document (Verified + Full Contract Tests + **Staging Verified**)  
 **Scope:** All Play domain UI components, API endpoints, and database tables
+
+> Historisk snapshot av wiring-auditen efter v2.7-passningen. Använd `PLAY_UI_WIRING_AUDIT_REPORT_v2.md` som den tydligare aktiva wiringreferensen i första hand.
 
 ---
 

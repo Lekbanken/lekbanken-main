@@ -1,8 +1,17 @@
 # Phase 0: Architecture & Reality Analysis — Shop Rewards Admin
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-10
+- Last updated: 2026-03-21
+- Last validated: 2026-01-10
+
+> Historical Phase 0 analysis. This document captures pre-implementation findings and should not be treated as a current canonical admin or gamification source.
+
 **Document Status:** Complete  
 **Feature:** `/admin/gamification/shop-rewards`  
-**Date:** 2026-01-10  
 **Purpose:** READ-ONLY ANALYSIS — Surface facts, risks, and constraints before Phase 1/2
 
 ---

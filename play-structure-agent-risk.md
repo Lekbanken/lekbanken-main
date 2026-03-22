@@ -2,6 +2,16 @@
 
 > Generated 2026-03-16. Rules for AI agents working in the play domain.
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Frozen agent-risk snapshot for the 2026-03-16 play structure audit pass. Revalidated 2026-03-21 after the orphan cleanup. Current working rules still defer to repo governance and the active play docs cluster.
+
 ---
 
 ## Architecture Quick Reference
@@ -67,7 +77,7 @@ Before adding a new play component, verify:
 
 | Module | Import path | What it exports |
 |--------|-------------|-----------------|
-| `components/play` | `@/components/play` | All 44 shared UI components + hooks |
+| `components/play` | `@/components/play` | Shared UI components + hooks |
 | `features/play` | `@/features/play` | Play modes, session shells, RunsDashboard, PlayPlanPage, types |
 | `features/play-participant` | `@/features/play-participant` | API functions + token storage |
 | `lib/play` | `@/lib/play` | No barrel — import individual files |
@@ -104,6 +114,6 @@ This domain was previously classified as "largest structural risk" in `repo-stru
 
 - The architecture is **intentional and correct** — NOT a broken parallel system
 - Dependencies flow in **one direction only** (no circular imports)
-- Only **1 orphaned file** (`SessionCard.tsx`) — deleted via `play-structure-consolidation-plan.md`
+- The historical orphan (`SessionCard.tsx`) is already deleted; no current orphaned file remains from that 2026-03-16 pass
 - `SessionHeader` exists in both trees but they are **different components** with different props — both are used
 - No reorganisation needed

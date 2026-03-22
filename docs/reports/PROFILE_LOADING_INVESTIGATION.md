@@ -1,5 +1,15 @@
 # Profile pages - intermittent infinite loading (Investigation log)
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-31
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk undersökningslogg för profile loading-incidenten. Behåll som felsökningshistorik och beslutsspår, inte som nuvarande statusdokument.
+
 Status: **IMPLEMENTED - awaiting verification**  
 Started: **2026-01-30**  
 Owner: Codex (with Johan)

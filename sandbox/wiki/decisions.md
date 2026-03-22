@@ -1,5 +1,13 @@
 # Decisions & invariants
 
+## Metadata
+- Status: draft
+- Date: 2025-12-17
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: sandbox
+- Scope: Sandbox wiki note for key decisions and invariants
+
 Syfte: kort lista på beslut som inte får tappas.
 
 Föreslagen process:

@@ -1,5 +1,15 @@
 # Custom Domains - Manual Test Plan
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-03
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft manual validation plan for custom domain provisioning, host handling, and tenant resolution behavior.
+
 **Phase:** A (Manual Provisioning)  
 **Date:** 2026-01-03  
 **Status:** Ready for testing

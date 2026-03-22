@@ -1,5 +1,15 @@
 # Participant Play UI Laws
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-22
+- Last updated: 2026-03-21
+- Last validated: 2026-02-22
+
+> Aktiv, låst UI-lag-kontrakt för participant play-vyn. Avvikelser kräver att kontraktet och dess guardrails uppdateras tillsammans.
+
 > Immutable layout contract for the participant mobile-first play view.
 > Every component in the `/play/session/[code]` route **must** obey these rules.
 > Violations = bugs.

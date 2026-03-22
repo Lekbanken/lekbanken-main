@@ -1,6 +1,16 @@
 # MFA & Trusted Device Audit
 
-> **Status:** VERIFIED — 5 findings (2 P0, 2 P1, 1 P2)  
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-19
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Current targeted auth audit for MFA and trusted-device admin flows. All verified findings are now closed, so treat this as a remediation-complete reference alongside `launch-readiness/launch-control.md`.
+
+> **Status:** VERIFIED — 5 findings (2 P0, 2 P1, 1 P2); all 5 findings closed after 2026-03-22 code verification  
 > **Audit date:** 2026-03-18  
 > **Auditor:** Claude (Codex discovery → Claude verification)  
 > **Domain:** Auth / MFA / Trusted Devices  
@@ -16,6 +26,8 @@ Codex identified 5 potential bugs (BUG-001 through BUG-005) in the MFA/trusted-d
 ### Root Cause
 
 All 5 bugs share a common root cause: **`as unknown as SupabaseClient` type casts** used in all affected files bypass TypeScript's type checking on Supabase queries. The generated types in `types/supabase.ts` are correct — the application code simply doesn't use them.
+
+**2026-03-22 note:** All 5 audited findings are now fixed. The admin listing route still contains a narrower `as unknown as MFAUserRow[]` cast, but that remaining type-safety debt is outside this audit's closed functional findings.
 
 ---
 
@@ -38,7 +50,7 @@ All 5 bugs share a common root cause: **`as unknown as SupabaseClient` type cast
 - **Actual:** Table has `is_revoked` (boolean). No `is_active` column exists. Correct filter: `.eq('is_revoked', false)`.
 - **Impact:** PostgREST returns HTTP 400. Code doesn't check for error on this query. Trusted device counts will always be 0 (null data, forEach skipped).
 
-### MFA-003 — Status filter applied JS-side after DB pagination (P2)
+### MFA-003 — Status filter applied JS-side after DB pagination (P2, fixed 2026-03-22)
 
 - **File:** `app/api/admin/tenant/[tenantId]/mfa/users/route.ts` L91 + L184-196
 - **Code:** `.range(offset, offset + pageSize - 1)` (L91) then `users.filter(u => u.mfa_status === statusFilter)` (L186)
@@ -47,6 +59,7 @@ All 5 bugs share a common root cause: **`as unknown as SupabaseClient` type cast
 - **Impact:** Admin sees incomplete/inconsistent pagination when filtering by MFA status. No data loss or security impact — admin UX only.
 - **Note:** For `status=all` (default), pagination works correctly.
 - **Fix:** Since MFA status is computed from a join (`user_mfa`), the filter cannot be pushed to the initial query. Options: (a) fetch all matching users and paginate in JS, (b) use a DB function/view that includes computed status, (c) two-pass: first fetch all IDs with status, then paginate the filtered set.
+- **2026-03-22 fix verification:** Implemented. The route now fetches all search-matching members, computes MFA status for the full set, applies the status filter, and slices the filtered list for pagination.
 
 ### MFA-004 — `user_mfa` update uses wrong field names; route returns success on failure (P0)
 

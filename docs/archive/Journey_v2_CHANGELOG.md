@@ -1,6 +1,16 @@
 # Journey v2.0 — Changelog
 
-> All changes from the Journey v2.0 implementation (Steps 1–8).
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-03-06
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived changelog for the superseded Journey v2 workstream. Keep as implementation history only.
+
+**Purpose:** All changes from the Journey v2.0 implementation (Steps 1–8).
 
 ---
 

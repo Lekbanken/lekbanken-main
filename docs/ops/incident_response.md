@@ -1,8 +1,14 @@
 # Incident Response
 
-Status: active  
-Owner: Ops/Platform  
-Last validated: 2025-12-17
+## Metadata
+
+- Owner: Ops/Platform
+- Status: active
+- Date: 2025-12-11
+- Last updated: 2026-03-21
+- Last validated: 2025-12-17
+
+> Active runbook for incident severity, roles, communication, and response sequencing across production issues.
 
 ## Related docs/code (source of truth)
 

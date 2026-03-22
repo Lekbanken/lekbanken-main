@@ -1,9 +1,18 @@
 # Import Atomicity Plan
 
-> **Syfte**: Eliminera partial-update risk vid `isUpdate=true` genom atomic RPC-transaktion.  
-> **Källa**: [IMPORT_METADATA_RISK_REPORT.md](IMPORT_METADATA_RISK_REPORT.md) sektion 14-15  
-> **Datum**: 2026-02-01  
-> **Policy**: Endast evidens. Inga gissningar.
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active implementation plan for the import atomicity track. Read together with the current audit and import spec, not as a standalone builder status document.
+
+**Syfte**: Eliminera partial-update risk vid `isUpdate=true` genom atomic RPC-transaktion.  
+**Källa**: [IMPORT_METADATA_RISK_REPORT.md](IMPORT_METADATA_RISK_REPORT.md) sektion 14-15  
+**Policy**: Endast evidens. Inga gissningar.
 
 ---
 

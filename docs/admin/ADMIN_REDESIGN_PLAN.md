@@ -1,5 +1,15 @@
 # LEKBANKEN /ADMIN REDESIGN – IMPLEMENTATION PLAN (REVISED)
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-12
+- Last updated: 2026-03-21
+- Last validated: 2025-12-12
+
+> Draft-but-approved redesign plan for `/admin`. Treat this as a bounded implementation plan from the redesign workstream, and revalidate scope against the current admin routes before reviving any unchecked milestone.
+
 **Version:** 1.1  
 **Date:** 2025-12-12  
 **Author:** Claude Opus 4.5 (revised by Codex)  

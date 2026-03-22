@@ -31,6 +31,14 @@ interface RateLimitResult {
  * This is cross-instance persistent (backed by Supabase/Postgres).
  */
 export async function checkDemoRateLimit(identifier: string): Promise<RateLimitResult> {
+  if (process.env.NODE_ENV !== 'production') {
+    return {
+      success: true,
+      remaining: DEMO_RATE_LIMIT.maxRequests,
+      reset: Math.floor((Date.now() + DEMO_RATE_LIMIT.windowMs) / 1000),
+    };
+  }
+
   const now = Date.now();
   const windowStart = new Date(now - DEMO_RATE_LIMIT.windowMs).toISOString();
   const resetTimestamp = Math.floor((now + DEMO_RATE_LIMIT.windowMs) / 1000);

@@ -2,9 +2,11 @@
 
 ## Metadata
 
-- Owner: -
-- Status: active
-- Last validated: 2025-12-17
+> **Status:** active
+> **Owner:** -
+> **Date:** 2025-12-03
+> **Last updated:** 2026-03-21
+> **Last validated:** 2025-12-17
 
 ## Related code (source of truth)
 

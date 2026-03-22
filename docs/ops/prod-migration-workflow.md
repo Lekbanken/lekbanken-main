@@ -1,9 +1,16 @@
 # Production Migration Workflow
 
-> **Status:** active  
-> **Owner:** Engineering  
-> **Created:** 2026-03-14  
-> **Related:** `docs/MIGRATIONS.md` (execution methods), `launch-readiness/incident-playbook.md` §3b (DB rollback)
+## Metadata
+
+- Owner: Engineering
+- Status: active
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Active workflow for classifying, promoting, and rolling back production database migrations with guarded environment promotion.
+
+**Related:** [MIGRATIONS.md](../MIGRATIONS.md) · [incident-playbook.md](../../launch-readiness/incident-playbook.md)
 
 ---
 

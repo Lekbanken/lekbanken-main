@@ -1,10 +1,24 @@
 # Game Builder P2 - Implementation Plan
 ## Faser, Roller & Publik Tavla
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-16
+- Last updated: 2026-03-21
+- Last validated: 2025-12-16
+
+> Historical snapshot of the completed Game Builder P2 implementation plan. Canonical routing for builder docs starts at `docs/builder/README.md`.
+
 **Version:** 1.2  
 **Date:** 2025-12-16  
-**Status:** Session 1 & 2 Complete  
+**Last updated:** 2026-03-21  
+**Last validated:** 2025-12-16  
+**Status:** historical snapshot  
+**Execution status:** Session 1 & 2 Complete  
 **Estimated Effort:** ~3 sessions (4-6h each)
+**Canonical entrypoint:** `docs/builder/README.md`
 
 ---
 

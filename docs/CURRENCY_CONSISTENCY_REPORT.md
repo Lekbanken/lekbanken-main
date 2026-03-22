@@ -1,5 +1,15 @@
 # Currency Consistency Report
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-14
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the DiceCoin terminology consistency work across the product.
+
 ## Summary
 
 This document tracks the implementation of consistent currency vocabulary across the Lekbanken product.

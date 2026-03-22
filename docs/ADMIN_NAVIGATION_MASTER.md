@@ -1,6 +1,16 @@
 ﻿# ADMIN_NAVIGATION_MASTER
 > Single source of truth för Admin-navigation.
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-03
+- Last updated: 2026-03-21
+- Last validated: 2026-01-03
+
+> Aktiv referens för beslutad admin-navigation och redirectstrategi. Revalidera alltid mot `lib/admin/nav.ts`, adminlayouten och faktiska routes innan större menyförändringar.
+
 ## Facit (beslutad menystruktur)
 - Lekbanken
   - Översikt

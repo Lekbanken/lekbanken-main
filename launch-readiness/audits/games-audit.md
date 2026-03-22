@@ -1,5 +1,15 @@
 # Games System Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed launch-readiness audit for the games domain, including library, builder, publish flow, snapshots, and import/export. Use `launch-readiness/launch-control.md` for current program status and the corresponding regression or remediation records for follow-up state.
+
 > **Status:** Complete (GPT-calibrated) — M1+M2 remediation done  
 > **Date:** 2026-03-11  
 > **Calibrated:** 2026-03-11 — severity adjustments per GPT feedback (GAME-001 split, GAME-003/004 reclassified, GAME-008 reframed)  

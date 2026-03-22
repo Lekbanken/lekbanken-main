@@ -1,9 +1,19 @@
 ﻿# 🎮 GameDetails & Sandbox Implementation Plan
 
-> **Datum:** 2026-03-13 (rev 12, final release pass)
-> **Status:** ✅ FAS 0–4 + Sprint A/B/C/D/E/F KLAR — D3 ENVIRONMENT CONFIRMED — Production Ready Gate 10/10 — Nästa: D4 framtida datamodell + builder-integration
-> **Föregående:** GAMECARD_UNIFIED_IMPLEMENTATION.md (100% klar — endast cards/summary)
-> **Referens:** GAMEDETAILS_SECTION_ANALYSIS.md (komplett sektionsanalys inkl. 10-punkts djupaudit)
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-30
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Historical implementation history for the broader GameDetails and sandbox workstream. Keep as a release/history artifact, not as the current canonical plan.
+
+**Execution status:** ✅ FAS 0–4 + Sprint A/B/C/D/E/F KLAR — D3 ENVIRONMENT CONFIRMED — Production Ready Gate 10/10 — Nästa: D4 framtida datamodell + builder-integration
+**Canonical entrypoint:** `docs/games/README.md`
+**Föregående:** GAMECARD_UNIFIED_IMPLEMENTATION.md (100% klar — endast cards/summary)
+**Referens:** GAMEDETAILS_SECTION_ANALYSIS.md (komplett sektionsanalys inkl. 10-punkts djupaudit)
 
 ### Statusnivåer i detta dokument
 

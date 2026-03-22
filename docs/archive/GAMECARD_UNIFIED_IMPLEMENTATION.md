@@ -1,8 +1,14 @@
-# 🎮 Unified GameCard & GameDisplay Implementation Plan
+# Unified GameCard and GameDisplay Implementation Plan
 
-> **Senast uppdaterad:** 2026-01-29
-> **Status:** ✅ KOMPLETT - Alla faser klara!
-> **Ansvarig:** [TBD]
+## Metadata
+- Status: archived
+- Date: 2026-01-30
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: play
+- Scope: Archived unified game card implementation notes
+
+Historical implementation snapshot retained for provenance. Use active play and component docs instead of this archived plan for current UI decisions.
 
 ---
 

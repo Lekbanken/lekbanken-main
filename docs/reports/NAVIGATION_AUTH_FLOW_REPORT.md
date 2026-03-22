@@ -1,4 +1,15 @@
 # 🔗 Navigation & Auth Flow Report
+
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-12
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk flödesrapport för navigation och auth mellan ytor. Behåll som analysbakgrund, inte som aktuell routing- eller authkarta.
+
 ## Connections between /marketing, /app and /admin
 
 **Datum:** 2025-12-12  

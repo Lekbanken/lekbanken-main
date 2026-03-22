@@ -1,5 +1,15 @@
 # Legendary Escape Room Toolkit – MVP Roadmap
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical roadmap snapshot for the Legendary Escape Room toolkit and its MVP1-MVP3 rollout plan.
+
 > Single source of truth for the modular, trigger-first Escape Room Toolkit.
 
 ---

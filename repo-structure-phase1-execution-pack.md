@@ -1,5 +1,7 @@
 # Phase 1 Execution Pack — Repo Structure Cleanup
 
+## Metadata
+
 > ✅ **EXECUTED 2026-03-16.** All steps completed. tsc/lint/build pass.
 > Short operational work card. No analysis — only actions.  
 > Source: `repo-structure-consolidation-plan.md` + `repo-structure-agent-risk.md`  

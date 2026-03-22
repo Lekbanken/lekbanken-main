@@ -1,5 +1,15 @@
 # Play Sessions MVP – UI/UX Specification
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-16
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft UI/UX specification for the play sessions MVP across participant, host, and admin surfaces.
+
 **Version:** 1.0  
 **Datum:** 2025-12-15  
 **Status:** Draft för implementation  

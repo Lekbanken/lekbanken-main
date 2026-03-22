@@ -1,5 +1,15 @@
 # Media & Assets Launch Audit (#12)
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed launch-readiness audit for media and assets handling. Treat this as the bounded audit snapshot behind later remediation and regression verification.
+
 **Date:** 2026-03-12  
 **Status:** ✅ GPT-calibrated (no severity changes)  
 **Scope:** Media CRUD, upload pipeline (signed URL flow), templates, fallback images, avatar uploads, tenant branding, spatial artifact previews, Supabase storage buckets  

@@ -1,5 +1,15 @@
 # Enterprise Isolation Implementation Plan
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Draft implementation plan for enterprise-isolated deployments. Use this as a future-readiness roadmap triggered by a real enterprise customer need, not as an active execution tracker.
+
 > **Status:** Design-Ready — No implementation before launch  
 > **Date:** 2026-03-13  
 > **Author:** Claude Opus 4.6  

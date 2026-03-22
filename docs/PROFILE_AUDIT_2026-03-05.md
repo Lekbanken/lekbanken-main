@@ -1,8 +1,18 @@
 # /app/profile — Total Audit + Implementeringsförslag
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-05
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Frozen audit snapshot for the `/app/profile` cleanup initiative before implementation work started.
+
 **Datum:** 2026-03-05  
-**Författare:** Claude (audit, ej kod)  
-**Status:** VÄNTAR PÅ GODKÄNNANDE — ingen kod får ändras förrän planen godkänts
+**Forfattare:** Claude (audit, ej kod)  
+**Status:** VANTAR PA GODKANNANDE - ingen kod far andras forran planen godkants
 
 ---
 

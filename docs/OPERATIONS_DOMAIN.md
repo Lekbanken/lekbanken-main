@@ -1,9 +1,13 @@
 # OPERATIONS DOMAIN
 
 ## Metadata
-- **Status:** Active
-- **Last updated:** 2025-12-17
-- **Source of truth:** Repo code + `docs/ops/*` runbooks + `.github/workflows/*` + `package.json` scripts
+
+> **Status:** active
+> **Owner:** -
+> **Date:** 2025-12-17
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+> **Source of truth:** Repo code + `docs/ops/*` runbooks + `.github/workflows/*` + `package.json` scripts
 
 ## Scope
 Operations Domain owns (as implemented/documented in repo):

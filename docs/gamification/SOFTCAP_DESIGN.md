@@ -1,7 +1,16 @@
 # LEKBANKEN — SOFTCAP DESIGN DOCUMENT
 
-**Date:** 2026-01-08  
-**Status:** Implementation Ready  
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Draft design reference for the softcap mechanic. Do not assume this design is fully shipped unless current code or a later audit confirms it.
+
+**Execution status:** Implementation Ready  
 **Objective:** Diminishing returns for extreme activity WITHOUT demotivating active users
 
 ---

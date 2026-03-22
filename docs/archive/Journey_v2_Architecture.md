@@ -1,8 +1,17 @@
 # Journey v2.0 — Arkitektur
 
-> **Datum:** 2026-03-07 (rev 3)  
-> **Status:** Draft — revision 3: §11 Tenant Override-arkitektur, CosmeticAccess multi-source model  
-> **Beroende av:** `Journey_v2_Audit.md`
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-03-06
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived Journey v2 architecture draft. Keep as superseded design history, not as an active architecture reference.
+
+**Status vid arkivering:** Draft — revision 3: §11 Tenant Override-arkitektur, CosmeticAccess multi-source model  
+**Beroende av:** `Journey_v2_Audit.md`
 
 ---
 

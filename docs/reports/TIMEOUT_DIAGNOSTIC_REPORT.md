@@ -1,5 +1,15 @@
 # Lekbanken — Fullständig Diagnostikrapport: Systemvida Timeouts
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-02-20
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Fryst diagnostikrapport för systemvida timeout-problem. Behåll som incidentunderlag, men återverifiera timeoutkedjor mot nuvarande kod innan operativa beslut tas.
+
 > **Datum:** 2025-02-20  
 > **Syfte:** Complete forensic analysis of timeout issues affecting the entire Supabase-backed application — notifications, marketing pages, and navigation. Intended to be shared for collaborative fixing.
 

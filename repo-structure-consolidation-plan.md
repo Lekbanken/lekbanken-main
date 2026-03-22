@@ -2,6 +2,16 @@
 
 > Generated 2026-03-16. Prioritized by impact-to-effort ratio. All actions verified against actual file structure.
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-16
+
+> Historical action-plan snapshot from the 2026-03-16 repo structure audit. Validate against later cleanup work before executing any recommendation here.
+
 ---
 
 ## Principle: Minimum Safe Path

@@ -1,5 +1,15 @@
 # Admin Tech Review (follow-up to Claude overview)
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-04
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historisk uppföljningsreview av adminytan. Behåll som genomfört tekniskt reviewunderlag, inte som aktuell design- eller strukturkälla.
+
 ## Scope
 - Admin UI/logic only. No auth or Supabase security touched.
 - Reviewed shared admin primitives and tightened layout/accessibility.

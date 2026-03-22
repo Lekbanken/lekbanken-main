@@ -1,8 +1,17 @@
 # Gamification Hub - Testplan
 
-> **Status**: Redo för testning
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-04
+- Last updated: 2026-03-21
+- Last validated: 2026-01-04
+
+> Smal manuell testplan för gamification-hubben. Behåll som checklistunderlag, men använd den inte som bevis på nuvarande testtäckning eller körstatus.
+
+> **Execution status**: Redo för testning
 > **Version**: 1.0
-> **Datum**: 2026-01-04
 
 ---
 

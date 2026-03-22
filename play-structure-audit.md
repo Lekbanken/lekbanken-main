@@ -2,6 +2,16 @@
 
 > Generated 2026-03-16. All findings verified via import analysis and route wiring.
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Frozen structural audit kept as a guardrail for the play domain. Revalidated 2026-03-21 after the orphan cleanup; re-audit before making broad structural changes beyond the currently documented boundaries.
+
 ---
 
 ## 1. Executive Summary
@@ -145,9 +155,10 @@ Multiple sandbox pages import from both trees for testing/preview.
 
 ### Orphaned files in `components/play/`
 
+No orphaned files were found in the 2026-03-21 revalidation pass.
+
 | File | Status | Reason |
 |------|--------|--------|
-| `SessionCard.tsx` | **ORPHAN** | `SessionCard` and `SessionCardSkeleton` — zero external references |
 | `SessionHeader.tsx` | **NOT orphaned** | Imported via barrel by `app/app/play/sessions/[id]/client.tsx` and `features/play/components/HostSessionWithPlay.tsx`. Different component from `features/play/SessionHeader` (different props). |
 | `ParticipantStatusBadge.tsx` | **NOT orphaned** | Internal dependency — imported by `ParticipantRow.tsx` (which is canonical) |
 | `KeypadDisplay.tsx` | Internal only | Only used by `Keypad.tsx` within same directory — not orphaned |
@@ -185,7 +196,7 @@ lib/play/ (server utils)           /api/play/* routes
 ### Why it looks confusing
 
 1. **The names suggest competition** — `features/play` and `components/play` sound like they do the same thing
-2. **1 orphaned file** (`SessionCard`) creates noise
+2. Historical cleanup context around the removed `SessionCard.tsx` can still create documentation noise if the guardrails are not kept current
 3. **Shared import style** — routes import from both `@/components/play` and `@/features/play`, making them look interchangeable
 4. **No documentation** explains the intended layering
 
@@ -197,7 +208,7 @@ lib/play/ (server utils)           /api/play/* routes
 
 | Risk | Severity | Impact |
 |------|----------|--------|
-| 1 orphaned file (`SessionCard`) in `components/play/` | LOW | Agent confusion, no runtime impact |
+| Historical orphan cleanup drift (`SessionCard.tsx` already removed) | LOW | Documentation drift can mislead agents even though runtime is unaffected |
 | No architectural documentation for the layering | MEDIUM | New contributors may put orchestration code in `components/play/` |
 | `SessionHeader` name collision | LOW | Two different components with same name in different trees — confusing but both are used |
 
@@ -215,8 +226,8 @@ lib/play/ (server utils)           /api/play/* routes
 
 ### Immediate (safe, zero risk)
 
-1. Delete 1 orphaned file: `SessionCard.tsx` from `components/play/`
-2. Remove its barrel export from `components/play/index.ts`
+1. Keep the structural guardrails synced after the completed `SessionCard.tsx` cleanup
+2. Preserve the current barrel/import boundaries in `components/play/index.ts`
 
 ### Short-term (documentation)
 

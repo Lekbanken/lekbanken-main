@@ -1,5 +1,15 @@
 # MANUELL VERIFIERING — Import Fix
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft manual verification guide for validating the import-fix behavior across legacy, canonical, and invalid trigger payloads.
+
 ## Datum: 2025-01-XX
 ## Verifierad av: Johan L
 

@@ -1,5 +1,15 @@
 # Legendary Escape Room Toolkit - Documentation
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2025-12-28
+- Last updated: 2026-03-21
+- Last validated: 2025-12-28
+
+> User-facing reference hub for the Legendary Escape Room Toolkit docs. This cluster is not an active triplet domain; use it as a navigational guide for product and developer-facing toolkit documentation.
+
 Welcome to the documentation for the Legendary Escape Room Toolkit. This guide covers everything from initial setup to advanced customization.
 
 ## Quick Links
@@ -8,6 +18,12 @@ Welcome to the documentation for the Legendary Escape Room Toolkit. This guide c
 - [Host Guide](./host-guide/README.md)
 - [Developer Guide](./developer-guide/README.md)
 - [API Reference](./api-reference/README.md)
+
+## Trust Boundary
+
+- Use this cluster for user/developer guidance and narrative product documentation.
+- For builder/import implementation truth, start at `docs/builder/README.md` and the import references linked from root docs.
+- For games-domain behavior, start at `docs/games/README.md`.
 
 ---
 

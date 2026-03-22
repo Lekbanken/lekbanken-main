@@ -1,5 +1,15 @@
 # PLANNER — MÅLARKITEKTUR & IMPLEMENTATION
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-30
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of an earlier planner target architecture document, superseded as canonical guidance by the current root planner triplet.
+
 **Version:** 1.0  
 **Datum:** 2025-12-30  
 **Status:** Arkitekturförslag baserat på verifierat facit  

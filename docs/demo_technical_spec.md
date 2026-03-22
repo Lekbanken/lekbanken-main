@@ -1,8 +1,19 @@
 # Lekbanken Enterprise Demo - Teknisk Specifikation
+
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft technical specification for the enterprise demo architecture, security model, and lifecycle design.
+
 **Version:** 1.0
 **Datum:** 2026-01-13
 **Status:** Design Phase - Fas 2
-**Författare:** Claude Code Analysis
+**Forfattare:** Claude Code Analysis
 
 ---
 

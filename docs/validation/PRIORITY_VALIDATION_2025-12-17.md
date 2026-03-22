@@ -1,6 +1,15 @@
 # Priority validation (Auth/RBAC, DB/migrations, Game Builder/CSV)
 
-**Date:** 2025-12-17  
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2025-12-17
+- Last updated: 2026-03-21
+- Last validated: 2025-12-17
+
+> Frozen high-priority validation snapshot. The findings remain useful as dated evidence, but current operational truth must be read from the canonical auth, migration, and builder docs.
+
 **Scope:** Auth/RBAC + tenant resolution, migrations/typegen, CSV import/export contract.
 
 ## Sources checked (repo = SoT)

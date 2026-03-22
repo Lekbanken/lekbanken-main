@@ -1,16 +1,42 @@
 # Production Signals Dashboard
 
-> **Created:** 2026-03-14
-> **Status:** ACTIVE
-> **Owner:** Platform / Ops
-> **Review cadence:** Daily (5 min) + Weekly (30 min)
-> **Related:** [launch-telemetry-pack.md](../../launch-readiness/launch-telemetry-pack.md) · [anomaly-detection-playbook.md](anomaly-detection-playbook.md)
+## Metadata
+
+- Owner: Platform / Ops
+- Status: active
+- Date: 2026-03-14
+- Last updated: 2026-03-22
+- Last validated: -
+
+> Active operational dashboard specification for production health signals, review cadence, and threshold-driven anomaly detection.
+
+**Review cadence:** Daily (5 min) + Weekly (30 min)
+**Related:** [launch-telemetry-pack.md](../../launch-readiness/launch-telemetry-pack.md) · [anomaly-detection-playbook.md](anomaly-detection-playbook.md)
 
 ---
 
 ## Dashboard Overview
 
 Five signal panels, each queryable from existing data sources. No external tooling required for v1 — all queries run against Supabase (SQL Editor or service role client).
+
+### Production Access Note
+
+Production deployments are protected by Vercel Authentication. For manual observe-mode checks:
+
+- Use an authenticated Vercel browser session, or
+- Use `vercel curl` from the linked repo to bypass deployment protection for endpoint checks.
+
+Command pattern:
+
+```bash
+vercel curl /api/health --deployment https://<current-production-deployment>
+vercel curl /api/readiness --deployment https://<current-production-deployment>
+```
+
+Route contract reminder:
+
+- `/api/health` is public at the app layer and should return binary status for production health checks.
+- `/api/readiness` is intentionally `system_admin` only and will return `401 Unauthorized` unless the caller is authenticated in the app as a system admin.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -448,12 +474,13 @@ Platform team. Escalation: Vercel/Supabase support for infrastructure issues.
 ### Daily Check (5 min — every morning)
 
 ```
-1. GET /api/readiness     → all checks passing?
-2. GET /api/system/metrics → error rates normal?
-3. SQL: session count today vs yesterday
-4. SQL: gamification daily summary — economy stable?
-5. SQL: top sessions by participants — outliers?
-6. Visual scan: anything unusual?
+1. GET /api/health via Vercel-authenticated access or `vercel curl` → status = ok?
+2. GET /api/readiness only with system_admin app auth → all checks passing?
+3. GET /api/system/metrics → error rates normal?
+4. SQL: session count today vs yesterday
+5. SQL: gamification daily summary — economy stable?
+6. SQL: top sessions by participants — outliers?
+7. Visual scan: anything unusual?
 ```
 
 ### Weekly Review (30 min — Mondays)
@@ -466,6 +493,72 @@ Platform team. Escalation: Vercel/Supabase support for infrastructure issues.
 5. Record observations in launch-control.md changelog
 6. Check if any gaps need instrumentation work
 ```
+
+### Week 1 Baseline Capture Template
+
+Use this once for the first real observe-mode pass. Record exact values, even if they are zero.
+
+```md
+## Observe Mode Baseline — YYYY-MM-DD HH:MM UTC
+
+Readiness
+- /api/readiness:
+- /api/health:
+- Notes:
+
+S1 — Session Creation Health
+- sessions_created_1h:
+- sessions_created_24h:
+- sessions_by_status:
+- session_error_rate_24h:
+- Notes:
+
+S2 — Participant Join Health
+- joins_success_1h:
+- joins_success_24h:
+- sessions_with_joins_24h:
+- avg_joins_per_session:
+- join_errors_24h:
+- Notes:
+
+S3 — Realtime & Presence Health
+- active_sessions_now:
+- live_participants_now:
+- stale_heartbeat_sessions:
+- reconnect_indicator_1h:
+- Realtime dashboard check:
+- Notes:
+
+S4 — Gamification Economy Integrity
+- coins_earned_txs_1h:
+- coins_amount_1h:
+- achievements_1h:
+- top_earners_24h:
+- softcap_pct_7d:
+- Notes:
+
+S5 — Error Pressure & Rate Limiting
+- errors_1h:
+- errors_24h:
+- api_latency_p95:
+- active_users_now:
+- 429 visibility from logs:
+- Notes:
+
+Alert Evaluation
+- Alert A triggered? yes/no
+- Alert B triggered? yes/no
+- Alert C triggered? yes/no
+- Incident playbook used? yes/no
+- Follow-up action:
+
+Decision
+- Baseline captured: yes/no
+- Automation justified yet? yes/no
+- If yes, which signal and why:
+```
+
+Store the filled template in the current ops note for the week or summarize it in `launch-control.md` if the pass is brief.
 
 ### Monthly (first 3 months)
 

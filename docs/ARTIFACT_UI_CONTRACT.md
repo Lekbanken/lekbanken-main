@@ -4,8 +4,17 @@
 > All UI components **must** implement against this contract.
 > Violations = bugs — update this contract first if behaviour needs to change.
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-02-27
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft contract for artifact data/state semantics pending full verification against current runtime implementation.
+
 **Version:** 1.0
-**Datum:** 2026-02-23
 
 ---
 

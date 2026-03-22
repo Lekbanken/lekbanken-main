@@ -1,5 +1,15 @@
 # Dependency & Supabase Call Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-01-03
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Frozen audit snapshot covering dependency review, Supabase mutation handling, and follow-up fixes.
+
 **Startdatum:** 2026-01-03  
 **Status:** ✅ Komplett  
 **Senast uppdaterad:** 2026-01-03

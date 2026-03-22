@@ -1,4 +1,14 @@
-# 🚀 LEKBANKEN — HANDOVER PROMPT (December 11, 2025)
+# Lekbanken Handover Prompt (December 11, 2025)
+
+## Metadata
+- Status: archived
+- Date: 2025-12-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: product
+- Scope: Archived new-AI onboarding prompt
+
+Historical onboarding prompt retained for provenance. Use current session prompts and governance docs instead of this archived handover prompt for active work.
 
 ## ⚠️ KRITISK LÄSNING FÖRST
 

@@ -1,9 +1,12 @@
 # API / INTEGRATION DOMAIN
 
 ## Metadata
-- **Status:** active
-- **Last updated:** 2025-12-17
-- **Owner:** -
+
+> **Status:** active
+> **Owner:** -
+> **Date:** 2025-12-18
+> **Last updated:** 2026-03-21
+> **Last validated:** -
 
 ## Scope
 This domain documents the **internal API surface** used by the Lekbanken app:

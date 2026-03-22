@@ -1,7 +1,16 @@
 # Game Builder Import/Export Compatibility
 
-**Datum:** 2026-02-01  
-**Status:** GAP ANALYSIS + ROUNDTRIP GUARANTEE
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active compatibility reference for builder import/export behavior and roundtrip guarantees. Read together with the import spec, atomicity plan, and metadata contracts.
+
+**Exekveringsstatus:** GAP ANALYSIS + ROUNDTRIP GUARANTEE
 
 ---
 

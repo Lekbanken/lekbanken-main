@@ -1,5 +1,15 @@
 # MFA Teknisk Specifikation för Lekbanken
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft MFA technical specification for schema, policy, API, and Supabase integration design.
+
 **Datum:** 2026-01-13  
 **Version:** 1.0  
 **Status:** Enterprise-grade design

@@ -1,7 +1,14 @@
 # Gamification Event Integrity — Remediation Plan
 
+## Metadata
+
+> **Date:** 2026-03-14  
+> **Last updated:** 2026-03-21  
+> **Last validated:** 2026-03-21  
+> **Status:** frozen audit  
 > **Source audit:** `launch-readiness/audits/gamification-event-integrity-audit.md`
-> **Priority:** Post-launch (no blocking issues found)
+> **Priority:** Post-launch (no blocking issues found)  
+> **Note:** Frozen post-launch remediation snapshot. Revalidate against current telemetry before treating any recommendation here as active work.
 
 ---
 

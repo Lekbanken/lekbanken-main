@@ -1,5 +1,15 @@
 # Samtalskort (Conversation Cards) — Systemfacit
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-03
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft facit/reference for the conversation cards system, including data model, API surface, admin flows, and play artifact wiring.
+
 ## Syfte
 Samtalskort är en Toolbelt-tool som låter host (och ev deltagare beroende på scope) välja en publicerad samling och bläddra mellan kort under en pågående session.
 

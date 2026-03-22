@@ -1,5 +1,15 @@
 # Marketing & Landing Audit (#16)
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed launch-readiness audit for the marketing and landing domain. Treat this as the bounded audit snapshot behind later SEO and polish work.
+
 > **Scope:** Public-facing pages, SEO metadata, indexing, static/dynamic rendering, images, analytics, cookie consent  
 > **Auditor:** Claude (automated, independently verified)  
 > **Status:** ✅ Complete — GPT-calibrated (2026-03-12)  

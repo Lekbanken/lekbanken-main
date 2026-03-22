@@ -1,5 +1,15 @@
 # Architecture Core — Launch Readiness Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed foundational architecture audit for launch-readiness. Use `launch-readiness/audits/README.md` to navigate the audit cluster and `launch-readiness/launch-control.md` for the current program status.
+
 > **Auditor:** Claude  
 > **Date:** 2026-03-10  
 > **Status:** Complete  

@@ -1,5 +1,15 @@
 # Performance Audit (#19) — Cross-Cutting
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed cross-cutting performance audit from the launch-readiness cycle. Use this as a bounded performance snapshot and revalidate against current traffic and code paths before treating it as current guidance.
+
 **Status:** ✅ Complete — GPT-calibrated (2026-03-12). PERF-001 downgraded P1→P2-high. No launch remediation required.  
 **Date:** 2026-03-12  
 **Scope:** Bundle/build, data fetching, database queries, caching/ISR, images, client performance, realtime/polling, middleware, CSS, third-party  

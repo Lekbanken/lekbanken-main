@@ -3,6 +3,16 @@
 > Generated 2026-03-16. Every play-related file classified.  
 > Legend: **CAN** = canonical runtime, **ORP** = orphaned, **INT** = internal-only, **API** = API layer, **SRV** = server utility
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Frozen classification map derived from the 2026-03-16 play audit. Revalidated 2026-03-21 after the orphan cleanup. Use with the companion audit and current code, not as a substitute for re-validation after structural changes.
+
 ---
 
 ## components/play/ — Shared UI Primitives (47 files)
@@ -22,7 +32,6 @@
 ### Session components
 | File | Status | Consumers |
 |------|--------|-----------|
-| `SessionCard.tsx` | **ORP** | Zero external references |
 | `SessionListItem.tsx` | **CAN** | App play sessions list |
 | `SessionHeader.tsx` | **CAN** | App play sessions, features/play (via barrel) — note: different component from features/play/SessionHeader |
 | `SessionControls.tsx` | **CAN** | App play sessions, features/play |
@@ -198,6 +207,4 @@
 
 ## Orphaned Files Summary
 
-| File | Tree | Action |
-|------|------|--------|
-| `components/play/SessionCard.tsx` | components/play | DELETE — zero consumers |
+No current orphaned files were identified in the 2026-03-21 revalidation pass.

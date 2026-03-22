@@ -1,5 +1,15 @@
 # 🛒 Purchase Flow – Status Report & Completion Plan
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-27
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical status report snapshot for the purchase-flow architecture and completion plan.
+
 **Date:** 2026-01-27  
 **Author:** Architecture Analysis  
 **Status:** APPROVED – Architecture Locked  

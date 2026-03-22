@@ -1,5 +1,15 @@
 # Batch A.1 — Host Architecture Verification
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-15
+- Last updated: 2026-03-21
+- Last validated: 2026-03-15
+
+> Historical architecture-verification snapshot for the host-routing decision work. Use this as bounded decision history rather than an active operating guide.
+
 **Date:** 2025-07-18  
 **Scope:** Verification-only — no implementation in this deliverable  
 **Directive:** GPT reframed A.1 from "choose A or B" to "verify architecture before deciding"

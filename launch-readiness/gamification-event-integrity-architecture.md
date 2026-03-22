@@ -1,5 +1,15 @@
 # Gamification Event Integrity — Architecture Reference
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-03-14
+- Last updated: 2026-03-21
+- Last validated: 2026-03-14
+
+> Active architecture reference for gamification event integrity and idempotency behavior. Use this as the stable design overview together with the paired audit snapshot and current launch-readiness state.
+
 > **Status:** Verified 2025-01-25
 > **Scope:** Event pipeline, idempotency model, anti-inflation systems
 

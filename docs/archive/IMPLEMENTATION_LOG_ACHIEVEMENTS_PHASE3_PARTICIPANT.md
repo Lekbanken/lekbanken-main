@@ -1,5 +1,15 @@
 # Achievements Phase 3: Participant-Facing Badge Showcase
 
+## Metadata
+- Status: archived
+- Date: 2026-01-10
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: gamification
+- Scope: Archived achievements phase 3 participant log
+
+Historical implementation log retained for provenance. Current guidance should come from active gamification docs, not this archived phase record.
+
 ## Overview
 
 Phase 3 implements participant-facing achievement features including tenant-aware filtering,

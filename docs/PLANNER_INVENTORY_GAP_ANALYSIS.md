@@ -1,5 +1,15 @@
 # PLANNER – INVENTERING & GAP-ANALYS
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2025-12-30
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Frozen audit snapshot of planner inventory and gap analysis prior to later architecture work.
+
 **Status:** Facitdokument för arkitekturarbete  
 **Datum:** 2025-12-30  
 **Syfte:** Exakt nulägesbild, avvecklingslista, saknade begrepp – INGEN lösningsdesign

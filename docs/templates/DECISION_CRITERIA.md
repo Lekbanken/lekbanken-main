@@ -1,5 +1,15 @@
 # DECISION CRITERIA – Architecture & Refactoring Guidelines
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft decision framework for architecture and refactoring work. Use as a reusable guideline template, not as a project-specific active policy without review.
+
 **Purpose:** Define clear decision-making criteria for all architectural and code changes during validation and refactoring phases.
 
 **Principle:** When in doubt, **prefer consistency over perfection** and **user approval over autonomous changes**.

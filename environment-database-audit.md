@@ -1,8 +1,15 @@
 # Miljö- och databasinventering — Revisionsrapport
 
+## Metadata
+
 **Datum:** 2026-03-19  
+**Senast uppdaterad:** 2026-03-21  
+**Senast validerad:** 2026-03-19  
+**Status:** Frozen audit  
 **Metod:** Statisk kodanalys, CLI-verifiering, Docker-databasinspektion  
 **Omfattning:** Alla tre Supabase-miljöer (local, sandbox, production), notifications-domänen
+
+> Fryst revisionssnapshot. Använd `docs/database/environments.md`, `docs/DEVELOPER_SETUP.md` och `launch-readiness/launch-control.md` som nuvarande operativ vägledning.
 
 ---
 

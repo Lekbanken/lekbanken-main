@@ -1,6 +1,14 @@
 # Component Inventory (Initial Pass)
 
-Status: draft • Date: 2025-12-11 • Owner: Frontend
+## Metadata
+
+- Owner: Frontend
+- Status: draft
+- Date: 2025-12-11
+- Last updated: 2026-03-21
+- Last validated: 2025-12-11
+
+> Draft working inventory for UI and sandbox coverage from an early audit pass. Useful for cleanup planning, but not a canonical map of current component ownership.
 
 Scope: inventory of main React components/hooks by folder, plus current sandbox coverage. This is a working list to drive sandbox completeness and legacy cleanup.
 

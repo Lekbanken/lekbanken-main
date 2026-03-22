@@ -1,7 +1,13 @@
 # 🔐 Security Audit - TODO Tracker
 
-> **Senast uppdaterad:** 2026-01-08  
-> **Status:** ✅ **ENTERPRISE READY** - Alla Supabase Advisor varningar åtgärdade!
+## Metadata
+
+> **Status:** completed
+> **Owner:** -
+> **Date:** 2026-01-07
+> **Last updated:** 2026-03-21
+> **Last validated:** 2026-01-08
+> **Notes:** Completed security backlog snapshot after the Supabase Advisor remediation pass.
 
 ---
 

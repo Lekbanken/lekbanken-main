@@ -1,5 +1,15 @@
 # Catalyst UI Kit (Tailwind Plus)
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-01
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft reference note for the Tailwind Plus Catalyst kit and how it may be adapted into the repo without importing it directly.
+
 - Plats: `catalyst-ui-kit/` (innehaller `typescript/`, `javascript/`, `demo/` och original README/CHANGELOG).
 - Format: Tailwind v4-komponenter med Headless UI och Motion. Anvands som referens; ingen kod ar importerad i appen an.
 - Nuvarande stack i sandboxen: Radix/shadcn-lika primitives (Dialog, DropdownMenu, Sheet) ersatter tidigare Headless UI-anvandning.

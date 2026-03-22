@@ -1,5 +1,15 @@
 # Games Domain TODOs
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft backlog for games-domain follow-up work. Canonical domain guidance lives in `docs/GAMES_DOMAIN.md`.
+
 Canonical documentation (repo source of truth):
 - `docs/GAMES_DOMAIN.md`
 

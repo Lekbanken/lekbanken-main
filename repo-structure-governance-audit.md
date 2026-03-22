@@ -2,6 +2,16 @@
 
 > Generated 2026-03-16. All findings verified against actual file system and import analysis.
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-16
+- Last updated: 2026-03-21
+- Last validated: 2026-03-16
+
+> Frozen structural audit snapshot. Use `REPO_GOVERNANCE.md` and `docs/DOCUMENTATION_STANDARD.md` as current operating guidance.
+
 ---
 
 ## 1. Auth Zones — `app/(marketing)/auth` vs `app/auth`

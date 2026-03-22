@@ -4,7 +4,11 @@
 
 - Owner: -
 - Status: active
+- Date: 2025-12-18
+- Last updated: 2026-03-21
 - Last validated: 2025-12-17
+
+> Canonical cluster entrypoint: `docs/notifications/README.md`
 
 ## Purpose
 

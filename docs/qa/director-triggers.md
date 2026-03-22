@@ -1,5 +1,15 @@
 # Director Mode Triggers — QA Test Plan
 
+## Metadata
+
+- Owner: Play domain
+- Status: draft
+- Date: 2026-02-23
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft QA test plan for Director Mode trigger behavior, override flow, and pending-state handling.
+
 **Owner:** Play domain  
 **Last updated:** 2026-02-24  
 **Components:** `DirectorTriggerCard`, `TriggerPanel` (in `DirectorModePanel`)  

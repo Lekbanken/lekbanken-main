@@ -38,10 +38,10 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Create two tenants
-INSERT INTO public.tenants (id, name, slug)
+INSERT INTO public.tenants (id, name, slug, type)
 VALUES
-  ('11111111-1111-1111-1111-111111111111', 'Tenant T1', 'tenant-t1'),
-  ('22222222-2222-2222-2222-222222222222', 'Tenant T2', 'tenant-t2')
+  ('11111111-1111-1111-1111-111111111111', 'Tenant T1', 'tenant-t1', 'school'),
+  ('22222222-2222-2222-2222-222222222222', 'Tenant T2', 'tenant-t2', 'school')
 ON CONFLICT (id) DO NOTHING;
 
 -- User A → T1 (owner), User B → T2 (owner)
@@ -88,21 +88,21 @@ VALUES ('b1b1b1b1-b1b1-b1b1-b1b1-b1b1b1b1b1b1', 'Plan B1 Tenant',
 ON CONFLICT (id) DO NOTHING;
 
 -- Create a plan_block under Plan A1
-INSERT INTO public.plan_blocks (id, plan_id, type, position, duration_minutes, label)
+INSERT INTO public.plan_blocks (id, plan_id, block_type, position, duration_minutes, title)
 VALUES ('ab01ab01-ab01-ab01-ab01-ab01ab01ab01',
         'a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1',
         'game', 0, 10, 'Test Block')
 ON CONFLICT (id) DO NOTHING;
 
 -- Create a plan_version under Plan A1
-INSERT INTO public.plan_versions (id, plan_id, version_number)
-VALUES ('v1v1v1v1-v1v1-v1v1-v1v1-v1v1v1v1v1v1',
-        'a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1', 1)
+INSERT INTO public.plan_versions (id, plan_id, version_number, name, published_by)
+VALUES ('c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c1c1c1',
+  'a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1', 1, 'Version 1', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')
 ON CONFLICT (id) DO NOTHING;
 
 -- Set current_version_id
 UPDATE public.plans 
-SET current_version_id = 'v1v1v1v1-v1v1-v1v1-v1v1-v1v1v1v1v1v1'
+SET current_version_id = 'c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c1c1c1'
 WHERE id = 'a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1';
 
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -277,7 +277,7 @@ SELECT _test_set_user('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');
 DO $$
 BEGIN
   BEGIN
-    INSERT INTO public.plan_blocks (id, plan_id, type, position, duration_minutes, label)
+    INSERT INTO public.plan_blocks (id, plan_id, block_type, position, duration_minutes, title)
     VALUES ('bad0bad0-bad0-bad0-bad0-bad0bad0bad0',
             'a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1',
             'game', 1, 5, 'Injected Block');
@@ -299,10 +299,11 @@ END $$;
 DO $$
 BEGIN
   BEGIN
-    INSERT INTO public.runs (id, user_id, plan_version_id, status, tenant_id)
+      INSERT INTO public.runs (id, plan_id, user_id, plan_version_id, status, tenant_id)
     VALUES ('bad1bad1-bad1-bad1-bad1-bad1bad1bad1',
+        'a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1',
             'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
-            'v1v1v1v1-v1v1-v1v1-v1v1-v1v1v1v1v1v1',
+        'c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c1c1c1',
             'not_started',
             '22222222-2222-2222-2222-222222222222');
     RAISE EXCEPTION 'TEST 9 FAILED: User B was able to create run on User A plan version';

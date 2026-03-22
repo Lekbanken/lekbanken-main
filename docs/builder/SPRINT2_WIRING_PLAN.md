@@ -1,7 +1,17 @@
 # Sprint 2: Wiring Plan
 
-> Status: **Ready to execute**  
-> Dependencies: Sprint 1 ✅ (130 tests passing)
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Historical sprint plan for a bounded wiring phase. Use the later validation/consolidation plans as the active execution surface unless this sprint is explicitly re-opened.
+
+**Execution status:** Ready to execute  
+**Dependencies:** Sprint 1 ✅ (130 tests passing)
 
 ## Overview
 

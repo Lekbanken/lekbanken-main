@@ -1,8 +1,17 @@
 # JSON Import Blueprint — Lekbanken (Legendary Games)
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Active canonical specification for JSON import into the builder/import pipeline. Update this file in the same change when import format or source-of-truth modules change.
+
 **Version:** 1.0  
-**Datum:** 2026-02-04  
-**Status:** CANONICAL SPECIFICATION  
+**Spec-status:** CANONICAL SPECIFICATION  
 **SSoT Modules:**
 - [types/csv-import.ts](../../types/csv-import.ts) — ParsedGame, ParsedTrigger, ParsedArtifact
 - [types/trigger.ts](../../types/trigger.ts) — TriggerCondition, TriggerAction

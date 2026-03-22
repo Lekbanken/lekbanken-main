@@ -1,5 +1,17 @@
 # Developer Guide
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft developer-facing guide for integration and extension scenarios around the toolkit. Use as guidance, not as a code-verified architecture source.
+
+**Related:** [README.md](../README.md) · [README.md](../api-reference/README.md) · [README.md](../getting-started/README.md)
+
 This guide is for developers integrating with or extending the Legendary Escape Room Toolkit.
 
 ## Table of Contents

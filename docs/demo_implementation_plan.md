@@ -1,4 +1,15 @@
 # Lekbanken Demo-läge - Detaljerad Implementeringsplan
+
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-13
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the original demo implementation plan and sprint breakdown.
+
 **Version:** 1.0
 **Datum:** 2026-01-13
 **Estimerad tid:** 136 timmar (17 arbetsdagar)

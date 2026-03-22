@@ -1,5 +1,15 @@
 # Learning Module Test Plan
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-04
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft validation and test plan for the learning module domain.
+
 ## Overview
 This document outlines test cases for the Learning Module (Lekledarutbildning) based on acceptance criteria from the specification.
 

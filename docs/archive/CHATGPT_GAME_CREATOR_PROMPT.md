@@ -1,5 +1,15 @@
 # LEKBANKEN GAME CREATOR – ChatGPT Prompt
 
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2025-12-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived one-shot game-creator prompt. Keep as historical prompt material, not as an active architecture or builder specification.
+
 **Purpose:** Build the ultimate game creation wizard that follows Lekbanken's architecture.
 
 ---

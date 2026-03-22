@@ -1,8 +1,14 @@
-# 🎯 Implementeringsplan: Personliga Licenser (B2C)
+# Implementeringsplan: Personliga Licenser (B2C)
 
-> **Status:** ✅ Klart  
-> **Startad:** 2026-01-29  
-> **Avslutad:** 2026-01-30
+## Metadata
+- Status: archived
+- Date: 2026-01-30
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+- Owner: licensing
+- Scope: Archived personal license implementation notes
+
+Historical implementation snapshot retained for provenance. Use active licensing and admin docs instead of this archived plan for current behavior and scope.
 
 ---
 

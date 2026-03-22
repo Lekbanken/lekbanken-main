@@ -1,5 +1,15 @@
 # Database Architecture & Migration Safety Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Closed database audit from the launch-readiness cycle. Use `launch-readiness/launch-control.md` for current program state and pair this file with `database-architecture-remediation-plan.md` and `database-rebuild-feasibility.md` for the full decision record.
+
 > **Status:** ✅ GENOMFÖRD — Audit klar, Alternativ B (Canonical Baseline) valt och verifierat  
 > **Datum:** 2026-03-13  
 > **Utlösare:** Sandbox-provisionering avslöjade 10 fresh-install-fel i migrationskedjan  

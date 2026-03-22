@@ -1,5 +1,15 @@
 # Admin AppShell Architecture
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-17
+- Last updated: 2026-03-21
+- Last validated: 2025-12-17
+
+> Draft architecture note for the admin shell and mode switching. Revalidate this document against `app/admin/layout.tsx`, `components/admin/*`, and `lib/admin/nav.ts` before treating it as exact runtime truth.
+
 This document describes the Admin panel's shell architecture, context separation, and navigation system.
 
 ## Overview

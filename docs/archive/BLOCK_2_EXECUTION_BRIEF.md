@@ -1,9 +1,18 @@
 # Block 2 Execution Brief
 
-> **Datum:** 2026-03-10  
-> **Förutsättning:** Block 1 ✅ KLAR (2026-03-10) — manuell verifiering pågår  
-> **Syfte:** Pre-execution review för Block 2 — Kontextutvidgning  
-> **Status:** BRIEF — ej exekverad
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-03-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived Block 2 execution brief kept as planning history after the workstream moved on. Do not treat it as an active implementation brief.
+
+**Förutsättning:** Block 1 ✅ KLAR (2026-03-10) — manuell verifiering pågår  
+**Syfte:** Pre-execution review för Block 2 — Kontextutvidgning  
+**Status vid arkivering:** BRIEF — ej exekverad
 
 ---
 

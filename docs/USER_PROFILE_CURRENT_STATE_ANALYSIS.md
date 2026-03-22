@@ -1,5 +1,15 @@
 # User Profile System - Nulägesanalys & Gap Analysis
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-16
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft current-state analysis of the user profile system and its enterprise implementation gaps.
+
 **Datum:** 2026-01-15  
 **Version:** 1.0  
 **Syfte:** Komplett analys av befintlig profil-funktionalitet för enterprise-grade implementation

@@ -1,5 +1,15 @@
 # 🚀 Automated Migration Execution - Option B
 
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2025-11-30
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived one-time migration execution guide. Keep as historical reference only; current migration workflows live outside `archive/`.
+
 ## Quick Start
 
 ```powershell

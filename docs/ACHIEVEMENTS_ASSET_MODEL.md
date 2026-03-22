@@ -1,5 +1,15 @@
 # Achievements Badge Assets & Icon Model
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-07
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft asset and icon-model reference for the Achievements Admin badge builder.
+
 This document explains how the **Utmärkelser** icon pack is wired into the Achievements Admin badge builder.
 
 ## Asset registry

@@ -1,5 +1,7 @@
 # LEKBANKEN – COMPREHENSIVE EXECUTION PLAN
 
+## Metadata
+
 **Version:** 1.0  
 **Date:** 2025-12-10  
 **Status:** Ready to Execute  
@@ -1186,14 +1188,14 @@ For each domain (Accounts, Tenant, Billing, Product, Browse, Games, Play, Planne
 | API changes | Break frontend | Type-safe contracts, gradual migration |
 | RLS policy changes | Data leaks or over-restriction | Test with multiple roles, staged deployment |
 | Legacy cleanup | Delete needed code | Archive first, delete after verification period |
-| Database migrations | Data loss or corruption | Backup before migrate, test on staging first |
+| Database migrations | Data loss or corruption | Backup before migrate, test in preview or other non-production target first |
 
 ### Mitigation Strategies
 
 **1. Staged Rollout**
 - Test locally
-- Deploy to staging
-- Test staging thoroughly
+- Deploy to preview
+- Test preview thoroughly
 - Deploy to production
 - Monitor closely
 

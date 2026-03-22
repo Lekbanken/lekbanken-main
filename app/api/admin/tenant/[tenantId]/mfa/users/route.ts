@@ -55,6 +55,7 @@ export const GET = apiHandler({
     const statusFilter = searchParams.get('status') ?? 'all';
 
     const offset = (page - 1) * pageSize;
+    const end = offset + pageSize;
 
     // Get tenant MFA policy to determine requirements
     const { data: policy } = await supabase
@@ -79,10 +80,9 @@ export const GET = apiHandler({
       query = query.or(`users.email.ilike.%${search}%,users.full_name.ilike.%${search}%`);
     }
 
-    // Get all matching members first (for MFA status joining)
-    const { data: members, count, error } = await query
-      .order('role', { ascending: true })
-      .range(offset, offset + pageSize - 1);
+    // Fetch all matching members so computed MFA-status filtering happens before pagination.
+    const { data: members, error } = await query
+      .order('role', { ascending: true });
 
     if (error) {
       console.error('[MFA Users] Error fetching members:', error);
@@ -179,18 +179,17 @@ export const GET = apiHandler({
       };
     });
 
-    // Filter by status if needed
+    // Filter by status before paginating so totals/pages stay accurate for filtered views.
     let filteredUsers = users;
     if (statusFilter && statusFilter !== 'all') {
       filteredUsers = users.filter(u => u.mfa_status === statusFilter);
     }
 
-    const totalCount = statusFilter !== 'all' 
-      ? filteredUsers.length 
-      : (count ?? 0);
+    const totalCount = filteredUsers.length;
+    const paginatedUsers = filteredUsers.slice(offset, end);
 
     return NextResponse.json({
-      users: filteredUsers,
+      users: paginatedUsers,
       total: totalCount,
       page,
       pageSize,

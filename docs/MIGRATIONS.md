@@ -4,6 +4,8 @@
 
 - Owner: -
 - Status: active
+- Date: 2025-11-29
+- Last updated: 2026-03-21
 - Last validated: 2025-12-17
 
 ## Validation checklist
@@ -12,6 +14,15 @@
 - After any schema change, regenerate types via `npm run db:types:remote` and commit the updated `types/supabase.ts` in the same PR.
 - `npm run type-check` passes after regeneration (no transient casts).
 - Docs never rely on a fixed migration count (folder contents are authoritative).
+
+## Document scope
+
+- This file explains migration execution methods and type regeneration.
+- [database/environments.md](database/environments.md) defines the canonical environment rules.
+- [ops/prod-migration-workflow.md](ops/prod-migration-workflow.md) defines production migration safety and sequencing.
+- [ops/release-promotion-checklist.md](ops/release-promotion-checklist.md) defines the tactical release gates.
+
+**Production rule:** use `npm run db:push` and `npm run db:push:dry` for production migrations. Do not treat bare `supabase db push` as the canonical production path.
 
 ## ⚠️ KRITISKT: Efter Varje Migration
 
@@ -84,16 +95,16 @@ See `supabase/migrations/`.
 
 ---
 
-### Method 2: Supabase CLI (Recommended for Production) 🚀
+### Method 2: Supabase CLI (Recommended for Local/Admin Workflows) 🚀
 
 **Better for automated deployments and version control**
 
-> **Tip (no global install needed):** You can run the CLI via `npx` if Claude/CI doesn't have `supabase` installed. Example:
+> **Tip (no global install needed):** You can run the CLI via `npx` if Claude/CI doesn't have `supabase` installed.
 > ```bash
-> # Requires SUPABASE_DB_URL in your env (postgres://…)
-> npx supabase db push --db-url "$SUPABASE_DB_URL"
+> # Example: inspect CLI availability
+> npx supabase --version
 > ```
-> On Windows PowerShell: `npx supabase db push --db-url "$env:SUPABASE_DB_URL"`.
+> On Windows PowerShell: `npx supabase --version`.
 
 #### Step 1: Install Supabase CLI
 
@@ -404,7 +415,7 @@ If migrations fail:
 |------|---------|
 | Install Supabase CLI | `winget install Supabase.supabase` |
 | Link project | `supabase link --project-ref YOUR_REF` |
-| Push migrations | `supabase db push` |
+| Push migrations (production) | `npm run db:push` |
 | View status | `supabase migration list` |
 | Generate types | `supabase gen types typescript --local > lib/supabase/types.ts` |
 | Check health | `supabase postgres health` |

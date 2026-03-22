@@ -1,8 +1,22 @@
 # Lekbanken Scaling Analysis
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Historical scaling analysis for future optimization decisions. Revalidate against real production traffic and `launch-readiness/launch-control.md` before using it to drive current engineering work.
+
 > **Date:** 2026-03-13
+> **Last updated:** 2026-03-21
+> **Last validated:** 2026-03-21
+> **Status:** historical snapshot
 > **Source:** GPT technical assessment, verified against codebase by Claude
-> **Status:** Reference document — informs post-launch scaling priorities
+> **Reference status:** informs post-launch scaling priorities
+> **Note:** Historical analysis for future optimization decisions. Revalidate against real production traffic and `launch-control.md` before using it to drive current engineering work.
 
 ---
 

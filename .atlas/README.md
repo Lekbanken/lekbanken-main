@@ -2,6 +2,16 @@
 
 > **Definition of Atlas** – Läs detta innan du arbetar med Atlas
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Date: 2026-01-26
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Lokal verktygsreferens. Detta är inte kanonisk runtime- eller produktdokumentation.
+
 ---
 
 ## Vad är Atlas?

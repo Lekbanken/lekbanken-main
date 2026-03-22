@@ -2,9 +2,15 @@
 
 Canonical domain doc (source of truth): `docs/TRANSLATION_ENGINE_DOMAIN.md`
 
-**Validation Date:** December 11, 2025  
-**Domain:** Translation Engine (i18n)  
-**Status:** ⚠️ PARTIAL IMPLEMENTATION (60% complete)
+## Metadata
+
+> **Status:** draft
+> **Owner:** -
+> **Date:** 2025-12-11
+> **Last updated:** 2026-03-21
+> **Last validated:** 2025-12-11
+> **Domain:** Translation Engine (i18n)
+> **Notes:** Partial implementation validation snapshot.
 
 ---
 

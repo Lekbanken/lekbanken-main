@@ -1,8 +1,18 @@
 # 🎯 GameDetails Sektionsanalys & Data Provenance
 
-> **Datum:** 2026-03-10 (uppdaterad från 2026-03-09)
-> **Status:** ✅ Fas 0–4 KLAR — P1-komponenter integrerade — Sandbox Golden Reference aktiv
-> **Syfte:** Komplett inventering av alla GameDetail-sektioner, deras datakällor, komponentstatus, och vad som saknas.
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-30
+- Last updated: 2026-03-21
+- Last validated: 2026-03-10
+
+> Historical deep analysis of GameDetails sections, provenance, and gaps. Use as a rich reference snapshot, not as a live source of truth without revalidation.
+
+**Execution status:** ✅ Fas 0–4 KLAR — P1-komponenter integrerade — Sandbox Golden Reference aktiv
+**Canonical entrypoint:** `docs/games/README.md`
+**Syfte:** Komplett inventering av alla GameDetail-sektioner, deras datakällor, komponentstatus, och vad som saknas.
 
 ---
 

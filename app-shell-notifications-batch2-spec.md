@@ -1,9 +1,13 @@
 # Notifications V2 — Batch 2: Scheduled Path Consolidation
 
+## Metadata
+
 **Date:** 2026-03-19  
+**Last updated:** 2026-03-21  
 **Status:** Spec — not started  
 **Prerequisite:** Batch 1 (atomic write pipeline) ✅ KLAR (2026-03-19)  
 **Scope:** `process_scheduled_notifications()` + admin scheduled-jobs surface  
+**Canonical entrypoint:** `docs/notifications/README.md`
 
 ---
 

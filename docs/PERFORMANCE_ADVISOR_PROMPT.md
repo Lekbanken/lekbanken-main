@@ -1,5 +1,13 @@
 # Supabase Performance Advisor - Analysrapport
 
+## Metadata
+
+> **Status:** active
+> **Owner:** -
+> **Date:** 2026-01-07
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+
 ## Bakgrund
 
 Security Advisor är nu tom (alla säkerhetsvarningar åtgärdade ✅), men Performance Advisor visar fortfarande ~300 varningar. Vi behöver analysera och kategorisera dessa.

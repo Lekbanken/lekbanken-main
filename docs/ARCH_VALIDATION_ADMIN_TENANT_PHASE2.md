@@ -1,6 +1,15 @@
 # Architecture Validation Report: Admin Separation & Tenant Access
 
-**Date**: 2026-01-10  
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-01-10
+- Last updated: 2026-03-21
+- Last validated: 2026-01-10
+
+> Frozen validation snapshot for the admin/tenant separation workstream. Re-check current guards and route structure before using this as present-tense architecture truth.
+
 **Scope**: System Admin vs Tenant Admin separation, routing structure, access control, Phase 1 correctness  
 **Status**: Read-only analysis for Phase 2 readiness
 

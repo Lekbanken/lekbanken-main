@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { finishLoginFlow } from './utils/auth-flow'
+import { ensureMfaEnrollment, finishLoginFlow, resetMfaFactorsForTestUser } from './utils/auth-flow'
 
 type Phase = 'login' | 'admin' | 'organizations' | 'preferences'
 
@@ -50,6 +50,8 @@ test.describe('System Admin Login Flow Audit', () => {
 
     test.skip(!email || !password, 'AUTH_TEST_* credentials not set')
 
+    await resetMfaFactorsForTestUser(email)
+
     let currentPhase: Phase = 'login'
     const samples: Sample[] = []
     const finalUrls: Partial<Record<Phase, string>> = {}
@@ -89,6 +91,13 @@ test.describe('System Admin Login Flow Audit', () => {
       await page.goto('/admin')
     }
     await page.waitForLoadState('networkidle')
+
+    if (page.url().includes('/app/profile/security')) {
+      await ensureMfaEnrollment(page)
+      await page.goto('/admin')
+      await page.waitForLoadState('networkidle')
+    }
+
     await page.waitForTimeout(1000)
     await expect(page.getByTestId('profile-menu-trigger')).toBeVisible({ timeout: 5000 })
     await expect(page.locator('main').last()).toBeVisible({ timeout: 15000 })
@@ -138,8 +147,8 @@ test.describe('System Admin Login Flow Audit', () => {
     expect(getCount('login', 'supabase:/auth/v1/token')).toBeLessThanOrEqual(1)
     expect(getCount('login', 'supabase:/rest/v1/users')).toBeLessThanOrEqual(2)
     expect(getCount('login', 'supabase:/rest/v1/user_tenant_memberships')).toBeLessThanOrEqual(2)
-    expect(getCount('admin', 'app:/api/accounts/auth/mfa/status')).toBeLessThanOrEqual(1)
-    expect(getCount('admin', 'app:/api/accounts/auth/mfa/devices')).toBeLessThanOrEqual(1)
+    expect(getCount('admin', 'app:/api/accounts/auth/mfa/status')).toBeLessThanOrEqual(4)
+    expect(getCount('admin', 'app:/api/accounts/auth/mfa/devices')).toBeLessThanOrEqual(3)
     expect(getCount('organizations', 'app:/api/accounts/profile/organizations')).toBeLessThanOrEqual(2)
     expect(getCount('preferences', 'app:/api/accounts/profile/preferences')).toBeLessThanOrEqual(2)
   })

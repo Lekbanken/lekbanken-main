@@ -1,5 +1,15 @@
 # Admin Organisations – Test Plan
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-04
+- Last updated: 2026-03-21
+- Last validated: 2026-01-04
+
+> Smal manuell testplan för organisationslistan i admin. Detta dokument beskriver önskad verifiering, inte ett utfört testresultat.
+
 ## Scope
 Listvy för `/admin/organisations` med summary cards, filter/sök, preview‑rader och snabbåtgärder.
 

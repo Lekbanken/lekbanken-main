@@ -1,9 +1,23 @@
 # Sessions & Participants Remediation Plan
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-13
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Executed remediation record for the launch-readiness sessions and participants audit. Use `launch-readiness/implementation/README.md` for implementation navigation, `launch-readiness/audits/sessions-audit.md` for the original findings snapshot, and `launch-readiness/launch-control.md` for current launch-program state.
+
 > **Source:** `audits/sessions-audit.md`  
-> **Status:** In Progress — M1 complete, M2 complete, M3 complete  
-> **Created:** 2026-03-11  
-> **Scope:** P1 findings from Sessions & Participants audit — no implementation yet
+> **Date:** 2026-03-11  
+> **Last updated:** 2026-03-22  
+> **Last validated:** 2026-03-22  
+> **Status:** historical snapshot  
+> **Execution status:** COMPLETE — M1, M2, M3 executed; M4 deferred post-launch  
+> **Scope:** Launch-scope remediation record for P1 findings from Sessions & Participants audit  
+> **Note:** Executed remediation record. Use `launch-control.md` for current launch-program status and this file for the bounded sessions remediation history.
 
 ---
 
@@ -105,7 +119,7 @@
 
 **✅ M3 COMPLETE (2026-03-11)**
 
-### ~~M4 — Broadcast Consolidation (SESS-004)~~ — Deferred (P2)
+### M4 — Broadcast Consolidation (SESS-004) — Deferred (P2)
 
 > **GPT Calibration (2026-03-11):** SESS-004 reclassified P1 → P2. No known user-facing errors or state corruption from the dual broadcast path. Should be addressed for architectural consistency, but not launch-blocking.
 
@@ -119,6 +133,8 @@
 | M4.4 | (Optional) Keep `session:` broadcast temporarily for backward compatibility |
 
 **Dependencies:** Client-side `useParticipantBroadcast` hook needs to be verified — does it only listen on `session:` for these events, or does it also listen on `play:`?
+
+**2026-03-22 verification note:** Still deferred as documented. The control route still uses direct `channel.send()` on the `session:` channel, so M4 remains post-launch hardening rather than launch-scope remediation.
 
 **Exit criteria:**
 - [ ] Control route uses `broadcastPlayEvent()` instead of direct `channel.send()`

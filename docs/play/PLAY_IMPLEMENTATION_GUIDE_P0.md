@@ -1,4 +1,15 @@
 # PLAY — Implementation Guide (P0)
+
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-18
+- Last updated: 2026-03-21
+- Last validated: 2026-01-18
+
+> Historisk snapshot av den avgränsade P0-implementeringsguiden. Behåll som genomförandehistorik, men använd inte som ensam aktuell play-plan.
+
 **Date:** 2026-01-18  
 **Source of truth:** `PLAY SYSTEM DOCUMENTATION v1.1 (2026-01-17)`  
 **Scope:** Golden Flows GF1–GF3 only  

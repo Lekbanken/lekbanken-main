@@ -1,8 +1,18 @@
 # Play Mode UI Audit
 ## Granskning av adaptivt UI baserat på spelläge (play_mode)
 
+## Metadata
+
+- Owner: -
+- Status: active audit
+- Date: 2026-01-19
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Aktiv audit för play mode-UI, routing och state boundaries. Verifiera slutsatser mot nuvarande mode-komponenter innan större UI-ändringar.
+
 **Datum:** 2026-01-19  
-**Uppdaterad:** 2026-02-09  
+**Uppdaterad:** 2026-03-21  
 **Status:** ✅ IMPLEMENTERAD (v2.7)
 
 ---
@@ -11,16 +21,16 @@
 
 | Komponent | Status | Evidens |
 |-----------|--------|---------|
-| HostPlayMode viewType routing | ✅ Done | `case 'participants'` → FacilitatedPlayView |
+| HostPlayMode viewType routing | ✅ Done | `caps.viewType` routar mellan `BasicPlayView` och `FacilitatedPlayView`; participants-intent degraderas via capability-systemet när roller saknas |
 | ParticipantPlayMode gating | ✅ Done | basic → "Follow Board" card |
-| useSessionCapabilities hook | ✅ Done | Graceful degradation implemented |
-| Contract tests | ✅ 19 tests | [play-mode-routing-contract.test.ts](tests/unit/play/play-mode-routing-contract.test.ts) |
+| useSessionCapabilities hook | ✅ Done | Graceful degradation + `show*` capability flags implemented |
+| Contract tests | ✅ Verified | `play-mode-routing-contract.test.ts` + komponentkontrakt finns under `tests/unit/play/` |
 | Translation keys | ✅ Done | en/sv/no `participantPlayMode.basic.*` |
 
 **Key files changed:**
-- [HostPlayMode.tsx](features/play/components/HostPlayMode.tsx) — L353-378 participants case
-- [ParticipantPlayMode.tsx](features/play/components/ParticipantPlayMode.tsx) — L120-138 playMode gating
-- [useSessionCapabilities.ts](hooks/useSessionCapabilities.ts) — determineViewType with degradation
+- [HostPlayMode.tsx](features/play/components/HostPlayMode.tsx) — capability-driven routing in active play mode
+- [ParticipantPlayMode.tsx](features/play/components/ParticipantPlayMode.tsx) — participant-facing play-mode gating + recovery poll
+- [useSessionCapabilities.ts](hooks/useSessionCapabilities.ts) — `determineViewType` + `show*` capability system
 
 ---
 
@@ -85,28 +95,32 @@ isParticipant->ParticipantPlayMode"
             │
             └── [isPlayMode=true + hasGame + isLive]
                 └── HostPlayMode (features/play/components/HostPlayMode.tsx)
-                    └── Alltid samma: FacilitatorDashboard + SimplePlayView i manage-tab
+          └── useSessionCapabilities(snapshotData)
+            ├── viewType='basic'       → BasicPlayView
+            └── viewType='facilitated'/'participants'
+              → FacilitatedPlayView + capability-styrda paneler
 ```
 
 ### 3.2 Vad som faktiskt händer
 
-1. **Inget villkor på `play_mode`** — Oavsett om spelet är `basic`, `facilitated` eller `participants` får hosten samma gränssnitt.
-
-2. **HostPlayMode** använder alltid `SimplePlayView` i play-tabben och `FacilitatorDashboard` för kontroller.
-
-3. **SessionCockpit** (1596 rader) är en komplex komponent som hanterar tabs, director mode, triggers etc. — men den kollar inte heller `play_mode`.
+1. **HostPlayMode routar nu på `viewType`** från `useSessionCapabilities(snapshotData)`.
+2. **Graceful degradation gäller fortfarande:** participants utan roller och facilitated utan faser faller tillbaka till basic-vy.
+3. **Capability-systemet styr detaljerna inom vyerna** via flaggor som `showPhaseNavigation`, `showToolbelt`, `showTriggersPanel`, `showBoardToggle` och dynamiska tabs.
 
 ### 3.3 Var play_mode faktiskt används
 
 | Plats | Användning |
 |-------|------------|
 | `game-validator.ts` | Validerar att facilitated-spel har faser, participants-spel har roller |
+| `useSessionCapabilities.ts` | Bestämmer `viewType`, degradering och vilka UI-ytor som ska visas |
+| `HostPlayMode.tsx` | Routar till rätt host-vy baserat på capabilities |
+| `ParticipantPlayMode.tsx` | Gatar participants i basic till "Follow Board" och skickar övriga modes till full cockpit |
 | `GameAdminPage.tsx` | Visar badge med play_mode i speladmin-listan |
 | `GameCardDrawer.tsx` | Visar play_mode-badge i detaljvy |
 | `BrowsePage.tsx` | Filtrerar/visar play_mode i browse |
-| `game-snapshot.ts` | `isSnapshotFacilitated()` helper — men används ej för UI-routing |
+| `game-snapshot.ts` | Snapshot helpers som capability-hooken bygger vidare på |
 
-**Observation:** `play_mode` sparas och valideras, men påverkar inte runtime-UI för hosten.
+**Observation:** `play_mode` påverkar nu runtime-UI, men genom capability-baserad routing och feature-hiding snarare än separata fullständigt frikopplade lägesimplementationer.
 
 ---
 
@@ -117,57 +131,50 @@ isParticipant->ParticipantPlayMode"
 | Funktionalitet | Dokumenterad | Implementerad |
 |----------------|--------------|---------------|
 | `uiMode` (lobby/live/paused/ended) | ✅ Spec finns | ✅ Finns i `resolveUiState()` |
-| `play_mode`-baserad UI-routing | ✅ Implicit (play_mode enum) | ❌ Ej implementerat |
-| SimplePlayView för basic | ✅ Beskriven | ⚠️ Finns men ej routad |
-| FacilitatedPlayView för facilitated | ✅ Beskriven i inventory | ❌ Filen saknas |
-| Tabs anpassade per play_mode | ✅ Implicit | ❌ Alla får samma tabs |
+| `play_mode`-baserad UI-routing | ✅ Implicit (play_mode enum) | ✅ Implementerad via `useSessionCapabilities` |
+| SimplePlayView för basic | ✅ Beskriven | ✅ Routad |
+| FacilitatedPlayView för facilitated | ✅ Beskriven i inventory | ✅ Finns och används |
+| Tabs anpassade per play_mode | ✅ Implicit | ✅ Delvis via capability-system och dynamiska tablistor |
 
 ### 4.2 Logisk konsekvens
 
-En **basic** lek (t.ex. "Namnbollen" utan faser, triggers eller roller) borde ge ett enkelt interface med:
+En **basic** lek (t.ex. "Namnbollen" utan faser, triggers eller roller) får nu ett enklare interface med:
 - Aktuellt steg
 - Material-lista
 - Simpel timer
 - Start/Paus/Slut
 
-Istället får hosten idag:
-- Full SessionCockpit med 6 tabs
-- Director Mode med triggers/signals
-- Artifacts-panel
-- Decisions-panel
-- Role Assigner
-- Preflight Checklist (för roller/triggers som inte finns)
+De mer avancerade ytorna exponeras nu bara när capabilities motiverar dem. Kvarvarande förbättringsbehov ligger främst i hur långt capability-systemet bör driva separata vyer, inte i att routing saknas.
 
 ---
 
-## 5. Komponenter som finns men inte används adaptivt
+## 5. Kvarvarande begränsningar efter implementationen
 
 ### 5.1 SimplePlayView.tsx
 
 ```typescript
 // Från features/play/components/SimplePlayView.tsx
-// Används i HostPlayMode.tsx men alltid — inte baserat på play_mode
+// Används nu för basic-läget via capability-routing
 
 export function SimplePlayView({ run, onStepComplete, ... })
   // Visar: PlayHeader, PlayTimer, InstructionsCard, MaterialsChecklist, NavigationControls
 ```
 
 **Avsedd användning:** Endast för `play_mode = 'basic'`  
-**Faktisk användning:** Alltid, oavsett play_mode
+**Faktisk användning:** Matchar nu detta syfte
 
 ### 5.2 ParticipantPlayMode.tsx
 
 ```typescript
-// Denna finns och är avsedd för participants-läge
-// Men finns ingen routing som väljer den baserat på play_mode
+// Denna finns och gatar nu participants-läget korrekt
 ```
 
 ### 5.3 FacilitatorDashboard.tsx
 
 ```typescript
-// Avancerad dashboard med:
-// - Phase navigation (borde bara visas för facilitated)
-// - Trigger controls (borde bara visas om spelet har triggers)
+// Avancerad dashboard med capability-styrda paneler.
+// Kvarvarande fråga är finare feature-hiding och vidare uppdelning,
+// inte avsaknad av mode-routing.
 // - Signal panel (borde bara visas om spelet använder signaler)
 ```
 

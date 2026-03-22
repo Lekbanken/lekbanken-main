@@ -8,7 +8,11 @@
 
 - Owner: -
 - Status: active
+- Date: 2025-12-16
+- Last updated: 2026-03-21
 - Last validated: 2025-12-27
+
+> Canonical builder/import entrypoint: `docs/builder/README.md`
 
 ## Related code (source of truth)
 

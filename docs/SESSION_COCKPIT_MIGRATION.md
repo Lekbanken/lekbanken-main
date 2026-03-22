@@ -1,5 +1,15 @@
 # Session Cockpit Migration Guide
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2025-12-28
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Historical snapshot of the migration path from the legacy host shell to the unified session cockpit.
+
 ## Epic 7: Cleanup & Consolidation
 
 This document describes the migration path from the legacy host shell architecture to the unified Session Cockpit.

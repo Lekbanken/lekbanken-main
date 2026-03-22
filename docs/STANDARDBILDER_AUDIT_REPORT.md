@@ -1,5 +1,15 @@
 # Standardbilder Audit Report
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-02-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Frozen audit snapshot for the standard-image auto-cover assignment system and its invariants.
+
 **Date:** 2025-01-08 (Updated: 2026-02-08)  
 **Status:** ✅ COMPLETE  
 **Goal:** Make imported games 100% production-ready by auto-assigning cover images (standardbilder)

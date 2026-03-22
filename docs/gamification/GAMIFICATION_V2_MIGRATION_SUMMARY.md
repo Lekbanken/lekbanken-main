@@ -1,6 +1,15 @@
 # GAMIFICATION V2 MIGRATION — IMPLEMENTATION SUMMARY
 
-**Date:** 2026-01-08  
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-08
+- Last updated: 2026-03-21
+- Last validated: 2026-03-21
+
+> Historical migration record for the v2 gamification expansion. Use current migration files and active gamification docs for present-tense guidance.
+
 **Migration File:** `20260108200000_gamification_v2_core_extensions.sql`
 
 ---

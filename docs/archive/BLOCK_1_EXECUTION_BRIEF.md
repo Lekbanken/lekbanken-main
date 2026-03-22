@@ -1,9 +1,18 @@
 # Block 1 Execution Brief
 
-> **Datum:** 2026-03-10  
-> **Status:** Pre-execution review — ej implementerad  
-> **Scope:** Enbart Block 1 (Informationssäkerhet)  
-> **Grunddokument:** GAMEDETAILS_CONTEXT_AUDIT.md v2.0, GAMEDETAILS_CONTEXT_ARCHITECTURE.md v2.0, GAMEDETAILS_CONTEXT_IMPLEMENTATION_PLAN.md v2.0
+## Metadata
+
+- Owner: -
+- Status: archived
+- Date: 2026-03-10
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Archived execution brief for a completed Block 1 security workstream. Keep as planning history, not as an active implementation surface.
+
+**Status vid arkivering:** Pre-execution review — ej implementerad  
+**Scope:** Enbart Block 1 (Informationssäkerhet)  
+**Grunddokument:** GAMEDETAILS_CONTEXT_AUDIT.md v2.0, GAMEDETAILS_CONTEXT_ARCHITECTURE.md v2.0, GAMEDETAILS_CONTEXT_IMPLEMENTATION_PLAN.md v2.0
 
 ---
 

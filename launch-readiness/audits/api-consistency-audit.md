@@ -1,5 +1,17 @@
 # API Consistency Audit
 
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-03-13
+- Last updated: 2026-03-22
+- Last validated: 2026-03-22
+
+> Closed cross-cutting audit of API wrapper adoption, auth consistency, validation, and error-format patterns across `app/api/**/route.ts`. Use `launch-readiness/audits/README.md` as the folder entrypoint and `launch-readiness/launch-control.md` for the current launch verdict.
+
+> **2026-03-22 verification note:** This file remains a frozen snapshot of the original findings. Current code and launch-control state match the expected follow-up: APC-003/APC-011 are resolved, Batches 1-6d are complete, and the remaining mixed/public/special-case routes are intentionally deferred to per-domain audits.
+
 > **Date:** 2026-03-10  
 > **Auditor:** Claude (automated scan + targeted code reads)  
 > **Scope:** All 287 `app/api/**/route.ts` files — auth, validation, error format, rate limiting, wrapper adoption  

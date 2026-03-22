@@ -1,5 +1,15 @@
 # Database Architecture Remediation Plan
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-13
+- Last updated: 2026-03-21
+- Last validated: 2026-03-13
+
+> Executed remediation record for the database canonical-baseline decision. Treat this as the implementation snapshot behind the database decision set; use current migration and environment docs for present-day operational guidance.
+
 > **Status:** ✅ GENOMFÖRD — Alternativ B valt och verifierat  
 > **Datum:** 2026-03-13  
 > **Input:** database-architecture-audit.md  

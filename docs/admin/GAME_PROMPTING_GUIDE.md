@@ -1,5 +1,15 @@
 # Game Prompting Guide (STRICT CONTRACT MODE)
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2026-01-19
+- Last updated: 2026-03-21
+- Last validated: 2026-01-19
+
+> Specialized prompting guide tied to a specific `GAME_INTEGRITY_REPORT.md` baseline. Use only when that report and the current builder/import contracts still match.
+
 **Version:** 1.0  
 **Updated:** 2026-01-19  
 **Reference:** [GAME_INTEGRITY_REPORT.md](../../GAME_INTEGRITY_REPORT.md)

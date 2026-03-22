@@ -1,9 +1,13 @@
 # Design Consistency TODO
 
-> **Audit Date:** 2024-11-30  
-> **Last Updated:** 2025-11-30
-> **Status:** 🟢 All Pages Complete (App + Admin)  
-> **Audited by:** Claude Opus 4.5
+## Metadata
+
+> **Status:** completed
+> **Owner:** -
+> **Date:** 2025-11-30
+> **Last updated:** 2026-03-21
+> **Last validated:** -
+> **Notes:** Historical backlog snapshot; the tracked pass is marked complete in the document body.
 
 ## Overview
 

@@ -1,5 +1,15 @@
 # DOMAIN: TENANT – TODO & ROADMAP
 
+## Metadata
+
+- Owner: -
+- Status: draft
+- Date: 2025-12-08
+- Last updated: 2026-03-21
+- Last validated: -
+
+> Draft tenant-domain backlog and roadmap. Canonical tenant guidance lives in `TENANT_DOMAIN.md`.
+
 > Canonical domain documentation (source of truth): **[TENANT_DOMAIN.md](TENANT_DOMAIN.md)**
 
 _Last updated: 2025-12-09 (based on full implementation report)._

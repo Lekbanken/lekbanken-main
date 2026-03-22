@@ -1,5 +1,15 @@
 # Post-Launch Cluster Triage
 
+## Metadata
+
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-03-19
+- Last updated: 2026-03-22
+- Last validated: 2026-03-19
+
+> Historical post-launch triage snapshot used to group and prioritize the first post-launch bug waves. Use current remediation trackers for live execution state.
+
 > **Status:** WAVE 1 COMPLETE — 23 closed, 1 needs decision, Wave 2/3 remainder tracked  
 > **Created:** 2026-03-18  
 > **Updated:** 2026-03-19  
@@ -14,7 +24,7 @@
 |----|---------|-------|---------|-----|-------------------|--------|----------------|-------------------|
 | MFA-001 | MFA | `profiles!inner` join on non-existent relation | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `mfa/users/route.ts` | Fixed: profiles→users join, display_name→full_name |
 | MFA-002 | MFA | `.eq('is_active', true)` on non-existent column | ✅ FIXED | P1 | RC-1 Schema drift | ~~Wave 2~~ ✅ KLAR (2026-03-19) | `mfa/users/route.ts` | Fixed: is_active→is_revoked (negated) |
-| MFA-003 | MFA | Status filter after DB pagination | VERIFIED | P2 | Standalone logic bug | Wave 3 | `mfa/users/route.ts` | Bundle w/ MFA-001, MFA-002 |
+| MFA-003 | MFA | Status filter after DB pagination | ✅ FIXED | P2 | Standalone logic bug | ~~Wave 3~~ ✅ KLAR (2026-03-22) | `mfa/users/route.ts` | Fixed in route: filter before pagination |
 | MFA-004 | MFA | `user_mfa` update wrong fields + silent success | ✅ FIXED | **P0** | RC-1 Schema drift + RC-4 False success | ~~Wave 1~~ ✅ KLAR (2026-03-18) | `mfa/reset/route.ts` | Bundle w/ MFA-005 (same file) |
 | MFA-005 | MFA | Cross-tenant MFA bypass (verify missing tenant_id) | ✅ FIXED | **P0** | RC-2 Tenant drift | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `mfaDevices.server.ts`, `mfa/verify/route.ts` | DD-MFA-1 resolved |
 | BUG-006 | C1 | Route-param / currentTenant desync in admin pages | ✅ FIXED/CLOSED | P1 | RC-2 Tenant drift | ~~Wave 1~~ ✅ KLAR (2026-03-19) | `admin/tenant/[tenantId]/layout.tsx`, 9 pages | Route param canonical via use(params); context secondary |
@@ -215,7 +225,7 @@
 
 | ID | Category |
 |----|----------|
-| MFA-003 | Filter-after-pagination logic bug (P2) |
+| MFA-003 | ~~Filter-after-pagination logic bug (P2)~~ ✅ Fixed 2026-03-22 |
 | BUG-008 | Hardcoded .limit(100) in admin recipient picker (P1) |
 | BUG-009 | Retry handler doesn't call reload (P2) |
 | BUG-040 | Pagination count mismatch (P2) |
@@ -321,7 +331,7 @@
 
 | ID | Sev | Root Cause | Notes |
 |----|-----|------------|-------|
-| MFA-003 | P2 | Standalone | Bundle with MFA-001/002 (same file) |
+| MFA-003 | P2 | Standalone | ~~Bundle with MFA-001/002 (same file)~~ ✅ KLAR (2026-03-22) |
 | BUG-008 | P1 | Standalone | Admin-only, add pagination |
 | BUG-009 | P2 | Standalone | One-line fix |
 | BUG-014 | P1 | RC-8 | Notification settings — needs product decision |

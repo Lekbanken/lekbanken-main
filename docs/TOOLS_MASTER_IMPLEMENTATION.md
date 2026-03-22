@@ -2,9 +2,13 @@
 
 ## Metadata
 
-- Owner: TBD
-- Status: draft
+- Owner: -
+- Status: historical snapshot
+- Date: 2026-01-02
+- Last updated: 2026-03-21
 - Last validated: 2026-01-02
+
+> Historical implementation snapshot for the Toolbelt MVP and its initial Dice Roller rollout.
 
 ## Scope (MVP)
 

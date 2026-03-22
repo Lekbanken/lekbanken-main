@@ -1,8 +1,16 @@
 # Admin Auth & RBAC Integrity Audit
 
-> **Last Updated:** 2026-01-03  
-> **Audit Type:** Security & Authorization Review  
-> **Status:** � Critical Issues FIXED
+## Metadata
+
+- Owner: -
+- Status: frozen audit
+- Date: 2026-01-03
+- Last updated: 2026-03-21
+- Last validated: 2026-01-03
+
+> Frozen security audit snapshot. Validate current route guards and RBAC behavior against code before treating this as current security truth.
+
+> **Audit Type:** Security & Authorization Review
 
 ---
 

@@ -86,7 +86,7 @@ Rekommenderad spegling i repo:
 - Content Management (aktuellt): [content/CONTENT_MANAGEMENT_DOMAIN.md](content/CONTENT_MANAGEMENT_DOMAIN.md)
 - Play (aktuellt): [PLAY_DOMAIN.md](PLAY_DOMAIN.md)
 - Planner (aktuellt): [PLANNER_DOMAIN.md](PLANNER_DOMAIN.md)
-- Gamification (aktuellt): [GAMIFICATION_DOMAIN.md](GAMIFICATION_DOMAIN.md)
+- Gamification (aktuellt): [gamification/GAMIFICATION_DOMAIN.md](gamification/GAMIFICATION_DOMAIN.md)
 - Journey (aktuellt): [JOURNEY_DOMAIN.md](JOURNEY_DOMAIN.md)
 - Marketing (aktuellt): [marketing/MARKETING_DOMAIN.md](marketing/MARKETING_DOMAIN.md)
 - Media (aktuellt): [media/MEDIA_DOMAIN.md](media/MEDIA_DOMAIN.md)
@@ -228,7 +228,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [x] **Games Domain** – Lekstruktur och metadata (se `docs/GAMES_DOMAIN.md`)
 - [x] **Planner Domain** – Planer, block/tidslinje, synlighet, anteckningar, play-projection (se `docs/PLANNER_DOMAIN.md`)
 - [ ] **Planner Domain** – AI-generering och templates
-- [x] **Gamification Domain** – "Din Lekresa"-gamification (coins, streaks, achievements) (se `docs/GAMIFICATION_DOMAIN.md`)
+- [x] **Gamification Domain** – "Din Lekresa"-gamification (coins, streaks, achievements) (se `docs/gamification/GAMIFICATION_DOMAIN.md`)
 - [x] **Journey Domain** – "Din lekresa" dashboard/timeline (read/composition) (se `docs/JOURNEY_DOMAIN.md`)
 - [x] **Translation Engine Domain** – i18n-fallback och batch-översättning (se `docs/content/TRANSLATION_ENGINE_DOMAIN.md`)
 - [x] **Operations Domain** – Drift och monitoring (se `docs/ops/OPERATIONS_DOMAIN.md` + `docs/ops/*`)

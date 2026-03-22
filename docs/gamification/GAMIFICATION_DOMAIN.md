@@ -5,7 +5,7 @@
 > **Status:** active
 > **Owner:** -
 > **Date:** 2025-12-17
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-22
 > **Last validated:** -
 > **Source of truth:** Repo code (`app/app/gamification/**`, `app/api/gamification/**`, `features/gamification/**`, `lib/services/*Service.ts`) + Supabase migrations (achievements, coins, streaks, progress, challenges, events, leaderboards)
 

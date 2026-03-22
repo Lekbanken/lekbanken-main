@@ -366,4 +366,4 @@ function GameCompletionHandler() {
 
 - [IMPLEMENTATION_LOG_ACHIEVEMENTS_PHASE1.md](./IMPLEMENTATION_LOG_ACHIEVEMENTS_PHASE1.md) - System admin achievements
 - [IMPLEMENTATION_LOG_ACHIEVEMENTS_PHASE2_TENANT.md](./IMPLEMENTATION_LOG_ACHIEVEMENTS_PHASE2_TENANT.md) - Tenant admin achievements
-- [GAMIFICATION_DOMAIN.md](./GAMIFICATION_DOMAIN.md) - Overall gamification architecture
+- [GAMIFICATION_DOMAIN.md](../gamification/GAMIFICATION_DOMAIN.md) - Overall gamification architecture

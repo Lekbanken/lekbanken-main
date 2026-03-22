@@ -284,7 +284,7 @@ Fält:
 | [docs/play/PLAY_UI_WIRING_AUDIT_REPORT_v2.md](play/PLAY_UI_WIRING_AUDIT_REPORT_v2.md) | C | active audit | 2026-03-21 | - | Active play wiring audit reference |
 | [docs/play/TRIGGER_ENGINE_CONTRACT.md](play/TRIGGER_ENGINE_CONTRACT.md) | A | active | 2026-02-09 | - | Trigger engine contract |
 | [docs/PLANNER_DOMAIN.md](PLANNER_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/GAMIFICATION_DOMAIN.md](GAMIFICATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/gamification/GAMIFICATION_DOMAIN.md](gamification/GAMIFICATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/JOURNEY_DOMAIN.md](JOURNEY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/import/JSON_IMPORT_FIELD_REFERENCE.md](import/JSON_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-26 | - | Import field reference |
 | [docs/import/JSON_IMPORT_VERIFICATION_CHECKLIST.md](import/JSON_IMPORT_VERIFICATION_CHECKLIST.md) | A | active | 2025-12-26 | - | Verification checklist |

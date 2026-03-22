@@ -5,7 +5,7 @@
 - Owner: -
 - Status: active
 - Date: 2026-03-21
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-21
 
 > Entry point for the gamification documentation cluster. Check each linked file's own status before treating it as current implementation or operational guidance.
@@ -19,14 +19,16 @@ Use this index to avoid reading older design or migration summaries as if they w
 ## Read order
 
 1. `launch-readiness/launch-control.md` for current program and launch state
-2. `docs/JOURNEY_DOMAIN.md` and other canonical repo docs for current product/domain context
-3. The active files in this folder listed below
-4. Frozen audits and historical snapshots only when you need design history, migration history, or earlier decisions
+2. `GAMIFICATION_DOMAIN.md`
+3. `docs/JOURNEY_DOMAIN.md` and other canonical repo docs for current product/domain context
+4. The active files in this folder listed below
+5. Frozen audits and historical snapshots only when you need design history, migration history, or earlier decisions
 
 ## Current working set
 
 ### Active
 
+- `GAMIFICATION_DOMAIN.md` — canonical domain reference for achievements, coins, streaks, progression, challenges, events, and leaderboards
 - `GAMIFICATION_MASTER_PLAN.md` — roadmap and domain decision log
 - `GAMIFICATION_MONITORING_ALERTS.md` — active monitoring guidance for the gamification subsystem
 - `GAMIFICATION_RECONCILIATION_RUNBOOK.md` — operational recovery and investigation runbook for wallet vs ledger mismatches

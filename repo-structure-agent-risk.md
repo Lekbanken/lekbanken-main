@@ -35,7 +35,7 @@ When starting work on this repo, read documents in this exact order:
 | Games | `docs/GAMES_DOMAIN.md` | `docs/builder/` |
 | Admin | `docs/admin/archive/ADMIN_OVERVIEW_REPORT.md` | `docs/admin/` |
 | Auth | `docs/AUTH_SYSTEM_ANALYSIS.md` | `docs/auth/` |
-| Gamification | `docs/GAMIFICATION_DOMAIN.md` | `docs/gamification/` |
+| Gamification | `docs/gamification/GAMIFICATION_DOMAIN.md` | `docs/gamification/` |
 | Any security question | `launch-readiness/audits/` | — |
 | System overview/launch status | `launch-readiness/launch-control.md` | — |
 

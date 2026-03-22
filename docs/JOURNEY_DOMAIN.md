@@ -20,7 +20,7 @@ Journey is NOT a new source of truth:
 - Journey should not write coin/XP/level/streak/award state.
 
 Non-goals (currently owned elsewhere):
-- Coins/streaks/levels/achievements as data models (see `docs/GAMIFICATION_DOMAIN.md`)
+- Coins/streaks/levels/achievements as data models (see `docs/gamification/GAMIFICATION_DOMAIN.md`)
 - Live sessions runtime (see `docs/PLAY_DOMAIN.md`)
 - Planner authoring and plan data model (see `docs/PLANNER_DOMAIN.md`)
 

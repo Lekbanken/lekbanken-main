@@ -113,7 +113,7 @@ If shared across domains — it goes in `components/`.
 | Games | `docs/GAMES_DOMAIN.md` |
 | Admin | `docs/admin/archive/ADMIN_OVERVIEW_REPORT.md` |
 | Auth | `docs/AUTH_SYSTEM_ANALYSIS.md` |
-| Gamification | `docs/GAMIFICATION_DOMAIN.md` |
+| Gamification | `docs/gamification/GAMIFICATION_DOMAIN.md` |
 | Security | `launch-readiness/audits/` |
 
 ### Documentation lifecycle rule

@@ -25,6 +25,11 @@ Scope: Auth, RBAC, tenant-access och routing.
 
 - [AUTH_DATABASE_SCHEMA.md](AUTH_DATABASE_SCHEMA.md) — DB schema overview (migrations + generated types are canonical)
 
+## Draft redesign and backlog
+
+- [AUTH_ARCHITECTURE_REDESIGN.md](AUTH_ARCHITECTURE_REDESIGN.md) — draft redesign proposal for server-first auth, tenant resolution, and role handling across surfaces
+- [AUTH_IMPLEMENTATION_TODO.md](AUTH_IMPLEMENTATION_TODO.md) — draft auth/tenant backlog tied to the redesign work
+
 ## Historical
 
 - [AUTH_SYSTEM_ANALYSIS.md](../AUTH_SYSTEM_ANALYSIS.md) — historical/archived analysis; do not treat as source of truth

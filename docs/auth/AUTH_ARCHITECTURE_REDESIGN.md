@@ -5,7 +5,7 @@
 - Owner: -
 - Status: draft
 - Date: 2025-12-15
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: -
 
 > Draft auth and authorization redesign proposal for server-first auth, tenant resolution, and multi-surface role handling.

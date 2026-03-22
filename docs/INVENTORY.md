@@ -304,7 +304,7 @@ Fält:
 | [docs/api/README.md](api/README.md) | A | active | 2026-03-22 | - | Sub-index for internal API and integration docs |
 | [docs/api/API_INTEGRATION_DOMAIN.md](api/API_INTEGRATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (API surface + conventions) |
 | [docs/play/PLAY_SESSIONS_UI_SPEC.md](play/PLAY_SESSIONS_UI_SPEC.md) | B | draft | 2025-12-16 | - | Spec |
-| [docs/PERFORMANCE_ADVISOR_PROMPT.md](PERFORMANCE_ADVISOR_PROMPT.md) | E | active | 2026-01-08 | - | Prompt for Supabase Performance Advisor |
+| [docs/database/PERFORMANCE_ADVISOR_PROMPT.md](database/PERFORMANCE_ADVISOR_PROMPT.md) | E | active | 2026-01-08 | - | Prompt for Supabase Performance Advisor |
 | [docs/plans/PRODUCT_CARD_UPGRADE_PLAN.md](plans/PRODUCT_CARD_UPGRADE_PLAN.md) | B | draft | 2026-01-08 | - | Product card upgrade plan |
 | [docs/plans/PROFILE_RESILIENCE_IMPLEMENTATION.md](plans/PROFILE_RESILIENCE_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-31 | - | Profile resilience implementation snapshot |
 | [docs/PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md) | B | draft | 2025-12-10 | - | Plan |

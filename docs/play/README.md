@@ -52,6 +52,7 @@ The play structure audits in this folder remain the guardrails for large-scale r
 - `PLAY_UI_WIRING_AUDIT_REPORT.md` — earlier wiring audit snapshot superseded by v2
 - `LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md` — historical Legendary Play rollout plan
 - `play-structure-consolidation-plan.md` — historical action-plan snapshot from the 2026-03-16 play structure audit
+- `sessions/README.md` — historical Session Cockpit architecture and migration snapshots
 
 ## Related guardrails
 

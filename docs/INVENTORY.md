@@ -301,8 +301,9 @@ Fält:
 | [docs/sandbox/README.md](sandbox/README.md) | A | active | 2026-03-21 | - | Sub-index for sandbox-only implementation and planning docs |
 | [docs/sandbox/SANDBOX_ARTIFACTS_IMPLEMENTATION.md](sandbox/SANDBOX_ARTIFACTS_IMPLEMENTATION.md) | A | active | 2025-12-29 | - | Sandbox artifacts implementation log |
 | [docs/sandbox/SANDBOX_ATLAS_IMPLEMENTATION_PLAN.md](sandbox/SANDBOX_ATLAS_IMPLEMENTATION_PLAN.md) | B | draft | 2026-01-10 | - | Sandbox Atlas implementation plan |
-| [docs/SESSION_COCKPIT_ARCHITECTURE.md](SESSION_COCKPIT_ARCHITECTURE.md) | C | historical snapshot | 2025-12-28 | - | Session cockpit architecture snapshot |
-| [docs/SESSION_COCKPIT_MIGRATION.md](SESSION_COCKPIT_MIGRATION.md) | B | historical snapshot | 2025-12-28 | - | Session cockpit migration guide snapshot |
+| [docs/play/sessions/README.md](play/sessions/README.md) | A | active | 2026-03-22 | - | Sub-index for historical session cockpit docs within the play cluster |
+| [docs/play/sessions/SESSION_COCKPIT_ARCHITECTURE.md](play/sessions/SESSION_COCKPIT_ARCHITECTURE.md) | C | historical snapshot | 2025-12-28 | - | Session cockpit architecture snapshot |
+| [docs/play/sessions/SESSION_COCKPIT_MIGRATION.md](play/sessions/SESSION_COCKPIT_MIGRATION.md) | B | historical snapshot | 2025-12-28 | - | Session cockpit migration guide snapshot |
 | [docs/SESSION_COMPLETION_REPORT.md](SESSION_COMPLETION_REPORT.md) | C | historical snapshot | 2025-12-11 | - | Completed session report snapshot |
 | [docs/SECURITY_AUDIT_TODO.md](SECURITY_AUDIT_TODO.md) | D | ✅ done | 2026-01-08 | - | Security backlog (completed) |
 | [docs/SECURITY_AUDIT_PROMPT_V2.md](SECURITY_AUDIT_PROMPT_V2.md) | E | active | 2026-01-08 | - | Verification queries for security audit |

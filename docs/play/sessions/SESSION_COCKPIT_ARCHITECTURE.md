@@ -1029,8 +1029,8 @@ For each task:
 - ✅ `lib/trigger-templates.ts` - Pre-built trigger templates
 
 ### Documentation
-- ✅ `docs/SESSION_COCKPIT_ARCHITECTURE.md` - This file
-- ✅ `docs/SESSION_COCKPIT_MIGRATION.md` - Migration guide
+- ✅ `docs/play/sessions/SESSION_COCKPIT_ARCHITECTURE.md` - This file
+- ✅ `docs/play/sessions/SESSION_COCKPIT_MIGRATION.md` - Migration guide
 
 ### Files to Modify (for integration)
 - `types/games.ts` - Add new artifact types

@@ -836,7 +836,7 @@ Mix of PowerShell, Python, JavaScript, TypeScript, and SQL scripts for:
 
 18 subdirectories covering every domain. Major categories:
 - Domain docs: `GAMES_DOMAIN.md`, `PLAY_DOMAIN.md`, `PLANNER_DOMAIN.md`, etc.
-- Architecture: `AUTH_ARCHITECTURE_REDESIGN.md`, `SESSION_COCKPIT_ARCHITECTURE.md`
+- Architecture: `AUTH_ARCHITECTURE_REDESIGN.md`, `play/sessions/SESSION_COCKPIT_ARCHITECTURE.md`
 - Implementation plans: `GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md`, etc.
 - Audits: `DATABASE_SECURITY_AUDIT.md`, `PROFILE_AUDIT_2026-03-05.md`
 - Test plans: `ADMIN_GAMIFICATION_TEST_PLAN.md`, `TESTPLAN_GAME_BUILDER_P0.md`

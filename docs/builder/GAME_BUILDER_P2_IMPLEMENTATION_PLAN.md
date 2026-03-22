@@ -6,7 +6,7 @@
 - Owner: -
 - Status: historical snapshot
 - Date: 2025-12-16
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2025-12-16
 
 > Historical snapshot of the completed Game Builder P2 implementation plan. Canonical routing for builder docs starts at `docs/builder/README.md`.

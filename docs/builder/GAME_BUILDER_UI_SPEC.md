@@ -6,7 +6,7 @@
 - Owner: -
 - Status: draft
 - Date: 2025-12-16
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2025-12-16
 
 > Draft builder UI specification. Canonical routing for the builder domain starts at `docs/builder/README.md`.

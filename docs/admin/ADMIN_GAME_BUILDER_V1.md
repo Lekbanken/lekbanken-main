@@ -68,7 +68,7 @@ Buildern organiserar innehåll i **GameCore** + valfria moduler som kan aktivera
 - **Phases/Rounds (P2a)**: `game_phases` och `game_steps.phase_id` (FK).
 - **Roles (P2b)**: `game_roles` (+ runtime `participant_role_assignments`).
 - **Board config (P2c)**: `game_board_config` (togglar + theme + bakgrund).
-- **Planerat/ej implementerat här**: “actions”-modell och per-fas board-content finns inte som DB-modell i nuvarande migrations; håll sånt i spec-dokument (t.ex. `GAME_BUILDER_UI_SPEC.md`) tills det finns i schema/API.
+- **Planerat/ej implementerat här**: “actions”-modell och per-fas board-content finns inte som DB-modell i nuvarande migrations; håll sånt i spec-dokument (t.ex. `docs/builder/GAME_BUILDER_UI_SPEC.md`) tills det finns i schema/API.
 
 ## 3) Valideringsnivåer (praktiskt)
 
@@ -143,7 +143,7 @@ Buildern organiserar innehåll i **GameCore** + valfria moduler som kan aktivera
 
 ## 6) Testplan
 
-Se `docs/TESTPLAN_GAME_BUILDER_P0.md`.
+Se `docs/builder/TESTPLAN_GAME_BUILDER_P0.md`.
 
 ## 7) Nästa steg / TODO
 

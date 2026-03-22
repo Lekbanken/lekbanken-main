@@ -177,11 +177,11 @@ Fält:
 | [docs/tenant/DOMAIN_TENANT_TODO.md](tenant/DOMAIN_TENANT_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
 | [docs/ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md) | A | active | 2025-12-17 | - | Core reference |
 | [docs/examples/README-legendary-play-example.md](examples/README-legendary-play-example.md) | B | draft | 2025-12-26 | - | Golden example for Legendary Play CSV imports |
-| [docs/GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md](GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md) | B | historical snapshot | 2025-12-16 | - | Historical P2 implementation plan |
-| [docs/GAME_BUILDER_UI_SPEC.md](GAME_BUILDER_UI_SPEC.md) | B | draft | 2025-12-16 | - | Builder UI specification |
-| [docs/GAME_CSV_IMPORT_EXPORT_PLAN.md](GAME_CSV_IMPORT_EXPORT_PLAN.md) | B | historical snapshot | 2025-12-16 | - | Historical CSV import/export implementation plan |
-| [docs/GAME_BUILDER_IMPLEMENTATION_TRACKER.md](GAME_BUILDER_IMPLEMENTATION_TRACKER.md) | B | historical snapshot | 2026-01-25 | - | Builder implementation tracker snapshot |
-| [docs/GAME_BUILDER_INVENTORY_AND_ROADMAP.md](GAME_BUILDER_INVENTORY_AND_ROADMAP.md) | C | historical snapshot | 2026-01-25 | - | Builder inventory and roadmap snapshot |
+| [docs/builder/GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md](builder/GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md) | B | historical snapshot | 2025-12-16 | - | Historical P2 implementation plan |
+| [docs/builder/GAME_BUILDER_UI_SPEC.md](builder/GAME_BUILDER_UI_SPEC.md) | B | draft | 2025-12-16 | - | Builder UI specification |
+| [docs/builder/GAME_CSV_IMPORT_EXPORT_PLAN.md](builder/GAME_CSV_IMPORT_EXPORT_PLAN.md) | B | historical snapshot | 2025-12-16 | - | Historical CSV import/export implementation plan |
+| [docs/builder/GAME_BUILDER_IMPLEMENTATION_TRACKER.md](builder/GAME_BUILDER_IMPLEMENTATION_TRACKER.md) | B | historical snapshot | 2026-01-25 | - | Builder implementation tracker snapshot |
+| [docs/builder/GAME_BUILDER_INVENTORY_AND_ROADMAP.md](builder/GAME_BUILDER_INVENTORY_AND_ROADMAP.md) | C | historical snapshot | 2026-01-25 | - | Builder inventory and roadmap snapshot |
 | [docs/games/GAMES_DOMAIN.md](games/GAMES_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/games/README.md](games/README.md) | A | active | 2026-03-22 | - | Sub-index for games domain, GameDetails context work, and related snapshots |
 | [docs/games/GAMEDETAILS_CONTEXT_ARCHITECTURE.md](games/GAMEDETAILS_CONTEXT_ARCHITECTURE.md) | A | active | 2026-03-10 | - | GameDetails context target architecture |
@@ -278,7 +278,7 @@ Fält:
 | [docs/TENANT_MEMBERSHIP_CONSOLIDATION.md](TENANT_MEMBERSHIP_CONSOLIDATION.md) | C | historical snapshot | 2026-01-03 | - | Tenant-membership naming consolidation snapshot |
 | [docs/tenant/README.md](tenant/README.md) | A | active | 2026-03-22 | - | Tenant cluster entrypoint |
 | [docs/tenant/TENANT_DOMAIN.md](tenant/TENANT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/TESTPLAN_GAME_BUILDER_P0.md](TESTPLAN_GAME_BUILDER_P0.md) | B | draft | 2025-12-17 | - | Testplan |
+| [docs/builder/TESTPLAN_GAME_BUILDER_P0.md](builder/TESTPLAN_GAME_BUILDER_P0.md) | B | draft | 2025-12-17 | - | Testplan |
 | [docs/play/PLAY_DOMAIN.md](play/PLAY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/play/README.md](play/README.md) | A | active | 2026-03-22 | - | Sub-index for play contracts, audits, and reference docs |
 | [docs/play/PARTICIPANT_PLAY_AUDIT.md](play/PARTICIPANT_PLAY_AUDIT.md) | C | active audit | 2026-03-21 | - | Participant play audit |

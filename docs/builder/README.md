@@ -5,7 +5,7 @@
 - Owner: -
 - Status: active
 - Date: 2026-02-08
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-21
 
 > Active coordination hub for builder documentation. This cluster mixes active audits/contracts/plans with bounded historical snapshots, and this file is the routing entrypoint.
@@ -43,11 +43,17 @@ Aktiv ingång till builder-dokumentationen. Den här mappen är blandad: vissa f
 
 ### Historical snapshots
 
+- `GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md` — genomförd P2-plan för faser, roller och publik tavla
+- `GAME_BUILDER_IMPLEMENTATION_TRACKER.md` — builder implementationsstatus efter roadmap-analysen
+- `GAME_BUILDER_INVENTORY_AND_ROADMAP.md` — tidigare inventory-, reuse- och roadmap-snapshot
+- `GAME_CSV_IMPORT_EXPORT_PLAN.md` — genomförd CSV import/export-plan för builder-spåret
 - `IMPORT_METADATA_RISK_REPORT.md` — tidigare riskunderlag för senare contract- och atomicityarbete
 - `SPRINT2_WIRING_PLAN.md` — sprintbunden genomförandeplan
 
 ### Draft or active plans
 
+- `GAME_BUILDER_UI_SPEC.md` — draft UI-specifikation för unified admin editor
+- `TESTPLAN_GAME_BUILDER_P0.md` — builderns P0-testplan
 - `SPRINT3_CONSOLIDATION_PLAN.md` — aktiv konsolideringsplan
 
 ## Dokumentöversikt
@@ -117,12 +123,12 @@ State change → isDirty → debounce 1500ms → PUT /api/games/builder/[id]
 
 | Dokument | Syfte |
 |----------|-------|
-| [GAME_BUILDER_IMPLEMENTATION_TRACKER.md](../GAME_BUILDER_IMPLEMENTATION_TRACKER.md) | Implementation status |
-| [GAME_BUILDER_INVENTORY_AND_ROADMAP.md](../GAME_BUILDER_INVENTORY_AND_ROADMAP.md) | Tidigare inventory (2026-01-24) |
-| [GAME_BUILDER_UI_SPEC.md](../GAME_BUILDER_UI_SPEC.md) | UI specifikation |
-| [GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md](../GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md) | Historisk P2-plan för faser, roller och tavla |
-| [GAME_CSV_IMPORT_EXPORT_PLAN.md](../GAME_CSV_IMPORT_EXPORT_PLAN.md) | Tidigare implementeringsplan för CSV import/export |
-| [TESTPLAN_GAME_BUILDER_P0.md](../TESTPLAN_GAME_BUILDER_P0.md) | Testplan |
+| [GAME_BUILDER_IMPLEMENTATION_TRACKER.md](GAME_BUILDER_IMPLEMENTATION_TRACKER.md) | Implementation status |
+| [GAME_BUILDER_INVENTORY_AND_ROADMAP.md](GAME_BUILDER_INVENTORY_AND_ROADMAP.md) | Tidigare inventory (2026-01-24) |
+| [GAME_BUILDER_UI_SPEC.md](GAME_BUILDER_UI_SPEC.md) | UI specifikation |
+| [GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md](GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md) | Historisk P2-plan för faser, roller och tavla |
+| [GAME_CSV_IMPORT_EXPORT_PLAN.md](GAME_CSV_IMPORT_EXPORT_PLAN.md) | Tidigare implementeringsplan för CSV import/export |
+| [TESTPLAN_GAME_BUILDER_P0.md](TESTPLAN_GAME_BUILDER_P0.md) | Testplan |
 
 ---
 

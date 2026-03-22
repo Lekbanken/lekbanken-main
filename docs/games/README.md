@@ -46,8 +46,8 @@ Use this cluster to understand the games content domain, browse and publish boun
 - `../admin/README.md` — builder UI and admin-domain references
 - `../admin/ADMIN_GAME_BUILDER_V1.md` — canonical builder UI/API reference under the admin cluster
 - `../import/CSV_IMPORT_FIELD_REFERENCE.md` — CSV field contract reference
-- `../GAME_BUILDER_UI_SPEC.md` — builder UI draft/spec material
-- `../TESTPLAN_GAME_BUILDER_P0.md` — builder validation/test plan
+- `../builder/GAME_BUILDER_UI_SPEC.md` — builder UI draft/spec material
+- `../builder/TESTPLAN_GAME_BUILDER_P0.md` — builder validation/test plan
 
 ## Working rule
 

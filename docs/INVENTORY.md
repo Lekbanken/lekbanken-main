@@ -321,7 +321,7 @@ Fält:
 | [docs/play/sessions/SESSION_COCKPIT_MIGRATION.md](play/sessions/SESSION_COCKPIT_MIGRATION.md) | B | historical snapshot | 2025-12-28 | - | Session cockpit migration guide snapshot |
 | [docs/SESSION_COMPLETION_REPORT.md](SESSION_COMPLETION_REPORT.md) | C | historical snapshot | 2025-12-11 | - | Completed session report snapshot |
 | [docs/archive/SECURITY_AUDIT_TODO.md](archive/SECURITY_AUDIT_TODO.md) | D | ✅ done | 2026-01-08 | - | Security backlog (completed) |
-| [docs/SECURITY_AUDIT_PROMPT_V2.md](SECURITY_AUDIT_PROMPT_V2.md) | E | active | 2026-01-08 | - | Verification queries for security audit |
+| [docs/ops/SECURITY_AUDIT_PROMPT_V2.md](ops/SECURITY_AUDIT_PROMPT_V2.md) | E | active | 2026-01-08 | - | Verification queries for security audit |
 | [docs/billing/STRIPE.md](billing/STRIPE.md) | A | active | 2025-12-17 | - | Billing reference |
 | [docs/support/README.md](support/README.md) | A | active | 2026-03-22 | - | Sub-index for support domain docs |
 | [docs/support/SUPPORT_DOMAIN.md](support/SUPPORT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |

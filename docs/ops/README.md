@@ -5,7 +5,7 @@
 - Owner: Ops/Platform
 - Status: active
 - Date: 2025-12-17
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2025-12-17
 
 > Active runbook cluster for operational workflows and production procedures. Use this folder for repo-verifiable operations guidance and mark external dependencies explicitly.
@@ -24,6 +24,7 @@ Runbooks och operativa rutiner. Dessa dokument är **repo-förankrade** där det
 - [Production migration workflow](prod-migration-workflow.md)
 - [Release promotion checklist](release-promotion-checklist.md)
 - [First production deploy runbook](first-deploy-runbook.md)
+- [Security audit verification prompt](SECURITY_AUDIT_PROMPT_V2.md)
 
 ## Source of truth
 

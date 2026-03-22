@@ -65,6 +65,8 @@
 | `scaling-analysis.md` | `launch-readiness/audits/` | Bottleneck analysis + 90-day plan | ✅ Historical reference |
 | `incident-playbook.md` | `launch-readiness/` | Incident response procedures | ✅ Current |
 | `enterprise-isolation-architecture.md` | `launch-readiness/` | Enterprise isolation design study | ✅ Current (design-only) |
+| `enterprise-isolation-audit.md` | `launch-readiness/` | Enterprise isolation readiness audit | ✅ Current (design-set audit) |
+| `enterprise-isolation-implementation-plan.md` | `launch-readiness/` | Enterprise isolation future-readiness roadmap | ✅ Current (triggered by enterprise need) |
 | `PROJECT_CONTEXT.md` | Root | Product overview | ✅ Current |
 | `planner-architecture.md` | Root | Planner system design | ✅ Current (per copilot-instructions.md) |
 | `planner-audit.md` | Root | Planner current status | ⚠️ Possibly duplicates `audits/planner-launch-audit.md` |
@@ -78,6 +80,10 @@
 
 | Document | Location | Purpose | Status |
 |----------|----------|---------|--------|
+| `next-execution-plan.md` | `launch-readiness/` | Active post-launch execution roadmap | ✅ Current |
+| `platform-operations-architecture.md` | `launch-readiness/` | Operations and environment topology study | ✅ Current (active workstream) |
+| `platform-operations-audit.md` | `launch-readiness/` | Operational-readiness audit | ✅ Current |
+| `platform-operations-implementation-plan.md` | `launch-readiness/` | Operations maturity roadmap | ✅ Current |
 | `production-signals-dashboard.md` | `docs/ops/` | Signal query reference | ✅ Exists |
 | `anomaly-detection-playbook.md` | `docs/ops/` | Alert response procedures | ✅ Exists |
 | `first-deploy-runbook.md` | `docs/ops/` | First deploy procedures | ✅ Exists |
@@ -238,6 +244,13 @@ These files are **never archivable** — they are the living memory of the syste
 | `launch-readiness/launch-readiness-implementation-plan.md` | Phase roadmap | Per phase change |
 | `launch-readiness/audits/launch-readiness-audit-program.md` | Audit methodology | Rarely (stable) |
 | `launch-readiness/launch-readiness-architecture.md` | Environment/deploy strategy | Per env change |
+| `launch-readiness/next-execution-plan.md` | Active post-launch roadmap | Per execution-cycle change |
+| `launch-readiness/platform-operations-architecture.md` | Operations topology study | Per operating-model change |
+| `launch-readiness/platform-operations-audit.md` | Operational readiness audit | Per ops gap or verification change |
+| `launch-readiness/platform-operations-implementation-plan.md` | Operations roadmap | Per phase change |
+| `launch-readiness/enterprise-isolation-architecture.md` | Enterprise topology design | On enterprise-model change |
+| `launch-readiness/enterprise-isolation-audit.md` | Enterprise readiness audit | On enterprise-readiness reassessment |
+| `launch-readiness/enterprise-isolation-implementation-plan.md` | Enterprise roadmap | On enterprise trigger or scope change |
 | `launch-readiness/launch-snapshot-2026-03.md` | Frozen launch state | Never (frozen) |
 | `launch-readiness/launch-telemetry-pack.md` | Observability signals | Per signal change |
 | `launch-readiness/incident-playbook.md` | Incident response | Per incident |

@@ -145,7 +145,7 @@ Use this exact sequence for the first observe-mode pass:
 
 - Do **not** start telemetry automation, cron-based signal collection, or a new observability implementation batch yet.
 - Do **not** start SEC-002b / Upstash-style rate limiter infrastructure work yet.
-- Treat `step5-backlog-triage-deliverable.md` as a historical shortlist, not as an auto-approved sprint.
+- Treat `audits/step5-backlog-triage-deliverable.md` as a historical shortlist, not as an auto-approved sprint.
 - If work must continue before real traffic exists, constrain it to config correctness and operator clarity items only, especially canonical host, Supabase auth redirect URLs, and Stripe webhook host verification.
 - Re-open Step 4 for true prioritization only when one of these triggers occurs: first non-zero production traffic, first alert threshold crossing, or an owner decision that forces host/config cleanup regardless of traffic.
 

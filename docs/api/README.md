@@ -32,6 +32,10 @@ Use it to answer:
 
 - `API_INTEGRATION_DOMAIN.md` — canonical internal API and integration reference for route handlers, auth patterns, tenancy, caching, and BFF boundaries
 
+### Frozen audits
+
+- `consumer-data-contract-audit.md` — frozen audit of browse and planner consumer contracts against their API mappers
+
 ## Working rule
 
 If an API design question conflicts with current auth/RLS or operational guardrails, prefer `../database/DATABASE_SECURITY_DOMAIN.md`, `../ops/OPERATIONS_DOMAIN.md`, and current code in `app/api/**`.

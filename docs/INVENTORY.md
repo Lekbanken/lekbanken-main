@@ -113,7 +113,7 @@ Fält:
 | [docs/database/DATABASE_SECURITY_AUDIT.md](database/DATABASE_SECURITY_AUDIT.md) | C | frozen audit | - | Security/Auth | Security audit report (resolved) |
 | [docs/database/migration-history.md](database/migration-history.md) | A | active | 2026-03-16 | - | Migration history normalization log |
 | [docs/database/rls-audit-2025-03-17.md](database/rls-audit-2025-03-17.md) | C | frozen audit | 2026-03-17 | - | RLS security audit snapshot |
-| [docs/consumer-data-contract-audit.md](consumer-data-contract-audit.md) | C | frozen audit | - | Data contracts | Consumer contract audit |
+| [docs/api/consumer-data-contract-audit.md](api/consumer-data-contract-audit.md) | C | frozen audit | - | Data contracts | Consumer contract audit |
 | [docs/CUSTOM_DOMAINS_TEST_PLAN.md](CUSTOM_DOMAINS_TEST_PLAN.md) | B | draft | 2026-01-03 | - | Validation plan |
 | [docs/DEPENDENCY_AUDIT_2026-01-03.md](DEPENDENCY_AUDIT_2026-01-03.md) | C | frozen audit | 2026-01-03 | - | Dependency and Supabase call audit |
 | [docs/demo/README.md](demo/README.md) | A | active | 2026-03-22 | - | Demo cluster entrypoint |

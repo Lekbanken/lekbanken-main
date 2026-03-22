@@ -5,7 +5,7 @@
 - Owner: -
 - Status: draft
 - Date: 2025-12-10
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: -
 
 > Draft platform-domain validation report covering deployment, environment, runtime, security, and observability infrastructure.
@@ -931,13 +931,13 @@ jobs:
 
 | Document | Priority | Notes |
 |----------|----------|-------|
-| `PLATFORM_DOMAIN.md` | **P1** | All info in Notion, should mirror to repo |
+| `platform/PLATFORM_DOMAIN.md` | **P1** | All info in Notion, should mirror to repo |
 | `DEPLOYMENT.md` | P2 | How to deploy, rollback, etc. |
 | `ENVIRONMENT_VARIABLES.md` | **P1** | Document all required vars |
 | `MONITORING.md` | P2 | Once monitoring is set up |
 | `RUNBOOK.md` | P2 | Emergency procedures |
 
-**Recommendation:** Create `docs/PLATFORM_DOMAIN.md` mirroring Notion content (P1)
+**Recommendation:** Keep `docs/platform/PLATFORM_DOMAIN.md` mirrored to current repo reality (P1)
 
 ---
 
@@ -960,7 +960,7 @@ jobs:
 |---|------|------------------|--------|-------|
 | 3 | ~~Implement error tracking (Supabase)~~ | ~~4-6h~~ | ✅ **DONE** | `lib/utils/error-tracker.ts` Dec 11 |
 | 4 | ~~Add rate limiting (in-memory)~~ | ~~6-8h~~ | ✅ **DONE** | `lib/utils/rate-limiter.ts` Dec 11 |
-| 5 | ~~Create `docs/PLATFORM_DOMAIN.md`~~ | ~~2h~~ | ✅ **EXISTS** | |
+| 5 | ~~Create `docs/platform/PLATFORM_DOMAIN.md`~~ | ~~2h~~ | ✅ **EXISTS** | |
 | 6 | ~~Document all environment variables~~ | ~~1h~~ | ✅ **EXISTS** | (`docs/ENVIRONMENT_VARIABLES.md`) |
 
 **Total P1 Effort:** ~~13-17 hours~~ → ✅ **ALL COMPLETE (Dec 11, 2025)**

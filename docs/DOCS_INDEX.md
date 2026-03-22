@@ -55,6 +55,7 @@ Regel:
 - notifications/: se [notifications/README.md](notifications/README.md)
 - ops/: se [ops/README.md](ops/README.md)
 - participants/: se [participants/README.md](participants/README.md)
+- platform/: se [platform/README.md](platform/README.md)
 - play/: se [play/README.md](play/README.md)
 - profile/: se [profile/README.md](profile/README.md)
 - support/: se [support/README.md](support/README.md)

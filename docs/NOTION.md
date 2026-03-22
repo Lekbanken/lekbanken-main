@@ -68,7 +68,7 @@ Om en länk saknas eller blir inaktuell: utgå från repo först och uppdatera s
 | [Browse Domain](browse/BROWSE_DOMAIN.md) | Sök, filter, rekommendationer, key tables |
 
 Rekommenderad spegling i repo:
-- [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
+- [platform/PLATFORM_DOMAIN.md](platform/PLATFORM_DOMAIN.md)
 - Browse (aktuellt): [browse/BROWSE_DOMAIN.md](browse/BROWSE_DOMAIN.md)
 - Data Model (aktuellt): [database/DATA_MODEL_DOMAIN.md](database/DATA_MODEL_DOMAIN.md)
 - Auth/RBAC: [auth/README.md](auth/README.md) (aktuellt) + [AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
@@ -192,7 +192,7 @@ Enligt [Master Structure v1.0](https://www.notion.so/Johan-Schultzs-omr-de-Lekba
 
 ### URL:er
 
-Källan för “vad som faktiskt är deployat” är [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md).
+Källan för “vad som faktiskt är deployat” är [platform/PLATFORM_DOMAIN.md](platform/PLATFORM_DOMAIN.md).
 
 | URL | Syfte |
 |-----|------|
@@ -202,7 +202,7 @@ Källan för “vad som faktiskt är deployat” är [PLATFORM_DOMAIN.md](PLATFO
 
 Miljö-/deployflöde kan förändras. Utgå från:
 
-- [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
+- [platform/PLATFORM_DOMAIN.md](platform/PLATFORM_DOMAIN.md)
 - Ops/runbooks i `docs/ops/*`
 - Repo-workflows (t.ex. `.github/workflows/*` om de finns)
 
@@ -210,10 +210,10 @@ Miljö-/deployflöde kan förändras. Utgå från:
 
 Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på repo:
 
-- [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
+- [platform/PLATFORM_DOMAIN.md](platform/PLATFORM_DOMAIN.md)
 - [MIGRATIONS.md](MIGRATIONS.md)
 
-**Fullständig specifikation:** [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
+**Fullständig specifikation:** [platform/PLATFORM_DOMAIN.md](platform/PLATFORM_DOMAIN.md)
 
 ---
 

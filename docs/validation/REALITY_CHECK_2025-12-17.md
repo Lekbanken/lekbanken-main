@@ -32,9 +32,9 @@ This report captures a targeted “reality check” for the highest drift-risk a
 ### F-001 — Platform docs claimed rate limiting exists (drift)
 
 - Area: Platform / security
-- Symptom: `docs/PLATFORM_DOMAIN.md` described Upstash-based rate limiting (`lib/ratelimit.ts`, `applyRateLimit`, Upstash env vars) as implemented.
+- Symptom: `docs/platform/PLATFORM_DOMAIN.md` described Upstash-based rate limiting (`lib/ratelimit.ts`, `applyRateLimit`, Upstash env vars) as implemented.
 - Reality: No such implementation files exist in the repo; no Upstash package usage detected.
-- Action taken: Updated `docs/PLATFORM_DOMAIN.md` to mark rate limiting as “not currently implemented”, removed Upstash from “critical vars” and from env validation claims.
+- Action taken: Updated `docs/platform/PLATFORM_DOMAIN.md` to mark rate limiting as “not currently implemented”, removed Upstash from “critical vars” and from env validation claims.
 - Status: fixed (docs aligned to repo)
 
 ### F-002 — Environment variables docs referenced missing/required Upstash vars (drift)

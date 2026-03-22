@@ -5,7 +5,7 @@
 > **Status:** active
 > **Owner:** -
 > **Date:** 2025-12-10
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-22
 > **Last validated:** 2025-12-17
 > **Notes:** Repo-anchored platform reference; avoid hardcoded ops or provider details.
 
@@ -612,7 +612,7 @@ Before deploying to production:
 
 ### Documentation
 - ✅ `ENVIRONMENT_VARIABLES.md` up to date
-- ✅ `PLATFORM_DOMAIN.md` (this file) accurate
+- ✅ `platform/PLATFORM_DOMAIN.md` (this file) accurate
 - ✅ README.md has deployment instructions
 
 ---
@@ -705,7 +705,7 @@ lekbanken-main/
 │   └── verify_rls_coverage.sql
 │
 ├── docs/                     # Documentation
-│   ├── PLATFORM_DOMAIN.md    # This file
+│   ├── platform/PLATFORM_DOMAIN.md    # This file
 │   └── ENVIRONMENT_VARIABLES.md
 │
 ├── proxy.ts                  # Auth proxy (NOT middleware.ts!)

@@ -63,7 +63,7 @@ Notion används som portal, översikt och kunskapsyta.
 
 Aktuell host- och deploytopologi ska alltid läsas från repo-dokumentationen, inte från hårdkodade README-sammanfattningar:
 
-- [docs/PLATFORM_DOMAIN.md](docs/PLATFORM_DOMAIN.md)
+- [docs/platform/PLATFORM_DOMAIN.md](docs/platform/PLATFORM_DOMAIN.md)
 - [docs/database/environments.md](docs/database/environments.md)
 - [docs/ops/README.md](docs/ops/README.md)
 

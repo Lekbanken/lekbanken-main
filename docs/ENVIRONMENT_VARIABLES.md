@@ -291,6 +291,6 @@ The application validates environment variables at startup using `lib/config/env
 
 - `.env.local.example` - Template with all variables
 - `lib/config/env.ts` - Validation logic and type-safe access
-- `docs/PLATFORM_DOMAIN.md` - Platform infrastructure documentation
+- `docs/platform/PLATFORM_DOMAIN.md` - Platform infrastructure documentation
 - Supabase Docs: https://supabase.com/docs
 - Stripe Docs: https://stripe.com/docs

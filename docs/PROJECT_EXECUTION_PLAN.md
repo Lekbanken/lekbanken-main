@@ -898,7 +898,7 @@ Use tool (dbdiagram.io or similar) to visualize all relationships.
 - Report creation: 2h
 - Fixes (if needed): 4-6h
 
-**Deliverable:** `PLATFORM_DOMAIN_VALIDATION_REPORT.md`
+**Deliverable:** `platform/PLATFORM_DOMAIN_VALIDATION_REPORT.md`
 
 ---
 

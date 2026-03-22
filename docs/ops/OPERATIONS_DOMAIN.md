@@ -27,7 +27,7 @@ Non-goals:
 - Backups & DR: `docs/ops/backup_dr.md`
 - Migrations/process: `docs/MIGRATIONS.md`
 - Environment variables: `docs/ENVIRONMENT_VARIABLES.md`
-- Platform runtime/deploy notes: `docs/PLATFORM_DOMAIN.md`
+- Platform runtime/deploy notes: `docs/platform/PLATFORM_DOMAIN.md`
 
 ## Related code (repo-anchored)
 

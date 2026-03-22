@@ -15,6 +15,6 @@ Syfte: ge en snabb mental modell av Lekbanken.
 - DB: Supabase (Postgres + RLS)
 
 Se även:
-- ../../docs/PLATFORM_DOMAIN.md
+- ../../docs/platform/PLATFORM_DOMAIN.md
 - ../../docs/AUTH_SYSTEM_ANALYSIS.md
 - ../../docs/MIGRATIONS.md

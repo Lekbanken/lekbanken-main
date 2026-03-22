@@ -32,6 +32,7 @@ This folder contains the bounded audit outputs produced during the launch-readin
 - `mfa-trusted-device-audit.md` — targeted auth hardening audit for MFA and trusted-device flows
 - `documentation-cleanup-audit.md`, `launch-docs-integrity-audit.md` — bounded documentation-layer audits that drove the markdown cleanup and SSoT verification work
 - `system-verification-2026.md` — frozen repository-verification snapshot used to compare the March launch snapshot against code-scanned reality
+- `scaling-analysis.md` — historical scaling and bottleneck analysis kept as an audit-era reference for post-launch capacity planning
 
 ### Security and isolation audit set
 

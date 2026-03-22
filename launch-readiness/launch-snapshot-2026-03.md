@@ -164,7 +164,7 @@ All 13 P0s were discovered and resolved during the audit program:
 | Session cleanup cron | ✅ Done | `vercel.json` daily 04:00 UTC. Disconnects expired tokens, archives ended sessions. |
 | Upstash rate limiter | ⏭️ Deferred | Migration path documented in `rate-limiter.ts`. Deploy when multi-region or >10k sessions/day. |
 
-> **Reference:** Full 5-bottleneck analysis with 90-day plan: `scaling-analysis.md`
+> **Reference:** Full 5-bottleneck analysis with 90-day plan: `audits/scaling-analysis.md`
 
 ---
 
@@ -224,7 +224,7 @@ Calibration process:
 | `launch-readiness-implementation-plan.md` | Roadmap, milestones, remediation tracking | `launch-readiness/` |
 | `incident-playbook.md` | Incident response, rollback, kill-switches, domain playbooks | `launch-readiness/` |
 | `launch-snapshot-2026-03.md` | Frozen system state at launch | `launch-readiness/` |
-| `scaling-analysis.md` | Live-session bottleneck analysis, 90-day plan, executive answer | `launch-readiness/` |
+| `audits/scaling-analysis.md` | Live-session bottleneck analysis, 90-day plan, executive answer | `launch-readiness/audits/` |
 | 23 audit files | Individual domain/cross-cutting audit reports | `launch-readiness/audits/` |
 | 8 remediation reports | Implementation details per domain | `launch-readiness/implementation/` |
 | 3 architecture docs | Play, Sessions, Launch Readiness architecture | `launch-readiness/` |

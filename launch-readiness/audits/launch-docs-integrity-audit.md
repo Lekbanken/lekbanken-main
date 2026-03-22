@@ -62,7 +62,7 @@
 |----------|----------|---------|--------|
 | `play-architecture.md` | `launch-readiness/` | Play system architecture | ✅ Current |
 | `sessions-architecture.md` | `launch-readiness/` | Sessions architecture | ✅ Current |
-| `scaling-analysis.md` | `launch-readiness/` | Bottleneck analysis + 90-day plan | ✅ Current |
+| `scaling-analysis.md` | `launch-readiness/audits/` | Bottleneck analysis + 90-day plan | ✅ Historical reference |
 | `incident-playbook.md` | `launch-readiness/` | Incident response procedures | ✅ Current |
 | `enterprise-isolation-architecture.md` | `launch-readiness/` | Enterprise isolation design study | ✅ Current (design-only) |
 | `PROJECT_CONTEXT.md` | Root | Product overview | ✅ Current |
@@ -239,7 +239,7 @@ These files are **never archivable** — they are the living memory of the syste
 | `launch-readiness/launch-snapshot-2026-03.md` | Frozen launch state | Never (frozen) |
 | `launch-readiness/launch-telemetry-pack.md` | Observability signals | Per signal change |
 | `launch-readiness/incident-playbook.md` | Incident response | Per incident |
-| `launch-readiness/scaling-analysis.md` | Bottleneck analysis | Per scaling change |
+| `launch-readiness/audits/scaling-analysis.md` | Bottleneck analysis | Per scaling change |
 | `PROJECT_CONTEXT.md` | Product overview | Per product pivot |
 | `.github/copilot-instructions.md` | Agent onboarding | Per convention change |
 | `planner-architecture.md` | Planner design (root) | Per planner change |

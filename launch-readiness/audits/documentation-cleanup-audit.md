@@ -152,7 +152,7 @@ All files in `launch-readiness/` are canonical and actively maintained:
 | Category | Files | Purpose |
 |----------|-------|---------|
 | Control files | 5 | `launch-control.md`, `launch-readiness-*.md`, `launch-snapshot-2026-03.md` |
-| Domain architecture | 3 | `play-architecture.md`, `sessions-architecture.md`, `scaling-analysis.md` |
+| Domain architecture | 3 | `play-architecture.md`, `sessions-architecture.md`, `audits/scaling-analysis.md` |
 | Incident playbook | 1 | `incident-playbook.md` |
 | Domain audits | 23 | `audits/*.md` — one per audit |
 | Implementation specs | 7 | `implementation/*.md` — remediation plans, DD specs |

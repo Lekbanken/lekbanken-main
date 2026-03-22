@@ -97,7 +97,7 @@ Legend:
 | `components/marketing/` | **SUI** | Marketing header, footer, hero, feature grid, pricing CTA, etc. |
 | `components/auth/` | **SUI** | MFA components (MFAChallenge, MFACodeInput, MFARecoveryInput, TrustDeviceCheckbox) |
 | `components/game/` | **SUI** | Game display components (GameCard, GameDetailsView, etc.) |
-| `components/play/` | **SUI** | 44 shared play UI primitives — ✅ audited 2026-03-16, deliberate shared layer (see `play-structure-audit.md`) |
+| `components/play/` | **SUI** | 44 shared play UI primitives — ✅ audited 2026-03-16, deliberate shared layer (see `docs/play/play-structure-audit.md`) |
 | `components/journey/` | **SUI** | Journey visualization (JourneyScene, JourneyStats, ParticleField) — imported by features/gamification |
 | `components/achievements/` | **SUI** | Badge builder and display |
 | `components/billing/` | **SUI** | Billing/payment UI |

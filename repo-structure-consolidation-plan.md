@@ -239,7 +239,7 @@ Audit completed — this is a **deliberate 4-layer architecture**, not a broken 
 Dependencies flow one direction: `features/play` → `components/play` (6 cross-imports). Zero reverse.
 
 **Action taken:** 3 orphaned files identified for deletion. No structural reorganization needed.
-See: `play-structure-audit.md`, `play-structure-canonical-map.md`, `play-structure-consolidation-plan.md`.
+See: `docs/play/play-structure-audit.md`, `docs/play/play-structure-canonical-map.md`, `docs/play/play-structure-consolidation-plan.md`.
 
 ### 14. Sandbox protection
 
@@ -268,12 +268,12 @@ These areas are **known risk zones** but must NOT be restructured without a dedi
 
 | Area | Why it's a risk | Why to wait |
 |------|----------------|-------------|
-| ~~`features/play/` vs `components/play/`~~ | ✅ **AUDITED 2026-03-16** — deliberate layered architecture | See `play-structure-audit.md`. No reorganization needed. |
+| ~~`features/play/` vs `components/play/`~~ | ✅ **AUDITED 2026-03-16** — deliberate layered architecture | See `docs/play/play-structure-audit.md`. No reorganization needed. |
 | `lib/services/` | Catch-all with 30+ files — unclear domain ownership | Low urgency. Works fine, just messy. Decompose when a specific service needs refactoring. |
 | `app/sandbox/` access policy | 166 files shipping as production routes without auth gate | Must decide between env-var gate, middleware, or build exclusion. Don't delete sandbox — just protect it. |
 | ~~`components/play/` → `features/play/` merge~~ | ✅ **REJECTED** — components/play is correctly shared across marketing, admin, sandbox | Merging would break consumers. Trees stay separate. |
 
-**Rule for agents:** If your task touches `lib/services/`, complete it within the existing structure. For play zones, follow `play-structure-agent-risk.md`.
+**Rule for agents:** If your task touches `lib/services/`, complete it within the existing structure. For play zones, follow `docs/play/play-structure-agent-risk.md`.
 
 ---
 

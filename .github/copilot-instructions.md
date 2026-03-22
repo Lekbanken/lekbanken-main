@@ -96,7 +96,7 @@ Rule: if a component is only used within one `features/{domain}/`, it belongs th
 
 Do not reorganize these areas without a dedicated audit:
 
-- `features/play/` ↔ `components/play/` — ✅ audited 2026-03-16, deliberate layered architecture (see `play-structure-audit.md`). Respect layer boundaries.
+- `features/play/` ↔ `components/play/` — ✅ audited 2026-03-16, deliberate layered architecture (see `docs/play/play-structure-audit.md`). Respect layer boundaries.
 - `lib/services/` — catch-all but functional, decompose only when needed
 - `app/sandbox/` — needs access policy decision, not deletion
 

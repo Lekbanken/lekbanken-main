@@ -146,6 +146,10 @@ Fält:
 | [docs/PLANNER_REFACTOR_IMPLEMENTATION.md](PLANNER_REFACTOR_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-25 | - | Completed refactor plan |
 | [docs/PLANNER_TARGET_ARCHITECTURE.md](PLANNER_TARGET_ARCHITECTURE.md) | B | historical snapshot | 2025-12-30 | - | Target architecture snapshot |
 | [docs/PLANNER_UI_UPGRADE_PLAN.md](PLANNER_UI_UPGRADE_PLAN.md) | B | draft | 2026-01-25 | - | UI upgrade plan |
+| [docs/play/play-structure-agent-risk.md](play/play-structure-agent-risk.md) | C | frozen audit | 2026-03-16 | - | Agent-risk guardrail for play-domain changes |
+| [docs/play/play-structure-audit.md](play/play-structure-audit.md) | C | frozen audit | 2026-03-16 | - | Structural audit guardrail for the play domain |
+| [docs/play/play-structure-canonical-map.md](play/play-structure-canonical-map.md) | C | frozen audit | 2026-03-16 | - | File classification map for play-related surfaces |
+| [docs/play/play-structure-consolidation-plan.md](play/play-structure-consolidation-plan.md) | B | historical snapshot | 2026-03-16 | - | Historical consolidation/action plan for the play structure audit |
 | [docs/play/PLAY_LOBBY_SOT.md](play/PLAY_LOBBY_SOT.md) | C | frozen audit | 2026-01-23 | - | Host lobby source-of-truth snapshot |
 | [docs/profile/README.md](profile/README.md) | A | active | 2026-03-22 | - | Profile cluster entrypoint |
 | [docs/profile/archive/PROFILE_AUDIT_2026-03-05.md](profile/archive/PROFILE_AUDIT_2026-03-05.md) | C | frozen audit | - | Profile | Audit snapshot |

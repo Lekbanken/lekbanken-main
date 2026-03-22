@@ -11,7 +11,7 @@
 > Archived Journey v2 audit snapshot from a superseded design cycle. Use only as historical context for earlier Journey planning.
 
 **Status vid arkivering:** Draft — revision 2 after GPT review  
-**Beroende av:** Journey v1.0 implementation, `journey-activation-implementation-plan.md`
+**Beroende av:** Journey v1.0 implementation, `../journey/journey-activation-implementation-plan.md`
 
 ---
 

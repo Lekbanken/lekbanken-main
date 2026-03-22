@@ -30,7 +30,7 @@ When starting work on this repo, read documents in this exact order:
 |--------|-----------------|------------|
 | Planner | Root `planner-architecture.md` → `planner-audit.md` → `planner-implementation-plan.md` | `docs/PLANNER_DOMAIN.md` |
 | Notifications | Root `app-shell-notifications-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | — |
-| Journey | Root `journey-activation-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | — |
+| Journey | `docs/journey/journey-activation-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | `docs/journey/JOURNEY_DOMAIN.md` |
 | Play | `launch-readiness/audits/play-*.md` | `docs/PLAY_DOMAIN.md` |
 | Games | `docs/GAMES_DOMAIN.md` | `docs/builder/` |
 | Admin | `docs/admin/archive/ADMIN_OVERVIEW_REPORT.md` | `docs/admin/` |

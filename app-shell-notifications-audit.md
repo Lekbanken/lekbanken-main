@@ -77,7 +77,7 @@ These files were the main source of false structural signals in the earlier audi
 
 - **Content:** Simple sticky header with title + eyebrow + rightSlot
 - **Imports:** Exactly 1 — from `features/journey/JourneyPage.tsx`
-- **JourneyPage status:** Per `docs/JOURNEY_DOMAIN.md`, this is a "Legacy placeholder"
+- **JourneyPage status:** Per `docs/journey/JOURNEY_DOMAIN.md`, this is a "Legacy placeholder"
 - **Active alternative:** `PageTitleHeader.tsx` (11 import sites) serves the same purpose with richer API
 - **Risk:** An agent looking for "page header" may choose this over `PageTitleHeader`
 

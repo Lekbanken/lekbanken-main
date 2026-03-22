@@ -48,6 +48,7 @@ Regel:
 - games/: se [games/README.md](games/README.md)
 - gamification/: se [gamification/README.md](gamification/README.md)
 - import/: se [import/README.md](import/README.md)
+- journey/: se [journey/README.md](journey/README.md)
 - legal/: se [legal/README.md](legal/README.md)
 - marketing/: se [marketing/README.md](marketing/README.md)
 - media/: se [media/README.md](media/README.md)

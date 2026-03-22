@@ -20,7 +20,7 @@ Use this index to avoid reading older design or migration summaries as if they w
 
 1. `launch-readiness/launch-control.md` for current program and launch state
 2. `GAMIFICATION_DOMAIN.md`
-3. `docs/JOURNEY_DOMAIN.md` and other canonical repo docs for current product/domain context
+3. `docs/journey/JOURNEY_DOMAIN.md` and other canonical repo docs for current product/domain context
 4. The active files in this folder listed below
 5. Frozen audits and historical snapshots only when you need design history, migration history, or earlier decisions
 

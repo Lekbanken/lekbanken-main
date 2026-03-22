@@ -68,9 +68,9 @@ Journey_v2_Audit.md
 Journey_v2_CHANGELOG.md
 Journey_v2_FinalReview.md
 Journey_v2_ImplementationPlan.md
-journey-activation-architecture.md
-journey-activation-audit.md
-journey-activation-implementation-plan.md
+docs/journey/journey-activation-architecture.md
+docs/journey/journey-activation-audit.md
+docs/journey/journey-activation-implementation-plan.md
 GAMIFICATION_JOURNEY_AUDIT.md
 ```
 

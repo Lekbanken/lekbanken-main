@@ -285,7 +285,11 @@ Fält:
 | [docs/play/TRIGGER_ENGINE_CONTRACT.md](play/TRIGGER_ENGINE_CONTRACT.md) | A | active | 2026-02-09 | - | Trigger engine contract |
 | [docs/PLANNER_DOMAIN.md](PLANNER_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/gamification/GAMIFICATION_DOMAIN.md](gamification/GAMIFICATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/JOURNEY_DOMAIN.md](JOURNEY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/journey/README.md](journey/README.md) | A | active | 2026-03-22 | - | Journey cluster entrypoint |
+| [docs/journey/JOURNEY_DOMAIN.md](journey/JOURNEY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/journey/journey-activation-architecture.md](journey/journey-activation-architecture.md) | A | active | 2026-03-06 | - | Journey activation architecture |
+| [docs/journey/journey-activation-audit.md](journey/journey-activation-audit.md) | C | active audit | 2026-03-06 | - | Journey activation audit |
+| [docs/journey/journey-activation-implementation-plan.md](journey/journey-activation-implementation-plan.md) | B | active | 2026-03-06 | - | Journey activation implementation plan |
 | [docs/import/JSON_IMPORT_FIELD_REFERENCE.md](import/JSON_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-26 | - | Import field reference |
 | [docs/import/JSON_IMPORT_VERIFICATION_CHECKLIST.md](import/JSON_IMPORT_VERIFICATION_CHECKLIST.md) | A | active | 2025-12-26 | - | Verification checklist |
 | [docs/API_INTEGRATION_DOMAIN.md](API_INTEGRATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (API surface + conventions) |

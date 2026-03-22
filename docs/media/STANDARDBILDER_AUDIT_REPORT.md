@@ -28,7 +28,7 @@ These are the **hard guarantees** this system provides:
 | Race-safe | PostgreSQL `23505` → treated as `already_has_cover` |
 | Alt-text for accessibility | Auto-set to `game.name` on insert |
 
-**Where to change selection logic:** [lib/import/assignCoverFromTemplates.ts](../lib/import/assignCoverFromTemplates.ts)
+**Where to change selection logic:** [lib/import/assignCoverFromTemplates.ts](../../lib/import/assignCoverFromTemplates.ts)
 
 ---
 
@@ -410,7 +410,7 @@ Or simply import a batch of games - the UI will show exactly which purposes are 
 5. **Accessibility** - `alt_text` auto-set to game name
 
 **Key Files:**
-- [lib/import/assignCoverFromTemplates.ts](../lib/import/assignCoverFromTemplates.ts) - Core logic
+- [lib/import/assignCoverFromTemplates.ts](../../lib/import/assignCoverFromTemplates.ts) - Core logic
 - [app/api/games/csv-import/route.ts](../app/api/games/csv-import/route.ts) - Integration point
 - [features/admin/games/components/GameImportDialog.tsx](../features/admin/games/components/GameImportDialog.tsx) - UI display
 - [supabase/migrations/20260208000000_game_media_unique_cover.sql](../supabase/migrations/20260208000000_game_media_unique_cover.sql) - DB constraint

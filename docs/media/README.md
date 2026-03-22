@@ -28,6 +28,7 @@ Use this cluster for the current media/storage/media-template domain reference a
 
 - [../archive/MEDIA_DOMAIN_COMPLETE.md](../archive/MEDIA_DOMAIN_COMPLETE.md) — archived completion notes
 - [../archive/MEDIA_DOMAIN_QUICKSTART.md](../archive/MEDIA_DOMAIN_QUICKSTART.md) — archived quickstart guide
+- [STANDARDBILDER_AUDIT_REPORT.md](STANDARDBILDER_AUDIT_REPORT.md) — frozen audit snapshot for the standard-image auto-cover assignment system
 
 ## Placement rule
 

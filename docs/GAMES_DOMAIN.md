@@ -3,7 +3,7 @@
 ## Metadata
 - **Status:** Active
 - **Date:** 2025-12-17
-- **Last updated:** 2026-03-21
+- **Last updated:** 2026-03-22
 - **Source of truth:** Repo code + `supabase/migrations/*` (schema) + `types/supabase.ts` (generated)
 
 > Canonical cluster entrypoint: `docs/games/README.md`
@@ -20,7 +20,7 @@ Non-goals:
 - Tenant lifecycle (Tenant Domain).
 
 ## Related docs
-- CSV contract reference: `docs/CSV_IMPORT_FIELD_REFERENCE.md`
+- CSV contract reference: `docs/import/CSV_IMPORT_FIELD_REFERENCE.md`
 - Billing entitlements and product mapping: `docs/billing/BILLING_LICENSING_DOMAIN.md` + `docs/billing/STRIPE.md`
 - Media junction patterns: `docs/media/MEDIA_DOMAIN.md`
 

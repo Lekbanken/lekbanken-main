@@ -5,7 +5,7 @@
 > **Status:** active
 > **Owner:** -
 > **Date:** 2025-12-18
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-22
 > **Last validated:** -
 > **Source of truth:** Repo code + `supabase/migrations/*` (schema) + `types/supabase.ts` (generated)
 
@@ -25,7 +25,7 @@ Non-goals:
 
 ## Related docs
 - Games model + publishing rules: `docs/GAMES_DOMAIN.md`
-- CSV contract (source-of-truth for fields): `docs/CSV_IMPORT_FIELD_REFERENCE.md`
+- CSV contract (source-of-truth for fields): `docs/import/CSV_IMPORT_FIELD_REFERENCE.md`
 - Builder overview (current admin builder): `docs/admin/ADMIN_GAME_BUILDER_V1.md`
 - Data model governance (migrations/typegen/RLS): `docs/DATA_MODEL_DOMAIN.md`
 
@@ -131,7 +131,7 @@ Important behavior:
 - Update path deletes old related data (`game_steps`, `game_materials`, `game_phases`, `game_roles`, `game_board_config`, `game_secondary_purposes`) before inserting new.
 
 Field contract:
-- Treat `docs/CSV_IMPORT_FIELD_REFERENCE.md` as the canonical contract for columns, formats and examples.
+- Treat `docs/import/CSV_IMPORT_FIELD_REFERENCE.md` as the canonical contract for columns, formats and examples.
 
 ### 3) CSV/JSON export (backup + editing)
 **Goal:** Export games for spreadsheet editing or backups.
@@ -173,6 +173,6 @@ There are **two** admin surfaces related to “content planning” right now:
 - `npm test`
 
 ## Change checklist (when modifying CMD)
-- If you change CSV columns/format: update `docs/CSV_IMPORT_FIELD_REFERENCE.md` and `types/csv-import.ts`.
+- If you change CSV columns/format: update `docs/import/CSV_IMPORT_FIELD_REFERENCE.md` and `types/csv-import.ts`.
 - If you change builder payload/schema: update `docs/admin/ADMIN_GAME_BUILDER_V1.md` and ensure migrations + typegen are in sync.
 - If you wire content planner UI to DB tables: ensure RLS policies allow the intended tenant roles.

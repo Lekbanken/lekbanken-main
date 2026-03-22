@@ -9,10 +9,10 @@
 - Owner: -
 - Status: active
 - Date: 2025-12-26
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2025-12-26
 
-> Canonical builder/import entrypoint: `docs/builder/README.md`
+> Canonical import-doc entrypoint: `docs/import/README.md`
 
 ---
 
@@ -324,3 +324,4 @@ WHERE artifact_type = 'keypad'
 - [JSON_IMPORT_FIELD_REFERENCE.md](JSON_IMPORT_FIELD_REFERENCE.md) - Fältreferens
 - [CSV_IMPORT_FIELD_REFERENCE.md](CSV_IMPORT_FIELD_REFERENCE.md) - CSV-guide
 - [CSV_IMPORT_VERIFICATION_CHECKLIST.md](CSV_IMPORT_VERIFICATION_CHECKLIST.md) - CSV-checklista
+- [MANUAL_VERIFICATION_IMPORT_FIX.md](MANUAL_VERIFICATION_IMPORT_FIX.md) - Triggerrelaterad regressionschecklista

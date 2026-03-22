@@ -148,7 +148,7 @@ Use this order when documents disagree:
 - `docs/admin/ADMIN_NAVIGATION_MASTER.md`
 - `docs/admin/ADMIN_GAME_BUILDER_V1.md`
 - `docs/admin/ADMIN_GAMES_V2_ARCHITECTURE.md`
-- `docs/CSV_IMPORT_FIELD_REFERENCE.md`
+- `docs/import/CSV_IMPORT_FIELD_REFERENCE.md`
 
 ### Demo and evaluation flows
 
@@ -168,11 +168,12 @@ Use this order when documents disagree:
 - `docs/toolkit/README.md`
 - `docs/import/README.md`
 - `docs/builder/README.md`
-- `docs/CSV_IMPORT_FIELD_REFERENCE.md`
+- `docs/import/CSV_IMPORT_FIELD_REFERENCE.md`
 - `docs/import/PHASE_STEP_ARTIFACT_AUDIT_REPORT.md`
-- `docs/JSON_IMPORT_FIELD_REFERENCE.md`
-- `docs/CSV_IMPORT_VERIFICATION_CHECKLIST.md`
-- `docs/JSON_IMPORT_VERIFICATION_CHECKLIST.md`
+- `docs/import/JSON_IMPORT_FIELD_REFERENCE.md`
+- `docs/import/CSV_IMPORT_VERIFICATION_CHECKLIST.md`
+- `docs/import/JSON_IMPORT_VERIFICATION_CHECKLIST.md`
+- `docs/import/MANUAL_VERIFICATION_IMPORT_FIX.md`
 
 ### Release, deploy, and operations
 

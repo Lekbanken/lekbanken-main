@@ -30,8 +30,8 @@ Use this cluster when the task spans structured game authoring, bulk content ope
 - [../builder/README.md](../builder/README.md) — builder-specific audit, contract, and implementation material
 - [../import/README.md](../import/README.md) — import validation and fail-fast audit material
 - [../admin/ADMIN_GAME_BUILDER_V1.md](../admin/ADMIN_GAME_BUILDER_V1.md) — admin builder UI/API reference
-- [../CSV_IMPORT_FIELD_REFERENCE.md](../CSV_IMPORT_FIELD_REFERENCE.md) — canonical CSV field contract
-- [../JSON_IMPORT_FIELD_REFERENCE.md](../JSON_IMPORT_FIELD_REFERENCE.md) — canonical JSON field contract
+- [../import/CSV_IMPORT_FIELD_REFERENCE.md](../import/CSV_IMPORT_FIELD_REFERENCE.md) — canonical CSV field contract
+- [../import/JSON_IMPORT_FIELD_REFERENCE.md](../import/JSON_IMPORT_FIELD_REFERENCE.md) — canonical JSON field contract
 
 ## Placement rule
 

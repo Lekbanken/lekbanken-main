@@ -102,8 +102,8 @@ Fält:
 | [docs/content/README.md](content/README.md) | A | active | 2026-03-22 | - | Content cluster entrypoint |
 | [docs/content/CONTENT_MANAGEMENT_DOMAIN.md](content/CONTENT_MANAGEMENT_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/CONVERSATION_CARDS_SYSTEM_FACIT.md](CONVERSATION_CARDS_SYSTEM_FACIT.md) | A | draft | 2026-01-03 | - | Conversation cards system facit/reference |
-| [docs/CSV_IMPORT_FIELD_REFERENCE.md](CSV_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-17 | - | Contract/reference |
-| [docs/CSV_IMPORT_VERIFICATION_CHECKLIST.md](CSV_IMPORT_VERIFICATION_CHECKLIST.md) | A | active | 2025-12-26 | - | Verification checklist |
+| [docs/import/CSV_IMPORT_FIELD_REFERENCE.md](import/CSV_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-17 | - | Contract/reference |
+| [docs/import/CSV_IMPORT_VERIFICATION_CHECKLIST.md](import/CSV_IMPORT_VERIFICATION_CHECKLIST.md) | A | active | 2025-12-26 | - | Verification checklist |
 | [docs/DATA_MODEL_DOMAIN.md](DATA_MODEL_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/database/README.md](database/README.md) | A | active | 2026-03-21 | - | Sub-index for database environment and security docs |
 | [docs/database/environments.md](database/environments.md) | A | active | 2026-03-16 | - | Canonical database environment rules |
@@ -204,7 +204,7 @@ Fält:
 | ~~docs/HANDOVER_2024-12-07.md~~ | C | archived | 2026-03-15 | - | → `archive/HANDOVER_2024-12-07.md` |
 | [docs/media/README.md](media/README.md) | A | active | 2026-03-22 | - | Media cluster entrypoint |
 | [docs/media/MEDIA_DOMAIN.md](media/MEDIA_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc |
-| [docs/MANUAL_VERIFICATION_IMPORT_FIX.md](MANUAL_VERIFICATION_IMPORT_FIX.md) | B | draft | 2026-02-08 | - | Manual verification guide for import-fix scenarios |
+| [docs/import/MANUAL_VERIFICATION_IMPORT_FIX.md](import/MANUAL_VERIFICATION_IMPORT_FIX.md) | B | draft | 2026-02-08 | - | Manual verification guide for import-fix scenarios |
 | [docs/MIGRATIONS.md](MIGRATIONS.md) | A | active | 2025-12-17 | - | Core reference |
 | [docs/marketing/MARKETING_DOMAIN.md](marketing/MARKETING_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/marketing/README.md](marketing/README.md) | A | active | 2026-03-22 | - | Cluster entrypoint for marketing domain docs |
@@ -280,8 +280,8 @@ Fält:
 | [docs/PLANNER_DOMAIN.md](PLANNER_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/GAMIFICATION_DOMAIN.md](GAMIFICATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/JOURNEY_DOMAIN.md](JOURNEY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/JSON_IMPORT_FIELD_REFERENCE.md](JSON_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-26 | - | Import field reference |
-| [docs/JSON_IMPORT_VERIFICATION_CHECKLIST.md](JSON_IMPORT_VERIFICATION_CHECKLIST.md) | A | active | 2025-12-26 | - | Verification checklist |
+| [docs/import/JSON_IMPORT_FIELD_REFERENCE.md](import/JSON_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-26 | - | Import field reference |
+| [docs/import/JSON_IMPORT_VERIFICATION_CHECKLIST.md](import/JSON_IMPORT_VERIFICATION_CHECKLIST.md) | A | active | 2025-12-26 | - | Verification checklist |
 | [docs/API_INTEGRATION_DOMAIN.md](API_INTEGRATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (API surface + conventions) |
 | [docs/play/PLAY_SESSIONS_UI_SPEC.md](play/PLAY_SESSIONS_UI_SPEC.md) | B | draft | 2025-12-16 | - | Spec |
 | [docs/PERFORMANCE_ADVISOR_PROMPT.md](PERFORMANCE_ADVISOR_PROMPT.md) | E | active | 2026-01-08 | - | Prompt for Supabase Performance Advisor |

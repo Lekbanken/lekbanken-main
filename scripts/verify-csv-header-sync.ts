@@ -3,7 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { CANONICAL_CSV_HEADER } from '../features/admin/games/import-spec';
 
-const DOC_PATH = path.join(process.cwd(), 'docs', 'CSV_IMPORT_FIELD_REFERENCE.md');
+const DOC_PATH = path.join(process.cwd(), 'docs', 'import', 'CSV_IMPORT_FIELD_REFERENCE.md');
 
 const START = '<!-- CANONICAL_CSV_HEADER_START -->';
 const END = '<!-- CANONICAL_CSV_HEADER_END -->';

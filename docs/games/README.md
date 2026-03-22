@@ -5,7 +5,7 @@
 - Owner: -
 - Status: active
 - Date: 2026-03-21
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-21
 
 > Entry point for the games documentation cluster. This folder covers the games domain, GameDetails context work, and related audit snapshots. Builder UI references remain under the admin cluster and are linked here rather than duplicated.
@@ -21,7 +21,7 @@ Use this cluster to understand the games content domain, browse and publish boun
 3. `GAMEDETAILS_CONTEXT_AUDIT.md`
 4. `GAMEDETAILS_CONTEXT_IMPLEMENTATION_PLAN.md`
 5. `../admin/ADMIN_GAME_BUILDER_V1.md`
-6. `../CSV_IMPORT_FIELD_REFERENCE.md`
+6. `../import/CSV_IMPORT_FIELD_REFERENCE.md`
 
 ## Status map
 
@@ -45,7 +45,7 @@ Use this cluster to understand the games content domain, browse and publish boun
 
 - `../admin/README.md` — builder UI and admin-domain references
 - `../admin/ADMIN_GAME_BUILDER_V1.md` — canonical builder UI/API reference under the admin cluster
-- `../CSV_IMPORT_FIELD_REFERENCE.md` — CSV field contract reference
+- `../import/CSV_IMPORT_FIELD_REFERENCE.md` — CSV field contract reference
 - `../GAME_BUILDER_UI_SPEC.md` — builder UI draft/spec material
 - `../TESTPLAN_GAME_BUILDER_P0.md` — builder validation/test plan
 

@@ -10,6 +10,8 @@
 
 > Draft manual verification guide for validating the import-fix behavior across legacy, canonical, and invalid trigger payloads.
 
+> Canonical import-doc entrypoint: `docs/import/README.md`
+
 ## Datum: 2025-01-XX
 ## Verifierad av: Johan L
 

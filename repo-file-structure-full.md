@@ -44,9 +44,10 @@ vitest.config.ts               # Vitest unit test config
 
 #### Notifications domain
 ```
-app-shell-notifications-architecture.md
-app-shell-notifications-audit.md
-app-shell-notifications-implementation-plan.md
+docs/notifications/app-shell-notifications-architecture.md
+docs/notifications/app-shell-notifications-audit.md
+docs/notifications/app-shell-notifications-implementation-plan.md
+docs/notifications/app-shell-notifications-batch2-spec.md
 notifications-architecture.md
 notifications-e2e-audit.md
 notifications-implementation-plan.md

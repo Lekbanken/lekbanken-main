@@ -413,5 +413,5 @@ Om `/admin/notifications` aldrig använts i produktion finns det inga `notificat
 ### Korrekt dokumentation
 
 - `docs/database/environments.md` — Korrekt gällande CLI link target, migration workflow, local-first-princip.
-- `app-shell-notifications-architecture.md` — Korrekt gällande notifikationsarkitektur.
-- `app-shell-notifications-audit.md` — Korrekt gällande komponentkedja.
+- `../notifications/app-shell-notifications-architecture.md` — Korrekt gällande notifikationsarkitektur.
+- `../notifications/app-shell-notifications-audit.md` — Korrekt gällande komponentkedja.

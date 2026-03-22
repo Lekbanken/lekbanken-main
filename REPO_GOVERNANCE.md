@@ -107,7 +107,7 @@ If shared across domains — it goes in `components/`.
 | Domain | Start with |
 |--------|-----------|
 | Planner | `planner-architecture.md` → `planner-audit.md` → `planner-implementation-plan.md` |
-| Notifications | `app-shell-notifications-architecture.md` → `*-audit.md` → `*-implementation-plan.md` |
+| Notifications | `docs/notifications/app-shell-notifications-architecture.md` → `*-audit.md` → `*-implementation-plan.md` |
 | Journey | `docs/journey/journey-activation-architecture.md` → `*-audit.md` → `*-implementation-plan.md` |
 | Play | `launch-readiness/audits/play-*.md` |
 | Games | `docs/GAMES_DOMAIN.md` |

@@ -134,9 +134,10 @@ Use this order when documents disagree:
 
 - `docs/notifications/README.md`
 - `docs/notifications/NOTIFICATIONS_DOMAIN.md`
-- `app-shell-notifications-architecture.md`
-- `app-shell-notifications-audit.md`
-- `app-shell-notifications-implementation-plan.md`
+- `docs/notifications/app-shell-notifications-architecture.md`
+- `docs/notifications/app-shell-notifications-audit.md`
+- `docs/notifications/app-shell-notifications-implementation-plan.md`
+- `docs/notifications/app-shell-notifications-batch2-spec.md`
 
 ### Games, builder, and display context
 

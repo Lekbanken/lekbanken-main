@@ -217,7 +217,7 @@ Legend:
 |------|---------------|-------|
 | `README.md` | **DOC** | Project README — should stay at root |
 | `PROJECT_CONTEXT.md` | **DOC** | Product context for AI agents — should stay at root |
-| Root `*-architecture/audit/implementation-plan.md` | **DOC** | Active AI triplets (planner, app-shell-notifications, journey-activation) |
+| Root `*-architecture/audit/implementation-plan.md` | **DOC** | Active AI triplets that still remain at root (planner only) |
 | Root completed implementation docs (~9 files) | **NC** | Should move to `docs/archive/` |
 | Root analysis/audit docs (~11 files) | **NC** | Should move to `docs/` by domain |
 | `docs/` | **DOC** | Domain reference docs (289 files, 18 subdirs) |

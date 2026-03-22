@@ -223,7 +223,11 @@ Fält:
 | [docs/notion-ai/README.md](notion-ai/README.md) | A | active | 2026-03-21 | - | Notion AI prompt pack usage |
 | [docs/notion-ai/WORKSPACE_ENTRY_PAGE_SOURCE.md](notion-ai/WORKSPACE_ENTRY_PAGE_SOURCE.md) | A | active | 2026-03-21 | - | Source brief for workspace entry page |
 | [docs/notifications/NOTIFICATIONS_DOMAIN.md](notifications/NOTIFICATIONS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/notifications/README.md](notifications/README.md) | A | active | 2026-03-21 | - | Sub-index for notifications domain and app-shell triplet docs |
+| [docs/notifications/README.md](notifications/README.md) | A | active | 2026-03-22 | - | Sub-index for notifications domain and app-shell triplet docs |
+| [docs/notifications/app-shell-notifications-architecture.md](notifications/app-shell-notifications-architecture.md) | A | active | 2026-03-21 | - | App-shell notifications architecture |
+| [docs/notifications/app-shell-notifications-audit.md](notifications/app-shell-notifications-audit.md) | C | active audit | 2026-03-21 | - | App-shell notifications audit |
+| [docs/notifications/app-shell-notifications-batch2-spec.md](notifications/app-shell-notifications-batch2-spec.md) | B | active | 2026-03-21 | - | Scheduled-path consolidation spec |
+| [docs/notifications/app-shell-notifications-implementation-plan.md](notifications/app-shell-notifications-implementation-plan.md) | B | active | 2026-03-21 | - | App-shell notifications implementation plan |
 | [docs/ops/OPERATIONS_DOMAIN.md](ops/OPERATIONS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/ops/alerting.md](ops/alerting.md) | A | active | 2025-12-11 | - | Alerting runbook |
 | [docs/ops/anomaly-detection-playbook.md](ops/anomaly-detection-playbook.md) | A | active | 2026-03-14 | - | Launch anomaly detection and response playbook |

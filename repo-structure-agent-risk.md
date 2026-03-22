@@ -29,7 +29,7 @@ When starting work on this repo, read documents in this exact order:
 | Domain | Canonical source | Then check |
 |--------|-----------------|------------|
 | Planner | Root `planner-architecture.md` → `planner-audit.md` → `planner-implementation-plan.md` | `docs/PLANNER_DOMAIN.md` |
-| Notifications | Root `app-shell-notifications-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | — |
+| Notifications | `docs/notifications/app-shell-notifications-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | `docs/notifications/NOTIFICATIONS_DOMAIN.md` |
 | Journey | `docs/journey/journey-activation-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | `docs/journey/JOURNEY_DOMAIN.md` |
 | Play | `launch-readiness/audits/play-*.md` | `docs/PLAY_DOMAIN.md` |
 | Games | `docs/GAMES_DOMAIN.md` | `docs/builder/` |
@@ -290,8 +290,8 @@ The `play` domain has **118+ components** split across two disconnected trees:
 |--------|-----------|-----------|
 | Planner | Root triplet (`planner-architecture/audit/implementation-plan.md`) | `docs/PLANNER_DOMAIN.md` |
 | Play | `launch-readiness/audits/play-*.md` | Root `PLAY_SYSTEM_DOCUMENTATION.md` |
-| Notifications | Root `app-shell-notifications-*.md` (newer triplet) | — |
-| Journey | Root `journey-activation-*.md` | — |
+| Notifications | `docs/notifications/app-shell-notifications-*.md` | `docs/notifications/NOTIFICATIONS_DOMAIN.md` |
+| Journey | `docs/journey/journey-activation-*.md` | `docs/journey/JOURNEY_DOMAIN.md` |
 | Games | `docs/GAMES_DOMAIN.md` | `docs/builder/` |
 | Any security question | `launch-readiness/audits/` | — |
 | System overview | `PROJECT_CONTEXT.md` → `launch-readiness/launch-control.md` | — |
@@ -305,7 +305,7 @@ The `play` domain has **118+ components** split across two disconnected trees:
 | `LIBRARY_MASTER_IMPLEMENTATION.md` | Looks like active work | **COMPLETED** — historical |
 | `MEDIA_DOMAIN_COMPLETE.md` | Looks like "complete" status | **COMPLETED** — the word "complete" is in the title |
 | `PROJECT_COMPLETION_SUMMARY.md` | Looks like project is done | Summary of a completed phase, not the whole project |
-| `notifications-architecture.md` vs `app-shell-notifications-architecture.md` | Two arch docs for same domain | The `app-shell-notifications-*` set is **newer and canonical** |
+| `notifications-architecture.md` vs `docs/notifications/app-shell-notifications-architecture.md` | Two arch docs for same domain | The `app-shell-notifications-*` set in `docs/notifications/` is **newer and canonical** |
 | `docs/PLANNER_TARGET_ARCHITECTURE.md` | Looks like the architecture doc | Root `planner-architecture.md` is canonical per copilot-instructions.md |
 
 ---
@@ -416,4 +416,4 @@ Sandbox-related code also exists in:
 2. **Reading completed root `.md` as active work** — 9+ completed implementation docs still at root
 3. **Using any `scripts/` migration script** — all 14 are legacy, none are canonical
 4. **Importing from orphaned duplicates** — `components/legal/CookieConsentBanner`, `app/(marketing)/components/marketing-header`, `features/browse/components/GameCard`
-5. **Reading old notification triplet** — `notifications-*.md` vs `app-shell-notifications-*.md` — the latter is canonical
+5. **Reading old notification triplet** — `notifications-*.md` vs `docs/notifications/app-shell-notifications-*.md` — the latter is canonical

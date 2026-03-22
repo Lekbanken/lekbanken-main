@@ -34,7 +34,7 @@ Produktions-URL:er finns **utkommenterade** ovanför:
 
 ### 1.2 `.env.local.example` — Mall bekräftar lokal-first-design
 
-**Källa:** [.env.local.example](.env.local.example)  
+**Källa:** [../../.env.local.example](../../.env.local.example)  
 **Observation:** Mallen anger `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321` som default, med produktionsvärden som kommentarer märkta "For PRODUCTION (Vercel sets these per scope)".  
 **Bevisar:** Repot är designat för att lokal `.env.local` alltid pekar lokalt.
 
@@ -72,7 +72,7 @@ Local          | Remote         | Time (UTC)
 
 ### 1.6 `scripts/db-push-guard.mjs` — Guardrail mot oavsiktlig push
 
-**Källa:** [scripts/db-push-guard.mjs](scripts/db-push-guard.mjs)  
+**Källa:** [../../scripts/db-push-guard.mjs](../../scripts/db-push-guard.mjs)  
 **Observation:** Scriptet:
 1. Läser `supabase/.temp/project-ref`
 2. Jämför med hårdkodad `PRODUCTION_REF = "qohhnufxididbmzqnjwg"`
@@ -103,7 +103,7 @@ Run supabase link --project-ref vmpdejhgpsrfulimsoqn to setup IPv4 connection.
 
 ### 1.9 `vercel.json` — Ingen Supabase-config
 
-**Källa:** [vercel.json](vercel.json)  
+**Källa:** [../../vercel.json](../../vercel.json)  
 **Observation:** Har bara en cron-definition: `"/api/participants/tokens/cleanup"` kl 04:00 dagligen.  
 **Bevisar:** `vercel.json` innehåller ingen env-var-konfiguration. Alla miljövariabler sätts via Vercel Dashboard.
 
@@ -127,7 +127,7 @@ Run supabase link --project-ref vmpdejhgpsrfulimsoqn to setup IPv4 connection.
 
 ### 1.12 Dokumentation säger sandbox-scope = Vercel Preview
 
-**Källa:** [launch-readiness/sandbox-implementation-brief.md](launch-readiness/sandbox-implementation-brief.md), [launch-readiness/launch-control.md](launch-readiness/launch-control.md)  
+**Källa:** [../../launch-readiness/sandbox-implementation-brief.md](../../launch-readiness/sandbox-implementation-brief.md), [../../launch-readiness/launch-control.md](../../launch-readiness/launch-control.md)  
 **Observation:** Preview-scoped env vars i Vercel Dashboard pekar mot sandbox:
 ```
 NEXT_PUBLIC_SUPABASE_URL = https://vmpdejhgpsrfulimsoqn.supabase.co  (Preview scope)
@@ -140,7 +140,7 @@ Verifierat via `/api/health` på preview-deploy (2026-03-14):
 
 ### 1.13 Hårdkodad fallback i kod
 
-**Källa:** [lib/auth/ephemeral-users.ts](lib/auth/ephemeral-users.ts) rad 23  
+**Källa:** [../../lib/auth/ephemeral-users.ts](../../lib/auth/ephemeral-users.ts) rad 23  
 **Observation:**
 ```ts
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qohhnufxididbmzqnjwg.supabase.co';

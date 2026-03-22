@@ -6,7 +6,7 @@
 -- on notification_deliveries never fire — the hook falls back to 30 s
 -- polling in every environment.
 --
--- See: environment-database-audit.md §1.14, §4.1
+-- See: docs/database/environment-database-audit.md §1.14, §4.1
 
 DO $$
 BEGIN

@@ -107,6 +107,7 @@ Fält:
 | [docs/DATA_MODEL_DOMAIN.md](DATA_MODEL_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/database/README.md](database/README.md) | A | active | 2026-03-21 | - | Sub-index for database environment and security docs |
 | [docs/database/environments.md](database/environments.md) | A | active | 2026-03-16 | - | Canonical database environment rules |
+| [docs/database/environment-database-audit.md](database/environment-database-audit.md) | C | frozen audit | 2026-03-19 | - | Environment and database state audit snapshot |
 | [docs/database/migration-history.md](database/migration-history.md) | A | active | 2026-03-16 | - | Migration history normalization log |
 | [docs/database/rls-audit-2025-03-17.md](database/rls-audit-2025-03-17.md) | C | frozen audit | 2026-03-17 | - | RLS security audit snapshot |
 | [docs/DATABASE_SECURITY_DOMAIN.md](DATABASE_SECURITY_DOMAIN.md) | A | active | 2026-01-08 | - | Security domain doc (Enterprise) |

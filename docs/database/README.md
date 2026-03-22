@@ -5,7 +5,7 @@
 - Owner: -
 - Status: active
 - Date: 2026-03-21
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-21
 
 > Entry point for database environment, migration-history, and RLS-audit documentation. Use this folder to separate current operational rules from dated audit snapshots.
@@ -38,7 +38,7 @@ Use it to answer:
 ### Frozen audits
 
 - `rls-audit-2025-03-17.md` — dated RLS security audit snapshot for the 2026-03-17 fix batch
-- `../../environment-database-audit.md` — broader frozen audit snapshot spanning local, sandbox, and production environment state
+- `environment-database-audit.md` — broader frozen audit snapshot spanning local, sandbox, and production environment state
 
 ## Working rule
 

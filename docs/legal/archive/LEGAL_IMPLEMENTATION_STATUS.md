@@ -126,7 +126,7 @@ Phase 4 (GDPR user rights, enterprise documents) is now complete.
 - DPA template: `docs/legal/DPA_TEMPLATE.md` (GDPR Art. 28 compliant).
 - SLA document: `docs/legal/SLA.md` (uptime, support, backup guarantees).
 - Subprocessors page: `/legal/subprocessors` (public page).
-- Svenska Kyrkan onboarding: `docs/SVENSKA_KYRKAN_ONBOARDING.md`.
+- Svenska Kyrkan onboarding: `docs/legal/SVENSKA_KYRKAN_ONBOARDING.md`.
 
 ## Not Implemented / Remaining
 ### Phase 2 follow-ups
@@ -171,5 +171,5 @@ Phase 4 (GDPR user rights, enterprise documents) is now complete.
 
 ## Notes
 - This summary covers only the legal system scope.
-- Svenska Kyrkan onboarding package: `docs/SVENSKA_KYRKAN_ONBOARDING.md`
-- Compliance audit: `docs/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md`
+- Svenska Kyrkan onboarding package: `docs/legal/SVENSKA_KYRKAN_ONBOARDING.md`
+- Compliance audit: `docs/legal/archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md`

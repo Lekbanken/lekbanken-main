@@ -5,7 +5,7 @@
 - Owner: -
 - Status: draft
 - Date: 2026-01-13
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: -
 
 > Draft onboarding guide for Svenska Kyrkan stakeholders covering due diligence, setup, and operational expectations.

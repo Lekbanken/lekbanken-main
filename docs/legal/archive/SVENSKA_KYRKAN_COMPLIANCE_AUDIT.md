@@ -5,7 +5,7 @@
 - Owner: -
 - Status: frozen audit
 - Date: 2026-01-13
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: -
 
 > Frozen audit snapshot of enterprise compliance readiness and gap analysis for Svenska Kyrkan.
@@ -49,7 +49,7 @@ GDPR-kritiska funktioner har implementerats och juridiska dokument är tillgäng
 | DPA Template | `docs/legal/DPA_TEMPLATE.md` | ✅ |
 | SLA Document | `docs/legal/SLA.md` | ✅ |
 | Subprocessors Page | `app/legal/subprocessors/page.tsx` | ✅ |
-| Onboarding Guide | `docs/SVENSKA_KYRKAN_ONBOARDING.md` | ✅ |
+| Onboarding Guide | `docs/legal/SVENSKA_KYRKAN_ONBOARDING.md` | ✅ |
 
 ---
 
@@ -460,7 +460,7 @@ Sannolik │            │               │            │
    - `app/legal/subprocessors/page.tsx`
 
 2. **Svenska Kyrkan Package**
-   - `docs/SVENSKA_KYRKAN_ONBOARDING.md`
+   - `docs/legal/SVENSKA_KYRKAN_ONBOARDING.md`
    - `docs/SVENSKA_KYRKAN_FAQ.md`
    - `docs/SVENSKA_KYRKAN_DUE_DILIGENCE.md`
 

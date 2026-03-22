@@ -168,8 +168,8 @@ Fält:
 | [docs/DOCS_INDEX.md](DOCS_INDEX.md) | A | active | 2026-03-22 | - | Lightweight entry map, not a classified registry |
 | [docs/INVENTORY.md](INVENTORY.md) | A | active | 2026-03-22 | - | Sole authoritative docs registry |
 | [docs/DOCS_NAMING_CONVENTIONS.md](DOCS_NAMING_CONVENTIONS.md) | A | active | 2026-03-22 | - | Naming, placement, and cluster-first structure conventions |
-| [docs/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md](SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md) | C | frozen audit | - | Compliance | Enterprise compliance audit |
-| [docs/SVENSKA_KYRKAN_ONBOARDING.md](SVENSKA_KYRKAN_ONBOARDING.md) | B | draft | 2026-01-13 | - | Onboarding guide |
+| [docs/legal/archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md](legal/archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md) | C | frozen audit | - | Compliance | Enterprise compliance audit |
+| [docs/legal/SVENSKA_KYRKAN_ONBOARDING.md](legal/SVENSKA_KYRKAN_ONBOARDING.md) | B | draft | 2026-01-13 | - | Onboarding guide |
 | [docs/DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md) | C | draft | 2025-12-08 | - | Learnings |
 | [docs/DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md) | D | draft | 2025-12-08 | - | Backlog |
 | [docs/DOMAIN_PLANNER_TODO.md](DOMAIN_PLANNER_TODO.md) | D | draft | 2025-12-08 | - | Backlog |

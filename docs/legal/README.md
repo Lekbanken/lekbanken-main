@@ -18,17 +18,21 @@ Use this cluster for legal/public-policy documents, enterprise contract template
 
 1. [DPA_TEMPLATE.md](DPA_TEMPLATE.md)
 2. [SLA.md](SLA.md)
-3. [archive/LEGAL_IMPLEMENTATION_STATUS.md](archive/LEGAL_IMPLEMENTATION_STATUS.md) when historical rollout context is needed
-4. [archive/COOKIE_CONSENT_CURRENT_STATE.md](archive/COOKIE_CONSENT_CURRENT_STATE.md) when cookie-consent gap analysis is needed
+3. [SVENSKA_KYRKAN_ONBOARDING.md](SVENSKA_KYRKAN_ONBOARDING.md) when enterprise onboarding/compliance due diligence is needed
+4. [archive/LEGAL_IMPLEMENTATION_STATUS.md](archive/LEGAL_IMPLEMENTATION_STATUS.md) when historical rollout context is needed
+5. [archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md](archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md) when detailed enterprise readiness context is needed
+6. [archive/COOKIE_CONSENT_CURRENT_STATE.md](archive/COOKIE_CONSENT_CURRENT_STATE.md) when cookie-consent gap analysis is needed
 
 ## Active docs
 
 - [DPA_TEMPLATE.md](DPA_TEMPLATE.md) — enterprise DPA template
 - [SLA.md](SLA.md) — service level agreement draft
+- [SVENSKA_KYRKAN_ONBOARDING.md](SVENSKA_KYRKAN_ONBOARDING.md) — draft onboarding guide for Svenska Kyrkan stakeholders and due diligence
 
 ## Historical docs
 
 - [archive/LEGAL_IMPLEMENTATION_STATUS.md](archive/LEGAL_IMPLEMENTATION_STATUS.md) — historical legal/GDPR implementation status snapshot
+- [archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md](archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md) — frozen enterprise compliance audit snapshot for Svenska Kyrkan
 - [archive/COOKIE_CONSENT_CURRENT_STATE.md](archive/COOKIE_CONSENT_CURRENT_STATE.md) — cookie consent current-state and gap analysis snapshot
 
 ## Related docs

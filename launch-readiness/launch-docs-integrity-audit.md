@@ -155,8 +155,8 @@ These 30 root-level files have been confirmed as safe to archive by both `docume
 | `STRIPE.md` | May contain active integration notes |
 | `I18N_GUIDE.md` | May be referenced by developers |
 | `I18N_MIGRATION_PLAN.md` | May be active migration plan |
-| `SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md` | Business-critical — verify if still needed for kyrkan partnership |
-| `SVENSKA_KYRKAN_ONBOARDING.md` | Same |
+| `legal/archive/SVENSKA_KYRKAN_COMPLIANCE_AUDIT.md` | Business-critical — verify if still needed for kyrkan partnership |
+| `legal/SVENSKA_KYRKAN_ONBOARDING.md` | Same |
 | Various `*_DOMAIN.md` files (15+) | Domain docs — some may still be active architecture references |
 
 ---

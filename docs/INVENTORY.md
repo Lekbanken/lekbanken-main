@@ -276,8 +276,8 @@ Fält:
 | [docs/TENANT_MEMBERSHIP_CONSOLIDATION.md](TENANT_MEMBERSHIP_CONSOLIDATION.md) | C | historical snapshot | 2026-01-03 | - | Tenant-membership naming consolidation snapshot |
 | [docs/TENANT_DOMAIN.md](TENANT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/TESTPLAN_GAME_BUILDER_P0.md](TESTPLAN_GAME_BUILDER_P0.md) | B | draft | 2025-12-17 | - | Testplan |
-| [docs/PLAY_DOMAIN.md](PLAY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/play/README.md](play/README.md) | A | active | 2026-03-21 | - | Sub-index for play contracts, audits, and reference docs |
+| [docs/play/PLAY_DOMAIN.md](play/PLAY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/play/README.md](play/README.md) | A | active | 2026-03-22 | - | Sub-index for play contracts, audits, and reference docs |
 | [docs/play/PARTICIPANT_PLAY_AUDIT.md](play/PARTICIPANT_PLAY_AUDIT.md) | C | active audit | 2026-03-21 | - | Participant play audit |
 | [docs/play/PARTICIPANT_PLAY_UI_LAWS.md](play/PARTICIPANT_PLAY_UI_LAWS.md) | A | active | 2026-02-22 | - | Participant play UI contract laws |
 | [docs/play/PLAY_IMPLEMENTATION_GUIDE_P0.md](play/PLAY_IMPLEMENTATION_GUIDE_P0.md) | B | historical snapshot | 2026-01-18 | - | P0 implementation guide snapshot |

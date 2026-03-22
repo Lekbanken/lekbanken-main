@@ -17,7 +17,7 @@ This cluster covers anonymous participant identity, participant sessions, join a
 ## Read order
 
 1. [PARTICIPANTS_DOMAIN.md](PARTICIPANTS_DOMAIN.md)
-2. [../PLAY_DOMAIN.md](../PLAY_DOMAIN.md) for the play runtime that consumes participants tables and APIs
+2. [../play/PLAY_DOMAIN.md](../play/PLAY_DOMAIN.md) for the play runtime that consumes participants tables and APIs
 3. [PARTICIPANTS_DOMAIN_ARCHITECTURE.md](PARTICIPANTS_DOMAIN_ARCHITECTURE.md) only for historical design context
 4. [PARTICIPANTS_DOMAIN_MVP.md](PARTICIPANTS_DOMAIN_MVP.md) and [PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md](PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md) only for historical context
 
@@ -33,7 +33,7 @@ This cluster covers anonymous participant identity, participant sessions, join a
 
 ## Related docs
 
-- [../PLAY_DOMAIN.md](../PLAY_DOMAIN.md) — canonical play runtime and host/participant flow reference
+- [../play/PLAY_DOMAIN.md](../play/PLAY_DOMAIN.md) — canonical play runtime and host/participant flow reference
 - [../games/GAMES_DOMAIN.md](../games/GAMES_DOMAIN.md) — game content model referenced by play sessions
 
 ## Placement rule

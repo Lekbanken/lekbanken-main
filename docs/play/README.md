@@ -6,7 +6,7 @@
 - Status: active
 - Date: 2026-03-21
 - Last updated: 2026-03-22
-- Last validated: 2026-03-21
+- Last validated: 2026-03-22
 
 > Entry point for the play documentation cluster. This folder mixes active play references, contracts, and dated audit snapshots that must be read together with the cluster-local play structure guardrails.
 
@@ -19,16 +19,18 @@ The play structure audits in this folder remain the guardrails for large-scale r
 ## Read order
 
 1. `play-structure-audit.md`
-2. `PLAY_SYSTEM_DOCUMENTATION.md`
-3. `PLAY_UI_CONTRACT.md`
-4. `TRIGGER_ENGINE_CONTRACT.md`
-5. The active audits in this folder for specific participant/play-mode questions
-6. Older wiring snapshots only when you need audit history
+2. `PLAY_DOMAIN.md`
+3. `PLAY_SYSTEM_DOCUMENTATION.md`
+4. `PLAY_UI_CONTRACT.md`
+5. `TRIGGER_ENGINE_CONTRACT.md`
+6. The active audits in this folder for specific participant/play-mode questions
+7. Older wiring snapshots only when you need audit history
 
 ## Status map
 
 ### Active references
 
+- `PLAY_DOMAIN.md` — canonical play runtime and host/participant flow reference
 - `PLAY_SYSTEM_DOCUMENTATION.md` — broad play-system reference and workstream log
 - `PLAY_UI_CONTRACT.md` — canonical surface/layout contract for play UIs
 - `TRIGGER_ENGINE_CONTRACT.md` — canonical trigger-engine contract

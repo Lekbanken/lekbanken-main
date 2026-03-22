@@ -26,7 +26,7 @@ Non-goals:
 
 ## Related docs
 - Games content model: `docs/games/GAMES_DOMAIN.md`
-- Play runtime vs plan playback: `docs/PLAY_DOMAIN.md`
+- Play runtime vs plan playback: `docs/play/PLAY_DOMAIN.md`
 - Tenancy model: `docs/TENANT_DOMAIN.md`
 
 ## Related code (repo-anchored)

@@ -21,7 +21,7 @@ Journey is NOT a new source of truth:
 
 Non-goals (currently owned elsewhere):
 - Coins/streaks/levels/achievements as data models (see `docs/gamification/GAMIFICATION_DOMAIN.md`)
-- Live sessions runtime (see `docs/PLAY_DOMAIN.md`)
+- Live sessions runtime (see `docs/play/PLAY_DOMAIN.md`)
 - Planner authoring and plan data model (see `docs/PLANNER_DOMAIN.md`)
 
 ## Current implementation status (as-is in repo)

@@ -84,7 +84,7 @@ Rekommenderad spegling i repo:
 	- Roadmap: [DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md)
 	- Learnings: [DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md)
 - Content Management (aktuellt): [content/CONTENT_MANAGEMENT_DOMAIN.md](content/CONTENT_MANAGEMENT_DOMAIN.md)
-- Play (aktuellt): [PLAY_DOMAIN.md](PLAY_DOMAIN.md)
+- Play (aktuellt): [play/PLAY_DOMAIN.md](play/PLAY_DOMAIN.md)
 - Planner (aktuellt): [PLANNER_DOMAIN.md](PLANNER_DOMAIN.md)
 - Gamification (aktuellt): [gamification/GAMIFICATION_DOMAIN.md](gamification/GAMIFICATION_DOMAIN.md)
 - Journey (aktuellt): [journey/JOURNEY_DOMAIN.md](journey/JOURNEY_DOMAIN.md)

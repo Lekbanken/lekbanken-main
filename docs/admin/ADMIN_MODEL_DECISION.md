@@ -359,8 +359,8 @@ CREATE POLICY achievement_awards_tenant_admin_select
 
 | Document | Purpose |
 |----------|---------|
-| `docs/ARCH_REALITY_CHECK_ADMIN_TENANT.md` | Detailed proxy vs layout analysis |
-| `docs/ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md` | Initial validation report |
+| `docs/admin/archive/ARCH_REALITY_CHECK_ADMIN_TENANT.md` | Detailed proxy vs layout analysis |
+| `docs/admin/archive/ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md` | Initial validation report |
 | `docs/admin/ADMIN_IA_PROPOSAL.md` | Original IA design intent |
 | `docs/admin/appshell.md` | AppShell architecture docs |
 | `docs/admin/archive/ADMIN_AUTH_AUDIT.md` | API auth patterns |

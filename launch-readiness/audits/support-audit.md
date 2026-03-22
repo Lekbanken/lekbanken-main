@@ -119,7 +119,7 @@ USING (
 
 **Description:** This file uses the browser Supabase client to perform direct `.insert()`, `.update()`, `.delete()` operations (create tickets, update status, assign, add messages) without any server-side validation. **Verified: zero imports exist** — all app pages use server actions instead, making this dead code.
 
-The file was identified in Phase 0 analysis (`docs/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md`) but never removed.
+The file was identified in Phase 0 analysis (`docs/admin/archive/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md`) but never removed.
 
 **Risk:** Dead code that could be accidentally imported, bypassing server-side validation and audit trails. Not P1 because RLS still applies and no active callers exist.
 
@@ -316,5 +316,5 @@ USING (
 - `messages/sv.json` — Support translation keys verified
 
 ### Cross-reference
-- `docs/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md` — Phase 0 support analysis
+- `docs/admin/archive/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md` — Phase 0 support analysis
 - `launch-readiness/audits/abuse-privacy-audit.md` — LEAK-001, PRIV-001/003, SEC-002a

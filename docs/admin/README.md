@@ -5,7 +5,7 @@
 - Owner: -
 - Status: active
 - Date: 2025-12-17
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: -
 
 > Entry point for the admin documentation cluster. This area mixes active admin references, redesign plans, draft IA material, and older audit/report snapshots.
@@ -43,6 +43,12 @@ Use this index to distinguish current admin design references from older audits 
 
 - `archive/ADMIN_PRODUCTS_CONTENT_IA.md` — completed IA refactor snapshot for products/content regrouping
 - `archive/ADMIN_GAMIFICATION_HUB_IA.md` — completed IA refactor snapshot for the gamification hub regrouping
+- `archive/ARCH_REALITY_CHECK_ADMIN_TENANT.md` — frozen admin-vs-tenant access-control reality check
+- `archive/ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md` — frozen validation snapshot for admin and tenant separation
+- `archive/ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md` — historical Phase 0 learning-admin analysis
+- `archive/ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md` — historical Phase 0 shop-rewards admin analysis
+- `archive/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md` — historical Phase 0 support/tickets admin analysis
+- `archive/ARCH_ANALYSIS_TRANSLATION_PHASE0.md` — historical Phase 0 translation/i18n admin analysis
 
 ### Narrow test plans
 
@@ -84,6 +90,12 @@ Use this index to distinguish current admin design references from older audits 
 - `ADMIN_PLANNER_MASTER_IMPLEMENTATION.md`
 - `archive/ADMIN_PRODUCTS_CONTENT_IA.md`
 - `archive/ADMIN_GAMIFICATION_HUB_IA.md`
+- `archive/ARCH_REALITY_CHECK_ADMIN_TENANT.md`
+- `archive/ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md`
+- `archive/ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md`
+- `archive/ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md`
+- `archive/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md`
+- `archive/ARCH_ANALYSIS_TRANSLATION_PHASE0.md`
 - `test-plans/ADMIN_USERS_TEST_PLAN.md`
 - `test-plans/ADMIN_PRODUCTS_TEST_PLAN.md`
 - `test-plans/ADMIN_ORGANISATIONS_TEST_PLAN.md`

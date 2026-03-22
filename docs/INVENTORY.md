@@ -361,12 +361,12 @@ Fält:
 | [docs/play/archive/ARTIFACTS_V2_IMPLEMENTATION.md](play/archive/ARTIFACTS_V2_IMPLEMENTATION.md) | C | historical snapshot | - | Play | Completed implementation record |
 | [docs/play/ARTIFACT_COMPONENTS.md](play/ARTIFACT_COMPONENTS.md) | B | draft | - | Play | UI layout spec/backlog |
 | [docs/play/ARTIFACT_MATRIX.md](play/ARTIFACT_MATRIX.md) | B | draft | - | Play | Coverage matrix/spec |
-| [docs/ARCH_REALITY_CHECK_ADMIN_TENANT.md](ARCH_REALITY_CHECK_ADMIN_TENANT.md) | C | frozen audit | 2026-01-10 | - | Admin versus tenant access-control reality check |
-| [docs/ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md](ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md) | C | historical snapshot | 2026-01-10 | - | Phase 0 analysis for learning admin architecture |
-| [docs/ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md](ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md) | C | historical snapshot | 2026-01-10 | - | Phase 0 analysis for shop rewards admin architecture |
-| [docs/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md](ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md) | C | historical snapshot | 2026-01-11 | - | Phase 0 analysis for support and tickets admin architecture |
-| [docs/ARCH_ANALYSIS_TRANSLATION_PHASE0.md](ARCH_ANALYSIS_TRANSLATION_PHASE0.md) | C | historical snapshot | 2026-01-11 | - | Phase 0 analysis for translation and i18n admin architecture |
-| [docs/ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md](ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md) | C | frozen audit | 2026-01-10 | - | Phase 2 validation for admin and tenant separation |
+| [docs/admin/archive/ARCH_REALITY_CHECK_ADMIN_TENANT.md](admin/archive/ARCH_REALITY_CHECK_ADMIN_TENANT.md) | C | frozen audit | 2026-01-10 | - | Admin versus tenant access-control reality check |
+| [docs/admin/archive/ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md](admin/archive/ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md) | C | historical snapshot | 2026-01-10 | - | Phase 0 analysis for learning admin architecture |
+| [docs/admin/archive/ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md](admin/archive/ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md) | C | historical snapshot | 2026-01-10 | - | Phase 0 analysis for shop rewards admin architecture |
+| [docs/admin/archive/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md](admin/archive/ARCH_ANALYSIS_SUPPORT_TICKETS_PHASE0.md) | C | historical snapshot | 2026-01-11 | - | Phase 0 analysis for support and tickets admin architecture |
+| [docs/admin/archive/ARCH_ANALYSIS_TRANSLATION_PHASE0.md](admin/archive/ARCH_ANALYSIS_TRANSLATION_PHASE0.md) | C | historical snapshot | 2026-01-11 | - | Phase 0 analysis for translation and i18n admin architecture |
+| [docs/admin/archive/ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md](admin/archive/ARCH_VALIDATION_ADMIN_TENANT_PHASE2.md) | C | frozen audit | 2026-01-10 | - | Phase 2 validation for admin and tenant separation |
 | [docs/archive/ARCHIVE_MANIFEST.md](archive/ARCHIVE_MANIFEST.md) | A | active | 2026-03-15 | - | Provenance manifest for archived files |
 | [docs/archive/ARTIFACT_UI_IMPLEMENTATION_BRIEF.md](archive/ARTIFACT_UI_IMPLEMENTATION_BRIEF.md) | B | archived | 2026-02-27 | - | Archived artifact UI execution brief |
 | [docs/archive/ATLAS_EVOLUTION_IMPLEMENTATION.md](archive/ATLAS_EVOLUTION_IMPLEMENTATION.md) | B | archived | 2026-01-26 | - | Archived Atlas evolution implementation notes |

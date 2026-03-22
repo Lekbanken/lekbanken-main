@@ -5,15 +5,15 @@
 - Owner: -
 - Status: archived
 - Date: 2026-02-27
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: -
 
 > Archived execution brief for an earlier artifact UI implementation pass. Keep as historical implementation context, not as an active UI contract.
 
 Claude's contract. One file, one truth.
-Read this FIRST. Reference `ARTIFACT_COMPONENTS.md` for detailed props/specs.
-Reference `ARTIFACT_MATRIX.md` for coverage verification.
-Reference `ARTIFACT_UI_CONTRACT.md` for data model and state machine.
+Read this FIRST. Reference `../play/ARTIFACT_COMPONENTS.md` for detailed props/specs.
+Reference `../play/ARTIFACT_MATRIX.md` for coverage verification.
+Reference `../play/ARTIFACT_UI_CONTRACT.md` for data model and state machine.
 
 **Version:** 1.0
 **Datum:** 2026-02-23
@@ -36,7 +36,7 @@ Dessa regler är absoluta. Bryt mot en enda = revert.
 
 | # | Regel |
 |---|---|
-| **N1** | Alla artifact actions i `ARTIFACT_MATRIX.md` måste ha en UI-path. Varje ✅ och 🔲 som byggs ska spåras tillbaka till matrisen. |
+| **N1** | Alla artifact actions i `../play/ARTIFACT_MATRIX.md` måste ha en UI-path. Varje ✅ och 🔲 som byggs ska spåras tillbaka till matrisen. |
 | **N2** | UI får ALDRIG kräva state som servern inte levererar. Participant ser ALDRIG `locked` — servern styr vad som skickas. 3-state-modellen gäller: **Highlighted → Available → Used**. Participant-label "Ny" är en *presentations-label* för highlighted-state, inte ett eget tillstånd. Director-label "Highlighted" är den explicita action/state-termen. |
 | **N3** | `visibleFromStart` + lazy auto-reveal måste fungera. Artefakter med `metadata.visibleFromStart === true` auto-reveals via API:t — UI ska visa dem som `revealed` utan manuell director-aktion. |
 | **N4** | Director och Participant får **konsekvent truth** om revealed/hidden. Samma `session_artifact_variant_state`-tabell, samma broadcast-events, samma seq-guard. |
@@ -313,7 +313,7 @@ Artefakter med `metadata.visibleFromStart === true`:
 - Exportera alla nya komponenter via `features/play/components/index.ts`
 - Använd befintliga i18n-nycklar — lägg till nya i `sv.json`, `en.json`, `no.json`
 - Testa med `visibleFromStart` artifacts
-- Verifiera mot `ARTIFACT_MATRIX.md` att varje typ har korrekt UI-path
+- Verifiera mot `../play/ARTIFACT_MATRIX.md` att varje typ har korrekt UI-path
 
 ### DON'T 🚫
 
@@ -424,12 +424,12 @@ features/play/components/
 
 | Dokument | Syfte | Läs när |
 |---|---|---|
-| `ARTIFACT_UI_CONTRACT.md` | Datamodell, states, actions, visibility, broadcast | Du behöver veta vad en artefakt ÄR |
-| `ARTIFACT_MATRIX.md` | Coverage-tabell (22 typer × 7 dimensioner) | Du vill verifiera att inget saknas |
-| `ARTIFACT_COMPONENTS.md` | Detaljerade props, layout-wireframes, alla befintliga | Du behöver prop-specifikationer |
+| `../play/ARTIFACT_UI_CONTRACT.md` | Datamodell, states, actions, visibility, broadcast | Du behöver veta vad en artefakt ÄR |
+| `../play/ARTIFACT_MATRIX.md` | Coverage-tabell (22 typer × 7 dimensioner) | Du vill verifiera att inget saknas |
+| `../play/ARTIFACT_COMPONENTS.md` | Detaljerade props, layout-wireframes, alla befintliga | Du behöver prop-specifikationer |
 | `PLAY_UI_CONTRACT.md` | Layout-ägande, drawer-chrome, realtime-regler | Före varje ny komponent |
 | `PARTICIPANT_PLAY_UI_LAWS.md` | Participant immutable layout-kontrakt | Före varje ändring i participant-vy |
 
 ---
 
-*Denna brief är Claude's kontrakt. Följ den. Konsultera referensdokumenten vid tveksamhet. Uppdatera `ARTIFACT_MATRIX.md` status-symboler när features implementeras.*
+*Denna brief är Claude's kontrakt. Följ den. Konsultera referensdokumenten vid tveksamhet. Uppdatera `../play/ARTIFACT_MATRIX.md` status-symboler när features implementeras.*

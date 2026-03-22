@@ -33,7 +33,7 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 - Internationalization guide: se [I18N_GUIDE.md](I18N_GUIDE.md)
 - VS Code/session workflow: se [VS_CODE_WORKFLOW.md](VS_CODE_WORKFLOW.md)
 - CLI/MCP tool policy: se [TOOLING_MATRIX.md](TOOLING_MATRIX.md)
-- Artifact UI specs (draft): se [ARTIFACT_COMPONENTS.md](ARTIFACT_COMPONENTS.md) + [ARTIFACT_MATRIX.md](ARTIFACT_MATRIX.md)
+- Artifact UI specs (draft): se [play/ARTIFACT_COMPONENTS.md](play/ARTIFACT_COMPONENTS.md) + [play/ARTIFACT_MATRIX.md](play/ARTIFACT_MATRIX.md) + [play/ARTIFACT_UI_CONTRACT.md](play/ARTIFACT_UI_CONTRACT.md)
 - AI coding guardrails: se [ai/AI_CODING_GUIDELINES.md](ai/AI_CODING_GUIDELINES.md)
 - AI cluster: [ai/README.md](ai/README.md)
 - DB/migrations: se [MIGRATIONS.md](MIGRATIONS.md)

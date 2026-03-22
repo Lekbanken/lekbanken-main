@@ -357,10 +357,10 @@ Fält:
 | [docs/validation/OPERATIONS_DOMAIN_GAP_PLAN.md](validation/OPERATIONS_DOMAIN_GAP_PLAN.md) | B | historical snapshot | 2025-12-11 | Ops/Platform | Plan |
 | [docs/validation/PRIORITY_VALIDATION_2025-12-17.md](validation/PRIORITY_VALIDATION_2025-12-17.md) | C | frozen audit | 2025-12-17 | - | Working log |
 | [docs/validation/REALITY_CHECK_2025-12-17.md](validation/REALITY_CHECK_2025-12-17.md) | C | frozen audit | 2025-12-17 | - | Findings + fixes |
-| [docs/ARTIFACT_UI_CONTRACT.md](ARTIFACT_UI_CONTRACT.md) | B | draft | - | Play | Artifact contract draft |
-| [docs/ARTIFACTS_V2_IMPLEMENTATION.md](ARTIFACTS_V2_IMPLEMENTATION.md) | C | historical snapshot | - | Play | Completed implementation record |
-| [docs/ARTIFACT_COMPONENTS.md](ARTIFACT_COMPONENTS.md) | B | draft | - | Play | UI layout spec/backlog |
-| [docs/ARTIFACT_MATRIX.md](ARTIFACT_MATRIX.md) | B | draft | - | Play | Coverage matrix/spec |
+| [docs/play/ARTIFACT_UI_CONTRACT.md](play/ARTIFACT_UI_CONTRACT.md) | B | draft | - | Play | Artifact contract draft |
+| [docs/play/archive/ARTIFACTS_V2_IMPLEMENTATION.md](play/archive/ARTIFACTS_V2_IMPLEMENTATION.md) | C | historical snapshot | - | Play | Completed implementation record |
+| [docs/play/ARTIFACT_COMPONENTS.md](play/ARTIFACT_COMPONENTS.md) | B | draft | - | Play | UI layout spec/backlog |
+| [docs/play/ARTIFACT_MATRIX.md](play/ARTIFACT_MATRIX.md) | B | draft | - | Play | Coverage matrix/spec |
 | [docs/ARCH_REALITY_CHECK_ADMIN_TENANT.md](ARCH_REALITY_CHECK_ADMIN_TENANT.md) | C | frozen audit | 2026-01-10 | - | Admin versus tenant access-control reality check |
 | [docs/ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md](ARCH_ANALYSIS_LEARNING_ADMIN_PHASE0.md) | C | historical snapshot | 2026-01-10 | - | Phase 0 analysis for learning admin architecture |
 | [docs/ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md](ARCH_ANALYSIS_SHOP_REWARDS_PHASE0.md) | C | historical snapshot | 2026-01-10 | - | Phase 0 analysis for shop rewards admin architecture |

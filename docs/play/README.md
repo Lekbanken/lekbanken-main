@@ -34,6 +34,9 @@ The play structure audits in this folder remain the guardrails for large-scale r
 - `PLAY_SYSTEM_DOCUMENTATION.md` — broad play-system reference and workstream log
 - `PLAY_UI_CONTRACT.md` — canonical surface/layout contract for play UIs
 - `TRIGGER_ENGINE_CONTRACT.md` — canonical trigger-engine contract
+- `ARTIFACT_UI_CONTRACT.md` — draft artifact data/state contract for play artifact surfaces
+- `ARTIFACT_COMPONENTS.md` — draft artifact UI component inventory and layout spec
+- `ARTIFACT_MATRIX.md` — draft artifact coverage matrix across play capabilities
 - `PARTICIPANT_PLAY_UI_LAWS.md` — immutable participant UI laws for the mobile-first play view
 - `LEGENDARY_PLAY_ADVANCED_FEATURES.md` — advanced immersion UX draft for Legendary Play
 - `PLAY_SESSIONS_UI_SPEC.md` — draft UI/UX spec across participant, host, and admin play surfaces
@@ -54,6 +57,7 @@ The play structure audits in this folder remain the guardrails for large-scale r
 - `PLAY_IMPLEMENTATION_GUIDE_P0.md` — bounded P0 implementation guide
 - `PLAY_UI_WIRING_AUDIT_REPORT.md` — earlier wiring audit snapshot superseded by v2
 - `LEGENDARY_PLAY_IMPLEMENTATION_PLAN.md` — historical Legendary Play rollout plan
+- `archive/ARTIFACTS_V2_IMPLEMENTATION.md` — completed Artifacts + Triggers V2 implementation record
 - `play-structure-consolidation-plan.md` — historical action-plan snapshot from the 2026-03-16 play structure audit
 - `sessions/README.md` — historical Session Cockpit architecture and migration snapshots
 

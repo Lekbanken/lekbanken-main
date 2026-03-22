@@ -1,7 +1,7 @@
 ## Artifact State Machine Change
 
 > Use this template when your PR modifies `ArtifactStateStatus` values, guards, or status-derived UI.
-> Reference: `ARTIFACT_COMPONENTS.md §9 ArtifactStateStatus Contract`
+> Reference: `docs/play/ARTIFACT_COMPONENTS.md §9 ArtifactStateStatus Contract`
 
 ### Policy
 
@@ -21,7 +21,7 @@ Adding a new `ArtifactStateStatus` value requires: updating §9 + at least one U
   # PowerShell fallback (Windows)
   Select-String -Path .\**\*.ts,.\**\*.tsx -Pattern "ArtifactStateStatus|'hidden'|'revealed'|'solved'|'failed'|'locked'" -List
   ```
-- [ ] Updated docs: `ARTIFACT_COMPONENTS.md §9` (if semantics changed)
+- [ ] Updated docs: `docs/play/ARTIFACT_COMPONENTS.md §9` (if semantics changed)
 - [ ] `tsc --noEmit` clean
 - [ ] `eslint` on changed files — no new errors
 

@@ -3,7 +3,7 @@
 ## Metadata
 - Status: archived
 - Date: 2025-12-30
-- Last updated: 2026-03-21
+- Last updated: 2026-03-22
 - Last validated: 2026-03-21
 - Owner: play
 - Scope: Archived play artifacts implementation log
@@ -20,7 +20,7 @@ Make Map/Hotspot + Audio artifacts usable end-to-end:
 - This is the single continuous log file for this initiative.
 - Before each step/subtask: write a short plan + TODO checklist.
 - After completing each step/subtask: mark TODOs done + notes + follow-ups.
-- **Status semantics:** see `ARTIFACT_COMPONENTS.md §9 ArtifactStateStatus Contract` for the canonical list of allowed `ArtifactStateStatus` values, guard guidance, and the change checklist. Do not duplicate status tables here.
+- **Status semantics:** see `../play/ARTIFACT_COMPONENTS.md §9 ArtifactStateStatus Contract` for the canonical list of allowed `ArtifactStateStatus` values, guard guidance, and the change checklist. Do not duplicate status tables here.
 
 ---
 

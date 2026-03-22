@@ -22,16 +22,18 @@ Use it to answer:
 
 ## Read order
 
-1. `environments.md`
-2. `../MIGRATIONS.md`
-3. `../ops/prod-migration-workflow.md`
-4. `migration-history.md` when you need the normalization timeline
-5. `rls-audit-2025-03-17.md` only for the dated RLS security snapshot
+1. `DATA_MODEL_DOMAIN.md`
+2. `environments.md`
+3. `../MIGRATIONS.md`
+4. `../ops/prod-migration-workflow.md`
+5. `migration-history.md` when you need the normalization timeline
+6. `rls-audit-2025-03-17.md` only for the dated RLS security snapshot
 
 ## Status map
 
 ### Active
 
+- `DATA_MODEL_DOMAIN.md` — canonical schema-governance reference for migrations, typegen, and RLS conventions
 - `environments.md` — canonical environment and database-target rules
 - `migration-history.md` — active normalization log for the current baseline/migration-history state
 

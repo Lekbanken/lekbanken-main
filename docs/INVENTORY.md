@@ -104,7 +104,7 @@ Fält:
 | [docs/CONVERSATION_CARDS_SYSTEM_FACIT.md](CONVERSATION_CARDS_SYSTEM_FACIT.md) | A | draft | 2026-01-03 | - | Conversation cards system facit/reference |
 | [docs/import/CSV_IMPORT_FIELD_REFERENCE.md](import/CSV_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-17 | - | Contract/reference |
 | [docs/import/CSV_IMPORT_VERIFICATION_CHECKLIST.md](import/CSV_IMPORT_VERIFICATION_CHECKLIST.md) | A | active | 2025-12-26 | - | Verification checklist |
-| [docs/DATA_MODEL_DOMAIN.md](DATA_MODEL_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
+| [docs/database/DATA_MODEL_DOMAIN.md](database/DATA_MODEL_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/database/README.md](database/README.md) | A | active | 2026-03-21 | - | Sub-index for database environment and security docs |
 | [docs/database/environments.md](database/environments.md) | A | active | 2026-03-16 | - | Canonical database environment rules |
 | [docs/database/environment-database-audit.md](database/environment-database-audit.md) | C | frozen audit | 2026-03-19 | - | Environment and database state audit snapshot |

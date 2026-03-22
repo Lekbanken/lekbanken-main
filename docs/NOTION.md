@@ -70,7 +70,7 @@ Om en länk saknas eller blir inaktuell: utgå från repo först och uppdatera s
 Rekommenderad spegling i repo:
 - [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
 - Browse (aktuellt): [browse/BROWSE_DOMAIN.md](browse/BROWSE_DOMAIN.md)
-- Data Model (aktuellt): [DATA_MODEL_DOMAIN.md](DATA_MODEL_DOMAIN.md)
+- Data Model (aktuellt): [database/DATA_MODEL_DOMAIN.md](database/DATA_MODEL_DOMAIN.md)
 - Auth/RBAC: [auth/README.md](auth/README.md) (aktuellt) + [AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
 - Accounts (aktuellt): [ACCOUNTS_DOMAIN.md](ACCOUNTS_DOMAIN.md)
 - Participants (aktuellt): [participants/PARTICIPANTS_DOMAIN.md](participants/PARTICIPANTS_DOMAIN.md)
@@ -221,7 +221,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 
 ### Domäner som behöver fyllas i:
 
-- [x] **Data Model Domain** – Central schema-governance (se `docs/DATA_MODEL_DOMAIN.md`)
+- [x] **Data Model Domain** – Central schema-governance (se `docs/database/DATA_MODEL_DOMAIN.md`)
 - [x] **Accounts Domain** – Auth-flöden och roller (se `docs/ACCOUNTS_DOMAIN.md` + `docs/auth/*`)
 - [x] **Tenant Domain** – Multi-tenancy-setup (se `docs/TENANT_DOMAIN.md`)
 - [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/billing/BILLING_LICENSING_DOMAIN.md` + `docs/billing/STRIPE.md`)

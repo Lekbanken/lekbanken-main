@@ -18,7 +18,7 @@ This cluster covers game and activity discovery: browse UI, search, filters, fea
 
 1. [BROWSE_DOMAIN.md](BROWSE_DOMAIN.md)
 2. [../GAMES_DOMAIN.md](../GAMES_DOMAIN.md) for the content model that browse reads from
-3. [../DATA_MODEL_DOMAIN.md](../DATA_MODEL_DOMAIN.md) when validating table ownership or schema boundaries
+3. [../database/DATA_MODEL_DOMAIN.md](../database/DATA_MODEL_DOMAIN.md) when validating table ownership or schema boundaries
 
 ## Active docs
 

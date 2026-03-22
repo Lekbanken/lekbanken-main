@@ -28,7 +28,7 @@ Non-goals:
 - Translation engine and locale fallback rules: `docs/content/TRANSLATION_ENGINE_DOMAIN.md`
 - CSV contract (source-of-truth for fields): `docs/import/CSV_IMPORT_FIELD_REFERENCE.md`
 - Builder overview (current admin builder): `docs/admin/ADMIN_GAME_BUILDER_V1.md`
-- Data model governance (migrations/typegen/RLS): `docs/DATA_MODEL_DOMAIN.md`
+- Data model governance (migrations/typegen/RLS): `docs/database/DATA_MODEL_DOMAIN.md`
 
 ## Related code (repo-anchored)
 

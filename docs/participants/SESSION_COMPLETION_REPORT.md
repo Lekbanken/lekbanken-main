@@ -558,7 +558,7 @@ All 11 new endpoints:
    - Gather feedback
 
 ### Medium-term (Next 2 Weeks)
-According to **PROJECT_EXECUTION_PLAN.md**, start:
+According to **docs/plans/PROJECT_EXECUTION_PLAN.md**, start:
 
 **Phase 1: Domain Documentation Validation**
 - Batch 1: Infrastructure Domains
@@ -577,7 +577,7 @@ We just completed what the plan calls:
 - ✅ All features documented to same standard
 
 ### Plan Status
-According to `PROJECT_EXECUTION_PLAN.md`:
+According to `docs/plans/PROJECT_EXECUTION_PLAN.md`:
 
 **Phase 0: Foundation Setup** - ✅ DONE (we have templates and tracking)  
 **Phase 1: Domain Documentation Validation** - 🔄 IN PROGRESS
@@ -693,7 +693,7 @@ The **Participants Domain** is now **100% complete** with all 12 tasks implement
 2. Quick fix for Task 9 progress endpoints (30 min)
 3. Integration testing with real users
 
-**Next recommended action:** Begin Phase 1 Batch 1 (Infrastructure Domains validation) according to PROJECT_EXECUTION_PLAN.md.
+**Next recommended action:** Begin Phase 1 Batch 1 (Infrastructure Domains validation) according to docs/plans/PROJECT_EXECUTION_PLAN.md.
 
 ---
 

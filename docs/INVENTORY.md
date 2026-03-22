@@ -307,7 +307,7 @@ Fält:
 | [docs/database/PERFORMANCE_ADVISOR_PROMPT.md](database/PERFORMANCE_ADVISOR_PROMPT.md) | E | active | 2026-01-08 | - | Prompt for Supabase Performance Advisor |
 | [docs/plans/PRODUCT_CARD_UPGRADE_PLAN.md](plans/PRODUCT_CARD_UPGRADE_PLAN.md) | B | draft | 2026-01-08 | - | Product card upgrade plan |
 | [docs/plans/PROFILE_RESILIENCE_IMPLEMENTATION.md](plans/PROFILE_RESILIENCE_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-31 | - | Profile resilience implementation snapshot |
-| [docs/PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md) | B | draft | 2025-12-10 | - | Plan |
+| [docs/plans/PROJECT_EXECUTION_PLAN.md](plans/PROJECT_EXECUTION_PLAN.md) | B | draft | 2025-12-10 | - | Plan |
 | [docs/games/archive/PUZZLE_MODULES_INTEGRATION_STATUS.md](games/archive/PUZZLE_MODULES_INTEGRATION_STATUS.md) | C | historical snapshot | 2025-12-28 | - | Puzzle modules integration status snapshot |
 | [docs/notifications/QA_APPSHELL_ANALYSIS.md](notifications/QA_APPSHELL_ANALYSIS.md) | C | draft | 2026-01-17 | - | AppShell QA and improvement analysis |
 | [docs/qa/director-triggers.md](qa/director-triggers.md) | B | draft | 2026-02-23 | Play domain | Director Mode triggers QA plan |

@@ -15,7 +15,7 @@ Historical onboarding prompt retained for provenance. Use current session prompt
 **INNAN DU GÖR NÅGOT - LÄS DESSA I ORDNING:**
 
 1. **`docs/participants/SESSION_COMPLETION_REPORT.md`** — VAR VI ÄR NU (Participants Domain komplett!)
-2. **`docs/PROJECT_EXECUTION_PLAN.md`** — HELA PLANEN FRAMÅT (7 faser)
+2. **`docs/plans/PROJECT_EXECUTION_PLAN.md`** — HELA PLANEN FRAMÅT (7 faser)
 3. **`docs/AI_CODING_GUIDELINES.md`** — Kritiska kodregler
 4. **`docs/VS_CODE_WORKFLOW.md`** — Utvecklingsworkflow
 
@@ -60,7 +60,7 @@ Historical onboarding prompt retained for provenance. Use current session prompt
 
 ## 🎯 DITT UPPDRAG: PHASE 1 - DOMAIN VALIDATION
 
-Enligt **`docs/PROJECT_EXECUTION_PLAN.md`**, börja med:
+Enligt **`docs/plans/PROJECT_EXECUTION_PLAN.md`**, börja med:
 
 ### **BATCH 1: INFRASTRUCTURE DOMAINS**
 
@@ -100,7 +100,7 @@ Enligt **`docs/PROJECT_EXECUTION_PLAN.md`**, börja med:
 
 4. **Validation Report (2h)**
    - Skapa: `docs/validation/PLATFORM_DOMAIN_VALIDATION_REPORT.md`
-   - Använd template från PROJECT_EXECUTION_PLAN.md
+   - Använd template från docs/plans/PROJECT_EXECUTION_PLAN.md
    - Lista alla P0 (kritiska) issues
    - Estimera fix-tid
 
@@ -194,7 +194,7 @@ Enligt **`docs/PROJECT_EXECUTION_PLAN.md`**, börja med:
 ```
 docs/
 ├── participants/SESSION_COMPLETION_REPORT.md          ← Var vi är NU
-├── PROJECT_EXECUTION_PLAN.md             ← Hela planen framåt
+├── plans/PROJECT_EXECUTION_PLAN.md       ← Hela planen framåt
 ├── participants/PARTICIPANTS_DOMAIN_ARCHITECTURE.md   ← Participants domain spec
 ├── participants/TASK_9_LIVE_PROGRESS.md               ← Task 9 dokumentation
 ├── participants/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md← Tasks 11 & 12 dokumentation
@@ -598,7 +598,7 @@ const errorMsg = "Session not found";
 Innan du börjar, verifiera:
 
 - [ ] Jag har läst docs/participants/SESSION_COMPLETION_REPORT.md
-- [ ] Jag har läst PROJECT_EXECUTION_PLAN.md
+- [ ] Jag har läst docs/plans/PROJECT_EXECUTION_PLAN.md
 - [ ] Jag förstår att Participants Domain är KLAR
 - [ ] Jag ska börja med Platform Domain validation
 - [ ] Jag känner till etablerade patterns
@@ -614,7 +614,7 @@ Innan du börjar, verifiera:
 
 ```
 1. Läs docs/participants/SESSION_COMPLETION_REPORT.md (5 min)
-2. Läs PROJECT_EXECUTION_PLAN.md sektion om Platform Domain (10 min)
+2. Läs docs/plans/PROJECT_EXECUTION_PLAN.md sektion om Platform Domain (10 min)
 3. Börja Platform Domain Discovery:
    - Sök efter platform/infrastructure-relaterad kod
    - Lista alla komponenter du hittar

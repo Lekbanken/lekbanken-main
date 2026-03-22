@@ -80,7 +80,7 @@ Rekommenderad spegling i repo:
 	- Learnings: [DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md](DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md)
 - Billing & Licensing (aktuellt): [billing/BILLING_LICENSING_DOMAIN.md](billing/BILLING_LICENSING_DOMAIN.md)
 	- Stripe integration (detail): [billing/STRIPE.md](billing/STRIPE.md)
-- Games (aktuellt): [GAMES_DOMAIN.md](GAMES_DOMAIN.md)
+- Games (aktuellt): [games/GAMES_DOMAIN.md](games/GAMES_DOMAIN.md)
 	- Roadmap: [DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md)
 	- Learnings: [DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md)
 - Content Management (aktuellt): [content/CONTENT_MANAGEMENT_DOMAIN.md](content/CONTENT_MANAGEMENT_DOMAIN.md)
@@ -225,7 +225,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [x] **Accounts Domain** – Auth-flöden och roller (se `docs/ACCOUNTS_DOMAIN.md` + `docs/auth/*`)
 - [x] **Tenant Domain** – Multi-tenancy-setup (se `docs/TENANT_DOMAIN.md`)
 - [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/billing/BILLING_LICENSING_DOMAIN.md` + `docs/billing/STRIPE.md`)
-- [x] **Games Domain** – Lekstruktur och metadata (se `docs/GAMES_DOMAIN.md`)
+- [x] **Games Domain** – Lekstruktur och metadata (se `docs/games/GAMES_DOMAIN.md`)
 - [x] **Planner Domain** – Planer, block/tidslinje, synlighet, anteckningar, play-projection (se `docs/PLANNER_DOMAIN.md`)
 - [ ] **Planner Domain** – AI-generering och templates
 - [x] **Gamification Domain** – "Din Lekresa"-gamification (coins, streaks, achievements) (se `docs/gamification/GAMIFICATION_DOMAIN.md`)

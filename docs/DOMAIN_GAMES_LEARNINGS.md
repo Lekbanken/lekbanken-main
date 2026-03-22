@@ -11,7 +11,7 @@
 > Draft learnings document derived from the games domain and intended as guidance for future domains.
 
 Canonical documentation (repo source of truth):
-- `docs/GAMES_DOMAIN.md`
+- `docs/games/GAMES_DOMAIN.md`
 
 This document summarizes the main architectural and implementation lessons learned from the current GAMES domain implementation. It should be used as guidance when designing and implementing future domains in Lekbanken.
 

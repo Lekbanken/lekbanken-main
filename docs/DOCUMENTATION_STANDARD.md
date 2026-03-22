@@ -142,7 +142,7 @@ Use this order when documents disagree:
 ### Games, builder, and display context
 
 - `docs/games/README.md`
-- `docs/GAMES_DOMAIN.md`
+- `docs/games/GAMES_DOMAIN.md`
 - `docs/admin/README.md`
 - `docs/admin/ADMIN_DESIGN_SYSTEM.md`
 - `docs/admin/ADMIN_MODEL_DECISION.md`

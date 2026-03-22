@@ -17,7 +17,7 @@ This cluster covers game and activity discovery: browse UI, search, filters, fea
 ## Read order
 
 1. [BROWSE_DOMAIN.md](BROWSE_DOMAIN.md)
-2. [../GAMES_DOMAIN.md](../GAMES_DOMAIN.md) for the content model that browse reads from
+2. [../games/GAMES_DOMAIN.md](../games/GAMES_DOMAIN.md) for the content model that browse reads from
 3. [../database/DATA_MODEL_DOMAIN.md](../database/DATA_MODEL_DOMAIN.md) when validating table ownership or schema boundaries
 
 ## Active docs
@@ -26,7 +26,7 @@ This cluster covers game and activity discovery: browse UI, search, filters, fea
 
 ## Related docs
 
-- [../GAMES_DOMAIN.md](../GAMES_DOMAIN.md) — canonical game/content domain reference
+- [../games/GAMES_DOMAIN.md](../games/GAMES_DOMAIN.md) — canonical game/content domain reference
 - [../billing/BILLING_LICENSING_DOMAIN.md](../billing/BILLING_LICENSING_DOMAIN.md) — entitlement mapping that affects allowed products in browse
 
 ## Placement rule

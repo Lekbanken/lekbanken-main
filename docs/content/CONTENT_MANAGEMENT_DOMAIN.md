@@ -24,7 +24,7 @@ Non-goals:
 - Media moderation/pipelines (Media Domain).
 
 ## Related docs
-- Games model + publishing rules: `docs/GAMES_DOMAIN.md`
+- Games model + publishing rules: `docs/games/GAMES_DOMAIN.md`
 - Translation engine and locale fallback rules: `docs/content/TRANSLATION_ENGINE_DOMAIN.md`
 - CSV contract (source-of-truth for fields): `docs/import/CSV_IMPORT_FIELD_REFERENCE.md`
 - Builder overview (current admin builder): `docs/admin/ADMIN_GAME_BUILDER_V1.md`

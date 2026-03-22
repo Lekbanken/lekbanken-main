@@ -110,7 +110,7 @@ If shared across domains — it goes in `components/`.
 | Notifications | `docs/notifications/app-shell-notifications-architecture.md` → `*-audit.md` → `*-implementation-plan.md` |
 | Journey | `docs/journey/journey-activation-architecture.md` → `*-audit.md` → `*-implementation-plan.md` |
 | Play | `launch-readiness/audits/play-*.md` |
-| Games | `docs/GAMES_DOMAIN.md` |
+| Games | `docs/games/GAMES_DOMAIN.md` |
 | Admin | `docs/admin/archive/ADMIN_OVERVIEW_REPORT.md` |
 | Auth | `docs/AUTH_SYSTEM_ANALYSIS.md` |
 | Gamification | `docs/gamification/GAMIFICATION_DOMAIN.md` |

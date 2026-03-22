@@ -32,7 +32,7 @@ When starting work on this repo, read documents in this exact order:
 | Notifications | `docs/notifications/app-shell-notifications-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | `docs/notifications/NOTIFICATIONS_DOMAIN.md` |
 | Journey | `docs/journey/journey-activation-architecture.md` → `*-audit.md` → `*-implementation-plan.md` | `docs/journey/JOURNEY_DOMAIN.md` |
 | Play | `launch-readiness/audits/play-*.md` | `docs/PLAY_DOMAIN.md` |
-| Games | `docs/GAMES_DOMAIN.md` | `docs/builder/` |
+| Games | `docs/games/GAMES_DOMAIN.md` | `docs/builder/` |
 | Admin | `docs/admin/archive/ADMIN_OVERVIEW_REPORT.md` | `docs/admin/` |
 | Auth | `docs/AUTH_SYSTEM_ANALYSIS.md` | `docs/auth/` |
 | Gamification | `docs/gamification/GAMIFICATION_DOMAIN.md` | `docs/gamification/` |
@@ -292,7 +292,7 @@ The `play` domain has **118+ components** split across two disconnected trees:
 | Play | `launch-readiness/audits/play-*.md` | Root `PLAY_SYSTEM_DOCUMENTATION.md` |
 | Notifications | `docs/notifications/app-shell-notifications-*.md` | `docs/notifications/NOTIFICATIONS_DOMAIN.md` |
 | Journey | `docs/journey/journey-activation-*.md` | `docs/journey/JOURNEY_DOMAIN.md` |
-| Games | `docs/GAMES_DOMAIN.md` | `docs/builder/` |
+| Games | `docs/games/GAMES_DOMAIN.md` | `docs/builder/` |
 | Any security question | `launch-readiness/audits/` | — |
 | System overview | `PROJECT_CONTEXT.md` → `launch-readiness/launch-control.md` | — |
 

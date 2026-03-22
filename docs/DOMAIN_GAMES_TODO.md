@@ -8,10 +8,10 @@
 - Last updated: 2026-03-21
 - Last validated: -
 
-> Draft backlog for games-domain follow-up work. Canonical domain guidance lives in `docs/GAMES_DOMAIN.md`.
+> Draft backlog for games-domain follow-up work. Canonical domain guidance lives in `docs/games/GAMES_DOMAIN.md`.
 
 Canonical documentation (repo source of truth):
-- `docs/GAMES_DOMAIN.md`
+- `docs/games/GAMES_DOMAIN.md`
 
 This file is a backlog/worklist and may lag behind implementation.
 
@@ -37,7 +37,7 @@ This file is a backlog/worklist and may lag behind implementation.
 - Expand browse filters (purpose, environment, age, time, group size) server-side and paginate.
 
 ## Documentation updates
-- Write/update `docs/GAMES_DOMAIN.md` with schema, RLS, service/API map, component map, and media/translation rules.
+- Write/update `docs/games/GAMES_DOMAIN.md` with schema, RLS, service/API map, component map, and media/translation rules.
 - Update Notion Games Domain page with the new schema, publish flow, and validation rules.
 
 ## Follow-up items (versioning)

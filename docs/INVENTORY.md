@@ -181,8 +181,8 @@ Fält:
 | [docs/GAME_CSV_IMPORT_EXPORT_PLAN.md](GAME_CSV_IMPORT_EXPORT_PLAN.md) | B | historical snapshot | 2025-12-16 | - | Historical CSV import/export implementation plan |
 | [docs/GAME_BUILDER_IMPLEMENTATION_TRACKER.md](GAME_BUILDER_IMPLEMENTATION_TRACKER.md) | B | historical snapshot | 2026-01-25 | - | Builder implementation tracker snapshot |
 | [docs/GAME_BUILDER_INVENTORY_AND_ROADMAP.md](GAME_BUILDER_INVENTORY_AND_ROADMAP.md) | C | historical snapshot | 2026-01-25 | - | Builder inventory and roadmap snapshot |
-| [docs/GAMES_DOMAIN.md](GAMES_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/games/README.md](games/README.md) | A | active | 2026-03-21 | - | Sub-index for games domain, GameDetails context work, and related snapshots |
+| [docs/games/GAMES_DOMAIN.md](games/GAMES_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/games/README.md](games/README.md) | A | active | 2026-03-22 | - | Sub-index for games domain, GameDetails context work, and related snapshots |
 | [docs/games/GAMEDETAILS_CONTEXT_ARCHITECTURE.md](games/GAMEDETAILS_CONTEXT_ARCHITECTURE.md) | A | active | 2026-03-10 | - | GameDetails context target architecture |
 | [docs/games/GAMEDETAILS_CONTEXT_AUDIT.md](games/GAMEDETAILS_CONTEXT_AUDIT.md) | C | frozen audit | 2026-03-10 | - | Closed GameDetails context audit |
 | [docs/games/GAMEDETAILS_CONTEXT_IMPLEMENTATION_PLAN.md](games/GAMEDETAILS_CONTEXT_IMPLEMENTATION_PLAN.md) | B | historical snapshot | 2026-03-10 | - | Security-focused implementation history for GameDetails context |

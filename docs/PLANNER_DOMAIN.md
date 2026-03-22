@@ -25,7 +25,7 @@ Non-goals:
 - Auth/RBAC primitives (Accounts/Auth/Tenant domains)
 
 ## Related docs
-- Games content model: `docs/GAMES_DOMAIN.md`
+- Games content model: `docs/games/GAMES_DOMAIN.md`
 - Play runtime vs plan playback: `docs/PLAY_DOMAIN.md`
 - Tenancy model: `docs/TENANT_DOMAIN.md`
 

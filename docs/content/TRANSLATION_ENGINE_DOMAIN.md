@@ -21,7 +21,7 @@ Non-goals (currently outside implemented scope):
 
 ## Related docs
 - Validation report (historical findings): `docs/content/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md`
-- Games content translations: `docs/GAMES_DOMAIN.md`
+- Games content translations: `docs/games/GAMES_DOMAIN.md`
 - Ops/system considerations: `docs/ops/OPERATIONS_DOMAIN.md`
 
 ## Related code (repo-anchored)

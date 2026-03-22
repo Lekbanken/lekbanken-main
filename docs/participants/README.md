@@ -34,7 +34,7 @@ This cluster covers anonymous participant identity, participant sessions, join a
 ## Related docs
 
 - [../PLAY_DOMAIN.md](../PLAY_DOMAIN.md) — canonical play runtime and host/participant flow reference
-- [../GAMES_DOMAIN.md](../GAMES_DOMAIN.md) — game content model referenced by play sessions
+- [../games/GAMES_DOMAIN.md](../games/GAMES_DOMAIN.md) — game content model referenced by play sessions
 
 ## Placement rule
 

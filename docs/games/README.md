@@ -6,7 +6,7 @@
 - Status: active
 - Date: 2026-03-21
 - Last updated: 2026-03-22
-- Last validated: 2026-03-21
+- Last validated: 2026-03-22
 
 > Entry point for the games documentation cluster. This folder covers the games domain, GameDetails context work, and related audit snapshots. Builder UI references remain under the admin cluster and are linked here rather than duplicated.
 
@@ -16,7 +16,7 @@ Use this cluster to understand the games content domain, browse and publish boun
 
 ## Start here
 
-1. `../GAMES_DOMAIN.md`
+1. `GAMES_DOMAIN.md`
 2. `GAMEDETAILS_CONTEXT_ARCHITECTURE.md`
 3. `GAMEDETAILS_CONTEXT_AUDIT.md`
 4. `GAMEDETAILS_CONTEXT_IMPLEMENTATION_PLAN.md`
@@ -27,7 +27,7 @@ Use this cluster to understand the games content domain, browse and publish boun
 
 ### Active references
 
-- `../GAMES_DOMAIN.md` — canonical games-domain overview for content model, publish flow, browse access, and API boundaries
+- `GAMES_DOMAIN.md` — canonical games-domain overview for content model, publish flow, browse access, and API boundaries
 
 ### Bounded GameDetails context work
 
@@ -51,4 +51,4 @@ Use this cluster to understand the games content domain, browse and publish boun
 
 ## Working rule
 
-For the overall games domain, prefer `docs/GAMES_DOMAIN.md`. For the specific GameDetails preview-context security and display workstream, use the bounded documents in this folder. For builder UI workflows, follow the admin cluster rather than treating builder docs as part of the games cluster.
+For the overall games domain, prefer `docs/games/GAMES_DOMAIN.md`. For the specific GameDetails preview-context security and display workstream, use the bounded documents in this folder. For builder UI workflows, follow the admin cluster rather than treating builder docs as part of the games cluster.

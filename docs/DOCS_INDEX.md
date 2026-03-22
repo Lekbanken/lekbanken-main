@@ -33,7 +33,7 @@ Regel:
 - [NOTION_UPDATE_CHECKLIST.md](NOTION_UPDATE_CHECKLIST.md) — practical sync checklist
 - [TOOLING_MATRIX.md](TOOLING_MATRIX.md) — tool responsibility model
 - [VS_CODE_WORKFLOW.md](VS_CODE_WORKFLOW.md) — local workflow guidance
-- [DEVELOPER_SETUP.md](DEVELOPER_SETUP.md) — local environment model
+- [toolkit/developer-guide/DEVELOPER_SETUP.md](toolkit/developer-guide/DEVELOPER_SETUP.md) — local environment model
 - [MIGRATIONS.md](MIGRATIONS.md) — migration and typegen guidance
 
 ## Cluster Entry Maps

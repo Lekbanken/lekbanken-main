@@ -421,7 +421,7 @@ Fält:
 | [docs/archive/summary.claude.md](archive/summary.claude.md) | E | archived | 2026-01-17 | - | Archived Claude-generated process summary |
 | [docs/archive/summary.md](archive/summary.md) | C | archived | 2026-01-17 | - | Archived inventory process summary |
 | [docs/legal/archive/COOKIE_CONSENT_CURRENT_STATE.md](legal/archive/COOKIE_CONSENT_CURRENT_STATE.md) | C | historical snapshot | 2026-01-15 | - | Cookie consent current-state analysis |
-| [docs/DEVELOPER_SETUP.md](DEVELOPER_SETUP.md) | A | active | 2026-03-15 | - | Developer setup and environment model |
+| [docs/toolkit/developer-guide/DEVELOPER_SETUP.md](toolkit/developer-guide/DEVELOPER_SETUP.md) | A | active | 2026-03-15 | - | Developer setup and environment model |
 | [docs/content/I18N_GUIDE.md](content/I18N_GUIDE.md) | A | active | 2026-03-21 | Frontend | Internationalization guide |
 | [docs/content/I18N_MIGRATION_PLAN.md](content/I18N_MIGRATION_PLAN.md) | B | historical snapshot | 2026-01-11 | - | i18n migration status snapshot |
 | [docs/VS_CODE_WORKFLOW.md](VS_CODE_WORKFLOW.md) | A | active | 2026-03-21 | Workflow | Session workflow |

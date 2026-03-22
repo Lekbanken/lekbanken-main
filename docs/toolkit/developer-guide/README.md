@@ -16,12 +16,13 @@ This guide is for developers integrating with or extending the Legendary Escape 
 
 ## Table of Contents
 
-1. [Architecture](./architecture.md)
-2. [Database Schema](./database-schema.md)
-3. [API Integration](./api-integration.md)
-4. [Webhooks](./webhooks.md)
-5. [Customization](./customization.md)
-6. [Contributing](./contributing.md)
+1. [Developer Setup](./DEVELOPER_SETUP.md)
+2. [Architecture](./architecture.md)
+3. [Database Schema](./database-schema.md)
+4. [API Integration](./api-integration.md)
+5. [Webhooks](./webhooks.md)
+6. [Customization](./customization.md)
+7. [Contributing](./contributing.md)
 
 ---
 

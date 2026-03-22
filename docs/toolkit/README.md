@@ -17,6 +17,7 @@ Welcome to the documentation for the Legendary Escape Room Toolkit. This guide c
 - [Getting Started](./getting-started/README.md)
 - [Host Guide](./host-guide/README.md)
 - [Developer Guide](./developer-guide/README.md)
+- [Developer Setup](./developer-guide/DEVELOPER_SETUP.md)
 - [API Reference](./api-reference/README.md)
 
 ## Trust Boundary

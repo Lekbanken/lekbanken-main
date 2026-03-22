@@ -21,7 +21,7 @@
 
 > **Note:** Staging was previously a Supabase Branch (`cxkfcqyasszjmxvvhkxt`). It was deleted 2026-03-17 because it referenced a non-existent `staging` git branch. Recreate when a real staging git branch exists on origin.
 
-**See also:** [../DEVELOPER_SETUP.md](../DEVELOPER_SETUP.md) for app-level environment naming (`APP_ENV`, `DEPLOY_TARGET`).
+**See also:** [../toolkit/developer-guide/DEVELOPER_SETUP.md](../toolkit/developer-guide/DEVELOPER_SETUP.md) for app-level environment naming (`APP_ENV`, `DEPLOY_TARGET`).
 
 ## Git Branch → Database Target
 

@@ -166,7 +166,7 @@ Three strategic workstreams are active. They are related but have distinct scope
 | `.nvmrc` | Pin Node.js version | `20` |
 | `.env.local.example` | Document required env vars | Template from `lib/config/env.ts` |
 | `supabase/config.toml` | Local Supabase CLI config | Project ref, region, ports |
-| `docs/DEVELOPER_SETUP.md` | Onboarding guide | WSL2 + Node + Supabase CLI + first run |
+| `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` | Onboarding guide | WSL2 + Node + Supabase CLI + first run |
 | `scripts/setup-dev.sh` | Automated dev setup | Install deps, start Supabase, apply migrations, seed |
 
 ---

@@ -8,7 +8,7 @@
 - Last updated: 2026-03-21
 - Last validated: 2026-03-21
 
-> Frozen implementation snapshot for the preview-isolation workstream. Use `docs/database/environments.md`, `docs/DEVELOPER_SETUP.md`, and `launch-readiness/launch-control.md` for current environment truth.
+> Frozen implementation snapshot for the preview-isolation workstream. Use `docs/database/environments.md`, `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`, and `launch-readiness/launch-control.md` for current environment truth.
 
 > **Date:** 2026-03-13 (revised)  
 > **Last updated:** 2026-03-21  
@@ -18,7 +18,7 @@
 > **Resolves:** OPS-SAND-001 (P1) — preview/dev hitting production data plane  
 > **Scope:** Sandbox Supabase + Preview env vars in existing Vercel project  
 > **Principle:** Första exekverbara operationsmål = få bort preview/dev från prod-data-plane.  
-> **Note:** Frozen implementation snapshot for the preview-isolation workstream. Current environment truth should be read from `docs/database/environments.md`, `docs/DEVELOPER_SETUP.md`, and `launch-control.md`.
+> **Note:** Frozen implementation snapshot for the preview-isolation workstream. Current environment truth should be read from `docs/database/environments.md`, `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`, and `launch-control.md`.
 
 ---
 
@@ -318,4 +318,4 @@ These deferred items become relevant when a persistent staging/demo environment 
 
 ### Next Move After This
 
-→ **WSL2 developer baseline** (Next 3 Moves #2) — `.nvmrc`, `.env.local.example`, `supabase/config.toml`, `docs/DEVELOPER_SETUP.md`
+→ **WSL2 developer baseline** (Next 3 Moves #2) — `.nvmrc`, `.env.local.example`, `supabase/config.toml`, `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`

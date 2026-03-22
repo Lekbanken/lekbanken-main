@@ -127,7 +127,7 @@ port = 54323
 
 ### Step 1.4 — Create Developer Setup Guide
 
-Create `docs/DEVELOPER_SETUP.md`:
+Create `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`:
 
 1. Install WSL2 + Ubuntu
 2. Install Node.js 20 via `nvm`
@@ -184,7 +184,7 @@ echo "=== Setup complete! Run 'npm run dev' to start. ==="
 - [ ] `.nvmrc` exists and `nvm use` works
 - [ ] `.env.local.example` exists and is documented
 - [ ] `supabase/config.toml` exists and `supabase start` works
-- [ ] `docs/DEVELOPER_SETUP.md` exists and a new setup succeeds
+- [ ] `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` exists and a new setup succeeds
 - [ ] `scripts/setup-dev.sh` runs end-to-end on WSL2
 
 ---
@@ -581,7 +581,7 @@ To prevent getting stuck in architecture without forward motion, these are the t
 | # | Move | What | Resolves | Effort |
 |---|------|------|----------|--------|
 | 1 | **Sandbox Supabase + Preview env vars** | Set Preview-scoped env vars in existing Vercel project to point at sandbox Supabase | OPS-SAND-001 (P1), isolates preview from prod data | 0.5 day |
-| 2 | **WSL2 developer baseline** | `.nvmrc`, `.env.local.example`, `supabase/config.toml`, `docs/DEVELOPER_SETUP.md`, `scripts/setup-dev.sh` | OPS-DEV-001–004, reproducible local setup | 1–2 days |
+| 2 | **WSL2 developer baseline** | `.nvmrc`, `.env.local.example`, `supabase/config.toml`, `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`, `scripts/setup-dev.sh` | OPS-DEV-001–004, reproducible local setup | 1–2 days |
 | 3 | **Deploy target registry + migration tooling** | `.deploy-targets.json`, `scripts/deploy-migrations.sh`, release process documentation | Foundation for enterprise + multi-target operations | 1 day |
 
 > **Priority 4 (next after these 3):** Observability foundation — Sentry + `DEPLOY_TARGET` tag + alerting destinations.

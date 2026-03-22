@@ -9,7 +9,7 @@
 **Metod:** Statisk kodanalys, CLI-verifiering, Docker-databasinspektion  
 **Omfattning:** Alla tre Supabase-miljöer (local, sandbox, production), notifications-domänen
 
-> Fryst revisionssnapshot. Använd `docs/database/environments.md`, `docs/DEVELOPER_SETUP.md` och `launch-readiness/launch-control.md` som nuvarande operativ vägledning.
+> Fryst revisionssnapshot. Använd `docs/database/environments.md`, `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` och `launch-readiness/launch-control.md` som nuvarande operativ vägledning.
 
 ---
 

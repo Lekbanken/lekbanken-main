@@ -12,7 +12,7 @@ Follow the rules and context from:
 - [PROJECT_CONTEXT.md](../../PROJECT_CONTEXT.md)
 - [launch-readiness/launch-control.md](../../launch-readiness/launch-control.md)
 - [docs/database/environments.md](../../docs/database/environments.md)
-- [docs/DEVELOPER_SETUP.md](../../docs/DEVELOPER_SETUP.md)
+- [docs/toolkit/developer-guide/DEVELOPER_SETUP.md](../../docs/toolkit/developer-guide/DEVELOPER_SETUP.md)
 - [docs/VS_CODE_WORKFLOW.md](../../docs/VS_CODE_WORKFLOW.md)
 - [.atlas/README.md](../../.atlas/README.md)
 - [.github/copilot-instructions.md](../copilot-instructions.md)

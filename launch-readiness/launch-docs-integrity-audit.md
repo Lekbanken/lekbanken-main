@@ -79,7 +79,7 @@
 | `production-signals-dashboard.md` | `docs/ops/` | Signal query reference | ✅ Exists |
 | `anomaly-detection-playbook.md` | `docs/ops/` | Alert response procedures | ✅ Exists |
 | `first-deploy-runbook.md` | `docs/ops/` | First deploy procedures | ✅ Exists |
-| `DEVELOPER_SETUP.md` | `docs/` | Developer onboarding | ✅ Current (MFA section added 2026-03-15) |
+| `DEVELOPER_SETUP.md` | `docs/toolkit/developer-guide/` | Developer onboarding | ✅ Current (MFA section added 2026-03-15) |
 | `ENVIRONMENT_VARIABLES.md` | `docs/` | Env var documentation | ⚠️ Needs verification against current `.env.local.example` |
 | `README.md` | Root | Project README | ⚠️ Last modified 2026-01-08 — likely outdated |
 
@@ -245,7 +245,7 @@ These files are **never archivable** — they are the living memory of the syste
 | `planner-architecture.md` | Planner design (root) | Per planner change |
 | `planner-audit.md` | Planner status (root) | Per planner change |
 | `planner-implementation-plan.md` | Planner roadmap (root) | Per planner change |
-| `docs/DEVELOPER_SETUP.md` | Dev onboarding | Per setup change |
+| `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` | Dev onboarding | Per setup change |
 | All 36 files in `launch-readiness/audits/` | Audit evidence | Rarely (reference) |
 | All 11 files in `launch-readiness/implementation/` | Remediation evidence | Rarely (reference) |
 

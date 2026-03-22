@@ -80,7 +80,7 @@ Use this order when documents disagree:
 ### Local workflow and environments
 
 - `docs/VS_CODE_WORKFLOW.md`
-- `docs/DEVELOPER_SETUP.md`
+- `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`
 - `docs/database/environments.md`
 
 ### Auth, routing, and tenant access
@@ -218,7 +218,7 @@ Read:
 Read:
 
 1. `docs/VS_CODE_WORKFLOW.md`
-2. `docs/DEVELOPER_SETUP.md`
+2. `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`
 3. `docs/database/environments.md`
 4. `docs/TOOLING_MATRIX.md`
 

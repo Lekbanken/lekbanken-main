@@ -10,7 +10,7 @@
 > **Scope:** Complete Phase 1B — isolate preview/dev from production Supabase  
 > **Resolves:** OPS-SAND-001 (P1)  
 > **Method:** Every claim verified against repository files, CI workflows, and configuration  
-> **Note:** Historical snapshot of the Phase 1B environment-isolation workstream. Current environment truth lives in `docs/database/environments.md`, `docs/DEVELOPER_SETUP.md`, and `launch-control.md`.
+> **Note:** Historical snapshot of the Phase 1B environment-isolation workstream. Current environment truth lives in `docs/database/environments.md`, `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`, and `launch-control.md`.
 
 ---
 
@@ -223,7 +223,7 @@ Cosmetic — the "307 migrations" refers to the original count before canonical 
 | B1 | **Create `supabase/config.toml`** — Required for `supabase start`. Use standard template with project-specific settings (API port 54321, DB port 54322, etc.). | 30 min | Engineering |
 | B2 | **Install Docker (WSL2/Desktop)** — Required for local Supabase. Document prerequisites. | 30 min | Manual |
 | B3 | **Test `supabase db reset --local`** — Verify canonical baseline replays cleanly with all 7 active migrations. | 30 min | Engineering |
-| B4 | **Create `docs/DEVELOPER_SETUP.md`** — Document local dev setup: Node 20, pnpm/npm, Docker, `supabase start`, `.env.local` configuration. | 1 hour | Engineering |
+| B4 | **Create `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`** — Document local dev setup: Node 20, pnpm/npm, Docker, `supabase start`, `.env.local` configuration. | 1 hour | Engineering |
 
 ### Phase 1B-C: Safety Guards (near-term, ~0.5 day)
 
@@ -620,7 +620,7 @@ Rejected for now: Alt A (local-only), Alt D (branching)
 - [ ] `.env.local` updated to sandbox (or local) Supabase
 - [x] `.env.local.example` updated with `APP_ENV`, `DEPLOY_TARGET`, sandbox defaults (✅ 2026-03-13)
 - [ ] `supabase db reset --local` tested (if Docker available)
-- [ ] `docs/DEVELOPER_SETUP.md` created
+- [ ] `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` created
 
 ### Phase 1B-C: Safety & Standards
 

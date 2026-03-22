@@ -49,7 +49,7 @@
 |---------|-----|----------|--------|
 | ~~No `.nvmrc` — Node version not pinned for developers~~ | OPS-DEV-001 | P2 | ✅ **LÖST** — `.nvmrc` satt till 22, CI uppdaterat till 22 (2026-03-15) |
 | ~~No `.env.local.example` — developers must read `env.ts`~~ | OPS-DEV-002 | P2 | ✅ **LÖST** — `.env.local.example` finns (uppdaterad med `APP_ENV`, `DEPLOY_TARGET`, 2026-03-13) |
-| ~~No developer setup guide (`DEVELOPER_SETUP.md`)~~ | OPS-DEV-003 | P2 | ✅ **LÖST** — `docs/DEVELOPER_SETUP.md` skapad med full onboarding-guide, SSoT-modell, migrationsworkflow (2026-03-15) |
+| ~~No developer setup guide (`DEVELOPER_SETUP.md`)~~ | OPS-DEV-003 | P2 | ✅ **LÖST** — `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` skapad med full onboarding-guide, SSoT-modell, migrationsworkflow (2026-03-15) |
 | No WSL2 setup instructions | OPS-DEV-004 | P2 | Open |
 
 **Current state:**
@@ -57,9 +57,9 @@
 - CI uses Node 22 (pinned in `.nvmrc` + all workflow files)
 - ✅ `.nvmrc` exists, pinned to Node 22
 - ✅ `.env.local.example` exists with `APP_ENV`, `DEPLOY_TARGET`, Supabase, Stripe, and security vars
-- ✅ `docs/DEVELOPER_SETUP.md` exists with full setup guide
+- ✅ `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` exists with full setup guide
 
-**Impact:** ~~New developers must reverse-engineer the setup.~~ ✅ Resolved — `docs/DEVELOPER_SETUP.md` provides full onboarding guide. Only WSL2-specific instructions (OPS-DEV-004) remain open.
+**Impact:** ~~New developers must reverse-engineer the setup.~~ ✅ Resolved — `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` provides full onboarding guide. Only WSL2-specific instructions (OPS-DEV-004) remain open.
 
 ---
 
@@ -132,7 +132,7 @@
 |---------|-----|----------|--------|
 | ~~No `supabase/config.toml` in repo~~ | OPS-SB-001 | P2 | ✅ **LÖST** — `supabase/config.toml` finns, `supabase start` fungerar (2026-03-14) |
 | ~~Seed scripts not fully idempotent~~ | OPS-SB-002 | P2 | ✅ **LÖST** — `supabase/seed.sql` skapad med 3 testanvändare, 2 tenants, idempotent via ON CONFLICT (2026-03-14) |
-| ~~No documented local Supabase workflow~~ | OPS-SB-003 | P2 | ✅ **LÖST** — Dokumenterat i `docs/DEVELOPER_SETUP.md` (2026-03-15) |
+| ~~No documented local Supabase workflow~~ | OPS-SB-003 | P2 | ✅ **LÖST** — Dokumenterat i `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` (2026-03-15) |
 
 **Current state:**
 - ✅ `supabase/migrations/` contains 304+ migration files (all idempotent)
@@ -141,7 +141,7 @@
 - ✅ `supabase/verify_rls_coverage.sql` exists (RLS verification script)
 - ✅ `rls-tests.yml` CI workflow runs Supabase CLI locally
 - ✅ `npm run db:reset` resets + seeds local database
-- ✅ Local Supabase workflow documented in `docs/DEVELOPER_SETUP.md`
+- ✅ Local Supabase workflow documented in `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`
 
 ---
 
@@ -217,7 +217,7 @@
 | Finding | ID | Severity | Status |
 |---------|-----|----------|--------|
 | ~~Ops docs are templates with TBD sections~~ | OPS-DOC-001 | P2 | Open (non-blocking — templates are functional) |
-| ~~No developer onboarding guide~~ | OPS-DOC-002 | P2 | ✅ **LÖST** — `docs/DEVELOPER_SETUP.md` skapad (2026-03-15) |
+| ~~No developer onboarding guide~~ | OPS-DOC-002 | P2 | ✅ **LÖST** — `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` skapad (2026-03-15) |
 
 **Current state:**
 - ✅ `docs/ops/alerting.md` — signal thresholds defined, destinations TBD

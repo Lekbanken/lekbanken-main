@@ -45,7 +45,7 @@ docs/ai/AI_CODING_GUIDELINES.md
 PROJECT_CONTEXT.md
 launch-readiness/launch-control.md
 docs/database/environments.md
-docs/DEVELOPER_SETUP.md
+docs/toolkit/developer-guide/DEVELOPER_SETUP.md
 docs/TOOLING_MATRIX.md
 docs/NOTION_SYNC_PLAN.md
 docs/VS_CODE_WORKFLOW.md
@@ -58,7 +58,7 @@ Why this exists:
 - `PROJECT_CONTEXT.md` explains the product and domain intent.
 - `launch-readiness/launch-control.md` explains current operational state.
 - `docs/database/environments.md` explains what is local, preview, and production.
-- `docs/DEVELOPER_SETUP.md` explains the practical local toolchain.
+- `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` explains the practical local toolchain.
 - `docs/TOOLING_MATRIX.md` locks which tools are primary, secondary, or skipped.
 - `docs/NOTION_SYNC_PLAN.md` explains how Notion stays updated without becoming split-brain.
 - `docs/VS_CODE_WORKFLOW.md` explains the session workflow.

@@ -37,6 +37,7 @@ Use it to answer:
 - `DATA_MODEL_DOMAIN.md` — canonical schema-governance reference for migrations, typegen, and RLS conventions
 - `DATABASE_SECURITY_DOMAIN.md` — canonical database security reference for RLS, SECURITY DEFINER hardening, and verification queries
 - `PERFORMANCE_ADVISOR_PROMPT.md` — active Supabase Performance Advisor query set for follow-up performance analysis
+- `TYPE_MANAGEMENT.md` — draft operational guide for when and how Supabase-generated TypeScript types must be regenerated and validated
 - `environments.md` — canonical environment and database-target rules
 - `migration-history.md` — active normalization log for the current baseline/migration-history state
 

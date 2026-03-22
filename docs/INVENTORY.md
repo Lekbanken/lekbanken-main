@@ -348,7 +348,7 @@ Fält:
 | [docs/toolkit/getting-started/concepts.md](toolkit/getting-started/concepts.md) | A | draft | 2025-12-28 | - | Toolkit core concepts overview |
 | [docs/toolkit/getting-started/README.md](toolkit/getting-started/README.md) | A | draft | 2025-12-28 | - | Toolkit onboarding quick start |
 | [docs/toolkit/host-guide/README.md](toolkit/host-guide/README.md) | A | draft | 2025-12-28 | - | Toolkit host operations guide |
-| [docs/TYPE_MANAGEMENT.md](TYPE_MANAGEMENT.md) | A | draft | 2025-12-10 | - | Core reference |
+| [docs/database/TYPE_MANAGEMENT.md](database/TYPE_MANAGEMENT.md) | A | draft | 2025-12-10 | - | Core reference |
 | [docs/demo/archive/VERIFICATION_PROMPT.md](demo/archive/VERIFICATION_PROMPT.md) | E | historical snapshot | 2026-01-13 | - | Demo sprint verification prompt snapshot |
 | [docs/validation/README.md](validation/README.md) | A | active | 2026-03-21 | - | Sub-index for validation snapshots and working material |
 | [docs/validation/API_VALIDATION_REPORT.md](validation/API_VALIDATION_REPORT.md) | C | historical snapshot | 2025-12-11 | - | Validation report |

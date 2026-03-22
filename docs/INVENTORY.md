@@ -277,7 +277,7 @@ Fält:
 | [docs/platform/PLATFORM_DOMAIN_VALIDATION_REPORT.md](platform/PLATFORM_DOMAIN_VALIDATION_REPORT.md) | C | draft | 2025-12-10 | - | Validation report |
 | [docs/billing/archive/PURCHASE_FLOW_IMPLEMENTATION.md](billing/archive/PURCHASE_FLOW_IMPLEMENTATION.md) | B | historical snapshot | 2026-01-27 | - | Purchase-flow implementation plan snapshot |
 | [docs/billing/archive/PURCHASE_FLOW_STATUS_REPORT.md](billing/archive/PURCHASE_FLOW_STATUS_REPORT.md) | C | historical snapshot | 2026-01-27 | - | Purchase-flow status report snapshot |
-| [docs/TENANT_MEMBERSHIP_CONSOLIDATION.md](TENANT_MEMBERSHIP_CONSOLIDATION.md) | C | historical snapshot | 2026-01-03 | - | Tenant-membership naming consolidation snapshot |
+| [docs/tenant/TENANT_MEMBERSHIP_CONSOLIDATION.md](tenant/TENANT_MEMBERSHIP_CONSOLIDATION.md) | C | historical snapshot | 2026-01-03 | - | Tenant-membership naming consolidation snapshot |
 | [docs/tenant/README.md](tenant/README.md) | A | active | 2026-03-22 | - | Tenant cluster entrypoint |
 | [docs/tenant/TENANT_DOMAIN.md](tenant/TENANT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/builder/TESTPLAN_GAME_BUILDER_P0.md](builder/TESTPLAN_GAME_BUILDER_P0.md) | B | draft | 2025-12-17 | - | Testplan |

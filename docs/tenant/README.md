@@ -19,7 +19,8 @@ Use this cluster to understand multi-tenancy, memberships, invitations, tenant-l
 1. `TENANT_DOMAIN.md`
 2. `DOMAIN_TENANT_TODO.md`
 3. `DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md`
-4. `../auth/README.md` when the question overlaps with auth, roles, or tenant resolution behavior
+4. `TENANT_MEMBERSHIP_CONSOLIDATION.md` when you need the historical naming-consolidation context for memberships/views/types
+5. `../auth/README.md` when the question overlaps with auth, roles, or tenant resolution behavior
 
 ## Status map
 
@@ -31,6 +32,10 @@ Use this cluster to understand multi-tenancy, memberships, invitations, tenant-l
 
 - `DOMAIN_TENANT_TODO.md` — tenant backlog and roadmap items that must stay synchronized with schema and API changes
 - `DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md` — cross-domain lessons from the tenant implementation and security model
+
+### Historical snapshots
+
+- `TENANT_MEMBERSHIP_CONSOLIDATION.md` — historical note for canonical tenant-membership naming across schema, policies, and generated types
 
 ## Working rule
 

@@ -1,13 +1,13 @@
 # 🌍 TRANSLATION ENGINE DOMAIN – VALIDATION REPORT
 
-Canonical domain doc (source of truth): `docs/TRANSLATION_ENGINE_DOMAIN.md`
+Canonical domain doc (source of truth): `docs/content/TRANSLATION_ENGINE_DOMAIN.md`
 
 ## Metadata
 
 > **Status:** draft
 > **Owner:** -
 > **Date:** 2025-12-11
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-22
 > **Last validated:** 2025-12-11
 > **Domain:** Translation Engine (i18n)
 > **Notes:** Partial implementation validation snapshot.

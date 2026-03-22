@@ -139,7 +139,7 @@ Enligt **`docs/PROJECT_EXECUTION_PLAN.md`**, börja med:
 - Hur hanteras missing translations?
 
 **Deliverable:**
-- `docs/validation/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md`
+- `docs/content/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md`
 
 ---
 

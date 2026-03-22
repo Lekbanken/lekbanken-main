@@ -92,7 +92,7 @@ Rekommenderad spegling i repo:
 - Media (aktuellt): [media/MEDIA_DOMAIN.md](media/MEDIA_DOMAIN.md)
 - Notifications (aktuellt): [notifications/NOTIFICATIONS_DOMAIN.md](notifications/NOTIFICATIONS_DOMAIN.md)
 - Support (aktuellt): [support/SUPPORT_DOMAIN.md](support/SUPPORT_DOMAIN.md)
-- Translation Engine (aktuellt): [TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md)
+- Translation Engine (aktuellt): [content/TRANSLATION_ENGINE_DOMAIN.md](content/TRANSLATION_ENGINE_DOMAIN.md)
 - Operations (aktuellt): [ops/OPERATIONS_DOMAIN.md](ops/OPERATIONS_DOMAIN.md)
 	- Runbooks: [ops/README.md](ops/README.md)
 - API / Integration (aktuellt): [API_INTEGRATION_DOMAIN.md](API_INTEGRATION_DOMAIN.md)
@@ -230,7 +230,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [ ] **Planner Domain** – AI-generering och templates
 - [x] **Gamification Domain** – "Din Lekresa"-gamification (coins, streaks, achievements) (se `docs/GAMIFICATION_DOMAIN.md`)
 - [x] **Journey Domain** – "Din lekresa" dashboard/timeline (read/composition) (se `docs/JOURNEY_DOMAIN.md`)
-- [x] **Translation Engine Domain** – i18n-fallback och batch-översättning (se `docs/TRANSLATION_ENGINE_DOMAIN.md`)
+- [x] **Translation Engine Domain** – i18n-fallback och batch-översättning (se `docs/content/TRANSLATION_ENGINE_DOMAIN.md`)
 - [x] **Operations Domain** – Drift och monitoring (se `docs/ops/OPERATIONS_DOMAIN.md` + `docs/ops/*`)
 - [x] **API/Integration Domain** – endpoints & conventions (se `docs/API_INTEGRATION_DOMAIN.md`)
 - [x] **Marketing Domain** – Landningssidor och funnels (se `docs/marketing/MARKETING_DOMAIN.md`)

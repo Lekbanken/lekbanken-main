@@ -624,5 +624,5 @@ This phase was about **thinking clearly**, not building fast.
 | `components/navigation/LanguageSwitcher.tsx` | Language selector UI |
 | `supabase/migrations/20251208090000_games_translations_media.sql` | Game translations schema |
 | `app/layout.tsx` | Root layout (hardcoded `lang="sv"`) |
-| `docs/TRANSLATION_ENGINE_DOMAIN.md` | Existing domain documentation |
-| `docs/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md` | Previous validation report |
+| `docs/content/TRANSLATION_ENGINE_DOMAIN.md` | Existing domain documentation |
+| `docs/content/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md` | Previous validation report |

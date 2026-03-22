@@ -5,7 +5,7 @@
 > **Status:** active
 > **Owner:** -
 > **Date:** 2025-12-17
-> **Last updated:** 2026-03-21
+> **Last updated:** 2026-03-22
 > **Last validated:** -
 > **Source of truth:** Repo code + `supabase/migrations/*` (schema) + `types/supabase.ts` (generated)
 
@@ -20,7 +20,7 @@ Non-goals (currently outside implemented scope):
 - Admin tooling/workflows for translation management (import/export, batch translate, missing key detection)
 
 ## Related docs
-- Validation report (historical findings): `docs/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md`
+- Validation report (historical findings): `docs/content/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md`
 - Games content translations: `docs/GAMES_DOMAIN.md`
 - Ops/system considerations: `docs/ops/OPERATIONS_DOMAIN.md`
 

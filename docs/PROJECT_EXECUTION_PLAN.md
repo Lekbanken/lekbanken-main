@@ -921,7 +921,7 @@ Use tool (dbdiagram.io or similar) to visualize all relationships.
 - Report creation: 2h
 - Fixes (if needed): 2-4h
 
-**Deliverable:** `TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md`
+**Deliverable:** `docs/content/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md`
 
 ---
 

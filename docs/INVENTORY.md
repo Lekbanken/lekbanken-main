@@ -325,8 +325,8 @@ Fält:
 | [docs/templates/TRIPLET_AUDIT_TEMPLATE.md](templates/TRIPLET_AUDIT_TEMPLATE.md) | E | active | 2026-03-21 | - | Template for new audit docs in active triplets |
 | [docs/templates/TRIPLET_IMPLEMENTATION_PLAN_TEMPLATE.md](templates/TRIPLET_IMPLEMENTATION_PLAN_TEMPLATE.md) | E | active | 2026-03-21 | - | Template for new implementation plans in active triplets |
 | [docs/templates/VALIDATION_CHECKLIST.md](templates/VALIDATION_CHECKLIST.md) | E | draft | 2025-12-10 | - | Validation checklist template |
-| [docs/TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
-| [docs/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md](TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md) | C | draft | 2025-12-11 | - | Validation report |
+| [docs/content/TRANSLATION_ENGINE_DOMAIN.md](content/TRANSLATION_ENGINE_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/content/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md](content/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md) | C | draft | 2025-12-11 | - | Validation report |
 | [docs/TOOLING_MATRIX.md](TOOLING_MATRIX.md) | A | active | 2026-03-21 | - | Locked CLI vs MCP guidance |
 | [docs/toolkit/README.md](toolkit/README.md) | A | active | 2025-12-28 | - | User-facing toolkit documentation hub |
 | [docs/toolkit/api-reference/README.md](toolkit/api-reference/README.md) | A | draft | 2025-12-28 | - | Toolkit public API reference |

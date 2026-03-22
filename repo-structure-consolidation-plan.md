@@ -96,7 +96,7 @@ Domain analysis docs — move to `docs/` by domain:
 | A33 | `ARTIFACT_COMPONENTS.md` | `docs/` |
 | A34 | `ARTIFACT_MATRIX.md` | `docs/` |
 | A35 | `ARTIFACT_UI_CONTRACT.md` | `docs/` |
-| A36 | `SIGNALS_SPEC.md` | `docs/` |
+| A36 | `play/signals/SIGNALS_SPEC.md` | `docs/play/signals/` |
 | A37 | `summary.md` | `docs/archive/` |
 
 ### RELABEL / DOCUMENT ONLY — Add markers, don't move

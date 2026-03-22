@@ -168,7 +168,7 @@ All files in `launch-readiness/` are canonical and actively maintained:
 | `planner-implementation-plan.md` | Planner roadmap | `copilot-instructions.md` |
 | `PLAY_UI_CONTRACT.md` | Enforced play UI contract | Guardrail tests (39j–39q) |
 | `PARTICIPANT_PLAY_UI_LAWS.md` | Participant mobile layout contract | Code references |
-| `SIGNALS_SPEC.md` | Signals system architecture | Code implementation |
+| `play/signals/SIGNALS_SPEC.md` | Signals system architecture | Code implementation |
 
 ### Config/infrastructure (not markdown but related)
 

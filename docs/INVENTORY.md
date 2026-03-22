@@ -156,7 +156,8 @@ Fält:
 | [docs/profile/archive/PROFILE_AUDIT_2026-03-05.md](profile/archive/PROFILE_AUDIT_2026-03-05.md) | C | frozen audit | - | Profile | Audit snapshot |
 | [docs/profile/archive/PROFILE_IMPLEMENTATION_PLAN.md](profile/archive/PROFILE_IMPLEMENTATION_PLAN.md) | B | historical snapshot | - | Profile | Completed implementation plan |
 | [docs/SANDBOX_GAMIFICATION_REPORT.md](SANDBOX_GAMIFICATION_REPORT.md) | C | historical snapshot | 2026-01-03 | - | Gamification sandbox coverage snapshot |
-| [docs/SIGNALS_SPEC.md](SIGNALS_SPEC.md) | B | draft | 2026-02-23 | - | Signals system architecture spec |
+| [docs/play/signals/README.md](play/signals/README.md) | A | active | 2026-03-22 | - | Sub-index for play signals docs |
+| [docs/play/signals/SIGNALS_SPEC.md](play/signals/SIGNALS_SPEC.md) | B | draft | 2026-02-23 | - | Signals system architecture spec |
 | [docs/STANDARDBILDER_AUDIT_REPORT.md](STANDARDBILDER_AUDIT_REPORT.md) | C | frozen audit | 2026-02-08 | - | Standard images audit report |
 | [docs/TRANSLATION_ADMIN_ENTERPRISE_ANALYSIS.md](TRANSLATION_ADMIN_ENTERPRISE_ANALYSIS.md) | C | historical snapshot | 2026-01-11 | - | Enterprise translation and i18n architecture analysis |
 | [docs/profile/archive/USER_PROFILE_CURRENT_STATE_ANALYSIS.md](profile/archive/USER_PROFILE_CURRENT_STATE_ANALYSIS.md) | C | historical snapshot | 2026-01-16 | - | User profile current-state analysis |

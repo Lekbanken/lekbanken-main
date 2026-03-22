@@ -35,6 +35,7 @@ The play structure audits in this folder remain the guardrails for large-scale r
 - `PARTICIPANT_PLAY_UI_LAWS.md` — immutable participant UI laws for the mobile-first play view
 - `LEGENDARY_PLAY_ADVANCED_FEATURES.md` — advanced immersion UX draft for Legendary Play
 - `PLAY_SESSIONS_UI_SPEC.md` — draft UI/UX spec across participant, host, and admin play surfaces
+- `signals/README.md` — signals-system architecture reference for two-way director/participant cues
 
 ### Active audits
 

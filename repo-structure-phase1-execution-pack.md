@@ -92,7 +92,7 @@ TO docs/:
   ARTIFACT_COMPONENTS.md
   ARTIFACT_MATRIX.md
   ARTIFACT_UI_CONTRACT.md
-  SIGNALS_SPEC.md
+  play/signals/SIGNALS_SPEC.md
 ```
 
 ### Step 3 — RELABEL / gitignore (R1–R3)

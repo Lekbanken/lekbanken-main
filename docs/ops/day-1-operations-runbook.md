@@ -8,7 +8,7 @@
 - Last updated: 2026-03-23
 - Last validated: 2026-03-23
 
-> Active entry-runbook for launch-day and early-production operations. Use this as the single starting point for who watches signals, when to escalate, and which deeper runbook to open next.
+> Active entry-runbook for launch-day and early-production operations. Use this as the single starting point for launch-day checks, escalation triggers, and which deeper runbook to open next.
 
 ## Purpose
 
@@ -37,18 +37,6 @@ Before using this runbook in production, verify these external items outside the
 - database owner contact
 - billing/Stripe contact if billing is in scope
 
-## Operating roles
-
-Use role ownership, not personal names, in the repo.
-
-| Role | Responsibility | Detailed source |
-|------|----------------|-----------------|
-| Release commander | Owns promotion decision and first-hour coordination | `docs/ops/release-promotion-checklist.md` |
-| Signal reviewer | Runs scheduled health and signal checks | `docs/ops/production-signals-dashboard.md` |
-| Incident commander | Takes over on SEV1-SEV3 events | `docs/ops/incident_response.md` |
-| Platform/DB operator | Handles rollback, migrations, env issues, Supabase checks | `docs/ops/prod-migration-workflow.md` |
-| Feature owner | Investigates domain-specific regressions such as Realtime or economy alerts | `docs/ops/anomaly-detection-playbook.md` |
-
 ## When to use this runbook
 
 Use this runbook for:
@@ -60,9 +48,9 @@ Use this runbook for:
 
 ## Launch-day flow
 
-### 1. Pre-promotion owner check
+### 1. Pre-promotion check
 
-Before promotion, the release commander confirms:
+Before promotion, confirm:
 
 - preview verification is complete
 - production env vars were checked
@@ -85,7 +73,7 @@ If a deployment issue is obvious and user impact is active, move directly to `do
 
 ### 3. First-hour signal sweep (15-60 min)
 
-The signal reviewer checks the key operational surfaces:
+Check the key operational surfaces:
 
 - health/readiness endpoints
 - production error pressure
@@ -123,12 +111,12 @@ If the incident includes a database change, use `docs/ops/prod-migration-workflo
 
 ## First 24 hours cadence
 
-| Time window | Owner | Required checks | Next doc |
-|-------------|-------|-----------------|----------|
-| 0-15 min | Release commander | Deploy smoke checks, health endpoint, critical route sanity | `docs/ops/first-deploy-runbook.md` |
-| 15-60 min | Signal reviewer | Error rate, latency, auth, Realtime, billing if touched | `docs/ops/production-signals-dashboard.md` |
-| 2-4 h | Signal reviewer + feature owner | Re-check thresholds and anomalies after real traffic | `docs/ops/anomaly-detection-playbook.md` |
-| End of day | Release commander | Confirm no unresolved alerts or hidden rollback need | `docs/ops/incident_response.md` if needed |
+| Time window | Required checks | Next doc |
+|-------------|-----------------|----------|
+| 0-15 min | Deploy smoke checks, health endpoint, critical route sanity | `docs/ops/first-deploy-runbook.md` |
+| 15-60 min | Error rate, latency, auth, Realtime, billing if touched | `docs/ops/production-signals-dashboard.md` |
+| 2-4 h | Re-check thresholds and anomalies after real traffic | `docs/ops/anomaly-detection-playbook.md` |
+| End of day | Confirm no unresolved alerts or hidden rollback need | `docs/ops/incident_response.md` if needed |
 
 ## First week cadence
 
@@ -143,10 +131,10 @@ During the first week after launch or a high-risk release:
 
 | Situation | Primary response | Escalate to |
 |-----------|------------------|-------------|
-| Deploy smoke failure | Roll back or fix config | Incident commander + platform owner |
-| Health/readiness failure | Incident flow | Platform/DB operator |
-| Alert A/B/C threshold breach | Anomaly playbook | Feature owner + incident commander if sustained |
-| Migration failure | Migration rollback flow | Platform/DB operator |
+| Deploy smoke failure | Roll back or fix config | Incident flow or external on-call path |
+| Health/readiness failure | Incident flow | Database or platform contact outside the repo |
+| Alert A/B/C threshold breach | Anomaly playbook | Incident flow if sustained |
+| Migration failure | Migration rollback flow | Database or platform contact outside the repo |
 | Unknown ownership | Incident flow first | External on-call roster |
 
 ## Evidence to capture
@@ -175,6 +163,7 @@ The day-1 operations window is complete when:
 ## Validation checklist
 
 - References point to existing ops runbooks in `docs/ops/`.
+- The runbook does not define or imply a repo-owned role model.
 - Escalation paths do not invent repo-invisible contact details.
 - Launch-day cadence matches `docs/ops/first-deploy-runbook.md` and `docs/ops/production-signals-dashboard.md`.
 - Incident handoff matches `docs/ops/incident_response.md`.

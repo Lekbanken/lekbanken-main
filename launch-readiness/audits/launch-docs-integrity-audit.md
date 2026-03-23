@@ -5,8 +5,8 @@
 - Owner: -
 - Status: frozen audit
 - Date: 2026-03-15
-- Last updated: 2026-03-22
-- Last validated: 2026-03-15
+- Last updated: 2026-03-23
+- Last validated: 2026-03-23
 
 > Closed audit of the launch-readiness documentation layer. Treat this as the bounded audit snapshot behind the ongoing documentation cleanup work.
 
@@ -88,7 +88,7 @@
 | `anomaly-detection-playbook.md` | `docs/ops/` | Alert response procedures | ✅ Exists |
 | `first-deploy-runbook.md` | `docs/ops/` | First deploy procedures | ✅ Exists |
 | `DEVELOPER_SETUP.md` | `docs/toolkit/developer-guide/` | Developer onboarding | ✅ Current (MFA section added 2026-03-15) |
-| `ENVIRONMENT_VARIABLES.md` | `docs/` | Env var documentation | ⚠️ Needs verification against current `.env.local.example` |
+| `ENVIRONMENT_VARIABLES.md` | `docs/` | Env var documentation | ✅ Verified against `.env.local.example` and `lib/config/env.ts` (2026-03-23) |
 | `README.md` | Root | Project README | ✅ Current launch routing added 2026-03-22 |
 
 ---
@@ -196,12 +196,12 @@ Migration guide filenames listed below were part of the original root-level audi
 | Gap | Impact | Priority |
 |-----|--------|----------|
 | **No unified ops runbook** | Incident playbook exists but no "day 1 operations" guide covering who runs signal checks, escalation paths, contact info | Medium |
-| **No deploy checklist** | `first-deploy-runbook.md` exists but no recurring deploy checklist for migrations, env var changes, cron config | Medium |
+| ~~No deploy checklist~~ | ✅ **Resolved 2026-03-23** — `docs/ops/release-promotion-checklist.md` plus `docs/ops/first-deploy-runbook.md` now cover recurring promotion and first-deploy verification. | Closed |
 | **No API reference** | 288 routes, no generated API docs. OpenAPI/Swagger not configured. | Low (post-launch) |
 | **No architecture decision log** | ADRs scattered across launch-control.md §7 and various docs. No single `docs/adr/` directory. | Low |
-| **No post-launch monitoring guide** | Telemetry pack defines signals but no "how to check production health daily" guide for the team | Medium |
-| **`README.md` outdated** | Last modified 2026-01-08. Does not reflect current dev setup, MFA requirements, or staging environment. | Medium |
-| **`ENVIRONMENT_VARIABLES.md` unverified** | May not reflect current `.env.local.example` with APP_ENV/DEPLOY_TARGET changes | Medium |
+| ~~No post-launch monitoring guide~~ | ✅ **Resolved 2026-03-23** — `docs/ops/production-signals-dashboard.md` defines daily/weekly review cadence and `docs/ops/anomaly-detection-playbook.md` documents escalation/triage. | Closed |
+| ~~`README.md` outdated~~ | ✅ **Resolved 2026-03-23** — root README now routes to current launch, ops, database, and workflow entrypoints. | Closed |
+| ~~`ENVIRONMENT_VARIABLES.md` unverified~~ | ✅ **Resolved 2026-03-23** — verified against `.env.local.example` and `lib/config/env.ts`; deployment identity and validation bypass rules are now documented. | Closed |
 
 ---
 
@@ -221,7 +221,7 @@ In Lekbanken, markdown files serve as AI agent memory. Each AI session reads the
 |-----------|-------|---------|
 | SSoT clarity | 7/10 | `launch-readiness/` is well-organized. Root has 70 loose files with unclear authority. |
 | Noise level | 3/10 | 397 markdown files. ~160 are archivable. Semantic search returns obsolete briefs and prompts. |
-| Freshness | 6/10 | Core docs are current within days. Wrapper numbers are stale. Phase labels are wrong. |
+| Freshness | 8/10 | Core docs are current within days. Tier 1 launch drift is resolved; remaining gaps are lower-priority governance and archive noise. |
 | Cross-referencing | 5/10 | Documents reference each other well within launch-readiness/. Root files rarely cross-reference. |
 | Discoverability | 4/10 | No master index. `DOCS_INDEX.md` exists in docs/ but is likely outdated. |
 

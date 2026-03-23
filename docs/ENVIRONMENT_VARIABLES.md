@@ -7,15 +7,17 @@ This document provides a comprehensive reference for all environment variables u
 > **Status:** active
 > **Owner:** -
 > **Date:** 2025-12-10
-> **Last updated:** 2026-03-21
-> **Last validated:** 2025-12-17
+> **Last updated:** 2026-03-23
+> **Last validated:** 2026-03-23
 
 ## Validation checklist
 
 - Source of truth for validation rules: `lib/config/env.ts`.
-- `.env.local.example` exists and includes at least the required Supabase variables.
+- `.env.local.example` exists and includes the local-first Supabase variables plus `APP_ENV` and `DEPLOY_TARGET`.
 - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are required (the app fails fast if missing).
-- Other variables are optional and should be documented as feature-gated.
+- `APP_ENV` is validated strictly when set (`local`, `staging`, `production`).
+- `SKIP_ENV_VALIDATION` is documented as a CI/build-only bypass, not a normal runtime setting.
+- Other variables are optional and should be documented as feature-gated or ops-only.
 
 ## Quick Start
 
@@ -58,8 +60,8 @@ All Supabase configuration is **required** for the application to function.
 - Media upload flows depend on Supabase Storage buckets + RLS policies existing in your project.
 - For artifact media uploads (hotspot images + audio), the app expects private buckets `media-images` and `media-audio`.
    - Migration: [supabase/migrations/20251229090000_media_artifact_buckets.sql](supabase/migrations/20251229090000_media_artifact_buckets.sql)
-   - Apply (local): `npx supabase db push`
-   - Apply (linked/remote): `npx supabase db push --linked`
+   - Apply locally by replaying migrations with `npm run db:reset`
+   - Apply remotely only through the guarded workflow: `npm run db:push`
 
 ---
 
@@ -108,6 +110,7 @@ if (NODE_ENV === 'production' || STRIPE_USE_LIVE_KEYS === 'true') {
 | `TENANT_COOKIE_SECRET` | ⭕ | Secret for encrypting tenant cookies | `'dev-secret-...'` | Random 32-char string |
 | `JWT_SECRET` | ⭕ | Secret for signing JWT tokens | - | Random 32-char string |
 | `MFA_ENFORCE_SYSTEM_ADMIN` | ⭕ | Require MFA for system admins | `false` | `true` |
+| `VAULT_ENCRYPTION_KEY` | ⭕ | 64-char hex key for AES-256-GCM vault encryption | - | `0123abcd...` |
 
 **Generating Secrets:**
 ```bash
@@ -123,6 +126,7 @@ openssl rand -base64 32
 - Use different secrets for production vs staging
 - Store secrets in Vercel environment variables (not in Git)
 - Rotate secrets periodically (especially if compromised)
+- For encrypted vault data, rotate `VAULT_ENCRYPTION_KEY` by moving the old value to `VAULT_ENCRYPTION_KEY_V<N>` and updating the active key
 
 ---
 
@@ -152,6 +156,13 @@ Enable or disable specific features.
 | `FEATURE_AI` | ⭕ | Master switch for user-facing AI features | `false` | `true` |
 | `FEATURE_AI_SUGGESTIONS` | ⭕ | Enable AI-powered game suggestions | `false` | `true` |
 | `FEATURE_PARTICIPANTS` | ⭕ | Enable Participants Domain (anonymous sessions) | `false` | `true` |
+| `FEATURE_SIGNALS` | ⭕ | Enable signals primitives in play/lobby | `true` in dev, `false` otherwise | `true` |
+| `FEATURE_TIME_BANK` | ⭕ | Enable time-bank primitives in play mode | `true` in dev, `false` otherwise | `true` |
+| `FEATURE_SESSION_COCKPIT` | ⭕ | Enable unified host shell for lobby/director mode | `true` in dev, `false` otherwise | `true` |
+| `FEATURE_DIRECTOR_MODE_DRAWER` | ⭕ | Use drawer-based director mode UI | `true` in dev, `false` otherwise | `true` |
+| `FEATURE_LEADER_SCRIPT` | ⭕ | Enable host-only leader script UI | `true` in dev, `false` otherwise | `true` |
+| `FEATURE_REALTIME_SESSION_EVENTS` | ⭕ | Enable realtime session event feed/subscriptions | `true` in dev, `false` otherwise | `true` |
+| `FEATURE_TRIGGER_KILL_SWITCH` | ⭕ | Emergency kill switch for trigger execution | `true` in dev, `false` otherwise | `false` |
 
 **Checking in Code:**
 ```typescript
@@ -161,6 +172,25 @@ if (isFeatureEnabled('participantsDomain')) {
   // Show participants UI
 }
 ```
+
+---
+
+### Deployment Identity & Build Controls
+
+These variables define where the app is running and how strict runtime validation should be.
+
+| Variable | Required | Purpose | Default | Example |
+|----------|----------|---------|---------|---------|
+| `APP_ENV` | ⭕ | Data environment identifier used for safety guards (`local`, `staging`, `production`) | `local` | `production` |
+| `DEPLOY_TARGET` | ⭕ | Deployment target tag used for observability and release routing | `development` | `prod` |
+| `NEXT_PUBLIC_SITE_URL` | ⭕ | Canonical app URL for server-driven redirects and links | - | `https://www.lekbanken.no` |
+| `SKIP_ENV_VALIDATION` | ⭕ | Build/CI-only bypass for runtime env validation | `false` | `true` |
+
+**Notes:**
+- `APP_ENV` is validated strictly when present; unknown values fail startup.
+- `DEPLOY_TARGET` is used for observability tagging and deployment identity.
+- `NEXT_PUBLIC_SITE_URL` is used by server-side flows such as reset links and canonical URL generation.
+- `SKIP_ENV_VALIDATION=true` is only appropriate for build-only CI checks where production secrets are intentionally unavailable.
 
 ---
 
@@ -193,6 +223,8 @@ if (isFeatureEnabled('participantsDomain')) {
 # Recommended
 ⭕ SUPABASE_SERVICE_ROLE_KEY (for admin features)
 ⭕ TENANT_COOKIE_SECRET (change from default)
+⭕ APP_ENV=local
+⭕ DEPLOY_TARGET=development
 
 # Optional
 ⭕ STRIPE_ENABLED=true (if testing billing)
@@ -207,12 +239,18 @@ if (isFeatureEnabled('participantsDomain')) {
 ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY
 ✅ SUPABASE_SERVICE_ROLE_KEY
 ✅ TENANT_COOKIE_SECRET (strong random value)
+✅ APP_ENV=production
+✅ DEPLOY_TARGET=prod
 
 # If using Stripe
 ⭕ STRIPE_ENABLED=true
 ⭕ NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY
 ⭕ STRIPE_LIVE_SECRET_KEY
 ⭕ STRIPE_LIVE_WEBHOOK_SECRET
+
+# Operationally important
+⭕ NEXT_PUBLIC_SITE_URL
+⭕ VAULT_ENCRYPTION_KEY
 ```
 
 ---
@@ -225,6 +263,8 @@ The application validates environment variables at startup using `lib/config/env
 - **Required variables:** Throw error immediately if missing
 - **Optional variables:** Warn if missing (but continue)
 - **Feature-gated variables:** Only validate if feature is enabled
+- **Strict environment guard:** `APP_ENV` rejects unknown values at startup
+- **Build-only bypass:** `SKIP_ENV_VALIDATION=true` is allowed for CI/build pipelines only
 
 **Error Messages:**
 ```
@@ -291,6 +331,8 @@ The application validates environment variables at startup using `lib/config/env
 
 - `.env.local.example` - Template with all variables
 - `lib/config/env.ts` - Validation logic and type-safe access
+- `docs/toolkit/developer-guide/DEVELOPER_SETUP.md` - App environment model (`APP_ENV`, `DEPLOY_TARGET`)
+- `docs/database/environments.md` - Database target rules and guarded migration workflow
 - `docs/platform/PLATFORM_DOMAIN.md` - Platform infrastructure documentation
 - Supabase Docs: https://supabase.com/docs
 - Stripe Docs: https://stripe.com/docs

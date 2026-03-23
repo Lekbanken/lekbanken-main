@@ -9,13 +9,13 @@ Initialize a new Lekbanken session.
 
 Follow the rules and context from:
 
-- `PROJECT_CONTEXT.md`
-- `launch-readiness/launch-control.md`
-- `docs/database/environments.md`
-- `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`
-- `docs/VS_CODE_WORKFLOW.md`
-- `.atlas/README.md`
-- `.github/copilot-instructions.md`
+- the project context document
+- the launch control document
+- the database environments guide
+- the developer setup guide
+- the VS Code workflow guide
+- the Atlas workspace README
+- the workspace Copilot instructions
 
 Use the chat argument as today's session goal.
 

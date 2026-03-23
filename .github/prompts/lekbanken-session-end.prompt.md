@@ -9,13 +9,13 @@ Close the current Lekbanken session safely.
 
 Follow the rules and context from:
 
-- `PROJECT_CONTEXT.md`
-- `launch-readiness/launch-control.md`
-- `docs/database/environments.md`
-- `docs/toolkit/developer-guide/DEVELOPER_SETUP.md`
-- `docs/VS_CODE_WORKFLOW.md`
-- `.atlas/README.md`
-- `.github/copilot-instructions.md`
+- the project context document
+- the launch control document
+- the database environments guide
+- the developer setup guide
+- the VS Code workflow guide
+- the Atlas workspace README
+- the workspace Copilot instructions
 
 Use the chat argument as extra shutdown context if one is provided.
 
@@ -27,7 +27,7 @@ Do this in order:
 4. If active canonical docs were changed, perform a date check before handoff.
 	- Use the current session date if the environment already provides it.
 	- Otherwise verify the local system date before accepting document metadata.
-	- Confirm that `Date`, `Last updated`, and `Last validated` follow `docs/DOCUMENT_DATING_STANDARD.md`.
+	- Confirm that `Date`, `Last updated`, and `Last validated` follow the document dating standard.
 	- Call out any document whose date fields were not verified.
 5. Summarize remaining risks, blockers, and recommended next steps.
 6. Suggest a commit message or commit grouping if changes exist.

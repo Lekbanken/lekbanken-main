@@ -5,8 +5,8 @@
 - Owner: -
 - Status: active
 - Date: 2025-12-17
-- Last updated: 2026-03-22
-- Last validated: 2026-03-22
+- Last updated: 2026-03-23
+- Last validated: 2026-03-23
 
 > Active exhaustive inventory of `docs/**/*.md`. This file is the sole authoritative classified registry for the docs tree.
 
@@ -236,13 +236,14 @@ Fält:
 | [docs/ops/anomaly-detection-playbook.md](ops/anomaly-detection-playbook.md) | A | active | 2026-03-14 | - | Launch anomaly detection and response playbook |
 | [docs/ops/backup_dr.md](ops/backup_dr.md) | A | active | 2025-12-11 | - | Backup and disaster recovery runbook |
 | [docs/ops/cicd_pipeline.md](ops/cicd_pipeline.md) | A | active | 2025-12-11 | - | CI/CD and rollback runbook |
+| [docs/ops/day-1-operations-runbook.md](ops/day-1-operations-runbook.md) | A | active | 2026-03-23 | - | Unified launch-day and early-production operations entry runbook |
 | [docs/ops/first-deploy-runbook.md](ops/first-deploy-runbook.md) | A | active | 2026-03-14 | - | First production deploy runbook |
 | [docs/ops/incident_response.md](ops/incident_response.md) | A | active | 2025-12-11 | - | Incident response runbook |
 | [docs/ops/incidents.md](ops/incidents.md) | A | active | 2025-12-11 | - | Incident log template |
 | [docs/ops/prod-migration-workflow.md](ops/prod-migration-workflow.md) | A | active | 2026-03-14 | - | Production migration workflow and rollback guidance |
 | [docs/ops/production-signals-dashboard.md](ops/production-signals-dashboard.md) | A | active | 2026-03-14 | - | Operational signals dashboard and thresholds |
 | [docs/ops/release-promotion-checklist.md](ops/release-promotion-checklist.md) | A | active | 2026-03-21 | - | Operational promotion checklist |
-| [docs/ops/README.md](ops/README.md) | A | active | 2025-12-17 | - | Sub-index for operational runbooks and procedures |
+| [docs/ops/README.md](ops/README.md) | A | active | 2026-03-23 | - | Sub-index for operational runbooks and procedures |
 | ~~docs/prompts/README.md~~ | A | archived | 2026-03-15 | - | → `archive/README.md` (prompts dir removed) |
 | [docs/reports/README.md](reports/README.md) | A | draft | 2025-12-18 | - | Index for reports, audits, and historical snapshots |
 | [docs/reports/ADMIN_ACCESS_INVESTIGATION_REPORT.md](reports/ADMIN_ACCESS_INVESTIGATION_REPORT.md) | C | historical snapshot | 2025-12-12 | - | Admin access investigation snapshot |

@@ -25,9 +25,9 @@
 | `launch-readiness/` | 25 | 25 | 0 | 0 |
 | `launch-readiness/audits/` | 36 | 36 | 0 | 0 |
 | `launch-readiness/implementation/` | 11 | 11 | 0 | 0 |
-| `docs/` | ~260 | ~110 | ~130 | ~20 |
-| `docs/ops/` | 6 | 6 | 0 | 0 |
-| **Total** | **~397** | **~225** | **~160** | **~25** |
+| `docs/` | ~261 | ~111 | ~130 | ~20 |
+| `docs/ops/` | 7 | 7 | 0 | 0 |
+| **Total** | **~398** | **~226** | **~160** | **~25** |
 
 ---
 
@@ -86,6 +86,7 @@
 | `platform-operations-implementation-plan.md` | `launch-readiness/` | Operations maturity roadmap | ✅ Current |
 | `production-signals-dashboard.md` | `docs/ops/` | Signal query reference | ✅ Exists |
 | `anomaly-detection-playbook.md` | `docs/ops/` | Alert response procedures | ✅ Exists |
+| `day-1-operations-runbook.md` | `docs/ops/` | Unified launch-day operations entrypoint | ✅ Added 2026-03-23 |
 | `first-deploy-runbook.md` | `docs/ops/` | First deploy procedures | ✅ Exists |
 | `DEVELOPER_SETUP.md` | `docs/toolkit/developer-guide/` | Developer onboarding | ✅ Current (MFA section added 2026-03-15) |
 | `ENVIRONMENT_VARIABLES.md` | `docs/` | Env var documentation | ✅ Verified against `.env.local.example` and `lib/config/env.ts` (2026-03-23) |
@@ -195,7 +196,7 @@ Migration guide filenames listed below were part of the original root-level audi
 
 | Gap | Impact | Priority |
 |-----|--------|----------|
-| **No unified ops runbook** | Incident playbook exists but no "day 1 operations" guide covering who runs signal checks, escalation paths, contact info | Medium |
+| ~~No unified ops runbook~~ | ✅ **Resolved 2026-03-23** — `docs/ops/day-1-operations-runbook.md` now provides the missing top-level launch-day/first-week operations entry flow and links to deploy, signal, anomaly, and incident runbooks without inventing repo-invisible contact details. | Closed |
 | ~~No deploy checklist~~ | ✅ **Resolved 2026-03-23** — `docs/ops/release-promotion-checklist.md` plus `docs/ops/first-deploy-runbook.md` now cover recurring promotion and first-deploy verification. | Closed |
 | **No API reference** | 288 routes, no generated API docs. OpenAPI/Swagger not configured. | Low (post-launch) |
 | **No architecture decision log** | ADRs scattered across launch-control.md §7 and various docs. No single `docs/adr/` directory. | Low |

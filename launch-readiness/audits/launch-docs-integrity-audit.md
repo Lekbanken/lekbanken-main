@@ -37,7 +37,7 @@
 
 | Document | Location | Purpose | Status | Last verified accurate |
 |----------|----------|---------|--------|----------------------|
-| `launch-control.md` | `launch-readiness/` | Master program tracker | ⚠️ Numbers stale | 2026-03-14 (content), 2026-03-12 (metrics) |
+| `launch-control.md` | `launch-readiness/` | Master program tracker | ✅ Current after 2026-03-23 final Tier 1 sync | 2026-03-23 |
 | `launch-readiness-implementation-plan.md` | `launch-readiness/` | Phase roadmap | ✅ Current after 2026-03-23 baseline/docs sync | 2026-03-23 |
 | `launch-readiness-audit-program.md` | `launch-readiness/audits/` | Audit methodology | ✅ Stable | 2026-03-14 (Level 2 methodology added) |
 | `launch-readiness-architecture.md` | `launch-readiness/` | Environment/test/deploy strategy | ✅ Current after 2026-03-23 environment/ops sync | 2026-03-23 |
@@ -48,7 +48,7 @@
 
 | Issue | Document | Detail | Severity |
 |-------|----------|--------|----------|
-| Stale wrapper coverage | `launch-control.md` | Reports 247/287 (86.1%) throughout; actual is 253/288 (87.8%) and 369/410 handlers (90.0%) | Medium |
+| ~~Stale wrapper coverage~~ | `launch-control.md` | ✅ **Resolved 2026-03-23** — active launch-control status surfaces now align with the verified 253/288 file and 369/410 handler coverage baseline. | Closed |
 | ~~Phase 5 labeled "Deferred"~~ | `implementation-plan.md` | ✅ **Resolved 2026-03-23** — plan now reflects completed regression phase. | Closed |
 | ~~Phase 2 labeled "Skipped"~~ | `implementation-plan.md` | ✅ **Resolved 2026-03-23** — plan now describes verified baseline with systematic coverage still deferred. | Closed |
 | ~~Phase 1B items unchecked~~ | `implementation-plan.md` | ✅ **Resolved 2026-03-15** — sub-items were already synced to the implemented sandbox track. | Closed |

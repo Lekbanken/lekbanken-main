@@ -5,14 +5,14 @@
 - Owner: -
 - Status: active
 - Date: 2026-03-13
-- Last updated: 2026-03-22
-- Last validated: 2026-03-22
+- Last updated: 2026-03-23
+- Last validated: 2026-03-23
 
 > Canonical operating summary for the launch-readiness program. Use this file for current status, phase posture, and links into the underlying audit and implementation records.
 
 > **Status:** LAUNCH READY — Post-launch operational phase  
-> **Last updated:** 2026-03-22  
-> **Current Phase:** Post-launch Observe Mode. All phases complete (Phase 2 formal execution skipped; Phase 6 deferred). Awaiting production traffic data.  
+> **Last updated:** 2026-03-23  
+> **Current Phase:** Post-launch Observe Mode. Launch phases are complete for current scope; Phase 2 has a verified local baseline without a standalone program phase, and Phase 6 broad refresh remains deferred beyond active SSoT sync. Awaiting production traffic data.  
 > **Audit index:** `launch-readiness/audits/README.md`
 > **Implementation index:** `launch-readiness/implementation/README.md`
 
@@ -38,7 +38,7 @@ No architectural changes will be implemented before real production traffic has 
 |-------|------|--------|---------|-----------|
 | 0 | Audit Operating Model | ✅ Complete | 2026-03-10 | 2026-03-10 |
 | 1 | Architecture & Environment Strategy | ✅ Complete | 2026-03-10 | 2026-03-11 |
-| 2 | Test Foundation | 🟡 Formal execution skipped; ad-hoc test assets and CI coverage exist | — | — |
+| 2 | Test Foundation | 🟡 Baseline verified; no standalone program phase | — | — |
 | 3 | Domain Audits | ✅ Complete | 2026-03-10 | 2026-03-12 |
 | 4 | Remediation (P0/P1) | ✅ Complete | 2026-03-10 | 2026-03-12 |
 | 5 | Regression Audits | ✅ Complete (per-domain, inline) | 2026-03-14 | 2026-03-14 |
@@ -48,10 +48,10 @@ No architectural changes will be implemented before real production traffic has 
 > **Note:** Phases 3 and 4 ran concurrently per domain: Audit → Implement → Regression before moving to next domain. Phase 1 produced the API wrapper infrastructure and architectural decisions that enabled all subsequent work.
 >
 > **Phase deviations:**
-> - **Phase 2 (Test Foundation):** Formal Phase 2 execution was skipped. Ad-hoc test assets exist (261 test files: 72 unit, 12 E2E specs, RLS tests) and CI runs 7 checks including `tsc --noEmit`. **Baseline verification update (2026-03-22):** `npx vitest run` passed locally, `npm test` passed locally, `supabase start` + `npm run db:reset` succeeded, and the active local RLS harnesses `tests/rls/demo-policies.test.sql` plus `supabase/tests/test_tenant_rls_isolation.sql` passed after aligning the manual tenant script with the current schema. `tests/rls/game-reactions-policies.test.sql` remains a SQL Editor manual script that requires authenticated user context rather than the CI-style container path.
+> - **Phase 2 (Test Foundation):** No standalone Phase 2 program was run, but the baseline is verified. Ad-hoc test assets exist (261 test files: 72 unit, 12 E2E specs, RLS tests) and CI runs 7 checks including `tsc --noEmit`. **Baseline verification update (2026-03-22):** `npx vitest run` passed locally, `npm test` passed locally, `supabase start` + `npm run db:reset` succeeded, and the active local RLS harnesses `tests/rls/demo-policies.test.sql` plus `supabase/tests/test_tenant_rls_isolation.sql` passed after aligning the manual tenant script with the current schema. `tests/rls/game-reactions-policies.test.sql` remains a SQL Editor manual script that requires authenticated user context rather than the CI-style container path.
 - **Playwright baseline (2026-03-22):** local E2E baseline is now verified. Auth/setup drift was removed by aligning the local demo seed with the canonical `DEMO_TENANT_ID`, bypassing non-production in-memory `demo` plus `auth`/`strict` rate-limit interference, and updating planner/profile/login audits to wait on visible app state instead of brittle full-load events. The latest full run (`npx playwright test`) finished at **60 passed / 43 skipped / 0 failed**. The 43 skipped cases remain intentionally excluded clusters, not active red failures.
 > - **Phase 5 (Regression):** ✅ Complete — 16/16 domain regressions executed inline during audit→implement cycle. 4 Level 2 building-block audits completed. All regressions passed. See Regression Progress Summary below.
-> - **Phase 6 (Docs Refresh):** Deferred — documentation kept current during audit cycle. Bulk cleanup of root-level .md files planned post-launch.
+> - **Phase 6 (Docs Refresh):** Deferred as a broad program phase — documentation stayed current during the audit cycle, active SSoT sync has continued, and broader root/Notion cleanup remains post-launch.
 > - **Phase 7 (Release Gate):** Verdict READY issued 2026-03-12 (see §6).
 
 ---
@@ -745,9 +745,9 @@ For the church/youth audience, bottlenecks are expected to hit in this order:
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| Phase 2 — Test Foundation | 🟡 Formal execution skipped | Ad-hoc test assets exist (261 test files, CI runs 7 checks). Formal E2E test investment recommended post-launch. |
+| Phase 2 — Test Foundation | 🟡 Baseline verified | Ad-hoc test assets exist (261 test files, CI runs 7 checks). Local baseline re-verified 2026-03-22; systematic coverage investment remains post-launch. |
 | Phase 5 — Regression Audits | ✅ Complete | 16/16 domain regressions + 4 Level 2 audits completed inline during audit cycle. All passed. |
-| Phase 6 — Documentation Refresh | ⏭️ Deferred | Root-level `.md` cleanup, Notion sync, Atlas annotations. Low risk. |
+| Phase 6 — Documentation Refresh | ⏭️ Deferred | Active SSoT sync complete; broader root-level `.md` cleanup, Notion sync, and residual Atlas/admin documentation work remain low-risk post-launch items. |
 | Phase 1B — Sandbox Strategy | ✅ Implemented | ADR-005 (Alt B remote sandbox) decided and implemented 2026-03-13. DB layer fix applied 2026-03-14 (5/5 permission checks passed). Preview → sandbox isolation verified. See `sandbox-phase-1b.md`. |
 
 ### Completed Milestones (reference)
